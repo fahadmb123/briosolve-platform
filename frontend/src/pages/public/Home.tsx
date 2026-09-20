@@ -1,22 +1,25 @@
+import { useState } from 'react';
 import './Home.css';
 
 
 export default function Home() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
     <>
       
     <div className="app-container sidebar-modal-layout">
         {/*  Sidebar Backdrop Overlay for Modal Mode  */}
-        <div id="sidebar-overlay" className="sidebar-overlay"></div>
+        <div id="sidebar-overlay" className={`sidebar-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
 
         {/*  App Sidebar (Modal Drawer on Home)  */}
-        <aside className="app-sidebar" id="app-sidebar">
+        <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
             <div className="sidebar-brand">
                 <a href="home.html" className="logo">
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
                 </a>
-                <button id="sidebar-close" className="btn-icon sidebar-close-btn" aria-label="Close Sidebar" title="Close Menu">
+                <button id="sidebar-close" className="btn-icon sidebar-close-btn" aria-label="Close Sidebar" title="Close Menu" onClick={() => setIsSidebarOpen(false)}>
                     <i className="fas fa-times"></i>
                 </button>
             </div>
@@ -118,7 +121,7 @@ export default function Home() {
             {/*  App Header  */}
             <header className="app-header">
                 <div className="flex items-center gap-3">
-                    <button id="sidebar-toggle" className="btn-icon" aria-label="Toggle Sidebar" title="Open Menu">
+                    <button id="sidebar-toggle" className="btn-icon" aria-label="Toggle Sidebar" title="Open Menu" onClick={() => setIsSidebarOpen(true)}>
                         <i className="fas fa-bars"></i>
                     </button>
                     <a href="home.html" className="logo">

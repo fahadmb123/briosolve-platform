@@ -3,7 +3,7 @@
    Reverse Service Marketplace - Platform Administration
    ========================================================================== */
 
-:root {
+body.theme-admin {
     --admin-primary: #6366F1;
     --admin-primary-hover: #4F46E5;
     --admin-primary-light: rgba(99, 102, 241, 0.12);
@@ -14,7 +14,7 @@
     --admin-text-header: #FFFFFF;
 }
 
-[data-theme="light"] {
+body.theme-admin[data-theme="light"] {
     --admin-primary: #4F46E5;
     --admin-primary-hover: #4338CA;
     --admin-primary-light: rgba(79, 70, 229, 0.08);

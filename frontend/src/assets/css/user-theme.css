@@ -4,7 +4,7 @@
    Palette: #05AD98 (Primary Teal), #BBBFBF (Silver), #878787 (Slate), #FFFFFF (White)
    ========================================================================== */
 
-:root {
+body.theme-user {
     /* DARK THEME (DEFAULT FOR USER PORTAL) */
     --bg: #0D1316;                 /* Deep Oceanic Charcoal */
     --surface: #131A1F;            /* Sleek Obsidian Slate */
@@ -53,7 +53,7 @@
 }
 
 /* LIGHT THEME USING EXACT PALETTE TOKENS: #FFFFFF, #BBBFBF, #878787, #05AD98 */
-[data-theme="light"] {
+body.theme-user[data-theme="light"] {
     --bg: #F5F8F8;                 /* Crisp Pure Canvas */
     --surface: #FFFFFF;            /* #FFFFFF Pure White */
     --surface-elevated: #EBF1F1;   /* Soft Silver Mist */

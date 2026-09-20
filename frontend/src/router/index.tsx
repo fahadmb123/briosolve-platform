@@ -1,5 +1,5 @@
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
-import React from 'react';
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
 
 // Phase 1: Public Pages (Placeholders for now)
 const Home = React.lazy(() => import('../pages/public/Home'));
@@ -16,11 +16,26 @@ const CustomerProfile = React.lazy(() => import('../pages/customer/Profile'));
 const CustomerSettings = React.lazy(() => import('../pages/customer/Settings'));
 const CustomerNotifications = React.lazy(() => import('../pages/customer/Notifications'));
 
+function ThemeManager() {
+  const location = useLocation();
+  useEffect(() => {
+    let themeClass = 'theme-user';
+    if (location.pathname.startsWith('/admin')) {
+      themeClass = 'theme-admin';
+    } else if (location.pathname.startsWith('/provider')) {
+      themeClass = 'theme-provider';
+    }
+    document.body.className = themeClass;
+  }, [location.pathname]);
+  return null;
+}
+
 const router = createBrowserRouter([
   {
     path: '/',
     element: (
       <React.Suspense fallback={<div>Loading...</div>}>
+        <ThemeManager />
         <Outlet />
       </React.Suspense>
     ),

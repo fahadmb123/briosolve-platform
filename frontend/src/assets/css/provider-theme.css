@@ -9,7 +9,7 @@
      #E9E6E7 - Soft Warm Platinum (Crisp Typography & Light Canvas)
    ========================================================================== */
 
-:root {
+body.theme-provider {
     /* DARK THEME (DEFAULT FOR PROVIDER PORTAL) */
     --bg: #111317;                 /* Deep Industrial Slate */
     --surface: #171A20;            /* Charcoal Slate Surface */
@@ -57,7 +57,7 @@
 }
 
 /* LIGHT THEME USING EXACT PALETTE: #E9E6E7, #5E5653, #7B7F8A, #AB978C, #6B7C98 */
-[data-theme="light"] {
+body.theme-provider[data-theme="light"] {
     --bg: #F4F3F3;                 /* Tinted #E9E6E7 light canvas */
     --surface: #FFFFFF;            /* Pure Crisp White */
     --surface-elevated: #E9E6E7;   /* #E9E6E7 Soft Warm Platinum */
