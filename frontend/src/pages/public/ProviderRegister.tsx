@@ -1,4 +1,5 @@
-import React from 'react';
+import './ProviderRegister.css';
+
 
 export default function ProviderRegister() {
   return (
@@ -192,7 +193,7 @@ export default function ProviderRegister() {
                     {/*  Short Professional Bio  */}
                     <div className="form-group mb-0">
                         <label className="form-label" htmlFor="pro-bio">Professional Overview / Pitch to Clients</label>
-                        <textarea id="pro-bio" className="form-control" rows="3" placeholder="Tell clients why they should choose your quotation...">Certified HVAC and licensed sanitary technician with 10+ years serving Mumbai residential complexes. Equipped with acoustic leak detectors and precision manifold gauges. Committed to transparent pricing and up to 180-day service warranties.</textarea>
+                        <textarea id="pro-bio" className="form-control" rows={3} placeholder="Tell clients why they should choose your quotation...">Certified HVAC and licensed sanitary technician with 10+ years serving Mumbai residential complexes. Equipped with acoustic leak detectors and precision manifold gauges. Committed to transparent pricing and up to 180-day service warranties.</textarea>
                     </div>
                     
                     <div className="flex justify-between mt-5 pt-4 border-top">

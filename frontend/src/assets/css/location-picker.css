@@ -1,0 +1,457 @@
+/* ==========================================================================
+   Location Picker Component Styles (Leaflet & OpenStreetMap Compatible)
+   ========================================================================== */
+
+.location-picker-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    position: relative;
+}
+
+/* Search Bar & Auto-Suggestions */
+.loc-search-box {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0.875rem;
+}
+
+.loc-search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.loc-search-input-wrapper i.search-icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    pointer-events: none;
+}
+
+.loc-search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.625rem;
+    background-color: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+}
+
+.loc-search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* Dropdown Suggestions List */
+.loc-suggestions-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background-color: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    max-height: 240px;
+    overflow-y: auto;
+    display: none;
+}
+
+.loc-suggestions-list.active {
+    display: block;
+}
+
+.loc-suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background-color var(--transition-fast);
+}
+
+.loc-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.loc-suggestion-item:hover {
+    background-color: var(--surface-elevated);
+}
+
+.loc-suggestion-item i {
+    color: var(--primary);
+    font-size: 0.9375rem;
+    flex-shrink: 0;
+}
+
+.loc-suggestion-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.loc-suggestion-sub {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+
+/* Action Controls Bar */
+.loc-controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.875rem;
+}
+
+.btn-current-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-elevated);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-current-location:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-current-location i {
+    color: var(--primary);
+}
+
+/* Status Notifications */
+.loc-status-feedback {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.875rem;
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.loc-status-feedback.active {
+    display: flex;
+}
+
+.loc-status-loading {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    color: #3B82F6;
+}
+
+.loc-status-success {
+    background-color: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    color: #22C55E;
+}
+
+.loc-status-denied,
+.loc-status-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #EF4444;
+}
+
+/* Map Container */
+.loc-map-container {
+    width: 100%;
+    height: 240px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+    background-color: #1a222d;
+}
+
+/* Dark mode styling for Leaflet OpenStreetMap tiles */
+.leaflet-container {
+    width: 100%;
+    height: 100%;
+    font-family: inherit;
+    background: #111827;
+}
+
+[data-theme="dark"] .leaflet-tile,
+body:not([data-theme="light"]) .leaflet-tile {
+    filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.35);
+}
+
+.leaflet-control-zoom {
+    border: 1px solid var(--border) !important;
+    border-radius: 6px !important;
+    overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+    background-color: var(--surface) !important;
+    color: var(--text) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background-color: var(--surface-elevated) !important;
+}
+
+/* Custom Pin Marker */
+.custom-map-marker-pin {
+    width: 32px;
+    height: 32px;
+    background-color: #EF4444;
+    border: 2px solid #FFFFFF;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-map-marker-pin::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    position: absolute;
+}
+
+/* Selected Location Preview Box */
+.selected-location-box {
+    background-color: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.selected-loc-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.selected-loc-icon {
+    font-size: 1.25rem;
+    color: var(--primary);
+    margin-top: 2px;
+}
+
+.selected-loc-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+}
+
+.selected-loc-sub {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.selected-loc-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Provider Radius Slider Controls */
+.provider-radius-section {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+}
+
+.radius-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.radius-val-display {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.radius-range-input {
+    width: 100%;
+    height: 6px;
+    background-color: var(--surface-elevated);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.radius-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform var(--transition-fast);
+}
+
+.radius-range-input::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.radius-markers {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.radius-coverage-statement {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+/* Mini Map Thumbnail (for details & profile cards) */
+.mini-map-preview {
+    width: 100%;
+    height: 140px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+    background-color: #1a222d;
+    margin-bottom: 0.75rem;
+}
+
+.mini-map-overlay-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: var(--text);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ==========================================================================
+   Universal Modal Dialog for Location Picker (Customer & Provider Portals)
+   ========================================================================== */
+
+.loc-modal-overlay,
+.admin-modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(6px) !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99999 !important;
+    padding: 1.5rem !important;
+    box-sizing: border-box !important;
+}
+
+.loc-modal-overlay.active,
+.admin-modal-overlay.active {
+    display: flex !important;
+}
+
+.loc-modal,
+.admin-modal {
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+    width: 100% !important;
+    max-width: 600px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    animation: locModalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    margin: auto !important;
+}
+
+@keyframes locModalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.loc-modal-header,
+.admin-modal-header {
+    padding: 1rem 1.25rem !important;
+    border-bottom: 1px solid var(--border) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background-color: var(--surface) !important;
+}
+
+.loc-modal-body,
+.admin-modal-body {
+    padding: 1.25rem !important;
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+}
+
+.loc-modal-footer,
+.admin-modal-footer {
+    padding: 1rem 1.25rem !important;
+    border-top: 1px solid var(--border) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
+    background-color: var(--surface-elevated) !important;
+}
+

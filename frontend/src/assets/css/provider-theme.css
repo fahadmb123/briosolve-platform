@@ -1,0 +1,181 @@
+/* ==========================================================================
+   Service Provider Portal Theme — Steel Slate Blue & Warm Bronze Taupe
+   Reverse Service Marketplace (Provider Experience)
+   Palette:
+     #6B7C98 - Steel Slate Blue (Primary Brand)
+     #AB978C - Warm Bronze Taupe (Secondary Warm Accent)
+     #7B7F8A - Steel Slate Grey (Borders & Muted Details)
+     #5E5653 - Deep Umber Charcoal (Structure Tone)
+     #E9E6E7 - Soft Warm Platinum (Crisp Typography & Light Canvas)
+   ========================================================================== */
+
+:root {
+    /* DARK THEME (DEFAULT FOR PROVIDER PORTAL) */
+    --bg: #111317;                 /* Deep Industrial Slate */
+    --surface: #171A20;            /* Charcoal Slate Surface */
+    --surface-elevated: #20242D;   /* Elevated Card Surface */
+    --surface-hover: #292E39;      /* Interactive Hover */
+
+    --text: #E9E6E7;               /* #E9E6E7 Soft Warm Platinum White */
+    --text-secondary: #B4B9C2;     /* Tinted #7B7F8A for readable secondary copy */
+    --text-muted: #7B7F8A;         /* #7B7F8A Steel Slate Grey */
+
+    --border: #2B303B;             /* Steel Slate Border */
+    --border-light: #39404E;       /* Sub-border / Card Divider */
+
+    /* Palette Hero Accent: #6B7C98 (Steel Slate Blue) */
+    --primary: #6B7C98;
+    --primary-hover: #576781;
+    --primary-active: #47546A;
+    --primary-light: rgba(107, 124, 152, 0.16);
+
+    /* Palette Secondary Accent: #AB978C (Warm Bronze Taupe) */
+    --accent-taupe: #AB978C;
+    --accent-taupe-hover: #968378;
+    --accent-taupe-light: rgba(171, 151, 140, 0.16);
+
+    /* Gradients */
+    --gradient-provider: linear-gradient(135deg, #6B7C98 0%, #52637D 100%);
+    --gradient-provider-subtle: linear-gradient(135deg, rgba(107, 124, 152, 0.16) 0%, rgba(171, 151, 140, 0.1) 100%);
+    --gradient-taupe: linear-gradient(135deg, #AB978C 0%, #8C7A70 100%);
+
+    /* Status Colors */
+    --success: #22C55E;
+    --success-bg: rgba(34, 197, 94, 0.12);
+    --warning: #AB978C;            /* Styled with warm bronze taupe */
+    --warning-bg: rgba(171, 151, 140, 0.16);
+    --danger: #EF4444;
+    --danger-bg: rgba(239, 68, 68, 0.12);
+    --info: #6B7C98;
+    --info-bg: rgba(107, 124, 152, 0.16);
+
+    /* Refined Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.45), 0 2px 6px -1px rgba(107, 124, 152, 0.08);
+    --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.55), 0 4px 12px -2px rgba(107, 124, 152, 0.12);
+    --shadow-xl: 0 20px 32px -6px rgba(0, 0, 0, 0.65), 0 8px 16px -3px rgba(107, 124, 152, 0.18);
+}
+
+/* LIGHT THEME USING EXACT PALETTE: #E9E6E7, #5E5653, #7B7F8A, #AB978C, #6B7C98 */
+[data-theme="light"] {
+    --bg: #F4F3F3;                 /* Tinted #E9E6E7 light canvas */
+    --surface: #FFFFFF;            /* Pure Crisp White */
+    --surface-elevated: #E9E6E7;   /* #E9E6E7 Soft Warm Platinum */
+    --surface-hover: #DDD8D8;
+
+    --text: #2A2523;               /* Deep Umber Black derived from #5E5653 */
+    --text-secondary: #5E5653;     /* #5E5653 Umber Charcoal */
+    --text-muted: #7B7F8A;         /* #7B7F8A Slate Grey */
+
+    --border: #D6D2D2;             /* Warm Platinum Border */
+    --border-light: #E4E0E0;
+
+    --primary: #576781;            /* Deepened #6B7C98 for contrast on light */
+    --primary-hover: #47546A;
+    --primary-active: #374254;
+    --primary-light: rgba(87, 103, 129, 0.12);
+
+    --accent-taupe: #8C7A70;
+    --accent-taupe-light: rgba(140, 122, 112, 0.12);
+
+    --shadow-sm: 0 1px 2px 0 rgba(42, 37, 35, 0.05);
+    --shadow-md: 0 4px 8px -1px rgba(42, 37, 35, 0.08), 0 2px 4px -1px rgba(107, 124, 152, 0.04);
+    --shadow-lg: 0 12px 20px -3px rgba(42, 37, 35, 0.1), 0 4px 8px -2px rgba(107, 124, 152, 0.06);
+}
+
+/* ==========================================================================
+   Provider Component Refinements
+   ========================================================================== */
+
+/* Primary Button in Provider Portal */
+.btn-primary {
+    background: var(--gradient-provider);
+    border-color: transparent;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px 0 rgba(107, 124, 152, 0.35);
+    transition: all var(--transition-fast);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #576781 0%, #435166 100%);
+    box-shadow: 0 6px 20px 0 rgba(107, 124, 152, 0.5);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px 0 rgba(107, 124, 152, 0.3);
+}
+
+/* Active Sidebar Navigation Item */
+.sidebar-item.active {
+    background: linear-gradient(135deg, rgba(107, 124, 152, 0.2) 0%, rgba(171, 151, 140, 0.12) 100%);
+    color: #9DB0CC;
+    border-left: 3px solid var(--primary);
+    font-weight: 600;
+}
+
+[data-theme="light"] .sidebar-item.active {
+    color: var(--primary);
+}
+
+.sidebar-item:hover {
+    background-color: var(--surface-hover);
+    color: var(--text);
+}
+
+/* Primary & Taupe Badges */
+.badge-primary {
+    background: rgba(107, 124, 152, 0.18);
+    color: #9DB0CC;
+    border: 1px solid rgba(107, 124, 152, 0.35);
+}
+
+[data-theme="light"] .badge-primary {
+    background: rgba(87, 103, 129, 0.12);
+    color: #576781;
+    border-color: rgba(87, 103, 129, 0.25);
+}
+
+.badge-warning, .badge-taupe {
+    background: rgba(171, 151, 140, 0.18);
+    color: #C8B7AD;
+    border: 1px solid rgba(171, 151, 140, 0.35);
+}
+
+[data-theme="light"] .badge-warning, [data-theme="light"] .badge-taupe {
+    background: rgba(140, 122, 112, 0.12);
+    color: #8C7A70;
+    border-color: rgba(140, 122, 112, 0.25);
+}
+
+/* Gradient Text Effect in Provider Portal */
+.gradient-text {
+    background: linear-gradient(135deg, #9DB0CC 0%, #AB978C 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* Form Controls Focus State */
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(107, 124, 152, 0.25);
+}
+
+/* Notification Badge */
+.notif-badge-count {
+    background: var(--primary);
+}
+
+/* Pro Verification & Level Badges */
+.level-badge, .pro-badge {
+    background: linear-gradient(135deg, #6B7C98 0%, #AB978C 100%);
+    color: #FFFFFF;
+}
+
+/* Hover Cards */
+.request-lead-card:hover, .opportunity-card:hover, .stat-widget-card:hover {
+    border-color: rgba(107, 124, 152, 0.45);
+    box-shadow: 0 8px 24px -4px rgba(107, 124, 152, 0.15);
+}

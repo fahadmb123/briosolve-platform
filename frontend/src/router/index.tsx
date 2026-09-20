@@ -10,6 +10,12 @@ const ForgotPassword = React.lazy(() => import('../pages/public/ForgotPassword')
 const ResetPassword = React.lazy(() => import('../pages/public/ResetPassword'));
 const EmailVerification = React.lazy(() => import('../pages/public/EmailVerification'));
 
+// Phase 2: Customer Pages
+const CustomerDashboard = React.lazy(() => import('../pages/customer/Dashboard'));
+const CustomerProfile = React.lazy(() => import('../pages/customer/Profile'));
+const CustomerSettings = React.lazy(() => import('../pages/customer/Settings'));
+const CustomerNotifications = React.lazy(() => import('../pages/customer/Notifications'));
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -26,6 +32,17 @@ const router = createBrowserRouter([
       { path: 'forgot-password', element: <ForgotPassword /> },
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'email-verification', element: <EmailVerification /> },
+      
+      // Customer Routes
+      {
+        path: 'customer',
+        children: [
+          { path: 'dashboard', element: <CustomerDashboard /> },
+          { path: 'profile', element: <CustomerProfile /> },
+          { path: 'settings', element: <CustomerSettings /> },
+          { path: 'notifications', element: <CustomerNotifications /> },
+        ]
+      }
     ],
   },
 ]);

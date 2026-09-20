@@ -1,0 +1,179 @@
+/* ==========================================================================
+   Customer / User Side Theme — Emerald Teal, Silver Grey & Pure White
+   Reverse Service Marketplace (Consumer Experience)
+   Palette: #05AD98 (Primary Teal), #BBBFBF (Silver), #878787 (Slate), #FFFFFF (White)
+   ========================================================================== */
+
+:root {
+    /* DARK THEME (DEFAULT FOR USER PORTAL) */
+    --bg: #0D1316;                 /* Deep Oceanic Charcoal */
+    --surface: #131A1F;            /* Sleek Obsidian Slate */
+    --surface-elevated: #1A242B;   /* Elevated Card Surface */
+    --surface-hover: #222E37;      /* Interactive Hover */
+
+    --text: #FFFFFF;               /* #FFFFFF Pure White */
+    --text-secondary: #BBBFBF;     /* #BBBFBF Soft Silver Grey */
+    --text-muted: #878787;         /* #878787 Medium Slate Grey */
+
+    --border: #233038;             /* Subtle Teal-tinted Dark Border */
+    --border-light: #32444E;       /* Sub-border / Divider */
+
+    /* Palette Core Accent: #05AD98 (Vibrant Emerald Teal) */
+    --primary: #05AD98;
+    --primary-hover: #049381;
+    --primary-active: #037A6B;
+    --primary-light: rgba(5, 173, 152, 0.16);
+
+    /* Secondary Palette Neutrals */
+    --accent-teal: #05AD98;
+    --accent-silver: #BBBFBF;
+    --accent-slate: #878787;
+    --accent-teal-glow: rgba(5, 173, 152, 0.35);
+
+    /* Mixed Gradient Tokens */
+    --gradient-teal: linear-gradient(135deg, #05AD98 0%, #00DDB3 100%);
+    --gradient-teal-subtle: linear-gradient(135deg, rgba(5, 173, 152, 0.15) 0%, rgba(187, 191, 191, 0.08) 100%);
+    --gradient-teal-border: linear-gradient(135deg, rgba(5, 173, 152, 0.45) 0%, rgba(187, 191, 191, 0.25) 100%);
+
+    /* Status Colors */
+    --success: #05AD98;
+    --success-bg: rgba(5, 173, 152, 0.15);
+    --warning: #F59E0B;
+    --warning-bg: rgba(245, 158, 11, 0.12);
+    --danger: #EF4444;
+    --danger-bg: rgba(239, 68, 68, 0.12);
+    --info: #0EA5E9;
+    --info-bg: rgba(14, 165, 233, 0.12);
+
+    /* Enhanced Soft Teal Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.45), 0 2px 6px -1px rgba(5, 173, 152, 0.08);
+    --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.55), 0 4px 12px -2px rgba(5, 173, 152, 0.12);
+    --shadow-xl: 0 20px 32px -6px rgba(0, 0, 0, 0.65), 0 8px 16px -3px rgba(5, 173, 152, 0.18);
+}
+
+/* LIGHT THEME USING EXACT PALETTE TOKENS: #FFFFFF, #BBBFBF, #878787, #05AD98 */
+[data-theme="light"] {
+    --bg: #F5F8F8;                 /* Crisp Pure Canvas */
+    --surface: #FFFFFF;            /* #FFFFFF Pure White */
+    --surface-elevated: #EBF1F1;   /* Soft Silver Mist */
+    --surface-hover: #DFE8E8;
+
+    --text: #11181C;               /* Dark Slate */
+    --text-secondary: #58636A;     /* Deepened #878787 for high contrast */
+    --text-muted: #878787;         /* #878787 */
+
+    --border: #D3DCDE;             /* Tinted #BBBFBF */
+    --border-light: #E2EAEC;
+
+    --primary: #05AD98;            /* #05AD98 */
+    --primary-hover: #049381;
+    --primary-active: #037A6B;
+    --primary-light: rgba(5, 173, 152, 0.12);
+
+    --accent-teal-glow: rgba(5, 173, 152, 0.2);
+
+    --shadow-sm: 0 1px 2px 0 rgba(17, 24, 28, 0.05);
+    --shadow-md: 0 4px 8px -1px rgba(17, 24, 28, 0.08), 0 2px 4px -1px rgba(5, 173, 152, 0.04);
+    --shadow-lg: 0 12px 20px -3px rgba(17, 24, 28, 0.1), 0 4px 8px -2px rgba(5, 173, 152, 0.06);
+}
+
+/* ==========================================================================
+   User Component Refinements: Emerald Teal #05AD98 Glow & Modern Accents
+   ========================================================================== */
+
+/* Primary Button: Gradient of #05AD98 */
+.btn-primary {
+    background: var(--gradient-teal);
+    border-color: transparent;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px 0 rgba(5, 173, 152, 0.35);
+    transition: all var(--transition-fast);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #049381 0%, #00B591 100%);
+    box-shadow: 0 6px 20px 0 rgba(5, 173, 152, 0.5);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px 0 rgba(5, 173, 152, 0.3);
+}
+
+/* Active Sidebar Items in User Portal */
+.sidebar-item.active {
+    background: linear-gradient(135deg, rgba(5, 173, 152, 0.18) 0%, rgba(187, 191, 191, 0.08) 100%);
+    color: #05AD98;
+    border-left: 3px solid #05AD98;
+    font-weight: 600;
+}
+
+.sidebar-item:hover {
+    background-color: var(--surface-hover);
+    color: var(--text);
+}
+
+/* Primary Badges */
+.badge-primary {
+    background: rgba(5, 173, 152, 0.16);
+    color: #05AD98;
+    border: 1px solid rgba(5, 173, 152, 0.35);
+}
+
+[data-theme="light"] .badge-primary {
+    background: rgba(5, 173, 152, 0.12);
+    color: #049381;
+    border-color: rgba(5, 173, 152, 0.25);
+}
+
+/* Gradient Text Effect in User Portal */
+.gradient-text {
+    background: var(--gradient-teal);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* Ambient Hero Glow for User Portal */
+.hero-ambient-glow {
+    background: radial-gradient(circle, rgba(5, 173, 152, 0.22) 0%, rgba(0, 221, 179, 0.12) 35%, rgba(13, 19, 22, 0) 70%) !important;
+}
+
+[data-theme="light"] .hero-ambient-glow {
+    background: radial-gradient(circle, rgba(5, 173, 152, 0.14) 0%, rgba(0, 221, 179, 0.08) 35%, rgba(245, 248, 248, 0) 70%) !important;
+}
+
+/* Pill Badges in Hero */
+.hero-pill-badge {
+    background: linear-gradient(135deg, rgba(5, 173, 152, 0.15) 0%, rgba(187, 191, 191, 0.1) 100%) !important;
+    border: 1px solid rgba(5, 173, 152, 0.35) !important;
+    color: #05AD98 !important;
+}
+
+[data-theme="light"] .hero-pill-badge {
+    color: #049381 !important;
+}
+
+.pulse-dot {
+    background-color: var(--primary) !important;
+    box-shadow: 0 0 0 0 rgba(5, 173, 152, 0.7) !important;
+}
+
+/* Form Controls Focus Glow */
+.form-control:focus, .search-modern-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(5, 173, 152, 0.25);
+}
+
+/* User Notification Badge */
+.notif-badge-count {
+    background: var(--gradient-teal);
+}
+
+/* Interactive Category Cards & Bento Highlights */
+.bento-card:hover, .category-card-pro:hover, .trend-category-card:hover {
+    border-color: rgba(5, 173, 152, 0.4);
+    box-shadow: 0 8px 24px -4px rgba(5, 173, 152, 0.15);
+}

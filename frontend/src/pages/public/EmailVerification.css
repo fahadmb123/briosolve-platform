@@ -1,0 +1,137 @@
+/* ==========================================================================
+   Email Verification Page Styles
+   Palette: Oceanic Charcoal, Obsidian Slate, Emerald Teal (#05AD98)
+   ========================================================================== */
+
+.auth-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    position: relative;
+    background: radial-gradient(circle at 50% 25%, rgba(5, 173, 152, 0.08) 0%, transparent 60%), var(--bg);
+}
+
+.auth-theme-toggle {
+    position: absolute;
+    top: 1.75rem;
+    right: 1.75rem;
+    z-index: 50;
+}
+
+.auth-card-container {
+    width: 100%;
+    max-width: 460px;
+    animation: authFadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes authFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-card {
+    padding: 2.5rem 2rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+}
+
+.verify-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.verify-icon-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-full);
+    background-color: var(--primary-light);
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.875rem;
+    position: relative;
+    z-index: 2;
+    border: 2px solid rgba(5, 173, 152, 0.35);
+    box-shadow: 0 0 20px rgba(5, 173, 152, 0.25);
+}
+
+.verify-icon-pulse {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border-radius: var(--radius-full);
+    background: rgba(5, 173, 152, 0.2);
+    z-index: 1;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.15); opacity: 0.2; }
+}
+
+.user-email-chip {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--surface-elevated);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+}
+
+.instruction-box {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+.text-left {
+    text-align: left;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.pt-5 {
+    padding-top: 1.25rem;
+}
+
+.mr-1 {
+    margin-right: 0.25rem;
+}
+
+.ml-1 {
+    margin-left: 0.25rem;
+}
+
+.back-link {
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: color var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+}
+
+.back-link:hover {
+    color: var(--primary);
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 1.75rem 1.25rem;
+    }
+}

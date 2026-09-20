@@ -1,0 +1,174 @@
+/* ==========================================================================
+   Customer Settings Page Styles
+   ========================================================================== */
+
+/* App Sidebar Specifics */
+.sidebar-brand {
+    height: var(--navbar-height);
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-menu-wrapper {
+    padding: 1.25rem 0.875rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.menu-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.sidebar-item:hover {
+    background-color: var(--surface-hover);
+    color: var(--text);
+}
+
+.sidebar-item.active {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.sidebar-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* Theme Selection Cards */
+.theme-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.theme-card {
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-elevated);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.theme-card:hover {
+    border-color: var(--border-light);
+}
+
+.theme-card.active {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.theme-preview {
+    height: 48px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+.dark-preview {
+    background-color: #0B0F14;
+}
+
+.light-preview {
+    background-color: #F8FAFC;
+}
+
+/* Toggle Switch Component */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--surface-elevated);
+    border: 1px solid var(--border);
+    transition: var(--transition-fast);
+    border-radius: var(--radius-full);
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text-secondary);
+    transition: var(--transition-fast);
+    border-radius: var(--radius-full);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+    background-color: #ffffff;
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.border-danger {
+    border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.p-6 { padding: 1.5rem 1.75rem; }
+.mr-1 { margin-right: 0.25rem; }
+.mx-2 { margin-left: 0.5rem; margin-right: 0.5rem; }
+
+@media (max-width: 600px) {
+    .theme-options-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-row-2 {
+        grid-template-columns: 1fr;
+    }
+}

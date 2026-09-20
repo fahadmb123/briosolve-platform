@@ -1,0 +1,143 @@
+/* ==========================================================================
+   Login Page Styles — Customer Portal
+   Palette: Oceanic Charcoal, Obsidian Slate, Emerald Teal (#05AD98)
+   ========================================================================== */
+
+.auth-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    position: relative;
+    background: radial-gradient(circle at 50% 20%, rgba(5, 173, 152, 0.08) 0%, transparent 60%), var(--bg);
+}
+
+.auth-theme-toggle {
+    position: absolute;
+    top: 1.75rem;
+    right: 1.75rem;
+    z-index: 50;
+}
+
+.auth-card-container {
+    width: 100%;
+    max-width: 440px;
+    animation: authFadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes authFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-card {
+    padding: 2.5rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+}
+
+.role-info-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-light);
+    border: 1px solid rgba(5, 173, 152, 0.3);
+    border-radius: var(--radius-md);
+    line-height: 1.45;
+}
+
+.role-info-banner i {
+    font-size: 1rem;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+    color: var(--primary);
+}
+
+.w-full {
+    width: 100%;
+}
+
+.pt-5 {
+    padding-top: 1.25rem;
+}
+
+.ml-1 {
+    margin-left: 0.25rem;
+}
+
+/* Custom Checkbox */
+.checkbox-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    background-color: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 0 8px rgba(5, 173, 152, 0.4);
+}
+
+.checkmark:after {
+    content: "";
+    display: none;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-bottom: 2px;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.provider-cta-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--surface-elevated);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 1.75rem 1.25rem;
+    }
+}

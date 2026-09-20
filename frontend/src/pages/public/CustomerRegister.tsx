@@ -1,4 +1,5 @@
-import React from 'react';
+import './CustomerRegister.css';
+
 
 export default function CustomerRegister() {
   return (

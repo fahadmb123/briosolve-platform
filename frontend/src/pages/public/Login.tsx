@@ -1,4 +1,5 @@
-import React from 'react';
+import './Login.css';
+
 
 export default function Login() {
   return (
@@ -45,7 +46,7 @@ export default function Login() {
                             <label className="form-label" htmlFor="login-otp">Verification Code (Check Email)</label>
                             <div className="input-icon-wrapper">
                                 <i className="fas fa-key"></i>
-                                <input type="text" id="login-otp" className="form-control" placeholder="e.g. 123456" maxlength="6" />
+                                <input type="text" id="login-otp" className="form-control" placeholder="e.g. 123456" maxLength={6} />
                             </div>
                         </div>
 
