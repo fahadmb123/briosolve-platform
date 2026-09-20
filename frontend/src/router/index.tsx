@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import React, { useEffect } from 'react';
 
 
@@ -43,7 +43,7 @@ export function AppRouter() {
             {publicRoutes}
             
             
-            <Route path="customer" element={<CustomerLayout />}>
+            <Route element={<CustomerLayout />}>
               {customerRoutes}
             </Route>
             
@@ -61,6 +61,9 @@ export function AppRouter() {
             <Route path="investigator" element={<InvestigatorLayout />}>
               {investigatorRoutes}
             </Route>
+
+            {/* Fallback for invalid URLs */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
       </React.Suspense>

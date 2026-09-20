@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 
+import { Link } from 'react-router-dom';
 export default function Dashboard() {
   return (
     <>
@@ -12,12 +13,12 @@ export default function Dashboard() {
                         <p className="text-secondary text-xs mb-0">Platform health, marketplace metrics, and pending governance actions.</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <a href="../verification/verification.html" className="btn btn-warning text-xs">
+                        <Link to="/admin/verification" className="btn btn-warning text-xs">
                             <i className="fas fa-user-check mr-1"></i>18 Verifications Pending
-                        </a>
-                        <a href="../investigations/investigations.html" className="btn btn-danger text-xs">
+                        </Link>
+                        <Link to="#" className="btn btn-danger text-xs">
                             <i className="fas fa-gavel mr-1"></i>4 Open Investigations
-                        </a>
+                        </Link>
                     </div>
                 </div>
 
@@ -153,7 +154,7 @@ export default function Dashboard() {
                         <div className="card p-5 mb-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="h5 mb-0"><i className="fas fa-bolt text-warning mr-2"></i>Recent Platform Activity</h2>
-                                <a href="../audit-logs/audit-logs.html" className="text-xs text-primary font-medium">View Full Audit Log <i className="fas fa-arrow-right ml-1"></i></a>
+                                <Link to="#" className="text-xs text-primary font-medium">View Full Audit Log <i className="fas fa-arrow-right ml-1"></i></Link>
                             </div>
 
                             <div className="activity-feed-list">
@@ -279,7 +280,7 @@ export default function Dashboard() {
                                     </div>
                                     <div className="text-xs text-secondary mt-1">Master Electrician • 2 documents</div>
                                 </div>
-                                <a href="../verification/verification.html" className="btn btn-secondary text-xs">Review</a>
+                                <Link to="/admin/verification" className="btn btn-secondary text-xs">Review</Link>
                             </div>
 
                             
@@ -291,7 +292,7 @@ export default function Dashboard() {
                                     </div>
                                     <div className="text-xs text-secondary mt-1">HVAC Technician • 3 documents</div>
                                 </div>
-                                <a href="../verification/verification.html" className="btn btn-secondary text-xs">Review</a>
+                                <Link to="/admin/verification" className="btn btn-secondary text-xs">Review</Link>
                             </div>
 
                             
@@ -303,7 +304,7 @@ export default function Dashboard() {
                                     </div>
                                     <div className="text-xs text-secondary mt-1">AC Gas Refill Warranty Breach</div>
                                 </div>
-                                <a href="../investigations/investigations.html" className="btn btn-secondary text-xs">Investigate</a>
+                                <Link to="#" className="btn btn-secondary text-xs">Investigate</Link>
                             </div>
 
                             
@@ -315,7 +316,7 @@ export default function Dashboard() {
                                     </div>
                                     <div className="text-xs text-secondary mt-1">Aggressive claim regarding delay</div>
                                 </div>
-                                <a href="../reviews/reviews.html" className="btn btn-secondary text-xs">Moderate</a>
+                                <Link to="#" className="btn btn-secondary text-xs">Moderate</Link>
                             </div>
 
                             
@@ -327,13 +328,13 @@ export default function Dashboard() {
                                     </div>
                                     <div className="text-xs text-secondary mt-1">Rapid quote spam detected</div>
                                 </div>
-                                <a href="../users/users.html" className="btn btn-secondary text-xs">Inspect</a>
+                                <Link to="/admin/users" className="btn btn-secondary text-xs">Inspect</Link>
                             </div>
 
                             <div className="mt-4 pt-3 border-top text-center">
-                                <a href="../audit-logs/audit-logs.html" className="text-xs text-muted hover:text-text">
+                                <Link to="#" className="text-xs text-muted hover:text-text">
                                     <i className="fas fa-shield-alt mr-1"></i>Security Audit Log Status: Active
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>

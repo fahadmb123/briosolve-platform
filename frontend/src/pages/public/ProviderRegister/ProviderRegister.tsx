@@ -1,6 +1,7 @@
 import './ProviderRegister.css';
 
 
+import { Link } from 'react-router-dom';
 export default function ProviderRegister() {
   return (
     <>
@@ -8,17 +9,17 @@ export default function ProviderRegister() {
     <div className="register-pro-wrapper">
         
         <header className="register-pro-header">
-            <a href="../../user/home/home.html" className="logo">
+            <Link to="/" className="logo">
                 <i className="fas fa-tools text-primary"></i>
                 <span>ReverseMarket <small className="text-xs text-primary font-bold ml-1">PRO</small></span>
-            </a>
+            </Link>
             <div className="flex items-center gap-4">
                 <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
                     <i className="fas fa-sun"></i>
                 </button>
                 <div className="text-xs text-secondary">
                     Already registered?
-                    <a href="../../user/login/login.html" className="font-bold text-primary ml-1">Sign In</a>
+                    <Link to="/login" className="font-bold text-primary ml-1">Sign In</Link>
                 </div>
             </div>
         </header>
@@ -318,7 +319,7 @@ export default function ProviderRegister() {
                     <div className="register-actions-footer bg-transparent p-0 border-0">
                         <label className="flex items-center gap-2 cursor-pointer text-xs text-secondary w-full justify-center mb-4">
                             <input type="checkbox" id="accept-terms" required checked className="w-4 h-4 accent-primary" />
-                            <span>I accept the ReverseMarket <a href="../../user/terms/terms.html" className="underline text-primary">Provider Service Terms</a></span>
+                            <span>I accept the ReverseMarket <Link to="#" className="underline text-primary">Provider Service Terms</Link></span>
                         </label>
 
                         <div className="flex gap-3 w-full max-w-md mx-auto">
@@ -332,7 +333,7 @@ export default function ProviderRegister() {
 
                         <div className="text-xs text-secondary text-center mt-4 w-full">
                             Already have an account?
-                            <a href="../../user/login/login.html" className="font-bold text-primary ml-1">Login to Portal</a>
+                            <Link to="/login" className="font-bold text-primary ml-1">Login to Portal</Link>
                         </div>
                     </div>
                 </div>

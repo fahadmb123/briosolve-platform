@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 
+import { Link } from 'react-router-dom';
 export default function Dashboard() {
   return (
     <>
@@ -61,9 +62,9 @@ export default function Dashboard() {
                                 <p className="text-sm text-dark mb-0"><i className="fas fa-map-marker-alt text-danger mr-1"></i> Lokhandwala, Andheri West, Mumbai</p>
                             </div>
                             <div className="text-right">
-                                <a href="../investigation-details/investigation-details.html" className="btn btn-primary btn-sm">
+                                <Link to="#" className="btn btn-primary btn-sm">
                                     Investigate Case <i className="fas fa-arrow-right ml-1"></i>
-                                </a>
+                                </Link>
                             </div>
                         </div>
                         
@@ -100,9 +101,9 @@ export default function Dashboard() {
                                 <p className="text-sm text-dark mb-0"><i className="fas fa-map-marker-alt text-danger mr-1"></i> Juhu, Mumbai</p>
                             </div>
                             <div className="text-right">
-                                <a href="../investigation-details/investigation-details.html" className="btn btn-outline btn-sm">
+                                <Link to="#" className="btn btn-outline btn-sm">
                                     View Details <i className="fas fa-arrow-right ml-1"></i>
-                                </a>
+                                </Link>
                             </div>
                         </div>
                         

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 
+import { Link } from 'react-router-dom';
 export default function Providers() {
   return (
     <>
@@ -12,9 +13,9 @@ export default function Providers() {
                         <p className="text-secondary text-xs mb-0">Track credentialed professionals, verified badges, service capacities, and reputation ratings.</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <a href="../verification/verification.html" className="btn btn-warning text-xs">
+                        <Link to="/admin/verification" className="btn btn-warning text-xs">
                             <i className="fas fa-user-check mr-1"></i>Review Pending Queue (18)
-                        </a>
+                        </Link>
                     </div>
                 </div>
 
@@ -154,7 +155,7 @@ export default function Providers() {
                                     <td><span className="badge badge-verified">Active</span></td>
                                     <td>Feb 2025</td>
                                     <td className="text-right">
-                                        <a href="../verification/verification.html" className="btn btn-warning text-xs py-1 px-2 mr-1">Review Docs</a>
+                                        <Link to="/admin/verification" className="btn btn-warning text-xs py-1 px-2 mr-1">Review Docs</Link>
                                         <button className="btn btn-danger text-xs py-1 px-2" onClick={() => {}}>Suspend</button>
                                     </td>
                                 </tr>
@@ -374,7 +375,7 @@ export default function Providers() {
                 </div>
             </div>
             <div className="admin-modal-footer">
-                <a href="../verification/verification.html" className="btn btn-secondary text-xs mr-auto">View Verification Dossier</a>
+                <Link to="/admin/verification" className="btn btn-secondary text-xs mr-auto">View Verification Dossier</Link>
                 <button className="btn btn-secondary text-xs" onClick={() => {}}>Close</button>
             </div>
         </div>

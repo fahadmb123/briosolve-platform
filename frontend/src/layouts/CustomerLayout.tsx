@@ -1,16 +1,16 @@
 // @ts-nocheck
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 
 export default function CustomerLayout() {
     return (
         <div className="app-container">
             <aside className="app-sidebar" id="app-sidebar">
             <div className="sidebar-brand">
-                <a href="../home/home.html" className="logo">
+                <Link to="/" className="logo">
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
-                </a>
+                </Link>
                 <button id="sidebar-close" className="btn-icon sidebar-close-btn" aria-label="Close Sidebar" title="Close Menu">
                     <i className="fas fa-times"></i>
                 </button>
@@ -20,89 +20,89 @@ export default function CustomerLayout() {
                 <div className="menu-label">Navigation</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <a href="../home/home.html" className="sidebar-item">
+                        <Link to="/" className="sidebar-item">
                             <i className="fas fa-home"></i>
                             <span>Home</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="dashboard.html" className="sidebar-item">
+                        <Link to="/dashboard" className="sidebar-item">
                             <i className="fas fa-chart-pie"></i>
                             <span>Dashboard</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../nearby-providers/nearby-providers.html" className="sidebar-item">
+                        <Link to="/admin/providers" className="sidebar-item">
                             <i className="fas fa-map-marked-alt"></i>
                             <span>Nearby Providers</span>
                             <span className="badge badge-primary ml-auto">12+</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../requests/requests.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-file-alt"></i>
                             <span>My Requests</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../bookings/bookings.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-calendar-check"></i>
                             <span>Bookings</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../chat/chat.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-comments"></i>
                             <span>Messages</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../reviews/reviews.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-star"></i>
                             <span>Reviews</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../ai-assistant/ai-assistant.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-robot"></i>
                             <span>AI Assistant</span>
                             <span className="badge badge-primary ml-auto">AI</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../products/products.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-shopping-bag"></i>
                             <span>Products</span>
                             <span className="badge badge-success ml-auto">New</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
 
                 <div className="menu-label mt-6">Preferences</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <a href="../notifications/notifications.html" className="sidebar-item">
+                        <Link to="/notifications" className="sidebar-item">
                             <i className="fas fa-bell"></i>
                             <span>Notifications</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../profile/profile.html" className="sidebar-item">
+                        <Link to="/profile" className="sidebar-item">
                             <i className="fas fa-user-circle"></i>
                             <span>Profile</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../settings/settings.html" className="sidebar-item">
+                        <Link to="/settings" className="sidebar-item">
                             <i className="fas fa-cog"></i>
                             <span>Settings</span>
-                        </a>
+                        </Link>
                     </li>
                     <li className="mt-4 pt-2 border-top">
-                        <a href="../login/login.html" className="sidebar-item text-danger">
+                        <Link to="/login" className="sidebar-item text-danger">
                             <i className="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
             </div>
@@ -113,15 +113,15 @@ export default function CustomerLayout() {
                     <button id="sidebar-toggle" className="btn-icon" aria-label="Toggle Sidebar" title="Open Menu">
                         <i className="fas fa-bars"></i>
                     </button>
-                    <a href="../home/home.html" className="logo">
+                    <Link to="/" className="logo">
                         <i className="fas fa-layer-group text-primary"></i>
                         <span>ReverseMarket</span>
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <a href="../nearby-providers/nearby-providers.html" className="nav-item-link hide-mobile">Nearby Providers</a>
-                    <a href="#how-it-works" className="nav-item-link hide-mobile">How It Works</a>
+                    <Link to="/admin/providers" className="nav-item-link hide-mobile">Nearby Providers</Link>
+                    <Link to="#" className="nav-item-link hide-mobile">How It Works</Link>
                     <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
                         <i className="fas fa-sun"></i>
                     </button>
@@ -131,15 +131,15 @@ export default function CustomerLayout() {
                             <span className="notif-badge-count" id="notif-badge">3</span>
                         </button>
                     </div>
-                    <a href="../create-request/create-request.html" className="btn btn-primary btn-sm">
+                    <Link to="#" className="btn btn-primary btn-sm">
                         <i className="fas fa-plus mr-1"></i> Post Request
-                    </a>
-                    <a href="../../provider/register/register.html" className="btn btn-outline btn-sm hide-mobile">
+                    </Link>
+                    <Link to="#" className="btn btn-outline btn-sm hide-mobile">
                         Become a Provider
-                    </a>
-                    <a href="../profile/profile.html" className="avatar avatar-sm ml-1" title="Profile">
+                    </Link>
+                    <Link to="/profile" className="avatar avatar-sm ml-1" title="Profile">
                         <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=6366F1&color=fff" alt="Aarav" />
-                    </a>
+                    </Link>
                 </div>
             </header>
                 <Outlet />

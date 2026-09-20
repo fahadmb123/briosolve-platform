@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './Home.css';
 
 
+import { Link } from 'react-router-dom';
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -15,10 +16,10 @@ export default function Home() {
         
         <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
             <div className="sidebar-brand">
-                <a href="home.html" className="logo">
+                <Link to="/" className="logo">
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
-                </a>
+                </Link>
                 <button id="sidebar-close" className="btn-icon sidebar-close-btn" aria-label="Close Sidebar" title="Close Menu" onClick={() => setIsSidebarOpen(false)}>
                     <i className="fas fa-times"></i>
                 </button>
@@ -28,89 +29,89 @@ export default function Home() {
                 <div className="menu-label">Navigation</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <a href="home.html" className="sidebar-item active">
+                        <Link to="/" className="sidebar-item active">
                             <i className="fas fa-home"></i>
                             <span>Home</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../dashboard/dashboard.html" className="sidebar-item">
+                        <Link to="//dashboard" className="sidebar-item">
                             <i className="fas fa-chart-pie"></i>
                             <span>Dashboard</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../nearby-providers/nearby-providers.html" className="sidebar-item">
+                        <Link to="/admin/providers" className="sidebar-item">
                             <i className="fas fa-map-marked-alt"></i>
                             <span>Nearby Providers</span>
                             <span className="badge badge-primary ml-auto">12+</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../requests/requests.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-file-alt"></i>
                             <span>My Requests</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../bookings/bookings.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-calendar-check"></i>
                             <span>Bookings</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../chat/chat.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-comments"></i>
                             <span>Messages</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../reviews/reviews.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-star"></i>
                             <span>Reviews</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../ai-assistant/ai-assistant.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-robot"></i>
                             <span>AI Assistant</span>
                             <span className="badge badge-primary ml-auto">AI</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../products/products.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-shopping-bag"></i>
                             <span>Products</span>
                             <span className="badge badge-success ml-auto">New</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
 
                 <div className="menu-label mt-6">Preferences</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <a href="../notifications/notifications.html" className="sidebar-item">
+                        <Link to="//notifications" className="sidebar-item">
                             <i className="fas fa-bell"></i>
                             <span>Notifications</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../profile/profile.html" className="sidebar-item">
+                        <Link to="//profile" className="sidebar-item">
                             <i className="fas fa-user-circle"></i>
                             <span>Profile</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../settings/settings.html" className="sidebar-item">
+                        <Link to="//settings" className="sidebar-item">
                             <i className="fas fa-cog"></i>
                             <span>Settings</span>
-                        </a>
+                        </Link>
                     </li>
                     <li className="mt-4 pt-2 border-top">
-                        <a href="../login/login.html" className="sidebar-item text-danger">
+                        <Link to="/login" className="sidebar-item text-danger">
                             <i className="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
             </div>
@@ -124,15 +125,15 @@ export default function Home() {
                     <button id="sidebar-toggle" className="btn-icon" aria-label="Toggle Sidebar" title="Open Menu" onClick={() => setIsSidebarOpen(true)}>
                         <i className="fas fa-bars"></i>
                     </button>
-                    <a href="home.html" className="logo">
+                    <Link to="/" className="logo">
                         <i className="fas fa-layer-group text-primary"></i>
                         <span>ReverseMarket</span>
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <a href="../nearby-providers/nearby-providers.html" className="nav-item-link hide-mobile">Nearby Providers</a>
-                    <a href="#how-it-works" className="nav-item-link hide-mobile">How It Works</a>
+                    <Link to="/admin/providers" className="nav-item-link hide-mobile">Nearby Providers</Link>
+                    <Link to="#" className="nav-item-link hide-mobile">How It Works</Link>
                     <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
                         <i className="fas fa-sun"></i>
                     </button>
@@ -142,15 +143,15 @@ export default function Home() {
                             <span className="notif-badge-count" id="notif-badge">3</span>
                         </button>
                     </div>
-                    <a href="../create-request/create-request.html" className="btn btn-primary btn-sm">
+                    <Link to="#" className="btn btn-primary btn-sm">
                         <i className="fas fa-plus mr-1"></i> Post Request
-                    </a>
-                    <a href="../../provider/register/register.html" className="btn btn-outline btn-sm hide-mobile">
+                    </Link>
+                    <Link to="/register" className="btn btn-outline btn-sm hide-mobile">
                         Become a Provider
-                    </a>
-                    <a href="../profile/profile.html" className="avatar avatar-sm ml-1" title="Profile">
+                    </Link>
+                    <Link to="//profile" className="avatar avatar-sm ml-1" title="Profile">
                         <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=6366F1&color=fff" alt="Aarav" />
-                    </a>
+                    </Link>
                 </div>
             </header>
 
@@ -197,21 +198,21 @@ export default function Home() {
                             
                             <div className="trending-pills-row">
                                 <span className="trending-label">Trending:</span>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
+                                <Link to="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-tools mr-1"></i> Plumbing
-                                </a>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
+                                </Link>
+                                <Link to="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-snowflake mr-1"></i> AC Repair
-                                </a>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
+                                </Link>
+                                <Link to="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-bolt mr-1"></i> Electrician
-                                </a>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
+                                </Link>
+                                <Link to="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-broom mr-1"></i> Deep Clean
-                                </a>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
+                                </Link>
+                                <Link to="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-paint-roller mr-1"></i> Painter
-                                </a>
+                                </Link>
                             </div>
 
                             
@@ -335,9 +336,9 @@ export default function Home() {
 
                                 
                                 <div className="live-card-actions">
-                                    <a href="../comparison/comparison.html" className="btn btn-primary w-full btn-lg">
+                                    <Link to="#" className="btn btn-primary w-full btn-lg">
                                         <i className="fas fa-balance-scale mr-1"></i> Compare Quotations Side-by-Side
-                                    </a>
+                                    </Link>
                                     <div className="flex justify-between items-center text-xs text-secondary mt-2 px-1">
                                         <span><i className="fas fa-shield-alt text-success mr-1"></i> ID Background Checked</span>
                                         <span><i className="fas fa-lock text-primary mr-1"></i> Escrow Milestone Protection</span>
@@ -405,19 +406,19 @@ export default function Home() {
                                 <p className="text-secondary text-sm mb-0">Post requirements across 120+ specialized home trade and freelance services.</p>
                             </div>
                             <div className="flex gap-2">
-                                <a href="../categories/categories.html" className="btn btn-outline">
+                                <Link to="#" className="btn btn-outline">
                                     <span>View All Categories</span>
-                                </a>
-                                <a href="../nearby-providers/nearby-providers.html" className="btn btn-secondary">
+                                </Link>
+                                <Link to="/admin/providers" className="btn btn-secondary">
                                     <span>Find Nearby Providers</span>
                                     <i className="fas fa-arrow-right ml-1"></i>
-                                </a>
+                                </Link>
                             </div>
                         </div>
 
                         <div className="bento-grid">
                             
-                            <a href="../category-details/category-details.html" className="bento-card bento-col-8">
+                            <Link to="#" className="bento-card bento-col-8">
                                 <div>
                                     <div className="bento-badge">
                                         <i className="fas fa-bolt"></i> High Demand • Avg 1st Bid: 11 Mins
@@ -441,10 +442,10 @@ export default function Home() {
                                     <span className="bento-stat-highlight">1,240+ Active Plumbers in Mumbai</span>
                                     <span className="bento-arrow-link">View Pricing & Quotes &rarr;</span>
                                 </div>
-                            </a>
+                            </Link>
 
                             
-                            <a href="../category-details/category-details.html" className="bento-card bento-col-4">
+                            <Link to="#" className="bento-card bento-col-4">
                                 <div>
                                     <div className="bento-badge" style={{ background: 'rgba(14, 165, 233, 0.15)', color: '#0284c7' }}>
                                         <i className="fas fa-snowflake"></i> Climate Specialist
@@ -461,10 +462,10 @@ export default function Home() {
                                     <span className="bento-stat-highlight">1,510 Technicians</span>
                                     <span className="bento-arrow-link">Explore &rarr;</span>
                                 </div>
-                            </a>
+                            </Link>
 
                             
-                            <a href="../category-details/category-details.html" className="bento-card bento-col-4">
+                            <Link to="#" className="bento-card bento-col-4">
                                 <div>
                                     <div className="bento-badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#059669' }}>
                                         <i className="fas fa-shield-virus"></i> Eco Sanitized
@@ -481,10 +482,10 @@ export default function Home() {
                                     <span className="bento-stat-highlight">2,100 Cleaners</span>
                                     <span className="bento-arrow-link">Explore &rarr;</span>
                                 </div>
-                            </a>
+                            </Link>
 
                             
-                            <a href="../category-details/category-details.html" className="bento-card bento-col-4">
+                            <Link to="#" className="bento-card bento-col-4">
                                 <div>
                                     <div className="bento-badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#d97706' }}>
                                         <i className="fas fa-bolt"></i> Certified Wiremen
@@ -501,10 +502,10 @@ export default function Home() {
                                     <span className="bento-stat-highlight">980 Electricians</span>
                                     <span className="bento-arrow-link">Explore &rarr;</span>
                                 </div>
-                            </a>
+                            </Link>
 
                             
-                            <a href="../category-details/category-details.html" className="bento-card bento-col-4">
+                            <Link to="#" className="bento-card bento-col-4">
                                 <div>
                                     <div className="bento-badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#9333ea' }}>
                                         <i className="fas fa-laptop-code"></i> Freelance & Tech
@@ -521,7 +522,7 @@ export default function Home() {
                                     <span className="bento-stat-highlight">3,450 Specialists</span>
                                     <span className="bento-arrow-link">Explore &rarr;</span>
                                 </div>
-                            </a>
+                            </Link>
 
                             
                             <div className="bento-card bento-col-12 bento-custom-banner">
@@ -531,9 +532,9 @@ export default function Home() {
                                         <h3 className="bento-title mb-1">Post Any Custom Service Requirement in 2 Minutes</h3>
                                         <p className="bento-desc mb-0">Describe what you need, set your budget limit, and verified providers with the right expertise will bid directly.</p>
                                     </div>
-                                    <a href="../create-request/create-request.html" className="btn btn-primary btn-lg">
+                                    <Link to="#" className="btn btn-primary btn-lg">
                                         <i className="fas fa-plus-circle mr-1"></i> Post Custom Requirement
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -726,9 +727,9 @@ export default function Home() {
                                     </div>
                                 </div>
 
-                                <a href="../create-request/create-request.html" className="btn btn-primary btn-lg">
+                                <Link to="#" className="btn btn-primary btn-lg">
                                     <i className="fas fa-plus-circle mr-1"></i> Post a Request for Free
-                                </a>
+                                </Link>
                             </div>
 
                             <div className="audience-visual-card">
@@ -783,9 +784,9 @@ export default function Home() {
                                     </div>
                                 </div>
 
-                                <a href="../../provider/register/register.html" className="btn btn-primary btn-lg">
+                                <Link to="/register" className="btn btn-primary btn-lg">
                                     <i className="fas fa-id-card mr-1"></i> Register as Verified Provider
-                                </a>
+                                </Link>
                             </div>
 
                             <div className="audience-visual-card">
@@ -849,12 +850,12 @@ export default function Home() {
                                 It takes under 90 seconds to publish your requirement. Receive competitive quotations from verified local professionals today with zero obligation.
                             </p>
                             <div className="flex justify-center gap-4 flex-wrap">
-                                <a href="../create-request/create-request.html" className="btn btn-primary btn-lg">
+                                <Link to="#" className="btn btn-primary btn-lg">
                                     <i className="fas fa-plus-circle mr-1"></i> Post Your Requirement Free
-                                </a>
-                                <a href="../../provider/register/register.html" className="btn btn-secondary btn-lg">
+                                </Link>
+                                <Link to="/register" className="btn btn-secondary btn-lg">
                                     <i className="fas fa-briefcase mr-1"></i> Join as a Provider
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -865,53 +866,53 @@ export default function Home() {
                     <div className="container">
                         <div className="footer-grid-modern mb-8">
                             <div>
-                                <a href="home.html" className="logo mb-4" style={{ display: 'inline-flex' }}>
+                                <Link to="/" className="logo mb-4" style={{ display: 'inline-flex' }}>
                                     <i className="fas fa-layer-group text-primary"></i>
                                     <span>ReverseMarket</span>
-                                </a>
+                                </Link>
                                 <p className="text-secondary text-sm mb-4" style={{ maxWidth: '320px', lineHeight: '1.6' }}>
                                     The reverse service marketplace that puts you in control. Post requirements, get competitive quotes, compare transparently, and hire verified pros.
                                 </p>
                                 <div className="flex items-center gap-2">
-                                    <a href="#" className="social-btn" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
-                                    <a href="#" className="social-btn" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
-                                    <a href="#" className="social-btn" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
-                                    <a href="#" className="social-btn" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
+                                    <Link to="#" className="social-btn" aria-label="Twitter"><i className="fab fa-twitter"></i></Link>
+                                    <Link to="#" className="social-btn" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></Link>
+                                    <Link to="#" className="social-btn" aria-label="Instagram"><i className="fab fa-instagram"></i></Link>
+                                    <Link to="#" className="social-btn" aria-label="Facebook"><i className="fab fa-facebook-f"></i></Link>
                                 </div>
                             </div>
 
                             <div>
                                 <h4 className="footer-heading">Top Categories</h4>
                                 <div className="footer-links">
-                                    <a href="../category-details/category-details.html">Plumbing Services</a>
-                                    <a href="../category-details/category-details.html">AC Repair & Gas Refill</a>
-                                    <a href="../category-details/category-details.html">Electrical Maintenance</a>
-                                    <a href="../category-details/category-details.html">Home Deep Cleaning</a>
-                                    <a href="../category-details/category-details.html">Interior Painting</a>
-                                    <a href="../category-details/category-details.html">Carpentry & Furniture</a>
+                                    <Link to="#">Plumbing Services</Link>
+                                    <Link to="#">AC Repair & Gas Refill</Link>
+                                    <Link to="#">Electrical Maintenance</Link>
+                                    <Link to="#">Home Deep Cleaning</Link>
+                                    <Link to="#">Interior Painting</Link>
+                                    <Link to="#">Carpentry & Furniture</Link>
                                 </div>
                             </div>
 
                             <div>
                                 <h4 className="footer-heading">Customer Portal</h4>
                                 <div className="footer-links">
-                                    <a href="../dashboard/dashboard.html">Customer Dashboard</a>
-                                    <a href="../create-request/create-request.html">Post a Requirement</a>
-                                    <a href="../requests/requests.html">Track Active Requests</a>
-                                    <a href="../quotations/quotations.html">Compare Quotations</a>
-                                    <a href="../bookings/bookings.html">Manage Bookings</a>
-                                    <a href="../ai-assistant/ai-assistant.html">AI Assistant</a>
+                                    <Link to="//dashboard">Customer Dashboard</Link>
+                                    <Link to="#">Post a Requirement</Link>
+                                    <Link to="#">Track Active Requests</Link>
+                                    <Link to="#">Compare Quotations</Link>
+                                    <Link to="#">Manage Bookings</Link>
+                                    <Link to="#">AI Assistant</Link>
                                 </div>
                             </div>
 
                             <div>
                                 <h4 className="footer-heading">For Providers</h4>
                                 <div className="footer-links">
-                                    <a href="../../provider/register/register.html">Become a Provider</a>
-                                    <a href="../../provider/register/register.html">Provider Login</a>
-                                    <a href="../../provider/requests/requests.html">Browse Job Requests</a>
-                                    <a href="../../provider/quotations/quotations.html">My Quotation Bids</a>
-                                    <a href="../../provider/dashboard/dashboard.html">Payouts & Earnings</a>
+                                    <Link to="/register">Become a Provider</Link>
+                                    <Link to="/register">Provider Login</Link>
+                                    <Link to="#">Browse Job Requests</Link>
+                                    <Link to="#">My Quotation Bids</Link>
+                                    <Link to="//dashboard">Payouts & Earnings</Link>
                                 </div>
                             </div>
                         </div>
@@ -919,10 +920,10 @@ export default function Home() {
                         <div className="flex justify-between items-center flex-wrap gap-4 pt-6 border-top text-xs text-secondary">
                             <div>&copy; 2026 ReverseMarket Inc. All rights reserved. Vetted and verified marketplace.</div>
                             <div className="flex items-center gap-4">
-                                <a href="#" className="text-secondary">Privacy Policy</a>
-                                <a href="#" className="text-secondary">Terms of Service</a>
-                                <a href="#" className="text-secondary">Trust & Security</a>
-                                <a href="#" className="text-secondary">Sitemap</a>
+                                <Link to="#" className="text-secondary">Privacy Policy</Link>
+                                <Link to="#" className="text-secondary">Terms of Service</Link>
+                                <Link to="#" className="text-secondary">Trust & Security</Link>
+                                <Link to="#" className="text-secondary">Sitemap</Link>
                             </div>
                         </div>
                     </div>

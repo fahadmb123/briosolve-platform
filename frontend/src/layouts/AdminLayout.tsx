@@ -1,16 +1,16 @@
 // @ts-nocheck
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 
 export default function AdminLayout() {
     return (
         <div className="app-container">
             <aside className="app-sidebar" id="app-sidebar">
             <div className="sidebar-brand flex justify-between items-center">
-                <a href="dashboard.html" className="logo">
+                <Link to="/admin/dashboard" className="logo">
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
-                </a>
+                </Link>
                 <span className="badge-admin">Admin</span>
                 <button id="sidebar-close" className="btn-icon sidebar-close-btn" aria-label="Close Sidebar">
                     <i className="fas fa-times"></i>
@@ -21,126 +21,126 @@ export default function AdminLayout() {
                 <div className="menu-label">Platform Governance</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <a href="dashboard.html" className="sidebar-item">
+                        <Link to="/admin/dashboard" className="sidebar-item">
                             <i className="fas fa-chart-line"></i>
                             <span>Dashboard</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../users/users.html" className="sidebar-item">
+                        <Link to="/admin/users" className="sidebar-item">
                             <i className="fas fa-users"></i>
                             <span>Users</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../providers/providers.html" className="sidebar-item">
+                        <Link to="/admin/providers" className="sidebar-item">
                             <i className="fas fa-user-tie"></i>
                             <span>Providers</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../investigators/investigators.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-user-secret"></i>
                             <span>Investigators</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../verification/verification.html" className="sidebar-item">
+                        <Link to="/admin/verification" className="sidebar-item">
                             <i className="fas fa-user-check"></i>
                             <span>Verification</span>
                             <span className="badge badge-warning ml-auto">18</span>
-                        </a>
+                        </Link>
                     </li>
                     </ul>
 
                 <div className="menu-label mt-6">Catalog</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <a href="../categories/categories.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-th-large"></i>
                             <span>Categories</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../services/services.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-concierge-bell"></i>
                             <span>Services</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../products/products.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-box-open"></i>
                             <span>Products</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../products/categories.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-tags"></i>
                             <span>Product Categories</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../products/orders.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-shopping-cart"></i>
                             <span>Product Orders</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
 
                 <div className="menu-label mt-6">Marketplace Operations</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <a href="../requests/requests.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-file-invoice"></i>
                             <span>Service Requests</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../quotations/quotations.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-calculator"></i>
                             <span>Quotations</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../bookings/bookings.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-calendar-check"></i>
                             <span>Bookings</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../investigations/investigations.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-gavel"></i>
                             <span>Investigations</span>
                             <span className="badge badge-danger ml-auto">4</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../reviews/reviews.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-star-half-alt"></i>
                             <span>Reviews</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
 
                 <div className="menu-label mt-6">System &amp; Intelligence</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <a href="../analytics/analytics.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-chart-pie"></i>
                             <span>Analytics</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../audit-logs/audit-logs.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-history"></i>
                             <span>Audit Logs</span>
-                        </a>
+                        </Link>
                     </li>
                     <li className="mt-4 pt-2 border-top">
-                        <a href="../login/admin-login.html" className="sidebar-item text-danger">
+                        <Link to="/login" className="sidebar-item text-danger">
                             <i className="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
             </div>

@@ -1,6 +1,7 @@
 import './CustomerRegister.css';
 
 
+import { Link } from 'react-router-dom';
 export default function CustomerRegister() {
   return (
     <>
@@ -21,18 +22,18 @@ export default function CustomerRegister() {
                         <div className="text-xs text-secondary">Join as a verified contractor and receive customer jobs</div>
                     </div>
                 </div>
-                <a href="../../provider/register/register.html" className="btn btn-outline text-xs py-1">
+                <Link to="/register" className="btn btn-outline text-xs py-1">
                     Become a Provider <i className="fas fa-arrow-right ml-1"></i>
-                </a>
+                </Link>
             </div>
 
             <div className="auth-card card">
                 
                 <div className="text-center mb-6">
-                    <a href="../home/home.html" className="logo justify-center mb-3">
+                    <Link to="/" className="logo justify-center mb-3">
                         <i className="fas fa-layer-group text-primary"></i>
                         <span>ReverseMarket</span>
-                    </a>
+                    </Link>
                     <h1 className="h3 mb-1">Create Customer Account</h1>
                     <p className="text-secondary text-sm">Post requirements and receive competitive quotations for free</p>
                 </div>
@@ -78,15 +79,15 @@ export default function CustomerRegister() {
                             <input type="checkbox" id="terms" required />
                             <span className="checkmark"></span>
                             <span className="text-xs text-secondary">
-                                I agree to the <a href="#" className="text-primary">Terms of Service</a>, <a href="#" className="text-primary">Privacy Policy</a>, and customer code of conduct.
+                                I agree to the <Link to="#" className="text-primary">Terms of Service</Link>, <Link to="#" className="text-primary">Privacy Policy</Link>, and customer code of conduct.
                             </span>
                         </label>
                     </div>
 
                     <div className="flex items-center justify-end text-xs text-secondary mb-4">
-                        <a href="../otp-verification/otp-verification.html" className="text-primary font-medium hidden">
+                        <Link to="//verification" className="text-primary font-medium hidden">
                             <i className="fas fa-mobile-alt mr-1"></i> Instant Mobile OTP
-                        </a>
+                        </Link>
                     </div>
 
                     <button type="submit" className="btn btn-primary w-full btn-lg mb-4">
@@ -96,7 +97,7 @@ export default function CustomerRegister() {
 
                     <div className="text-center text-sm text-secondary pt-4 border-top">
                         Already have an account? 
-                        <a href="../login/login.html" className="text-primary font-semibold">Sign In</a>
+                        <Link to="/login" className="text-primary font-semibold">Sign In</Link>
                     </div>
                 </form>
             </div>

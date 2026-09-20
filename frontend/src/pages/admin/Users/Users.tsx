@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 
+import { Link } from 'react-router-dom';
 export default function Users() {
   return (
     <>
@@ -195,7 +196,7 @@ export default function Users() {
                                     <td>25 mins ago</td>
                                     <td className="text-right">
                                         <button className="btn btn-secondary text-xs py-1 px-2 mr-1" onClick={() => {}}>View</button>
-                                        <a href="../verification/verification.html" className="btn btn-warning text-xs py-1 px-2">Verify</a>
+                                        <Link to="/admin/verification" className="btn btn-warning text-xs py-1 px-2">Verify</Link>
                                     </td>
                                 </tr>
 

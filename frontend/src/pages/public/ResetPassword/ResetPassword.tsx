@@ -1,6 +1,7 @@
 import './ResetPassword.css';
 
 
+import { Link } from 'react-router-dom';
 export default function ResetPassword() {
   return (
     <>
@@ -14,10 +15,10 @@ export default function ResetPassword() {
         <div className="auth-card-container">
             <div className="auth-card card">
                 <div className="text-center mb-6">
-                    <a href="../home/home.html" className="logo justify-center mb-4">
+                    <Link to="/" className="logo justify-center mb-4">
                         <i className="fas fa-layer-group text-primary"></i>
                         <span>ReverseMarket</span>
-                    </a>
+                    </Link>
                     <div className="shield-icon-circle mb-3">
                         <i className="fas fa-shield-alt"></i>
                     </div>
@@ -57,9 +58,9 @@ export default function ResetPassword() {
                     </button>
 
                     <div className="text-center text-sm border-top pt-5">
-                        <a href="../login/login.html" className="back-link">
+                        <Link to="/login" className="back-link">
                             <i className="fas fa-arrow-left mr-1"></i> Back to Login
-                        </a>
+                        </Link>
                     </div>
                 </form>
             </div>

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 
+import { Link } from 'react-router-dom';
 export default function Dashboard() {
   return (
     <>
@@ -18,12 +19,12 @@ export default function Dashboard() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <a href="../requests/requests.html" className="btn btn-primary">
+                        <Link to="#" className="btn btn-primary">
                             <i className="fas fa-search-dollar mr-1"></i> Browse Service Requests
-                        </a>
-                        <a href="../verification/verification.html" className="btn btn-outline text-xs">
+                        </Link>
+                        <Link to="/provider/verification" className="btn btn-outline text-xs">
                             <i className="fas fa-shield-alt mr-1"></i> Verified Status
-                        </a>
+                        </Link>
                     </div>
                 </div>
 
@@ -40,9 +41,9 @@ export default function Dashboard() {
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <a href="../settings/settings.html#sec-service-area" className="btn btn-secondary btn-xs">
+                        <Link to="/provider/settings" className="btn btn-secondary btn-xs">
                             <i className="fas fa-sliders-h mr-1"></i> Manage Service Area
-                        </a>
+                        </Link>
                     </div>
                 </div>
 
@@ -118,9 +119,9 @@ export default function Dashboard() {
                                 <h2 className="h5 mb-0">New Opportunities Matching Your Skills</h2>
                                 <p className="text-xs text-secondary mb-0">Plumbing &amp; AC repair requests posted recently in your radius</p>
                             </div>
-                            <a href="../requests/requests.html" className="btn btn-outline text-xs">
+                            <Link to="#" className="btn btn-outline text-xs">
                                 View All (8) <i className="fas fa-arrow-right ml-1"></i>
-                            </a>
+                            </Link>
                         </div>
 
                         
@@ -133,9 +134,9 @@ export default function Dashboard() {
                                         <span className="text-xs text-muted">ID: #REQ-84920 • Posted 2 hrs ago</span>
                                     </div>
                                     <h3 className="h6 mb-1">
-                                        <a href="../request-details/request-details.html" className="text-text hover-primary">
+                                        <Link to="#" className="text-text hover-primary">
                                             Bathroom Plumbing Repair &amp; Concealed Pipe Leak Fix
-                                        </a>
+                                        </Link>
                                     </h3>
                                     <div className="text-xs text-secondary flex items-center gap-4 flex-wrap">
                                         <span><i className="fas fa-faucet text-primary mr-1"></i> Plumbing</span>
@@ -154,12 +155,12 @@ export default function Dashboard() {
                             <div className="flex justify-between items-center flex-wrap gap-2 pt-2 border-top">
                                 <span className="text-xs text-muted"><i className="fas fa-user-check text-success mr-1"></i> Verified Homeowner (Pooja S.)</span>
                                 <div className="flex items-center gap-2">
-                                    <a href="../request-details/request-details.html" className="btn btn-outline text-xs">
+                                    <Link to="#" className="btn btn-outline text-xs">
                                         View Details
-                                    </a>
-                                    <a href="../submit-quotation/submit-quotation.html" className="btn btn-primary text-xs">
+                                    </Link>
+                                    <Link to="#" className="btn btn-primary text-xs">
                                         <i className="fas fa-paper-plane mr-1"></i> Submit Quotation
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -174,9 +175,9 @@ export default function Dashboard() {
                                         <span className="text-xs text-muted">ID: #REQ-84915 • Posted 4 hrs ago</span>
                                     </div>
                                     <h3 className="h6 mb-1">
-                                        <a href="../request-details/request-details.html?req=REQ-84915" className="text-text hover-primary">
+                                        <Link to="#" className="text-text hover-primary">
                                             Split AC Master Foam Jet Cleaning &amp; Gas Pressure Refill
-                                        </a>
+                                        </Link>
                                     </h3>
                                     <div className="text-xs text-secondary flex items-center gap-4 flex-wrap">
                                         <span><i className="fas fa-snowflake text-primary mr-1"></i> AC Repair</span>
@@ -195,12 +196,12 @@ export default function Dashboard() {
                             <div className="flex justify-between items-center flex-wrap gap-2 pt-2 border-top">
                                 <span className="text-xs text-muted"><i className="fas fa-user-check text-success mr-1"></i> Verified Homeowner (Rahul N.)</span>
                                 <div className="flex items-center gap-2">
-                                    <a href="../request-details/request-details.html?req=REQ-84915" className="btn btn-outline text-xs">
+                                    <Link to="#" className="btn btn-outline text-xs">
                                         View Details
-                                    </a>
-                                    <a href="../submit-quotation/submit-quotation.html" className="btn btn-primary text-xs">
+                                    </Link>
+                                    <Link to="#" className="btn btn-primary text-xs">
                                         <i className="fas fa-paper-plane mr-1"></i> Submit Quotation
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -215,9 +216,9 @@ export default function Dashboard() {
                                         <span className="text-xs text-muted">ID: #REQ-84880 • Posted today</span>
                                     </div>
                                     <h3 className="h6 mb-1">
-                                        <a href="../request-details/request-details.html" className="text-text hover-primary">
+                                        <Link to="#" className="text-text hover-primary">
                                             Commercial Kitchen Grease Trap Overhaul &amp; CPVC Piping
-                                        </a>
+                                        </Link>
                                     </h3>
                                     <div className="text-xs text-secondary flex items-center gap-4 flex-wrap">
                                         <span><i className="fas fa-faucet text-primary mr-1"></i> Commercial Plumbing</span>
@@ -236,12 +237,12 @@ export default function Dashboard() {
                             <div className="flex justify-between items-center flex-wrap gap-2 pt-2 border-top">
                                 <span className="text-xs text-muted"><i className="fas fa-building text-primary mr-1"></i> Business Client (Spice Garden Cafe)</span>
                                 <div className="flex items-center gap-2">
-                                    <a href="../request-details/request-details.html" className="btn btn-outline text-xs">
+                                    <Link to="#" className="btn btn-outline text-xs">
                                         View Details
-                                    </a>
-                                    <a href="../submit-quotation/submit-quotation.html" className="btn btn-primary text-xs">
+                                    </Link>
+                                    <Link to="#" className="btn btn-primary text-xs">
                                         <i className="fas fa-paper-plane mr-1"></i> Submit Quotation
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -325,9 +326,9 @@ export default function Dashboard() {
                             <p className="text-xs text-secondary mb-3">
                                 Your verified profile is recommended to clients in 98% of relevant searches in Mumbai.
                             </p>
-                            <a href="../verification/verification.html" className="btn btn-outline text-xs w-full text-center">
+                            <Link to="/provider/verification" className="btn btn-outline text-xs w-full text-center">
                                 Manage Verification Badges
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>

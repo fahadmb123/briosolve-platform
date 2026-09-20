@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 
+import { Link } from 'react-router-dom';
 export default function Login() {
   return (
     <>
@@ -14,10 +15,10 @@ export default function Login() {
             <div className="auth-card card">
                 
                 <div className="text-center mb-6">
-                    <a href="#" className="logo justify-center mb-4">
+                    <Link to="#" className="logo justify-center mb-4">
                         <i className="fas fa-layer-group text-danger"></i>
                         <span>ReverseMarket</span>
-                    </a>
+                    </Link>
                     <h1 className="h3 mb-2">Investigator Portal</h1>
                     <p className="text-secondary text-sm">Internal access for technical staff</p>
                 </div>
@@ -50,9 +51,9 @@ export default function Login() {
                     <div className="form-group mb-4">
                         <div className="flex justify-between items-center mb-1">
                             <label className="form-label mb-0" htmlFor="password">Password</label>
-                            <a href="#" className="text-xs text-danger font-medium"
+                            <Link to="#" className="text-xs text-danger font-medium"
                                 onClick={() => {}}>Forgot
-                                Password?</a>
+                                Password?</Link>
                         </div>
                         <div className="input-icon-wrapper">
                             <i className="fas fa-lock"></i>

@@ -1,16 +1,16 @@
 // @ts-nocheck
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 
 export default function InvestigatorLayout() {
     return (
         <div className="app-container">
             <aside className="app-sidebar" id="app-sidebar">
             <div className="sidebar-brand flex justify-between items-center">
-                <a href="dashboard.html" className="logo">
+                <Link to="/investigator/dashboard" className="logo">
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
-                </a>
+                </Link>
                 <span className="badge-danger text-xs px-2 py-1 rounded font-bold">Investigator</span>
                 <button id="sidebar-close" className="btn-icon sidebar-close-btn" aria-label="Close Sidebar">
                     <i className="fas fa-times"></i>
@@ -21,28 +21,28 @@ export default function InvestigatorLayout() {
                 <div className="menu-label">Portal</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <a href="dashboard.html" className="sidebar-item">
+                        <Link to="/investigator/dashboard" className="sidebar-item">
                             <i className="fas fa-chart-line"></i>
                             <span>Dashboard</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../investigations/investigations.html" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-gavel"></i>
                             <span>Investigations</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../profile/profile.html" className="sidebar-item">
+                        <Link to="/investigator/profile" className="sidebar-item">
                             <i className="fas fa-user-shield"></i>
                             <span>Profile</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="../settings/settings.html" className="sidebar-item">
+                        <Link to="/investigator/settings" className="sidebar-item">
                             <i className="fas fa-cog"></i>
                             <span>Settings</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
             </div>

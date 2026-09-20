@@ -1,6 +1,7 @@
 import './EmailVerification.css';
 
 
+import { Link } from 'react-router-dom';
 export default function EmailVerification() {
   return (
     <>
@@ -13,10 +14,10 @@ export default function EmailVerification() {
 
         <div className="auth-card-container">
             <div className="auth-card card text-center">
-                <a href="../home/home.html" className="logo justify-center mb-5">
+                <Link to="/" className="logo justify-center mb-5">
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
-                </a>
+                </Link>
 
                 <div className="verify-icon-wrapper mb-4">
                     <div className="verify-icon-pulse"></div>
@@ -44,24 +45,24 @@ export default function EmailVerification() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <a href="#" onClick={() => {  }} className="btn btn-primary w-full btn-lg">
+                    <Link to="#" onClick={() => {  }} className="btn btn-primary w-full btn-lg">
                         <span>I've Verified My Email</span>
                         <i className="fas fa-arrow-right ml-1"></i>
-                    </a>
+                    </Link>
 
                     <button type="button" className="btn btn-secondary w-full" id="resend-btn">
                         <i className="fas fa-redo-alt mr-1"></i> Resend Verification Email
                     </button>
 
-                    <a href="../otp-verification/otp-verification.html" className="btn btn-outline w-full text-xs">
+                    <Link to="//verification" className="btn btn-outline w-full text-xs">
                         <i className="fas fa-mobile-alt mr-1"></i> Verify via Mobile OTP Instead
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="text-center text-sm border-top pt-5 mt-6">
-                    <a href="../login/login.html" className="back-link">
+                    <Link to="/login" className="back-link">
                         <i className="fas fa-arrow-left mr-1"></i> Back to Login
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 
+import { Link } from 'react-router-dom';
 export default function Profile() {
   return (
     <>
@@ -145,9 +146,9 @@ export default function Profile() {
                                 <h2 className="profile-card-title">
                                     <i className="fas fa-layer-group text-primary"></i> Active Service Categories
                                 </h2>
-                                <a href="../settings/settings.html" className="text-xs text-primary font-medium hover:underline">
+                                <Link to="/provider/settings" className="text-xs text-primary font-medium hover:underline">
                                     Manage Rates <i className="fas fa-arrow-right ml-1"></i>
-                                </a>
+                                </Link>
                             </div>
                             <div className="categories-pro-grid">
                                 <div className="category-pro-card">
@@ -324,9 +325,9 @@ export default function Profile() {
                                 </div>
                             </div>
 
-                            <a href="../reviews/reviews.html" className="btn btn-outline text-xs w-full text-center">
+                            <Link to="#" className="btn btn-outline text-xs w-full text-center">
                                 <i className="fas fa-comments mr-1"></i> Read All 186 Client Reviews
-                            </a>
+                            </Link>
                         </div>
 
                         
@@ -363,9 +364,9 @@ export default function Profile() {
                             </div>
 
                             <div className="mt-3 pt-2">
-                                <a href="../verification/verification.html" className="btn btn-secondary text-xs w-full text-center">
+                                <Link to="/provider/verification" className="btn btn-secondary text-xs w-full text-center">
                                     <i className="fas fa-file-contract mr-1"></i> Manage Document Badges
-                                </a>
+                                </Link>
                             </div>
                         </div>
 
@@ -399,9 +400,9 @@ export default function Profile() {
                             </div>
 
                             <div className="mt-4">
-                                <a href="../settings/settings.html" className="btn btn-secondary text-xs w-full text-center">
+                                <Link to="/provider/settings" className="btn btn-secondary text-xs w-full text-center">
                                     <i className="fas fa-clock mr-1"></i> Edit Availability Schedule
-                                </a>
+                                </Link>
                             </div>
                         </div>
 

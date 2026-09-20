@@ -1,6 +1,7 @@
 import './Login.css';
 
 
+import { Link } from 'react-router-dom';
 export default function Login() {
   return (
     <>
@@ -15,10 +16,10 @@ export default function Login() {
             <div className="auth-card card">
                 
                 <div className="text-center mb-6">
-                    <a href="../home/home.html" className="logo justify-center mb-4">
+                    <Link to="/" className="logo justify-center mb-4">
                         <i className="fas fa-layer-group text-primary"></i>
                         <span>ReverseMarket</span>
-                    </a>
+                    </Link>
                     <h1 className="h3 mb-2">Welcome Back</h1>
                     <p className="text-secondary text-sm">Sign in to manage your requests and quotations</p>
                 </div>
@@ -56,7 +57,7 @@ export default function Login() {
                                 <span className="checkmark"></span>
                                 <span className="text-xs text-secondary">Remember me on this device</span>
                             </label>
-                            <a href="#" className="text-xs text-primary font-medium" onClick={() => {  }}>Resend Code</a>
+                            <Link to="#" className="text-xs text-primary font-medium" onClick={() => {  }}>Resend Code</Link>
                         </div>
                     </div>
 
@@ -74,13 +75,13 @@ export default function Login() {
                     <div className="auth-footer text-center border-top pt-5">
                         <p className="text-sm text-secondary mb-3">
                             Don't have a customer account? 
-                            <a href="../register/register.html" className="text-primary font-semibold">Sign Up</a>
+                            <Link to="/register" className="text-primary font-semibold">Sign Up</Link>
                         </p>
                         <div className="provider-cta-box">
                             <span className="text-xs text-secondary">Looking to offer services?</span>
-                            <a href="../../provider/register/register.html" className="text-xs font-semibold text-primary">
+                            <Link to="/register" className="text-xs font-semibold text-primary">
                                 Become a Provider <i className="fas fa-external-link-alt ml-1"></i>
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </form>

@@ -1,5 +1,6 @@
 import './Notifications.css';
 
+import { Link } from 'react-router-dom';
 export default function Notifications() {
   return (
     <>
@@ -17,9 +18,9 @@ export default function Notifications() {
                             <button className="btn btn-secondary text-xs">
                                 <i className="fas fa-check-double mr-1"></i> Mark All as Read
                             </button>
-                            <a href="../settings/settings.html" className="btn btn-outline text-xs" title="Notification Settings">
+                            <Link to="/settings" className="btn btn-outline text-xs" title="Notification Settings">
                                 <i className="fas fa-sliders-h mr-1"></i> Preferences
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
@@ -40,7 +41,7 @@ export default function Notifications() {
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-1">
                                             <div className="notif-title text-sm font-semibold text-text">
-                                                New Quotation Received from <a href="../quotation-details/quotation-details.html" className="text-primary">Farhan Ansari</a>
+                                                New Quotation Received from <Link to="#" className="text-primary">Farhan Ansari</Link>
                                             </div>
                                             <span className="text-xs text-muted">20m ago</span>
                                         </div>
@@ -48,8 +49,8 @@ export default function Notifications() {
                                             Apex Plumbing Solutions quoted <strong>₹3,200</strong> for "Bathroom Plumbing Repair & Pipe Leak Fix".
                                         </p>
                                         <div className="flex gap-2">
-                                            <a href="../quotation-details/quotation-details.html" className="btn btn-primary btn-xs">View Quotation</a>
-                                            <a href="../comparison/comparison.html" className="btn btn-secondary btn-xs">Compare (7)</a>
+                                            <Link to="#" className="btn btn-primary btn-xs">View Quotation</Link>
+                                            <Link to="#" className="btn btn-secondary btn-xs">Compare (7)</Link>
                                         </div>
                                     </div>
                                     <span className="unread-dot"></span>
@@ -63,14 +64,14 @@ export default function Notifications() {
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-1">
                                             <div className="notif-title text-sm font-semibold text-text">
-                                                New Message from <a href="../chat/chat.html" className="text-primary">Farhan Ansari</a>
+                                                New Message from <Link to="#" className="text-primary">Farhan Ansari</Link>
                                             </div>
                                             <span className="text-xs text-muted">1h ago</span>
                                         </div>
                                         <p className="text-xs text-secondary mb-2">
                                             "Pressure test is holding up nicely, no drips at all. Running hot and cold water..."
                                         </p>
-                                        <a href="../chat/chat.html" className="btn btn-secondary btn-xs">Reply in Chat</a>
+                                        <Link to="#" className="btn btn-secondary btn-xs">Reply in Chat</Link>
                                     </div>
                                     <span className="unread-dot"></span>
                                 </div>
@@ -90,7 +91,7 @@ export default function Notifications() {
                                         <p className="text-xs text-secondary mb-2">
                                             Farhan Ansari arrived on premises and marked the job milestone as <strong>In Progress</strong>.
                                         </p>
-                                        <a href="../booking-details/booking-details.html" className="btn btn-outline btn-xs">Track Progress</a>
+                                        <Link to="#" className="btn btn-outline btn-xs">Track Progress</Link>
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +119,7 @@ export default function Notifications() {
                                         <p className="text-xs text-secondary mb-2">
                                             "Kitchen Water Purifier Installation" has been locked for Oct 14 at 10:30 AM.
                                         </p>
-                                        <a href="../booking-details/booking-details.html" className="btn btn-outline btn-xs">View Schedule</a>
+                                        <Link to="#" className="btn btn-outline btn-xs">View Schedule</Link>
                                     </div>
                                 </div>
 
@@ -137,7 +138,7 @@ export default function Notifications() {
                                         <p className="text-xs text-secondary mb-2">
                                             Sunil Verma completed your AC foam jet service. Help the community by leaving a star rating.
                                         </p>
-                                        <a href="../reviews/reviews.html" className="btn btn-secondary btn-xs">Leave Review</a>
+                                        <Link to="#" className="btn btn-secondary btn-xs">Leave Review</Link>
                                     </div>
                                 </div>
                             </div>

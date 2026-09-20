@@ -1,5 +1,6 @@
 import './Dashboard.css';
 
+import { Link } from 'react-router-dom';
 export default function Dashboard() {
   return (
     <>
@@ -13,10 +14,10 @@ export default function Dashboard() {
                             You have <span className="text-primary font-semibold">7 new quotations</span> waiting for your review across 2 active requests.
                         </p>
                     </div>
-                    <a href="../create-request/create-request.html" className="btn btn-primary btn-lg cta-pulse-btn">
+                    <Link to="#" className="btn btn-primary btn-lg cta-pulse-btn">
                         <i className="fas fa-plus-circle"></i>
                         <span>Post a Service Request</span>
-                    </a>
+                    </Link>
                 </div>
 
                 
@@ -77,9 +78,9 @@ export default function Dashboard() {
                                     <h2 className="h5 mb-0">Active Service Requests</h2>
                                     <p className="text-xs text-secondary mb-0">Track quotes received from competing providers</p>
                                 </div>
-                                <a href="../requests/requests.html" className="btn btn-text text-xs">
+                                <Link to="#" className="btn btn-text text-xs">
                                     View All <i className="fas fa-chevron-right ml-1"></i>
-                                </a>
+                                </Link>
                             </div>
 
                             <div className="table-responsive">
@@ -97,9 +98,9 @@ export default function Dashboard() {
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <a href="../request-details/request-details.html" className="font-semibold text-text hover-primary">
+                                                <Link to="#" className="font-semibold text-text hover-primary">
                                                     Bathroom Plumbing & Pipe Leak Repair
-                                                </a>
+                                                </Link>
                                                 <div className="text-xs text-secondary mt-1">
                                                     <i className="fas fa-map-marker-alt"></i> Andheri West, Mumbai • Needed by Oct 15
                                                 </div>
@@ -115,21 +116,21 @@ export default function Dashboard() {
                                             <td><span className="badge badge-warning">Receiving Bids</span></td>
                                             <td className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <a href="../quotations/quotations.html" className="btn btn-secondary text-xs py-1">
+                                                    <Link to="#" className="btn btn-secondary text-xs py-1">
                                                         View Quotes (4)
-                                                    </a>
-                                                    <a href="../comparison/comparison.html" className="btn btn-primary text-xs py-1">
+                                                    </Link>
+                                                    <Link to="#" className="btn btn-primary text-xs py-1">
                                                         Compare
-                                                    </a>
+                                                    </Link>
                                                 </div>
                                             </td>
                                         </tr>
 
                                         <tr>
                                             <td>
-                                                <a href="../request-details/request-details.html" className="font-semibold text-text hover-primary">
+                                                <Link to="#" className="font-semibold text-text hover-primary">
                                                     Split AC Master Cleaning & Gas Refill
-                                                </a>
+                                                </Link>
                                                 <div className="text-xs text-secondary mt-1">
                                                     <i className="fas fa-map-marker-alt"></i> Bandra, Mumbai • Needed by Oct 18
                                                 </div>
@@ -145,21 +146,21 @@ export default function Dashboard() {
                                             <td><span className="badge badge-warning">Receiving Bids</span></td>
                                             <td className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <a href="../quotations/quotations.html" className="btn btn-secondary text-xs py-1">
+                                                    <Link to="#" className="btn btn-secondary text-xs py-1">
                                                         View Quotes (3)
-                                                    </a>
-                                                    <a href="../comparison/comparison.html" className="btn btn-primary text-xs py-1">
+                                                    </Link>
+                                                    <Link to="#" className="btn btn-primary text-xs py-1">
                                                         Compare
-                                                    </a>
+                                                    </Link>
                                                 </div>
                                             </td>
                                         </tr>
 
                                         <tr>
                                             <td>
-                                                <a href="../request-details/request-details.html" className="font-semibold text-text hover-primary">
+                                                <Link to="#" className="font-semibold text-text hover-primary">
                                                     Full 2BHK Deep House Sanitization
-                                                </a>
+                                                </Link>
                                                 <div className="text-xs text-secondary mt-1">
                                                     <i className="fas fa-map-marker-alt"></i> Juhu, Mumbai • Needed by Oct 24
                                                 </div>
@@ -171,9 +172,9 @@ export default function Dashboard() {
                                             </td>
                                             <td><span className="badge badge-primary">Published</span></td>
                                             <td className="text-right">
-                                                <a href="../request-details/request-details.html" className="btn btn-secondary text-xs py-1">
+                                                <Link to="#" className="btn btn-secondary text-xs py-1">
                                                     View Details
-                                                </a>
+                                                </Link>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -188,9 +189,9 @@ export default function Dashboard() {
                                     <h2 className="h5 mb-0">Upcoming Bookings</h2>
                                     <p className="text-xs text-secondary mb-0">Services confirmed and scheduled with providers</p>
                                 </div>
-                                <a href="../bookings/bookings.html" className="btn btn-text text-xs">
+                                <Link to="#" className="btn btn-text text-xs">
                                     All Bookings <i className="fas fa-chevron-right ml-1"></i>
-                                </a>
+                                </Link>
                             </div>
 
                             <div className="card-body">
@@ -225,12 +226,12 @@ export default function Dashboard() {
                                             <div className="text-xs text-secondary">Total Agreed</div>
                                             <div className="font-bold text-base text-text">₹1,200</div>
                                         </div>
-                                        <a href="../chat/chat.html" className="btn btn-secondary btn-sm" aria-label="Chat with Provider">
+                                        <Link to="#" className="btn btn-secondary btn-sm" aria-label="Chat with Provider">
                                             <i className="fas fa-comment-dots"></i> Chat
-                                        </a>
-                                        <a href="../booking-details/booking-details.html" className="btn btn-outline btn-sm">
+                                        </Link>
+                                        <Link to="#" className="btn btn-outline btn-sm">
                                             Manage
-                                        </a>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
@@ -317,9 +318,9 @@ export default function Dashboard() {
                                     <p className="text-xs text-secondary mb-3">
                                         Comparing quotations? Don't just look at the price. Check provider completion ratings, warranty offered on parts, and past customer reviews.
                                     </p>
-                                    <a href="../comparison/comparison.html" className="btn btn-outline text-xs py-1">
+                                    <Link to="#" className="btn btn-outline text-xs py-1">
                                         Open Provider Comparison Tool
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
