@@ -5,7 +5,7 @@ export default function Settings() {
     <>
       
     <div className="app-content">
-                {/*  Title  */}
+                
                 <div className="mb-6">
                         <h1 className="h2 mb-1">Account & Application Settings</h1>
                         <p className="text-secondary text-sm">
@@ -13,21 +13,21 @@ export default function Settings() {
                         </p>
                     </div>
 
-                    {/*  Settings Sections Container  */}
+                    
                     <div className="flex flex-col gap-6">
-                        {/*  1. Appearance / Theming  */}
+                        
                         <div className="card p-6">
                             <h2 className="h5 mb-2">Theme & Appearance</h2>
                             <p className="text-xs text-secondary mb-4">Choose your preferred visual style across all customer screens.</p>
                             
                             <div className="theme-options-grid">
-                                <div className="theme-card active" onClick={() => { /* document.documentElement.removeAttribute('data-theme'); localStorage.setItem('theme', 'dark'); */ }}>
+                                <div className="theme-card active" onClick={() => {  }}>
                                     <div className="theme-preview dark-preview mb-2"></div>
                                     <div className="font-semibold text-xs text-text">Dark Mode (Default)</div>
                                     <div className="text-xs text-secondary">Optimal contrast for low-light</div>
                                 </div>
 
-                                <div className="theme-card" onClick={() => { /* document.documentElement.setAttribute('data-theme', 'light'); localStorage.setItem('theme', 'light'); */ }}>
+                                <div className="theme-card" onClick={() => {  }}>
                                     <div className="theme-preview light-preview mb-2"></div>
                                     <div className="font-semibold text-xs text-text">Light Mode</div>
                                     <div className="text-xs text-secondary">Clean neutral surfaces</div>
@@ -35,7 +35,7 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/*  2. Account Security & Password  */}
+                        
                         <div className="card p-6">
                             <h2 className="h5 mb-2">Security & Password</h2>
                             <p className="text-xs text-secondary mb-4">Update your sign-in credentials to protect your marketplace account.</p>
@@ -57,7 +57,7 @@ export default function Settings() {
                             </form>
                         </div>
 
-                        {/*  3. Notification Preferences  */}
+                        
                         <div className="card p-6">
                             <h2 className="h5 mb-2">Notification Alerts</h2>
                             <p className="text-xs text-secondary mb-4">Configure which activity generates direct push or email alerts.</p>
@@ -109,7 +109,7 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/*  4. Location Preferences  */}
+                        
                         <div className="card p-6">
                             <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
                                 <h2 className="h5 mb-0">Location & Privacy Preferences</h2>
@@ -120,7 +120,7 @@ export default function Settings() {
                             <p className="text-xs text-secondary mb-4">Manage default address auto-fill and browser GPS permission preferences.</p>
 
                             <div className="flex flex-col gap-4">
-                                {/*  Default Location Summary  */}
+                                
                                 <div className="p-3 bg-surface-elevated rounded border flex justify-between items-center flex-wrap gap-2">
                                     <div className="flex items-center gap-3">
                                         <i className="fas fa-map-marker-alt text-primary text-lg"></i>
@@ -132,7 +132,7 @@ export default function Settings() {
                                     <span className="badge badge-verified text-xs"><i className="fas fa-check-circle mr-1"></i>Active</span>
                                 </div>
 
-                                {/*  Geolocation Permission Toggle  */}
+                                
                                 <div className="flex justify-between items-center py-2 border-bottom">
                                     <div>
                                         <div className="font-semibold text-xs text-text">Allow Browser Geolocation Detection</div>
@@ -144,7 +144,7 @@ export default function Settings() {
                                     </label>
                                 </div>
 
-                                {/*  Nearby Provider Matching Range  */}
+                                
                                 <div className="flex justify-between items-center py-2">
                                     <div>
                                         <div className="font-semibold text-xs text-text">Preferred Proximity Range for Providers</div>
@@ -159,7 +159,7 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/*  5. Privacy & Active Sessions  */}
+                        
                         <div className="card p-6">
                             <h2 className="h5 mb-2">Privacy & Active Sessions</h2>
                             <p className="text-xs text-secondary mb-4">Manage connected devices and data visibility.</p>
@@ -180,7 +180,7 @@ export default function Settings() {
                             </button>
                         </div>
 
-                        {/*  5. Danger Zone  */}
+                        
                         <div className="card p-6 border-danger">
                             <h2 className="h5 mb-2 text-danger">Danger Zone</h2>
                             <p className="text-xs text-secondary mb-4">
@@ -195,7 +195,7 @@ export default function Settings() {
         
     
 
-    {/*  Main JavaScript  */}
+    
     
 
     </>

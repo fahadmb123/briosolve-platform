@@ -6,13 +6,13 @@ export default function CustomerRegister() {
     <>
       
     <div className="auth-page-wrapper">
-        {/*  Floating Theme Toggle  */}
+        
         <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
             <i className="fas fa-sun"></i>
         </button>
 
         <div className="auth-card-container register-container">
-            {/*  Provider Callout Banner  */}
+            
             <div className="provider-callout-card mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="provider-badge-icon"><i className="fas fa-briefcase"></i></div>
@@ -27,7 +27,7 @@ export default function CustomerRegister() {
             </div>
 
             <div className="auth-card card">
-                {/*  Header  */}
+                
                 <div className="text-center mb-6">
                     <a href="../home/home.html" className="logo justify-center mb-3">
                         <i className="fas fa-layer-group text-primary"></i>
@@ -37,7 +37,7 @@ export default function CustomerRegister() {
                     <p className="text-secondary text-sm">Post requirements and receive competitive quotations for free</p>
                 </div>
 
-                {/*  Registration Form  */}
+                
                 <form action="../email-verification/email-verification.html" method="GET">
                     <div className="form-group">
                         <label className="form-label" htmlFor="full-name">Full Name</label>
@@ -103,7 +103,7 @@ export default function CustomerRegister() {
         </div>
     </div>
 
-    {/*  Main JavaScript  */}
+    
     
 
     </>

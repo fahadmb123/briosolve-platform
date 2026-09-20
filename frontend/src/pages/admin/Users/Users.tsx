@@ -5,7 +5,7 @@ export default function Users() {
   return (
     <>
 <div className="app-content">
-                {/*  Page Title  */}
+                
                 <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
                     <div>
                         <h1 className="h3 mb-1">User Accounts Directory</h1>
@@ -18,7 +18,7 @@ export default function Users() {
                     </div>
                 </div>
 
-                {/*  Search &amp; Filters Bar  */}
+                
                 <div className="admin-filter-bar">
                     <div className="admin-search-input">
                         <i className="fas fa-search"></i>
@@ -45,7 +45,7 @@ export default function Users() {
                     </div>
                 </div>
 
-                {/*  User List Table Card  */}
+                
                 <div className="admin-table-card">
                     <div className="admin-table-header">
                         <div className="text-sm font-semibold text-text">Registered Accounts (Showing 1–10 of 14,820)</div>
@@ -290,7 +290,7 @@ export default function Users() {
                         </table>
                     </div>
 
-                    {/*  Pagination Footer  */}
+                    
                     <div className="admin-pagination">
                         <div>Showing <strong>1 to 10</strong> of 14,820 accounts</div>
                         <div className="pagination-controls">
@@ -308,7 +308,7 @@ export default function Users() {
         
     
 
-    {/*  Modal 1: User Details Dialog  */}
+    
     <div className="admin-modal-overlay" id="userDetailsModal">
         <div className="admin-modal">
             <div className="admin-modal-header">
@@ -351,7 +351,7 @@ export default function Users() {
         </div>
     </div>
 
-    {/*  Modal 2: Suspend User Confirmation Dialog  */}
+    
     <div className="admin-modal-overlay" id="suspendModal">
         <div className="admin-modal">
             <div className="admin-modal-header">
@@ -383,7 +383,7 @@ export default function Users() {
         </div>
     </div>
 
-    {/*  Main JS &amp; Page Logic  */}
+    
     </>
   );
 }

@@ -5,7 +5,7 @@ export default function Verification() {
   return (
     <>
 <div className="app-content">
-                {/*  Verification Status Overview  */}
+                
                 <div className="verification-status-banner mb-6 p-4 rounded-lg flex items-center gap-4 bg-warning-light border border-warning" id="verification-banner">
                     <div className="status-icon bg-warning text-white rounded-full w-12 h-12 flex items-center justify-center text-xl flex-shrink-0">
                         <i className="fas fa-clock"></i>
@@ -16,9 +16,9 @@ export default function Verification() {
                     </div>
                 </div>
 
-                {/*  Document Upload Grid  */}
+                
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    {/*  Identity Document  */}
+                    
                     <div className="doc-upload-card bg-surface border rounded-xl p-5 text-center">
                         <div className="icon-circle bg-primary-light text-primary mx-auto w-16 h-16 rounded-full flex items-center justify-center text-2xl mb-4">
                             <i className="fas fa-id-card"></i>
@@ -32,7 +32,7 @@ export default function Verification() {
                         </div>
                     </div>
 
-                    {/*  Business Proof  */}
+                    
                     <div className="doc-upload-card bg-surface border rounded-xl p-5 text-center">
                         <div className="icon-circle bg-primary-light text-primary mx-auto w-16 h-16 rounded-full flex items-center justify-center text-2xl mb-4">
                             <i className="fas fa-file-contract"></i>
@@ -46,7 +46,7 @@ export default function Verification() {
                         </div>
                     </div>
 
-                    {/*  Additional Document  */}
+                    
                     <div className="doc-upload-card bg-surface border rounded-xl p-5 text-center">
                         <div className="icon-circle bg-primary-light text-primary mx-auto w-16 h-16 rounded-full flex items-center justify-center text-2xl mb-4">
                             <i className="fas fa-certificate"></i>
@@ -72,7 +72,7 @@ export default function Verification() {
         
     
 
-    {/*  Main JavaScript  */}
+    
     </>
   );
 }

@@ -8,7 +8,7 @@ export default function Profile() {
                 <form id="profile-form">
                     <div className="grid grid-cols-1 lg-grid-cols-3 gap-6">
                         
-                        {/*  Left: Core info  */}
+                        
                         <div className="lg-col-span-2 flex flex-col gap-6">
                             
                             <div className="card p-6">
@@ -80,7 +80,7 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/*  Right: Status Read-only info  */}
+                        
                         <div className="flex flex-col gap-6">
                             <div className="card p-5 border-danger bg-danger-light">
                                 <h3 className="h6 mb-3 uppercase tracking-wider text-xs text-danger border-bottom pb-2 border-danger">Account Status</h3>
@@ -109,7 +109,7 @@ export default function Profile() {
         
     
 
-    {/*  Main JavaScript  */}
+    
     </>
   );
 }

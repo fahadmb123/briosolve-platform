@@ -47,7 +47,7 @@ export default function InvestigatorLayout() {
                 </ul>
             </div>
             
-            {/*  User Info (Bottom)  */}
+            
             <div className="sidebar-user mt-auto border-top pt-4 mt-6">
                 <div className="flex items-center gap-3 px-2">
                     <div className="avatar avatar-sm bg-danger text-white font-bold">IN</div>

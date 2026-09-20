@@ -6,7 +6,7 @@ export default function ProviderRegister() {
     <>
       
     <div className="register-pro-wrapper">
-        {/*  Minimal Onboarding Topbar  */}
+        
         <header className="register-pro-header">
             <a href="../../user/home/home.html" className="logo">
                 <i className="fas fa-tools text-primary"></i>
@@ -23,9 +23,9 @@ export default function ProviderRegister() {
             </div>
         </header>
 
-        {/*  Main Form Container  */}
+        
         <main className="register-main-container">
-            {/*  Intro Banner  */}
+            
             <div className="onboarding-intro-card">
                 <div>
                     <span className="badge badge-primary text-xs mb-2">⚡ Pro Onboarding • Zero Commission</span>
@@ -44,7 +44,7 @@ export default function ProviderRegister() {
             </div>
 
             <form id="provider-register-form" action="../dashboard/dashboard.html" method="GET">
-                {/*  Stepper Progress Bar  */}
+                
                 <div className="stepper-wrapper mb-6">
                     <div className="stepper-item active" id="step-1-indicator">
                         <div className="stepper-circle">1</div>
@@ -68,7 +68,7 @@ export default function ProviderRegister() {
                     </div>
                 </div>
 
-                {/*  STEP 1: Account Information  */}
+                
                 <div className="form-step-card step-content active" id="step-1">
                     <div className="step-heading-row">
                         <div className="step-num-pill">1</div>
@@ -123,11 +123,11 @@ export default function ProviderRegister() {
                     </div>
                     
                     <div className="flex justify-end mt-5 pt-4 border-top">
-                        <button type="button" className="btn btn-primary" onClick={() => { /* nextStep(2) */ }}>Next Step <i className="fas fa-arrow-right ml-1"></i></button>
+                        <button type="button" className="btn btn-primary" onClick={() => {  }}>Next Step <i className="fas fa-arrow-right ml-1"></i></button>
                     </div>
                 </div>
 
-                {/*  STEP 2: Professional Information  */}
+                
                 <div className="form-step-card step-content" id="step-2" style={{ display: 'none' }}>
                     <div className="step-heading-row">
                         <div className="step-num-pill">2</div>
@@ -147,7 +147,7 @@ export default function ProviderRegister() {
                         </select>
                     </div>
 
-                    {/*  Service Selection by Category  */}
+                    
                     <div className="form-group mb-4">
                         <label className="form-label">Select Specific Services You Provide <span className="text-danger">*</span></label>
                         
@@ -184,25 +184,25 @@ export default function ProviderRegister() {
                         </div>
                     </div>
 
-                    {/*  Skills Tags  */}
+                    
                     <div className="form-group mb-4">
                         <label className="form-label" htmlFor="skills-input">Specific Trade Skills (Comma Separated)</label>
                         <input type="text" id="skills-input" className="form-control" placeholder="e.g. Concealed Leak Detection, R32 Gas Refill, Copper Brazing, CPVC Piping" value="Concealed Leak Detection, R32 Gas Refill, Copper Brazing, CPVC Piping, Pressure Testing" />
                     </div>
 
-                    {/*  Short Professional Bio  */}
+                    
                     <div className="form-group mb-0">
                         <label className="form-label" htmlFor="pro-bio">Professional Overview / Pitch to Clients</label>
                         <textarea id="pro-bio" className="form-control" rows={3} placeholder="Tell clients why they should choose your quotation...">Certified HVAC and licensed sanitary technician with 10+ years serving Mumbai residential complexes. Equipped with acoustic leak detectors and precision manifold gauges. Committed to transparent pricing and up to 180-day service warranties.</textarea>
                     </div>
                     
                     <div className="flex justify-between mt-5 pt-4 border-top">
-                        <button type="button" className="btn btn-secondary" onClick={() => { /* prevStep(1) */ }}><i className="fas fa-arrow-left mr-1"></i> Back</button>
-                        <button type="button" className="btn btn-primary" onClick={() => { /* nextStep(3) */ }}>Next Step <i className="fas fa-arrow-right ml-1"></i></button>
+                        <button type="button" className="btn btn-secondary" onClick={() => {  }}><i className="fas fa-arrow-left mr-1"></i> Back</button>
+                        <button type="button" className="btn btn-primary" onClick={() => {  }}>Next Step <i className="fas fa-arrow-right ml-1"></i></button>
                     </div>
                 </div>
 
-                {/*  STEP 3: Service Area & Coverage  */}
+                
                 <div className="form-step-card step-content" id="step-3" style={{ display: 'none' }}>
                     <div className="step-heading-row">
                         <div className="step-num-pill">3</div>
@@ -212,22 +212,22 @@ export default function ProviderRegister() {
                         </div>
                     </div>
 
-                    {/*  Interactive Provider Location & Radius Component  */}
+                    
                     <div id="pro-register-location-picker" className="mb-2"></div>
 
-                    {/*  Structured Provider Location Hidden Inputs  */}
+                    
                     <input type="hidden" id="pro-address" name="serviceAddress" value="Kodungallur, Thrissur, Kerala, India" />
                     <input type="hidden" id="pro-lat" name="serviceLatitude" value="10.2201" />
                     <input type="hidden" id="pro-lng" name="serviceLongitude" value="76.2002" />
                     <input type="hidden" id="pro-radius" name="serviceRadiusKm" value="20" />
                     
                     <div className="flex justify-between mt-5 pt-4 border-top">
-                        <button type="button" className="btn btn-secondary" onClick={() => { /* prevStep(2) */ }}><i className="fas fa-arrow-left mr-1"></i> Back</button>
-                        <button type="button" className="btn btn-primary" onClick={() => { /* nextStep(4) */ }}>Next Step <i className="fas fa-arrow-right ml-1"></i></button>
+                        <button type="button" className="btn btn-secondary" onClick={() => {  }}><i className="fas fa-arrow-left mr-1"></i> Back</button>
+                        <button type="button" className="btn btn-primary" onClick={() => {  }}>Next Step <i className="fas fa-arrow-right ml-1"></i></button>
                     </div>
                 </div>
 
-                {/*  STEP 4: Availability & Working Hours  */}
+                
                 <div className="form-step-card step-content" id="step-4" style={{ display: 'none' }}>
                     <div className="step-heading-row">
                         <div className="step-num-pill">4</div>
@@ -237,28 +237,28 @@ export default function ProviderRegister() {
                         </div>
                     </div>
 
-                    {/*  Weekly Schedule UI  */}
+                    
                     <div className="mt-4 pt-3 border-top">
                         <h3 className="h6 mb-3">Weekly Working Schedule</h3>
                         <div id="weekly-schedule-container" className="schedule-days-container text-sm">
-                            {/*  Populated dynamically via JS  */}
+                            
                         </div>
                     </div>
 
-                    {/*  Specific Date Overrides UI  */}
+                    
                     <div className="mt-4 pt-3 border-top">
                         <div className="flex justify-between items-center mb-3">
                             <h3 className="h6 mb-0">Specific Date Overrides</h3>
-                            <button type="button" className="btn btn-outline btn-xs" onClick={() => { /* addDateOverride() */ }}>Add Date Override</button>
+                            <button type="button" className="btn btn-outline btn-xs" onClick={() => {  }}>Add Date Override</button>
                         </div>
                         <p className="text-xs text-secondary mb-3">Set custom hours or take a specific day off. This overrides your weekly schedule.</p>
                         
                         <div id="date-overrides-container">
-                            {/*  Populated dynamically via JS  */}
+                            
                         </div>
                     </div>
                     
-                    {/*  Travel Buffer  */}
+                    
                     <div className="mt-4 pt-3 border-top">
                         <div className="form-group mb-0">
                             <label className="form-label">Travel Buffer Time (Minutes)</label>
@@ -274,12 +274,12 @@ export default function ProviderRegister() {
                     </div>
                     
                     <div className="flex justify-between mt-5 pt-4 border-top">
-                        <button type="button" className="btn btn-secondary" onClick={() => { /* prevStep(3) */ }}><i className="fas fa-arrow-left mr-1"></i> Back</button>
-                        <button type="button" className="btn btn-primary" onClick={() => { /* nextStep(5) */ }}>Next Step <i className="fas fa-arrow-right ml-1"></i></button>
+                        <button type="button" className="btn btn-secondary" onClick={() => {  }}><i className="fas fa-arrow-left mr-1"></i> Back</button>
+                        <button type="button" className="btn btn-primary" onClick={() => {  }}>Next Step <i className="fas fa-arrow-right ml-1"></i></button>
                     </div>
                 </div>
 
-                {/*  STEP 5: Review & Submit  */}
+                
                 <div className="form-step-card step-content" id="step-5" style={{ display: 'none' }}>
                     <div className="step-heading-row">
                         <div className="step-num-pill">5</div>
@@ -314,7 +314,7 @@ export default function ProviderRegister() {
                         </div>
                     </div>
 
-                    {/*  Terms & Submit Button  */}
+                    
                     <div className="register-actions-footer bg-transparent p-0 border-0">
                         <label className="flex items-center gap-2 cursor-pointer text-xs text-secondary w-full justify-center mb-4">
                             <input type="checkbox" id="accept-terms" required checked className="w-4 h-4 accent-primary" />
@@ -322,10 +322,10 @@ export default function ProviderRegister() {
                         </label>
 
                         <div className="flex gap-3 w-full max-w-md mx-auto">
-                            <button type="button" className="btn btn-secondary w-full" onClick={() => { /* prevStep(4) */ }}>
+                            <button type="button" className="btn btn-secondary w-full" onClick={() => {  }}>
                                 <i className="fas fa-arrow-left mr-2"></i> Back
                             </button>
-                            <button type="button" className="btn btn-primary w-full" onClick={() => { /* submitRegistration() */ }}>
+                            <button type="button" className="btn btn-primary w-full" onClick={() => {  }}>
                                 <i className="fas fa-check-circle mr-2"></i> Submit Application
                             </button>
                         </div>
@@ -341,9 +341,9 @@ export default function ProviderRegister() {
         </main>
     </div>
 
-    {/*  Main JavaScript  */}
     
-    {/*  Leaflet & Location Picker JS  */}
+    
+    
     
     
     

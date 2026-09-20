@@ -5,7 +5,7 @@ export default function Notifications() {
     <>
       
     <div className="app-content">
-                {/*  Heading and Actions  */}
+                
                 <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
                         <div>
                             <h1 className="h2 mb-1">Notifications & Activity Alerts</h1>
@@ -23,16 +23,16 @@ export default function Notifications() {
                         </div>
                     </div>
 
-                    {/*  Notification Groups Container  */}
+                    
                     <div className="flex flex-col gap-6">
-                        {/*  GROUP 1: TODAY  */}
+                        
                         <div className="card p-0 notif-group-card">
                             <div className="group-header p-3 px-4 border-bottom bg-surface-elevated font-semibold text-xs text-secondary uppercase tracking-wider">
                                 Today
                             </div>
 
                             <div className="notif-list">
-                                {/*  Notif 1: Quotation (Unread)  */}
+                                
                                 <div className="notif-item unread flex items-start gap-4 p-4 border-bottom">
                                     <div className="notif-type-icon bg-warning-light text-warning">
                                         <i className="fas fa-file-invoice-dollar"></i>
@@ -55,7 +55,7 @@ export default function Notifications() {
                                     <span className="unread-dot"></span>
                                 </div>
 
-                                {/*  Notif 2: Message (Unread)  */}
+                                
                                 <div className="notif-item unread flex items-start gap-4 p-4 border-bottom">
                                     <div className="notif-type-icon bg-info-light text-info">
                                         <i className="fas fa-comment-dots"></i>
@@ -75,7 +75,7 @@ export default function Notifications() {
                                     <span className="unread-dot"></span>
                                 </div>
 
-                                {/*  Notif 3: Status Milestone  */}
+                                
                                 <div className="notif-item flex items-start gap-4 p-4">
                                     <div className="notif-type-icon bg-success-light text-success">
                                         <i className="fas fa-wrench"></i>
@@ -96,14 +96,14 @@ export default function Notifications() {
                             </div>
                         </div>
 
-                        {/*  GROUP 2: YESTERDAY  */}
+                        
                         <div className="card p-0 notif-group-card">
                             <div className="group-header p-3 px-4 border-bottom bg-surface-elevated font-semibold text-xs text-secondary uppercase tracking-wider">
                                 Yesterday
                             </div>
 
                             <div className="notif-list">
-                                {/*  Notif 4: Booking Scheduled  */}
+                                
                                 <div className="notif-item flex items-start gap-4 p-4 border-bottom">
                                     <div className="notif-type-icon bg-primary-light text-primary">
                                         <i className="fas fa-calendar-check"></i>
@@ -122,7 +122,7 @@ export default function Notifications() {
                                     </div>
                                 </div>
 
-                                {/*  Notif 5: Review Reminder  */}
+                                
                                 <div className="notif-item flex items-start gap-4 p-4">
                                     <div className="notif-type-icon bg-warning-light text-warning">
                                         <i className="fas fa-star"></i>
@@ -143,14 +143,14 @@ export default function Notifications() {
                             </div>
                         </div>
 
-                        {/*  GROUP 3: EARLIER  */}
+                        
                         <div className="card p-0 notif-group-card">
                             <div className="group-header p-3 px-4 border-bottom bg-surface-elevated font-semibold text-xs text-secondary uppercase tracking-wider">
                                 Earlier this month
                             </div>
 
                             <div className="notif-list">
-                                {/*  Notif 6: System Notification  */}
+                                
                                 <div className="notif-item flex items-start gap-4 p-4">
                                     <div className="notif-type-icon bg-surface-elevated text-secondary">
                                         <i className="fas fa-shield-alt"></i>
@@ -174,7 +174,7 @@ export default function Notifications() {
         
     
 
-    {/*  Main JavaScript  */}
+    
     
 
     </>

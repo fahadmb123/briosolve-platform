@@ -5,7 +5,7 @@ export default function Verification() {
   return (
     <>
 <div className="app-content">
-                {/*  Page Title  */}
+                
                 <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
                     <div>
                         <h1 className="h3 mb-1">Provider Verification Queue</h1>
@@ -16,7 +16,7 @@ export default function Verification() {
                     </div>
                 </div>
 
-                {/*  Verification Pipeline Metrics  */}
+                
                 <div className="admin-kpi-grid" style={{"gridTemplateColumns":"repeat(auto-fit, minmax(200px, 1fr))"}}>
                     <div className="admin-kpi-card">
                         <div className="admin-kpi-icon bg-warning-light text-warning">
@@ -56,7 +56,7 @@ export default function Verification() {
                     </div>
                 </div>
 
-                {/*  Verification Queue Table  */}
+                
                 <div className="admin-table-card">
                     <div className="admin-table-header">
                         <div className="text-sm font-semibold text-text">Dossiers Awaiting Audit (18 Applications)</div>
@@ -184,7 +184,7 @@ export default function Verification() {
         
     
 
-    {/*  Verification Review Modal Dialog  */}
+    
     <div className="admin-modal-overlay" id="reviewDossierModal">
         <div className="admin-modal" style={{"maxWidth":"600px"}}>
             <div className="admin-modal-header">
@@ -195,7 +195,7 @@ export default function Verification() {
                 <button className="btn-icon" onClick={() => {}}><i className="fas fa-times"></i></button>
             </div>
             <div className="admin-modal-body">
-                {/*  Provider Meta Header  */}
+                
                 <div className="flex items-center gap-3 p-3 bg-surface-elevated rounded-md border mb-4">
                     <img id="dossierAvatar" src="https://ui-avatars.com/api/?name=Provider&amp;background=6B7C98&amp;color=fff" className="avatar avatar-md" alt="Avatar" />
                     <div>
@@ -206,7 +206,7 @@ export default function Verification() {
                     <span className="badge badge-pending ml-auto">Pending Review</span>
                 </div>
 
-                {/*  Document Checklist &amp; Masked Previews  */}
+                
                 <h5 className="text-xs font-semibold text-secondary uppercase mb-2">Uploaded Document Credentials</h5>
                 
                 <div className="doc-preview-box">
@@ -236,7 +236,7 @@ export default function Verification() {
                     <span className="badge badge-neutral text-xs">Workshop Verified</span>
                 </div>
 
-                {/*  Rejection Reason Field (collapsible)  */}
+                
                 <div id="rejectionField" className="mt-3 p-3 bg-danger-light border rounded" style={{"display":"none"}}>
                     <label className="form-label text-xs text-danger font-semibold mb-1">Specific Rejection Reason (Dispatched to Provider)</label>
                     <textarea className="form-control text-xs" id="rejectionReasonText" rows="2" placeholder="e.g. Uploaded trade certificate is expired or illegible. Please submit valid ITI diploma."></textarea>
@@ -254,7 +254,7 @@ export default function Verification() {
         </div>
     </div>
 
-    {/*  Main JS &amp; Page Logic  */}
+    
     </>
   );
 }

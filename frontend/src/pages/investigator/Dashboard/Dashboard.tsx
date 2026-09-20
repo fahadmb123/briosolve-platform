@@ -5,9 +5,9 @@ export default function Dashboard() {
   return (
     <>
 <div className="app-content">
-                {/*  Stats Row  */}
+                
                 <div className="grid grid-cols-1 md-grid-cols-3 gap-6 mb-8">
-                    {/*  Stat 1  */}
+                    
                     <div className="card p-5 border-primary bg-primary-light">
                         <div className="flex justify-between items-center mb-3">
                             <h3 className="text-sm font-bold text-primary uppercase tracking-wider">Total Assigned</h3>
@@ -17,7 +17,7 @@ export default function Dashboard() {
                         <div className="text-xs text-primary font-medium mt-2">All-time assignments</div>
                     </div>
                     
-                    {/*  Stat 2  */}
+                    
                     <div className="card p-5 border-danger bg-danger-light">
                         <div className="flex justify-between items-center mb-3">
                             <h3 className="text-sm font-bold text-danger uppercase tracking-wider">Pending Investigations</h3>
@@ -27,7 +27,7 @@ export default function Dashboard() {
                         <div className="text-xs text-danger font-medium mt-2">Requires immediate action</div>
                     </div>
 
-                    {/*  Stat 3  */}
+                    
                     <div className="card p-5 border-success">
                         <div className="flex justify-between items-center mb-3">
                             <h3 className="text-sm font-bold text-success uppercase tracking-wider">Completed</h3>
@@ -42,13 +42,13 @@ export default function Dashboard() {
                     <h2 className="h5 mb-0">Action Required: Active Cases</h2>
                 </div>
 
-                {/*  Investigations List  */}
+                
                 <div id="investigations-list" className="flex flex-col gap-4">
                     <div id="empty-state" style={{"display":"none"}} className="card p-5 text-center text-secondary">
                         No assigned investigations currently.
                     </div>
                     
-                    {/*  Investigation Card 1  */}
+                    
                     <div className="card p-5 inv-card" data-inv-id="INV-9802">
                         <div className="flex flex-wrap justify-between items-start gap-4 mb-3 border-bottom pb-3">
                             <div>
@@ -87,7 +87,7 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/*  Investigation Card 2  */}
+                    
                     <div className="card p-5 inv-card" data-inv-id="INV-9801">
                         <div className="flex flex-wrap justify-between items-start gap-4 mb-3 border-bottom pb-3">
                             <div>
@@ -131,7 +131,7 @@ export default function Dashboard() {
         
     
 
-    {/*  Main JavaScript  */}
+    
     </>
   );
 }

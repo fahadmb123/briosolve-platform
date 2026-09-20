@@ -5,7 +5,7 @@ export default function Dashboard() {
   return (
     <>
 <div className="app-content">
-                {/*  Page Header Title  */}
+                
                 <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
                     <div>
                         <h1 className="h3 mb-1">Administrative Overview</h1>
@@ -21,7 +21,7 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/*  8 Dashboard Statistics Cards  */}
+                
                 <div className="admin-kpi-grid">
                     <div className="admin-kpi-card">
                         <div className="admin-kpi-icon bg-primary-light text-primary">
@@ -103,7 +103,7 @@ export default function Dashboard() {
                         </div>
                     </div>
                     
-                    {/*  Product Marketplace KPIs  */}
+                    
                     <div className="admin-kpi-card">
                         <div className="admin-kpi-icon bg-success-light text-success">
                             <i className="fas fa-box-open"></i>
@@ -145,11 +145,11 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/*  Two-Column Operational Layout  */}
+                
                 <div className="dashboard-layout-grid">
-                    {/*  Left: Recent Activity &amp; Platform Health  */}
+                    
                     <div>
-                        {/*  Recent Activity Feed Card  */}
+                        
                         <div className="card p-5 mb-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="h5 mb-0"><i className="fas fa-bolt text-warning mr-2"></i>Recent Platform Activity</h2>
@@ -237,7 +237,7 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/*  Platform Health &amp; Summary  */}
+                        
                         <div className="card p-5">
                             <h2 className="h5 mb-3"><i className="fas fa-server text-info mr-2"></i>Platform Operational Health</h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -260,7 +260,7 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/*  Right Column: Pending Governance Actions  */}
+                    
                     <div>
                         <div className="card p-5">
                             <div className="flex justify-between items-center mb-4">
@@ -270,7 +270,7 @@ export default function Dashboard() {
 
                             <p className="text-xs text-secondary mb-4">Operational tasks requiring administrator intervention and review.</p>
 
-                            {/*  Action 1  */}
+                            
                             <div className="pending-action-card">
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -282,7 +282,7 @@ export default function Dashboard() {
                                 <a href="../verification/verification.html" className="btn btn-secondary text-xs">Review</a>
                             </div>
 
-                            {/*  Action 2  */}
+                            
                             <div className="pending-action-card">
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -294,7 +294,7 @@ export default function Dashboard() {
                                 <a href="../verification/verification.html" className="btn btn-secondary text-xs">Review</a>
                             </div>
 
-                            {/*  Action 3  */}
+                            
                             <div className="pending-action-card">
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -306,7 +306,7 @@ export default function Dashboard() {
                                 <a href="../investigations/investigations.html" className="btn btn-secondary text-xs">Investigate</a>
                             </div>
 
-                            {/*  Action 4  */}
+                            
                             <div className="pending-action-card">
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -318,7 +318,7 @@ export default function Dashboard() {
                                 <a href="../reviews/reviews.html" className="btn btn-secondary text-xs">Moderate</a>
                             </div>
 
-                            {/*  Action 5  */}
+                            
                             <div className="pending-action-card">
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -342,7 +342,7 @@ export default function Dashboard() {
         
     
 
-    {/*  Main JS  */}
+    
     </>
   );
 }

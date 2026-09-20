@@ -5,7 +5,7 @@ export default function Providers() {
   return (
     <>
 <div className="app-content">
-                {/*  Page Title  */}
+                
                 <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
                     <div>
                         <h1 className="h3 mb-1">Service Provider Management</h1>
@@ -18,7 +18,7 @@ export default function Providers() {
                     </div>
                 </div>
 
-                {/*  Search &amp; Filters Bar  */}
+                
                 <div className="admin-filter-bar">
                     <div className="admin-search-input">
                         <i className="fas fa-search"></i>
@@ -45,7 +45,7 @@ export default function Providers() {
                     </div>
                 </div>
 
-                {/*  Provider Table Card  */}
+                
                 <div className="admin-table-card">
                     <div className="admin-table-header">
                         <div className="text-sm font-semibold text-text">3,410 Providers Listed (Showing 1–8)</div>
@@ -314,7 +314,7 @@ export default function Providers() {
                         </table>
                     </div>
 
-                    {/*  Pagination Footer  */}
+                    
                     <div className="admin-pagination">
                         <div>Showing <strong>1 to 8</strong> of 3,410 verified specialists</div>
                         <div className="pagination-controls">
@@ -332,7 +332,7 @@ export default function Providers() {
         
     
 
-    {/*  Modal 1: Provider Details Dialog  */}
+    
     <div className="admin-modal-overlay" id="providerDetailsModal">
         <div className="admin-modal">
             <div className="admin-modal-header">
@@ -380,7 +380,7 @@ export default function Providers() {
         </div>
     </div>
 
-    {/*  Modal 2: Suspend Provider Confirmation Dialog  */}
+    
     <div className="admin-modal-overlay" id="suspendModal">
         <div className="admin-modal">
             <div className="admin-modal-header">
@@ -412,7 +412,7 @@ export default function Providers() {
         </div>
     </div>
 
-    {/*  Main JS &amp; Page Logic  */}
+    
     </>
   );
 }

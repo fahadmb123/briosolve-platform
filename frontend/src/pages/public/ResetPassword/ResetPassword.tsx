@@ -6,7 +6,7 @@ export default function ResetPassword() {
     <>
       
     <div className="auth-page-wrapper">
-        {/*  Floating Theme Toggle  */}
+        
         <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
             <i className="fas fa-sun"></i>
         </button>
@@ -66,7 +66,7 @@ export default function ResetPassword() {
         </div>
     </div>
 
-    {/*  Main JavaScript  */}
+    
     
 
     </>

@@ -5,7 +5,7 @@ export default function Profile() {
   return (
     <>
 <div className="app-content">
-                {/*  1. MODERN PROFILE HERO COVER BANNER  */}
+                
                 <div className="profile-hero-card">
                     <div className="profile-cover-banner">
                         <span className="profile-cover-badge">
@@ -61,11 +61,11 @@ export default function Profile() {
                     </div>
                 </div>
 
-                {/*  2. TWO-COLUMN MAIN CONTENT GRID  */}
+                
                 <div className="profile-content-grid">
-                    {/*  Left Column: Biography, Credentials, Skills &amp; Portfolio  */}
+                    
                     <div>
-                        {/*  Card 1: About &amp; Professional Background  */}
+                        
                         <div className="profile-card">
                             <div className="profile-card-header">
                                 <h2 className="profile-card-title">
@@ -77,7 +77,7 @@ export default function Profile() {
                                 Licensed master technician with a decade of hands-on expertise specializing in multi-storey residential leak diagnostics, concealed sanitary overhaul, high-pressure CPVC piping, and inverter air conditioner servicing. Equipped with state-of-the-art ultrasonic acoustic leak listening sensors and digital manifold gauges for zero-destruction troubleshooting.
                             </p>
 
-                            {/*  Credentials Micro Grid  */}
+                            
                             <div className="credentials-micro-grid">
                                 <div className="credential-item">
                                     <div className="credential-icon">
@@ -109,7 +109,7 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/*  Card 2: Specialized Technical Skills  */}
+                        
                         <div className="profile-card">
                             <div className="profile-card-header">
                                 <h2 className="profile-card-title">
@@ -139,7 +139,7 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/*  Card 3: Primary Service Categories  */}
+                        
                         <div className="profile-card">
                             <div className="profile-card-header">
                                 <h2 className="profile-card-title">
@@ -189,7 +189,7 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/*  Card 4: Completed Job Portfolio Gallery  */}
+                        
                         <div className="profile-card">
                             <div className="profile-card-header">
                                 <div>
@@ -204,7 +204,7 @@ export default function Profile() {
                             </div>
 
                             <div className="portfolio-gallery-grid">
-                                {/*  Project 1  */}
+                                
                                 <div className="portfolio-item-card">
                                     <div className="portfolio-thumb-wrapper">
                                         <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&amp;auto=format&amp;fit=crop&amp;q=80" alt="Concealed Pipe Repair" />
@@ -221,7 +221,7 @@ export default function Profile() {
                                     </div>
                                 </div>
 
-                                {/*  Project 2  */}
+                                
                                 <div className="portfolio-item-card">
                                     <div className="portfolio-thumb-wrapper">
                                         <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&amp;auto=format&amp;fit=crop&amp;q=80" alt="AC Coil Jet Cleaning" />
@@ -238,7 +238,7 @@ export default function Profile() {
                                     </div>
                                 </div>
 
-                                {/*  Project 3  */}
+                                
                                 <div className="portfolio-item-card">
                                     <div className="portfolio-thumb-wrapper">
                                         <img src="https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=600&amp;auto=format&amp;fit=crop&amp;q=80" alt="Brass Diverter Assembly" />
@@ -258,9 +258,9 @@ export default function Profile() {
                         </div>
                     </div>
 
-                    {/*  Right Column: Performance, Trust &amp; Schedule  */}
+                    
                     <div>
-                        {/*  Card 1: Platform Reputation &amp; Performance  */}
+                        
                         <div className="profile-card">
                             <div className="profile-card-header">
                                 <h3 className="profile-card-title">
@@ -329,7 +329,7 @@ export default function Profile() {
                             </a>
                         </div>
 
-                        {/*  Card 2: Verification Status &amp; Compliance Badges  */}
+                        
                         <div className="profile-card">
                             <div className="profile-card-header">
                                 <h3 className="profile-card-title">
@@ -369,7 +369,7 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/*  Card 3: Availability &amp; Service Radius  */}
+                        
                         <div className="profile-card">
                             <div className="profile-card-header">
                                 <h3 className="profile-card-title">
@@ -378,7 +378,7 @@ export default function Profile() {
                                 <span className="badge badge-success text-xs">Active</span>
                             </div>
 
-                            {/*  Weekly Day Pills  */}
+                            
                             <div className="weekdays-pill-row">
                                 <div className="weekday-pill active" title="Monday (Working)">Mon</div>
                                 <div className="weekday-pill active" title="Tuesday (Working)">Tue</div>
@@ -405,7 +405,7 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/*  Card 4: Service Location &amp; Travel Radius  */}
+                        
                         <div className="profile-card">
                             <div className="profile-card-header">
                                 <h3 className="profile-card-title">
@@ -422,7 +422,7 @@ export default function Profile() {
                                 </div>
                             </div>
 
-                            {/*  Mini map with radius circle  */}
+                            
                             <div className="mini-map-preview" id="pro-profile-mini-map">
                                 <div className="mini-map-overlay-badge">
                                     <i className="fas fa-compass text-primary"></i>
@@ -450,7 +450,7 @@ export default function Profile() {
         
     
 
-    {/*  Provider Location &amp; Radius Modal  */}
+    
     <div className="loc-modal-overlay" id="proLocModal">
         <div className="loc-modal" style={{"maxWidth":"600px"}}>
             <div className="loc-modal-header">
@@ -470,9 +470,9 @@ export default function Profile() {
         </div>
     </div>
 
-    {/*  Main JavaScript  */}
     
-    {/*  Leaflet &amp; Location Picker JS  */}
+    
+    
     </>
   );
 }

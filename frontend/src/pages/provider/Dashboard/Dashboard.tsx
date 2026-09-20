@@ -5,7 +5,7 @@ export default function Dashboard() {
   return (
     <>
 <div className="app-content">
-                {/*  Welcome Banner  */}
+                
                 <div className="pro-welcome-banner">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -27,7 +27,7 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/*  Service Area Summary Widget  */}
+                
                 <div className="card p-4 mb-6 flex justify-between items-center flex-wrap gap-3">
                     <div className="flex items-center gap-3">
                         <div className="icon-circle bg-primary-light text-primary" style={{"width":"40px","height":"40px","borderRadius":"50%","display":"flex","alignItems":"center","justifyContent":"center","fontSize":"1.1rem"}}>
@@ -46,9 +46,9 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/*  6 Core Marketplace Statistics  */}
+                
                 <div className="pro-stats-grid">
-                    {/*  Stat 1  */}
+                    
                     <div className="card stat-widget">
                         <div className="stat-icon-wrapper bg-primary-light text-primary">
                             <i className="fas fa-search-dollar"></i>
@@ -58,7 +58,7 @@ export default function Dashboard() {
                         <div className="stat-meta text-primary"><i className="fas fa-bolt mr-1"></i> In your radius</div>
                     </div>
 
-                    {/*  Stat 2  */}
+                    
                     <div className="card stat-widget">
                         <div className="stat-icon-wrapper bg-warning-light text-warning">
                             <i className="fas fa-file-invoice-dollar"></i>
@@ -68,7 +68,7 @@ export default function Dashboard() {
                         <div className="stat-meta text-warning"><i className="fas fa-clock mr-1"></i> Under review</div>
                     </div>
 
-                    {/*  Stat 3  */}
+                    
                     <div className="card stat-widget">
                         <div className="stat-icon-wrapper bg-info-light text-info">
                             <i className="fas fa-calendar-check"></i>
@@ -78,7 +78,7 @@ export default function Dashboard() {
                         <div className="stat-meta text-info"><i className="fas fa-calendar-day mr-1"></i> Next: Tomorrow</div>
                     </div>
 
-                    {/*  Stat 4  */}
+                    
                     <div className="card stat-widget">
                         <div className="stat-icon-wrapper bg-success-light text-success">
                             <i className="fas fa-check-double"></i>
@@ -88,7 +88,7 @@ export default function Dashboard() {
                         <div className="stat-meta text-success"><i className="fas fa-check-circle mr-1"></i> 99.4% on time</div>
                     </div>
 
-                    {/*  Stat 5  */}
+                    
                     <div className="card stat-widget">
                         <div className="stat-icon-wrapper bg-warning-light text-warning">
                             <i className="fas fa-star"></i>
@@ -98,7 +98,7 @@ export default function Dashboard() {
                         <div className="stat-meta text-success"><i className="fas fa-thumbs-up mr-1"></i> 186 reviews</div>
                     </div>
 
-                    {/*  Stat 6 (Informational statistics only, no payment functionality)  */}
+                    
                     <div className="card stat-widget">
                         <div className="stat-icon-wrapper bg-primary-light text-primary">
                             <i className="fas fa-chart-line"></i>
@@ -109,9 +109,9 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/*  Two Column Layout: New Opportunities (Left) &amp; Recent Activity (Right)  */}
+                
                 <div className="dashboard-grid-container">
-                    {/*  Left: New Opportunities Stream  */}
+                    
                     <div className="flex flex-col gap-4">
                         <div className="flex justify-between items-center">
                             <div>
@@ -123,7 +123,7 @@ export default function Dashboard() {
                             </a>
                         </div>
 
-                        {/*  Opportunity 1 (Urgent / Top Match)  */}
+                        
                         <div className="opportunity-card match-lead">
                             <div className="flex justify-between items-start flex-wrap gap-3 mb-2">
                                 <div>
@@ -164,7 +164,7 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/*  Opportunity 2  */}
+                        
                         <div className="opportunity-card urgent-lead">
                             <div className="flex justify-between items-start flex-wrap gap-3 mb-2">
                                 <div>
@@ -205,7 +205,7 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/*  Opportunity 3  */}
+                        
                         <div className="opportunity-card">
                             <div className="flex justify-between items-start flex-wrap gap-3 mb-2">
                                 <div>
@@ -247,9 +247,9 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/*  Right: Recent Activity &amp; Quick Schedule  */}
+                    
                     <div className="flex flex-col gap-4">
-                        {/*  Activity Feed Card  */}
+                        
                         <div className="card p-5">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="h6 mb-0">Recent Activity</h3>
@@ -257,7 +257,7 @@ export default function Dashboard() {
                             </div>
 
                             <div className="activity-feed-list">
-                                {/*  Item 1  */}
+                                
                                 <div className="activity-feed-item">
                                     <div className="activity-icon-badge bg-success-light text-success">
                                         <i className="fas fa-check"></i>
@@ -270,7 +270,7 @@ export default function Dashboard() {
                                     </div>
                                 </div>
 
-                                {/*  Item 2  */}
+                                
                                 <div className="activity-feed-item">
                                     <div className="activity-icon-badge bg-primary-light text-primary">
                                         <i className="fas fa-comment-dots"></i>
@@ -283,7 +283,7 @@ export default function Dashboard() {
                                     </div>
                                 </div>
 
-                                {/*  Item 3  */}
+                                
                                 <div className="activity-feed-item">
                                     <div className="activity-icon-badge bg-info-light text-info">
                                         <i className="fas fa-calendar-check"></i>
@@ -296,7 +296,7 @@ export default function Dashboard() {
                                     </div>
                                 </div>
 
-                                {/*  Item 4  */}
+                                
                                 <div className="activity-feed-item">
                                     <div className="activity-icon-badge bg-warning-light text-warning">
                                         <i className="fas fa-star"></i>
@@ -311,7 +311,7 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/*  Verification &amp; Pro Tier Status Card  */}
+                        
                         <div className="card p-5" style={{"background":"linear-gradient(135deg, var(--surface) 0%, rgba(99, 102, 241, 0.05) 100%)"}}>
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="avatar avatar-sm bg-success-light text-success">
@@ -335,7 +335,7 @@ export default function Dashboard() {
         
     
 
-    {/*  Main JavaScript  */}
+    
     </>
   );
 }

@@ -5,7 +5,7 @@ export default function Profile() {
     <>
       
     <div className="app-content">
-                {/*  Heading  */}
+                
                 <div className="flex justify-between items-end flex-wrap gap-4 mb-6">
                         <div>
                             <h1 className="h2 mb-1">My Account Profile</h1>
@@ -20,7 +20,7 @@ export default function Profile() {
                         </div>
                     </div>
 
-                    {/*  Profile Header Summary Card  */}
+                    
                     <div className="card p-6 profile-summary-card mb-6">
                         <div className="flex justify-between items-center flex-wrap gap-4">
                             <div className="flex items-center gap-5">
@@ -51,9 +51,9 @@ export default function Profile() {
                         </div>
                     </div>
 
-                    {/*  Form Sections  */}
+                    
                     <form action="#" className="flex flex-col gap-6">
-                        {/*  Section 1: Personal Information  */}
+                        
                         <div className="card p-6">
                             <h3 className="h5 mb-4 border-bottom pb-3">Personal Information</h3>
                             <div className="form-row-2 mb-4">
@@ -72,7 +72,7 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/*  Section 2: Contact Information  */}
+                        
                         <div className="card p-6">
                             <h3 className="h5 mb-4 border-bottom pb-3">Contact Details</h3>
                             <div className="form-row-2">
@@ -98,19 +98,19 @@ export default function Profile() {
                                         <div id="mobile-verify-ui" className="bg-surface p-3 rounded border mb-2">
                                             <div id="mv-step-1">
                                                 <p className="text-xs text-secondary mb-2">We will send an OTP to verify this number.</p>
-                                                <button type="button" id="btn-send-otp" className="btn btn-primary btn-sm w-full" onClick={() => { /* sendMobileOtp() */ }}>Send OTP</button>
+                                                <button type="button" id="btn-send-otp" className="btn btn-primary btn-sm w-full" onClick={() => {  }}>Send OTP</button>
                                             </div>
                                             <div id="mv-step-2" style={{ display: 'none' }}>
                                                 <label className="text-xs font-semibold mb-1 block">Enter OTP</label>
                                                 <input type="text" id="mobile-otp" className="form-control form-control-sm mb-2" placeholder="e.g. 123456" maxLength={6} />
-                                                <button type="button" id="btn-verify-otp" className="btn btn-success btn-sm w-full" onClick={() => { /* verifyMobileOtp() */ }}>Verify Mobile</button>
+                                                <button type="button" id="btn-verify-otp" className="btn btn-success btn-sm w-full" onClick={() => {  }}>Verify Mobile</button>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div id="mobile-display-group">
                                         <div className="text-sm font-medium mb-3" id="verified-number-display">None</div>
-                                        <button type="button" id="btn-start-verify" className="btn btn-outline btn-sm w-full" onClick={() => { /* startMobileVerification() */ }}>
+                                        <button type="button" id="btn-start-verify" className="btn btn-outline btn-sm w-full" onClick={() => {  }}>
                                             Add & Verify Mobile
                                         </button>
                                     </div>
@@ -118,7 +118,7 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/*  Section 3: Default Location  */}
+                        
                         <div className="card p-6">
                             <div className="flex justify-between items-center mb-3 border-bottom pb-3">
                                 <div>
@@ -128,7 +128,7 @@ export default function Profile() {
                                 <span className="badge badge-verified"><i className="fas fa-home mr-1"></i>Primary Home</span>
                             </div>
 
-                            {/*  Non-overwriting advisory notice  */}
+                            
                             <div className="p-3 bg-surface-elevated border rounded text-xs text-secondary mb-4 flex items-center gap-2">
                                 <i className="fas fa-info-circle text-primary"></i>
                                 <span><strong>Note:</strong> Updating this default profile location sets your standard account address. It will not overwrite or alter existing service request locations.</span>
@@ -142,12 +142,12 @@ export default function Profile() {
                                         <div className="selected-loc-sub text-xs" id="profile-loc-sub">Kerala, India (10.2201° N, 76.2002° E)</div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn-primary btn-sm" onClick={() => { /* openProfileLocModal() */ }}>
+                                <button type="button" className="btn btn-primary btn-sm" onClick={() => {  }}>
                                     <i className="fas fa-edit mr-1"></i> Change Location
                                 </button>
                             </div>
 
-                            {/*  Mini Map View  */}
+                            
                             <div className="mini-map-preview" id="profile-mini-map">
                                 <div className="mini-map-overlay-badge">
                                     <i className="fas fa-map-pin text-primary"></i>
@@ -156,7 +156,7 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/*  Footer Actions  */}
+                        
                         <div className="flex justify-end items-center gap-3">
                             <button type="button" className="btn btn-secondary">Cancel</button>
                             <button type="submit" className="btn btn-primary btn-lg">
@@ -168,7 +168,7 @@ export default function Profile() {
         
     
 
-    {/*  Location Modal: Update Profile Default Location  */}
+    
     <div className="loc-modal-overlay" id="profileLocModal">
         <div className="loc-modal" style={{ maxWidth: '600px' }}>
             <div className="loc-modal-header">
@@ -176,21 +176,21 @@ export default function Profile() {
                     <i className="fas fa-home text-primary"></i>
                     <h3 className="h6 mb-0">Update Default Profile Location</h3>
                 </div>
-                <button className="btn-icon" onClick={() => { /* closeProfileLocModal() */ }}><i className="fas fa-times"></i></button>
+                <button className="btn-icon" onClick={() => {  }}><i className="fas fa-times"></i></button>
             </div>
             <div className="loc-modal-body">
                 <div id="profile-location-picker"></div>
             </div>
             <div className="loc-modal-footer">
-                <button type="button" className="btn btn-secondary text-xs" onClick={() => { /* closeProfileLocModal() */ }}>Cancel</button>
-                <button type="button" className="btn btn-primary text-xs" onClick={() => { /* saveProfileLocation() */ }}>Save Default Location</button>
+                <button type="button" className="btn btn-secondary text-xs" onClick={() => {  }}>Cancel</button>
+                <button type="button" className="btn btn-primary text-xs" onClick={() => {  }}>Save Default Location</button>
             </div>
         </div>
     </div>
 
-    {/*  Main JavaScript  */}
     
-    {/*  Leaflet & Location Picker JS  */}
+    
+    
     
     
     

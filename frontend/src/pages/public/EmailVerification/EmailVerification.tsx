@@ -6,7 +6,7 @@ export default function EmailVerification() {
     <>
       
     <div className="auth-page-wrapper">
-        {/*  Floating Theme Toggle  */}
+        
         <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
             <i className="fas fa-sun"></i>
         </button>
@@ -44,7 +44,7 @@ export default function EmailVerification() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <a href="#" onClick={() => { /* handleVerification(event) */ }} className="btn btn-primary w-full btn-lg">
+                    <a href="#" onClick={() => {  }} className="btn btn-primary w-full btn-lg">
                         <span>I've Verified My Email</span>
                         <i className="fas fa-arrow-right ml-1"></i>
                     </a>
@@ -67,7 +67,7 @@ export default function EmailVerification() {
         </div>
     </div>
 
-    {/*  Main JavaScript  */}
+    
     
     
 

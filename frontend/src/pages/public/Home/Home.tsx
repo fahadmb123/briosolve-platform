@@ -9,10 +9,10 @@ export default function Home() {
     <>
       
     <div className="app-container sidebar-modal-layout">
-        {/*  Sidebar Backdrop Overlay for Modal Mode  */}
+        
         <div id="sidebar-overlay" className={`sidebar-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
 
-        {/*  App Sidebar (Modal Drawer on Home)  */}
+        
         <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
             <div className="sidebar-brand">
                 <a href="home.html" className="logo">
@@ -116,9 +116,9 @@ export default function Home() {
             </div>
         </aside>
 
-        {/*  Main Content Area  */}
+        
         <main className="app-main">
-            {/*  App Header  */}
+            
             <header className="app-header">
                 <div className="flex items-center gap-3">
                     <button id="sidebar-toggle" className="btn-icon" aria-label="Toggle Sidebar" title="Open Menu" onClick={() => setIsSidebarOpen(true)}>
@@ -156,11 +156,11 @@ export default function Home() {
 
             <div className="app-content-home">
 
-                {/*  1. DYNAMIC SPLIT HERO SECTION  */}
+                
                 <header className="hero-split-section">
                     <div className="hero-ambient-glow"></div>
                     <div className="container hero-grid">
-                        {/*  Left: Value Prop & Interactive Smart Search  */}
+                        
                         <div className="hero-left">
                             <div className="hero-pill-badge">
                                 <span className="pulse-dot"></span>
@@ -176,7 +176,7 @@ export default function Home() {
                                 Stop scrolling through cluttered directories or dodging sales calls. Describe your task once, receive custom bids from background-verified local specialists, compare transparently, and hire on your terms.
                             </p>
 
-                            {/*  Modern Dual-Input Search Card  */}
+                            
                             <form action="../create-request/create-request.html" method="GET" className="modern-search-card">
                                 <div className="search-inputs-row">
                                     <div className="search-field-wrapper">
@@ -194,27 +194,27 @@ export default function Home() {
                                 </div>
                             </form>
 
-                            {/*  Quick Trending Pills  */}
+                            
                             <div className="trending-pills-row">
                                 <span className="trending-label">Trending:</span>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => { /* selectTrending('Plumbing & Leak Repair') */ }}>
+                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-tools mr-1"></i> Plumbing
                                 </a>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => { /* selectTrending('Split AC Jet Cleaning') */ }}>
+                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-snowflake mr-1"></i> AC Repair
                                 </a>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => { /* selectTrending('Switchboard & Wiring Fix') */ }}>
+                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-bolt mr-1"></i> Electrician
                                 </a>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => { /* selectTrending('Deep Home Cleaning') */ }}>
+                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-broom mr-1"></i> Deep Clean
                                 </a>
-                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => { /* selectTrending('Interior Wall Painting') */ }}>
+                                <a href="javascript:void(0)" className="trending-pill-chip" onClick={() => {  }}>
                                     <i className="fas fa-paint-roller mr-1"></i> Painter
                                 </a>
                             </div>
 
-                            {/*  Social Proof Avatars Cluster  */}
+                            
                             <div className="social-proof-cluster">
                                 <div className="avatar-stack">
                                     <div className="avatar-stack-item">
@@ -237,10 +237,10 @@ export default function Home() {
                             </div>
                         </div>
 
-                        {/*  Right: Interactive Live Bidding Simulator Card  */}
+                        
                         <div className="hero-right">
                             <div className="live-bidding-card">
-                                {/*  Top Request Header  */}
+                                
                                 <div className="live-card-top">
                                     <div className="flex items-center gap-2">
                                         <span className="live-tag-badge bg-primary-light text-primary">
@@ -252,7 +252,7 @@ export default function Home() {
                                     </span>
                                 </div>
 
-                                {/*  The Posted Requirement  */}
+                                
                                 <div className="live-req-summary">
                                     <div className="text-xs text-muted mb-1">REQ-84920 • Posted 14m ago by Aarav S.</div>
                                     <div className="live-req-title">Bathroom Plumbing Repair & Pipe Leak Fix</div>
@@ -263,14 +263,14 @@ export default function Home() {
                                     </div>
                                 </div>
 
-                                {/*  Competing Bids Feed  */}
+                                
                                 <div className="bids-feed-title">
                                     <span>Verified Providers Competing</span>
                                     <span className="text-primary text-xs" style={{ textTransform: 'none' }}><i className="fas fa-check-circle"></i> Price Bidding Active</span>
                                 </div>
 
                                 <div className="bids-feed-list">
-                                    {/*  Bid 1: AI Recommended Top Match  */}
+                                    
                                     <div className="live-bid-row featured-bid">
                                         <div className="bid-provider-info">
                                             <div className="bid-provider-avatar">
@@ -294,7 +294,7 @@ export default function Home() {
                                         </div>
                                     </div>
 
-                                    {/*  Bid 2  */}
+                                    
                                     <div className="live-bid-row">
                                         <div className="bid-provider-info">
                                             <div className="bid-provider-avatar">
@@ -313,7 +313,7 @@ export default function Home() {
                                         </div>
                                     </div>
 
-                                    {/*  Bid 3  */}
+                                    
                                     <div className="live-bid-row">
                                         <div className="bid-provider-info">
                                             <div className="bid-provider-avatar">
@@ -333,7 +333,7 @@ export default function Home() {
                                     </div>
                                 </div>
 
-                                {/*  Card Actions  */}
+                                
                                 <div className="live-card-actions">
                                     <a href="../comparison/comparison.html" className="btn btn-primary w-full btn-lg">
                                         <i className="fas fa-balance-scale mr-1"></i> Compare Quotations Side-by-Side
@@ -348,7 +348,7 @@ export default function Home() {
                     </div>
                 </header>
 
-                {/*  2. REAL-TIME MARKETPLACE PULSE MARQUEE STRIP  */}
+                
                 <div className="market-pulse-strip" aria-hidden="true">
                     <div className="pulse-track">
                         <div className="pulse-item">
@@ -375,7 +375,7 @@ export default function Home() {
                             <span className="pulse-item-badge"></span>
                             <strong>Interior Wall Painting</strong> in Thane got 5 quotes (Average saving: 28%)
                         </div>
-                        {/*  Duplicate for seamless continuous looping  */}
+                        
                         <div className="pulse-item">
                             <span className="pulse-item-badge"></span>
                             <strong>Split AC Jet Cleaning</strong> in Bandra received 4 bids in 12 mins (Saved ₹650)
@@ -395,7 +395,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/*  3. BENTO GRID CATEGORIES SECTION  */}
+                
                 <section className="bento-section">
                     <div className="container">
                         <div className="section-header-modern">
@@ -416,7 +416,7 @@ export default function Home() {
                         </div>
 
                         <div className="bento-grid">
-                            {/*  Bento 1: Large Featured Card (Emergency & Plumbing)  */}
+                            
                             <a href="../category-details/category-details.html" className="bento-card bento-col-8">
                                 <div>
                                     <div className="bento-badge">
@@ -443,7 +443,7 @@ export default function Home() {
                                 </div>
                             </a>
 
-                            {/*  Bento 2: AC & Cooling Care  */}
+                            
                             <a href="../category-details/category-details.html" className="bento-card bento-col-4">
                                 <div>
                                     <div className="bento-badge" style={{ background: 'rgba(14, 165, 233, 0.15)', color: '#0284c7' }}>
@@ -463,7 +463,7 @@ export default function Home() {
                                 </div>
                             </a>
 
-                            {/*  Bento 3: Deep Home Cleaning  */}
+                            
                             <a href="../category-details/category-details.html" className="bento-card bento-col-4">
                                 <div>
                                     <div className="bento-badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#059669' }}>
@@ -483,7 +483,7 @@ export default function Home() {
                                 </div>
                             </a>
 
-                            {/*  Bento 4: Electrical & Wiring  */}
+                            
                             <a href="../category-details/category-details.html" className="bento-card bento-col-4">
                                 <div>
                                     <div className="bento-badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#d97706' }}>
@@ -503,7 +503,7 @@ export default function Home() {
                                 </div>
                             </a>
 
-                            {/*  Bento 5: Digital & Freelance Creative  */}
+                            
                             <a href="../category-details/category-details.html" className="bento-card bento-col-4">
                                 <div>
                                     <div className="bento-badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#9333ea' }}>
@@ -523,7 +523,7 @@ export default function Home() {
                                 </div>
                             </a>
 
-                            {/*  Bento 6: Wide Custom Request Banner  */}
+                            
                             <div className="bento-card bento-col-12 bento-custom-banner">
                                 <div className="flex justify-between items-center flex-wrap gap-4">
                                     <div>
@@ -540,7 +540,7 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/*  4. MODEL COMPARISON: OLD DIRECTORY vs REVERSEMARKET  */}
+                
                 <section className="comparison-section-modern">
                     <div className="container">
                         <div className="text-center max-w-2xl mx-auto mb-6">
@@ -550,7 +550,7 @@ export default function Home() {
                         </div>
 
                         <div className="comparison-matrix-grid">
-                            {/*  Old Way  */}
+                            
                             <div className="comparison-card old-way">
                                 <div className="comp-header">
                                     <h3 className="h4 mb-0">Traditional Directories</h3>
@@ -588,7 +588,7 @@ export default function Home() {
                                 </div>
                             </div>
 
-                            {/*  ReverseMarket Way  */}
+                            
                             <div className="comparison-card new-way">
                                 <div className="comp-header">
                                     <h3 className="h4 mb-0">ReverseMarket Platform</h3>
@@ -629,7 +629,7 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/*  5. HOW IT WORKS: 4-STEP INTERACTIVE STEPPER  */}
+                
                 <section id="how-it-works" className="stepper-section">
                     <div className="container">
                         <div className="text-center max-w-2xl mx-auto mb-6">
@@ -639,7 +639,7 @@ export default function Home() {
                         </div>
 
                         <div className="stepper-grid-modern">
-                            {/*  Step 1  */}
+                            
                             <div className="stepper-card-modern">
                                 <div className="stepper-step-number">01</div>
                                 <div className="stepper-icon-box">
@@ -649,7 +649,7 @@ export default function Home() {
                                 <p>Describe your issue, attach photos or dimensions, define your estimated budget in ₹, and set your target date.</p>
                             </div>
 
-                            {/*  Step 2  */}
+                            
                             <div className="stepper-card-modern">
                                 <div className="stepper-step-number">02</div>
                                 <div className="stepper-icon-box">
@@ -659,7 +659,7 @@ export default function Home() {
                                 <p>Verified local contractors review your project and submit competitive itemized quotations in real-time.</p>
                             </div>
 
-                            {/*  Step 3  */}
+                            
                             <div className="stepper-card-modern">
                                 <div className="stepper-step-number">03</div>
                                 <div className="stepper-icon-box">
@@ -669,7 +669,7 @@ export default function Home() {
                                 <p>Compare side-by-side: price, past homeowner reviews, completion rates, and AI recommendations to pick the best fit.</p>
                             </div>
 
-                            {/*  Step 4  */}
+                            
                             <div className="stepper-card-modern">
                                 <div className="stepper-step-number">04</div>
                                 <div className="stepper-icon-box">
@@ -682,19 +682,19 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/*  6. AUDIENCE SWITCHER: CUSTOMERS VS PROVIDERS  */}
+                
                 <section className="audience-section">
                     <div className="container">
                         <div className="audience-switcher-tabs">
-                            <button type="button" className="audience-tab-btn active" id="tab-customers-btn" onClick={() => { /* switchAudience('customers') */ }}>
+                            <button type="button" className="audience-tab-btn active" id="tab-customers-btn" onClick={() => {  }}>
                                 <i className="fas fa-user mr-1"></i> For Homeowners & Customers
                             </button>
-                            <button type="button" className="audience-tab-btn" id="tab-providers-btn" onClick={() => { /* switchAudience('providers') */ }}>
+                            <button type="button" className="audience-tab-btn" id="tab-providers-btn" onClick={() => {  }}>
                                 <i className="fas fa-briefcase mr-1"></i> For Independent Service Pros
                             </button>
                         </div>
 
-                        {/*  Customer Pane  */}
+                        
                         <div className="audience-content-pane active" id="pane-customers">
                             <div className="audience-text">
                                 <span className="badge badge-primary mb-2">Customer Advantages</span>
@@ -751,7 +751,7 @@ export default function Home() {
                             </div>
                         </div>
 
-                        {/*  Provider Pane  */}
+                        
                         <div className="audience-content-pane" id="pane-providers">
                             <div className="audience-text">
                                 <span className="badge badge-warning mb-2">Provider Growth Hub</span>
@@ -816,7 +816,7 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/*  7. PLATFORM TRUST & METRICS COUNTER  */}
+                
                 <section className="metrics-section">
                     <div className="container">
                         <div className="metrics-counter-grid">
@@ -840,7 +840,7 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/*  8. HIGH IMPACT MODERN CTA SECTION  */}
+                
                 <section className="modern-cta-section">
                     <div className="container">
                         <div className="modern-cta-box">
@@ -860,7 +860,7 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/*  9. COMPREHENSIVE MODERN FOOTER  */}
+                
                 <footer className="footer-modern">
                     <div className="container">
                         <div className="footer-grid-modern mb-8">
@@ -932,10 +932,10 @@ export default function Home() {
         </main>
     </div>
 
-    {/*  Main JavaScript  */}
     
     
-    {/*  Main JavaScript  */}
+    
+    
     
 
     </>

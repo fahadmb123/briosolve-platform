@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import React, { useEffect } from 'react';
 
-// Layouts
+
 const AdminLayout = React.lazy(() => import('../layouts/AdminLayout'));
 const ProviderLayout = React.lazy(() => import('../layouts/ProviderLayout'));
 const InvestigatorLayout = React.lazy(() => import('../layouts/InvestigatorLayout'));
 const CustomerLayout = React.lazy(() => import('../layouts/CustomerLayout'));
 
-// Route Modules
+
 import { adminRoutes } from './adminRoutes';
 import { providerRoutes } from './providerRoutes';
 import { investigatorRoutes } from './investigatorRoutes';
@@ -39,25 +39,25 @@ export function AppRouter() {
           <Route path="/">
             <Route index element={<Home />} />
             
-            {/* Public Routes */}
+            
             {publicRoutes}
             
-            {/* Customer Routes */}
+            
             <Route path="customer" element={<CustomerLayout />}>
               {customerRoutes}
             </Route>
             
-            {/* Provider Routes */}
+            
             <Route path="provider" element={<ProviderLayout />}>
               {providerRoutes}
             </Route>
 
-            {/* Admin Routes */}
+            
             <Route path="admin" element={<AdminLayout />}>
               {adminRoutes}
             </Route>
 
-            {/* Investigator Routes */}
+            
             <Route path="investigator" element={<InvestigatorLayout />}>
               {investigatorRoutes}
             </Route>

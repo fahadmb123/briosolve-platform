@@ -5,7 +5,7 @@ export default function Dashboard() {
     <>
       
     <div className="app-content">
-                {/*  Welcome Banner  */}
+                
                 <div className="welcome-header flex justify-between items-center flex-wrap gap-4 mb-8">
                     <div>
                         <h1 className="h2 mb-1">Welcome back, Aarav 👋</h1>
@@ -19,7 +19,7 @@ export default function Dashboard() {
                     </a>
                 </div>
 
-                {/*  4 Core Metrics / Stats Cards  */}
+                
                 <div className="dashboard-stats-grid mb-8">
                     <div className="card stat-widget">
                         <div className="stat-icon-wrapper bg-primary-light text-primary">
@@ -66,11 +66,11 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/*  Two Column Layout: Main Active Operations & Sidebar Feed  */}
+                
                 <div className="dashboard-main-grid">
-                    {/*  Left Primary Column  */}
+                    
                     <div className="grid-left flex flex-col gap-6">
-                        {/*  Active Requests Section  */}
+                        
                         <div className="card">
                             <div className="card-header flex justify-between items-center">
                                 <div>
@@ -181,7 +181,7 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/*  Active Bookings & Upcoming Schedule  */}
+                        
                         <div className="card">
                             <div className="card-header flex justify-between items-center">
                                 <div>
@@ -210,7 +210,7 @@ export default function Dashboard() {
                                                 Scheduled Time: <strong>10:30 AM - 11:30 AM</strong> • Booking ID: #BK-9204
                                             </div>
 
-                                            {/*  Provider preview  */}
+                                            
                                             <div className="flex items-center gap-2">
                                                 <img src="https://ui-avatars.com/api/?name=Rajesh+Patil&background=334155&color=fff" alt="Rajesh Patil" className="avatar avatar-sm" />
                                                 <span className="text-xs font-semibold">Rajesh Patil</span>
@@ -237,9 +237,9 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/*  Right Secondary Column  */}
+                    
                     <div className="grid-right flex flex-col gap-6">
-                        {/*  Recent Activity Stream  */}
+                        
                         <div className="card">
                             <div className="card-header">
                                 <h2 className="h5 mb-0">Recent Activity</h2>
@@ -308,7 +308,7 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/*  Marketplace Tip / Decision Support Box  */}
+                        
                         <div className="card p-5 border-primary">
                             <div className="flex items-start gap-3">
                                 <div className="tip-icon text-primary"><i className="fas fa-lightbulb"></i></div>
@@ -329,7 +329,7 @@ export default function Dashboard() {
         
     
 
-    {/*  Main JavaScript  */}
+    
     
 
     </>

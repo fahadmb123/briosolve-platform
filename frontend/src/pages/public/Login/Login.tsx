@@ -6,14 +6,14 @@ export default function Login() {
     <>
       
     <div className="auth-page-wrapper">
-        {/*  Floating Theme Toggle  */}
+        
         <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
             <i className="fas fa-sun"></i>
         </button>
 
         <div className="auth-card-container">
             <div className="auth-card card">
-                {/*  Header  */}
+                
                 <div className="text-center mb-6">
                     <a href="../home/home.html" className="logo justify-center mb-4">
                         <i className="fas fa-layer-group text-primary"></i>
@@ -23,7 +23,7 @@ export default function Login() {
                     <p className="text-secondary text-sm">Sign in to manage your requests and quotations</p>
                 </div>
 
-                {/*  Unified Role Info Banner  */}
+                
                 <div className="role-info-banner mb-6">
                     <i className="fas fa-info-circle text-primary"></i>
                     <span className="text-xs text-secondary">
@@ -31,7 +31,7 @@ export default function Login() {
                     </span>
                 </div>
 
-                {/*  Form  */}
+                
                 <form action="../dashboard/dashboard.html" method="GET">
                     <div className="form-group">
                         <label className="form-label" htmlFor="email">Email Address</label>
@@ -56,7 +56,7 @@ export default function Login() {
                                 <span className="checkmark"></span>
                                 <span className="text-xs text-secondary">Remember me on this device</span>
                             </label>
-                            <a href="#" className="text-xs text-primary font-medium" onClick={() => { /* alert('OTP resent to your email.') */ }}>Resend Code</a>
+                            <a href="#" className="text-xs text-primary font-medium" onClick={() => {  }}>Resend Code</a>
                         </div>
                     </div>
 
@@ -70,7 +70,7 @@ export default function Login() {
                         <i className="fas fa-arrow-right ml-1"></i>
                     </button>
 
-                    {/*  Links  */}
+                    
                     <div className="auth-footer text-center border-top pt-5">
                         <p className="text-sm text-secondary mb-3">
                             Don't have a customer account? 
@@ -88,7 +88,7 @@ export default function Login() {
         </div>
     </div>
 
-    {/*  Main JavaScript  */}
+    
     
     
 

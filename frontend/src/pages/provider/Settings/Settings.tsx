@@ -5,7 +5,7 @@ export default function Settings() {
   return (
     <>
 <div className="app-content">
-                {/*  Page Title  */}
+                
                 <div className="flex justify-between items-end flex-wrap gap-4 mb-5">
                     <div>
                         <h1 className="h2 mb-1">Provider Settings</h1>
@@ -21,7 +21,7 @@ export default function Settings() {
                     </div>
                 </div>
 
-                {/*  Settings Grid Layout  */}
+                
                 <div id="settings-grid-view">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <div className="card p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary transition-all shadow-sm" onClick={() => {}}>
@@ -59,12 +59,12 @@ export default function Settings() {
                     </div>
                 </div>
 
-                {/*  Right: Panels Container  */}
+                
                 <div id="settings-detail-view" style={{"display":"none"}}>
                     <button className="btn btn-outline btn-sm mb-4" onClick={() => {}}>
                         <i className="fas fa-arrow-left mr-2"></i> Back to Settings Grid
                     </button>
-                    {/*  1. Account &amp; Security  */}
+                    
                         <div className="settings-card-panel" id="sec-account">
                             <h2 className="h5 mb-4">Account Information &amp; Password</h2>
                             <div className="grid-2 gap-4 mb-4">
@@ -114,7 +114,7 @@ export default function Settings() {
                             </button>
                         </div>
 
-                        {/*  2. Business Information  */}
+                        
                         <div className="settings-card-panel" id="sec-business">
                             <h2 className="h5 mb-4">Business Information</h2>
                             <div className="grid-2 gap-4 mb-4">
@@ -138,7 +138,7 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/*  3. Trade Services  */}
+                        
                         <div className="settings-card-panel" id="sec-services">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="h5 mb-0">Trade &amp; Services</h2>
@@ -148,11 +148,11 @@ export default function Settings() {
                             </div>
                             
                             <div id="display-services-container" className="flex flex-col gap-4">
-                                {/*  Populated dynamically by JS  */}
+                                
                             </div>
                         </div>
 
-                        {/*  2. Availability &amp; Schedule  */}
+                        
                         <div className="settings-card-panel" id="sec-availability">
                             <h2 className="h5 mb-2">Availability &amp; Work Status</h2>
                             <p className="text-xs text-secondary mb-4">Pause lead invitations when you are fully booked or on leave</p>
@@ -179,15 +179,15 @@ export default function Settings() {
                                 </label>
                             </div>
 
-                            {/*  Weekly Schedule UI  */}
+                            
                             <div className="mt-4 pt-3 border-top">
                                 <h3 className="h6 mb-3">Weekly Working Schedule</h3>
                                 <div id="weekly-schedule-container" className="schedule-days-container text-sm">
-                                    {/*  Populated dynamically via JS  */}
+                                    
                                 </div>
                             </div>
 
-                            {/*  Specific Date Overrides UI  */}
+                            
                             <div className="mt-4 pt-3 border-top">
                                 <div className="flex justify-between items-center mb-3">
                                     <h3 className="h6 mb-0">Specific Date Overrides</h3>
@@ -196,11 +196,11 @@ export default function Settings() {
                                 <p className="text-xs text-secondary mb-3">Set custom hours or take a specific day off. This overrides your weekly schedule.</p>
                                 
                                 <div id="date-overrides-container">
-                                    {/*  Populated dynamically via JS  */}
+                                    
                                 </div>
                             </div>
                             
-                            {/*  Travel Buffer  */}
+                            
                             <div className="mt-4 pt-3 border-top">
                                 <div className="form-group mb-0">
                                     <label className="form-label">Travel Buffer Time (Minutes)</label>
@@ -216,7 +216,7 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/*  3. Notifications Preferences  */}
+                        
                         <div className="settings-card-panel" id="sec-notifications">
                             <h2 className="h5 mb-2">Notification Preferences</h2>
                             <p className="text-xs text-secondary mb-4">Choose which marketplace events trigger real-time push alerts</p>
@@ -266,7 +266,7 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/*  4. Service Area &amp; Radius  */}
+                        
                         <div className="settings-card-panel" id="sec-service-area">
                             <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
                                 <h2 className="h5 mb-0">Service Area &amp; Travel Radius</h2>
@@ -291,7 +291,7 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/*  5. Privacy &amp; Active Sessions  */}
+                        
                         <div className="settings-card-panel" id="sec-privacy">
                             <h2 className="h5 mb-4">Privacy &amp; Security Sessions</h2>
 
@@ -329,7 +329,7 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/*  5. Danger Zone  */}
+                        
                         <div className="settings-card-panel danger-zone-box" id="sec-danger">
                             <h2 className="h5 text-danger mb-1">Danger Zone</h2>
                             <p className="text-xs text-secondary mb-3">
@@ -339,12 +339,12 @@ export default function Settings() {
                                 <i className="fas fa-trash-alt mr-1"></i> Deactivate Provider Account
                             </button>
                         </div>
-                    </div> {/*  Close settings-detail-view  */}
+                    </div> 
                 </div>
         
     
 
-    {/*  Provider Service Area Settings Modal  */}
+    
     <div className="loc-modal-overlay" id="settingsLocModal">
         <div className="loc-modal" style={{"maxWidth":"600px"}}>
             <div className="loc-modal-header">
@@ -364,7 +364,7 @@ export default function Settings() {
         </div>
     </div>
 
-    {/*  Mobile Verification Modal  */}
+    
     <div className="loc-modal-overlay" id="mobileOtpModal">
         <div className="loc-modal" style={{"maxWidth":"450px"}}>
             <div className="loc-modal-header">
@@ -398,7 +398,7 @@ export default function Settings() {
         </div>
     </div>
 
-    {/*  Trade &amp; Services Edit Modal  */}
+    
     <div className="loc-modal-overlay" id="servicesEditModal">
         <div className="loc-modal" style={{"maxWidth":"500px"}}>
             <div className="loc-modal-header">
@@ -412,14 +412,14 @@ export default function Settings() {
                 <div className="form-group mb-4">
                     <label className="form-label font-bold">Service Category</label>
                     <select id="modal-category-select" className="form-control" onchange="renderModalServices()">
-                        {/*  Populated dynamically  */}
+                        
                     </select>
                 </div>
                 
                 <div className="form-group mb-0">
                     <label className="form-label font-bold">Available Services</label>
                     <div id="modal-services-container" className="bg-surface-elevated border rounded p-3" style={{"maxHeight":"250px","overflowY":"auto"}}>
-                        {/*  Checkboxes populated dynamically  */}
+                        
                     </div>
                 </div>
             </div>
@@ -430,10 +430,10 @@ export default function Settings() {
         </div>
     </div>
 
-    {/*  Main JavaScript  */}
     
     
-    {/*  Leaflet &amp; Location Picker JS  */}
+    
+    
     </>
   );
 }

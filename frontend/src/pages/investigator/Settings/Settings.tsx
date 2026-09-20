@@ -7,7 +7,7 @@ export default function Settings() {
 <div className="app-content">
                 <div className="grid grid-cols-1 lg-grid-cols-2 gap-6">
                     
-                    {/*  Change Password  */}
+                    
                     <div className="card p-6">
                         <h2 className="h5 mb-4 border-bottom pb-2">Change Password</h2>
                         <form id="password-form">
@@ -27,7 +27,7 @@ export default function Settings() {
                         </form>
                     </div>
 
-                    {/*  Preferences  */}
+                    
                     <div className="flex flex-col gap-6">
                         <div className="card p-6">
                             <h2 className="h5 mb-4 border-bottom pb-2">Notification Preferences</h2>
@@ -47,7 +47,7 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/*  Logout Card  */}
+                        
                         <div className="card p-6 border-danger bg-danger-light">
                             <h2 className="h5 mb-2 text-danger">Account Access</h2>
                             <p className="text-sm text-secondary mb-4">You are currently logged into the Investigator Portal.</p>
@@ -62,7 +62,7 @@ export default function Settings() {
         
     
 
-    {/*  Main JavaScript  */}
+    
     </>
   );
 }

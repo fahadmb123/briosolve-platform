@@ -5,14 +5,14 @@ export default function Login() {
   return (
     <>
 <div className="auth-page-wrapper">
-        {/*  Floating Theme Toggle  */}
+        
         <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
             <i className="fas fa-sun"></i>
         </button>
 
         <div className="auth-card-container">
             <div className="auth-card card">
-                {/*  Header  */}
+                
                 <div className="text-center mb-6">
                     <a href="#" className="logo justify-center mb-4">
                         <i className="fas fa-layer-group text-danger"></i>
@@ -22,7 +22,7 @@ export default function Login() {
                     <p className="text-secondary text-sm">Internal access for technical staff</p>
                 </div>
 
-                {/*  Unified Role Info Banner  */}
+                
                 <div className="role-info-banner mb-6">
                     <i className="fas fa-shield-alt text-danger"></i>
                     <span className="text-xs text-secondary">
@@ -36,7 +36,7 @@ export default function Login() {
                         credentials.</span>
                 </div>
 
-                {/*  Form  */}
+                
                 <form id="investigator-login-form">
                     <div className="form-group">
                         <label className="form-label" htmlFor="email">Email Address</label>
@@ -82,7 +82,7 @@ export default function Login() {
         </div>
     </div>
 
-    {/*  Main JavaScript  */}
+    
     </>
   );
 }
