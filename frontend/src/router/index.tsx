@@ -2,7 +2,6 @@ import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-
 import React, { useEffect } from 'react';
 
 // Phase 1: Public Pages (Placeholders for now)
-const Home = React.lazy(() => import('../pages/public/Home'));
 const Login = React.lazy(() => import('../pages/public/Login'));
 const CustomerRegister = React.lazy(() => import('../pages/public/CustomerRegister'));
 const ProviderRegister = React.lazy(() => import('../pages/public/ProviderRegister'));
@@ -11,6 +10,7 @@ const ResetPassword = React.lazy(() => import('../pages/public/ResetPassword'));
 const EmailVerification = React.lazy(() => import('../pages/public/EmailVerification'));
 
 // Phase 2: Customer Pages
+const Home = React.lazy(() => import('../pages/customer/Home'));
 const CustomerDashboard = React.lazy(() => import('../pages/customer/Dashboard'));
 const CustomerProfile = React.lazy(() => import('../pages/customer/Profile'));
 const CustomerSettings = React.lazy(() => import('../pages/customer/Settings'));
