@@ -54,7 +54,7 @@ export default function ForgotPassword() {
     </div>
 
     {/*  Main JavaScript  */}
-    <script src="../../assets/js/main.js"></script>
+    
 
     </>
   );

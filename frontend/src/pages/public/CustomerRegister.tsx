@@ -103,7 +103,7 @@ export default function CustomerRegister() {
     </div>
 
     {/*  Main JavaScript  */}
-    <script src="../../assets/js/main.js"></script>
+    
 
     </>
   );

@@ -66,7 +66,7 @@ export default function ResetPassword() {
     </div>
 
     {/*  Main JavaScript  */}
-    <script src="../../assets/js/main.js"></script>
+    
 
     </>
   );

@@ -101,6 +101,7 @@ export default function Home() {
                             <i className="fas fa-cog"></i>
                             <span>Settings</span>
                         </a>
+                    </li>
                     <li className="mt-4 pt-2 border-top">
                         <a href="../login/login.html" className="sidebar-item text-danger">
                             <i className="fas fa-sign-out-alt"></i>
@@ -928,39 +929,10 @@ export default function Home() {
     </div>
 
     {/*  Main JavaScript  */}
-    <script src="../../assets/js/main.js"></script>
-    <script>
-        // Trending pill click helper
-        function selectTrending(serviceName) {
-            const input = document.getElementById('service-search-input');
-            if (input) {
-                input.value = serviceName;
-                input.focus();
-            }
-        }
-
-        // Audience switcher tabs helper
-        function switchAudience(tab) {
-            const custBtn = document.getElementById('tab-customers-btn');
-            const provBtn = document.getElementById('tab-providers-btn');
-            const custPane = document.getElementById('pane-customers');
-            const provPane = document.getElementById('pane-providers');
-
-            if (tab === 'customers') {
-                custBtn.classList.add('active');
-                provBtn.classList.remove('active');
-                custPane.classList.add('active');
-                provPane.classList.remove('active');
-            } else {
-                provBtn.classList.add('active');
-                custBtn.classList.remove('active');
-                provPane.classList.add('active');
-                custPane.classList.remove('active');
-            }
-        }
-    </script>
+    
+    
     {/*  Main JavaScript  */}
-    <script src="../../assets/js/main.js"></script>
+    
 
     </>
   );

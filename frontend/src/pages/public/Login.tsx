@@ -88,78 +88,8 @@ export default function Login() {
     </div>
 
     {/*  Main JavaScript  */}
-    <script src="../../assets/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const emailInput = document.getElementById('email');
-            const sendOtpBtn = document.getElementById('send-otp-btn');
-            const otpSection = document.getElementById('otp-section');
-            const loginBtn = document.getElementById('login-btn');
-            const otpInput = document.getElementById('login-otp');
-            const form = document.querySelector('form');
-
-            sendOtpBtn.addEventListener('click', () => {
-                if (!emailInput.value) {
-                    alert('Please enter your email address first.');
-                    return;
-                }
-                
-                // Simulate sending OTP
-                sendOtpBtn.innerHTML = '<i className="fas fa-spinner fa-spin mr-2"></i> Sending...';
-                sendOtpBtn.disabled = true;
-                
-                setTimeout(() => {
-                    sendOtpBtn.style.display = 'none';
-                    otpSection.style.display = 'block';
-                    loginBtn.style.display = 'flex';
-                    emailInput.readOnly = true;
-                    emailInput.classList.add('bg-surface');
-                    
-                    // Pre-fill for prototype convenience
-                    otpInput.value = '123456';
-                    
-                    alert('Verification code sent to ' + emailInput.value);
-                }, 800);
-            });
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                if (otpInput.value.length < 6) {
-                    alert('Please enter a valid 6-digit code.');
-                    return;
-                }
-                
-                loginBtn.innerHTML = '<i className="fas fa-spinner fa-spin mr-2"></i> Verifying...';
-                loginBtn.disabled = true;
-                
-                setTimeout(() => {
-                    localStorage.setItem('emailVerified', 'true');
-                    
-                    // Check if this email belongs to an investigator
-                    const emailValue = emailInput.value.trim().toLowerCase();
-                    let isInvestigator = false;
-                    try {
-                        const invs = JSON.parse(localStorage.getItem('mock_investigators') || '[]');
-                        const investigator = invs.find(inv => inv.email.toLowerCase() === emailValue);
-                        if (investigator) {
-                            localStorage.setItem('loggedInUser', investigator.userId);
-                            localStorage.setItem('loggedInRole', 'INVESTIGATOR');
-                            isInvestigator = true;
-                        }
-                    } catch(e) {}
-
-                    if (isInvestigator) {
-                        window.location.href = '../../investigator/dashboard/dashboard.html';
-                    } else {
-                        // Default to user dashboard
-                        localStorage.setItem('loggedInRole', 'USER');
-                        window.location.href = '../dashboard/dashboard.html';
-                    }
-                }, 800);
-            });
-        });
-    </script>
+    
+    
 
     </>
   );

@@ -67,18 +67,8 @@ export default function EmailVerification() {
     </div>
 
     {/*  Main JavaScript  */}
-    <script src="../../assets/js/main.js"></script>
-    <script>
-        function handleVerification(e) {
-            e.preventDefault();
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('context') === 'switch_role') {
-                // Deactivate provider capability conceptually without deleting data
-                localStorage.setItem('providerActive', 'false');
-            }
-            window.location.href = '../dashboard/dashboard.html';
-        }
-    </script>
+    
+    
 
     </>
   );
