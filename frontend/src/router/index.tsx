@@ -10,11 +10,11 @@ const ResetPassword = React.lazy(() => import('../pages/public/ResetPassword/Res
 const EmailVerification = React.lazy(() => import('../pages/public/EmailVerification/EmailVerification'));
 
 // Phase 2: Customer Pages
-const Home = React.lazy(() => import('../pages/customer/Home'));
-const CustomerDashboard = React.lazy(() => import('../pages/customer/Dashboard'));
-const CustomerProfile = React.lazy(() => import('../pages/customer/Profile'));
-const CustomerSettings = React.lazy(() => import('../pages/customer/Settings'));
-const CustomerNotifications = React.lazy(() => import('../pages/customer/Notifications'));
+const Home = React.lazy(() => import('../pages/customer/Home/Home'));
+const CustomerDashboard = React.lazy(() => import('../pages/customer/Dashboard/Dashboard'));
+const CustomerProfile = React.lazy(() => import('../pages/customer/Profile/Profile'));
+const CustomerSettings = React.lazy(() => import('../pages/customer/Settings/Settings'));
+const CustomerNotifications = React.lazy(() => import('../pages/customer/Notifications/Notifications'));
 
 function ThemeManager() {
   const location = useLocation();
