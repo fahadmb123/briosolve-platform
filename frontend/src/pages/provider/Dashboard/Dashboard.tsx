@@ -1,0 +1,471 @@
+// @ts-nocheck
+import React from 'react';
+
+export default function Dashboard() {
+  return (
+    <>
+<div className="app-container">
+        {/*  Sidebar Navigation  */}
+        <aside className="app-sidebar" id="app-sidebar">
+            <div className="sidebar-brand flex justify-between items-center">
+                <a href="dashboard.html" className="logo">
+                    <i className="fas fa-tools text-primary"></i>
+                    <span>ReverseMarket <small className="text-xs text-primary font-bold ml-1">PRO</small></span>
+                </a>
+                <button id="sidebar-close" className="btn-icon sidebar-close-btn" aria-label="Close Sidebar">
+                    <i className="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div className="sidebar-menu-wrapper">
+                <div className="menu-label">Provider Workspace</div>
+                <ul className="sidebar-menu">
+                    <li>
+                        <a href="dashboard.html" className="sidebar-item active">
+                            <i className="fas fa-chart-pie"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../requests/requests.html" className="sidebar-item">
+                            <i className="fas fa-search-dollar"></i>
+                            <span>Service Requests</span>
+                            <span className="badge badge-primary ml-auto">8 New</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../quotations/quotations.html" className="sidebar-item">
+                            <i className="fas fa-file-invoice-dollar"></i>
+                            <span>My Quotations</span>
+                            <span className="badge badge-warning ml-auto">4</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../bookings/bookings.html" className="sidebar-item">
+                            <i className="fas fa-calendar-check"></i>
+                            <span>Bookings</span>
+                            <span className="badge badge-info ml-auto">3</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../chat/chat.html" className="sidebar-item">
+                            <i className="fas fa-comments"></i>
+                            <span>Messages</span>
+                            <span className="badge badge-danger ml-auto">2</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../reviews/reviews.html" className="sidebar-item">
+                            <i className="fas fa-star"></i>
+                            <span>Reviews</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div className="menu-label mt-6">Professional Profile</div>
+                <ul className="sidebar-menu">
+                    <li>
+                        <a href="../verification/verification.html" className="sidebar-item">
+                            <i className="fas fa-shield-alt"></i>
+                            <span>Verification</span>
+                            <span className="badge badge-success ml-auto"><i className="fas fa-check"></i></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../profile/profile.html" className="sidebar-item">
+                            <i className="fas fa-user-tie"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../settings/settings.html" className="sidebar-item">
+                            <i className="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li className="mt-4 pt-2 border-top">
+                        <a href="../../user/email-verification/email-verification.html?context=switch_role" className="sidebar-item text-primary font-medium" id="customer-mode-switch">
+                            <i className="fas fa-exchange-alt"></i>
+                            <span>Switch to User</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../../user/login/login.html" className="sidebar-item text-danger">
+                            <i className="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        {/*  Main Content  */}
+        <main className="app-main">
+            {/*  Topbar Navigation  */}
+            <header className="app-header">
+                <div className="flex items-center gap-4">
+                    <button id="sidebar-toggle" className="btn-icon mobile-menu-toggle" aria-label="Toggle Sidebar">
+                        <i className="fas fa-bars"></i>
+                    </button>
+                    <div className="breadcrumbs-trail text-xs text-secondary">
+                        <span className="text-text font-medium">Provider Workspace</span>
+                        <i className="fas fa-chevron-right text-muted mx-2"></i>
+                        <span>Dashboard</span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <span className="badge badge-success text-xs py-1 px-2.5 flex items-center gap-1.5" title="You are receiving live customer requests in Andheri West">
+                        <span className="pulse-dot-green"></span>
+                        <span>Receiving Leads</span>
+                    </span>
+                    <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
+                        <i className="fas fa-sun"></i>
+                    </button>
+                    <div className="notif-dropdown-wrapper">
+                        <button id="notif-toggle" className="btn-icon notif-bell-btn" aria-label="Notifications" title="Notifications">
+                            <i className="fas fa-bell"></i>
+                            <span className="notif-badge-count" id="notif-badge">3</span>
+                        </button>
+                    </div>
+                    <a href="../profile/profile.html" className="avatar avatar-sm ml-1" title="Arjun Menon (Verified Master Tech)">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&amp;auto=format&amp;fit=crop&amp;q=80" alt="Arjun Menon" />
+                    </a>
+                </div>
+            </header>
+
+            <div className="app-content">
+                {/*  Welcome Banner  */}
+                <div className="pro-welcome-banner">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="badge badge-primary text-xs">Level 3 Pro • Master Technician</span>
+                            <span className="text-xs text-secondary"><i className="fas fa-map-marker-alt mr-1"></i> Kodungallur, Thrissur (Within 20 km)</span>
+                        </div>
+                        <h1 className="h2 mb-1">Good morning, Arjun</h1>
+                        <p className="text-secondary text-sm mb-0">
+                            Find new service requests and grow your business with zero platform commission.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <a href="../requests/requests.html" className="btn btn-primary">
+                            <i className="fas fa-search-dollar mr-1"></i> Browse Service Requests
+                        </a>
+                        <a href="../verification/verification.html" className="btn btn-outline text-xs">
+                            <i className="fas fa-shield-alt mr-1"></i> Verified Status
+                        </a>
+                    </div>
+                </div>
+
+                {/*  Service Area Summary Widget  */}
+                <div className="card p-4 mb-6 flex justify-between items-center flex-wrap gap-3">
+                    <div className="flex items-center gap-3">
+                        <div className="icon-circle bg-primary-light text-primary" style={{"width":"40px","height":"40px","borderRadius":"50%","display":"flex","alignItems":"center","justifyContent":"center","fontSize":"1.1rem"}}>
+                            <i className="fas fa-compass"></i>
+                        </div>
+                        <div>
+                            <div className="text-xs text-secondary uppercase font-semibold">Service Area</div>
+                            <div className="text-sm font-bold text-text">📍 Kodungallur, Thrissur</div>
+                            <div className="text-xs text-secondary">Within <strong>20 km</strong> radius • Active on-call dispatch</div>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <a href="../settings/settings.html#sec-service-area" className="btn btn-secondary btn-xs">
+                            <i className="fas fa-sliders-h mr-1"></i> Manage Service Area
+                        </a>
+                    </div>
+                </div>
+
+                {/*  6 Core Marketplace Statistics  */}
+                <div className="pro-stats-grid">
+                    {/*  Stat 1  */}
+                    <div className="card stat-widget">
+                        <div className="stat-icon-wrapper bg-primary-light text-primary">
+                            <i className="fas fa-search-dollar"></i>
+                        </div>
+                        <div className="stat-value">8</div>
+                        <div className="stat-title">New Requests</div>
+                        <div className="stat-meta text-primary"><i className="fas fa-bolt mr-1"></i> In your radius</div>
+                    </div>
+
+                    {/*  Stat 2  */}
+                    <div className="card stat-widget">
+                        <div className="stat-icon-wrapper bg-warning-light text-warning">
+                            <i className="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div className="stat-value">4</div>
+                        <div className="stat-title">Active Quotations</div>
+                        <div className="stat-meta text-warning"><i className="fas fa-clock mr-1"></i> Under review</div>
+                    </div>
+
+                    {/*  Stat 3  */}
+                    <div className="card stat-widget">
+                        <div className="stat-icon-wrapper bg-info-light text-info">
+                            <i className="fas fa-calendar-check"></i>
+                        </div>
+                        <div className="stat-value">3</div>
+                        <div className="stat-title">Accepted Bookings</div>
+                        <div className="stat-meta text-info"><i className="fas fa-calendar-day mr-1"></i> Next: Tomorrow</div>
+                    </div>
+
+                    {/*  Stat 4  */}
+                    <div className="card stat-widget">
+                        <div className="stat-icon-wrapper bg-success-light text-success">
+                            <i className="fas fa-check-double"></i>
+                        </div>
+                        <div className="stat-value">142</div>
+                        <div className="stat-title">Completed Services</div>
+                        <div className="stat-meta text-success"><i className="fas fa-check-circle mr-1"></i> 99.4% on time</div>
+                    </div>
+
+                    {/*  Stat 5  */}
+                    <div className="card stat-widget">
+                        <div className="stat-icon-wrapper bg-warning-light text-warning">
+                            <i className="fas fa-star"></i>
+                        </div>
+                        <div className="stat-value">4.92 ★</div>
+                        <div className="stat-title">Average Rating</div>
+                        <div className="stat-meta text-success"><i className="fas fa-thumbs-up mr-1"></i> 186 reviews</div>
+                    </div>
+
+                    {/*  Stat 6 (Informational statistics only, no payment functionality)  */}
+                    <div className="card stat-widget">
+                        <div className="stat-icon-wrapper bg-primary-light text-primary">
+                            <i className="fas fa-chart-line"></i>
+                        </div>
+                        <div className="stat-value">₹3,84,500</div>
+                        <div className="stat-title">Marketplace Volume</div>
+                        <div className="stat-meta text-muted">All-time jobs won</div>
+                    </div>
+                </div>
+
+                {/*  Two Column Layout: New Opportunities (Left) &amp; Recent Activity (Right)  */}
+                <div className="dashboard-grid-container">
+                    {/*  Left: New Opportunities Stream  */}
+                    <div className="flex flex-col gap-4">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h2 className="h5 mb-0">New Opportunities Matching Your Skills</h2>
+                                <p className="text-xs text-secondary mb-0">Plumbing &amp; AC repair requests posted recently in your radius</p>
+                            </div>
+                            <a href="../requests/requests.html" className="btn btn-outline text-xs">
+                                View All (8) <i className="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+
+                        {/*  Opportunity 1 (Urgent / Top Match)  */}
+                        <div className="opportunity-card match-lead">
+                            <div className="flex justify-between items-start flex-wrap gap-3 mb-2">
+                                <div>
+                                    <div className="opportunity-badge-row">
+                                        <span className="badge badge-primary text-xs">98% Skill Match</span>
+                                        <span className="badge badge-warning text-xs"><i className="fas fa-clock mr-1"></i> 4 Bids Received</span>
+                                        <span className="text-xs text-muted">ID: #REQ-84920 • Posted 2 hrs ago</span>
+                                    </div>
+                                    <h3 className="h6 mb-1">
+                                        <a href="../request-details/request-details.html" className="text-text hover-primary">
+                                            Bathroom Plumbing Repair &amp; Concealed Pipe Leak Fix
+                                        </a>
+                                    </h3>
+                                    <div className="text-xs text-secondary flex items-center gap-4 flex-wrap">
+                                        <span><i className="fas fa-faucet text-primary mr-1"></i> Plumbing</span>
+                                        <span><i className="fas fa-map-marker-alt text-primary mr-1"></i> Andheri West (1.8 km away)</span>
+                                        <span><i className="fas fa-hourglass-half text-warning mr-1"></i> Deadline: Within 48 Hours</span>
+                                    </div>
+                                </div>
+                                <div className="lead-price-box">
+                                    <div className="text-xs text-secondary uppercase font-semibold">Client Budget</div>
+                                    <div className="lead-budget">₹3,000 – ₹5,000</div>
+                                </div>
+                            </div>
+                            <p className="text-xs text-secondary mb-3 leading-relaxed">
+                                Continuous dripping from under-counter bathroom sink joint. Requires replacement of worn washers, Teflon sealing, and 30-min pressure test.
+                            </p>
+                            <div className="flex justify-between items-center flex-wrap gap-2 pt-2 border-top">
+                                <span className="text-xs text-muted"><i className="fas fa-user-check text-success mr-1"></i> Verified Homeowner (Pooja S.)</span>
+                                <div className="flex items-center gap-2">
+                                    <a href="../request-details/request-details.html" className="btn btn-outline text-xs">
+                                        View Details
+                                    </a>
+                                    <a href="../submit-quotation/submit-quotation.html" className="btn btn-primary text-xs">
+                                        <i className="fas fa-paper-plane mr-1"></i> Submit Quotation
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/*  Opportunity 2  */}
+                        <div className="opportunity-card urgent-lead">
+                            <div className="flex justify-between items-start flex-wrap gap-3 mb-2">
+                                <div>
+                                    <div className="opportunity-badge-row">
+                                        <span className="badge badge-danger text-xs">Urgent Need</span>
+                                        <span className="badge badge-secondary text-xs"><i className="fas fa-clock mr-1"></i> 2 Bids Received</span>
+                                        <span className="text-xs text-muted">ID: #REQ-84915 • Posted 4 hrs ago</span>
+                                    </div>
+                                    <h3 className="h6 mb-1">
+                                        <a href="../request-details/request-details.html?req=REQ-84915" className="text-text hover-primary">
+                                            Split AC Master Foam Jet Cleaning &amp; Gas Pressure Refill
+                                        </a>
+                                    </h3>
+                                    <div className="text-xs text-secondary flex items-center gap-4 flex-wrap">
+                                        <span><i className="fas fa-snowflake text-primary mr-1"></i> AC Repair</span>
+                                        <span><i className="fas fa-map-marker-alt text-primary mr-1"></i> Bandra West (4.2 km away)</span>
+                                        <span><i className="fas fa-hourglass-half text-danger mr-1"></i> Needed Today</span>
+                                    </div>
+                                </div>
+                                <div className="lead-price-box">
+                                    <div className="text-xs text-secondary uppercase font-semibold">Client Budget</div>
+                                    <div className="lead-budget">₹1,800 – ₹2,500</div>
+                                </div>
+                            </div>
+                            <p className="text-xs text-secondary mb-3 leading-relaxed">
+                                1.5 Ton Inverter AC cooling is weak. Deep coil jet cleaning, filter sanitization, and R32 pressure top-up requested.
+                            </p>
+                            <div className="flex justify-between items-center flex-wrap gap-2 pt-2 border-top">
+                                <span className="text-xs text-muted"><i className="fas fa-user-check text-success mr-1"></i> Verified Homeowner (Rahul N.)</span>
+                                <div className="flex items-center gap-2">
+                                    <a href="../request-details/request-details.html?req=REQ-84915" className="btn btn-outline text-xs">
+                                        View Details
+                                    </a>
+                                    <a href="../submit-quotation/submit-quotation.html" className="btn btn-primary text-xs">
+                                        <i className="fas fa-paper-plane mr-1"></i> Submit Quotation
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/*  Opportunity 3  */}
+                        <div className="opportunity-card">
+                            <div className="flex justify-between items-start flex-wrap gap-3 mb-2">
+                                <div>
+                                    <div className="opportunity-badge-row">
+                                        <span className="badge badge-info text-xs">Commercial Lead</span>
+                                        <span className="badge badge-secondary text-xs">3 Bids Received</span>
+                                        <span className="text-xs text-muted">ID: #REQ-84880 • Posted today</span>
+                                    </div>
+                                    <h3 className="h6 mb-1">
+                                        <a href="../request-details/request-details.html" className="text-text hover-primary">
+                                            Commercial Kitchen Grease Trap Overhaul &amp; CPVC Piping
+                                        </a>
+                                    </h3>
+                                    <div className="text-xs text-secondary flex items-center gap-4 flex-wrap">
+                                        <span><i className="fas fa-faucet text-primary mr-1"></i> Commercial Plumbing</span>
+                                        <span><i className="fas fa-map-marker-alt text-primary mr-1"></i> Juhu (2.5 km away)</span>
+                                        <span><i className="fas fa-hourglass-half text-warning mr-1"></i> Deadline: 3 Days</span>
+                                    </div>
+                                </div>
+                                <div className="lead-price-box">
+                                    <div className="text-xs text-secondary uppercase font-semibold">Client Budget</div>
+                                    <div className="lead-budget">₹6,000 – ₹9,000</div>
+                                </div>
+                            </div>
+                            <p className="text-xs text-secondary mb-3 leading-relaxed">
+                                Restaurant kitchen drainage backflow. Requires heavy-duty grease separator dismantling, solvent sealing, and new 2-inch pipe manifold.
+                            </p>
+                            <div className="flex justify-between items-center flex-wrap gap-2 pt-2 border-top">
+                                <span className="text-xs text-muted"><i className="fas fa-building text-primary mr-1"></i> Business Client (Spice Garden Cafe)</span>
+                                <div className="flex items-center gap-2">
+                                    <a href="../request-details/request-details.html" className="btn btn-outline text-xs">
+                                        View Details
+                                    </a>
+                                    <a href="../submit-quotation/submit-quotation.html" className="btn btn-primary text-xs">
+                                        <i className="fas fa-paper-plane mr-1"></i> Submit Quotation
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/*  Right: Recent Activity &amp; Quick Schedule  */}
+                    <div className="flex flex-col gap-4">
+                        {/*  Activity Feed Card  */}
+                        <div className="card p-5">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="h6 mb-0">Recent Activity</h3>
+                                <span className="text-xs text-muted">Real-time alerts</span>
+                            </div>
+
+                            <div className="activity-feed-list">
+                                {/*  Item 1  */}
+                                <div className="activity-feed-item">
+                                    <div className="activity-icon-badge bg-success-light text-success">
+                                        <i className="fas fa-check"></i>
+                                    </div>
+                                    <div className="activity-content">
+                                        <div className="activity-title">
+                                            Quotation Accepted! Client Pooja S. accepted your ₹3,200 bid for <strong>#REQ-84920</strong>.
+                                        </div>
+                                        <div className="activity-time">12 minutes ago</div>
+                                    </div>
+                                </div>
+
+                                {/*  Item 2  */}
+                                <div className="activity-feed-item">
+                                    <div className="activity-icon-badge bg-primary-light text-primary">
+                                        <i className="fas fa-comment-dots"></i>
+                                    </div>
+                                    <div className="activity-content">
+                                        <div className="activity-title">
+                                            New Message from Vikram M.: <em>"Can you arrive tomorrow at 10 AM?"</em>
+                                        </div>
+                                        <div className="activity-time">45 minutes ago</div>
+                                    </div>
+                                </div>
+
+                                {/*  Item 3  */}
+                                <div className="activity-feed-item">
+                                    <div className="activity-icon-badge bg-info-light text-info">
+                                        <i className="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div className="activity-content">
+                                        <div className="activity-title">
+                                            Booking Confirmed: AC Gas Refill for Sneha R. (BKG-7719).
+                                        </div>
+                                        <div className="activity-time">3 hours ago</div>
+                                    </div>
+                                </div>
+
+                                {/*  Item 4  */}
+                                <div className="activity-feed-item">
+                                    <div className="activity-icon-badge bg-warning-light text-warning">
+                                        <i className="fas fa-star"></i>
+                                    </div>
+                                    <div className="activity-content">
+                                        <div className="activity-title">
+                                            New 5-Star Review received from Ananya K.: <em>"Fixed the leak within 2 hours, very professional!"</em>
+                                        </div>
+                                        <div className="activity-time">Yesterday, 4:30 PM</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/*  Verification &amp; Pro Tier Status Card  */}
+                        <div className="card p-5" style={{"background":"linear-gradient(135deg, var(--surface) 0%, rgba(99, 102, 241, 0.05) 100%)"}}>
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="avatar avatar-sm bg-success-light text-success">
+                                    <i className="fas fa-shield-check text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-sm text-text mb-0">Level 3 Verified Pro</h4>
+                                    <div className="text-xs text-secondary">Aadhaar + Trade License Active</div>
+                                </div>
+                            </div>
+                            <p className="text-xs text-secondary mb-3">
+                                Your verified profile is recommended to clients in 98% of relevant searches in Mumbai.
+                            </p>
+                            <a href="../verification/verification.html" className="btn btn-outline text-xs w-full text-center">
+                                Manage Verification Badges
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {/*  Main JavaScript  */}
+    </>
+  );
+}
