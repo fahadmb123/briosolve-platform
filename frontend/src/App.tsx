@@ -5,7 +5,7 @@ import './assets/css/user-theme.css';
 import './assets/css/provider-theme.css';
 import './assets/css/admin-theme.css';
 
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider } from './contexts/ThemeProvider';
 
 function App() {
   return (
