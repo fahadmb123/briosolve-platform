@@ -5,7 +5,7 @@ export default function InvestigatorLayout() {
     const { isSidebarOpen, setIsSidebarOpen, isSidebarCollapsed, handleSidebarToggle } = useSidebar();
 
     return (
-        <div className={`app-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        <div className={`app-container sidebar-modal-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
             <div id="sidebar-overlay" className={`sidebar-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
             <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
             <div className="sidebar-brand flex items-center justify-between">

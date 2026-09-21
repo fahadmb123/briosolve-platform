@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useSidebar } from '../../../hooks/useSidebar';
 import './Home.css';
 
 
 import { Link } from 'react-router-dom';
 export default function Home() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
 
   return (
     <>
       
-    <div className="app-container sidebar-modal-layout">
+    <div className={`app-container sidebar-modal-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
         
         <div id="sidebar-overlay" className={`sidebar-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
 
@@ -20,7 +20,7 @@ export default function Home() {
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
                 </Link>
-                <button className="btn-icon ml-auto sidebar-inner-toggle" aria-label="Close Sidebar" title="Close Menu" onClick={() => setIsSidebarOpen(false)}>
+                <button className="btn-icon ml-auto sidebar-inner-toggle" aria-label="Close Sidebar" title="Close Menu" onClick={handleSidebarToggle}>
                     <i className="fas fa-bars"></i>
                 </button>
             </div>
@@ -122,7 +122,7 @@ export default function Home() {
             
             <header className="app-header">
                 <div className="flex items-center gap-3">
-                    <button id="sidebar-toggle" className="btn-icon" aria-label="Toggle Sidebar" title="Open Menu" onClick={() => setIsSidebarOpen(true)}>
+                    <button id="sidebar-toggle" className="btn-icon mobile-menu-toggle" aria-label="Toggle Sidebar" title="Open Menu" onClick={handleSidebarToggle}>
                         <i className="fas fa-bars"></i>
                     </button>
                     <Link to="/" className="logo">
@@ -896,7 +896,7 @@ export default function Home() {
                             <div>
                                 <h4 className="footer-heading">Customer Portal</h4>
                                 <div className="footer-links">
-                                    <Link to="//dashboard">Customer Dashboard</Link>
+                                    <Link to="/dashboard">Customer Dashboard</Link>
                                     <Link to="#">Post a Requirement</Link>
                                     <Link to="#">Track Active Requests</Link>
                                     <Link to="#">Compare Quotations</Link>

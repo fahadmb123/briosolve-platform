@@ -1141,7 +1141,7 @@ textarea.form-control {
 }
 
 @media (min-width: 992px) {
-    .app-container:not(.sidebar-collapsed) .app-header .mobile-menu-toggle {
+    .app-container.sidebar-open .app-header .mobile-menu-toggle {
         display: none;
     }
 }
