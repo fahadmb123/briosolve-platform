@@ -1,4 +1,4 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
 
 export default function InvestigatorLayout() {
@@ -23,10 +23,10 @@ export default function InvestigatorLayout() {
                 <div className="menu-label">Portal</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="/investigator/dashboard" className="sidebar-item">
+                        <NavLink to="/investigator/dashboard" end className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-chart-line"></i>
                             <span>Dashboard</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">
@@ -35,16 +35,16 @@ export default function InvestigatorLayout() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/investigator/profile" className="sidebar-item">
+                        <NavLink to="/investigator/profile" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-user-shield"></i>
                             <span>Profile</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/investigator/settings" className="sidebar-item">
+                        <NavLink to="/investigator/settings" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-cog"></i>
                             <span>Settings</span>
-                        </Link>
+                        </NavLink>
                     </li>
                 </ul>
             </div>

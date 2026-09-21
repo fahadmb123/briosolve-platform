@@ -1,4 +1,4 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
 
 export default function ProviderLayout() {
@@ -22,10 +22,10 @@ export default function ProviderLayout() {
                 <div className="menu-label">Provider Workspace</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="/provider/dashboard" className="sidebar-item">
+                        <NavLink to="/provider/dashboard" end className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-chart-pie"></i>
                             <span>Dashboard</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">
@@ -66,23 +66,23 @@ export default function ProviderLayout() {
                 <div className="menu-label mt-6">Professional Profile</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="/provider/verification" className="sidebar-item">
+                        <NavLink to="/provider/verification" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-shield-alt"></i>
                             <span>Verification</span>
                             <span className="badge badge-success ml-auto"><i className="fas fa-check"></i></span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/provider/profile" className="sidebar-item">
+                        <NavLink to="/provider/profile" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-user-tie"></i>
                             <span>Profile</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/provider/settings" className="sidebar-item">
+                        <NavLink to="/provider/settings" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-cog"></i>
                             <span>Settings</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="mt-4 pt-2 border-top">
                         <Link to="/provider/verification" className="sidebar-item text-primary font-medium" id="customer-mode-switch">

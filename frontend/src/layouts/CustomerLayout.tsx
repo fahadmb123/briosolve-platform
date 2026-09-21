@@ -1,4 +1,4 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
 
 export default function CustomerLayout() {
@@ -22,16 +22,16 @@ export default function CustomerLayout() {
                 <div className="menu-label">Navigation</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="/" className="sidebar-item">
+                        <NavLink to="/" end className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-home"></i>
                             <span>Home</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/dashboard" className="sidebar-item">
+                        <NavLink to="/dashboard" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-chart-pie"></i>
                             <span>Dashboard</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">
@@ -83,22 +83,22 @@ export default function CustomerLayout() {
                 <div className="menu-label mt-6">Preferences</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="/notifications" className="sidebar-item">
+                        <NavLink to="/notifications" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-bell"></i>
                             <span>Notifications</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/profile" className="sidebar-item">
+                        <NavLink to="/profile" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-user-circle"></i>
                             <span>Profile</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/settings" className="sidebar-item">
+                        <NavLink to="/settings" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-cog"></i>
                             <span>Settings</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="mt-4 pt-2 border-top">
                         <Link to="/login" className="sidebar-item text-danger">

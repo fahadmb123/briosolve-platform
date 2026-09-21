@@ -2,7 +2,7 @@ import { useSidebar } from '../../../hooks/useSidebar';
 import './Home.css';
 
 
-import { Link } from 'react-router-dom';
+import { Link , NavLink } from 'react-router-dom';
 export default function Home() {
   const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
 
@@ -29,23 +29,23 @@ export default function Home() {
                 <div className="menu-label">Navigation</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="/" className="sidebar-item active">
+                        <NavLink to="/" end className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-home"></i>
                             <span>Home</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/dashboard" className="sidebar-item">
+                        <NavLink to="/dashboard" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-chart-pie"></i>
                             <span>Dashboard</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/admin/providers" className="sidebar-item">
+                        <NavLink to="/admin/providers" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-map-marked-alt"></i>
                             <span>Nearby Providers</span>
                             <span className="badge badge-primary ml-auto">12+</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">
@@ -90,22 +90,22 @@ export default function Home() {
                 <div className="menu-label mt-6">Preferences</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="/notifications" className="sidebar-item">
+                        <NavLink to="/notifications" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-bell"></i>
                             <span>Notifications</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/profile" className="sidebar-item">
+                        <NavLink to="/profile" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-user-circle"></i>
                             <span>Profile</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/settings" className="sidebar-item">
+                        <NavLink to="/settings" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-cog"></i>
                             <span>Settings</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="mt-4 pt-2 border-top">
                         <Link to="/login" className="sidebar-item text-danger">

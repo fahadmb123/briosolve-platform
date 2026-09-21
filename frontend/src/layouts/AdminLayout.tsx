@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
 
 export default function AdminLayout() {
@@ -10,10 +10,10 @@ export default function AdminLayout() {
             <div id="sidebar-overlay" className={`sidebar-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
             <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
             <div className="sidebar-brand flex items-center justify-between">
-                <Link to="/admin/dashboard" className="logo flex items-center gap-2">
+                <NavLink to="/admin/dashboard" className="logo flex items-center gap-2">
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
-                </Link>
+                </NavLink>
                 <button className="btn-icon ml-auto sidebar-inner-toggle" aria-label="Toggle Sidebar" onClick={handleSidebarToggle}>
                     <i className="fas fa-bars"></i>
                 </button>
@@ -23,22 +23,22 @@ export default function AdminLayout() {
                 <div className="menu-label">Platform Governance</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="/admin/dashboard" className="sidebar-item">
+                        <NavLink to="/admin/dashboard" end className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-chart-line"></i>
                             <span>Dashboard</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/admin/users" className="sidebar-item">
+                        <NavLink to="/admin/users" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-users"></i>
                             <span>Users</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="/admin/providers" className="sidebar-item">
+                        <NavLink to="/admin/providers" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-user-tie"></i>
                             <span>Providers</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">
@@ -47,11 +47,11 @@ export default function AdminLayout() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/admin/verification" className="sidebar-item">
+                        <NavLink to="/admin/verification" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-user-check"></i>
                             <span>Verification</span>
                             <span className="badge badge-warning ml-auto">18</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     </ul>
 
@@ -139,10 +139,10 @@ export default function AdminLayout() {
                         </Link>
                     </li>
                     <li className="mt-4 pt-2 border-top">
-                        <Link to="/login" className="sidebar-item text-danger">
+                        <NavLink to="/login" className="sidebar-item text-danger">
                             <i className="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
-                        </Link>
+                        </NavLink>
                     </li>
                 </ul>
             </div>
