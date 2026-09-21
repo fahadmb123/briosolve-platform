@@ -90,6 +90,25 @@
     padding: 0;
 }
 
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
 html, body {
     max-width: 100vw;
     overflow-x: hidden;
@@ -210,7 +229,8 @@ h6, .h6 { font-size: 1rem; }
     top: 0;
     left: 0;
     height: 100vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     z-index: 40;
     transition: transform var(--transition-normal);
 }
@@ -308,7 +328,7 @@ h6, .h6 { font-size: 1rem; }
 
 /* Sidebar Close Button */
 .sidebar-close-btn {
-    display: none;
+    display: none !important;
     align-items: center;
     justify-content: center;
     width: 32px;
@@ -954,7 +974,7 @@ textarea.form-control {
     }
 
     .sidebar-close-btn {
-        display: inline-flex;
+        display: inline-flex !important;
     }
 }
 
@@ -1118,4 +1138,10 @@ textarea.form-control {
 
 .stepper-item.completed .stepper-label {
     color: var(--success);
+}
+
+@media (min-width: 992px) {
+    .app-container:not(.sidebar-collapsed) .app-header .mobile-menu-toggle {
+        display: none;
+    }
 }
