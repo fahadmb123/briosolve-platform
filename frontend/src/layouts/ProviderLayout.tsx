@@ -1,5 +1,4 @@
-// @ts-nocheck
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 
 export default function ProviderLayout() {

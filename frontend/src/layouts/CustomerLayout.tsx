@@ -1,5 +1,4 @@
-// @ts-nocheck
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 
 export default function CustomerLayout() {
@@ -44,7 +43,7 @@ export default function CustomerLayout() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/admin/providers" className="sidebar-item">
+                        <Link to="#" className="sidebar-item">
                             <i className="fas fa-map-marked-alt"></i>
                             <span>Nearby Providers</span>
                             <span className="badge badge-primary ml-auto">12+</span>
