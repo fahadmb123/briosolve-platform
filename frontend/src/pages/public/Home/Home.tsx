@@ -15,13 +15,13 @@ export default function Home() {
 
         
         <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
-            <div className="sidebar-brand">
-                <Link to="/" className="logo">
+            <div className="sidebar-brand flex items-center justify-between">
+                <Link to="/" className="logo flex items-center gap-2">
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
                 </Link>
-                <button id="sidebar-close" className="btn-icon sidebar-close-btn" aria-label="Close Sidebar" title="Close Menu" onClick={() => setIsSidebarOpen(false)}>
-                    <i className="fas fa-times"></i>
+                <button className="btn-icon ml-auto sidebar-inner-toggle" aria-label="Close Sidebar" title="Close Menu" onClick={() => setIsSidebarOpen(false)}>
+                    <i className="fas fa-bars"></i>
                 </button>
             </div>
 

@@ -1,18 +1,30 @@
 // @ts-nocheck
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 
 export default function CustomerLayout() {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+    const handleSidebarToggle = () => {
+        if (window.innerWidth <= 991) {
+            setIsSidebarOpen(!isSidebarOpen);
+        } else {
+            setIsSidebarCollapsed(!isSidebarCollapsed);
+        }
+    };
+
     return (
-        <div className="app-container">
-            <aside className="app-sidebar" id="app-sidebar">
-            <div className="sidebar-brand">
-                <Link to="/" className="logo">
+        <div className={`app-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+            <div id="sidebar-overlay" className={`sidebar-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
+            <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
+            <div className="sidebar-brand flex items-center justify-between">
+                <Link to="/" className="logo flex items-center gap-2">
                     <i className="fas fa-layer-group text-primary"></i>
                     <span>ReverseMarket</span>
                 </Link>
-                <button id="sidebar-close" className="btn-icon sidebar-close-btn" aria-label="Close Sidebar" title="Close Menu">
-                    <i className="fas fa-times"></i>
+                <button className="btn-icon ml-auto sidebar-inner-toggle" aria-label="Toggle Sidebar" onClick={handleSidebarToggle}>
+                    <i className="fas fa-bars"></i>
                 </button>
             </div>
 
@@ -110,7 +122,7 @@ export default function CustomerLayout() {
             <main className="app-main">
                 <header className="app-header">
                 <div className="flex items-center gap-3">
-                    <button id="sidebar-toggle" className="btn-icon" aria-label="Toggle Sidebar" title="Open Menu">
+                    <button id="sidebar-toggle" className="btn-icon mobile-menu-toggle" aria-label="Toggle Sidebar" title="Open Menu" onClick={handleSidebarToggle}>
                         <i className="fas fa-bars"></i>
                     </button>
                     <Link to="/" className="logo">
