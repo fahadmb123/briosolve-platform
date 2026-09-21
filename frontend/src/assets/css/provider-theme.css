@@ -46,25 +46,27 @@ body.theme-provider {
 }
 
 html[data-theme="light"] body.theme-provider {
-    /* LIGHT THEME - Platinum & Forest */
-    --bg: #F4F5F4;
-    --surface: #FFFFFF;
-    --surface-elevated: #EAEDE9;
-    --surface-hover: #E0E4DE;
+    /* LIGHT THEME (Classic Premium Green & Alabaster) */
+    --bg: #FAF9F6; /* Premium Alabaster / Off-White Canvas */
+    --surface: #FFFFFF; /* Pure White Navbar and Cards */
+    --surface-elevated: #F2F0E6; /* Subtle Linen/Stone for elevated elements */
+    --surface-hover: #EAE7DB;
+    
+    --navbar-bg: #F4EBD7; /* Custom warm cream color for the navbar */
 
-    --text: #1A201C;
-    --text-secondary: #4A544D;
-    --text-muted: #78867C;
+    --text: #0A2514; /* Extremely Deep Forest Green for Bold/Sized text */
+    --text-secondary: #4E5951; /* Refined Sage-Grey for attractive small text */
+    --text-muted: #828C85;
 
-    --border: #DDE2DD;
-    --border-light: #E8EBE8;
+    --border: #E6E8E6; /* Very soft, clean borders */
+    --border-light: #F0F2F0;
 
-    /* Deep Forest Green Accents */
-    --primary: #1B4332;
-    --primary-content: #FFFFFF;
-    --primary-hover: #122C21;
-    --primary-active: #0B1B14;
-    --primary-light: rgba(27, 67, 50, 0.1);
+    /* Classic Green Accents */
+    --primary: #0F4415; /* Rich Dark Green */
+    --primary-content: #FFFFFF; /* Crisp White text on buttons */
+    --primary-hover: #0A2D0E;
+    --primary-active: #051A07;
+    --primary-light: rgba(15, 68, 21, 0.06);
 
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px var(--primary-light);
@@ -76,7 +78,7 @@ html[data-theme="light"] body.theme-provider {
    ========================================================================== */
 
 /* Primary Button in Provider Portal */
-.btn-primary {
+body.theme-provider .btn-primary {
     background: var(--gradient-provider);
     border-color: transparent;
     color: #FFFFFF !important;
@@ -84,13 +86,14 @@ html[data-theme="light"] body.theme-provider {
     transition: all var(--transition-fast);
 }
 
-.btn-primary:hover {
+body.theme-provider .btn-primary:hover {
     background: linear-gradient(135deg, #576781 0%, #435166 100%);
+    color: #FFFFFF !important;
     box-shadow: 0 6px 20px 0 rgba(107, 124, 152, 0.5);
     transform: translateY(-1px);
 }
 
-.btn-primary:active {
+body.theme-provider .btn-primary:active {
     transform: translateY(0);
     box-shadow: 0 2px 8px 0 rgba(107, 124, 152, 0.3);
 }

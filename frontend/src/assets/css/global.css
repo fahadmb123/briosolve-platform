@@ -60,24 +60,27 @@
 }
 
 [data-theme="light"] {
-    /* LIGHT THEME - Warm Desert */
-    --bg: #EADAC1;
-    --surface: #F6F0E4;
-    --surface-elevated: #FDFBF7;
-    --surface-hover: #EBE1D0;
+    /* LIGHT THEME (Classic Premium Green & Alabaster) */
+    --bg: #FAF9F6; /* Premium Alabaster / Off-White Canvas */
+    --surface: #FFFFFF; /* Pure White Navbar and Cards */
+    --surface-elevated: #F2F0E6; /* Subtle Linen/Stone for elevated elements */
+    --surface-hover: #EAE7DB;
+    
+    --navbar-bg: #F4EBD7; /* Custom warm cream color for the navbar */
 
-    --text: #1C2329;
-    --text-secondary: #5C5243;
-    --text-muted: #8A8170;
+    --text: #0A2514; /* Extremely Deep Forest Green for Bold/Sized text */
+    --text-secondary: #243B2A; /* Darker, richer forest-grey for small text */
+    --text-muted: #828C85;
 
-    --border: #D4C5AD;
-    --border-light: #E0D3BE;
+    --border: #E6E8E6; /* Very soft, clean borders */
+    --border-light: #F0F2F0;
 
-    --primary: #183D4E;
-    --primary-content: #F6F0E4;
-    --primary-hover: #133140;
-    --primary-active: #0F2733;
-    --primary-light: rgba(24, 61, 78, 0.1);
+    /* Classic Green Accents */
+    --primary: #0F4415; /* Rich Dark Green */
+    --primary-content: #FFFFFF; /* Crisp White text on buttons */
+    --primary-hover: #0A2D0E;
+    --primary-active: #051A07;
+    --primary-light: rgba(15, 68, 21, 0.06);
 
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -250,7 +253,7 @@ h6, .h6 { font-size: 1rem; }
 
 .app-header {
     height: var(--navbar-height);
-    background-color: var(--surface);
+    background-color: var(--navbar-bg, var(--surface));
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;

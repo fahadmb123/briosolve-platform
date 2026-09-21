@@ -181,7 +181,7 @@ export default function Home() {
                             </p>
 
                             
-                            <form action="../create-request/create-request.html" method="GET" className="modern-search-card">
+                            {/*<form action="../create-request/create-request.html" method="GET" className="modern-search-card">
                                 <div className="search-inputs-row">
                                     <div className="search-field-wrapper">
                                         <i className="fas fa-search field-icon"></i>
@@ -238,7 +238,7 @@ export default function Home() {
                                     <strong>12,400+ Verified Specialists</strong> ready to bid<br />
                                     <span className="text-secondary"><i className="fas fa-star text-warning"></i> <strong>4.9/5</strong> rating from 48,500+ completed projects</span>
                                 </div>
-                            </div>
+                            </div>*/}
                         </div>
 
                         
