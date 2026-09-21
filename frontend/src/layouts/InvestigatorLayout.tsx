@@ -2,7 +2,7 @@ import { Outlet, Link } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
 
 export default function InvestigatorLayout() {
-    const { isSidebarOpen, setIsSidebarOpen, isSidebarCollapsed, handleSidebarToggle } = useSidebar();
+    const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
 
     return (
         <div className={`app-container sidebar-modal-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
