@@ -35,7 +35,7 @@ export default function Home() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="//dashboard" className="sidebar-item">
+                        <Link to="/dashboard" className="sidebar-item">
                             <i className="fas fa-chart-pie"></i>
                             <span>Dashboard</span>
                         </Link>
@@ -90,19 +90,19 @@ export default function Home() {
                 <div className="menu-label mt-6">Preferences</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="//notifications" className="sidebar-item">
+                        <Link to="/notifications" className="sidebar-item">
                             <i className="fas fa-bell"></i>
                             <span>Notifications</span>
                         </Link>
                     </li>
                     <li>
-                        <Link to="//profile" className="sidebar-item">
+                        <Link to="/profile" className="sidebar-item">
                             <i className="fas fa-user-circle"></i>
                             <span>Profile</span>
                         </Link>
                     </li>
                     <li>
-                        <Link to="//settings" className="sidebar-item">
+                        <Link to="/settings" className="sidebar-item">
                             <i className="fas fa-cog"></i>
                             <span>Settings</span>
                         </Link>
