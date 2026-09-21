@@ -36,19 +36,11 @@
 }
 
 .hero-ambient-glow {
-    position: absolute;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1200px;
-    height: 650px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(139, 92, 246, 0.12) 35%, rgba(11, 15, 20, 0) 70%);
-    z-index: 0;
-    pointer-events: none;
+    display: none; /* Removed ambient glow for a cleaner, classy look */
 }
 
 [data-theme="light"] .hero-ambient-glow {
-    background: radial-gradient(circle, rgba(79, 70, 229, 0.14) 0%, rgba(124, 58, 237, 0.08) 35%, rgba(248, 250, 252, 0) 70%);
+    display: none;
 }
 
 .hero-grid {
@@ -83,46 +75,24 @@
 }
 
 .pulse-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: var(--radius-full);
-    background-color: var(--primary);
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
-    animation: pulseGlow 2s infinite;
+    display: none; /* Removed for a more premium editorial feel */
 }
 
 .pulse-dot-green {
-    width: 8px;
-    height: 8px;
-    border-radius: var(--radius-full);
-    background-color: var(--success);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-    animation: pulseGreen 2s infinite;
-}
-
-@keyframes pulseGlow {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(99, 102, 241, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
-}
-
-@keyframes pulseGreen {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    display: none;
 }
 
 .hero-title-modern {
-    font-size: 3.25rem;
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.035em;
+    font-size: 4rem; /* Increased size for premium look */
+    font-weight: 900; /* Bolder weight */
+    line-height: 1.1;
+    letter-spacing: -0.04em;
     color: var(--text);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 
 .gradient-text {
-    background: linear-gradient(135deg, #818CF8 0%, #C084FC 50%, #6366F1 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;

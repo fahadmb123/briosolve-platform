@@ -1,27 +1,55 @@
 /* ==========================================================================
-   Admin Theme & Operational Styles
-   Reverse Service Marketplace - Platform Administration
+   Admin Side Theme — Midnight Navy & Silver
+   Reverse Service Marketplace
    ========================================================================== */
 
 body.theme-admin {
-    --admin-primary: #6366F1;
-    --admin-primary-hover: #4F46E5;
-    --admin-primary-light: rgba(99, 102, 241, 0.12);
-    --admin-border: #26313D;
-    --admin-card-bg: #111820;
-    --admin-card-elevated: #171F29;
-    --admin-table-hover: rgba(99, 102, 241, 0.04);
+    /* DARK THEME - Midnight Navy */
+    --bg: #020617;
+    --surface: #0F172A;
+    --surface-elevated: #1E293B;
+    --surface-hover: #334155;
+
+    --text: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+
+    --border: #1E293B;
+    --border-light: #334155;
+
+    /* Crisp Ice Silver/Blue Accents */
+    --admin-primary: #E2E8F0;
+    --admin-primary-content: #0F172A;
+    --admin-primary-hover: #F8FAFC;
+    --admin-primary-active: #FFFFFF;
+    --admin-primary-light: rgba(226, 232, 240, 0.15);
+
+    --admin-table-hover: rgba(226, 232, 240, 0.05);
     --admin-text-header: #FFFFFF;
 }
 
-body.theme-admin[data-theme="light"] {
-    --admin-primary: #4F46E5;
-    --admin-primary-hover: #4338CA;
-    --admin-primary-light: rgba(79, 70, 229, 0.08);
-    --admin-border: #E2E8F0;
-    --admin-card-bg: #FFFFFF;
-    --admin-card-elevated: #F8FAFC;
-    --admin-table-hover: rgba(79, 70, 229, 0.04);
+html[data-theme="light"] body.theme-admin {
+    /* LIGHT THEME - Silver & Navy */
+    --bg: #F0F2F5;
+    --surface: #FFFFFF;
+    --surface-elevated: #F8FAFC;
+    --surface-hover: #F1F5F9;
+
+    --text: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+
+    --border: #E2E8F0;
+    --border-light: #CBD5E1;
+
+    /* Deep Royal Navy Accents */
+    --admin-primary: #0A2540;
+    --admin-primary-content: #FFFFFF;
+    --admin-primary-hover: #071C33;
+    --admin-primary-active: #041224;
+    --admin-primary-light: rgba(10, 37, 64, 0.1);
+    
+    --admin-table-hover: rgba(10, 37, 64, 0.03);
     --admin-text-header: #0F172A;
 }
 

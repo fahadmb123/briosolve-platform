@@ -5,24 +5,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* DARK THEME (DEFAULT) */
-    --bg: #0B0F14;
-    --surface: #111820;
-    --surface-elevated: #171F29;
-    --surface-hover: #1e293b;
+    /* DARK THEME (DEFAULT) - Classic Black */
+    --bg: #000000;
+    --surface: #0A0A0A;
+    --surface-elevated: #111111;
+    --surface-hover: #1A1A1A;
 
-    --text: #F5F7FA;
-    --text-secondary: #8B98A7;
-    --text-muted: #647180;
+    --text: #F6F0E4;
+    --text-secondary: #A0A0A0;
+    --text-muted: #666666;
 
-    --border: #26313D;
-    --border-light: #334155;
+    --border: #222222;
+    --border-light: #333333;
 
-    /* Accent Colors - Indigo */
-    --primary: #6366F1;
-    --primary-hover: #4F46E5;
-    --primary-active: #4338CA;
-    --primary-light: rgba(99, 102, 241, 0.15);
+    /* Classic Editorial Accents */
+    --primary: #D4AC77;
+    --primary-content: #101C23;
+    --primary-hover: #C39962;
+    --primary-active: #B28851;
+    --primary-light: rgba(212, 172, 119, 0.15);
 
     /* Status Colors */
     --success: #22C55E;
@@ -59,22 +60,24 @@
 }
 
 [data-theme="light"] {
-    --bg: #F8FAFC;
-    --surface: #FFFFFF;
-    --surface-elevated: #F1F5F9;
-    --surface-hover: #E2E8F0;
+    /* LIGHT THEME - Warm Desert */
+    --bg: #EADAC1;
+    --surface: #F6F0E4;
+    --surface-elevated: #FDFBF7;
+    --surface-hover: #EBE1D0;
 
-    --text: #0F172A;
-    --text-secondary: #475569;
-    --text-muted: #94A3B8;
+    --text: #1C2329;
+    --text-secondary: #5C5243;
+    --text-muted: #8A8170;
 
-    --border: #E2E8F0;
-    --border-light: #CBD5E1;
+    --border: #D4C5AD;
+    --border-light: #E0D3BE;
 
-    --primary: #4F46E5;
-    --primary-hover: #4338CA;
-    --primary-active: #3730A3;
-    --primary-light: rgba(79, 70, 229, 0.1);
+    --primary: #183D4E;
+    --primary-content: #F6F0E4;
+    --primary-hover: #133140;
+    --primary-active: #0F2733;
+    --primary-light: rgba(24, 61, 78, 0.1);
 
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -711,12 +714,12 @@ h6, .h6 { font-size: 1rem; }
 
 .btn-primary {
     background-color: var(--primary);
-    color: #ffffff;
+    color: var(--primary-content);
 }
 
 .btn-primary:hover:not(:disabled) {
     background-color: var(--primary-hover);
-    color: #ffffff;
+    color: var(--primary-content);
 }
 
 .btn-secondary {

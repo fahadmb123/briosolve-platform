@@ -2,9 +2,12 @@ import { useSidebar } from '../../../hooks/useSidebar';
 import './Home.css';
 
 
-import { Link , NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
+import { useTheme } from '../../../hooks/useTheme';
+
 export default function Home() {
   const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
@@ -134,8 +137,8 @@ export default function Home() {
                 <div className="flex items-center gap-3">
                     <Link to="/admin/providers" className="nav-item-link hide-mobile">Nearby Providers</Link>
                     <Link to="#" className="nav-item-link hide-mobile">How It Works</Link>
-                    <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
-                        <i className="fas fa-sun"></i>
+                    <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
+                        <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
                     <div className="notif-dropdown-wrapper">
                         <button id="notif-toggle" className="btn-icon notif-bell-btn" aria-label="Notifications" title="Notifications">
@@ -349,52 +352,6 @@ export default function Home() {
                     </div>
                 </header>
 
-                
-                <div className="market-pulse-strip" aria-hidden="true">
-                    <div className="pulse-track">
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>Split AC Jet Cleaning</strong> in Bandra received 4 bids in 12 mins (Saved ₹650)
-                        </div>
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>Pipe Leak Repair</strong> in Andheri booked by Farhan Ansari for ₹2,800
-                        </div>
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>Full Apartment Deep Clean</strong> in Juhu received 6 competing quotes
-                        </div>
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>Switchboard & Wiring</strong> in Borivali completed with 5.0★ rating
-                        </div>
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>RO Purifier Filter Service</strong> in Powai received bids within 9 minutes
-                        </div>
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>Interior Wall Painting</strong> in Thane got 5 quotes (Average saving: 28%)
-                        </div>
-                        
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>Split AC Jet Cleaning</strong> in Bandra received 4 bids in 12 mins (Saved ₹650)
-                        </div>
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>Pipe Leak Repair</strong> in Andheri booked by Farhan Ansari for ₹2,800
-                        </div>
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>Full Apartment Deep Clean</strong> in Juhu received 6 competing quotes
-                        </div>
-                        <div className="pulse-item">
-                            <span className="pulse-item-badge"></span>
-                            <strong>Switchboard & Wiring</strong> in Borivali completed with 5.0★ rating
-                        </div>
-                    </div>
-                </div>
 
                 
                 <section className="bento-section">
