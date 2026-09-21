@@ -5,11 +5,15 @@ import './assets/css/user-theme.css';
 import './assets/css/provider-theme.css';
 import './assets/css/admin-theme.css';
 
+import { ThemeProvider } from './contexts/ThemeContext';
+
 function App() {
   return (
-    <div className="app">
-      <AppRouter />
-    </div>
+    <ThemeProvider>
+      <div className="app">
+        <AppRouter />
+      </div>
+    </ThemeProvider>
   );
 }
 

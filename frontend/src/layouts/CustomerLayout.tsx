@@ -1,8 +1,10 @@
 import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function CustomerLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
+    const { theme, toggleTheme } = useTheme();
 
     return (
         <div className={`app-container sidebar-modal-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
@@ -124,8 +126,8 @@ export default function CustomerLayout() {
                 <div className="flex items-center gap-3">
                     <Link to="/admin/providers" className="nav-item-link hide-mobile">Nearby Providers</Link>
                     <Link to="#" className="nav-item-link hide-mobile">How It Works</Link>
-                    <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
-                        <i className="fas fa-sun"></i>
+                    <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
+                        <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
                     <div className="notif-dropdown-wrapper">
                         <button id="notif-toggle" className="btn-icon notif-bell-btn" aria-label="Notifications" title="Notifications">

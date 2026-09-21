@@ -1,9 +1,11 @@
 // @ts-nocheck
 import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function AdminLayout() {
     const { isSidebarOpen, setIsSidebarOpen, isSidebarCollapsed, handleSidebarToggle } = useSidebar();
+    const { theme, toggleTheme } = useTheme();
 
     return (
         <div className={`app-container sidebar-modal-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
@@ -162,8 +164,8 @@ export default function AdminLayout() {
 
                 <div className="flex items-center gap-3">
                     <span className="badge badge-verified text-xs px-2 py-1"><i className="fas fa-circle text-xs mr-1" style={{"fontSize":"8px"}}></i>All Systems Operational</span>
-                    <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
-                        <i className="fas fa-sun"></i>
+                    <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
+                        <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
                     <div className="notif-dropdown-wrapper">
                         <button id="notif-toggle" className="btn-icon notif-bell-btn" aria-label="Notifications" title="Notifications">
