@@ -1,17 +1,8 @@
-import { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
+import { useSidebar } from '../hooks/useSidebar';
 
 export default function ProviderLayout() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
-    const handleSidebarToggle = () => {
-        if (window.innerWidth <= 991) {
-            setIsSidebarOpen(!isSidebarOpen);
-        } else {
-            setIsSidebarCollapsed(!isSidebarCollapsed);
-        }
-    };
+    const { isSidebarOpen, setIsSidebarOpen, isSidebarCollapsed, handleSidebarToggle } = useSidebar();
 
     return (
         <div className={`app-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
