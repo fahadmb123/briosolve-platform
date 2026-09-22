@@ -64,11 +64,7 @@ export default function Login() {
                         </div>
 
                         <div className="flex items-center justify-between mb-6">
-                            <label className="checkbox-container">
-                                <input type="checkbox" defaultChecked />
-                                <span className="checkmark"></span>
-                                <span className="text-xs text-secondary">Remember me</span>
-                            </label>
+                            
                             <Link to="/forgot-password" className="text-primary font-medium text-xs">Forgot Password?</Link>
                         </div>
 
