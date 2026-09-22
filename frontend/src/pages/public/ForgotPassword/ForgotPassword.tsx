@@ -1,14 +1,24 @@
 import './ForgotPassword.css';
 
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTheme } from '../../../hooks/useTheme';
+
 export default function ForgotPassword() {
+  const { toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate('/reset-password');
+  };
+
   return (
     <>
       
     <div className="auth-page-wrapper">
         
-        <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
+        <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
             <i className="fas fa-sun"></i>
         </button>
 
@@ -28,7 +38,7 @@ export default function ForgotPassword() {
                     </p>
                 </div>
 
-                <form action="../reset-password/reset-password.html" method="GET">
+                <form onSubmit={handleSubmit}>
                     <div className="form-group mb-6">
                         <label className="form-label" htmlFor="recovery-email">Registered Email</label>
                         <div className="input-icon-wrapper">

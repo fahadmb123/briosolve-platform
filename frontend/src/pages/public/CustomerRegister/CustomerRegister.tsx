@@ -2,13 +2,16 @@ import './CustomerRegister.css';
 
 
 import { Link } from 'react-router-dom';
+import { useTheme } from '../../../hooks/useTheme';
+
 export default function CustomerRegister() {
+  const { toggleTheme } = useTheme();
   return (
     <>
       
     <div className="auth-page-wrapper">
         
-        <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
+        <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme" onClick={toggleTheme}>
             <i className="fas fa-sun"></i>
         </button>
 

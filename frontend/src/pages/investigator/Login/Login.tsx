@@ -2,12 +2,15 @@
 import React from 'react';
 
 import { Link } from 'react-router-dom';
+import { useTheme } from '../../../hooks/useTheme';
+
 export default function Login() {
+  const { toggleTheme } = useTheme();
   return (
     <>
 <div className="auth-page-wrapper">
         
-        <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
+        <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
             <i className="fas fa-sun"></i>
         </button>
 

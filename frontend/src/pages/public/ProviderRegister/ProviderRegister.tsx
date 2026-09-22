@@ -2,7 +2,10 @@ import './ProviderRegister.css';
 
 
 import { Link } from 'react-router-dom';
+import { useTheme } from '../../../hooks/useTheme';
+
 export default function ProviderRegister() {
+  const { toggleTheme } = useTheme();
   return (
     <>
       
@@ -14,7 +17,7 @@ export default function ProviderRegister() {
                 <span>ReverseMarket <small className="text-xs text-primary font-bold ml-1">PRO</small></span>
             </Link>
             <div className="flex items-center gap-4">
-                <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
+                <button onClick={toggleTheme} id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
                     <i className="fas fa-sun"></i>
                 </button>
                 <div className="text-xs text-secondary">
