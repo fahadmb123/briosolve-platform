@@ -73,11 +73,22 @@ export default function InvestigatorLayout() {
                     </button>
                     <h1 className="h4 mb-0">Dashboard</h1>
                 </div>
-                <div className="flex items-center gap-4">
-                    <button id="theme-toggle" className="btn-icon text-secondary" aria-label="Toggle Theme" onClick={toggleTheme}>
+                <div className="flex items-center gap-3">
+                    <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
                         <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
-                    <button className="btn-icon text-secondary"><i className="fas fa-bell"></i></button>
+                    <div className="notif-dropdown-wrapper">
+                        <button id="notif-toggle" className="btn-icon notif-bell-btn" aria-label="Notifications" title="Notifications">
+                            <i className="fas fa-bell"></i>
+                            <span className="notif-badge-count" id="notif-badge">1</span>
+                        </button>
+                    </div>
+                    <Link to="/login" className="btn btn-primary btn-sm hide-mobile">
+                        <i className="fas fa-sign-out-alt mr-1"></i> Logout
+                    </Link>
+                    <Link to="#" className="avatar avatar-sm ml-2" title="Investigator Profile">
+                        <img src="https://ui-avatars.com/api/?name=Investigator&background=6366F1&color=fff&rounded=true" alt="Investigator" />
+                    </Link>
                 </div>
             </header>
                 <Outlet />

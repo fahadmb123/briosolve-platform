@@ -172,8 +172,11 @@ export default function AdminLayout() {
                             <span className="notif-badge-count">6</span>
                         </button>
                     </div>
-                    <div className="flex items-center gap-2 pl-2 border-left">
-                        <img src="https://ui-avatars.com/api/?name=Vikram+Malhotra&amp;background=6366F1&amp;color=fff" alt="Admin Avatar" className="avatar avatar-sm" />
+                    <Link to="/login" className="btn btn-primary btn-sm hide-mobile">
+                        <i className="fas fa-sign-out-alt mr-1"></i> Logout
+                    </Link>
+                    <div className="flex items-center gap-2 pl-2 ml-1">
+                        <img src="https://ui-avatars.com/api/?name=Vikram+Malhotra&amp;background=6366F1&amp;color=fff&rounded=true" alt="Admin Avatar" className="avatar avatar-sm" />
                         <div className="hidden sm:block text-left">
                             <div className="text-xs font-semibold text-text">Vikram Malhotra</div>
                             <div className="text-xs text-muted" style={{"fontSize":"10px"}}>Super Administrator</div>

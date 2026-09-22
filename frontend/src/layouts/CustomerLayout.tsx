@@ -123,9 +123,12 @@ export default function CustomerLayout() {
                     </Link>
                 </div>
 
+                <div className="navbar-center hide-mobile">
+                    <Link to="/admin/providers" className="nav-item-link">Nearby Providers</Link>
+                    <Link to="#" className="nav-item-link">How It Works</Link>
+                </div>
+
                 <div className="flex items-center gap-3">
-                    <Link to="/admin/providers" className="nav-item-link hide-mobile">Nearby Providers</Link>
-                    <Link to="#" className="nav-item-link hide-mobile">How It Works</Link>
                     <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
                         <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
@@ -135,14 +138,11 @@ export default function CustomerLayout() {
                             <span className="notif-badge-count" id="notif-badge">3</span>
                         </button>
                     </div>
-                    <Link to="#" className="btn btn-primary btn-sm">
-                        <i className="fas fa-plus mr-1"></i> Post Request
+                    <Link to="/login" className="btn btn-primary btn-sm hide-mobile">
+                        <i className="fas fa-sign-out-alt mr-1"></i> Logout
                     </Link>
-                    <Link to="#" className="btn btn-outline btn-sm hide-mobile">
-                        Become a Provider
-                    </Link>
-                    <Link to="/profile" className="avatar avatar-sm ml-1" title="Profile">
-                        <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=6366F1&color=fff" alt="Aarav" />
+                    <Link to="/profile" className="avatar avatar-sm ml-2" title="Profile">
+                        <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=6366F1&color=fff&rounded=true" alt="Aarav" />
                     </Link>
                 </div>
             </header>

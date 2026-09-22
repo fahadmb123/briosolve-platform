@@ -5,18 +5,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* DARK THEME (DEFAULT) - Classic Black */
-    --bg: #000000;
-    --surface: #0A0A0A;
-    --surface-elevated: #111111;
-    --surface-hover: #1A1A1A;
+    /* DARK THEME (DEFAULT) - Sleek Dark Blue/Slate */
+    --bg: #0B1121;
+    --surface: #111827;
+    --surface-elevated: #1F2937;
+    --surface-hover: #374151;
+    
+    --navbar-bg: rgba(17, 24, 39, 0.85); /* Sync with surface */
 
     --text: #F6F0E4;
     --text-secondary: #A0A0A0;
     --text-muted: #666666;
 
-    --border: #222222;
-    --border-light: #333333;
+    --border: #374151; /* Slate 700 */
+    --border-light: #4B5563; /* Slate 600 */
 
     /* Classic Editorial Accents */
     --primary: #D4AC77;
@@ -66,7 +68,7 @@
     --surface-elevated: #F2F0E6; /* Subtle Linen/Stone for elevated elements */
     --surface-hover: #EAE7DB;
     
-    --navbar-bg: #F4EBD7; /* Custom warm cream color for the navbar */
+    --navbar-bg: rgba(244, 235, 215, 0.85); /* Transparent custom warm cream color (#F4EBD7) */
 
     --text: #0A2514; /* Extremely Deep Forest Green for Bold/Sized text */
     --text-secondary: #243B2A; /* Darker, richer forest-grey for small text */
@@ -229,7 +231,9 @@ h6, .h6 { font-size: 1rem; }
 
 .app-sidebar {
     width: var(--sidebar-width);
-    background-color: var(--surface);
+    background-color: var(--navbar-bg, var(--surface));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-right: 1px solid var(--border);
     position: fixed;
     top: 0;
@@ -254,15 +258,73 @@ h6, .h6 { font-size: 1rem; }
 .app-header {
     height: var(--navbar-height);
     background-color: var(--navbar-bg, var(--surface));
-    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border); /* Full border for floating effect */
+    border-radius: var(--radius-full); /* Curved shape */
+    box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 2rem;
     position: sticky;
-    top: 0;
+    top: 1.5rem; /* Space from top */
+    margin: 1.5rem 1.5rem 0 1.5rem; /* Space from edges */
     z-index: 30;
+    width: auto;
+}
+
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.avatar img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+}
+
+.navbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.navbar-action-box {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--navbar-bg, var(--surface));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 2rem; /* Curved shape */
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 100;
+    box-shadow: var(--shadow-lg); /* Slightly stronger shadow for bottom FAB */
+}
+
+/* Hide on mobile to prevent overlap */
+@media (max-width: 768px) {
+    .navbar-center {
+        display: none;
+    }
 }
 
 .app-content {
@@ -768,9 +830,10 @@ h6, .h6 { font-size: 1rem; }
 
 .btn-icon {
     padding: 0.5rem;
-    border-radius: var(--radius-md);
-    width: 36px;
-    height: 36px;
+    border-radius: var(--radius-full); /* Perfectly circular to match avatar */
+    width: 40px;
+    height: 40px;
+    font-size: 1.125rem; /* Slightly larger icon */
     display: flex;
     align-items: center;
     justify-content: center;

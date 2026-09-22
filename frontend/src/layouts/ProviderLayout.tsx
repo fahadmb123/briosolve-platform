@@ -128,8 +128,11 @@ export default function ProviderLayout() {
                             <span className="notif-badge-count" id="notif-badge">3</span>
                         </button>
                     </div>
-                    <Link to="/provider/profile" className="avatar avatar-sm ml-1" title="Arjun Menon (Verified Master Tech)">
-                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&amp;auto=format&amp;fit=crop&amp;q=80" alt="Arjun Menon" />
+                    <Link to="/login" className="btn btn-primary btn-sm hide-mobile">
+                        <i className="fas fa-sign-out-alt mr-1"></i> Logout
+                    </Link>
+                    <Link to="/provider/profile" className="avatar avatar-sm ml-2" title="Arjun Menon (Verified Master Tech)">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&amp;auto=format&amp;fit=crop&amp;q=80" alt="Arjun Menon" style={{borderRadius: '50%'}} />
                     </Link>
                 </div>
             </header>

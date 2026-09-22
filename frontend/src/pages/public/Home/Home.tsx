@@ -134,9 +134,12 @@ export default function Home() {
                     </Link>
                 </div>
 
+                <div className="navbar-center hide-mobile">
+                    <Link to="/admin/providers" className="nav-item-link">Nearby Providers</Link>
+                    <Link to="#" className="nav-item-link">How It Works</Link>
+                </div>
+
                 <div className="flex items-center gap-3">
-                    <Link to="/admin/providers" className="nav-item-link hide-mobile">Nearby Providers</Link>
-                    <Link to="#" className="nav-item-link hide-mobile">How It Works</Link>
                     <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
                         <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
@@ -146,17 +149,24 @@ export default function Home() {
                             <span className="notif-badge-count" id="notif-badge">3</span>
                         </button>
                     </div>
-                    <Link to="#" className="btn btn-primary btn-sm">
-                        <i className="fas fa-plus mr-1"></i> Post Request
+                    <Link to="/login" className="btn btn-primary btn-sm hide-mobile">
+                        <i className="fas fa-sign-out-alt mr-1"></i> Logout
                     </Link>
-                    <Link to="/register" className="btn btn-outline btn-sm hide-mobile">
-                        Become a Provider
-                    </Link>
-                    <Link to="//profile" className="avatar avatar-sm ml-1" title="Profile">
-                        <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=6366F1&color=fff" alt="Aarav" />
+                    <Link to="//profile" className="avatar avatar-sm ml-2" title="Profile">
+                        <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=6366F1&color=fff&rounded=true" alt="Aarav" />
                     </Link>
                 </div>
             </header>
+
+            {/* Floating Top-Right Action Box */}
+            <div className="navbar-action-box hide-mobile">
+                <Link to="/register" className="btn btn-outline btn-sm">
+                    Become a Provider
+                </Link>
+                <Link to="#" className="btn btn-primary btn-sm">
+                    <i className="fas fa-plus mr-1"></i> Post Request
+                </Link>
+            </div>
 
             <div className="app-content-home">
 
@@ -172,13 +182,21 @@ export default function Home() {
                             </div>
                             
                             <h1 className="hero-title-modern">
-                                Post what you need.<br />
-                                Let skilled pros <span className="gradient-text">compete to win</span> your project.
+                                Post what you need. Let skilled pros <span className="gradient-text">compete.</span>
                             </h1>
 
                             <p className="hero-lead-text">
-                                Stop scrolling through cluttered directories or dodging sales calls. Describe your task once, receive custom bids from background-verified local specialists, compare transparently, and hire on your terms.
+                                Stop scrolling through cluttered directories or dodging sales calls. Describe your task once, receive custom bids, and hire on your terms.
                             </p>
+
+                            <div className="hero-cta-group">
+                                <Link to="/create-request" className="btn btn-primary hero-btn-massive">
+                                    Post Request <i className="fas fa-arrow-right ml-2"></i>
+                                </Link>
+                                <Link to="/providers" className="hero-subtle-link">
+                                    Browse Providers <i className="fas fa-chevron-right text-xs ml-1"></i>
+                                </Link>
+                            </div>
 
                             
                             {/*<form action="../create-request/create-request.html" method="GET" className="modern-search-card">

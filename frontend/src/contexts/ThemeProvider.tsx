@@ -13,7 +13,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (theme === 'light') {
       root.setAttribute('data-theme', 'light');
     } else {
-      root.removeAttribute('data-theme');
+      root.setAttribute('data-theme', 'dark');
     }
   }, [theme]);
 
