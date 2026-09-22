@@ -1,5 +1,5 @@
 import { Route } from 'react-router-dom';
-import { CustomerRegister, EmailVerification, ForgotPassword, Login, ProviderRegister, ResetPassword } from './public.lazy';
+import { CustomerRegister, EmailVerification, ForgotPassword, Login, ProviderRegister, ResetPassword, OtpVerification } from './public.lazy';
 
 
 
@@ -12,5 +12,6 @@ export const publicRoutes = (
     <Route path="forgot-password" element={<ForgotPassword />} />
     <Route path="reset-password" element={<ResetPassword />} />
     <Route path="email-verification" element={<EmailVerification />} />
+    <Route path="otp-verification" element={<OtpVerification />} />
   </>
 );

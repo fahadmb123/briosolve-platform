@@ -1,11 +1,18 @@
 import './CustomerRegister.css';
 
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../hooks/useTheme';
 
 export default function CustomerRegister() {
   const { toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate('/otp-verification');
+  };
+
   return (
     <>
       
@@ -42,7 +49,7 @@ export default function CustomerRegister() {
                 </div>
 
                 
-                <form action="../email-verification/email-verification.html" method="GET">
+                <form onSubmit={handleRegister}>
                     <div className="form-group">
                         <label className="form-label" htmlFor="full-name">Full Name</label>
                         <div className="input-icon-wrapper">

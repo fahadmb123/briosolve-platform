@@ -6,3 +6,4 @@ export const ProviderRegister = React.lazy(() => import('../../pages/public/Prov
 export const ForgotPassword = React.lazy(() => import('../../pages/public/ForgotPassword/ForgotPassword'));
 export const ResetPassword = React.lazy(() => import('../../pages/public/ResetPassword/ResetPassword'));
 export const EmailVerification = React.lazy(() => import('../../pages/public/EmailVerification/EmailVerification'));
+export const OtpVerification = React.lazy(() => import('../../pages/public/OtpVerification/OtpVerification'));
