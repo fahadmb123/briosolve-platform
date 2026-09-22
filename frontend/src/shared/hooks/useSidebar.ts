@@ -8,7 +8,7 @@ export function useSidebar() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(globalSidebarOpen);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-    // Sync local state with global state
+    
     useEffect(() => {
         const handleStateChange = (isOpen: boolean) => {
             setIsSidebarOpen(isOpen);
@@ -19,7 +19,7 @@ export function useSidebar() {
         };
     }, []);
 
-    // Custom setter that updates the global variable and notifies all layouts
+    
     const setGlobalSidebarOpen = (isOpen: boolean) => {
         globalSidebarOpen = isOpen;
         listeners.forEach(listener => listener(isOpen));

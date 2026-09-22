@@ -1,6 +1,6 @@
 import './NotFound.css';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../../../hooks/useTheme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 
 
 export default function NotFound() {

@@ -1,11 +1,11 @@
-import { AppRouter } from './router';
+import { AppRouter } from './app/router';
 import './App.css';
-import './assets/css/global.css';
-import './assets/css/user-theme.css';
-import './assets/css/provider-theme.css';
-import './assets/css/admin-theme.css';
+import './shared/styles/global.css';
+import './shared/styles/user-theme.css';
+import './shared/styles/provider-theme.css';
+import './shared/styles/admin-theme.css';
 
-import { ThemeProvider } from './contexts/ThemeProvider';
+import { ThemeProvider } from './app/providers/ThemeProvider';
 
 function App() {
   return (

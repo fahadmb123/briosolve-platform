@@ -2,7 +2,7 @@ import './CustomerRegister.css';
 
 
 import { Link, useNavigate } from 'react-router-dom';
-import { useTheme } from '../../../hooks/useTheme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 
 export default function CustomerRegister() {
   const { toggleTheme } = useTheme();

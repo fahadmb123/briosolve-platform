@@ -1,9 +1,9 @@
-import { useSidebar } from '../../../hooks/useSidebar';
+import { useSidebar } from '../../../shared/hooks/useSidebar';
 import './Home.css';
 
 
 import { Link, NavLink } from 'react-router-dom';
-import { useTheme } from '../../../hooks/useTheme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 
 export default function Home() {
   const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();

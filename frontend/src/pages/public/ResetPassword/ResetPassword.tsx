@@ -1,5 +1,5 @@
 import './ResetPassword.css';
-import { useTheme } from '../../../hooks/useTheme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 
 import { Link } from 'react-router-dom';
 export default function ResetPassword() {

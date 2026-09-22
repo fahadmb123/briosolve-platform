@@ -1,4 +1,4 @@
-import { useTheme } from '../../../hooks/useTheme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import './Settings.css';
 import { Link } from 'react-router-dom';
 

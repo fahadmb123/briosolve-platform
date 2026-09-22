@@ -1,6 +1,6 @@
 import { Outlet, Link, NavLink } from 'react-router-dom';
-import { useSidebar } from '../hooks/useSidebar';
-import { useTheme } from '../hooks/useTheme';
+import { useSidebar } from '../../shared/hooks/useSidebar';
+import { useTheme } from '../../shared/hooks/useTheme';
 
 export default function InvestigatorLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();

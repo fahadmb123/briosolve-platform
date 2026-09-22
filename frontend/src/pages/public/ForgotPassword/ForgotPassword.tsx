@@ -2,7 +2,7 @@ import './ForgotPassword.css';
 
 
 import { Link, useNavigate } from 'react-router-dom';
-import { useTheme } from '../../../hooks/useTheme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 
 export default function ForgotPassword() {
   const { toggleTheme } = useTheme();
