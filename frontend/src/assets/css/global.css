@@ -11,7 +11,7 @@
     --surface-elevated: #1F2937;
     --surface-hover: #374151;
     
-    --navbar-bg: rgba(17, 24, 39, 0.85); /* Sync with surface */
+    --navbar-bg: rgba(255, 255, 255, 0.08); /* Premium Apple-style dark frosted glass */
 
     --text: #F6F0E4;
     --text-secondary: #A0A0A0;
