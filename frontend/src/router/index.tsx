@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import React, { useEffect } from 'react';
 
 const Home = React.lazy(() => import('../pages/public/Home/Home'));
+const NotFound = React.lazy(() => import('../pages/public/NotFound/NotFound'));
 const AdminLayout = React.lazy(() => import('../layouts/AdminLayout'));
 const ProviderLayout = React.lazy(() => import('../layouts/ProviderLayout'));
 const InvestigatorLayout = React.lazy(() => import('../layouts/InvestigatorLayout'));
@@ -62,7 +63,7 @@ export function AppRouter() {
             </Route>
 
             {/* Fallback for invalid URLs */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </React.Suspense>
