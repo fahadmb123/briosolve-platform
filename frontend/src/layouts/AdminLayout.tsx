@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
 import { useTheme } from '../hooks/useTheme';
 
 export default function AdminLayout() {
-    const { isSidebarOpen, setIsSidebarOpen, isSidebarCollapsed, handleSidebarToggle } = useSidebar();
+    const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
     const { theme, toggleTheme } = useTheme();
 
     return (
