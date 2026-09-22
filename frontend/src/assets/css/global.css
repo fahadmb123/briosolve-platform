@@ -12,6 +12,7 @@
     --surface-hover: #374151;
     
     --navbar-bg: rgba(255, 255, 255, 0.08); /* Premium Apple-style dark frosted glass */
+    --sidebar-bg: #111827; /* Match surface for solid dark sidebar */
 
     --text: #F6F0E4;
     --text-secondary: #A0A0A0;
@@ -68,7 +69,8 @@
     --surface-elevated: #F2F0E6; /* Subtle Linen/Stone for elevated elements */
     --surface-hover: #EAE7DB;
     
-    --navbar-bg: rgba(244, 235, 215, 0.85); /* Transparent custom warm cream color (#F4EBD7) */
+    --navbar-bg: rgba(244, 235, 215, 0.4); /* Highly transparent warm cream frosted glass */
+    --sidebar-bg: rgba(244, 235, 215, 0.9); /* Solid warm cream for sidebar to match visual weight */
 
     --text: #0A2514; /* Extremely Deep Forest Green for Bold/Sized text */
     --text-secondary: #243B2A; /* Darker, richer forest-grey for small text */
@@ -231,7 +233,7 @@ h6, .h6 { font-size: 1rem; }
 
 .app-sidebar {
     width: var(--sidebar-width);
-    background-color: var(--navbar-bg, var(--surface));
+    background-color: var(--sidebar-bg, var(--navbar-bg));
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-right: 1px solid var(--border);
