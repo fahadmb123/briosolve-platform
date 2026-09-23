@@ -1,5 +1,5 @@
 import { Router } from "express";
-import validate from "../middlewares/validateRequest";
+import validate from "../middlewares/validat-request";
 import { customerRegistrationSchema } from "../validators/auth/registerCustomer.schema";
 
 const router = Router();
