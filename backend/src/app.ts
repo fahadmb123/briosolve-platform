@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import routes from "./presentation/routes";
+import routes from "./presentation/http/routes";
 
 const app = express()
 
