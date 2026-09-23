@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signupSchema, type SignupInputType } from '../../../features/authentication/validation';
+import { registerSchema, type RegisterInputType } from '../../../features/authentication/validation';
 
 
 
@@ -11,11 +11,11 @@ import { signupSchema, type SignupInputType } from '../../../features/authentica
 export default function CustomerRegister() {
     const { toggleTheme } = useTheme();
     
-    const {register,handleSubmit,formState:{errors}} = useForm<SignupInputType>({
-        resolver : zodResolver(signupSchema),mode : "onChange"
+    const {register,handleSubmit,formState:{errors}} = useForm<RegisterInputType>({
+        resolver : zodResolver(registerSchema),mode : "onChange"
     })
 
-    const handleRegister = (data:SignupInputType) => {
+    const handleRegister = (data:RegisterInputType) => {
         console.log(data)
     };
 

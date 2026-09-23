@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const requiredMessage = "Please fill the field";
 
-export const signupSchema = z.object({
+export const registerSchema = z.object({
   name: z
     .string()
     .trim()
@@ -34,4 +34,4 @@ export const signupSchema = z.object({
   path: ["confirmPassword"]
 });
 
-export type SignupInputType = z.infer<typeof signupSchema>;
+export type RegisterInputType = z.infer<typeof registerSchema>;
