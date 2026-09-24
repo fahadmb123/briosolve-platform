@@ -1,5 +1,5 @@
 import { Router } from "express";
-import validate from "../middlewares/validat-request.js";
+import validate from "../middlewares/validate-request.js";
 import { customerRegistrationSchema } from "../validators/auth/registerCustomer.schema.js";
 import { customerAuthController } from "../../../composition/customer/customer-auth.dependencies.js";
 

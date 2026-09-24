@@ -1,0 +1,10 @@
+export type ErrorKind =
+  | "VALIDATION"
+  | "AUTHENTICATION"
+  | "AUTHORIZATION"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "PRECONDITION"
+  | "RATE_LIMIT"
+  | "UNSUPPORTED"
+  | "INTERNAL";
