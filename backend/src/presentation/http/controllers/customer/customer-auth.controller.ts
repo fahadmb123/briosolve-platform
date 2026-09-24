@@ -1,9 +1,11 @@
 import { Request,Response,NextFunction } from "express"
+import { RegisterCustomerUseCase } from "../../../../application/interfaces/use-case/customer/register-customer.use-case.js"
 
 class CustomerAuthController {
-    constructor () {}
+    constructor (private readonly registerCustomerUseCase:RegisterCustomerUseCase) {}
+
     async register(req:Request,res:Response,next:NextFunction){
-        return res.json({message:"Hey this is from controller"})
+        await this.registerCustomerUseCase.execute(req.body)
     }
 }
 

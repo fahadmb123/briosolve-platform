@@ -1,7 +1,7 @@
 import { Router } from "express";
-import validate from "../middlewares/validat-request";
-import { customerRegistrationSchema } from "../validators/auth/registerCustomer.schema";
-import { customerAuthController } from "../../../composition/customer/customer-auth.dependencies";
+import validate from "../middlewares/validat-request.js";
+import { customerRegistrationSchema } from "../validators/auth/registerCustomer.schema.js";
+import { customerAuthController } from "../../../composition/customer/customer-auth.dependencies.js";
 
 
 const router = Router();

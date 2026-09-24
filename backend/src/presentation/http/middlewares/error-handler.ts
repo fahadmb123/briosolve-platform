@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import AppError from "../../../shared/error/app-error";
+import AppError from "../../../shared/error/app-error.js";
 
 export const errorHandler = (error: unknown,req: Request,res: Response,next: NextFunction): void => {
     if (error instanceof AppError) {
