@@ -4,6 +4,7 @@ import type { CustomerRegistrationInputType } from "../../../presentation/http/v
 
 
 export default class RegisterCustomerUseCaseImpl implements RegisterCustomerUseCase {
+    constructor(){}
     async execute (input:CustomerRegistrationInputType):Promise<void>{
         console.log("This is From usecase Register")
     }
