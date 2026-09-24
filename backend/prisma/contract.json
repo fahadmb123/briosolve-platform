@@ -8,10 +8,6 @@
       "model": "customer_profiles",
       "namespace": "public"
     },
-    "user_roles": {
-      "model": "user_roles",
-      "namespace": "public"
-    },
     "users": {
       "model": "users",
       "namespace": "public"
@@ -187,63 +183,6 @@
               },
               "namespaceId": "public",
               "table": "customer_profiles"
-            }
-          },
-          "user_roles": {
-            "fields": {
-              "created_at": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "kind": "scalar"
-                }
-              },
-              "id": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/uuid@1",
-                  "kind": "scalar"
-                }
-              },
-              "role": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
-                },
-                "valueSet": {
-                  "entityKind": "enum",
-                  "entityName": "user_role",
-                  "namespaceId": "public",
-                  "plane": "domain"
-                }
-              },
-              "user_id": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/uuid@1",
-                  "kind": "scalar"
-                }
-              }
-            },
-            "relations": {},
-            "storage": {
-              "fields": {
-                "created_at": {
-                  "column": "created_at"
-                },
-                "id": {
-                  "column": "id"
-                },
-                "role": {
-                  "column": "role"
-                },
-                "user_id": {
-                  "column": "user_id"
-                }
-              },
-              "namespaceId": "public",
-              "table": "user_roles"
             }
           },
           "users": {
@@ -485,58 +424,6 @@
                 }
               ]
             },
-            "user_roles": {
-              "checks": [
-                {
-                  "expression": "\"role\" IN ('CUSTOMER', 'PROVIDER', 'ADMIN', 'INVESTIGATOR')",
-                  "name": "user_roles_role_check_17469d79",
-                  "prefix": "user_roles_role_check"
-                }
-              ],
-              "columns": {
-                "created_at": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "nativeType": "timestamptz",
-                  "nullable": false
-                },
-                "id": {
-                  "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
-                  "nullable": false
-                },
-                "role": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false,
-                  "valueSet": {
-                    "entityKind": "valueSet",
-                    "entityName": "user_role",
-                    "namespaceId": "public",
-                    "plane": "storage"
-                  }
-                },
-                "user_id": {
-                  "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
-                  "nullable": false
-                }
-              },
-              "foreignKeys": [],
-              "indexes": [],
-              "primaryKey": {
-                "columns": [
-                  "id"
-                ]
-              },
-              "uniques": [
-                {
-                  "columns": [
-                    "user_id",
-                    "role"
-                  ]
-                }
-              ]
-            },
             "users": {
               "checks": [
                 {
@@ -675,10 +562,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "31fc53d3410021dbf2c89647fae59220b731c25e7dec9a927829ee8c0160b449"
+    "storageHash": "4aacdb57a00791dc45b03366375d136cead9cb6eb2b1c61f40fd47f253e885fa"
   },
   "execution": {
-    "executionHash": "8ff276c2a4ad808d3b7284a15d3d141db126267a071dd0ea3dda8a6d58cb586c",
+    "executionHash": "cefff650f604f12327a3cc8c63a5588ff57cef351ac6fa3567371a88c8397fc1",
     "mutations": {
       "defaults": [
         {
@@ -690,17 +577,6 @@
             "column": "id",
             "namespace": "public",
             "table": "customer_profiles"
-          }
-        },
-        {
-          "onCreate": {
-            "id": "uuidv4",
-            "kind": "generator"
-          },
-          "ref": {
-            "column": "id",
-            "namespace": "public",
-            "table": "user_roles"
           }
         },
         {

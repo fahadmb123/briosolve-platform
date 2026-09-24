@@ -25,15 +25,6 @@ model users {
   updated_at     DateTime
 }
 
-model user_roles {
-  id         Uuid      @id @default(uuid())
-  user_id    Uuid
-  role       user_role
-  created_at DateTime
-
-  @@unique([user_id, role])
-}
-
 model customer_profiles {
   id            Uuid            @id @default(uuid())
   user_id       Uuid            @unique

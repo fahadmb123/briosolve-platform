@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'31fc53d3410021dbf2c89647fae59220b731c25e7dec9a927829ee8c0160b449'>;
+  StorageHashBase<'4aacdb57a00791dc45b03366375d136cead9cb6eb2b1c61f40fd47f253e885fa'>;
 export type ExecutionHash =
-  ExecutionHashBase<'8ff276c2a4ad808d3b7284a15d3d141db126267a071dd0ea3dda8a6d58cb586c'>;
+  ExecutionHashBase<'cefff650f604f12327a3cc8c63a5588ff57cef351ac6fa3567371a88c8397fc1'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -254,12 +254,6 @@ export type FieldOutputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
-    readonly user_roles: {
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly user_id: CodecTypes['pg/uuid@1']['output'];
-      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
-      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    };
     readonly users: {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly name: Varchar<100>;
@@ -288,12 +282,6 @@ export type FieldInputTypes = {
       readonly longitude: CodecTypes['pg/numeric@1']['input'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
-    };
-    readonly user_roles: {
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly user_id: CodecTypes['pg/uuid@1']['input'];
-      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
-      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly users: {
       readonly id: CodecTypes['pg/uuid@1']['input'];
@@ -324,12 +312,6 @@ export type StorageColumnTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
     };
-    readonly user_roles: {
-      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
-      readonly user_id: CodecTypes['pg/uuid@1']['output'];
-    };
     readonly users: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly email: Varchar<255>;
@@ -357,12 +339,6 @@ export type StorageColumnInputTypes = {
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
       readonly state: CodecTypes['sql/varchar@1']['input'] | null;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly user_id: CodecTypes['pg/uuid@1']['input'];
-    };
-    readonly user_roles: {
-      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
     };
     readonly users: {
@@ -396,13 +372,6 @@ export namespace Models {
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     readonly [RelationKeys]?: never;
   };
-  export type public_user_roles = {
-    id: CodecTypes['pg/uuid@1']['output'];
-    user_id: CodecTypes['pg/uuid@1']['output'];
-    role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
-    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    readonly [RelationKeys]?: never;
-  };
   export type public_customer_profiles = {
     id: CodecTypes['pg/uuid@1']['output'];
     user_id: CodecTypes['pg/uuid@1']['output'];
@@ -421,7 +390,6 @@ export namespace Models {
 export declare const models: {
   public: {
     users: Models.public_users;
-    user_roles: Models.public_user_roles;
     customer_profiles: Models.public_customer_profiles;
   };
 };
@@ -504,34 +472,6 @@ type ContractBase = Omit<
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [{ readonly columns: readonly ['user_id'] }];
-              indexes: readonly [];
-              foreignKeys: readonly [];
-            };
-            readonly user_roles: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                };
-                readonly user_id: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                };
-                readonly role: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly created_at: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['user_id', 'role'] }];
               indexes: readonly [];
               foreignKeys: readonly [];
             };
@@ -628,10 +568,6 @@ type ContractBase = Omit<
   readonly targetFamily: 'sql';
   readonly roots: {
     readonly users: { readonly namespace: 'public' & NamespaceId; readonly model: 'users' };
-    readonly user_roles: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'user_roles';
-    };
     readonly customer_profiles: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'customer_profiles';
@@ -725,40 +661,6 @@ type ContractBase = Omit<
                 readonly longitude: { readonly column: 'longitude' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
-              };
-            };
-          };
-          readonly user_roles: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly user_id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly role: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly created_at: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-            };
-            readonly relations: Record<string, never>;
-            readonly storage: {
-              readonly table: 'user_roles';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly user_id: { readonly column: 'user_id' };
-                readonly role: { readonly column: 'role' };
-                readonly created_at: { readonly column: 'created_at' };
               };
             };
           };
@@ -900,14 +802,6 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'customer_profiles';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'user_roles';
             readonly column: 'id';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
