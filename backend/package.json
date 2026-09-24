@@ -4,15 +4,17 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "postinstall": "prisma skills sync || exit 0"
   },
   "keywords": [],
   "dependencies": {
+    "@prisma/orm-postgres": "^8.0.0-rc.11",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
@@ -26,6 +28,8 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@types/node": "^26.6.2",
+    "prisma": "^8.0.0-rc.15",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

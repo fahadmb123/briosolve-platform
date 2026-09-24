@@ -1,0 +1,48 @@
+enum user_status {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+enum user_role {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+  INVESTIGATOR
+}
+
+model users {
+  id             Uuid         @id @default(uuid())
+  name           VarChar(100)
+  email          VarChar(255) @unique
+  password_hash  VarChar(255)
+  phone          VarChar(20)?
+  role           user_role
+  status         user_status  @default(ACTIVE)
+  email_verified Boolean
+  phone_verified Boolean
+  created_at     DateTime
+  updated_at     DateTime
+}
+
+model user_roles {
+  id         Uuid      @id @default(uuid())
+  user_id    Uuid
+  role       user_role
+  created_at DateTime
+
+  @@unique([user_id, role])
+}
+
+model customer_profiles {
+  id            Uuid            @id @default(uuid())
+  user_id       Uuid            @unique
+  profile_image VarChar(500)?
+  address       String?
+  city          VarChar(100)?
+  state         VarChar(100)?
+  latitude      Numeric(10, 7)?
+  longitude     Numeric(10, 7)?
+  created_at    DateTime
+  updated_at    DateTime
+}
