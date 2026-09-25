@@ -37,7 +37,7 @@ export default function CustomerRegister() {
         }
     };
 
-    return (
+    return ( 
         <>
         
         <div className="auth-page-wrapper">
