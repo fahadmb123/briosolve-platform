@@ -1,6 +1,7 @@
 import './CustomerRegister.css';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, type RegisterInputType } from '../../../features/authentication/auth-customer/validation';
@@ -12,12 +13,15 @@ import { isAxiosError } from 'axios';
 
 export default function CustomerRegister() {
     const { toggleTheme } = useTheme();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    
     const {register,handleSubmit,formState:{errors}} = useForm<RegisterInputType>({
         resolver : zodResolver(registerSchema),mode : "onChange"
     })
 
     const handleRegister = async (data:RegisterInputType) => {
+        setIsLoading(true);
         try {
             await registerCustomer({
                 name:data.name,
@@ -34,6 +38,8 @@ export default function CustomerRegister() {
             } else {
                 toast.error("An unexpected error occurred");
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -128,9 +134,18 @@ export default function CustomerRegister() {
                             </Link>
                         </div>*/}
 
-                        <button type="submit" className="btn btn-primary w-full btn-lg mb-4">
-                            <span>Complete Registration</span>
-                            <i className="fas fa-arrow-right"></i>
+                        <button type="submit" className="btn btn-primary w-full btn-lg mb-4" disabled={isLoading}>
+                            {isLoading ? (
+                                <>
+                                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                                    <span>Creating Account...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>Complete Registration</span>
+                                    <i className="fas fa-arrow-right ml-2"></i>
+                                </>
+                            )}
                         </button>
 
                         <div className="text-center text-sm text-secondary pt-4 border-top">
