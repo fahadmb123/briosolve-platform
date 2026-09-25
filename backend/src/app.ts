@@ -6,7 +6,10 @@ import { errorHandler } from "./presentation/http/middlewares/error-handler.js";
 
 const app = express()
 
-app.use(cors({origin:"http://localhost:5173"}))
+app.use(cors({
+  origin: "http://localhost:5173", // Replace with your frontend URL if different
+  credentials: true,
+}))
 app.use(express.json())
 app.use(cookieParser())
 

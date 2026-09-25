@@ -1,5 +1,7 @@
 import React from 'react';
 
+
+export const ProviderRegister = React.lazy(() => import('../../../pages/provider/ProviderRegister/ProviderRegister'));
 export const ProviderDashboard = React.lazy(() => import('../../../pages/provider/Dashboard/Dashboard'));
 export const ProviderProfile = React.lazy(() => import('../../../pages/provider/Profile/Profile'));
 export const ProviderVerification = React.lazy(() => import('../../../pages/provider/Verification/Verification'));

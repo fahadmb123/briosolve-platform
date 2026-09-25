@@ -3,20 +3,38 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema, type RegisterInputType } from '../../../features/authentication/validation';
-
-
+import { registerSchema, type RegisterInputType } from '../../../features/authentication/auth-customer/validation';
+import {toast} from "react-toastify"
+import { useNavigate } from 'react-router-dom';
+import { registerCustomer } from '../../../features/authentication/auth-customer/api';
+import { isAxiosError } from 'axios';
 
 
 export default function CustomerRegister() {
     const { toggleTheme } = useTheme();
-    
+    const navigate = useNavigate()
     const {register,handleSubmit,formState:{errors}} = useForm<RegisterInputType>({
         resolver : zodResolver(registerSchema),mode : "onChange"
     })
 
-    const handleRegister = (data:RegisterInputType) => {
-        console.log(data)
+    const handleRegister = async (data:RegisterInputType) => {
+        try {
+            await registerCustomer({
+                name:data.name,
+                email:data.email,
+                password:data.password
+            })
+            toast.success("Acount Created")
+            navigate("/otp-verification")
+        } catch (err) {
+            if (isAxiosError(err) && err.response?.data?.message) {
+                toast.error(err.response.data.message);
+            } else if (err instanceof Error) {
+                toast.error(err.message);
+            } else {
+                toast.error("An unexpected error occurred");
+            }
+        }
     };
 
     return (
