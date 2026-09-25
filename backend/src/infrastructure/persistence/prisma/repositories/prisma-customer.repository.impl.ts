@@ -1,15 +1,16 @@
+import { Temporal } from "@js-temporal/polyfill";
 import { Customer } from "../../../../domain/entities/customer/customer-auth.entity.js";
-import { CustomerAuthRepository,RegisterCustomerInput } from "../../../../domain/repositories/customer.repository.js";
+import {CustomerAuthRepository,RegisterCustomerInput} from "../../../../domain/repositories/customer.repository.js";
 import { db } from "../client.js";
 
-export class PrismaCustomerAuthRepositoryImpl implements CustomerAuthRepository{
-    
+
+export class PrismaCustomerAuthRepositoryImpl implements CustomerAuthRepository {
+
     async findByEmail(email: string): Promise<Customer | null> {
         return null;
     }
 
-    async createCustomer( data:RegisterCustomerInput ): Promise<Customer> {
-        // @ts-ignore - Prisma 8 rc types evaluate to never due to excessive depth in arktype
+    async createCustomer(data: RegisterCustomerInput): Promise<Customer> {
         const user = await db.orm.public.users.create({
             name: data.name,
             email: data.email,
@@ -18,21 +19,21 @@ export class PrismaCustomerAuthRepositoryImpl implements CustomerAuthRepository{
             status: "ACTIVE" as const,
             email_verified: false,
             phone_verified: false,
-            created_at: new Date(),
-            updated_at: new Date(),
-        })
+            created_at: Temporal.Now.instant(),
+            updated_at: Temporal.Now.instant(),
+        } as never);
 
         await db.orm.public.customer_profiles.create({
             user_id: user.id,
-            created_at: new Date(),
-            updated_at: new Date(),
-        })
-
-        return new Customer(
+            created_at: Temporal.Now.instant(),
+            updated_at: Temporal.Now.instant(),
+        } as never);
+        const customer = new Customer(
             user.id,
             user.name,
             user.email,
             user.phone
-        )
+        );
+        return customer;
     }
 }

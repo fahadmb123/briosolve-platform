@@ -6,11 +6,10 @@ class CustomerAuthController {
 
     register = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            console.log("Controller Reached")
-            await this.registerCustomerUseCase.execute({name:"fahad",email:"fafgafefe",password:"1234"})
-            console.log("After")
+            const customer = await this.registerCustomerUseCase.execute(req.body)
+            return res.status(200).json(customer)
         } catch (err) {
-            throw (err)
+            next(err)
         }
     }
 }

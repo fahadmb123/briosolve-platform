@@ -14,6 +14,7 @@
   },
   "keywords": [],
   "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
     "@prisma/orm-postgres": "^8.0.0-rc.11",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",

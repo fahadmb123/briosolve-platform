@@ -1,3 +1,13 @@
+import { Temporal, toTemporalInstant } from "@js-temporal/polyfill";
+declare global {
+  var Temporal: any;
+  interface Date {
+    toTemporalInstant: typeof toTemporalInstant;
+  }
+}
+
+globalThis.Temporal = Temporal;
+Date.prototype.toTemporalInstant = toTemporalInstant;
 import "dotenv/config";
 import postgres from "@prisma/orm-postgres/runtime";
 
