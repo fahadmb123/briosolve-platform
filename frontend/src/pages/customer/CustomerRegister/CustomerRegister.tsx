@@ -1,29 +1,29 @@
 import './CustomerRegister.css';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, type RegisterInputType } from '../../../features/authentication/auth-customer/validation';
 import {toast} from "react-toastify"
 import { useNavigate } from 'react-router-dom';
-import { registerCustomer } from '../../../features/authentication/auth-customer/api';
 import { isAxiosError } from 'axios';
+import { useRegisterCustomer } from '../../../features/authentication/auth-customer/model/use-register-customer';
+
+
+
 
 
 export default function CustomerRegister() {
     const { toggleTheme } = useTheme();
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
-    
+    const registerMutation = useRegisterCustomer()
     const {register,handleSubmit,formState:{errors}} = useForm<RegisterInputType>({
         resolver : zodResolver(registerSchema),mode : "onChange"
     })
 
     const handleRegister = async (data:RegisterInputType) => {
-        setIsLoading(true);
         try {
-            await registerCustomer({
+            await registerMutation.mutateAsync({
                 name:data.name,
                 email:data.email,
                 password:data.password
@@ -38,8 +38,6 @@ export default function CustomerRegister() {
             } else {
                 toast.error("An unexpected error occurred");
             }
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -134,8 +132,8 @@ export default function CustomerRegister() {
                             </Link>
                         </div>*/}
 
-                        <button type="submit" className="btn btn-primary w-full btn-lg mb-4" disabled={isLoading}>
-                            {isLoading ? (
+                        <button type="submit" className="btn btn-primary w-full btn-lg mb-4" disabled={registerMutation.isPending}>
+                            {registerMutation.isPending ? (
                                 <>
                                     <i className="fas fa-spinner fa-spin mr-2"></i>
                                     <span>Creating Account...</span>
