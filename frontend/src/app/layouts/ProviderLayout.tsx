@@ -1,10 +1,15 @@
-import { Outlet, Link, NavLink } from 'react-router-dom';
+import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
 import { useSidebar } from '../../shared/hooks/useSidebar';
 import { useTheme } from '../../shared/hooks/useTheme';
 
 export default function ProviderLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
     const { theme, toggleTheme } = useTheme();
+    const location = useLocation();
+
+    if (location.pathname.endsWith('/register') || location.pathname.endsWith('/register/')) {
+        return <Outlet />;
+    }
 
     return (
         <div className={`app-container sidebar-modal-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
