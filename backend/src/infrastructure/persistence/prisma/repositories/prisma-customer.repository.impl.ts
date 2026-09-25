@@ -2,12 +2,14 @@ import { Temporal } from "@js-temporal/polyfill";
 import { Customer } from "../../../../domain/entities/customer/customer-auth.entity.js";
 import {CustomerAuthRepository,RegisterCustomerInput} from "../../../../domain/repositories/customer.repository.js";
 import { db } from "../client.js";
+import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 
 
 export class PrismaCustomerAuthRepositoryImpl implements CustomerAuthRepository {
 
     async findByEmail(email: string): Promise<Customer | null> {
-        return null;
+        const user = await db.orm.public.users.where({email:email as Varchar<255>}).first()
+        return user ? user : null
     }
 
     async createCustomer(data: RegisterCustomerInput): Promise<Customer> {
@@ -21,19 +23,21 @@ export class PrismaCustomerAuthRepositoryImpl implements CustomerAuthRepository 
             phone_verified: false,
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant(),
-        } as never);
+        } as never)
 
         await db.orm.public.customer_profiles.create({
             user_id: user.id,
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant(),
-        } as never);
+        } as never)
+
         const customer = new Customer(
             user.id,
             user.name,
             user.email,
             user.phone
-        );
-        return customer;
+        )
+
+        return customer
     }
 }
