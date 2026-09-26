@@ -4,6 +4,7 @@ export interface IPendingCustomerRegistration {
     passwordHash: string;
     otpHash: string;
     attempts: number;
+    for:string
 }
 
 export interface IPendingRegistrationStore {

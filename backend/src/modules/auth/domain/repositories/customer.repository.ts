@@ -9,7 +9,7 @@ export type RegisterCustomerInput = {
   email : string,
   password:string
 }
-export interface ICustomerAuthRepository {
+export interface ICustomerRepository {
   findByEmail(email: string): Promise<Customer | null>
   createCustomer(data: RegisterCustomerInput): Promise<Customer>
 }

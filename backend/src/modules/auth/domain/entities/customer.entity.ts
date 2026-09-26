@@ -5,6 +5,4 @@ export class Customer {
         public readonly email: string,
         public readonly phone: string | null
     ) {}
-
-    
 }

@@ -9,7 +9,6 @@ const router = Router();
 
 
 
-// authentication parts
 router.post("/register",validate(customerRegistrationSchema),customerAuthController.register)
 
 

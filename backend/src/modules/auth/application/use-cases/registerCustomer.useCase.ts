@@ -1,5 +1,5 @@
 import type { RegisterCustomerInput ,RegisterCustomerOutput} from "../dto/customerDto.js";
-import { ICustomerAuthRepository } from "../../domain/repositories/customer.repository.js";
+import { ICustomerRepository } from "../../domain/repositories/customer.repository.js";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
 import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js";
@@ -11,7 +11,7 @@ import { IRegisterCustomerUseCase } from "../../domain/interfaces/use-cases/IReg
 
 
 export default class RegisterCustomerUseCase implements IRegisterCustomerUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
-    constructor(private readonly customerAuthRepository : ICustomerAuthRepository,
+    constructor(private readonly customerRepository : ICustomerRepository,
         readonly passwordHasher:IPasswordHasher,
         readonly otpGenerate:IOtpGenerator,
         readonly EmailSender:IEmailSender,
@@ -19,7 +19,7 @@ export default class RegisterCustomerUseCase implements IRegisterCustomerUseCase
     ){}
 
     async execute (input:RegisterCustomerInput):Promise<RegisterCustomerOutput>{
-        const isEmailExist = await this.customerAuthRepository.findByEmail(input.email)
+        const isEmailExist = await this.customerRepository.findByEmail(input.email)
         if (isEmailExist) throw new ApplicationError("USER_EMAIL_ALREADY_EXIST","User with email already exist","CONFLICT")
 
         const otp = this.otpGenerate.generate()
@@ -33,7 +33,9 @@ export default class RegisterCustomerUseCase implements IRegisterCustomerUseCase
             email:input.email,
             passwordHash,
             otpHash,
-            attempts:0},
+            attempts:0,
+            for:"CREATE_CUSTOMER",
+        },
             60
         )
         

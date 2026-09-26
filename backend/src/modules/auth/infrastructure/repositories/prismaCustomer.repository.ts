@@ -1,11 +1,11 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Customer } from "../../domain/entities/customer.entity.js";
-import {ICustomerAuthRepository,RegisterCustomerInput} from "../../domain/repositories/customer.repository.js";
+import {ICustomerRepository,RegisterCustomerInput} from "../../domain/repositories/customer.repository.js";
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 
 
-export class PrismaCustomerAuthRepository implements ICustomerAuthRepository {
+export class PrismaCustomerRepository implements ICustomerRepository {
 
     async findByEmail(email: string): Promise<Customer | null> {
         const user = await db.orm.public.users.where({email:email as Varchar<255>}).first()
