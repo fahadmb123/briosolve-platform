@@ -6,7 +6,13 @@ type RegisterCustomerInput = {
     password:string
 }
 
-export const registerCustomer = async (data:RegisterCustomerInput): Promise<RegisterCustomerInput> => {
+type RegisterCustomerOutput<T> = {
+    success:boolean,
+    message:string,
+    data:T
+}
+
+export const registerCustomer = async (data:RegisterCustomerInput): Promise<RegisterCustomerOutput<{expiresIn:number}>> => {
     const response = await apiClient.post(
         "/api/auth/register",
         data

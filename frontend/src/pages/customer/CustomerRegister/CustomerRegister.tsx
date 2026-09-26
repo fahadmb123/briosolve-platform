@@ -23,12 +23,12 @@ export default function CustomerRegister() {
 
     const handleRegister = async (data:RegisterInputType) => {
         try {
-            await registerMutation.mutateAsync({
+            const response = await registerMutation.mutateAsync({
                 name:data.name,
                 email:data.email,
                 password:data.password
             })
-            toast.success("Acount Created")
+            toast.success(response.message)
             navigate("/otp-verification")
         } catch (err) {
             if (isAxiosError(err) && err.response?.data?.message) {

@@ -1,5 +1,5 @@
-import type { CustomerRegistrationInputType } from "../../../../presentation/http/validators/auth/registerCustomer.schema.js";
+import { RegisterCustomerInput,RegisterCustomerOutput } from "../../../dto/customer/customer-auth.type.js";
 
 export interface RegisterCustomerUseCase {
-  execute(input: CustomerRegistrationInputType): Promise<void>;
+  execute(input: RegisterCustomerInput): Promise<RegisterCustomerOutput>;
 }
