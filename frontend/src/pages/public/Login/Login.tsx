@@ -1,16 +1,41 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, type LoginInputType } from '../../../features/authentication/public/validation';
 import './Login.css';
+import { useLogin } from '../../../features/authentication/public/model/use-otp-varify';
+import { toast } from 'react-toastify';
+import { isAxiosError } from 'axios';
 
 export default function Login() {
-    
-    //const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    
-    const {toggleTheme} = useTheme()
- 
+    const navigate = useNavigate()
+    const { toggleTheme } = useTheme()
+    const login = useLogin()
+    const {
+        register,
+        handleSubmit,
+        formState: { errors }
+    } = useForm<LoginInputType>({
+        resolver: zodResolver(loginSchema),
+        mode: "onChange"
+    })
+
+    const handleLogin = async (data: LoginInputType) => {
+        try {
+            const response = await login.mutateAsync(data)
+            toast.success(response.message)
+            navigate("/",{replace:true})
+        } catch (err) {
+            if (isAxiosError(err) && err.response?.data?.message) {
+                toast.error(err.response.data.message);
+            } else if (err instanceof Error) {
+                toast.error(err.message);
+            } else {
+                toast.error("An unexpected error occurred");
+            }
+        }
+    }
 
     return (
         <div className="auth-page-wrapper">
@@ -30,7 +55,7 @@ export default function Login() {
                         <p>Enter your email and password to securely access your account.</p>
                     </div>
 
-                    <form >
+                    <form onSubmit={handleSubmit(handleLogin)}>
                         <div className="form-group mb-4">
                             <label className="form-label" htmlFor="email">Email Address</label>
                             <div className="input-icon-wrapper">
@@ -38,13 +63,12 @@ export default function Login() {
                                 <input 
                                     type="email" 
                                     id="email" 
-                                    className="form-control" 
+                                    className={`form-control ${errors.email ? 'border-danger' : ''}`}
                                     placeholder="name@example.com" 
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required 
+                                    {...register("email")}
                                 />
                             </div>
+                            {errors.email && <div className="text-danger text-xs mt-2">{errors.email.message}</div>}
                         </div>
 
                         <div className="form-group mb-4">
@@ -54,13 +78,12 @@ export default function Login() {
                                 <input 
                                     type="password" 
                                     id="password" 
-                                    className="form-control" 
+                                    className={`form-control ${errors.password ? 'border-danger' : ''}`}
                                     placeholder="••••••••" 
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required 
+                                    {...register("password")}
                                 />
                             </div>
+                            {errors.password && <div className="text-danger text-xs mt-2">{errors.password.message}</div>}
                         </div>
 
                         <div className="flex items-center justify-between mb-6">
@@ -68,7 +91,7 @@ export default function Login() {
                             <Link to="/forgot-password" className="text-primary font-medium text-xs">Forgot Password?</Link>
                         </div>
 
-                        <button type="submit" className="btn btn-primary w-full btn-lg mb-4" >Sign In</button>
+                        <button type="submit" className="btn btn-primary w-full btn-lg mb-4">Sign In</button>
                     </form>
 
                     <div className="auth-footer">

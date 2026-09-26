@@ -3,9 +3,27 @@ import React from 'react';
 
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, type LoginInputType } from '../../../features/authentication/public/validation';
 
 export default function Login() {
   const { toggleTheme } = useTheme();
+
+  const {
+      register,
+      handleSubmit,
+      formState: { errors }
+  } = useForm<LoginInputType>({
+      resolver: zodResolver(loginSchema),
+      mode: "onChange"
+  })
+
+  const handleLogin = (data: LoginInputType) => {
+      console.log("Investigator Login data:", data)
+      // TODO: call investigator login mutation
+  }
+
   return (
     <>
 <div className="auth-page-wrapper">
@@ -41,14 +59,20 @@ export default function Login() {
                 </div>
 
                 
-                <form id="investigator-login-form">
-                    <div className="form-group">
+                <form id="investigator-login-form" onSubmit={handleSubmit(handleLogin)}>
+                    <div className="form-group mb-4">
                         <label className="form-label" htmlFor="email">Email Address</label>
                         <div className="input-icon-wrapper">
                             <i className="fas fa-envelope"></i>
-                            <input type="email" id="email" className="form-control"
-                                placeholder="investigator@reversemarket.com" required />
+                            <input 
+                                type="email" 
+                                id="email" 
+                                className={`form-control ${errors.email ? 'border-danger' : ''}`}
+                                placeholder="investigator@reversemarket.com" 
+                                {...register("email")}
+                            />
                         </div>
+                        {errors.email && <div className="text-danger text-xs mt-2">{errors.email.message}</div>}
                     </div>
 
                     <div className="form-group mb-4">
@@ -60,17 +84,24 @@ export default function Login() {
                         </div>
                         <div className="input-icon-wrapper">
                             <i className="fas fa-lock"></i>
-                            <input type="password" id="password" className="form-control" placeholder="••••••••" required />
+                            <input 
+                                type="password" 
+                                id="password" 
+                                className={`form-control ${errors.password ? 'border-danger' : ''}`} 
+                                placeholder="••••••••" 
+                                {...register("password")}
+                            />
                             <button type="button" className="toggle-password" id="toggle-password-btn"
                                 aria-label="Toggle Password Visibility">
                                 <i className="fas fa-eye"></i>
                             </button>
                         </div>
+                        {errors.password && <div className="text-danger text-xs mt-2">{errors.password.message}</div>}
                     </div>
 
                     <div className="form-group flex items-center justify-between mb-6">
                         <label className="checkbox-container">
-                            <input type="checkbox" id="remember" checked />
+                            <input type="checkbox" id="remember" defaultChecked />
                             <span className="checkmark"
                                 style={{"borderColor":"var(--border)","backgroundColor":"var(--bg)"}}></span>
                             <span className="text-xs text-secondary">Remember me on this device</span>

@@ -9,16 +9,19 @@ import OtpVarificationController from "../modules/auth/presentation/controllers/
 import OtpVarificationUseCase from "../modules/auth/application/use-cases/otpVarification.useCase.js";
 
 import ResendOtpUseCase from "../modules/auth/application/use-cases/resendOtp.useCase.js";
+import { AuthController } from "../modules/auth/presentation/controllers/auth.controller.js";
+import LoginUseCase from "../modules/auth/application/use-cases/login.useCase.js";
+import { JwtService } from "../shared/infrastructure/security/jwt.service.js";
 
 // Services Shared...
 const pendingRegistrationStore = new RedisPendingRegistrationStore()
 const emailSender = new NodemailerEmailSender()
 const otpGenerator = new SecureOtpGeneratorService()
 const passwordHasher = new BcryptPasswordHasherService()
+const jwtService = new JwtService()
 
 
-
-// Repositories
+// Repo
 const customerRepository = new PrismaCustomerRepository();
 
 
@@ -36,19 +39,26 @@ const otpVarificationUseCase = new OtpVarificationUseCase(
   pendingRegistrationStore,
   passwordHasher,
   customerRepository
-);
+)
 
 const resendOtpUseCase = new ResendOtpUseCase(
   pendingRegistrationStore,
   passwordHasher,
   otpGenerator,
   emailSender
-);
+)
+//auth
+const loginUseCase = new LoginUseCase(
+  customerRepository,
+  passwordHasher,
+  jwtService
+)
 
 // Controllers
 export const customerAuthController = new CustomerAuthController(registerCustomerUseCase);
 export const otpVarificationController = new OtpVarificationController(
-  otpVarificationUseCase,
-  pendingRegistrationStore,
-  resendOtpUseCase
-);
+    otpVarificationUseCase,
+    pendingRegistrationStore,
+    resendOtpUseCase
+)
+export const authController = new AuthController(loginUseCase)

@@ -1,3 +1,4 @@
+import { UserData } from "../../application/dto/authDto.js"
 import { Customer } from "../entities/customer.entity.js"
 
 
@@ -12,4 +13,5 @@ export type RegisterCustomerInput = {
 export interface ICustomerRepository {
   findByEmail(email: string): Promise<Customer | null>
   createCustomer(data: RegisterCustomerInput): Promise<Customer>
+  findById(id: string): Promise<UserData | null> 
 }

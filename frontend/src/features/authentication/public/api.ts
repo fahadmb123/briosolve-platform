@@ -1,4 +1,5 @@
 import { apiClient } from "../../../shared/api/Client";
+import type { LoginInputType } from "./validation";
 
 type OtpVarifyInput = {
     otp:string
@@ -13,6 +14,12 @@ type OtpStatusOut = {
         attempts: number,
         expiresIn: number
     }
+}
+
+type response<T> = {
+    success: boolean,
+    message: string,
+    data: T
 }
 
 
@@ -30,15 +37,14 @@ export const getOtpStatus = async (): Promise<OtpStatusOut> => {
     return response.data;
 }
 
-type ResendOtpOutput = {
-    success: boolean,
-    message: string,
-    data: {
-        expiresIn: number
-    }
+
+
+export const resendOtp = async (): Promise<response<{expiresIn: number}>> => {
+    const response = await apiClient.post("/api/auth/resend-otp")
+    return response.data;
 }
 
-export const resendOtp = async (): Promise<ResendOtpOutput> => {
-    const response = await apiClient.post("/api/auth/resend-otp")
+export const login = async (data:LoginInputType): Promise<response<string>> => {
+    const response = await apiClient.post("/api/auth/login",data)
     return response.data;
 }

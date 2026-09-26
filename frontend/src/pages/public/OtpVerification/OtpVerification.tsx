@@ -77,7 +77,7 @@ export default function OtpVerification() {
         try {
             const response = await resendOtp.mutateAsync()
             toast.success(response.message)
-            setTimer(response.data.expiresIn)
+            setTimer(response?.data.expiresIn)
             setAttempts(prev => prev + 1)
         } catch (err) {
             if (isAxiosError(err) && err.response?.data?.message) {
@@ -153,7 +153,7 @@ export default function OtpVerification() {
 
                     <div className="text-center text-sm border-top pt-5">
                         <Link to="/login" className="back-link">
-                            <i className="fas fa-arrow-left mr-1"></i> Back to Login
+                            <i className="fas fa-arrow-left mr-1"></i> Back
                         </Link>
                     </div>
                 </div>

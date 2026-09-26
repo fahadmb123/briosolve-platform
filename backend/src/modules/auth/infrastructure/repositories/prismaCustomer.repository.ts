@@ -3,6 +3,7 @@ import { Customer } from "../../domain/entities/customer.entity.js";
 import {ICustomerRepository,RegisterCustomerInput} from "../../domain/repositories/customer.repository.js";
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
+import { UserData } from "../../application/dto/authDto.js";
 
 
 export class PrismaCustomerRepository implements ICustomerRepository {
@@ -39,5 +40,10 @@ export class PrismaCustomerRepository implements ICustomerRepository {
         )
 
         return customer
+    }
+
+    async findById(id: string): Promise<UserData | null> {
+        const user = await db.orm.public.users.where({id:id as Varchar<255>}).first()
+        return user ? (user as UserData)  : null
     }
 }
