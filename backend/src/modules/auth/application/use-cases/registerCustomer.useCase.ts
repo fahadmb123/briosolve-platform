@@ -1,5 +1,4 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import type { RegisterCustomerInput ,RegisterCustomerOutput} from "../dto/customerAuthDto.js";
+import type { RegisterCustomerInput ,RegisterCustomerOutput} from "../dto/customerDto.js";
 import { ICustomerAuthRepository } from "../../domain/repositories/customer.repository.js";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
@@ -7,10 +6,11 @@ import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGen
 import type { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
 import { randomUUID } from "crypto";
 import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
+import { IRegisterCustomerUseCase } from "../../domain/interfaces/use-cases/IRegisterCustomerUseCase.js";
 
 
 
-export default class RegisterCustomerUseCase implements IUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
+export default class RegisterCustomerUseCase implements IRegisterCustomerUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
     constructor(private readonly customerAuthRepository : ICustomerAuthRepository,
         readonly passwordHasher:IPasswordHasher,
         readonly otpGenerate:IOtpGenerator,

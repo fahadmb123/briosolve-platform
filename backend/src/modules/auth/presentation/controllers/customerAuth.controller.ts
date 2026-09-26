@@ -1,7 +1,7 @@
 import { Request,Response,NextFunction } from "express"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { RegisterCustomerInput } from "../../domain/repositories/customer.repository.js"
-import { RegisterCustomerOutput } from "../../application/dto/customerAuthDto.js"
+import { RegisterCustomerOutput } from "../../application/dto/customerDto.js"
 
 
 
