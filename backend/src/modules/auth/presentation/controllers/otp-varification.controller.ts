@@ -1,10 +1,10 @@
 import { Request,Response,NextFunction } from "express"
-import { UseCase } from "../../../../shared/application/interfaces/use-case/use-case.js"
+import { IUseCase } from "../../../../shared/application/interfaces/use-case/use-case.js"
 
 
 
 class OtpVarificationController {
-    constructor (private readonly otpVarificationUseCase:UseCase<string,void>) {}
+    constructor (private readonly otpVarificationUseCase:IUseCase<string,void>) {}
 
     validate = async (req:Request,res:Response,next:NextFunction) => {
         try {

@@ -1,8 +1,8 @@
 import { randomInt } from "crypto";
-import { OtpGenerator } from "../../application/interfaces/services/otp-generator.service.js";
+import { IOtpGenerator } from "../../application/interfaces/services/otp-generator.service.js";
 
 
-export class SecureOtpGeneratorServiceImpl implements OtpGenerator {
+export class SecureOtpGeneratorServiceImpl implements IOtpGenerator {
     generate(): string {
         return randomInt(100000, 1000000).toString();
     }

@@ -1,12 +1,12 @@
 import { Request,Response,NextFunction } from "express"
-import { UseCase } from "../../../../shared/application/interfaces/use-case/use-case.js"
+import { IUseCase } from "../../../../shared/application/interfaces/use-case/use-case.js"
 import { RegisterCustomerInput } from "../../domain/repositories/customer.repository.js"
 import { RegisterCustomerOutput } from "../../application/dto/customer-auth.type.js"
 
 
 
 class CustomerAuthController {
-    constructor (private readonly registerCustomerUseCase:UseCase<RegisterCustomerInput,RegisterCustomerOutput>) {}
+    constructor (private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,RegisterCustomerOutput>) {}
 
     register = async (req:Request,res:Response,next:NextFunction) => {
         try {

@@ -1,4 +1,4 @@
-export interface PendingCustomerRegistration {
+export interface IPendingCustomerRegistration {
     name: string;
     email: string;
     passwordHash: string;
@@ -6,13 +6,13 @@ export interface PendingCustomerRegistration {
     attempts: number;
 }
 
-export interface PendingRegistrationStore {
+export interface IPendingRegistrationStore {
     save(
         registrationId: string,
-        data: PendingCustomerRegistration,
+        data: IPendingCustomerRegistration,
         ttlSeconds: number
     ): Promise<void>
 
-    get(registrationId: string): Promise<PendingCustomerRegistration | null>
+    get(registrationId: string): Promise<IPendingCustomerRegistration | null>
     delete(registrationId: string): Promise<void>
 }

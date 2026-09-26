@@ -1,21 +1,21 @@
-import { UseCase } from "../../../../shared/application/interfaces/use-case/use-case.js";
+import { IUseCase } from "../../../../shared/application/interfaces/use-case/use-case.js";
 import type { RegisterCustomerInput ,RegisterCustomerOutput} from "../dto/customer-auth.type.js";
-import { CustomerAuthRepository } from "../../domain/repositories/customer.repository.js";
+import { ICustomerAuthRepository } from "../../domain/repositories/customer.repository.js";
 import { ApplicationError } from "../../../../shared/application/errors/application-error.js";
-import { PasswordHasher } from "../../../../shared/application/interfaces/services/password-hasher.service.js";
-import type { OtpGenerator } from "../../../../shared/application/interfaces/services/otp-generator.service.js";
-import type { EmailSender } from "../../../../shared/application/interfaces/services/email-sender.service.js";
+import { IPasswordHasher } from "../../../../shared/application/interfaces/services/password-hasher.service.js";
+import type { IOtpGenerator } from "../../../../shared/application/interfaces/services/otp-generator.service.js";
+import type { IEmailSender } from "../../../../shared/application/interfaces/services/email-sender.service.js";
 import { randomUUID } from "crypto";
-import { PendingRegistrationStore } from "../../../../shared/application/interfaces/services/pending-registration-store.js";
+import { IPendingRegistrationStore } from "../../../../shared/application/interfaces/services/pending-registration-store.js";
 
 
 
-export default class RegisterCustomerUseCaseImpl implements UseCase<RegisterCustomerInput,RegisterCustomerOutput> {
-    constructor(private readonly customerAuthRepository : CustomerAuthRepository,
-        readonly passwordHasher:PasswordHasher,
-        readonly otpGenerate:OtpGenerator,
-        readonly EmailSender:EmailSender,
-        readonly PendingRegistrationStore:PendingRegistrationStore
+export default class RegisterCustomerUseCaseImpl implements IUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
+    constructor(private readonly customerAuthRepository : ICustomerAuthRepository,
+        readonly passwordHasher:IPasswordHasher,
+        readonly otpGenerate:IOtpGenerator,
+        readonly EmailSender:IEmailSender,
+        readonly PendingRegistrationStore:IPendingRegistrationStore
     ){}
 
     async execute (input:RegisterCustomerInput):Promise<RegisterCustomerOutput>{

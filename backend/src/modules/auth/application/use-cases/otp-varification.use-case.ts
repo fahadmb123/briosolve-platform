@@ -1,14 +1,14 @@
 import { ApplicationError } from "../../../../shared/application/errors/application-error.js";
-import { PendingRegistrationStore } from "../../../../shared/application/interfaces/services/pending-registration-store.js";
-import { UseCase } from "../../../../shared/application/interfaces/use-case/use-case.js";
+import { IPendingRegistrationStore } from "../../../../shared/application/interfaces/services/pending-registration-store.js";
+import { IUseCase } from "../../../../shared/application/interfaces/use-case/use-case.js";
 import { OtpVarificationInput } from "../dto/otp.types.js";
-import { PasswordHasher } from "../../../../shared/application/interfaces/services/password-hasher.service.js";
+import { IPasswordHasher } from "../../../../shared/application/interfaces/services/password-hasher.service.js";
 
 
-export default class OtpVarificationUseCaseImpl implements UseCase<OtpVarificationInput,void>{
+export default class OtpVarificationUseCaseImpl implements IUseCase<OtpVarificationInput,void>{
     constructor(
-        private readonly PendingRegistrationStore:PendingRegistrationStore,
-        private readonly PasswordHasher:PasswordHasher
+        private readonly PendingRegistrationStore:IPendingRegistrationStore,
+        private readonly PasswordHasher:IPasswordHasher
     ){}
 
     async execute ({registrationId,otp}:OtpVarificationInput):Promise<void>{

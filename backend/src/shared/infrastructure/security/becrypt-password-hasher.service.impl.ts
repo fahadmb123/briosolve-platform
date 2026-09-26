@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
-import { PasswordHasher } from "../../application/interfaces/services/password-hasher.service.js";
+import { IPasswordHasher } from "../../application/interfaces/services/password-hasher.service.js";
 
 
 
-export class BcryptPasswordHasherServiceImpl implements PasswordHasher {
+export class BcryptPasswordHasherServiceImpl implements IPasswordHasher {
     private readonly salt = 12
     async hash(password: string): Promise<string> {
         return bcrypt.hash(password, this.salt)
