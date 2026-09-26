@@ -29,7 +29,7 @@ export default function CustomerRegister() {
                 password:data.password
             })
             toast.success(response.message)
-            navigate("/otp-verification")
+            navigate("/otp-verification",{replace:true})
         } catch (err) {
             if (isAxiosError(err) && err.response?.data?.message) {
                 toast.error(err.response.data.message);

@@ -14,7 +14,7 @@ type RegisterCustomerOutput<T> = {
 
 export const registerCustomer = async (data:RegisterCustomerInput): Promise<RegisterCustomerOutput<{expiresIn:number}>> => {
     const response = await apiClient.post(
-        "/api/auth/register",
+        "/api/customer/register",
         data
     )
     return response.data;
