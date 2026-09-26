@@ -2,9 +2,14 @@ import { Request,Response,NextFunction } from "express"
 import { IOtpVarificationUseCase } from "../../domain/interfaces/use-cases/IOtpVarificationUseCase.js"
 import { OtpVarificationInput } from "../../application/dto/otpDto.js"
 import { Customer } from "../../domain/entities/customer.entity.js"
+import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
 
 class OtpVarificationController {
-    constructor (private readonly otpVarificationUseCase:IOtpVarificationUseCase<OtpVarificationInput,Customer>) {}
+    constructor (
+        private readonly otpVarificationUseCase:IOtpVarificationUseCase<OtpVarificationInput,Customer>,
+        private readonly pendingRegistrationStore:IPendingRegistrationStore
+
+    ) {}
 
     validate = async (req:Request,res:Response,next:NextFunction) => {
         try {
@@ -15,6 +20,22 @@ class OtpVarificationController {
                 success :true,
                 message:"Acount Created",
                 data:response
+            })
+        } catch (err) {
+            next(err)
+        }
+    }
+    getStatus = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const registrationId = req.cookies.registration_id
+            const response = await this.pendingRegistrationStore.get(registrationId)
+            const expiresIn = await this.pendingRegistrationStore.getTtl(registrationId)
+            res.status(201).json({
+                success :true,
+                data:{
+                    attempts:response?.attempts,
+                    expiresIn
+                }
             })
         } catch (err) {
             next(err)

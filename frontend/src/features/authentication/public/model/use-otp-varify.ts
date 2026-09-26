@@ -1,8 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
-import { otpVarify } from "../api";
+import { getOtpStatus, otpVarify } from "../api";
+
+
+
 
 export const useOtpVarify = () => {
     return useMutation({
         mutationFn:otpVarify ,
+    })
+}
+export const useGetOtpStatus = () => {
+    return useMutation({
+        mutationFn:getOtpStatus ,
     })
 }

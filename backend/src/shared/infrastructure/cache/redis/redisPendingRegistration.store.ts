@@ -24,4 +24,9 @@ export class RedisPendingRegistrationStore implements IPendingRegistrationStore 
         const key = `pending-registration:${registrationId}`
         await redisClient.del(key)
     }
+    async getTtl(registrationId: string): Promise<number> {
+        const key = `pending-registration:${registrationId}`;
+
+        return await redisClient.ttl(key);
+    }
 }

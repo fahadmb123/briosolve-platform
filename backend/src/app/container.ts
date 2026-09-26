@@ -41,4 +41,4 @@ const otpVarificationUseCase = new OtpVarificationUseCase(
 
 // Controllers
 export const customerAuthController = new CustomerAuthController(registerCustomerUseCase);
-export const otpVarificationController = new OtpVarificationController(otpVarificationUseCase);
+export const otpVarificationController = new OtpVarificationController(otpVarificationUseCase,pendingRegistrationStore);

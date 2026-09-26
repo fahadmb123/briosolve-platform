@@ -5,6 +5,7 @@ import { otpVarificationController } from "../../../../app/container.js";
 
 const router = Router()
 
+router.get("/otp-status",otpVarificationController.getStatus)
 
 
 router.post("/otp-varify",validate(otpSchema),otpVarificationController.validate)

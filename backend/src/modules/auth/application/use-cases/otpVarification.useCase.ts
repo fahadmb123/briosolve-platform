@@ -31,6 +31,7 @@ export default class OtpVarificationUseCase implements IOtpVarificationUseCase<O
                     }
                 )
         }
+        await this.PendingRegistrationStore.delete(registrationId)
         return response!
     }
 }

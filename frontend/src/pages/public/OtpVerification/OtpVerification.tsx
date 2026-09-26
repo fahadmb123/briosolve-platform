@@ -7,28 +7,54 @@ import { otpSchema, type OtpInputType } from '../../../features/authentication/p
 import { toast } from 'react-toastify';
 import { isAxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
-import { useOtpVarify } from '../../../features/authentication/public/model/use-otp-varify';
+import { useGetOtpStatus, useOtpVarify } from '../../../features/authentication/public/model/use-otp-varify';
 
 
 export default function OtpVerification() {
     const { toggleTheme } = useTheme()
     const [otp, setOtp] = useState('')
     const [timer, setTimer] = useState(60)
+    const [attempts, setAttempts] = useState(0)
     const navigate = useNavigate()
     const {register,handleSubmit,formState:{errors}} = useForm<OtpInputType>({
         resolver : zodResolver(otpSchema),mode : "onChange"
     })
     const otpVarify = useOtpVarify()
+    const getOtpStatus = useGetOtpStatus()
 
     useEffect(() => {
-        
-        /*if (timer > 0) {
-            interval = setInterval(() => {
-                setTimer((prev) => prev - 1);
-            }, 1000);
+        const getStatus = async () => {
+            try {
+                const response = await getOtpStatus.mutateAsync()
+                setTimer(response.data.expiresIn)
+                setAttempts(response.data.attempts)
+            } catch (err) {
+                if (isAxiosError(err) && err.response?.data?.message) {
+                    toast.error(err.response.data.message);
+                } else if (err instanceof Error) {
+                    toast.error(err.message);
+                } else {
+                    toast.error("An unexpected error occurred");
+                }
+            }
         }
-        return () => clearInterval(interval);*/
-    }, [timer]);
+
+        getStatus()
+    }, [])
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimer(prev => {
+                if (prev <= 1) {
+                    clearInterval(interval)
+                    return 0
+                }
+                return prev - 1
+            })
+        }, 1000)
+
+        return () => clearInterval(interval)
+    }, [])
 
     const handleOtp = async (data:OtpInputType) => {
         try {
@@ -94,12 +120,12 @@ export default function OtpVerification() {
 
                     <div className="text-center text-sm">
                         <p className="text-secondary mb-2">
-                            {timer > 0 ? `Resend code in ${timer}s` : "Didn't receive the code?"}
+                            {timer > 0 ? `Resend code in ${timer}s` : (attempts >= 5 ? "Maximum attempts reached" : "Didn't receive the code?")}
                         </p>
                         <button 
                             type="button" 
                             className="btn btn-outline w-full mb-5" 
-                            disabled={timer > 0}
+                            disabled={timer > 0 || attempts >= 5}
                             onClick={() => setTimer(60)}
                         >
                             <i className="fas fa-redo-alt mr-1"></i> Resend OTP

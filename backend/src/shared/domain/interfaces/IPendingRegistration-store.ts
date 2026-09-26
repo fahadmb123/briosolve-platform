@@ -16,4 +16,5 @@ export interface IPendingRegistrationStore {
 
     get(registrationId: string): Promise<IPendingCustomerRegistration | null>
     delete(registrationId: string): Promise<void>
+    getTtl(registrationId: string): Promise<number>
 }
