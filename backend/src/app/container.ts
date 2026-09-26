@@ -1,31 +1,31 @@
-import RegisterCustomerUseCaseImpl from "../modules/auth/application/use-cases/register-customer.use-case.impl.js";
-import { PrismaCustomerAuthRepositoryImpl } from "../modules/auth/infrastructure/repositories/prisma-customer.repository.impl.js";
-import { BcryptPasswordHasherServiceImpl } from "../shared/infrastructure/security/becrypt-password-hasher.service.impl.js";
-import CustomerAuthController from "../modules/auth/presentation/controllers/customer-auth.controller.js";
-import { SecureOtpGeneratorServiceImpl } from "../shared/infrastructure/security/secure-otp-generate.service.impl.js";
-import { NodemailerEmailSenderImpl } from "../shared/infrastructure/email/nodemailer/nodemailer-email-sender.impl.js";
-import { RedisPendingRegistrationStoreImpl } from "../shared/infrastructure/cache/redis/redis-pending-registration.store.impl.js";
-import OtpVarificationController from "../modules/auth/presentation/controllers/otp-varification.controller.js";
-import OtpVarificationUseCaseImpl from "../modules/auth/application/use-cases/otp-varification.use-case.js";
+import RegisterCustomerUseCase from "../modules/auth/application/use-cases/registerCustomer.useCase.js";
+import { PrismaCustomerAuthRepository } from "../modules/auth/infrastructure/repositories/prismaCustomer.repository.js";
+import { BcryptPasswordHasherService } from "../shared/infrastructure/security/becryptPasswordHasher.service.js";
+import CustomerAuthController from "../modules/auth/presentation/controllers/customerAuth.controller.js";
+import { SecureOtpGeneratorService } from "../shared/infrastructure/security/secureOtpGenerate.service.js";
+import { NodemailerEmailSender } from "../shared/infrastructure/email/nodemailer/nodemailerEmail-sender.js";
+import { RedisPendingRegistrationStore } from "../shared/infrastructure/cache/redis/redisPendingRegistration.store.js";
+import OtpVarificationController from "../modules/auth/presentation/controllers/otpVarification.controller.js";
+import OtpVarificationUseCase from "../modules/auth/application/use-cases/otpVarification.useCase.js";
 
 // Shared Infrastructure Instances
-const pendingRegistrationStore = new RedisPendingRegistrationStoreImpl();
-const emailSender = new NodemailerEmailSenderImpl();
-const otpGenerator = new SecureOtpGeneratorServiceImpl();
-const passwordHasher = new BcryptPasswordHasherServiceImpl();
+const pendingRegistrationStore = new RedisPendingRegistrationStore();
+const emailSender = new NodemailerEmailSender();
+const otpGenerator = new SecureOtpGeneratorService();
+const passwordHasher = new BcryptPasswordHasherService();
 
 // Repositories
-const customerRepository = new PrismaCustomerAuthRepositoryImpl();
+const customerRepository = new PrismaCustomerAuthRepository();
 
 // Use Cases
-const registerCustomerUseCase = new RegisterCustomerUseCaseImpl(
+const registerCustomerUseCase = new RegisterCustomerUseCase(
   customerRepository,
   passwordHasher,
   otpGenerator,
   emailSender,
   pendingRegistrationStore
 );
-const otpVarificationUseCase = new OtpVarificationUseCaseImpl(
+const otpVarificationUseCase = new OtpVarificationUseCase(
   pendingRegistrationStore,
   passwordHasher
 );

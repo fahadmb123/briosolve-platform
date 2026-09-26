@@ -1,9 +1,9 @@
-import {IPendingCustomerRegistration,IPendingRegistrationStore,} from "../../../application/interfaces/services/pending-registration-store.js";
+import {IPendingCustomerRegistration,IPendingRegistrationStore,} from "../../../domain/interfaces/IPendingRegistration-store.js";
 import { redisClient } from "./redis.client.js";
 
 
 
-export class RedisPendingRegistrationStoreImpl implements IPendingRegistrationStore {
+export class RedisPendingRegistrationStore implements IPendingRegistrationStore {
 
     async save(registrationId: string,data: IPendingCustomerRegistration,ttlSeconds: number): Promise<void> {
       

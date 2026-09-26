@@ -1,5 +1,5 @@
 import { Request,Response,NextFunction } from "express"
-import { IUseCase } from "../../../../shared/application/interfaces/use-case/use-case.js"
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 
 
 

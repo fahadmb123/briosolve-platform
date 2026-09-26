@@ -1,4 +1,4 @@
-import { Customer } from "../entities/customer-auth.entity.js"
+import { Customer } from "../entities/customer.entity.js"
 
 
 

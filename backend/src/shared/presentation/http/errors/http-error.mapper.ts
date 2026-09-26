@@ -1,5 +1,5 @@
-import { ApplicationError } from "../../../application/errors/application-error.js";
-import { ErrorKind } from "../../../application/errors/error-kind.js";
+import { ApplicationError } from "../../../application/errors/applicationError.js";
+import { ErrorKind } from "../../../application/errors/errorKind.js";
 
 const statusMap: Record<ErrorKind, number> = {
     VALIDATION: 422,

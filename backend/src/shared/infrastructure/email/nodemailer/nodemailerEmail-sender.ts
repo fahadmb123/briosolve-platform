@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
-import type { IEmailSender } from "../../../application/interfaces/services/email-sender.service.js";
+import type { IEmailSender } from "../../../domain/interfaces/IEmailSender.service.js";
 
 
 
-export class NodemailerEmailSenderImpl implements IEmailSender {
+export class NodemailerEmailSender implements IEmailSender {
 
     private readonly transporter
 

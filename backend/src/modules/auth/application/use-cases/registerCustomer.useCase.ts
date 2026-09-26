@@ -1,16 +1,16 @@
-import { IUseCase } from "../../../../shared/application/interfaces/use-case/use-case.js";
-import type { RegisterCustomerInput ,RegisterCustomerOutput} from "../dto/customer-auth.type.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
+import type { RegisterCustomerInput ,RegisterCustomerOutput} from "../dto/customerAuthDto.js";
 import { ICustomerAuthRepository } from "../../domain/repositories/customer.repository.js";
-import { ApplicationError } from "../../../../shared/application/errors/application-error.js";
-import { IPasswordHasher } from "../../../../shared/application/interfaces/services/password-hasher.service.js";
-import type { IOtpGenerator } from "../../../../shared/application/interfaces/services/otp-generator.service.js";
-import type { IEmailSender } from "../../../../shared/application/interfaces/services/email-sender.service.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
+import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
+import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js";
+import type { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
 import { randomUUID } from "crypto";
-import { IPendingRegistrationStore } from "../../../../shared/application/interfaces/services/pending-registration-store.js";
+import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
 
 
 
-export default class RegisterCustomerUseCaseImpl implements IUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
+export default class RegisterCustomerUseCase implements IUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
     constructor(private readonly customerAuthRepository : ICustomerAuthRepository,
         readonly passwordHasher:IPasswordHasher,
         readonly otpGenerate:IOtpGenerator,
