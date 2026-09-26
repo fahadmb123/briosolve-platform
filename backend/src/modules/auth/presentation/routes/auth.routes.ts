@@ -9,9 +9,7 @@ router.get("/otp-status",otpVarificationController.getStatus)
 
 
 router.post("/otp-varify",validate(otpSchema),otpVarificationController.validate)
-
-
-
+router.post("/resend-otp",otpVarificationController.resend)
 
 
 

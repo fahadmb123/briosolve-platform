@@ -17,7 +17,8 @@ export default class OtpVarificationUseCase implements IOtpVarificationUseCase<O
 
     async execute ({registrationId,otp}:OtpVarificationInput):Promise<Customer>{
         const data = await this.PendingRegistrationStore.get(registrationId)
-        if (!registrationId) throw new ApplicationError("OTP_EXPIRED","OTP Expired","AUTHENTICATION")
+        if (!registrationId || !data) throw new ApplicationError("REGISTRATION_EXPIRED","Registration session expired","AUTHENTICATION")
+        if (data.otpExpiresAt && Date.now() > data.otpExpiresAt) throw new ApplicationError("OTP_EXPIRED","OTP Expired","AUTHENTICATION")
         const isMatch = await this.PasswordHasher.compare(otp,data?.otpHash!)
         if (!isMatch) throw new ApplicationError("INVALID_OTP","Invalid OTP","AUTHENTICATION")
         let response

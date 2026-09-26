@@ -7,7 +7,7 @@ import { otpSchema, type OtpInputType } from '../../../features/authentication/p
 import { toast } from 'react-toastify';
 import { isAxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
-import { useGetOtpStatus, useOtpVarify } from '../../../features/authentication/public/model/use-otp-varify';
+import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../../features/authentication/public/model/use-otp-varify';
 
 
 export default function OtpVerification() {
@@ -21,6 +21,7 @@ export default function OtpVerification() {
     })
     const otpVarify = useOtpVarify()
     const getOtpStatus = useGetOtpStatus()
+    const resendOtp = useResendOtp()
 
     useEffect(() => {
         const getStatus = async () => {
@@ -54,7 +55,7 @@ export default function OtpVerification() {
         }, 1000)
 
         return () => clearInterval(interval)
-    }, [])
+    }, [timer])
 
     const handleOtp = async (data:OtpInputType) => {
         try {
@@ -71,6 +72,24 @@ export default function OtpVerification() {
             }
         }
     }
+
+    const handleResend = async () => {
+        try {
+            const response = await resendOtp.mutateAsync()
+            toast.success(response.message)
+            setTimer(response.data.expiresIn)
+            setAttempts(prev => prev + 1)
+        } catch (err) {
+            if (isAxiosError(err) && err.response?.data?.message) {
+                toast.error(err.response.data.message);
+            } else if (err instanceof Error) {
+                toast.error(err.message);
+            } else {
+                toast.error("An unexpected error occurred");
+            }
+        }
+    }
+
     return (
         <div className="auth-page-wrapper">
             <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
@@ -125,10 +144,10 @@ export default function OtpVerification() {
                         <button 
                             type="button" 
                             className="btn btn-outline w-full mb-5" 
-                            disabled={timer > 0 || attempts >= 5}
-                            onClick={() => setTimer(60)}
+                            disabled={timer > 0 || attempts >= 5 || resendOtp.isPending}
+                            onClick={handleResend}
                         >
-                            <i className="fas fa-redo-alt mr-1"></i> Resend OTP
+                            <i className="fas fa-redo-alt mr-1"></i> {resendOtp.isPending ? "Resending..." : "Resend OTP"}
                         </button>
                     </div>
 

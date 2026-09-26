@@ -15,7 +15,7 @@ class CustomerAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "lax",
-                maxAge: 60 * 1000,
+                maxAge: 10 * 60 * 1000,
                 path: "/"
             }).status(201).json({
                 success: true,

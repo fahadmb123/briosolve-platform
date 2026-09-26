@@ -8,6 +8,8 @@ import { RedisPendingRegistrationStore } from "../shared/infrastructure/cache/re
 import OtpVarificationController from "../modules/auth/presentation/controllers/otpVarification.controller.js";
 import OtpVarificationUseCase from "../modules/auth/application/use-cases/otpVarification.useCase.js";
 
+import ResendOtpUseCase from "../modules/auth/application/use-cases/resendOtp.useCase.js";
+
 // Services Shared...
 const pendingRegistrationStore = new RedisPendingRegistrationStore()
 const emailSender = new NodemailerEmailSender()
@@ -36,9 +38,17 @@ const otpVarificationUseCase = new OtpVarificationUseCase(
   customerRepository
 );
 
-
-
+const resendOtpUseCase = new ResendOtpUseCase(
+  pendingRegistrationStore,
+  passwordHasher,
+  otpGenerator,
+  emailSender
+);
 
 // Controllers
 export const customerAuthController = new CustomerAuthController(registerCustomerUseCase);
-export const otpVarificationController = new OtpVarificationController(otpVarificationUseCase,pendingRegistrationStore);
+export const otpVarificationController = new OtpVarificationController(
+  otpVarificationUseCase,
+  pendingRegistrationStore,
+  resendOtpUseCase
+);

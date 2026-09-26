@@ -28,20 +28,25 @@ export default class RegisterCustomerUseCase implements IRegisterCustomerUseCase
         const otpHash = await this.passwordHasher.hash(otp)
         const registrationId  = randomUUID()
         
+        const registrationTtl = 10 * 60
+        const otpExpiresIn = 60
+        const otpExpiresAt = Date.now() + otpExpiresIn * 1000
+
         await this.PendingRegistrationStore.save(registrationId,{
             name:input.name,
             email:input.email,
             passwordHash,
             otpHash,
             attempts:0,
+            otpExpiresAt,
             for:"CREATE_CUSTOMER",
         },
-            60
+            registrationTtl
         )
         
         
         await this.EmailSender.sendOtp(input.email,otp)
     
-        return {registrationId,expiresIn: 60}
+        return {registrationId,expiresIn: otpExpiresIn}
     }
 }

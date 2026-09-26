@@ -12,6 +12,14 @@ export class RedisPendingRegistrationStore implements IPendingRegistrationStore 
 
     }
 
+    async update(registrationId: string, data: IPendingCustomerRegistration): Promise<void> {
+        const key = `pending-registration:${registrationId}`;
+        const ttl = await redisClient.ttl(key);
+        if (ttl > 0) {
+            await redisClient.set(key, JSON.stringify(data), { EX: ttl });
+        }
+    }
+
     async get(registrationId: string): Promise<IPendingCustomerRegistration | null> {
         const key = `pending-registration:${registrationId}`
         const data = await redisClient.get(key)

@@ -29,3 +29,16 @@ export const getOtpStatus = async (): Promise<OtpStatusOut> => {
     )
     return response.data;
 }
+
+type ResendOtpOutput = {
+    success: boolean,
+    message: string,
+    data: {
+        expiresIn: number
+    }
+}
+
+export const resendOtp = async (): Promise<ResendOtpOutput> => {
+    const response = await apiClient.post("/api/auth/resend-otp")
+    return response.data;
+}
