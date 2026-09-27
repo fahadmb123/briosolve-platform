@@ -7,7 +7,7 @@ import './Login.css';
 import { useLogin } from '../../../features/authentication/public/model/use-otp-varify';
 import { toast } from 'react-toastify';
 import { isAxiosError } from 'axios';
-import { useAuthStore, type IAuthUser } from '../../../shared/stores/auth/auth.store';
+import { useAuthStore } from '../../../shared/stores/auth/auth.store';
 import { SpinnerOverlay } from '../../../shared/ui/SpinnerOverlay/SpinnerOverlay';
 
 
@@ -28,8 +28,16 @@ export default function Login() {
     const handleLogin = async (data: LoginInputType) => {
         try {
             const response = await login.mutateAsync(data)
-            useAuthStore.getState().setUser(response.data as unknown as IAuthUser)
-            navigate("/",{replace:true})
+            useAuthStore.getState().setUser(response.data)
+            console.log(response.data.role)
+            if (response.data.role === "CUSTOMER"){
+                navigate("/",{replace:true})
+                console.log("From Login")
+            } else {
+                console.log("From Other Routes")
+                navigate(`/${response.data.role.toLocaleLowerCase()}`,{replace:true})
+            }
+            
             toast.success(response.message)
         } catch (err) {
             if (isAxiosError(err) && err.response?.data?.message) {

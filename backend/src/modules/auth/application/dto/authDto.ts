@@ -11,7 +11,7 @@ export type UserData = {
     email: string;
     phone:string|null
     password_hash: string;
-    role: "CUSTOMER";
+    role: "CUSTOMER" | "ADMIN" | "INVESTIGATOR" | "PROVIDER";
     status: "ACTIVE" | "INACTIVE" | "BLOCKED";
     email_verified: boolean;
     phone_verified: boolean;

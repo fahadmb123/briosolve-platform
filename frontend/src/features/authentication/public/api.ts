@@ -1,6 +1,7 @@
 import { apiClient } from "../../../shared/api/Client";
 import type { LoginInputType, EmailInputType } from "./validation";
 import type { response } from "../../../shared/Dtos";
+import type { IAuthUser } from "../../../shared/stores/auth/auth.store";
 
 type OtpVarifyInput = {
     otp:string
@@ -44,7 +45,7 @@ export const resendOtp = async (): Promise<response<{expiresIn: number}>> => {
     return response.data;
 }
 
-export const login = async (data:LoginInputType): Promise<response<string>> => {
+export const login = async (data:LoginInputType): Promise<response<IAuthUser>> => {
     const response = await apiClient.post("/api/auth/login",data)
     return response.data;
 }

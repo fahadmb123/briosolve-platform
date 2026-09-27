@@ -15,6 +15,7 @@ import { investigatorRoutes } from './investigator/investigatorRoutes';
 import { customerRoutes } from './customer/customerRoutes';
 import { publicRoutes, verificationRoutes } from './public/publicRoutes';
 import PublicRoute from '../../shared/middlewares/PublicRoute';
+import RoleRoute from '../../shared/middlewares/RoleRoute';
 
 
 
@@ -55,8 +56,10 @@ export function AppRouter() {
               {providerRoutes}
           </Route>
 
-          <Route path="admin" element={<AdminLayout />}>
-              {adminRoutes}
+          <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+              <Route path="admin" element={<AdminLayout />}>
+                  {adminRoutes}
+              </Route>
           </Route>
 
           <Route path="investigator" element={<InvestigatorLayout />}>
