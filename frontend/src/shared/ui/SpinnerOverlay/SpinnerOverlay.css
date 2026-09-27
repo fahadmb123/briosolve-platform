@@ -1,0 +1,40 @@
+.spinner-overlay-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.5); /* Transparent dark overlay */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Light mode overlay adjustment */
+:root[data-theme="light"] .spinner-overlay-container,
+.light .spinner-overlay-container {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Classic CSS Spinner */
+.spinner {
+  width: 45px;
+  height: 45px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Light mode spinner color adjustment */
+:root[data-theme="light"] .spinner,
+.light .spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--primary);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
