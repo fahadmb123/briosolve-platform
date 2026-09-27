@@ -121,7 +121,6 @@
 
 html, body {
     max-width: 100vw;
-    overflow-x: clip;
 }
 
 body {
@@ -228,7 +227,6 @@ h6, .h6 { font-size: 1rem; }
     display: flex;
     min-height: 100vh;
     max-width: 100vw;
-    overflow-x: clip;
 }
 
 .app-sidebar {
@@ -262,18 +260,20 @@ h6, .h6 { font-size: 1rem; }
     background-color: var(--navbar-bg, var(--surface));
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border); /* Full border for floating effect */
-    border-radius: var(--radius-full); /* Curved shape */
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
     box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 2rem;
     position: sticky;
-    top: 1.5rem; /* Space from top */
-    margin: 1.5rem 1.5rem 0 1.5rem; /* Space from edges */
-    z-index: 30;
-    width: auto;
+    top: 1.5rem;
+    margin: 1.5rem auto 0 auto;
+    width: 92%;
+    max-width: 1200px;
+    z-index: 46;
+    transition: margin-left var(--transition-normal), width var(--transition-normal);
 }
 
 .avatar {
@@ -320,6 +320,20 @@ h6, .h6 { font-size: 1rem; }
     gap: 1rem;
     z-index: 100;
     box-shadow: var(--shadow-lg); /* Slightly stronger shadow for bottom FAB */
+    
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.95);
+    transition: all var(--transition-normal);
+}
+
+.app-container.sidebar-open .navbar-action-box,
+.navbar-action-box.always-visible {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transform: translateY(0) scale(1);
 }
 
 /* Hide on mobile to prevent overlap */
@@ -1057,6 +1071,35 @@ textarea.form-control {
     .card-header, .card-body, .card-footer {
         padding: 1rem;
     }
+    
+    .app-header {
+        margin: 0;
+        width: 100%;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        top: 0;
+        padding: 0 1rem;
+    }
+    
+    .navbar-action-box {
+        bottom: 1rem;
+        left: 1rem;
+        right: 1rem;
+        width: auto;
+        padding: 0.75rem;
+        justify-content: center;
+        gap: 0.75rem;
+        border-radius: 1rem;
+    }
+    
+    .navbar-action-box .btn {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.5rem;
+    }
 }
 
 /* ==========================================================================
@@ -1214,5 +1257,10 @@ textarea.form-control {
 @media (min-width: 992px) {
     .app-container.sidebar-open .app-header .mobile-menu-toggle {
         display: none;
+    }
+    
+    .app-container.sidebar-modal-layout.sidebar-open .app-header {
+        margin-left: calc(var(--sidebar-width) + 1.5rem);
+        width: calc(100% - var(--sidebar-width) - 3rem);
     }
 }

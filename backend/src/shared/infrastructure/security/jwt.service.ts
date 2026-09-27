@@ -11,7 +11,7 @@ export class JwtService implements IJwtService {
         if (!secret) throw new Error("JWT_SECRET is not configured")
 
         return jwt.sign(payload, secret, {
-            expiresIn: "15m"
+            expiresIn: "5d"
         })
     }
 

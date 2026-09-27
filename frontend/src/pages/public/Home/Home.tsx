@@ -16,6 +16,7 @@ export default function Home() {
   const {isAuthenticated} = useAuthStore.getState()
 
   const handleLogout = async () => {
+    if(!isAuthenticated) return navigate('/login')
     await logout.mutateAsync()
     clearAuth();
     navigate('/login');
@@ -171,7 +172,7 @@ export default function Home() {
             </header>
 
             {/* Floating Top-Right Action Box */}
-            <div className="navbar-action-box hide-mobile">
+            <div className="navbar-action-box always-visible">
                 <Link to="/register" className="btn btn-outline btn-sm">
                     Become a Provider
                 </Link>

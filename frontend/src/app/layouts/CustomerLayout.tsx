@@ -15,6 +15,7 @@ export default function CustomerLayout() {
 
 
     const handleLogout = async () => {
+        if(!isAuthenticated) return navigate('/login')
         await logout.mutateAsync()
         clearAuth();
         navigate('/login');
@@ -164,6 +165,17 @@ export default function CustomerLayout() {
                     </Link>
                 </div>
             </header>
+
+            {/* Floating Top-Right Action Box */}
+            <div className="navbar-action-box">
+                <Link to="/register" className="btn btn-outline btn-sm">
+                    Become a Provider
+                </Link>
+                <Link to="#" className="btn btn-primary btn-sm">
+                    <i className="fas fa-plus mr-1"></i> Post Request
+                </Link>
+            </div>
+
                 <Outlet />
             </main>
         </div>
