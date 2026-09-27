@@ -40,9 +40,9 @@ export default function AdminLayout() {
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/admin/users" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+                        <NavLink to="/admin/customers" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-users"></i>
-                            <span>Users</span>
+                            <span>Customers</span>
                         </NavLink>
                     </li>
                     <li>
@@ -159,7 +159,7 @@ export default function AdminLayout() {
             </div>
         </aside>
             <main className="app-main">
-                <header className="app-header">
+                <header className="app-header admin-app-header">
                 <div className="flex items-center gap-4">
                     <button id="sidebar-toggle" className="btn-icon mobile-menu-toggle" aria-label="Toggle Sidebar" onClick={handleSidebarToggle}>
                         <i className="fas fa-bars"></i>
@@ -173,7 +173,6 @@ export default function AdminLayout() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <span className="badge badge-verified text-xs px-2 py-1"><i className="fas fa-circle text-xs mr-1" style={{"fontSize":"8px"}}></i>All Systems Operational</span>
                     <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
                         <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>

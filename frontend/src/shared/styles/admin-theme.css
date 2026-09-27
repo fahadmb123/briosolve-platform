@@ -471,3 +471,13 @@ html[data-theme="light"] body.theme-admin {
 .p-5 { padding: 1.25rem; }
 .p-3 { padding: 0.75rem; }
 .flex-1 { flex: 1; min-width: 0; }
+
+/* Admin Navbar Specific Overrides */
+.admin-app-header {
+    width: 98%;
+    max-width: 1600px;
+}
+
+.app-container.sidebar-open .admin-app-header {
+    display: none !important;
+}

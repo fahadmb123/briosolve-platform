@@ -27,7 +27,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                         <div className="admin-kpi-val">14,820</div>
-                        <div className="admin-kpi-lbl">Total Users</div>
+                        <div className="admin-kpi-lbl">Total Customers</div>
                     </div>
                 </div>
 
@@ -274,7 +274,7 @@ export default function Dashboard() {
                                 </div>
                                 <div className="text-xs text-secondary mt-1">Rapid quote spam detected</div>
                             </div>
-                            <Link to="/admin/users" className="btn btn-secondary text-xs">Inspect</Link>
+                            <Link to="/admin/customers" className="btn btn-secondary text-xs">Inspect</Link>
                         </div>
 
                         <div className="mt-4 pt-3 border-top text-center">
