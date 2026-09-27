@@ -1,0 +1,68 @@
+.loading-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dark mode support */
+:root[data-theme="dark"] .loading-container,
+.dark .loading-container {
+  background: var(--bg);
+}
+
+.loading-exit {
+  display: none;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-logo {
+  display: flex;
+  gap: 8px;
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: 15px;
+}
+
+.logo-r, .logo-s, .logo-m {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.loading-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--text-color, #1e293b);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+:root[data-theme="dark"] .loading-title,
+.dark .loading-title {
+  color: #f8fafc;
+}
+
+.loading-subtitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 8px;
+  color: var(--text-muted, #64748b);
+  margin: 8px 0 0 0;
+  text-transform: uppercase;
+}
+
+:root[data-theme="dark"] .loading-subtitle,
+.dark .loading-subtitle {
+  color: #94a3b8;
+}

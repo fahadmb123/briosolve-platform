@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import React, { useEffect } from 'react';
+import { LoadingScreen } from '../../shared/ui/LoadingScreen/LoadingScreen';
 
 const Home = React.lazy(() => import('../../pages/public/Home/Home'));
 const NotFound = React.lazy(() => import('../../pages/public/NotFound/NotFound'));
@@ -33,7 +34,7 @@ function ThemeManager() {
 export function AppRouter() {
   return (
     <BrowserRouter>
-      <React.Suspense fallback={<div>Loading...</div>}>
+      <React.Suspense fallback={<LoadingScreen isLoading={true} />}>
         <ThemeManager />
         <Routes>
           <Route path="/">
