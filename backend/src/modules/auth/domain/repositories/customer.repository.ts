@@ -14,4 +14,5 @@ export interface ICustomerRepository {
   findByEmail(email: string): Promise<Customer | null>
   createCustomer(data: RegisterCustomerInput): Promise<Customer>
   findById(id: string): Promise<UserData | null> 
+  updatePassword(id:string,passwordHash: string):Promise<void>
 }

@@ -14,6 +14,7 @@ import LoginUseCase from "../../modules/auth/application/use-cases/login.useCase
 import { JwtService } from "../../shared/infrastructure/security/jwt.service.js";
 import GetMeUseCase from "../../modules/auth/application/use-cases/getMe.useCase.js";
 import EmailVerificationUseCase from "../../modules/auth/application/use-cases/emailVerification.useCase.js";
+import ResetPasswordUseCase from "../../modules/auth/application/use-cases/resetPassword.useCase.js";
 
 
 
@@ -76,6 +77,11 @@ const emailVerificationUseCase = new EmailVerificationUseCase(
   emailSender
 )
 
+const resetPasswordUseCase = new ResetPasswordUseCase(
+  pendingRegistrationStore,
+  passwordHasher,
+  customerRepository
+)
 
 
 
@@ -83,10 +89,19 @@ const emailVerificationUseCase = new EmailVerificationUseCase(
 
 
 // Controllers
-export const customerAuthController = new CustomerAuthController(registerCustomerUseCase);
+export const customerAuthController = new CustomerAuthController(
+  registerCustomerUseCase
+)
+
 export const otpVarificationController = new OtpVarificationController(
     otpVarificationUseCase,
     pendingRegistrationStore,
     resendOtpUseCase
 )
-export const authController = new AuthController(loginUseCase,getMeUseCase,emailVerificationUseCase)
+
+export const authController = new AuthController(
+  loginUseCase,
+  getMeUseCase,
+  emailVerificationUseCase,
+  resetPasswordUseCase
+)

@@ -8,7 +8,7 @@ import { ResendOtpOutput } from "../../application/use-cases/resendOtp.useCase.j
 
 class OtpVarificationController {
     constructor (
-        private readonly otpVarificationUseCase:IOtpVarificationUseCase<OtpVarificationInput,Customer>,
+        private readonly otpVarificationUseCase:IOtpVarificationUseCase<OtpVarificationInput,{response:Customer | IPendingCustomerRegistration,for:string}>,
         private readonly pendingRegistrationStore:IPendingRegistrationStore,
         private readonly resendOtpUseCase: IResendOtpUseCase<string, ResendOtpOutput>
     ) {}
@@ -18,11 +18,17 @@ class OtpVarificationController {
             const registrationId = req.cookies.registration_id
             const otp = req.body.otp
             const response  = await this.otpVarificationUseCase.execute({ registrationId, otp })
-            
+            response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password",registrationId , {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                maxAge: 15 * 60 * 1000,
+                path: "/"
+            }) : null
             res.status(201).json({
                 success :true,
                 message:"Acount Created",
-                data:response
+                data:response.response
             })
         } catch (err) {
             next(err)

@@ -47,4 +47,13 @@ export class PrismaCustomerRepository implements ICustomerRepository {
         const user = await db.orm.public.users.where({id:id as Varchar<255>}).first()
         return user ? (user as UserData)  : null
     }
+    async updatePassword(id: string, passwordHash: string): Promise<void> {
+        await db.orm.public.users
+            .where({ id: id as Varchar<255> })
+            .update({
+                password_hash: passwordHash,
+                updated_at: Temporal.Now.instant(),
+            } as never);
+        return
+    }
 }

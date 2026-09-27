@@ -8,14 +8,14 @@ import { Customer } from "../../domain/entities/customer.entity.js";
 
 
 
-export default class OtpVarificationUseCase implements IOtpVarificationUseCase<OtpVarificationInput,Customer | IPendingCustomerRegistration>{
+export default class OtpVarificationUseCase implements IOtpVarificationUseCase<OtpVarificationInput,{response:Customer | IPendingCustomerRegistration,for:string}>{
     constructor(
         private readonly PendingRegistrationStore:IPendingRegistrationStore,
         private readonly PasswordHasher:IPasswordHasher,
         private readonly CustomerRepository : ICustomerRepository
     ){}
 
-    async execute ({registrationId,otp}:OtpVarificationInput):Promise<Customer | IPendingCustomerRegistration>{
+    async execute ({registrationId,otp}:OtpVarificationInput):Promise<{response:Customer | IPendingCustomerRegistration,for:string}>{
         const data = await this.PendingRegistrationStore.get(registrationId)
         if (!registrationId || !data) throw new ApplicationError("REGISTRATION_EXPIRED","Registration session expired","AUTHENTICATION")
         if (data.otpExpiresAt && Date.now() > data.otpExpiresAt) throw new ApplicationError("OTP_EXPIRED","OTP Expired","AUTHENTICATION")
@@ -31,10 +31,10 @@ export default class OtpVarificationUseCase implements IOtpVarificationUseCase<O
                         password:data.passwordHash!
                     }
                 )
+                await this.PendingRegistrationStore.delete(registrationId)
             case "FORGOT_PASSWORD" :
                 response = data
         }
-        await this.PendingRegistrationStore.delete(registrationId)
-        return response!
+        return {response:response!,for:data?.for}
     }
 }
