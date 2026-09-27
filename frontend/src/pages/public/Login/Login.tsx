@@ -7,11 +7,14 @@ import './Login.css';
 import { useLogin } from '../../../features/authentication/public/model/use-otp-varify';
 import { toast } from 'react-toastify';
 import { isAxiosError } from 'axios';
+import { useAuthStore, type IAuthUser } from '../../../shared/stores/auth/auth.store';
+
 
 export default function Login() {
     const navigate = useNavigate()
     const { toggleTheme } = useTheme()
     const login = useLogin()
+
     const {
         register,
         handleSubmit,
@@ -24,6 +27,8 @@ export default function Login() {
     const handleLogin = async (data: LoginInputType) => {
         try {
             const response = await login.mutateAsync(data)
+            const userData:IAuthUser = JSON.parse(response.data)
+            useAuthStore.getState().setUser(userData)
             toast.success(response.message)
             navigate("/",{replace:true})
         } catch (err) {

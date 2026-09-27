@@ -9,6 +9,7 @@ export type UserData = {
     id:string;
     name: string;
     email: string;
+    phone:string|null
     password_hash: string;
     role: "CUSTOMER";
     status: "ACTIVE" | "INACTIVE" | "BLOCKED";

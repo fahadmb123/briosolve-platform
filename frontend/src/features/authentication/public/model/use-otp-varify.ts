@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { getOtpStatus, login, otpVarify, resendOtp } from "../api";
+import { getMe, getOtpStatus, login, otpVarify, resendOtp } from "../api";
 
 
 
@@ -22,5 +22,10 @@ export const useResendOtp = () => {
 export const useLogin = () => {
     return useMutation({
         mutationFn: login,
+    })
+}
+export const useGetMe = () => {
+    return useMutation({
+        mutationFn: getMe,
     })
 }

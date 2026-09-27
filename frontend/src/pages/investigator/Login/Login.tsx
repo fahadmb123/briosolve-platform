@@ -1,6 +1,3 @@
-// @ts-nocheck
-import React from 'react';
-
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { useForm } from 'react-hook-form';

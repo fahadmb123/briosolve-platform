@@ -6,7 +6,7 @@ export type UserRole =
     | "ADMIN"
     | "INVESTIGATOR";
 
-interface IAuthUser {
+export interface IAuthUser {
     id: string;
     name: string;
     email: string;
