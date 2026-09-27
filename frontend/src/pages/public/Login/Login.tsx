@@ -28,10 +28,9 @@ export default function Login() {
     const handleLogin = async (data: LoginInputType) => {
         try {
             const response = await login.mutateAsync(data)
-            const userData:IAuthUser = JSON.parse(response.data)
-            useAuthStore.getState().setUser(userData)
-            toast.success(response.message)
+            useAuthStore.getState().setUser(response.data as unknown as IAuthUser)
             navigate("/",{replace:true})
+            toast.success(response.message)
         } catch (err) {
             if (isAxiosError(err) && err.response?.data?.message) {
                 toast.error(err.response.data.message);
