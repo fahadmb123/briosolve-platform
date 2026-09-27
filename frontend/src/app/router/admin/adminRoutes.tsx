@@ -1,10 +1,11 @@
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import { AdminDashboard, AdminNotifications, AdminProviderDetails, AdminProviders, AdminSettings, AdminUserDetails, AdminUsers, AdminVerification, AdminVerificationDetails } from './admin.lazy';
 
 
 
 export const adminRoutes = (
   <>
+    <Route index element={<Navigate to="dashboard" replace />} />
     <Route path="dashboard" element={<AdminDashboard />} />
     <Route path="users" element={<AdminUsers />} />
     <Route path="users/:id" element={<AdminUserDetails />} />

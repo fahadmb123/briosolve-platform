@@ -1258,7 +1258,12 @@ textarea.form-control {
     .app-container.sidebar-open .app-header .mobile-menu-toggle {
         display: none;
     }
-    
+}
+
+/* On laptop screens, the centered navbar is wide enough to be overlapped by the sidebar drawer.
+   We must squish and push the navbar to the right to avoid the overlap. 
+   On screens >= 1768px, there is enough natural empty margin that they don't overlap, so we do nothing. */
+@media (min-width: 992px) and (max-width: 1767px) {
     .app-container.sidebar-modal-layout.sidebar-open .app-header {
         margin-left: calc(var(--sidebar-width) + 1.5rem);
         width: calc(100% - var(--sidebar-width) - 3rem);
