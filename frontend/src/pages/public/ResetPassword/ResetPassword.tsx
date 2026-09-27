@@ -8,11 +8,14 @@ import { useResetPassword } from '../../../features/authentication/public/model/
 import { toast } from 'react-toastify';
 import { isAxiosError } from 'axios';
 import { SpinnerOverlay } from '../../../shared/ui/SpinnerOverlay/SpinnerOverlay';
+import { useResetFlowStore } from '../../../shared/stores/auth/reset-flow.store';
 
 export default function ResetPassword() {
     const {toggleTheme} = useTheme()
     const navigate = useNavigate()
     const resetPassword = useResetPassword()
+    const clearResetFlow = useResetFlowStore((state) => state.clearResetFlow);
+
     const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordInputType>({
         resolver: zodResolver(resetPasswordSchema),
         mode: "onChange"
@@ -23,6 +26,7 @@ export default function ResetPassword() {
     const onSubmit = async (data: ResetPasswordInputType) => {
         try {
             const response = await resetPassword.mutateAsync({password:data.password});
+            clearResetFlow();
             navigate("/login",{replace:true})
             toast.success(response.message)
         } catch (err) {

@@ -10,6 +10,7 @@ import { useEmailVerify } from '../../../features/authentication/public/model/us
 import { toast } from 'react-toastify';
 import { isAxiosError } from 'axios';
 import { SpinnerOverlay } from '../../../shared/ui/SpinnerOverlay/SpinnerOverlay';
+import { useResetFlowStore } from '../../../shared/stores/auth/reset-flow.store';
 
 export default function ForgotPassword() {
 
@@ -19,11 +20,12 @@ export default function ForgotPassword() {
         resolver : zodResolver(emailSchema),mode : "onChange"
     })
     const emailVerify = useEmailVerify()
-
+    const setResetFlowStarted = useResetFlowStore((state) => state.setResetFlowStarted);
 
     const handle = async (data:EmailInputType) => {
         try {
             const response = await emailVerify.mutateAsync(data);
+            setResetFlowStarted(true);
             navigate("/otp-verification",{replace:true})
             toast.success(response.message)
         } catch (err) {

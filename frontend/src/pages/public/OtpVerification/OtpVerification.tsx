@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import { isAxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../../features/authentication/public/model/use-otp-varify';
-
+import { useResetFlowStore } from '../../../shared/stores/auth/reset-flow.store';
 
 export default function OtpVerification() {
     const { toggleTheme } = useTheme()
@@ -22,6 +22,7 @@ export default function OtpVerification() {
     const otpVarify = useOtpVarify()
     const getOtpStatus = useGetOtpStatus()
     const resendOtp = useResendOtp()
+    const setOtpVerified = useResetFlowStore((state) => state.setOtpVerified);
 
     useEffect(() => {
         const getStatus = async () => {
@@ -60,6 +61,9 @@ export default function OtpVerification() {
     const handleOtp = async (data:OtpInputType) => {
         try {
             const response = await otpVarify.mutateAsync(data)
+            if (response.data.path === "reset-password") {
+                setOtpVerified(true);
+            }
             navigate(`/${response?.data.path}`)
             if (response.data.path === "login") toast.success(response.message)
         } catch (err) {
