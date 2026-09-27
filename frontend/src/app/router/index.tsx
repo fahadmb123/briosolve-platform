@@ -13,7 +13,8 @@ import { adminRoutes } from './admin/adminRoutes';
 import { providerRoutes } from './provider/providerRoutes';
 import { investigatorRoutes } from './investigator/investigatorRoutes';
 import { customerRoutes } from './customer/customerRoutes';
-import { publicRoutes } from './public/publicRoutes';
+import { publicRoutes, verificationRoutes } from './public/publicRoutes';
+import PublicRoute from '../../shared/middlewares/PublicRoute';
 
 
 
@@ -37,35 +38,33 @@ export function AppRouter() {
       <React.Suspense fallback={<LoadingScreen isLoading={true} />}>
         <ThemeManager />
         <Routes>
-          <Route path="/">
-            <Route index element={<Home />} />
-            
-            
-            {publicRoutes}
-            
-            
-            <Route element={<CustomerLayout />}>
-              {customerRoutes}
-            </Route>
-            
-            
-            <Route path="provider" element={<ProviderLayout />}>
-              {providerRoutes}
-            </Route>
+         <Route path="/">
+          <Route index element={<Home />} />
 
-            
-            <Route path="admin" element={<AdminLayout />}>
-              {adminRoutes}
-            </Route>
-
-            
-            <Route path="investigator" element={<InvestigatorLayout />}>
-              {investigatorRoutes}
-            </Route>
-
-            {/* Fallback for invalid URLs */}
-            <Route path="*" element={<NotFound />} />
+          <Route element={<PublicRoute />}>
+              {publicRoutes}
           </Route>
+
+          {verificationRoutes}
+
+          <Route element={<CustomerLayout />}>
+              {customerRoutes}
+          </Route>
+
+          <Route path="provider" element={<ProviderLayout />}>
+              {providerRoutes}
+          </Route>
+
+          <Route path="admin" element={<AdminLayout />}>
+              {adminRoutes}
+          </Route>
+
+          <Route path="investigator" element={<InvestigatorLayout />}>
+              {investigatorRoutes}
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
+      </Route>
         </Routes>
       </React.Suspense>
     </BrowserRouter>

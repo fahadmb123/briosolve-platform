@@ -2,12 +2,24 @@ import { useSidebar } from '../../../shared/hooks/useSidebar';
 import './Home.css';
 
 
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { useAuthStore } from '../../../shared/stores/auth/auth.store';
+import { useLogout } from '../../../features/authentication/public/model/use-otp-varify';
 
 export default function Home() {
   const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const logout = useLogout()
+  const {isAuthenticated} = useAuthStore.getState()
+
+  const handleLogout = async () => {
+    await logout.mutateAsync()
+    clearAuth();
+    navigate('/login');
+  }
 
   return (
     <>
@@ -111,10 +123,10 @@ export default function Home() {
                         </NavLink>
                     </li>
                     <li className="mt-4 pt-2 border-top">
-                        <Link to="/login" className="sidebar-item text-danger">
+                        <button onClick={handleLogout} className="sidebar-item text-danger" style={{ width: '100%', background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' }}>
                             <i className="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </Link>
+                            <span><span>{isAuthenticated ? "Logout" : "Login"}</span></span>
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -149,9 +161,9 @@ export default function Home() {
                             <span className="notif-badge-count" id="notif-badge">3</span>
                         </button>
                     </div>
-                    <Link to="/login" className="btn btn-primary btn-sm hide-mobile">
-                        <i className="fas fa-sign-out-alt mr-1"></i> Logout
-                    </Link>
+                    <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
+                        <span>{isAuthenticated ? "Logout" : "Login"}</span>
+                    </button>
                     <Link to="//profile" className="avatar avatar-sm ml-2" title="Profile">
                         <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=6366F1&color=fff&rounded=true" alt="Aarav" />
                     </Link>

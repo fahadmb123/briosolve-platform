@@ -5,11 +5,15 @@ import {  EmailVerification, ForgotPassword, Login, ResetPassword, OtpVerificati
 
 
 export const publicRoutes = (
-  <>
-    <Route path="login" element={<Login />} />
-    <Route path="forgot-password" element={<ForgotPassword />} />
-    <Route path="reset-password" element={<ResetPassword />} />
-    <Route path="email-verification" element={<EmailVerification />} />
-    <Route path="otp-verification" element={<OtpVerification />} />
-  </>
+    <>
+        <Route path="login" element={<Login />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
+    </>
+)
+export const verificationRoutes = (
+    <>
+        <Route path="email-verification" element={<EmailVerification />} />
+        <Route path="otp-verification" element={<OtpVerification />} />
+    </>
 );

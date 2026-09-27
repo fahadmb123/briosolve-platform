@@ -49,3 +49,7 @@ export const getMe = async (): Promise<response<string>> => {
     const response = await apiClient.get("/api/auth/me")
     return response.data;
 }
+export const logout = async (): Promise<response<null>> => {
+    const response = await apiClient.get("/api/auth/logout")
+    return response.data;
+}

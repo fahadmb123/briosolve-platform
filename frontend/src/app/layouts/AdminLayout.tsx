@@ -1,10 +1,20 @@
-import { Outlet, Link, NavLink } from 'react-router-dom';
+import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import { useSidebar } from '../../shared/hooks/useSidebar';
 import { useTheme } from '../../shared/hooks/useTheme';
+import { useLogout } from '../../features/authentication/public/model/use-otp-varify';
+import { useAuthStore } from '../../shared/stores/auth/auth.store';
 
 export default function AdminLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
     const { theme, toggleTheme } = useTheme();
+    const clearAuth = useAuthStore((state) => state.clearAuth);
+    const logout = useLogout()
+    const navigate = useNavigate()
+    const handleLogout = async () => {
+        await logout.mutateAsync()
+        clearAuth();
+        navigate('/login');
+    }
 
     return (
         <div className={`app-container sidebar-modal-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
@@ -172,9 +182,9 @@ export default function AdminLayout() {
                             <span className="notif-badge-count">6</span>
                         </button>
                     </div>
-                    <Link to="/login" className="btn btn-primary btn-sm hide-mobile">
+                    <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
                         <i className="fas fa-sign-out-alt mr-1"></i> Logout
-                    </Link>
+                    </button>
                     <div className="flex items-center gap-2 pl-2 ml-1">
                         <img src="https://ui-avatars.com/api/?name=Vikram+Malhotra&amp;background=6366F1&amp;color=fff&rounded=true" alt="Admin Avatar" className="avatar avatar-sm" />
                         <div className="hidden sm:block text-left">

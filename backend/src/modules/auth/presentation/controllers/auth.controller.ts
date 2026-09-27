@@ -44,4 +44,17 @@ export class AuthController extends BaseController{
             next(err)
         }
     }
+    logout = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            res.clearCookie("access_token")
+            return res.status(200).json({
+                success:true,
+                message:"Logged Out"
+            })
+        } catch (err) {
+            next(err)
+        }
+    }
+
+    
 }

@@ -13,7 +13,7 @@ const router = Router()
 
 router.get("/otp-status",otpVarificationController.getStatus)
 router.get("/me",authMiddleware,authController.getMe)
-
+router.get("/logout",authController.logout)
 
 
 
