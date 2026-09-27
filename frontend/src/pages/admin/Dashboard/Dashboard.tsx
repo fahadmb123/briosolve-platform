@@ -7,8 +7,8 @@ export default function Dashboard() {
         <div className="app-content">
             <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
                 <div>
-                    <h1 className="h3 mb-1">Administrative Overview</h1>
-                    <p className="text-secondary text-xs mb-0">Platform health, marketplace metrics, and pending governance actions.</p>
+                    <h1 className="font-extrabold tracking-tight mb-1" style={{ fontSize: '2rem' }}>Dashboard</h1>
+                    <p className="text-secondary text-sm mb-0">Platform health, marketplace metrics, and pending governance actions.</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Link to="/admin/verification" className="btn btn-warning text-xs">

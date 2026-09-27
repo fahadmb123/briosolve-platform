@@ -164,10 +164,11 @@ export default function AdminLayout() {
                     <button id="sidebar-toggle" className="btn-icon mobile-menu-toggle" aria-label="Toggle Sidebar" onClick={handleSidebarToggle}>
                         <i className="fas fa-bars"></i>
                     </button>
-                    <div className="breadcrumbs-trail text-xs text-secondary">
-                        <span className="text-text font-medium">Administration</span>
-                        <i className="fas fa-chevron-right text-muted mx-2"></i>
-                        <span>Operational Dashboard</span>
+                    <div className="flex items-center gap-3">
+                        <i className="fas fa-layer-group text-primary text-2xl"></i>
+                        <div className="breadcrumbs-trail tracking-widest text-text" style={{ fontSize: '1.5rem', fontWeight: 800 }}>
+                            ADMIN
+                        </div>
                     </div>
                 </div>
 
@@ -185,13 +186,6 @@ export default function AdminLayout() {
                     <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
                         <i className="fas fa-sign-out-alt mr-1"></i> Logout
                     </button>
-                    <div className="flex items-center gap-2 pl-2 ml-1">
-                        <img src="https://ui-avatars.com/api/?name=Vikram+Malhotra&amp;background=6366F1&amp;color=fff&rounded=true" alt="Admin Avatar" className="avatar avatar-sm" />
-                        <div className="hidden sm:block text-left">
-                            <div className="text-xs font-semibold text-text">Vikram Malhotra</div>
-                            <div className="text-xs text-muted" style={{"fontSize":"10px"}}>Super Administrator</div>
-                        </div>
-                    </div>
                 </div>
             </header>
                 <Outlet />
