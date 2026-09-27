@@ -1,5 +1,5 @@
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
+import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
 import { OtpVarificationInput } from "../dto/otpDto.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
 import { IOtpVarificationUseCase } from "../../domain/interfaces/use-cases/IOtpVarificationUseCase.js";
@@ -8,14 +8,14 @@ import { Customer } from "../../domain/entities/customer.entity.js";
 
 
 
-export default class OtpVarificationUseCase implements IOtpVarificationUseCase<OtpVarificationInput,Customer>{
+export default class OtpVarificationUseCase implements IOtpVarificationUseCase<OtpVarificationInput,Customer | IPendingCustomerRegistration>{
     constructor(
         private readonly PendingRegistrationStore:IPendingRegistrationStore,
         private readonly PasswordHasher:IPasswordHasher,
         private readonly CustomerRepository : ICustomerRepository
     ){}
 
-    async execute ({registrationId,otp}:OtpVarificationInput):Promise<Customer>{
+    async execute ({registrationId,otp}:OtpVarificationInput):Promise<Customer | IPendingCustomerRegistration>{
         const data = await this.PendingRegistrationStore.get(registrationId)
         if (!registrationId || !data) throw new ApplicationError("REGISTRATION_EXPIRED","Registration session expired","AUTHENTICATION")
         if (data.otpExpiresAt && Date.now() > data.otpExpiresAt) throw new ApplicationError("OTP_EXPIRED","OTP Expired","AUTHENTICATION")
@@ -28,9 +28,11 @@ export default class OtpVarificationUseCase implements IOtpVarificationUseCase<O
                     {
                         name:data.name,
                         email:data.email,
-                        password:data.passwordHash
+                        password:data.passwordHash!
                     }
                 )
+            case "FORGOT_PASSWORD" :
+                response = data
         }
         await this.PendingRegistrationStore.delete(registrationId)
         return response!

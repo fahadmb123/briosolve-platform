@@ -1,5 +1,5 @@
 import { apiClient } from "../../../shared/api/Client";
-import type { LoginInputType } from "./validation";
+import type { LoginInputType, EmailInputType } from "./validation";
 import type { response } from "../../../shared/Dtos";
 
 type OtpVarifyInput = {
@@ -8,6 +8,9 @@ type OtpVarifyInput = {
 type OtpVarifyOutput = {
     success:boolean,
     message:string,
+    data:{
+        path:string
+    }
 }
 type OtpStatusOut = {
     success: boolean,
@@ -51,5 +54,9 @@ export const getMe = async (): Promise<response<string>> => {
 }
 export const logout = async (): Promise<response<null>> => {
     const response = await apiClient.get("/api/auth/logout")
+    return response.data;
+}
+export const emailVerify = async (data: EmailInputType): Promise<response<null>> => {
+    const response = await apiClient.post("/api/auth/email-verify", data)
     return response.data;
 }

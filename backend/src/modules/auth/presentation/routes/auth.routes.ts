@@ -2,7 +2,7 @@ import { Router } from "express";
 import validate from "../../../../shared/presentation/http/middlewares/validate-request.js";
 import { otpSchema } from "../validators/registerCustomer.schema.js";
 import { otpVarificationController ,authController} from "../../../../app/container/container.js";
-import { loginSchema } from "../validators/auth.schema.js";
+import { emailSchema, loginSchema } from "../validators/auth.schema.js";
 import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
 
 const router = Router()
@@ -18,6 +18,11 @@ router.get("/logout",authController.logout)
 
 
 router.post("/login",validate(loginSchema),authController.login)
+
+
+router.post("/email-verify",validate(emailSchema),authController.emailVerify)
+
+
 router.post("/otp-varify",validate(otpSchema),otpVarificationController.validate)
 router.post("/resend-otp",otpVarificationController.resend)
 

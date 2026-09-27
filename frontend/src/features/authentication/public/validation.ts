@@ -15,4 +15,10 @@ export const loginSchema = z.object({
     password: z.string().min(1, { message: "Password is required" }).min(6, { message: "Password must be at least 6 characters" }),
 })
 
+export const emailSchema = z.object({
+    email: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email address" })
+})
+
+
+export type EmailInputType = z.infer<typeof emailSchema>;
 export type LoginInputType = z.infer<typeof loginSchema>;

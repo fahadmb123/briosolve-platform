@@ -1,0 +1,54 @@
+
+import { randomUUID } from "crypto"
+import { ICustomerRepository } from "../../domain/repositories/customer.repository.js"
+import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js"
+import { IEmailVerificationUseCase } from "../../domain/interfaces/use-cases/IEmailVerification.useCase.js"
+import { ApplicationError } from "../../../../shared/application/errors/applicationError.js"
+import { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js"
+import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
+import { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js"
+import { RegisterCustomerOutput } from "../dto/customerDto.js"
+
+
+
+
+export default class EmailVerificationUseCase implements IEmailVerificationUseCase<string,RegisterCustomerOutput>{
+    constructor(
+        private readonly customerRepository:ICustomerRepository,
+        private readonly passwordHasher:IPasswordHasher,
+        private readonly otpGenerate : IOtpGenerator,
+        private readonly PendingRegistrationStore:IPendingRegistrationStore,
+        private readonly EmailSender : IEmailSender
+    ){}
+
+    async execute (email:string):Promise<RegisterCustomerOutput>{
+        const user = await this.customerRepository.findByEmail(email)
+        if (!user) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
+
+        const otp = this.otpGenerate.generate()
+
+        const otpHash = await this.passwordHasher.hash(otp)
+        const registrationId  = randomUUID()
+        
+        const registrationTtl = 10 * 60
+        const otpExpiresIn = 60
+        const otpExpiresAt = Date.now() + otpExpiresIn * 1000
+        const path = "reset-password"
+        await this.PendingRegistrationStore.save(registrationId,{
+            name:user.name,
+            email,
+            otpHash,
+            attempts:0,
+            path,
+            otpExpiresAt,
+            for:"FORGOT_PASSWORD",
+        },
+            registrationTtl
+        )
+        
+        
+        await this.EmailSender.sendOtp(email,otp)
+    
+        return {registrationId,expiresIn: otpExpiresIn}
+    }
+}

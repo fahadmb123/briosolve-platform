@@ -60,8 +60,8 @@ export default function OtpVerification() {
     const handleOtp = async (data:OtpInputType) => {
         try {
             const response = await otpVarify.mutateAsync(data)
-            toast.success(response.message)
-            navigate("/login")
+            navigate(`/${response?.data.path}`)
+            if (response.data.path === "login") toast.success(response.message)
         } catch (err) {
             if (isAxiosError(err) && err.response?.data?.message) {
                 toast.error(err.response.data.message);
@@ -95,7 +95,7 @@ export default function OtpVerification() {
             <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
                 <i className="fas fa-sun"></i>
             </button>
-
+            
             <div className="auth-card-container">
                 <div className="auth-card otp-card text-center">
                     <Link to="/" className="logo justify-center mb-5">
@@ -103,12 +103,7 @@ export default function OtpVerification() {
                         <span>ReverseMarket</span>
                     </Link>
 
-                    <div className="verify-icon-wrapper mb-4">
-                        <div className="verify-icon-pulse"></div>
-                        <div className="verify-icon-circle">
-                            <i className="fas fa-shield-alt"></i>
-                        </div>
-                    </div>
+                   
 
                     <h1 className="h3 mb-2">Two-Step Verification</h1>
                     <p className="text-secondary text-sm mb-6">

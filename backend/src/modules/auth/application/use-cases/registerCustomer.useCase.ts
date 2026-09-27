@@ -31,14 +31,16 @@ export default class RegisterCustomerUseCase implements IRegisterCustomerUseCase
         const registrationTtl = 10 * 60
         const otpExpiresIn = 60
         const otpExpiresAt = Date.now() + otpExpiresIn * 1000
-
+        const path = "login"
         await this.PendingRegistrationStore.save(registrationId,{
             name:input.name,
             email:input.email,
             passwordHash,
             otpHash,
             attempts:0,
+            path,
             otpExpiresAt,
+            
             for:"CREATE_CUSTOMER",
         },
             registrationTtl

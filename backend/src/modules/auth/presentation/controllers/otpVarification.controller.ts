@@ -2,7 +2,7 @@ import { Request,Response,NextFunction } from "express"
 import { IOtpVarificationUseCase } from "../../domain/interfaces/use-cases/IOtpVarificationUseCase.js"
 import { OtpVarificationInput } from "../../application/dto/otpDto.js"
 import { Customer } from "../../domain/entities/customer.entity.js"
-import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
+import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
 import { IResendOtpUseCase } from "../../domain/interfaces/use-cases/IResendOtpUseCase.js"
 import { ResendOtpOutput } from "../../application/use-cases/resendOtp.useCase.js"
 
@@ -18,6 +18,7 @@ class OtpVarificationController {
             const registrationId = req.cookies.registration_id
             const otp = req.body.otp
             const response  = await this.otpVarificationUseCase.execute({ registrationId, otp })
+            
             res.status(201).json({
                 success :true,
                 message:"Acount Created",

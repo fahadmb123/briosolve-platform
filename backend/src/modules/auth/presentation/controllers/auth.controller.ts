@@ -5,13 +5,16 @@ import { Customer } from "../../domain/entities/customer.entity.js"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js"
 import { IGetMeUseCase } from "../../domain/interfaces/use-cases/IGetMe.useCase.js"
 import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.js"
+import { IEmailVerificationUseCase } from "../../domain/interfaces/use-cases/IEmailVerification.useCase.js"
+import { RegisterCustomerOutput } from "../../application/dto/customerDto.js"
 
 
 
 export class AuthController extends BaseController{
     constructor (
         private readonly loginUseCase:ILoginUseCase<LoginInputDto,{accessToken:string,isExist:Customer}>,
-        private readonly getMeUseCase:IGetMeUseCase<IUserTokenPayload,Customer>
+        private readonly getMeUseCase:IGetMeUseCase<IUserTokenPayload,Customer>,
+        private readonly emailVerification : IEmailVerificationUseCase<string,RegisterCustomerOutput>
     ) {super()}
 
     login = async (req:Request,res:Response,next:NextFunction) => {
@@ -56,5 +59,25 @@ export class AuthController extends BaseController{
         }
     }
 
+    emailVerify = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const response = await this.emailVerification.execute(req.body.email)
+            res.cookie("registration_id", response.registrationId, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                maxAge: 10 * 60 * 1000,
+                path: "/"
+            }).status(201).json({
+                success: true,
+                message: "OTP sent successfully",
+                data: {
+                    expiresIn: response.expiresIn
+                }
+            })
+        } catch (err) {
+            next(err)
+        }
+    }
     
 }

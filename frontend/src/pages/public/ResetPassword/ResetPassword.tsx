@@ -20,9 +20,7 @@ export default function ResetPassword() {
                             <i className="fas fa-layer-group text-primary"></i>
                             <span>ReverseMarket</span>
                         </Link>
-                        <div className="shield-icon-circle mb-3">
-                            <i className="fas fa-shield-alt"></i>
-                        </div>
+                        
                         <h1 className="h3 mb-2">Create New Password</h1>
                         <p className="text-secondary text-sm">
                             Choose a strong, unique password to secure your marketplace account.
@@ -36,13 +34,7 @@ export default function ResetPassword() {
                                 <i className="fas fa-lock"></i>
                                 <input type="password" id="new-password" className="form-control" placeholder="At least 8 characters" required />
                             </div>
-                            <div className="password-strength-bar mt-2">
-                                <div className="strength-fill strength-medium"></div>
-                            </div>
-                            <div className="flex justify-between text-xs text-secondary mt-1">
-                                <span>Password strength:</span>
-                                <span className="text-warning font-medium">Good</span>
-                            </div>
+                            
                         </div>
 
                         <div className="form-group mb-6">
