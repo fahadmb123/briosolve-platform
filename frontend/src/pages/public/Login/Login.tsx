@@ -8,6 +8,7 @@ import { useLogin } from '../../../features/authentication/public/model/use-otp-
 import { toast } from 'react-toastify';
 import { isAxiosError } from 'axios';
 import { useAuthStore, type IAuthUser } from '../../../shared/stores/auth/auth.store';
+import { SpinnerOverlay } from '../../../shared/ui/SpinnerOverlay/SpinnerOverlay';
 
 
 export default function Login() {
@@ -43,11 +44,12 @@ export default function Login() {
     }
 
     return (
+        
         <div className="auth-page-wrapper">
             <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
                 <i className="fas fa-sun"></i>
             </button>
-
+            {login.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
             <div className="auth-card-container">
                 <div className="auth-card">
                     

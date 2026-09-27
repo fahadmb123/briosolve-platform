@@ -8,6 +8,7 @@ import {toast} from "react-toastify"
 import { useNavigate } from 'react-router-dom';
 import { isAxiosError } from 'axios';
 import { useRegisterCustomer } from '../../../features/authentication/auth-customer/model/use-register-customer';
+import { SpinnerOverlay } from '../../../shared/ui/SpinnerOverlay/SpinnerOverlay';
 
 
 
@@ -43,7 +44,7 @@ export default function CustomerRegister() {
 
     return ( 
         <>
-        
+        {registerMutation.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
         <div className="auth-page-wrapper">
             
             <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme" onClick={toggleTheme}>
