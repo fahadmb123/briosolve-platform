@@ -60,3 +60,7 @@ export const emailVerify = async (data: EmailInputType): Promise<response<null>>
     const response = await apiClient.post("/api/auth/email-verify", data)
     return response.data;
 }
+export const resetPassword = async (data:{password:string}): Promise<response<null>> => {
+    const response = await apiClient.post("/api/auth/reset-password", data)
+    return response.data;
+}

@@ -1,9 +1,41 @@
 import './ResetPassword.css';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { resetPasswordSchema, type ResetPasswordInputType } from '../../../features/authentication/public/validation';
+import { useResetPassword } from '../../../features/authentication/public/model/use-otp-varify';
+import { toast } from 'react-toastify';
+import { isAxiosError } from 'axios';
+import { SpinnerOverlay } from '../../../shared/ui/SpinnerOverlay/SpinnerOverlay';
 
-import { Link } from 'react-router-dom';
 export default function ResetPassword() {
     const {toggleTheme} = useTheme()
+    const navigate = useNavigate()
+    const resetPassword = useResetPassword()
+    const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordInputType>({
+        resolver: zodResolver(resetPasswordSchema),
+        mode: "onChange"
+    });
+
+
+
+    const onSubmit = async (data: ResetPasswordInputType) => {
+        try {
+            const response = await resetPassword.mutateAsync({password:data.password});
+            navigate("/login",{replace:true})
+            toast.success(response.message)
+        } catch (err) {
+            if (isAxiosError(err) && err.response?.data?.message) {
+                toast.error(err.response.data.message);
+            } else if (err instanceof Error) {
+                toast.error(err.message);
+            } else {
+                toast.error("An unexpected error occurred");
+            }
+        }
+    };
+
     return (
         <>
         
@@ -12,7 +44,7 @@ export default function ResetPassword() {
             <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
                 <i className="fas fa-sun"></i>
             </button>
-
+            {resetPassword.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
             <div className="auth-card-container">
                 <div className="auth-card card">
                     <div className="text-center mb-6">
@@ -27,22 +59,31 @@ export default function ResetPassword() {
                         </p>
                     </div>
 
-                    <form action="../login/login.html" method="GET">
+                    <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="form-group mb-4">
                             <label className="form-label" htmlFor="new-password">New Password</label>
                             <div className="input-icon-wrapper">
                                 <i className="fas fa-lock"></i>
-                                <input type="password" id="new-password" className="form-control" placeholder="At least 8 characters" required />
+                                <input {...register("password")} type="password" id="new-password" className={`form-control ${errors.password ? 'is-invalid border-danger' : ''}`} placeholder="At least 6 characters" />
                             </div>
-                            
+                            {errors.password && (
+                                <span className="field-error text-xs text-danger mt-1 block">
+                                    {errors.password.message}
+                                </span>
+                            )}
                         </div>
 
                         <div className="form-group mb-6">
                             <label className="form-label" htmlFor="confirm-new-password">Confirm New Password</label>
                             <div className="input-icon-wrapper">
                                 <i className="fas fa-check-double"></i>
-                                <input type="password" id="confirm-new-password" className="form-control" placeholder="Repeat your new password" required />
+                                <input {...register("confirmPassword")} type="password" id="confirm-new-password" className={`form-control ${errors.confirmPassword ? 'is-invalid border-danger' : ''}`} placeholder="Repeat your new password" />
                             </div>
+                            {errors.confirmPassword && (
+                                <span className="field-error text-xs text-danger mt-1 block">
+                                    {errors.confirmPassword.message}
+                                </span>
+                            )}
                         </div>
 
                         <button type="submit" className="btn btn-primary w-full btn-lg mb-5">
