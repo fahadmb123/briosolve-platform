@@ -36,7 +36,8 @@ export class PrismaCustomerRepository implements ICustomerRepository {
             user.id,
             user.name,
             user.email,
-            user.phone
+            user.phone,
+            user.role
         )
 
         return customer
