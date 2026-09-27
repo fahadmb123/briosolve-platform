@@ -1,8 +1,8 @@
 import { Route } from 'react-router-dom';
 import {  EmailVerification, ForgotPassword, Login, ResetPassword, OtpVerification } from './public.lazy';
-import ResetFlowRoute from '../../../shared/middlewares/ResetFlowRoute';
-import ResetPasswordRoute from '../../../shared/middlewares/ResetPasswordRoute';
 
+import ResetPasswordRoute from '../../../shared/middlewares/ResetPasswordRoute';
+import OtpFlowRoute from '../../../shared/middlewares/OtpFlowRoute';
 
 
 
@@ -18,7 +18,7 @@ export const publicRoutes = (
 export const verificationRoutes = (
     <>
         <Route path="email-verification" element={<EmailVerification />} />
-        <Route element={<ResetFlowRoute />}>
+        <Route element={<OtpFlowRoute />}>
             <Route path="otp-verification" element={<OtpVerification />} />
         </Route>
     </>

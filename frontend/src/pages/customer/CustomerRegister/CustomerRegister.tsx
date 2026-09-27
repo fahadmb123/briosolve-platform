@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { isAxiosError } from 'axios';
 import { useRegisterCustomer } from '../../../features/authentication/auth-customer/model/use-register-customer';
 import { SpinnerOverlay } from '../../../shared/ui/SpinnerOverlay/SpinnerOverlay';
-
+import { useResetFlowStore } from "../../../shared/stores/auth/reset-flow.store";
 
 
 
@@ -17,6 +17,7 @@ import { SpinnerOverlay } from '../../../shared/ui/SpinnerOverlay/SpinnerOverlay
 export default function CustomerRegister() {
     const { toggleTheme } = useTheme();
     const navigate = useNavigate();
+    const setOtpFlowStarted = useResetFlowStore((state) => state.setOtpFlowStarted);
     const registerMutation = useRegisterCustomer()
     const {register,handleSubmit,formState:{errors}} = useForm<RegisterInputType>({
         resolver : zodResolver(registerSchema),mode : "onChange"
@@ -29,6 +30,7 @@ export default function CustomerRegister() {
                 email:data.email,
                 password:data.password
             })
+            setOtpFlowStarted(true)
             navigate("/otp-verification",{replace:true})
             toast.success(response.message)
         } catch (err) {

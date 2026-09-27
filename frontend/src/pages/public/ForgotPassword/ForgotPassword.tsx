@@ -21,11 +21,13 @@ export default function ForgotPassword() {
     })
     const emailVerify = useEmailVerify()
     const setResetFlowStarted = useResetFlowStore((state) => state.setResetFlowStarted);
+    const setOtpFlowStarted = useResetFlowStore((state) => state.setOtpFlowStarted);
 
     const handle = async (data:EmailInputType) => {
         try {
             const response = await emailVerify.mutateAsync(data);
             setResetFlowStarted(true);
+            setOtpFlowStarted(true);
             navigate("/otp-verification",{replace:true})
             toast.success(response.message)
         } catch (err) {
