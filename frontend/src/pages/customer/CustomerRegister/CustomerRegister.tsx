@@ -1,6 +1,7 @@
 import './CustomerRegister.css';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, type RegisterInputType } from '../../../features/authentication/auth-customer/validation';
@@ -17,6 +18,8 @@ import { useResetFlowStore } from "../../../shared/stores/auth/reset-flow.store"
 export default function CustomerRegister() {
     const { toggleTheme } = useTheme();
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const setOtpFlowStarted = useResetFlowStore((state) => state.setOtpFlowStarted);
     const registerMutation = useRegisterCustomer()
     const {register,handleSubmit,formState:{errors}} = useForm<RegisterInputType>({
@@ -104,7 +107,16 @@ export default function CustomerRegister() {
                                 <label className="form-label" htmlFor="password">Password</label>
                                 <div className="input-icon-wrapper">
                                     <i className="fas fa-lock"></i>
-                                    <input  {...register("password")} type="password" id="password" className={`form-control ${errors.password ? 'border-danger' : ''}`} placeholder="At least 8 chars"  />
+                                    <input  {...register("password")} type={showPassword ? "text" : "password"} id="password" className={`form-control ${errors.password ? 'border-danger' : ''}`} placeholder="At least 8 chars"  />
+                                    <button 
+                                        type="button" 
+                                        className="toggle-password" 
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        aria-label="Toggle Password Visibility"
+                                        style={{ background: 'none', border: 'none', position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-secondary)' }}
+                                    >
+                                        <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                                    </button>
                                 </div>
                                 {errors.password && <span className="text-danger text-xs mt-1 block">{errors.password.message}</span>}
                             </div>
@@ -113,7 +125,16 @@ export default function CustomerRegister() {
                                 <label className="form-label" htmlFor="confirm-password">Confirm Password</label>
                                 <div className="input-icon-wrapper">
                                     <i className="fas fa-check-double"></i>
-                                    <input  {...register("confirmPassword")} type="password" id="confirm-password" className={`form-control ${errors.confirmPassword ? 'border-danger' : ''}`} placeholder="Repeat password"  />
+                                    <input  {...register("confirmPassword")} type={showConfirmPassword ? "text" : "password"} id="confirm-password" className={`form-control ${errors.confirmPassword ? 'border-danger' : ''}`} placeholder="Repeat password"  />
+                                    <button 
+                                        type="button" 
+                                        className="toggle-password" 
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        aria-label="Toggle Confirm Password Visibility"
+                                        style={{ background: 'none', border: 'none', position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-secondary)' }}
+                                    >
+                                        <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                                    </button>
                                 </div>
                                 {errors.confirmPassword && <span className="text-danger text-xs mt-1 block">{errors.confirmPassword.message}</span>}
                             </div>

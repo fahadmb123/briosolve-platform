@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { useForm } from 'react-hook-form';
@@ -15,6 +16,7 @@ export default function Login() {
     const navigate = useNavigate()
     const { toggleTheme } = useTheme()
     const login = useLogin()
+    const [showPassword, setShowPassword] = useState(false);
 
     const {
         register,
@@ -90,12 +92,21 @@ export default function Login() {
                             <div className="input-icon-wrapper">
                                 <i className="fas fa-lock"></i>
                                 <input 
-                                    type="password" 
+                                    type={showPassword ? "text" : "password"} 
                                     id="password" 
                                     className={`form-control ${errors.password ? 'border-danger' : ''}`}
                                     placeholder="••••••••" 
                                     {...register("password")}
                                 />
+                                <button 
+                                    type="button" 
+                                    className="toggle-password" 
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    aria-label="Toggle Password Visibility"
+                                    style={{ background: 'none', border: 'none', position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-secondary)' }}
+                                >
+                                    <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                                </button>
                             </div>
                             {errors.password && <div className="text-danger text-xs mt-2">{errors.password.message}</div>}
                         </div>

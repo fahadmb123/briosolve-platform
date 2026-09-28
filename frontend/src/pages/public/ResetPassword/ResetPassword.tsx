@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './ResetPassword.css';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,6 +16,8 @@ export default function ResetPassword() {
     const navigate = useNavigate()
     const resetPassword = useResetPassword()
     const clearResetFlow = useResetFlowStore((state) => state.clearResetFlow);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordInputType>({
         resolver: zodResolver(resetPasswordSchema),
@@ -68,7 +71,15 @@ export default function ResetPassword() {
                             <label className="form-label" htmlFor="new-password">New Password</label>
                             <div className="input-icon-wrapper">
                                 <i className="fas fa-lock"></i>
-                                <input {...register("password")} type="password" id="new-password" className={`form-control ${errors.password ? 'is-invalid border-danger' : ''}`} placeholder="At least 6 characters" />
+                                <input {...register("password")} type={showPassword ? "text" : "password"} id="new-password" className={`form-control ${errors.password ? 'is-invalid border-danger' : ''}`} placeholder="At least 6 characters" />
+                                <button 
+                                    type="button" 
+                                    className="toggle-password" 
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    aria-label="Toggle Password Visibility"
+                                >
+                                    <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                                </button>
                             </div>
                             {errors.password && (
                                 <span className="field-error text-xs text-danger mt-1 block">
@@ -81,7 +92,15 @@ export default function ResetPassword() {
                             <label className="form-label" htmlFor="confirm-new-password">Confirm New Password</label>
                             <div className="input-icon-wrapper">
                                 <i className="fas fa-check-double"></i>
-                                <input {...register("confirmPassword")} type="password" id="confirm-new-password" className={`form-control ${errors.confirmPassword ? 'is-invalid border-danger' : ''}`} placeholder="Repeat your new password" />
+                                <input {...register("confirmPassword")} type={showConfirmPassword ? "text" : "password"} id="confirm-new-password" className={`form-control ${errors.confirmPassword ? 'is-invalid border-danger' : ''}`} placeholder="Repeat your new password" />
+                                <button 
+                                    type="button" 
+                                    className="toggle-password" 
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    aria-label="Toggle Confirm Password Visibility"
+                                >
+                                    <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                                </button>
                             </div>
                             {errors.confirmPassword && (
                                 <span className="field-error text-xs text-danger mt-1 block">

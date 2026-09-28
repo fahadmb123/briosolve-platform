@@ -929,6 +929,37 @@ textarea.form-control {
 
 .input-icon-wrapper .form-control {
     padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+.toggle-password {
+    background: none;
+    border: none;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    z-index: 10;
+}
+
+.input-icon-wrapper .toggle-password i {
+    position: static;
+    left: auto;
+    top: auto;
+    transform: none;
+    color: inherit;
+}
+
+/* Hide native browser password toggles */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
 }
 
 /* ==========================================================================

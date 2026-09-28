@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { useForm } from 'react-hook-form';
@@ -6,6 +7,7 @@ import { loginSchema, type LoginInputType } from '../../../features/authenticati
 
 export default function Login() {
   const { toggleTheme } = useTheme();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
       register,
@@ -82,15 +84,20 @@ export default function Login() {
                         <div className="input-icon-wrapper">
                             <i className="fas fa-lock"></i>
                             <input 
-                                type="password" 
+                                type={showPassword ? "text" : "password"} 
                                 id="password" 
                                 className={`form-control ${errors.password ? 'border-danger' : ''}`} 
                                 placeholder="••••••••" 
                                 {...register("password")}
                             />
-                            <button type="button" className="toggle-password" id="toggle-password-btn"
-                                aria-label="Toggle Password Visibility">
-                                <i className="fas fa-eye"></i>
+                            <button 
+                                type="button" 
+                                className="toggle-password" 
+                                id="toggle-password-btn"
+                                aria-label="Toggle Password Visibility"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                             </button>
                         </div>
                         {errors.password && <div className="text-danger text-xs mt-2">{errors.password.message}</div>}
