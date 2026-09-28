@@ -13,7 +13,7 @@ export default function Customers() {
     const [page, setPage] = useState(0)
     const [search, setSearch] = useState("")
     const [filter,setFilter] = useState("")
-    const [limit,setLimit] = useState(10)
+    const [limit] = useState(10)
     const [total, setTotal] = useState(0)
     const [totalPages, setTotalPages] = useState(0)
 
@@ -58,6 +58,12 @@ export default function Customers() {
             }
         }
     }
+
+    const handleReset = () => {
+        setSearch("")
+        setFilter("")
+        setPage(1)
+    }
     return (
         <>
         {updateStatus.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
@@ -98,7 +104,7 @@ export default function Customers() {
                         <option value="BLOCKED">Suspended</option>
                     </select>
 
-                    <button className="btn btn-secondary text-xs py-2" onClick={() => {}}>
+                    <button  className="btn btn-secondary text-xs py-2" onClick={() => handleReset()}>
                         <i className="fas fa-undo mr-1"></i>Reset
                     </button>
                 </div>
@@ -169,16 +175,50 @@ export default function Customers() {
 
                 
                 <div className="admin-pagination">
-                    <div>Showing <strong>1 to 10</strong> of 14,820 accounts</div>
-                    <div className="pagination-controls">
-                        <button className="page-btn" disabled><i className="fas fa-chevron-left"></i></button>
-                        <button className="page-btn active">1</button>
-                        <button className="page-btn" onClick={() => {}}>2</button>
-                        <button className="page-btn" onClick={() => {}}>3</button>
-                        <span className="px-1 text-muted">...</span>
-                        <button className="page-btn" onClick={() => {}}>1482</button>
-                        <button className="page-btn" onClick={() => {}}><i className="fas fa-chevron-right"></i></button>
+                    <div>
+                        Showing{" "}
+                        <strong>
+                            {total === 0 ? 0 : (page - 1) * limit + 1}
+                            {" "}to{" "}
+                            {Math.min(page * limit, total)}
+                        </strong>{" "}
+                        of {total.toLocaleString()} accounts
                     </div>
+
+                    <div className="pagination-controls">
+
+                        <button
+                            className="page-btn"
+                            disabled={page === 1}
+                            onClick={() => setPage(page - 1)}
+                        >
+                            <i className="fas fa-chevron-left"></i>
+                        </button>
+
+                        {Array.from(
+                            { length: totalPages },
+                            (_, index) => index + 1
+                        ).map((pageNumber) => (
+                            <button
+                                key={pageNumber}
+                                className={`page-btn ${
+                                    page === pageNumber ? "active" : ""
+                                }`}
+                                onClick={() => setPage(pageNumber)}
+                            >
+                                {pageNumber}
+                            </button>
+                        ))}
+
+                        <button
+                            className="page-btn"
+                            disabled={page === totalPages}
+                            onClick={() => setPage(page + 1)}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </button>
+
+                </div>
                 </div>
             </div>
         </div>
