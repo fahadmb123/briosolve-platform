@@ -15,12 +15,16 @@ export class UserController extends BaseController{
     getCustomers = async (req:Request,res:Response,next:NextFunction) => {
         try {
             this.getCurrentUser(req)
-            const users = await this.getCustomersUseCase.execute()
+    
+            const response = await this.getCustomersUseCase.execute({
+                page:Number(req.query.page) || 1,
+                limit:Number(req.query.limit) || 10,
+                filter:req.query.filter as string | undefined,
+                search:req.query.search as string | undefined
+            })
             res.status(200).json({
                 success:true,
-                data:{
-                    users
-                }
+                data:response
             })
         } catch (err) {
             next(err)

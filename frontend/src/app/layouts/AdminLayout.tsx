@@ -183,7 +183,7 @@ export default function AdminLayout() {
                         </button>
                     </div>
                     <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
-                        <i className="fas fa-sign-out-alt mr-1"></i> Logout
+                        Logout
                     </button>
                 </div>
             </header>

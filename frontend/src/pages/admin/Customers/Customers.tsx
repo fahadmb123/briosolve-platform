@@ -7,14 +7,26 @@ import { SpinnerOverlay } from "../../../shared/ui/SpinnerOverlay/SpinnerOverlay
 
 export default function Customers() {
     const [customers,setCustomers] = useState<User[]>([])
-    const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null);
+    const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null)
+
+
+    const [page, setPage] = useState(0)
+    const [search, setSearch] = useState("")
+    const [filter,setFilter] = useState("")
+    const [limit,setLimit] = useState(10)
+    const [total, setTotal] = useState(0)
+    const [totalPages, setTotalPages] = useState(0)
+
+
     const getCustomers = useGetCustomers()
     const updateStatus = useUpdateStatus()
     useEffect(()=>{
         (async ()=>{
             try {
-                const response = await getCustomers.mutateAsync()
+                const response = await getCustomers.mutateAsync({page,search,filter,limit})
                 setCustomers(response.data.users)
+                setTotal(response.data.total)
+                setTotalPages(response.data.totalPages)
             } catch (err) {
                 if (isAxiosError(err) && err.response?.data?.message) {
                     toast.error(err.response.data.message);
@@ -25,7 +37,7 @@ export default function Customers() {
                 }
             }
         })()
-    },[])
+    },[filter,search,page])
 
 
     const handleStatusButton = async (id:string,status:string)=>{
@@ -49,7 +61,7 @@ export default function Customers() {
     return (
         <>
         {updateStatus.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
-        {getCustomers.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
+        
         <div className="app-content">
                 
             <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
@@ -62,17 +74,28 @@ export default function Customers() {
             <div className="admin-filter-bar">
                 <div className="admin-search-input">
                     <i className="fas fa-search"></i>
-                    <input type="text" placeholder="Search for email..." id="userSearchInput" />
+                    <input 
+                        onChange={(e)=>{
+                            setSearch(e.target.value)
+                            setPage(1)
+                        }}
+                        type="text" placeholder="Search for email..." id="userSearchInput" 
+                     />
                 </div>
 
                 <div className="admin-filters-group">
 
 
-                    <select className="admin-select" id="statusFilter">
-                        <option value="all">All Statuses</option>
-                        <option value="active">Active</option>
-                        <option value="suspended">Suspended</option>
-                        <option value="verified">Verified</option>
+                    <select
+                        value={filter}
+                        onChange={(e)=>{
+                            setFilter(e.target.value)
+                            setPage(1)
+                        }}
+                         className="admin-select" id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="BLOCKED">Suspended</option>
                     </select>
 
                     <button className="btn btn-secondary text-xs py-2" onClick={() => {}}>
@@ -101,7 +124,15 @@ export default function Customers() {
                             </tr>
                         </thead>
                         <tbody>
-                            {customers.length > 0 ? (
+                            {getCustomers.isPending ? (
+                                <tr>
+                                    <td colSpan={6} className="text-center py-10 text-secondary">
+                                        <div className="flex flex-col items-center justify-center gap-3">
+                                            <span className="font-medium">Searching for results...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : customers.length > 0 ? (
                                 customers.map((customer) => (
                                     <tr key={customer.id} style={customer.status === "BLOCKED" ? { backgroundColor: "rgba(239, 68, 68, 0.03)" } : {}}>
                                         <td>
