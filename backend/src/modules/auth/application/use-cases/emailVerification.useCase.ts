@@ -2,17 +2,17 @@
 import { randomUUID } from "crypto"
 import { ICustomerRepository } from "../../domain/repositories/customer.repository.js"
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js"
-import { IEmailVerificationUseCase } from "../../domain/interfaces/use-cases/IEmailVerification.useCase.js"
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js"
 import { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js"
 import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
 import { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js"
 import { RegisterCustomerOutput } from "../dto/customerDto.js"
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 
 
 
 
-export default class EmailVerificationUseCase implements IEmailVerificationUseCase<string,RegisterCustomerOutput>{
+export default class EmailVerificationUseCase implements IUseCase<string,RegisterCustomerOutput>{
     constructor(
         private readonly customerRepository:ICustomerRepository,
         private readonly passwordHasher:IPasswordHasher,

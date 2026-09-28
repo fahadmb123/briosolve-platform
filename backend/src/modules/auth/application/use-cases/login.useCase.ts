@@ -2,12 +2,12 @@ import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
 import { Customer } from "../../domain/entities/customer.entity.js";
-import { ILoginUseCase } from "../../domain/interfaces/use-cases/ILoginUseCase.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 import { ICustomerRepository } from "../../domain/repositories/customer.repository.js";
 import { LoginInputDto } from "../dto/authDto.js";
 
 
-export default class LoginUseCase implements ILoginUseCase<LoginInputDto,{accessToken:string,isExist:Customer}>{
+export default class LoginUseCase implements IUseCase<LoginInputDto,{accessToken:string,isExist:Customer}>{
     constructor(
         private readonly customerRepository:ICustomerRepository,
         private readonly passwordHasher:IPasswordHasher,

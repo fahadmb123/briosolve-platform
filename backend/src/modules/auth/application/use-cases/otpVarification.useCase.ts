@@ -2,13 +2,13 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
 import { OtpVarificationInput } from "../dto/otpDto.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import { IOtpVarificationUseCase } from "../../domain/interfaces/use-cases/IOtpVarificationUseCase.js";
 import { ICustomerRepository } from "../../domain/repositories/customer.repository.js";
 import { Customer } from "../../domain/entities/customer.entity.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 
 
 
-export default class OtpVarificationUseCase implements IOtpVarificationUseCase<OtpVarificationInput,{response:Customer | IPendingCustomerRegistration,for:string}>{
+export default class OtpVarificationUseCase implements IUseCase<OtpVarificationInput,{response:Customer | IPendingCustomerRegistration,for:string}>{
     constructor(
         private readonly PendingRegistrationStore:IPendingRegistrationStore,
         private readonly PasswordHasher:IPasswordHasher,

@@ -1,23 +1,20 @@
 import { NextFunction ,Response,Request} from "express"
 import { LoginInputDto } from "../../application/dto/authDto.js"
-import { ILoginUseCase } from "../../domain/interfaces/use-cases/ILoginUseCase.js"
 import { Customer } from "../../domain/entities/customer.entity.js"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js"
-import { IGetMeUseCase } from "../../domain/interfaces/use-cases/IGetMe.useCase.js"
 import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.js"
-import { IEmailVerificationUseCase } from "../../domain/interfaces/use-cases/IEmailVerification.useCase.js"
 import { RegisterCustomerOutput } from "../../application/dto/customerDto.js"
-import { IResetPasswordUseCase } from "../../domain/interfaces/use-cases/IResetPasswordUseCase.js"
 import { ResetPasswordDto } from "../../application/dto/resetPasswordDtos.js"
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 
 
 
 export class AuthController extends BaseController{
     constructor (
-        private readonly loginUseCase:ILoginUseCase<LoginInputDto,{accessToken:string,isExist:Customer}>,
-        private readonly getMeUseCase:IGetMeUseCase<IUserTokenPayload,Customer>,
-        private readonly emailVerification : IEmailVerificationUseCase<string,RegisterCustomerOutput>,
-        private readonly resetPasswordUseCase:IResetPasswordUseCase<ResetPasswordDto,void>
+        private readonly loginUseCase:IUseCase<LoginInputDto,{accessToken:string,isExist:Customer}>,
+        private readonly getMeUseCase:IUseCase<IUserTokenPayload,Customer>,
+        private readonly emailVerification : IUseCase<string,RegisterCustomerOutput>,
+        private readonly resetPasswordUseCase:IUseCase<ResetPasswordDto,void>
     ) {super()}
 
     login = async (req:Request,res:Response,next:NextFunction) => {

@@ -3,13 +3,13 @@ import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
 import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js";
 import type { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
-import { IResendOtpUseCase } from "../../domain/interfaces/use-cases/IResendOtpUseCase.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 
 export type ResendOtpOutput = {
     expiresIn: number;
 }
 
-export default class ResendOtpUseCase implements IResendOtpUseCase<string, ResendOtpOutput> {
+export default class ResendOtpUseCase implements IUseCase<string, ResendOtpOutput> {
     constructor(
         private readonly pendingRegistrationStore: IPendingRegistrationStore,
         private readonly passwordHasher: IPasswordHasher,

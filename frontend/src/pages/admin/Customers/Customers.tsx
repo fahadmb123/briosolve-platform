@@ -13,7 +13,7 @@ export default function Customers() {
     const [page, setPage] = useState(0)
     const [search, setSearch] = useState("")
     const [filter,setFilter] = useState("")
-    const [limit] = useState(10)
+    const [limit] = useState(1)
     const [total, setTotal] = useState(0)
     const [totalPages, setTotalPages] = useState(0)
 
@@ -113,7 +113,7 @@ export default function Customers() {
         
             <div className="admin-table-card">
                 <div className="admin-table-header">
-                    <div className="text-sm font-semibold text-text">Registered Accounts (Showing 1–10 of 14,820)</div>
+                    <div className="text-sm font-semibold text-text"></div>
                     <div className="text-xs text-muted"><i className="fas fa-shield-alt mr-1 text-primary"></i>Admin Action Logging Active</div>
                 </div>
 
@@ -178,11 +178,9 @@ export default function Customers() {
                     <div>
                         Showing{" "}
                         <strong>
-                            {total === 0 ? 0 : (page - 1) * limit + 1}
-                            {" "}to{" "}
-                            {Math.min(page * limit, total)}
+                            {` ${page} of ${totalPages} pages`}
                         </strong>{" "}
-                        of {total.toLocaleString()} accounts
+                        
                     </div>
 
                     <div className="pagination-controls">

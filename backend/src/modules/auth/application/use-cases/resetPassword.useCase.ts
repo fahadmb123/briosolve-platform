@@ -1,7 +1,7 @@
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
 import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { IResetPasswordUseCase } from "../../domain/interfaces/use-cases/IResetPasswordUseCase.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 import { ICustomerRepository } from "../../domain/repositories/customer.repository.js";
 import { ResetPasswordDto } from "../dto/resetPasswordDtos.js";
 
@@ -9,7 +9,7 @@ import { ResetPasswordDto } from "../dto/resetPasswordDtos.js";
 
 
 
-export default class ResetPasswordUseCase implements IResetPasswordUseCase<ResetPasswordDto, void> {
+export default class ResetPasswordUseCase implements IUseCase<ResetPasswordDto, void> {
     constructor(
         private readonly pendingRegistrationStore: IPendingRegistrationStore,
         private readonly passwordHasher: IPasswordHasher,

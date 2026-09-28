@@ -6,11 +6,11 @@ import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGen
 import type { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
 import { randomUUID } from "crypto";
 import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { IRegisterCustomerUseCase } from "../../domain/interfaces/use-cases/IRegisterCustomerUseCase.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 
 
 
-export default class RegisterCustomerUseCase implements IRegisterCustomerUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
+export default class RegisterCustomerUseCase implements IUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
     constructor(private readonly customerRepository : ICustomerRepository,
         readonly passwordHasher:IPasswordHasher,
         readonly otpGenerate:IOtpGenerator,

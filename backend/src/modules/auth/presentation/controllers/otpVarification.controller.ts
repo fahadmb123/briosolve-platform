@@ -1,16 +1,15 @@
 import { Request,Response,NextFunction } from "express"
-import { IOtpVarificationUseCase } from "../../domain/interfaces/use-cases/IOtpVarificationUseCase.js"
 import { OtpVarificationInput } from "../../application/dto/otpDto.js"
 import { Customer } from "../../domain/entities/customer.entity.js"
 import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
-import { IResendOtpUseCase } from "../../domain/interfaces/use-cases/IResendOtpUseCase.js"
 import { ResendOtpOutput } from "../../application/use-cases/resendOtp.useCase.js"
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 
 class OtpVarificationController {
     constructor (
-        private readonly otpVarificationUseCase:IOtpVarificationUseCase<OtpVarificationInput,{response:Customer | IPendingCustomerRegistration,for:string}>,
+        private readonly otpVarificationUseCase:IUseCase<OtpVarificationInput,{response:Customer | IPendingCustomerRegistration,for:string}>,
         private readonly pendingRegistrationStore:IPendingRegistrationStore,
-        private readonly resendOtpUseCase: IResendOtpUseCase<string, ResendOtpOutput>
+        private readonly resendOtpUseCase: IUseCase<string, ResendOtpOutput>
     ) {}
 
     validate = async (req:Request,res:Response,next:NextFunction) => {

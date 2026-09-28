@@ -2,13 +2,13 @@ import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js"
 import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.js"
 import { Customer } from "../../domain/entities/customer.entity.js"
-import { IGetMeUseCase } from "../../domain/interfaces/use-cases/IGetMe.useCase.js"
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { ICustomerRepository } from "../../domain/repositories/customer.repository.js"
 
 
 
 
-export default class GetMeUseCase implements IGetMeUseCase<IUserTokenPayload,Customer>{
+export default class GetMeUseCase implements IUseCase<IUserTokenPayload,Customer>{
     constructor(
         private readonly userRepository:ICustomerRepository
     ){}
