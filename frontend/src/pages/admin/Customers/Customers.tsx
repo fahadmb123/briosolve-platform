@@ -7,6 +7,7 @@ import { SpinnerOverlay } from "../../../shared/ui/SpinnerOverlay/SpinnerOverlay
 
 export default function Customers() {
     const [customers,setCustomers] = useState<User[]>([])
+    const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null);
     const getCustomers = useGetCustomers()
     const updateStatus = useUpdateStatus()
     useEffect(()=>{
@@ -115,10 +116,12 @@ export default function Customers() {
                                             </span>
                                         </td>
                                         <td className="text-right">
-                                            <button className="btn btn-secondary text-xs py-1 px-2 mr-1" onClick={() => {}}>View</button>
-                                            <button onClick={() => handleStatusButton(customer.id,customer.status)} className={`btn text-xs py-1 px-2 ${customer.status === 'ACTIVE' ? 'btn-danger' : 'btn-success'}`}>
-                                                {customer.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
-                                            </button>
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button className="btn btn-secondary text-xs py-1 px-2" onClick={() => setSelectedCustomer(customer)}>View</button>
+                                                <button onClick={() => handleStatusButton(customer.id,customer.status)} className={`btn text-xs py-1 px-2 ${customer.status === 'ACTIVE' ? 'btn-danger' : 'btn-success'}`}>
+                                                    {customer.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -152,44 +155,53 @@ export default function Customers() {
         
 
         
-        <div className="admin-modal-overlay" id="userDetailsModal">
+        <div className={`admin-modal-overlay ${selectedCustomer ? 'active' : ''}`} id="userDetailsModal">
             <div className="admin-modal">
                 <div className="admin-modal-header">
                     <div className="flex items-center gap-2">
                         <i className="fas fa-id-card text-primary"></i>
                         <h3 className="h6 mb-0">Platform User Dossier</h3>
                     </div>
-                    <button className="btn-icon" onClick={() => {}}><i className="fas fa-times"></i></button>
+                    <button className="btn-icon" onClick={() => setSelectedCustomer(null)}><i className="fas fa-times"></i></button>
                 </div>
                 <div className="admin-modal-body">
-                    <div className="text-center mb-4">
-                        <img id="modalUserAvatar" src="https://ui-avatars.com/api/?name=User&amp;background=6366F1&amp;color=fff" className="avatar avatar-lg mx-auto mb-2" alt="Avatar" />
-                        <h4 className="h5 mb-0" id="modalUserName">User Name</h4>
-                        <span className="user-meta-role" id="modalUserRole">Role</span>
-                    </div>
-                    <div className="modal-detail-row">
-                        <span className="text-secondary">Email</span>
-                        <span className="text-text font-medium" id="modalUserEmail">email@example.com</span>
-                    </div>
-                    <div className="modal-detail-row">
-                        <span className="text-secondary">Phone</span>
-                        <span className="text-text font-medium" id="modalUserPhone">+91 00000 00000</span>
-                    </div>
-                    <div className="modal-detail-row">
-                        <span className="text-secondary">Location</span>
-                        <span className="text-text font-medium" id="modalUserLocation">Mumbai, India</span>
-                    </div>
-                    <div className="modal-detail-row">
-                        <span className="text-secondary">Registration Date</span>
-                        <span className="text-text font-medium" id="modalUserJoined">Date</span>
-                    </div>
-                    <div className="modal-detail-row">
-                        <span className="text-secondary">Account Status</span>
-                        <span className="text-text font-medium" id="modalUserStatus">Active</span>
-                    </div>
+                    {selectedCustomer && (
+                        <>
+                            <div className="text-center mb-6">
+                                <img src={`https://ui-avatars.com/api/?name=${selectedCustomer.name}&background=6366F1&color=fff`} className="avatar avatar-lg mx-auto mb-3 border border-border" alt="Avatar" style={{ width: '80px', height: '80px' }} />
+                                <h4 className="h5 mb-1 text-text">{selectedCustomer.name}</h4>
+                                <span className={`badge ${selectedCustomer.status === 'ACTIVE' ? 'badge-verified' : selectedCustomer.status === 'BLOCKED' ? 'badge-danger-alert' : 'badge-pending'} text-xs`}>
+                                    {selectedCustomer.status}
+                                </span>
+                            </div>
+                            
+                            <div className="flex flex-col gap-3">
+                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Email Address</span>
+                                    <span className="text-sm font-semibold text-text">{selectedCustomer.email}</span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Phone Number</span>
+                                    <span className="text-sm font-semibold text-text">{selectedCustomer.phone || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Location</span>
+                                    <span className="text-sm font-semibold text-text">N/A</span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Joined Date</span>
+                                    <span className="text-sm font-semibold text-text">{new Date(selectedCustomer.created_at.toString()).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Internal ID</span>
+                                    <span className="text-xs font-mono text-muted">{selectedCustomer.id}</span>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
                 <div className="admin-modal-footer">
-                    <button className="btn btn-secondary text-xs" onClick={() => {}}>Close</button>
+                    <button className="btn btn-secondary text-xs" onClick={() => setSelectedCustomer(null)}>Close</button>
                 </div>
             </div>
         </div>
