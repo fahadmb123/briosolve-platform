@@ -5,6 +5,9 @@ const PublicRoute = () => {
     const { isAuthenticated, user } = useAuthStore()
     
     if (isAuthenticated) {
+        if (user?.status === 'BLOCKED') {
+            return <Outlet />;
+        }
         if (user && user.role !== "CUSTOMER") {
             return <Navigate to={`/${user.role.toLowerCase()}`} replace />;
         }

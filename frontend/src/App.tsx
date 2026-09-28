@@ -32,9 +32,12 @@ function App() {
   return (
     <ThemeProvider>
       <div className="app">
-        {getMe.isPending ? (<LoadingScreen isLoading={true}/>):null }
-        <ToastContainer/>
-        <AppRouter />
+        {getMe.isPending ? (<LoadingScreen isLoading={true}/>) : (
+          <>
+            <ToastContainer/>
+            <AppRouter />
+          </>
+        )}
       </div>
     </ThemeProvider>
   );

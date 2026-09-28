@@ -9,5 +9,7 @@ const router = Router();
 router.get("/get-users",authMiddleware,userController.getCustomers)
 
 
+router.post("/update-status",authMiddleware,userController.updateUserStatus)
+
 
 export default router;

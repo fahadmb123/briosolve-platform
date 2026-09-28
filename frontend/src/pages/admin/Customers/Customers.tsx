@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { useGetCustomers } from "../../../features/user-management/customer/user.model";
+import { useGetCustomers, useUpdateStatus } from "../../../features/user-management/customer/user.model";
 import { isAxiosError } from "axios";
 import { toast } from "react-toastify";
 import type { User } from "../../../shared/Dtos";
+import { SpinnerOverlay } from "../../../shared/ui/SpinnerOverlay/SpinnerOverlay";
 
 export default function Customers() {
     const [customers,setCustomers] = useState<User[]>([])
     const getCustomers = useGetCustomers()
+    const updateStatus = useUpdateStatus()
     useEffect(()=>{
         (async ()=>{
             try {
@@ -23,8 +25,30 @@ export default function Customers() {
             }
         })()
     },[])
+
+
+    const handleStatusButton = async (id:string,status:string)=>{
+        try {
+            const passStatus = status === "ACTIVE" ? "BLOCKED" : "ACTIVE"
+            const response = await updateStatus.mutateAsync({id,status:passStatus})
+            setCustomers((users:User[])=> 
+                users.map((user)=>user.id === id ? {...user,status:passStatus} : user)
+            )
+            toast.success(response.message)
+        } catch (err) {
+            if (isAxiosError(err) && err.response?.data?.message) {
+                toast.error(err.response.data.message);
+            } else if (err instanceof Error) {
+                toast.error(err.message);
+            } else {
+                toast.error("An unexpected error occurred");
+            }
+        }
+    }
     return (
         <>
+        {updateStatus.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
+        {getCustomers.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
         <div className="app-content">
                 
             <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
@@ -92,7 +116,7 @@ export default function Customers() {
                                         </td>
                                         <td className="text-right">
                                             <button className="btn btn-secondary text-xs py-1 px-2 mr-1" onClick={() => {}}>View</button>
-                                            <button className={`btn text-xs py-1 px-2 ${customer.status === 'ACTIVE' ? 'btn-danger' : 'btn-success'}`} onClick={() => {}}>
+                                            <button onClick={() => handleStatusButton(customer.id,customer.status)} className={`btn text-xs py-1 px-2 ${customer.status === 'ACTIVE' ? 'btn-danger' : 'btn-success'}`}>
                                                 {customer.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
                                             </button>
                                         </td>

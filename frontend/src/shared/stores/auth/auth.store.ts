@@ -11,6 +11,7 @@ export interface IAuthUser {
     name: string;
     email: string;
     role: UserRole;
+    status: 'ACTIVE' | 'BLOCKED' | 'PENDING';
     phone?:string | null
 }
 
