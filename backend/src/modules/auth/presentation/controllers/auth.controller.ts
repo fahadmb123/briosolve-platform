@@ -24,7 +24,7 @@ export class AuthController extends BaseController{
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "lax",
-                maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+                maxAge: 5 * 24 * 60 * 60 * 1000, 
                 path: "/"
             }).status(200).json({
                 success: true,

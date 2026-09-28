@@ -25,6 +25,10 @@ export default class EmailVerificationUseCase implements IUseCase<string,Registe
         const user = await this.customerRepository.findByEmail(email)
         if (!user) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
 
+        const customer = await this.customerRepository.findById(user.id)
+        if (!customer) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
+
+        if (customer.status === "BLOCKED") throw new ApplicationError("BLOCKED_ACCOUNT","User is Blocked","AUTHORIZATION")
         const otp = this.otpGenerate.generate()
 
         const otpHash = await this.passwordHasher.hash(otp)
