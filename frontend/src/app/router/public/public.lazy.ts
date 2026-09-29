@@ -1,7 +1,7 @@
 import React from 'react';
 
-export const Login = React.lazy(() => import('../../../pages/public/Login/Login'));
-export const ForgotPassword = React.lazy(() => import('../../../pages/public/ForgotPassword/ForgotPassword'));
-export const ResetPassword = React.lazy(() => import('../../../pages/public/ResetPassword/ResetPassword'));
-export const EmailVerification = React.lazy(() => import('../../../pages/public/EmailVerification/EmailVerification'));
-export const OtpVerification = React.lazy(() => import('../../../pages/public/OtpVerification/OtpVerification'));
+export const Login = React.lazy(() => import('../../../modules/auth/pages/Login/Login'));
+export const ForgotPassword = React.lazy(() => import('../../../modules/auth/pages/ForgotPassword/ForgotPassword'));
+export const ResetPassword = React.lazy(() => import('../../../modules/auth/pages/ResetPassword/ResetPassword'));
+export const EmailVerification = React.lazy(() => import('../../../modules/auth/pages/EmailVerification/EmailVerification'));
+export const OtpVerification = React.lazy(() => import('../../../modules/auth/pages/OtpVerification/OtpVerification'));

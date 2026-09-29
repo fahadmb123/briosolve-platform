@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import React, { useEffect } from 'react';
-import { LoadingScreen } from '../../shared/ui/LoadingScreen/LoadingScreen';
+import { LoadingScreen } from '../../shared/components/ui/LoadingScreen/LoadingScreen';
 
-const Home = React.lazy(() => import('../../pages/public/Home/Home'));
-const NotFound = React.lazy(() => import('../../pages/public/NotFound/NotFound'));
-const AdminLayout = React.lazy(() => import('../layouts/AdminLayout'));
-const ProviderLayout = React.lazy(() => import('../layouts/ProviderLayout'));
-const InvestigatorLayout = React.lazy(() => import('../layouts/InvestigatorLayout'));
-const CustomerLayout = React.lazy(() => import('../layouts/CustomerLayout'));
+const Home = React.lazy(() => import('../pages/Home/Home'));
+const NotFound = React.lazy(() => import('../pages/NotFound/NotFound'));
+const AdminLayout = React.lazy(() => import('../../layouts/AdminLayout'));
+const ProviderLayout = React.lazy(() => import('../../layouts/ProviderLayout'));
+const InvestigatorLayout = React.lazy(() => import('../../layouts/InvestigatorLayout'));
+const CustomerLayout = React.lazy(() => import('../../layouts/CustomerLayout'));
 
 import { adminRoutes } from './admin/adminRoutes';
 import { providerRoutes } from './provider/providerRoutes';

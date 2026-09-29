@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useResetFlowStore } from "../stores/auth/reset-flow.store";
+import { useResetFlowStore } from "../../store/auth/reset-flow.store";
 
 const OtpFlowRoute = () => {
     const { otpFlowStarted } = useResetFlowStore();
