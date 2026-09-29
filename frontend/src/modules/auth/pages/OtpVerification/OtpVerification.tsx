@@ -25,23 +25,12 @@ export default function OtpVerification() {
     const setOtpVerified = useResetFlowStore((state) => state.setOtpVerified);
 
     useEffect(() => {
-        const getStatus = async () => {
-            try {
-                const response = await getOtpStatus.mutateAsync()
+        getOtpStatus.mutate(undefined, {
+            onSuccess: (response) => {
                 setTimer(response.data.expiresIn)
                 setAttempts(response.data.attempts)
-            } catch (err) {
-                if (isAxiosError(err) && err.response?.data?.message) {
-                    toast.error(err.response.data.message);
-                } else if (err instanceof Error) {
-                    toast.error(err.message);
-                } else {
-                    toast.error("An unexpected error occurred");
-                }
             }
-        }
-
-        getStatus()
+        })
     }, [])
 
     useEffect(() => {
@@ -58,40 +47,26 @@ export default function OtpVerification() {
         return () => clearInterval(interval)
     }, [timer])
 
-    const handleOtp = async (data:OtpInputType) => {
-        try {
-            const response = await otpVarify.mutateAsync(data)
-            if (response.data.path === "reset-password") {
-                setOtpVerified(true);
+    const handleOtp = (data:OtpInputType) => {
+        otpVarify.mutate(data, {
+            onSuccess: (response) => {
+                if (response.data.path === "reset-password") {
+                    setOtpVerified(true);
+                }
+                navigate(`/${response?.data.path}`)
+                if (response.data.path === "login") toast.success(response.message)
             }
-            navigate(`/${response?.data.path}`)
-            if (response.data.path === "login") toast.success(response.message)
-        } catch (err) {
-            if (isAxiosError(err) && err.response?.data?.message) {
-                toast.error(err.response.data.message);
-            } else if (err instanceof Error) {
-                toast.error(err.message);
-            } else {
-                toast.error("An unexpected error occurred");
-            }
-        }
+        })
     }
 
-    const handleResend = async () => {
-        try {
-            const response = await resendOtp.mutateAsync()
-            toast.success(response.message)
-            setTimer(response?.data.expiresIn)
-            setAttempts(prev => prev + 1)
-        } catch (err) {
-            if (isAxiosError(err) && err.response?.data?.message) {
-                toast.error(err.response.data.message);
-            } else if (err instanceof Error) {
-                toast.error(err.message);
-            } else {
-                toast.error("An unexpected error occurred");
+    const handleResend = () => {
+        resendOtp.mutate(undefined, {
+            onSuccess: (response) => {
+                toast.success(response.message)
+                setTimer(response?.data.expiresIn)
+                setAttempts(prev => prev + 1)
             }
-        }
+        })
     }
 
     return (

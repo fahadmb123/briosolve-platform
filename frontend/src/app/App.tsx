@@ -1,9 +1,9 @@
 import { AppRouter } from './router/index';
-import './App.css';
-import './shared/styles/global.css';
-import './shared/styles/user-theme.css';
-import './shared/styles/provider-theme.css';
-import './shared/styles/admin-theme.css';
+import '../App.css';
+import '../shared/styles/global.css';
+import '../shared/styles/user-theme.css';
+import '../shared/styles/provider-theme.css';
+import '../shared/styles/admin-theme.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ThemeProvider } from './providers/ThemeProvider';

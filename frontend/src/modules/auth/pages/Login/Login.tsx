@@ -27,29 +27,21 @@ export default function Login() {
         mode: "onChange"
     })
 
-    const handleLogin = async (data: LoginInputType) => {
-        try {
-            const response = await login.mutateAsync(data)
-            useAuthStore.getState().setUser(response.data)
-            console.log(response.data.role)
-            if (response.data.role === "CUSTOMER"){
-                navigate("/",{replace:true})
-                console.log("From Login")
-            } else {
-                console.log("From Other Routes")
-                navigate(`/${response.data.role.toLocaleLowerCase()}`,{replace:true})
+    const handleLogin = (data: LoginInputType) => {
+        login.mutate(data, {
+            onSuccess: (response) => {
+                useAuthStore.getState().setUser(response.data)
+                console.log(response.data.role)
+                if (response.data.role === "CUSTOMER"){
+                    navigate("/",{replace:true})
+                    console.log("From Login")
+                } else {
+                    console.log("From Other Routes")
+                    navigate(`/${response.data.role.toLocaleLowerCase()}`,{replace:true})
+                }
+                toast.success(response.message)
             }
-            
-            toast.success(response.message)
-        } catch (err) {
-            if (isAxiosError(err) && err.response?.data?.message) {
-                toast.error(err.response.data.message);
-            } else if (err instanceof Error) {
-                toast.error(err.message);
-            } else {
-                toast.error("An unexpected error occurred");
-            }
-        }
+        });
     }
 
     return (

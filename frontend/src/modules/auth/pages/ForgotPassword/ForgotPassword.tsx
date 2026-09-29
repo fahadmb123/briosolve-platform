@@ -23,23 +23,15 @@ export default function ForgotPassword() {
     const setResetFlowStarted = useResetFlowStore((state) => state.setResetFlowStarted);
     const setOtpFlowStarted = useResetFlowStore((state) => state.setOtpFlowStarted);
 
-    const handle = async (data:EmailInputType) => {
-        try {
-            const response = await emailVerify.mutateAsync(data);
-            setResetFlowStarted(true);
-            setOtpFlowStarted(true);
-            navigate("/otp-verification",{replace:true})
-            toast.success(response.message)
-        } catch (err) {
-            if (isAxiosError(err) && err.response?.data?.message) {
-                toast.error(err.response.data.message);
-            } else if (err instanceof Error) {
-                toast.error(err.message);
-            } else {
-                toast.error("An unexpected error occurred");
+    const handle = (data:EmailInputType) => {
+        emailVerify.mutate(data, {
+            onSuccess: (response) => {
+                setResetFlowStarted(true);
+                setOtpFlowStarted(true);
+                navigate("/otp-verification",{replace:true})
+                toast.success(response.message)
             }
-        }
-        
+        });
     };
 
     return (

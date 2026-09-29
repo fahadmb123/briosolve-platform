@@ -26,25 +26,18 @@ export default function CustomerRegister() {
         resolver : zodResolver(registerSchema),mode : "onChange"
     })
 
-    const handleRegister = async (data:RegisterInputType) => {
-        try {
-            const response = await registerMutation.mutateAsync({
-                name:data.name,
-                email:data.email,
-                password:data.password 
-            })
-            setOtpFlowStarted(true)
-            navigate("/otp-verification",{replace:true})
-            toast.success(response.message)
-        } catch (err) {
-            if (isAxiosError(err) && err.response?.data?.message) {
-                toast.error(err.response.data.message);
-            } else if (err instanceof Error) {
-                toast.error(err.message);
-            } else {
-                toast.error("An unexpected error occurred");
+    const handleRegister = (data:RegisterInputType) => {
+        registerMutation.mutate({
+            name:data.name,
+            email:data.email,
+            password:data.password 
+        }, {
+            onSuccess: (response) => {
+                setOtpFlowStarted(true)
+                navigate("/otp-verification",{replace:true})
+                toast.success(response.message)
             }
-        }
+        });
     };
 
     return ( 

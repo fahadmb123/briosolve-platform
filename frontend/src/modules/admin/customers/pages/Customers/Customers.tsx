@@ -21,42 +21,26 @@ export default function Customers() {
     const getCustomers = useGetCustomers()
     const updateStatus = useUpdateStatus()
     useEffect(()=>{
-        (async ()=>{
-            try {
-                const response = await getCustomers.mutateAsync({page,search,filter,limit})
+        getCustomers.mutate({page,search,filter,limit}, {
+            onSuccess: (response) => {
                 setCustomers(response.data.users)
                 setTotal(response.data.total)
                 setTotalPages(response.data.totalPages)
-            } catch (err) {
-                if (isAxiosError(err) && err.response?.data?.message) {
-                    toast.error(err.response.data.message);
-                } else if (err instanceof Error) {
-                    toast.error(err.message);
-                } else {
-                    toast.error("An unexpected error occurred");
-                }
             }
-        })()
+        })
     },[filter,search,page])
 
 
-    const handleStatusButton = async (id:string,status:string)=>{
-        try {
-            const passStatus = status === "ACTIVE" ? "BLOCKED" : "ACTIVE"
-            const response = await updateStatus.mutateAsync({id,status:passStatus})
-            setCustomers((users:User[])=> 
-                users.map((user)=>user.id === id ? {...user,status:passStatus} : user)
-            )
-            toast.success(response.message)
-        } catch (err) {
-            if (isAxiosError(err) && err.response?.data?.message) {
-                toast.error(err.response.data.message);
-            } else if (err instanceof Error) {
-                toast.error(err.message);
-            } else {
-                toast.error("An unexpected error occurred");
+    const handleStatusButton = (id:string,status:string)=>{
+        const passStatus = status === "ACTIVE" ? "BLOCKED" : "ACTIVE"
+        updateStatus.mutate({id,status:passStatus}, {
+            onSuccess: (response) => {
+                setCustomers((users:User[])=> 
+                    users.map((user)=>user.id === id ? {...user,status:passStatus} : user)
+                )
+                toast.success(response.message)
             }
-        }
+        })
     }
 
     const handleReset = () => {

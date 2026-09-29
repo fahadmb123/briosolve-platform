@@ -26,21 +26,14 @@ export default function ResetPassword() {
 
 
 
-    const onSubmit = async (data: ResetPasswordInputType) => {
-        try {
-            const response = await resetPassword.mutateAsync({password:data.password});
-            clearResetFlow();
-            navigate("/login",{replace:true})
-            toast.success(response.message)
-        } catch (err) {
-            if (isAxiosError(err) && err.response?.data?.message) {
-                toast.error(err.response.data.message);
-            } else if (err instanceof Error) {
-                toast.error(err.message);
-            } else {
-                toast.error("An unexpected error occurred");
+    const onSubmit = (data: ResetPasswordInputType) => {
+        resetPassword.mutate({password:data.password}, {
+            onSuccess: (response) => {
+                clearResetFlow();
+                navigate("/login",{replace:true})
+                toast.success(response.message)
             }
-        }
+        });
     };
 
     return (

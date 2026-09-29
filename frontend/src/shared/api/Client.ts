@@ -1,4 +1,6 @@
 import axios from "axios";
+import { normalizeApiError } from "./ApiError";
+import { useAuthStore } from "../../store/auth/auth.store";
 
 export const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -7,3 +9,14 @@ export const apiClient = axios.create({
         "Content-Type": "application/json",
     },
 });
+
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const normalizedError = normalizeApiError(error);
+        if (normalizedError.status === 401 && error.config && !error.config.url?.includes('/login')) {
+            useAuthStore.getState().clearAuth();
+        }
+        return Promise.reject(normalizedError);
+    }
+);
