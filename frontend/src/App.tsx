@@ -5,6 +5,7 @@ import './shared/styles/user-theme.css';
 import './shared/styles/provider-theme.css';
 import './shared/styles/admin-theme.css';
 import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { ThemeProvider } from './app/providers/ThemeProvider';
 import { useEffect } from 'react';
 import { useAuthStore, type IAuthUser } from './shared/stores/auth/auth.store';
@@ -34,7 +35,7 @@ function App() {
       <div className="app">
         {getMe.isPending ? (<LoadingScreen isLoading={true}/>) : (
           <>
-            <ToastContainer/>
+            <ToastContainer position="top-center" autoClose={1000} hideProgressBar={true} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover toastClassName="custom-premium-toast" closeButton={false} />
             <AppRouter />
           </>
         )}
