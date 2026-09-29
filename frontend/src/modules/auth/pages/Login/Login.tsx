@@ -117,6 +117,13 @@ export default function Login() {
 
                 </div>
             </div>
+            
+            {/* Floating Home Box */}
+            <div className="navbar-action-box always-visible" style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 100 }}>
+                <Link to="/" className="btn btn-outline btn-sm" style={{ borderRadius: '2rem' }}>
+                    <i className="fas fa-home mr-1"></i> Home
+                </Link>
+            </div>
         </div>
     );
 }
