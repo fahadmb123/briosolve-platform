@@ -16,6 +16,7 @@ import { customerRoutes } from './customer/customerRoutes';
 import { publicRoutes, verificationRoutes } from './public/publicRoutes';
 import PublicRoute from '../../shared/middlewares/PublicRoute';
 import RoleRoute from '../../shared/middlewares/RoleRoute';
+import { ProviderRegister } from './provider/provider.lazy';
 
 
 
@@ -44,6 +45,7 @@ export function AppRouter() {
 
           <Route element={<PublicRoute />}>
               {publicRoutes}
+              <Route path="provider/register" element={<ProviderRegister />} />
           </Route>
 
           {verificationRoutes}

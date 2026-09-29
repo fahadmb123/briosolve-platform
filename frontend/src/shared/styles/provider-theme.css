@@ -3,100 +3,13 @@
    Reverse Service Marketplace
    ========================================================================== */
 
-body.theme-provider {
-    /* DARK THEME - Deep Forest */
-    --bg: #081C15;
-    --surface: #112A20;
-    --surface-elevated: #1B4332;
-    --surface-hover: #265A43;
-
-    --text: #E8F2ED;
-    --text-secondary: #A3BCAE;
-    --text-muted: #6A8D7A;
-
-    --border: #1B4332;
-    --border-light: #265A43;
-
-    /* Soft Premium Sage Accents */
-    --primary: #74C69D;
-    --primary-content: #081C15;
-    --primary-hover: #52B788;
-    --primary-active: #40916C;
-    --primary-light: rgba(116, 198, 157, 0.15);
-
-    /* Gradients */
-    --gradient-provider: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-    --gradient-provider-subtle: linear-gradient(135deg, var(--primary-light) 0%, rgba(0,0,0,0) 100%);
-
-    /* Status Colors */
-    --success: #22C55E;
-    --success-bg: rgba(34, 197, 94, 0.12);
-    --warning: #F59E0B;
-    --warning-bg: rgba(245, 158, 11, 0.16);
-    --danger: #EF4444;
-    --danger-bg: rgba(239, 68, 68, 0.12);
-    --info: #3B82F6;
-    --info-bg: rgba(59, 130, 246, 0.16);
-
-    /* Refined Shadows */
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
-    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.45), 0 2px 6px -1px var(--primary-light);
-    --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.55), 0 4px 12px -2px var(--primary-light);
-    --shadow-xl: 0 20px 32px -6px rgba(0, 0, 0, 0.65), 0 8px 16px -3px var(--primary-light);
-}
-
-html[data-theme="light"] body.theme-provider {
-    /* LIGHT THEME (Classic Premium Green & Alabaster) */
-    --bg: #FAF9F6; /* Premium Alabaster / Off-White Canvas */
-    --surface: #FFFFFF; /* Pure White Navbar and Cards */
-    --surface-elevated: #F2F0E6; /* Subtle Linen/Stone for elevated elements */
-    --surface-hover: #EAE7DB;
-    
-    --navbar-bg: #F4EBD7; /* Custom warm cream color for the navbar */
-
-    --text: #0A2514; /* Extremely Deep Forest Green for Bold/Sized text */
-    --text-secondary: #4E5951; /* Refined Sage-Grey for attractive small text */
-    --text-muted: #828C85;
-
-    --border: #E6E8E6; /* Very soft, clean borders */
-    --border-light: #F0F2F0;
-
-    /* Classic Green Accents */
-    --primary: #0F4415; /* Rich Dark Green */
-    --primary-content: #FFFFFF; /* Crisp White text on buttons */
-    --primary-hover: #0A2D0E;
-    --primary-active: #051A07;
-    --primary-light: rgba(15, 68, 21, 0.06);
-
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px var(--primary-light);
-    --shadow-lg: 0 12px 20px -3px rgba(0, 0, 0, 0.1), 0 4px 8px -2px var(--primary-light);
-}
+/* Color variables have been removed to inherit the global user theme */
 
 /* ==========================================================================
    Provider Component Refinements
    ========================================================================== */
 
-/* Primary Button in Provider Portal */
-body.theme-provider .btn-primary {
-    background: var(--gradient-provider);
-    border-color: transparent;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 14px 0 rgba(107, 124, 152, 0.35);
-    transition: all var(--transition-fast);
-}
-
-body.theme-provider .btn-primary:hover {
-    background: linear-gradient(135deg, #576781 0%, #435166 100%);
-    color: #FFFFFF !important;
-    box-shadow: 0 6px 20px 0 rgba(107, 124, 152, 0.5);
-    transform: translateY(-1px);
-}
-
-body.theme-provider .btn-primary:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px 0 rgba(107, 124, 152, 0.3);
-}
+/* Primary Button styles removed to inherit from global theme */
 
 /* Active Sidebar Navigation Item */
 .sidebar-item.active {

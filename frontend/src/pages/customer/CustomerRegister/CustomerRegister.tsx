@@ -31,7 +31,7 @@ export default function CustomerRegister() {
             const response = await registerMutation.mutateAsync({
                 name:data.name,
                 email:data.email,
-                password:data.password
+                password:data.password 
             })
             setOtpFlowStarted(true)
             navigate("/otp-verification",{replace:true})
@@ -66,7 +66,7 @@ export default function CustomerRegister() {
                             <div className="text-xs text-secondary">Join as a verified contractor and receive customer jobs</div>
                         </div>
                     </div>
-                    <Link to="/register" className="btn btn-outline text-xs py-1">
+                    <Link to="/provider/register" replace className="btn btn-outline text-xs py-1">
                         Become a Provider <i className="fas fa-arrow-right ml-1"></i>
                     </Link>
                 </div>
