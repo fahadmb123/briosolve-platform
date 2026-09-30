@@ -6,6 +6,8 @@ import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.j
 import { RegisterCustomerOutput } from "../../application/dto/customerDto.js"
 import { ResetPasswordDto } from "../../application/dto/resetPasswordDtos.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
+import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
+
 
 
 
@@ -38,22 +40,23 @@ export class AuthController extends BaseController{
     getMe = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const user = this.getCurrentUser(req)
+
             const response = await this.getMeUseCase.execute(user)
-            res.status(200).json({
-                success: true,
-                data:response
-            });
+
+            return sendSuccess(res,"",response)
         } catch (err) {
             next(err)
         }
     }
+
+
     logout = async (req:Request,res:Response,next:NextFunction) => {
         try {
+
             res.clearCookie("access_token")
-            return res.status(200).json({
-                success:true,
-                message:"Logged Out"
-            })
+
+            return sendSuccess(res,"Logged Out")
+
         } catch (err) {
             next(err)
         }
@@ -83,11 +86,10 @@ export class AuthController extends BaseController{
     resetPassword = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const registrationId = req.cookies.reset_password
+
             await this.resetPasswordUseCase.execute({registrationId,password:req.body.password})
-            res.status(201).json({
-                success: true,
-                message: "Password Updated"
-            })
+
+            return sendSuccess(res,"Password Updated")
         } catch (err) {
             next(err)
         }

@@ -4,6 +4,7 @@ import { Customer } from "../../domain/entities/customer.entity.js"
 import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
 import { ResendOtpOutput } from "../../application/use-cases/resendOtp.useCase.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
+import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
 
 class OtpVarificationController {
     constructor (
@@ -17,6 +18,7 @@ class OtpVarificationController {
             const registrationId = req.cookies.registration_id
             const otp = req.body.otp
             const response  = await this.otpVarificationUseCase.execute({ registrationId, otp })
+
             response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password",registrationId , {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
@@ -24,11 +26,8 @@ class OtpVarificationController {
                 maxAge: 15 * 60 * 1000,
                 path: "/"
             }) : null
-            res.status(201).json({
-                success :true,
-                message:"Acount Created",
-                data:response.response
-            })
+
+            return sendSuccess(res,"Acount Created",response.response)
         } catch (err) {
             next(err)
         }
@@ -37,14 +36,11 @@ class OtpVarificationController {
     resend = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const registrationId = req.cookies.registration_id
+            
             const response = await this.resendOtpUseCase.execute(registrationId)
-            res.status(200).json({
-                success: true,
-                message: "OTP resent successfully",
-                data: {
-                    expiresIn: response.expiresIn
-                }
-            })
+
+            return sendSuccess(res,"OTP resent successfully",{expiresIn: response.expiresIn})
+    
         } catch (err) {
             next(err)
         }
@@ -53,22 +49,16 @@ class OtpVarificationController {
     getStatus = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const registrationId = req.cookies.registration_id
-            if (!registrationId) {
-                return res.status(200).json({ success: true, data: { attempts: 0, expiresIn: 0 } });
-            }
-            const response = await this.pendingRegistrationStore.get(registrationId)
-            let expiresIn = 0;
-            if (response && response.otpExpiresAt) {
-                expiresIn = Math.max(0, Math.floor((response.otpExpiresAt - Date.now()) / 1000));
-            }
 
-            res.status(200).json({
-                success :true,
-                data:{
-                    attempts:response?.attempts || 0,
-                    expiresIn
-                }
-            })
+            if (!registrationId) return res.status(200).json({ success: true, data: { attempts: 0, expiresIn: 0 } })
+
+            const response = await this.pendingRegistrationStore.get(registrationId)
+
+            let expiresIn = 0
+
+            if (response && response.otpExpiresAt) expiresIn = Math.max(0, Math.floor((response.otpExpiresAt - Date.now()) / 1000))
+
+            return sendSuccess(res,"",{attempts:response?.attempts || 0,expiresIn})
         } catch (err) {
             next(err)
         }
