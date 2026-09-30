@@ -7,6 +7,7 @@ import { RegisterCustomerOutput } from "../../application/dto/customerDto.js"
 import { ResetPasswordDto } from "../../application/dto/resetPasswordDtos.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
+import { accessTokenCookie, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
 
 
 
@@ -22,17 +23,10 @@ export class AuthController extends BaseController{
     login = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const response = await this.loginUseCase.execute(req.body)
-            res.cookie("access_token", response.accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: 5 * 24 * 60 * 60 * 1000, 
-                path: "/"
-            }).status(200).json({
-                success: true,
-                message: "Login successful",
-                data:response.isExist
-            });
+             
+            res.cookie("access_token",response.accessToken,accessTokenCookie)
+
+            return sendSuccess(res,"LoggedIn Successfully",response.isExist)
         } catch (err) {
             next(err)
         }
@@ -52,11 +46,9 @@ export class AuthController extends BaseController{
 
     logout = async (req:Request,res:Response,next:NextFunction) => {
         try {
-
             res.clearCookie("access_token")
 
             return sendSuccess(res,"Logged Out")
-
         } catch (err) {
             next(err)
         }
@@ -65,19 +57,10 @@ export class AuthController extends BaseController{
     emailVerify = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const response = await this.emailVerification.execute(req.body.email)
-            res.cookie("registration_id", response.registrationId, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: 10 * 60 * 1000,
-                path: "/"
-            }).status(201).json({
-                success: true,
-                message: "OTP sent successfully",
-                data: {
-                    expiresIn: response.expiresIn
-                }
-            })
+
+            res.cookie("registration_id",response.registrationId,registrationCookie)
+            
+            return sendSuccess(res,"OTP Sent Successfully",{expiresIn: response.expiresIn}) 
         } catch (err) {
             next(err)
         }

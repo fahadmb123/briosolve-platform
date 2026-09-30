@@ -5,6 +5,7 @@ import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../.
 import { ResendOtpOutput } from "../../application/use-cases/resendOtp.useCase.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
+import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
 
 class OtpVarificationController {
     constructor (
@@ -17,15 +18,10 @@ class OtpVarificationController {
         try {
             const registrationId = req.cookies.registration_id
             const otp = req.body.otp
+
             const response  = await this.otpVarificationUseCase.execute({ registrationId, otp })
 
-            response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password",registrationId , {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: 15 * 60 * 1000,
-                path: "/"
-            }) : null
+            response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password",registrationId,registrationCookie) : null
 
             return sendSuccess(res,"Acount Created",response.response)
         } catch (err) {
@@ -40,7 +36,6 @@ class OtpVarificationController {
             const response = await this.resendOtpUseCase.execute(registrationId)
 
             return sendSuccess(res,"OTP resent successfully",{expiresIn: response.expiresIn})
-    
         } catch (err) {
             next(err)
         }

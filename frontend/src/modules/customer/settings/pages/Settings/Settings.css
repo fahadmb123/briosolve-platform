@@ -173,13 +173,17 @@
     }
 }
 .settings-glass-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1.5rem;
     margin-top: 1.5rem;
 }
 
 .settings-glass-card {
+    width: 320px;
+    max-width: 100%;
+    min-height: 250px;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
