@@ -2,6 +2,7 @@ import { NextFunction ,Response,Request} from "express"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js";
 import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCustomersUseCase.js";
 import { IUpdateUserStatusUseCase } from "../../domain/interfaces/use-cases/IUpdateUserUseCase.js";
+import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
 
 
 
@@ -22,10 +23,8 @@ export class UserController extends BaseController{
                 filter:req.query.filter as string | undefined,
                 search:req.query.search as string | undefined
             })
-            res.status(200).json({
-                success:true,
-                data:response
-            })
+
+            return sendSuccess(res,"",response)
         } catch (err) {
             next(err)
         }
@@ -35,10 +34,8 @@ export class UserController extends BaseController{
         try {
             this.getCurrentUser(req)
             await this.updateUserUseCase.execute(req.body)
-            res.status(200).json({
-                success:true,
-                message: "User Updated"
-            })
+
+            return sendSuccess(res,"User Updated")
         } catch (err) {
             next(err)
         }
