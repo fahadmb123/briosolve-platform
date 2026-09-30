@@ -1348,3 +1348,66 @@ input::-ms-clear {
 .Toastify__toast--error.custom-premium-toast .Toastify__progress-bar { background: var(--danger) !important; }
 .Toastify__toast--warning.custom-premium-toast .Toastify__progress-bar { background: var(--warning) !important; }
 .Toastify__toast--info.custom-premium-toast .Toastify__progress-bar { background: var(--info) !important; }
+/* ==========================================================================
+   Form Controls
+   ========================================================================== */
+.form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    font-family: inherit;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text);
+    background-color: var(--bg);
+    background-clip: padding-box;
+    border: 1px solid var(--border);
+    appearance: none;
+    border-radius: var(--radius-md);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    color: var(--text);
+    background-color: var(--bg);
+    border-color: var(--primary);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+}
+
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon-wrapper i {
+    position: absolute;
+    left: 0.875rem;
+    color: var(--text-muted);
+}
+
+.input-icon-wrapper .form-control {
+    padding-left: 2.5rem;
+}
+

@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import './Profile.css';
+import '../../../../../shared/styles/location-picker.css';
 
 export default function Profile() {
+  const [isLocModalOpen, setIsLocModalOpen] = useState(false);
   return (
     <>
       
@@ -73,51 +76,6 @@ export default function Profile() {
                         </div>
 
                         
-                        <div className="card p-6">
-                            <h3 className="h5 mb-4 border-bottom pb-3">Contact Details</h3>
-                            <div className="form-row-2">
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="prof-email">Email Address</label>
-                                    <div className="input-icon-wrapper">
-                                        <i className="fas fa-envelope"></i>
-                                        <input type="email" id="prof-email" className="form-control" value="aarav.sharma@example.com" />
-                                    </div>
-                                </div>
-                                <div className="form-group" id="mobile-container">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <label className="form-label mb-0" htmlFor="prof-phone">Mobile Number</label>
-                                        <span id="phone-status-badge" className="badge badge-warning text-xs">Not Verified</span>
-                                    </div>
-                                    
-                                    <div id="mobile-input-group" style={{ display: 'none' }}>
-                                        <div className="input-icon-wrapper mb-3">
-                                            <i className="fas fa-phone"></i>
-                                            <input type="tel" id="prof-phone" className="form-control" placeholder="+91 XXXXXXXXXX" value="" />
-                                        </div>
-                                        
-                                        <div id="mobile-verify-ui" className="bg-surface p-3 rounded border mb-2">
-                                            <div id="mv-step-1">
-                                                <p className="text-xs text-secondary mb-2">We will send an OTP to verify this number.</p>
-                                                <button type="button" id="btn-send-otp" className="btn btn-primary btn-sm w-full" onClick={() => {  }}>Send OTP</button>
-                                            </div>
-                                            <div id="mv-step-2" style={{ display: 'none' }}>
-                                                <label className="text-xs font-semibold mb-1 block">Enter OTP</label>
-                                                <input type="text" id="mobile-otp" className="form-control form-control-sm mb-2" placeholder="e.g. 123456" maxLength={6} />
-                                                <button type="button" id="btn-verify-otp" className="btn btn-success btn-sm w-full" onClick={() => {  }}>Verify Mobile</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div id="mobile-display-group">
-                                        <div className="text-sm font-medium mb-3" id="verified-number-display">None</div>
-                                        <button type="button" id="btn-start-verify" className="btn btn-outline btn-sm w-full" onClick={() => {  }}>
-                                            Add & Verify Mobile
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         
                         <div className="card p-6">
                             <div className="flex justify-between items-center mb-3 border-bottom pb-3">
@@ -142,7 +100,7 @@ export default function Profile() {
                                         <div className="selected-loc-sub text-xs" id="profile-loc-sub">Kerala, India (10.2201° N, 76.2002° E)</div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn-primary btn-sm" onClick={() => {  }}>
+                                <button type="button" className="btn btn-primary btn-sm" onClick={() => setIsLocModalOpen(true)}>
                                     <i className="fas fa-edit mr-1"></i> Change Location
                                 </button>
                             </div>
@@ -169,21 +127,21 @@ export default function Profile() {
     
 
     
-    <div className="loc-modal-overlay" id="profileLocModal">
+    <div className={`loc-modal-overlay ${isLocModalOpen ? 'active' : ''}`} id="profileLocModal">
         <div className="loc-modal" style={{ maxWidth: '600px' }}>
             <div className="loc-modal-header">
                 <div className="flex items-center gap-2">
                     <i className="fas fa-home text-primary"></i>
                     <h3 className="h6 mb-0">Update Default Profile Location</h3>
                 </div>
-                <button className="btn-icon" onClick={() => {  }}><i className="fas fa-times"></i></button>
+                <button className="btn-icon" onClick={() => setIsLocModalOpen(false)}><i className="fas fa-times"></i></button>
             </div>
             <div className="loc-modal-body">
                 <div id="profile-location-picker"></div>
             </div>
             <div className="loc-modal-footer">
-                <button type="button" className="btn btn-secondary text-xs" onClick={() => {  }}>Cancel</button>
-                <button type="button" className="btn btn-primary text-xs" onClick={() => {  }}>Save Default Location</button>
+                <button type="button" className="btn btn-secondary text-xs" onClick={() => setIsLocModalOpen(false)}>Cancel</button>
+                <button type="button" className="btn btn-primary text-xs" onClick={() => setIsLocModalOpen(false)}>Save Default Location</button>
             </div>
         </div>
     </div>

@@ -49,7 +49,7 @@ export default class EmailVerificationUseCase implements IUseCase<string,Registe
         },
             registrationTtl
         )
-        
+
         
         await this.EmailSender.sendOtp(email,otp)
     
