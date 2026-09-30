@@ -2,7 +2,6 @@ import React from 'react';
 
 export const AdminDashboard = React.lazy(() => import('../../../modules/admin/dashboard/pages/Dashboard/Dashboard'));
 export const AdminCustomers = React.lazy(() => import('../../../modules/admin/customers/pages/Customers/Customers'));
-export const AdminCustomerDetails = React.lazy(() => import('../../../modules/admin/customers/pages/CustomerDetails/CustomerDetails'));
 export const AdminProviders = React.lazy(() => import('../../../modules/admin/providers/pages/Providers/Providers'));
 export const AdminProviderDetails = React.lazy(() => import('../../../modules/admin/providers/pages/ProviderDetails/ProviderDetails'));
 export const AdminVerification = React.lazy(() => import('../../../modules/admin/verification/pages/Verification/Verification'));

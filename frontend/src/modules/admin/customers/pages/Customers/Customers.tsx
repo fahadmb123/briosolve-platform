@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGetCustomers, useUpdateStatus } from '../../hooks/mutations/user.model';
-import { isAxiosError } from "axios";
 import { toast } from "react-toastify";
-import type { User } from '../../../../../shared/types/Dtos';
+import type { User, response } from '../../../../../shared/types/Dtos';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 
 export default function Customers() {
@@ -22,10 +21,10 @@ export default function Customers() {
     const updateStatus = useUpdateStatus()
     useEffect(()=>{
         getCustomers.mutate({page,search,filter,limit}, {
-            onSuccess: (response) => {
-                setCustomers(response.data.users)
-                setTotal(response.data.total)
-                setTotalPages(response.data.totalPages)
+            onSuccess: (res: response<{users:User[],total:number,totalPages:number}>) => {
+                setCustomers(res.data.users)
+                setTotal(res.data.total)
+                setTotalPages(res.data.totalPages)
             }
         })
     },[filter,search,page])
@@ -34,11 +33,11 @@ export default function Customers() {
     const handleStatusButton = (id:string,status:string)=>{
         const passStatus = status === "ACTIVE" ? "BLOCKED" : "ACTIVE"
         updateStatus.mutate({id,status:passStatus}, {
-            onSuccess: (response) => {
+            onSuccess: (res: response<{users:User[]}>) => {
                 setCustomers((users:User[])=> 
                     users.map((user)=>user.id === id ? {...user,status:passStatus} : user)
                 )
-                toast.success(response.message)
+                toast.success(res.message)
             }
         })
     }
