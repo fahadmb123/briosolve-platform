@@ -242,7 +242,9 @@ h6, .h6 { font-size: 1rem; }
     display: flex;
     flex-direction: column;
     z-index: 40;
-    transition: transform var(--transition-normal);
+    transition: transform var(--transition-normal), width var(--transition-normal), box-shadow var(--transition-normal);
+    overflow-x: hidden;
+    white-space: nowrap;
 }
 
 .app-main {
@@ -1411,3 +1413,87 @@ input::-ms-clear {
     padding-left: 2.5rem;
 }
 
+
+/* ==========================================================================
+   Desktop Mini-Sidebar Behavior for ALL Portals
+   ========================================================================== */
+@media (min-width: 993px) {
+    /* Hide the navbar toggle button completely on desktop */
+    .app-header #sidebar-toggle {
+        display: none !important;
+    }
+
+    /* Hide the dark modal overlay on desktop ONLY when closed */
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-overlay {
+        display: none !important;
+    }
+
+    /* OPEN STATE: Modal Overlay */
+    .app-container.sidebar-modal-layout.sidebar-open .app-sidebar {
+        transform: translateX(0);
+        width: 260px;
+        z-index: 50;
+    }
+    
+    /* Main content always stays at 80px margin on desktop */
+    .app-container.sidebar-modal-layout.sidebar-open .app-main {
+        margin-left: 80px !important;
+        width: calc(100% - 80px) !important;
+        max-width: calc(100vw - 80px) !important;
+    }
+
+    /* CLOSED STATE: Mini Sidebar */
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .app-sidebar {
+        transform: translateX(0) !important;
+        width: 80px;
+        box-shadow: none;
+        z-index: 40;
+    }
+    
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .app-main {
+        margin-left: 80px !important;
+        width: calc(100% - 80px) !important;
+        max-width: calc(100vw - 80px) !important;
+    }
+
+    /* Mini Sidebar inner styling */
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand span,
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item span:not(.badge),
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .menu-label {
+        display: none;
+    }
+
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item .badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        padding: 2px 4px;
+        font-size: 0.6rem;
+    }
+    
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item {
+        position: relative;
+        justify-content: center;
+        padding: 0.75rem;
+        margin: 0 0.5rem;
+    }
+
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item i {
+        margin: 0;
+        font-size: 1.25rem;
+    }
+    
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand {
+        justify-content: center;
+        padding: 0;
+    }
+    
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand .logo {
+        display: none;
+    }
+    
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-inner-toggle {
+        display: flex;
+        margin: 0 auto;
+    }
+}

@@ -105,3 +105,207 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   Premium Modern Profile Layout
+   ========================================================================== */
+
+.profile-premium-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.profile-banner {
+    width: calc(100% + 3rem);
+    margin-left: -1.5rem;
+    margin-top: -1.5rem;
+    height: 200px;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 0 0 1.5rem 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+[data-theme='dark'] .profile-banner {
+    background: linear-gradient(135deg, #1c1f26 0%, #0a0c10 100%);
+    border-bottom: 1px solid var(--border);
+}
+
+.profile-content-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    position: relative;
+    z-index: 10;
+    margin-top: -80px;
+    padding: 0 0.5rem;
+}
+
+@media (max-width: 992px) {
+    .profile-content-grid {
+        grid-template-columns: 1fr;
+        margin-top: -60px;
+    }
+}
+
+/* Sidebar Card Overhaul */
+.profile-card-modern {
+    background: var(--surface);
+    border-radius: 1.25rem;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-light);
+    backdrop-filter: blur(10px);
+}
+
+[data-theme='dark'] .profile-card-modern {
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    background: rgba(30, 41, 59, 0.85);
+}
+
+.floating-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    padding: 6px;
+    background: var(--surface);
+    margin-top: -70px;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.floating-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.floating-avatar .avatar-edit-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--surface);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.floating-avatar .avatar-edit-badge:hover {
+    transform: scale(1.1);
+    background: var(--primary-hover);
+}
+
+.profile-stats-modern {
+    display: flex;
+    width: 100%;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.stat-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.stat-box:first-child::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 10%;
+    height: 80%;
+    width: 1px;
+    background: var(--border);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+}
+
+/* Form Styling Improvements */
+.form-card-modern {
+    background: var(--surface);
+    border-radius: 1.25rem;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-light);
+}
+
+.modern-input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.modern-input-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.modern-input-group .form-control {
+    background-color: var(--surface-elevated);
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    font-size: 0.9375rem;
+    transition: all 0.3s ease;
+}
+
+.modern-input-group .form-control:focus {
+    background-color: var(--surface);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+}
+
+.modern-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.location-premium-box {
+    background: linear-gradient(145deg, var(--surface-elevated), var(--surface));
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.3s ease;
+}
+
+.location-premium-box:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-light);
+}

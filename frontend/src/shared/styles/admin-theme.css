@@ -474,23 +474,29 @@ html[data-theme="light"] body.theme-admin {
 
 /* Admin Navbar Specific Overrides */
 body.theme-admin .app-header.admin-app-header {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    border-radius: 0;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    top: 0;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    top: 0 !important;
 }
 
 /* Smooth transitions for the layout shift */
-.app-main, .app-sidebar, .admin-app-header {
+.app-main, .app-sidebar {
     transition: margin-left var(--transition-normal), width var(--transition-normal), max-width var(--transition-normal), transform var(--transition-normal);
 }
 
+body.theme-admin .app-header.admin-app-header {
+    transition: none; /* Prevent laggy double-transition against app-main */
+}
+
 /* Sidebar behavior for Admin on Desktop */
+/* Removed overriding admin desktop sidebar rules so it inherits the global modal/mini sidebar logic */
+/* Sidebar behavior for Admin on Desktop - RESTORED */
 @media (min-width: 993px) {
     /* Hide the navbar toggle button completely on desktop */
     body.theme-admin .admin-app-header #sidebar-toggle {
@@ -504,9 +510,9 @@ body.theme-admin .app-header.admin-app-header {
 
     /* OPEN STATE: Push content smoothly instead of modal floating */
     body.theme-admin .app-container.sidebar-modal-layout.sidebar-open .app-sidebar {
-        transform: translateX(0);
-        width: 260px;
-        box-shadow: none;
+        transform: translateX(0) !important;
+        width: 260px !important;
+        box-shadow: none !important;
     }
     
     body.theme-admin .app-container.sidebar-modal-layout.sidebar-open .app-main {
@@ -517,9 +523,9 @@ body.theme-admin .app-header.admin-app-header {
 
     /* CLOSED STATE: Mini Sidebar */
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .app-sidebar {
-        transform: translateX(0);
-        width: 80px;
-        box-shadow: none;
+        transform: translateX(0) !important;
+        width: 80px !important;
+        box-shadow: none !important;
     }
     
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .app-main {
@@ -532,7 +538,7 @@ body.theme-admin .app-header.admin-app-header {
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand span,
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item span:not(.badge),
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .menu-label {
-        display: none;
+        display: none !important;
     }
 
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item .badge {
@@ -569,3 +575,4 @@ body.theme-admin .app-header.admin-app-header {
         margin: 0 auto;
     }
 }
+
