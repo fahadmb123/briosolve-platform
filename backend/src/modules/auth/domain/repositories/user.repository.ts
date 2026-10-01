@@ -11,7 +11,10 @@ export type RegisterCustomerInput = {
   email : string,
   password:string
 }
-export interface ICustomerRepository extends BaseRepository<UserData | null>{
+
+
+
+export interface IUserRepository extends BaseRepository<UserData | null>{
   findByEmail(email: string): Promise<Customer | null>
   createCustomer(data: RegisterCustomerInput): Promise<Customer>
   findById(id: string): Promise<UserData | null> 

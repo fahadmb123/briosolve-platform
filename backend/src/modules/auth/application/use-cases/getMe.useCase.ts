@@ -3,14 +3,14 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.js"
 import { Customer } from "../../domain/entities/customer.entity.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
-import { ICustomerRepository } from "../../domain/repositories/customer.repository.js"
+import { IUserRepository } from "../../domain/repositories/user.repository.js"
 
 
 
 
 export default class GetMeUseCase implements IUseCase<IUserTokenPayload,Customer>{
     constructor(
-        private readonly userRepository:ICustomerRepository
+        private readonly userRepository:IUserRepository
     ){}
 
     async execute (user:IUserTokenPayload):Promise<Customer>{

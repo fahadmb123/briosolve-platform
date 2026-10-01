@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'60393a8d6c540492f28f416dc6b583da271cbd15225746b93a4048a35341747d'>;
+  StorageHashBase<'e609c22c50330fda3989ba93fc0d7042b20c944c3c7080163e4febd5886e9d7a'>;
 export type ExecutionHash =
   ExecutionHashBase<'cff43b31509181a9a41f79f66a3c602205a448eee3523ecbf84af51030501098'>;
 export type ProfileHash =
@@ -262,6 +262,7 @@ export type FieldOutputTypes = {
       readonly profile_image: Varchar<500> | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly about: Varchar<500>;
     };
     readonly users: {
       readonly id: CodecTypes['pg/uuid@1']['output'];
@@ -300,6 +301,7 @@ export type FieldInputTypes = {
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly about: CodecTypes['sql/varchar@1']['input'];
     };
     readonly users: {
       readonly id: CodecTypes['pg/uuid@1']['input'];
@@ -332,6 +334,7 @@ export type StorageColumnTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
     readonly customer_profiles: {
+      readonly about: Varchar<500>;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly current_address_id: CodecTypes['pg/uuid@1']['output'] | null;
       readonly id: CodecTypes['pg/uuid@1']['output'];
@@ -370,6 +373,7 @@ export type StorageColumnInputTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly customer_profiles: {
+      readonly about: CodecTypes['sql/varchar@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly current_address_id: CodecTypes['pg/uuid@1']['input'] | null;
       readonly id: CodecTypes['pg/uuid@1']['input'];
@@ -416,6 +420,7 @@ export namespace Models {
     profile_image: Varchar<500> | null;
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    about: Varchar<500>;
     addresses: public_customer_addresses[];
     current_address: public_customer_addresses | null;
     user: public_users;
@@ -590,6 +595,12 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-temporal@1';
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly about: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 500 };
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
@@ -893,6 +904,14 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-temporal@1';
                 };
               };
+              readonly about: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 500 };
+                };
+              };
             };
             readonly relations: {
               readonly addresses: {
@@ -941,6 +960,7 @@ type ContractBase = Omit<
                 readonly profile_image: { readonly column: 'profile_image' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
+                readonly about: { readonly column: 'about' };
               };
             };
           };

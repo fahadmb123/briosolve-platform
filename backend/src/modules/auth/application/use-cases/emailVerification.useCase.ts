@@ -1,6 +1,6 @@
 
 import { randomUUID } from "crypto"
-import { ICustomerRepository } from "../../domain/repositories/customer.repository.js"
+import { IUserRepository } from "../../domain/repositories/user.repository.js"
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js"
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js"
 import { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js"
@@ -14,7 +14,7 @@ import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 
 export default class EmailVerificationUseCase implements IUseCase<string,RegisterCustomerOutput>{
     constructor(
-        private readonly customerRepository:ICustomerRepository,
+        private readonly customerRepository:IUserRepository,
         private readonly passwordHasher:IPasswordHasher,
         private readonly otpGenerate : IOtpGenerator,
         private readonly PendingRegistrationStore:IPendingRegistrationStore,

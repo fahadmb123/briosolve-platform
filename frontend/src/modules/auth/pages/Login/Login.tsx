@@ -7,7 +7,6 @@ import { loginSchema, type LoginInputType } from '../../schemas/validation';
 import './Login.css';
 import { useLogin } from '../../hooks/mutations/use-otp-varify';
 import { toast } from 'react-toastify';
-import { isAxiosError } from 'axios';
 import { useAuthStore } from '../../../../store/auth/auth.store';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 

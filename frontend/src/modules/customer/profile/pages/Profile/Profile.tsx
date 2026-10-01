@@ -1,9 +1,28 @@
 import { useState } from 'react';
 import './Profile.css';
 import '../../../../../shared/styles/location-picker.css';
+import { nameSchema, type NameInputType } from '../../schemas/validation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'react-toastify';
+import { useUpdateProfile } from '../../hooks/mutations/useUpdateProfile';
 
 export default function Profile() {
-  const [isLocModalOpen, setIsLocModalOpen] = useState(false);
+  
+  const [isLocModalOpen, setIsLocModalOpen] = useState(false)
+  const {register,handleSubmit,formState:{errors}} = useForm<NameInputType>({
+          resolver : zodResolver(nameSchema),mode : "onChange"
+  })
+
+  const { mutate: updateProfile, isPending } = useUpdateProfile();
+
+  const onSubmitForm = (data: NameInputType) => {
+    updateProfile(data, {
+      onSuccess: (response) => {
+        toast.success(response.message)
+      }
+    })
+  }
 
   return (
     <>
@@ -75,7 +94,7 @@ export default function Profile() {
 
           {/* RIGHT MAIN CONTENT - EDIT FORM */}
           <div className="profile-main-content">
-            <form action="#" className="form-card-modern flex flex-col h-full">
+            <form onSubmit={handleSubmit(onSubmitForm)} className="form-card-modern flex flex-col h-full">
               <div className="flex justify-between items-center mb-6 pb-4 border-bottom">
                 <h3 className="h4 mb-0">Personal Information</h3>
                 <button type="button" className="btn btn-secondary btn-sm">
@@ -83,14 +102,13 @@ export default function Profile() {
                 </button>
               </div>
 
-              <div className="form-row-2 mb-2">
+              <div className="mb-2">
                 <div className="modern-input-group">
-                  <label htmlFor="prof-fname">First Name</label>
-                  <input type="text" id="prof-fname" className="form-control" defaultValue="Aarav" />
-                </div>
-                <div className="modern-input-group">
-                  <label htmlFor="prof-lname">Last Name</label>
-                  <input type="text" id="prof-lname" className="form-control" defaultValue="Sharma" />
+                  <label htmlFor="prof-name">Full Name</label>
+                  <input type="text" id="prof-name" className="form-control" defaultValue="Aarav Sharma" {...register("name")} />
+                  {errors.name && (
+                    <span className="text-red-500 text-xs mt-1">{errors.name.message}</span>
+                  )}
                 </div>
               </div>
 
@@ -101,7 +119,11 @@ export default function Profile() {
                   className="form-control modern-textarea" 
                   defaultValue="Homeowner in Lokhandwala, Andheri West. High priority on punctual service and transparent quotations."
                   placeholder="Brief note about your preferences or pets for visiting providers..."
+                  {...register("customer_description")}
                 ></textarea>
+                {errors.customer_description && (
+                  <span className="text-red-500 text-xs mt-1">{errors.customer_description.message}</span>
+                )}
                 <p className="text-xs text-secondary mt-2">
                   <i className="fas fa-info-circle mr-1"></i> 
                   This information helps providers understand your household preferences before they arrive.
@@ -109,8 +131,8 @@ export default function Profile() {
               </div>
 
               <div className="flex justify-end items-center gap-3 mt-auto pt-6 border-top">
-                <button type="submit" className="btn btn-primary btn-lg px-8 shadow-lg">
-                  <i className="fas fa-check mr-2"></i> Save Changes
+                <button type="submit" disabled={isPending} className="btn btn-primary btn-lg px-8 shadow-lg">
+                  <i className="fas fa-check mr-2"></i> {isPending ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>

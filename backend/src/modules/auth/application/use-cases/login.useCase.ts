@@ -3,13 +3,13 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
 import { Customer } from "../../domain/entities/customer.entity.js";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { ICustomerRepository } from "../../domain/repositories/customer.repository.js";
+import { IUserRepository } from "../../domain/repositories/user.repository.js";
 import { LoginInputDto } from "../dto/authDto.js";
 
 
 export default class LoginUseCase implements IUseCase<LoginInputDto,{accessToken:string,isExist:Customer}>{
     constructor(
-        private readonly customerRepository:ICustomerRepository,
+        private readonly customerRepository:IUserRepository,
         private readonly passwordHasher:IPasswordHasher,
         private readonly jwtService:IJwtService
     ){}

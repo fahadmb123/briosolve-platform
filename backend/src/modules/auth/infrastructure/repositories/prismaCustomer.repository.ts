@@ -1,18 +1,13 @@
-import { Temporal } from "@js-temporal/polyfill";
-import { Customer } from "../../domain/entities/customer.entity.js";
-import {ICustomerRepository,RegisterCustomerInput} from "../../domain/repositories/customer.repository.js";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { UserData } from "../../application/dto/authDto.js";
+import { Varchar } from "@prisma/orm-postgres/target/codec-types"
+import { db } from "../../../../infrastructure/persistence/prisma/client.js"
+import { UpdateCustomerProfileInputDto } from "../../application/dto/authDto.js"
+import { Customer } from "../../domain/entities/customer.entity.js"
+import { ICustomerRepository } from "../../domain/repositories/customer.respository.js"
+import { RegisterCustomerInput } from "../../domain/repositories/user.repository.js"
+
 
 
 export class PrismaCustomerRepository implements ICustomerRepository {
-
-    async findByEmail(email: string): Promise<Customer | null> {
-        const user = await db.orm.public.users.where({email:email as Varchar<255>}).first()
-        return user ? (user as unknown as Customer) : null
-    }
-
     async createCustomer(data: RegisterCustomerInput): Promise<Customer> {
         const user = await db.orm.public.users.create({
             name: data.name,
@@ -27,7 +22,7 @@ export class PrismaCustomerRepository implements ICustomerRepository {
         } as never)
 
         await db.orm.public.customer_profiles.create({
-            user_id: user.id,
+            user_id: user.id, 
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant(),
         } as never)
@@ -43,17 +38,14 @@ export class PrismaCustomerRepository implements ICustomerRepository {
         return customer
     }
 
-    async findById(id: string): Promise<UserData | null> {
-        const user = await db.orm.public.users.where({id:id as Varchar<255>}).first()
-        return user ? (user as UserData)  : null
-    }
-    async updatePassword(id: string, passwordHash: string): Promise<void> {
+    async updateProfile(input:UpdateCustomerProfileInputDto): Promise<void> {
         await db.orm.public.users
-            .where({ id: id as Varchar<255> })
-            .update({
-                password_hash: passwordHash,
-                updated_at: Temporal.Now.instant(),
-            } as never);
+            .where({ id: input.id as Varchar<255> })
+            .update({name: input.data.name} as never);
+
+        await db.orm.public.customer_profiles
+            .where({ user_id: input.id as Varchar<255> })
+            .update({about: input.data.about} as never);
         return
     }
 }

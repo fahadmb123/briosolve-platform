@@ -1,4 +1,5 @@
 import RegisterCustomerUseCase from "../application/use-cases/registerCustomer.useCase.js";
+import { PrismaUserRepository } from "../infrastructure/repositories/prismaUser.repository.js";
 import { PrismaCustomerRepository } from "../infrastructure/repositories/prismaCustomer.repository.js";
 import { BcryptPasswordHasherService } from "../../../shared/infrastructure/security/becryptPasswordHasher.service.js";
 import CustomerAuthController from "../presentation/controllers/customerAuth.controller.js";
@@ -15,6 +16,7 @@ import { JwtService } from "../../../shared/infrastructure/security/jwt.service.
 import GetMeUseCase from "../application/use-cases/getMe.useCase.js";
 import EmailVerificationUseCase from "../application/use-cases/emailVerification.useCase.js";
 import ResetPasswordUseCase from "../application/use-cases/resetPassword.useCase.js";
+import UpdateProfileUseCase from "../application/use-cases/updateCustomerProfile.useCase.js";
 
 
 
@@ -33,6 +35,7 @@ const jwtService = new JwtService()
 
 
 // Repo
+const userRepository = new PrismaUserRepository();
 const customerRepository = new PrismaCustomerRepository();
 
 
@@ -42,7 +45,7 @@ const customerRepository = new PrismaCustomerRepository();
 
 // Use Cases
 const registerCustomerUseCase = new RegisterCustomerUseCase(
-  customerRepository,
+  userRepository,
   passwordHasher,
   otpGenerator,
   emailSender,
@@ -63,14 +66,14 @@ const resendOtpUseCase = new ResendOtpUseCase(
 )
 //auth
 const loginUseCase = new LoginUseCase(
-  customerRepository,
+  userRepository,
   passwordHasher,
   jwtService
 )
-const getMeUseCase = new GetMeUseCase(customerRepository)
+const getMeUseCase = new GetMeUseCase(userRepository)
 
 const emailVerificationUseCase = new EmailVerificationUseCase(
-  customerRepository,
+  userRepository,
   passwordHasher,
   otpGenerator,
   pendingRegistrationStore,
@@ -80,17 +83,18 @@ const emailVerificationUseCase = new EmailVerificationUseCase(
 const resetPasswordUseCase = new ResetPasswordUseCase(
   pendingRegistrationStore,
   passwordHasher,
-  customerRepository
+  userRepository
 )
 
-
+const updateProfileUseCase = new UpdateProfileUseCase(userRepository, customerRepository)
 
 
 
 
 // Controllers
 export const customerAuthController = new CustomerAuthController(
-  registerCustomerUseCase
+  registerCustomerUseCase,
+  updateProfileUseCase
 )
 
 export const otpVarificationController = new OtpVarificationController(

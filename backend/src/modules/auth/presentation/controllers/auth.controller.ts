@@ -77,5 +77,6 @@ export class AuthController extends BaseController{
             next(err)
         }
     }
+
     
 }

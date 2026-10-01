@@ -18,3 +18,14 @@ export type UserData = {
     created_at: Temporal.Instant;
     updated_at: Temporal.Instant;
 }
+
+
+export type UpdateCustomerProfileInputDto = {
+    id:string,
+    data:UpdateCustomerProfileInputDataDto
+}
+
+export type UpdateCustomerProfileInputDataDto = {
+    name:string,
+    about:string
+}

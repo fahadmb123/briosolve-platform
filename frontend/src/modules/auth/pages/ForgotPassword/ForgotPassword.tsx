@@ -8,7 +8,6 @@ import { emailSchema, type EmailInputType } from '../../schemas/validation';
 import { useForm } from 'react-hook-form';
 import { useEmailVerify } from '../../hooks/mutations/use-otp-varify';
 import { toast } from 'react-toastify';
-import { isAxiosError } from 'axios';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
 

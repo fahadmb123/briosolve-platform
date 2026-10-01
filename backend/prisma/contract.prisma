@@ -28,16 +28,16 @@ model users {
 }
 
 model customer_profiles {
-  id                 Uuid                 @id @default(uuid())
-  user_id            Uuid                 @unique
-  current_address_id Uuid?
-  profile_image      VarChar(500)?
-  created_at         DateTime             @default(now())
-  updated_at         DateTime             @default(now())
-
-  user               users                @relation(fields:[user_id], references:[id])
-  addresses          customer_addresses[] @relation("CustomerAddresses")
-  current_address    customer_addresses?  @relation("CurrentAddress", fields:[current_address_id], references:[id])
+  id                   Uuid                 @id @default(uuid())
+  user_id              Uuid                 @unique
+  current_address_id   Uuid?
+  profile_image        VarChar(500)?
+  created_at           DateTime             @default(now())
+  updated_at           DateTime             @default(now())
+  about                VarChar(500)
+  user                 users                @relation(fields:[user_id], references:[id])
+  addresses            customer_addresses[] @relation("CustomerAddresses")
+  current_address      customer_addresses?  @relation("CurrentAddress", fields:[current_address_id], references:[id])
 }
 
 model customer_addresses {

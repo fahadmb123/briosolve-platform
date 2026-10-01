@@ -1,5 +1,5 @@
 import type { RegisterCustomerInput ,RegisterCustomerOutput} from "../dto/customerDto.js";
-import { ICustomerRepository } from "../../domain/repositories/customer.repository.js";
+import { IUserRepository } from "../../domain/repositories/user.repository.js";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
 import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js";
@@ -11,7 +11,7 @@ import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 
 
 export default class RegisterCustomerUseCase implements IUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
-    constructor(private readonly customerRepository : ICustomerRepository,
+    constructor(private readonly customerRepository : IUserRepository,
         readonly passwordHasher:IPasswordHasher,
         readonly otpGenerate:IOtpGenerator,
         readonly EmailSender:IEmailSender,

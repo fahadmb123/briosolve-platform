@@ -236,6 +236,16 @@
           },
           "customer_profiles": {
             "fields": {
+              "about": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 500
+                  }
+                }
+              },
               "created_at": {
                 "nullable": false,
                 "type": {
@@ -333,6 +343,9 @@
             },
             "storage": {
               "fields": {
+                "about": {
+                  "column": "about"
+                },
                 "created_at": {
                   "column": "created_at"
                 },
@@ -650,6 +663,14 @@
             },
             "customer_profiles": {
               "columns": {
+                "about": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 500
+                  }
+                },
                 "created_at": {
                   "codecId": "pg/timestamptz-temporal@1",
                   "default": {
@@ -895,7 +916,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "60393a8d6c540492f28f416dc6b583da271cbd15225746b93a4048a35341747d"
+    "storageHash": "e609c22c50330fda3989ba93fc0d7042b20c944c3c7080163e4febd5886e9d7a"
   },
   "execution": {
     "executionHash": "cff43b31509181a9a41f79f66a3c602205a448eee3523ecbf84af51030501098",
