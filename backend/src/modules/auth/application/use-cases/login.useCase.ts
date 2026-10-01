@@ -1,20 +1,20 @@
 import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.service.js";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import { Customer } from "../../domain/entities/customer.entity.js";
+import { User } from "../../domain/entities/user.entity.js";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 import { IUserRepository } from "../../domain/repositories/user.repository.js";
 import { LoginInputDto } from "../dto/authDto.js";
 
 
-export default class LoginUseCase implements IUseCase<LoginInputDto,{accessToken:string,isExist:Customer}>{
+export default class LoginUseCase implements IUseCase<LoginInputDto,{accessToken:string,isExist:User}>{
     constructor(
         private readonly customerRepository:IUserRepository,
         private readonly passwordHasher:IPasswordHasher,
         private readonly jwtService:IJwtService
     ){}
 
-    async execute (input:LoginInputDto):Promise<{accessToken:string,isExist:Customer}>{
+    async execute (input:LoginInputDto):Promise<{accessToken:string,isExist:User}>{
         const isExist = await this.customerRepository.findByEmail(input.email)
         if (!isExist) throw new ApplicationError("USER_NOT_FOUND","User not found","NOT_FOUND")
 

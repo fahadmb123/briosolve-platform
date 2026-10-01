@@ -1,14 +1,15 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types"
 import { db } from "../../../../infrastructure/persistence/prisma/client.js"
 import { UpdateCustomerProfileInputDto } from "../../application/dto/authDto.js"
-import { Customer } from "../../domain/entities/customer.entity.js"
+import { User } from "../../domain/entities/user.entity.js"
 import { ICustomerRepository } from "../../domain/repositories/customer.respository.js"
 import { RegisterCustomerInput } from "../../domain/repositories/user.repository.js"
+import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js"
 
 
 
 export class PrismaCustomerRepository implements ICustomerRepository {
-    async createCustomer(data: RegisterCustomerInput): Promise<Customer> {
+    async createCustomer(data: RegisterCustomerInput): Promise<User> {
         const user = await db.orm.public.users.create({
             name: data.name,
             email: data.email,
@@ -27,15 +28,20 @@ export class PrismaCustomerRepository implements ICustomerRepository {
             updated_at: Temporal.Now.instant(),
         } as never)
 
-        const customer = new Customer(
+        const userEntity = new User(
             user.id,
             user.name,
             user.email,
             user.phone,
-            user.role
+            user.role,
+            user.status,
+            user.email_verified,
+            user.phone_verified,
+            new Date(user.created_at.epochMilliseconds),
+            new Date(user.updated_at.epochMilliseconds)
         )
 
-        return customer
+        return userEntity
     }
 
     async updateProfile(input:UpdateCustomerProfileInputDto): Promise<void> {
@@ -47,5 +53,10 @@ export class PrismaCustomerRepository implements ICustomerRepository {
             .where({ user_id: input.id as Varchar<255> })
             .update({about: input.data.about} as never);
         return
+    }
+
+    async findById(id : string): Promise<CustomerProfile | null> {
+        const customer = await db.orm.public.customer_profiles.where({user_id:id as Varchar<255>}).first()
+        return customer ? (customer as CustomerProfile)  : null
     }
 }

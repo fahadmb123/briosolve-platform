@@ -3,19 +3,19 @@ import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../.
 import { OtpVarificationInput } from "../dto/otpDto.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
 import { ICustomerRepository } from "../../domain/repositories/customer.respository.js";
-import { Customer } from "../../domain/entities/customer.entity.js";
+import { User } from "../../domain/entities/user.entity.js";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 
 
 
-export default class OtpVarificationUseCase implements IUseCase<OtpVarificationInput,{response:Customer | IPendingCustomerRegistration,for:string}>{
+export default class OtpVarificationUseCase implements IUseCase<OtpVarificationInput,{response:User | IPendingCustomerRegistration,for:string}>{
     constructor(
         private readonly PendingRegistrationStore:IPendingRegistrationStore,
         private readonly PasswordHasher:IPasswordHasher,
         private readonly CustomerRepository : ICustomerRepository
     ){}
 
-    async execute ({registrationId,otp}:OtpVarificationInput):Promise<{response:Customer | IPendingCustomerRegistration,for:string}>{
+    async execute ({registrationId,otp}:OtpVarificationInput):Promise<{response:User | IPendingCustomerRegistration,for:string}>{
         const data = await this.PendingRegistrationStore.get(registrationId)
         if (!registrationId || !data) throw new ApplicationError("REGISTRATION_EXPIRED","Registration session expired","AUTHENTICATION")
         if (data.otpExpiresAt && Date.now() > data.otpExpiresAt) throw new ApplicationError("OTP_EXPIRED","OTP Expired","AUTHENTICATION")

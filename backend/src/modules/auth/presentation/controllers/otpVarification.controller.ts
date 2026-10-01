@@ -1,6 +1,6 @@
 import { Request,Response,NextFunction } from "express"
 import { OtpVarificationInput } from "../../application/dto/otpDto.js"
-import { Customer } from "../../domain/entities/customer.entity.js"
+import { User } from "../../domain/entities/user.entity.js"
 import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
 import { ResendOtpOutput } from "../../application/use-cases/resendOtp.useCase.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
@@ -9,7 +9,7 @@ import { registrationCookie } from "../../../../shared/presentation/http/cookies
 
 class OtpVarificationController {
     constructor (
-        private readonly otpVarificationUseCase:IUseCase<OtpVarificationInput,{response:Customer | IPendingCustomerRegistration,for:string}>,
+        private readonly otpVarificationUseCase:IUseCase<OtpVarificationInput,{response:User | IPendingCustomerRegistration,for:string}>,
         private readonly pendingRegistrationStore:IPendingRegistrationStore,
         private readonly resendOtpUseCase: IUseCase<string, ResendOtpOutput>
     ) {}

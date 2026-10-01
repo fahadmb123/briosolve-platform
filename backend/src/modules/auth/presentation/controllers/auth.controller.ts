@@ -1,6 +1,6 @@
 import { NextFunction ,Response,Request} from "express"
 import { LoginInputDto } from "../../application/dto/authDto.js"
-import { Customer } from "../../domain/entities/customer.entity.js"
+import { User } from "../../domain/entities/user.entity.js"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js"
 import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.js"
 import { RegisterCustomerOutput } from "../../application/dto/customerDto.js"
@@ -14,10 +14,11 @@ import { accessTokenCookie, registrationCookie } from "../../../../shared/presen
 
 export class AuthController extends BaseController{
     constructor (
-        private readonly loginUseCase:IUseCase<LoginInputDto,{accessToken:string,isExist:Customer}>,
-        private readonly getMeUseCase:IUseCase<IUserTokenPayload,Customer>,
+        private readonly loginUseCase:IUseCase<LoginInputDto,{accessToken:string,isExist:User}>,
+        private readonly getMeUseCase:IUseCase<IUserTokenPayload,User>,
         private readonly emailVerification : IUseCase<string,RegisterCustomerOutput>,
-        private readonly resetPasswordUseCase:IUseCase<ResetPasswordDto,void>
+        private readonly resetPasswordUseCase:IUseCase<ResetPasswordDto,void>,
+        
     ) {super()}
 
     login = async (req:Request,res:Response,next:NextFunction) => {
@@ -77,6 +78,7 @@ export class AuthController extends BaseController{
             next(err)
         }
     }
+
 
     
 }

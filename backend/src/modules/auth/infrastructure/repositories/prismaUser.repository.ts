@@ -1,5 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { Customer } from "../../domain/entities/customer.entity.js";
+import { User } from "../../domain/entities/user.entity.js";
 import {IUserRepository,RegisterCustomerInput} from "../../domain/repositories/user.repository.js";
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
@@ -8,12 +8,12 @@ import { UserData } from "../../application/dto/authDto.js";
 
 export class PrismaUserRepository implements IUserRepository {
 
-    async findByEmail(email: string): Promise<Customer | null> {
+    async findByEmail(email: string): Promise<User | null> {
         const user = await db.orm.public.users.where({email:email as Varchar<255>}).first()
-        return user ? (user as unknown as Customer) : null
+        return user ? (user as unknown as User) : null
     }
 
-    async createCustomer(data: RegisterCustomerInput): Promise<Customer> {
+    async createCustomer(data: RegisterCustomerInput): Promise<User> {
         const user = await db.orm.public.users.create({
             name: data.name,
             email: data.email,
@@ -32,15 +32,20 @@ export class PrismaUserRepository implements IUserRepository {
             updated_at: Temporal.Now.instant(),
         } as never)
 
-        const customer = new Customer(
+        const userEntity = new User(
             user.id,
             user.name,
             user.email,
             user.phone,
-            user.role
+            user.role,
+            user.status,
+            user.email_verified,
+            user.phone_verified,
+            new Date(user.created_at.epochMilliseconds),
+            new Date(user.updated_at.epochMilliseconds)
         )
 
-        return customer
+        return userEntity
     }
 
     async findById(id: string): Promise<UserData | null> {

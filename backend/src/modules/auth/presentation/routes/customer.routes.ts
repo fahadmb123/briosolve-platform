@@ -7,8 +7,6 @@ import { authMiddleware } from "../../../../shared/presentation/http/middlewares
 const router = Router();
 
 
-
-
 router.post("/register",validate(customerRegistrationSchema),customerAuthController.register)
 
 router.post("/update-profile",authMiddleware,customerAuthController.updateProfile)
