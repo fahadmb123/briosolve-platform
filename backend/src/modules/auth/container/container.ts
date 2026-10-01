@@ -17,6 +17,7 @@ import GetMeUseCase from "../application/use-cases/getMe.useCase.js";
 import EmailVerificationUseCase from "../application/use-cases/emailVerification.useCase.js";
 import ResetPasswordUseCase from "../application/use-cases/resetPassword.useCase.js";
 import UpdateProfileUseCase from "../application/use-cases/updateCustomerProfile.useCase.js";
+import GetProfileUseCase from "../application/use-cases/getProfile.useCase.js";
 
 
 
@@ -51,27 +52,23 @@ const registerCustomerUseCase = new RegisterCustomerUseCase(
   emailSender,
   pendingRegistrationStore
 )
-
 const otpVarificationUseCase = new OtpVarificationUseCase(
   pendingRegistrationStore,
   passwordHasher,
   customerRepository
 )
-
 const resendOtpUseCase = new ResendOtpUseCase(
   pendingRegistrationStore,
   passwordHasher,
   otpGenerator,
   emailSender
 )
-//auth
 const loginUseCase = new LoginUseCase(
   userRepository,
   passwordHasher,
   jwtService
 )
 const getMeUseCase = new GetMeUseCase(userRepository)
-
 const emailVerificationUseCase = new EmailVerificationUseCase(
   userRepository,
   passwordHasher,
@@ -79,14 +76,19 @@ const emailVerificationUseCase = new EmailVerificationUseCase(
   pendingRegistrationStore,
   emailSender
 )
-
 const resetPasswordUseCase = new ResetPasswordUseCase(
   pendingRegistrationStore,
   passwordHasher,
   userRepository
 )
-
-const updateProfileUseCase = new UpdateProfileUseCase(userRepository, customerRepository)
+const updateProfileUseCase = new UpdateProfileUseCase(
+  userRepository,
+  customerRepository
+)
+const getProfileUseCase = new GetProfileUseCase(
+  userRepository,
+  customerRepository
+)
 
 
 
@@ -103,9 +105,15 @@ export const otpVarificationController = new OtpVarificationController(
     resendOtpUseCase
 )
 
+
+
+
+
+
 export const authController = new AuthController(
   loginUseCase,
   getMeUseCase,
   emailVerificationUseCase,
-  resetPasswordUseCase
+  resetPasswordUseCase,
+  getProfileUseCase
 )
