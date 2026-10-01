@@ -13,7 +13,7 @@ export default function Customers() {
     const [search, setSearch] = useState("")
     const [filter,setFilter] = useState("")
     const [limit] = useState(10)
-    const [total, setTotal] = useState(0)
+    const [, setTotal] = useState(0)
     const [totalPages, setTotalPages] = useState(0)
 
 

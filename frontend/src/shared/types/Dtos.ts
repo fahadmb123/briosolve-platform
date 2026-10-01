@@ -18,3 +18,14 @@ export type User = {
     created_at: Temporal.Instant;
     updated_at: Temporal.Instant;
 }
+
+
+export type CustomerProfile = {
+    id: string,
+    user_id: string,
+    current_address_id: string | null,
+    profile_image: string | null,
+    about: string,
+    created_at: Temporal.Instant,
+    updated_at: Temporal.Instant,
+}

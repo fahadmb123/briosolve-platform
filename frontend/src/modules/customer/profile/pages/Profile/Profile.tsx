@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './Profile.css';
 import '../../../../../shared/styles/location-picker.css';
 import { nameSchema, type NameInputType } from '../../schemas/validation';
@@ -6,15 +6,38 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import { useUpdateProfile } from '../../hooks/mutations/useUpdateProfile';
+import { useGetProfile } from '../../hooks/mutations/useGetProfile';
+import type { CustomerProfile, response, User } from '../../../../../shared/types/Dtos';
+import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 
 export default function Profile() {
+
   
   const [isLocModalOpen, setIsLocModalOpen] = useState(false)
-  const {register,handleSubmit,formState:{errors}} = useForm<NameInputType>({
-          resolver : zodResolver(nameSchema),mode : "onChange"
+  const [,setData] = useState<{name:string,about:string}>({name:"",about:""})
+  const {register, handleSubmit, reset, formState:{errors}} = useForm<NameInputType>({
+          resolver : zodResolver(nameSchema),
+          mode : "onChange",
+          defaultValues: { name: "", about: "" }
   })
 
-  const { mutate: updateProfile, isPending } = useUpdateProfile();
+
+  const { mutate: updateProfile, isPending } = useUpdateProfile()
+  const getProfile = useGetProfile()
+
+  useEffect(() => {
+    getProfile.mutate(undefined, {
+      onSuccess: (res: response<{user:User,profile:CustomerProfile}>) => {
+        const payload = res.data || res;
+        const fetchedData = { 
+          name: payload.user?.name || "", 
+          about: payload.profile?.about || "" 
+        };
+        setData(fetchedData);
+        reset(fetchedData);
+      }
+    });
+  }, []);
 
   const onSubmitForm = (data: NameInputType) => {
     updateProfile(data, {
@@ -26,6 +49,8 @@ export default function Profile() {
 
   return (
     <>
+
+    {getProfile.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
       <div className="profile-premium-wrapper">
         {/* Top Gradient/Image Banner */}
         <div className="profile-banner"></div>
@@ -97,15 +122,13 @@ export default function Profile() {
             <form onSubmit={handleSubmit(onSubmitForm)} className="form-card-modern flex flex-col h-full">
               <div className="flex justify-between items-center mb-6 pb-4 border-bottom">
                 <h3 className="h4 mb-0">Personal Information</h3>
-                <button type="button" className="btn btn-secondary btn-sm">
-                  <i className="fas fa-undo mr-1"></i> Reset
-                </button>
+                
               </div>
 
               <div className="mb-2">
                 <div className="modern-input-group">
                   <label htmlFor="prof-name">Full Name</label>
-                  <input type="text" id="prof-name" className="form-control" defaultValue="Aarav Sharma" {...register("name")} />
+                  <input type="text" id="prof-name" className="form-control" {...register("name")} />
                   {errors.name && (
                     <span className="text-red-500 text-xs mt-1">{errors.name.message}</span>
                   )}
@@ -117,12 +140,11 @@ export default function Profile() {
                 <textarea 
                   id="prof-headline" 
                   className="form-control modern-textarea" 
-                  defaultValue="Homeowner in Lokhandwala, Andheri West. High priority on punctual service and transparent quotations."
                   placeholder="Brief note about your preferences or pets for visiting providers..."
-                  {...register("customer_description")}
+                  {...register("about")}
                 ></textarea>
-                {errors.customer_description && (
-                  <span className="text-red-500 text-xs mt-1">{errors.customer_description.message}</span>
+                {errors.about && (
+                  <span className="text-red-500 text-xs mt-1">{errors.about.message}</span>
                 )}
                 <p className="text-xs text-secondary mt-2">
                   <i className="fas fa-info-circle mr-1"></i> 

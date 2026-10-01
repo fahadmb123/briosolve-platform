@@ -8,7 +8,7 @@ export const nameSchema = z.object({
     .trim()
     .min(2, { message: "Name must be at least 2 characters" })
     .max(50, { message: "Name cannot exceed 50 characters" }),
-  customer_description: z
+  about: z
     .string()
     .max(500, { message: "Description cannot exceed 500 characters" })
     .optional(),

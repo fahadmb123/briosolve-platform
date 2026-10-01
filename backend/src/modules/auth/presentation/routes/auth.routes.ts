@@ -9,10 +9,12 @@ import { authMiddleware } from "../../../../shared/presentation/http/middlewares
 
 const router = Router()
 
+router.get("/logout",authController.logout)
 
 router.get("/otp-status",otpVarificationController.getStatus)
+
 router.get("/me",authMiddleware,authController.getMe)
-router.get("/logout",authController.logout)
+router.get("/get-profile",authMiddleware,authController.getProfile)
 
 
 router.post("/login",validate(loginSchema),authController.login)
@@ -25,8 +27,6 @@ router.post("/reset-password",validate(resetPasswordSchema),authController.reset
 router.post("/otp-varify",validate(otpSchema),otpVarificationController.validate)
 router.post("/resend-otp",otpVarificationController.resend)
 
-
-router.post("/get-profile",authMiddleware,authController.getProfile)
 
 
 
