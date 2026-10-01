@@ -1,5 +1,5 @@
 import { NextFunction ,Response,Request} from "express"
-import { LoginInputDto } from "../../application/dto/authDto.js"
+import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto, LoginInputDto } from "../../application/dto/authDto.js"
 import { User } from "../../domain/entities/user.entity.js"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js"
 import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.js"
@@ -18,6 +18,7 @@ export class AuthController extends BaseController{
         private readonly getMeUseCase:IUseCase<IUserTokenPayload,User>,
         private readonly emailVerification : IUseCase<string,RegisterCustomerOutput>,
         private readonly resetPasswordUseCase:IUseCase<ResetPasswordDto,void>,
+        private readonly getProfileUseCase:IUseCase<GetProfileUseCaseInputDto,GetProfileUseCaseOutputDto>,
         
     ) {super()}
 
@@ -79,6 +80,15 @@ export class AuthController extends BaseController{
         }
     }
 
+    getProfile = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            this.getCurrentUser(req)
+            const response = await this.getProfileUseCase.execute({id:req.user?.userId!,role:req.user?.role!})
 
+            return sendSuccess(res,"",response) 
+        } catch (err) {
+            next(err)
+        }
+    }
     
 }
