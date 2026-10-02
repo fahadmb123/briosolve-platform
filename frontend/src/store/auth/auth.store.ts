@@ -12,7 +12,11 @@ export interface IAuthUser {
     email: string;
     role: UserRole;
     status: 'ACTIVE' | 'BLOCKED' | 'PENDING';
-    phone?:string | null
+    phone?: string | null;
+    email_verified: boolean;
+    phone_verified: boolean;
+    created_at: string;
+    updated_at: string;
 }
 
 interface IAuthState {

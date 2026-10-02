@@ -1,16 +1,16 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { emailSchema, phoneSchema, type EmailInputType, type PhoneInputType } from '../../../../schemas/validation';
-import { useState } from 'react';
 import { useUpdateEmail } from '../../../../hooks/mutations/contact';
 
 
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useResetFlowStore } from '../../../../../../../store/auth/reset-flow.store';
+import { useAuthStore } from '../../../../../../../store/auth/auth.store';
 
 export const Contact = () => {
-    const [data] = useState<{phone:string,email:string}>({phone:"",email:""})
+    const user = useAuthStore((state) => state.user);
     const updateEmail = useUpdateEmail()
     const navigate = useNavigate()
 
@@ -18,13 +18,13 @@ export const Contact = () => {
     const {register: registerEmail, handleSubmit: handleEmailSubmit, formState: { errors: emailErrors }} = useForm<EmailInputType>({
         resolver: zodResolver(emailSchema),
         mode: "onChange",
-        defaultValues: { email: data.email }
+        defaultValues: { email: user?.email || "" }
     });
 
     const {register: registerPhone, handleSubmit: handlePhoneSubmit, formState: { errors: phoneErrors }} = useForm<PhoneInputType>({
         resolver: zodResolver(phoneSchema),
         mode: "onChange",
-        defaultValues: { phone: data.phone}
+        defaultValues: { phone: user?.phone || "" }
     });
 
     const onEmailSubmit = (formData: EmailInputType) => {
@@ -47,7 +47,11 @@ export const Contact = () => {
             <form onSubmit={handleEmailSubmit(onEmailSubmit)} className="card p-6 fade-in flex flex-col h-full">
                 <div className="flex justify-between items-center mb-4 border-bottom pb-3">
                     <h2 className="h5 mb-0">Email Address</h2>
-                    <span className="badge badge-success text-xs"><i className="fas fa-check-circle mr-1"></i>Verified</span>
+                    {user?.email_verified ? (
+                        <span className="badge badge-success text-xs"><i className="fas fa-check-circle mr-1"></i>Verified</span>
+                    ) : (
+                        <span className="badge badge-warning text-xs">Not Verified</span>
+                    )}
                 </div>
                 <p className="text-xs text-secondary mb-4">Update your sign-in email address.</p>
                 <div className="form-group mb-4 flex-grow">
@@ -72,7 +76,11 @@ export const Contact = () => {
             <form onSubmit={handlePhoneSubmit(onPhoneSubmit)} className="card p-6 fade-in flex flex-col h-full">
                 <div className="flex justify-between items-center mb-4 border-bottom pb-3">
                     <h2 className="h5 mb-0">Mobile Number</h2>
-                    <span className="badge badge-warning text-xs">Not Verified</span>
+                    {user?.phone_verified ? (
+                        <span className="badge badge-success text-xs"><i className="fas fa-check-circle mr-1"></i>Verified</span>
+                    ) : (
+                        <span className="badge badge-warning text-xs">Not Verified</span>
+                    )}
                 </div>
                 <p className="text-xs text-secondary mb-4">Update and verify your mobile number.</p>
                 <div className="form-group mb-4 flex-grow">
