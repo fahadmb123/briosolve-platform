@@ -3,7 +3,6 @@ import {  EmailVerification, ForgotPassword, Login, ResetPassword, OtpVerificati
 
 import ResetPasswordRoute from '../../../shared/middlewares/ResetPasswordRoute';
 import OtpFlowRoute from '../../../shared/middlewares/OtpFlowRoute';
-import PublicRoute from '../../../shared/middlewares/PublicRoute';
 
 
 
@@ -19,10 +18,8 @@ export const publicRoutes = (
 export const verificationRoutes = (
     <>
         <Route path="email-verification" element={<EmailVerification />} />
-        <Route element={<PublicRoute/>}>
-            <Route element={<OtpFlowRoute />}>
-                <Route path="otp-verification" element={<OtpVerification />} />
-            </Route>
+        <Route element={<OtpFlowRoute />}>
+            <Route path="otp-verification" element={<OtpVerification />} />
         </Route>
         
     </>

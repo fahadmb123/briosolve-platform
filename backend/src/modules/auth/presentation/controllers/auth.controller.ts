@@ -3,7 +3,7 @@ import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto, LoginInputDto } 
 import { User } from "../../domain/entities/user.entity.js"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js"
 import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.js"
-import { RegisterCustomerOutput } from "../../application/dto/customerDto.js"
+import { EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto, UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto } from "../../application/dto/customerDto.js"
 import { ResetPasswordDto } from "../../application/dto/resetPasswordDtos.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
@@ -16,9 +16,10 @@ export class AuthController extends BaseController{
     constructor (
         private readonly loginUseCase:IUseCase<LoginInputDto,{accessToken:string,isExist:User}>,
         private readonly getMeUseCase:IUseCase<IUserTokenPayload,User>,
-        private readonly emailVerification : IUseCase<string,RegisterCustomerOutput>,
+        private readonly emailVerification : IUseCase<EmailVerificationUseCaseInputDto,EmailVerificationUseCaseOutputDto>,
         private readonly resetPasswordUseCase:IUseCase<ResetPasswordDto,void>,
         private readonly getProfileUseCase:IUseCase<GetProfileUseCaseInputDto,GetProfileUseCaseOutputDto>,
+        private readonly updateEmailUseCase:IUseCase<UpdateEmailUseCaseInputDto,UpdateEmailUseCaseOutputDto>,
         
     ) {super()}
 
@@ -58,7 +59,15 @@ export class AuthController extends BaseController{
 
     emailVerify = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const response = await this.emailVerification.execute(req.body.email)
+            const work = req.query.work || ""
+            let response = null
+
+            if (work === "UPDATE") {
+                const user = this.getCurrentUser(req)
+                response = await this.updateEmailUseCase.execute({email:req.body.email, userId: user.userId})
+            }else {
+                response = await this.emailVerification.execute({email:req.body.email})
+            }
 
             res.cookie("registration_id",response.registrationId,registrationCookie)
             

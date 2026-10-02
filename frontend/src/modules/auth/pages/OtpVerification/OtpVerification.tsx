@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { otpSchema, type OtpInputType } from '../../schemas/validation';
 import { toast } from 'react-toastify';
-import { isAxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../hooks/mutations/use-otp-varify';
 import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
@@ -14,6 +13,7 @@ export default function OtpVerification() {
     const { toggleTheme } = useTheme()
     const [otp, setOtp] = useState('')
     const [timer, setTimer] = useState(60)
+    const [email,setEmail] = useState("")
     const [attempts, setAttempts] = useState(0)
     const navigate = useNavigate()
     const {register,handleSubmit,formState:{errors}} = useForm<OtpInputType>({
@@ -29,6 +29,7 @@ export default function OtpVerification() {
             onSuccess: (response) => {
                 setTimer(response.data.expiresIn)
                 setAttempts(response.data.attempts)
+                setEmail(response.data.email)
             }
         })
     }, [])
@@ -53,8 +54,9 @@ export default function OtpVerification() {
                 if (response.data.path === "reset-password") {
                     setOtpVerified(true);
                 }
+                
                 navigate(`/${response?.data.path}`)
-                if (response.data.path === "login") toast.success(response.message)
+                if (response.data.path === "login" || response.data.path === "settings") toast.success(response.message)
             }
         })
     }
@@ -68,6 +70,17 @@ export default function OtpVerification() {
             }
         })
     }
+
+    const maskEmail = (emailAddress: string) => {
+        if (!emailAddress) return "";
+        const [username, domain] = emailAddress.split('@');
+        if (!username || !domain) return emailAddress;
+        
+        if (username.length > 2) {
+            return `${username.substring(0, 2)}${'*'.repeat(Math.max(0, username.length - 3))}${username.substring(username.length - 1)}@${domain}`;
+        }
+        return `${username[0]}*@${domain}`;
+    };
 
     return (
         <div className="auth-page-wrapper">
@@ -86,7 +99,7 @@ export default function OtpVerification() {
 
                     <h1 className="h3 mb-2">Two-Step Verification</h1>
                     <p className="text-secondary text-sm mb-6">
-                        Enter the 6-digit verification code sent to your email or mobile device.
+                        Enter the 6-digit verification code sent to your email or mobile device. to {maskEmail(email)}
                     </p>
 
                     <form onSubmit={handleSubmit(handleOtp)}>

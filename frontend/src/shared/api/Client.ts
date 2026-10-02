@@ -14,8 +14,11 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         const normalizedError = normalizeApiError(error);
-        if (normalizedError.status === 401 && error.config && !error.config.url?.includes('/login')) {
-            useAuthStore.getState().clearAuth();
+        if (normalizedError.status === 401 && error.config) {
+            const url = error.config.url || "";
+            if (!url.includes('/login') && !url.includes('/otp-varify') && !url.includes('/otp-varification')) {
+                useAuthStore.getState().clearAuth();
+            }
         }
         return Promise.reject(normalizedError);
     }

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface ResetFlowState {
     resetFlowStarted: boolean;
@@ -11,13 +12,20 @@ interface ResetFlowState {
     clearResetFlow: () => void;
 }
 
-export const useResetFlowStore = create<ResetFlowState>()((set) => ({
-    resetFlowStarted: false,
-    otpFlowStarted: false,
-    otpVerified: false,
+export const useResetFlowStore = create<ResetFlowState>()(
+    persist(
+        (set) => ({
+            resetFlowStarted: false,
+            otpFlowStarted: false,
+            otpVerified: false,
 
-    setResetFlowStarted: (status) => set({ resetFlowStarted: status }),
-    setOtpFlowStarted: (status) => set({ otpFlowStarted: status }),
-    setOtpVerified: (status) => set({ otpVerified: status }),
-    clearResetFlow: () => set({ resetFlowStarted: false, otpFlowStarted: false, otpVerified: false }),
-}));
+            setResetFlowStarted: (status) => set({ resetFlowStarted: status }),
+            setOtpFlowStarted: (status) => set({ otpFlowStarted: status }),
+            setOtpVerified: (status) => set({ otpVerified: status }),
+            clearResetFlow: () => set({ resetFlowStarted: false, otpFlowStarted: false, otpVerified: false }),
+        }),
+        {
+            name: "reset-flow-storage",
+        }
+    )
+);

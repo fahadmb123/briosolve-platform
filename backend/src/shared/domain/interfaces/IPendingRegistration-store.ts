@@ -6,7 +6,8 @@ export interface IPendingCustomerRegistration {
     attempts: number;
     path:string,
     otpExpiresAt?: number;
-    for:string
+    for:string;
+    userId?: string;
 }
 
 export interface IPendingRegistrationStore {

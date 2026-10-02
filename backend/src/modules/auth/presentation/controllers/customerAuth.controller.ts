@@ -1,6 +1,6 @@
 import { Request,Response,NextFunction } from "express"
 import { RegisterCustomerInput } from "../../domain/repositories/user.repository.js"
-import { RegisterCustomerOutput } from "../../application/dto/customerDto.js"
+import { EmailVerificationUseCaseOutputDto } from "../../application/dto/customerDto.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
@@ -11,7 +11,7 @@ import { UpdateCustomerProfileInputDto } from "../../application/dto/authDto.js"
 
 class CustomerAuthController extends BaseController {
     constructor (
-        private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,RegisterCustomerOutput>,
+        private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto>,
         private readonly updateCustomerProfileUseCase :IUseCase<UpdateCustomerProfileInputDto,void>
     ) { super() }
 

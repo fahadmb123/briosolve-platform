@@ -6,13 +6,13 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js"
 import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
 import { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js"
-import { RegisterCustomerOutput } from "../dto/customerDto.js"
+import { EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto } from "../dto/customerDto.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 
 
 
 
-export default class EmailVerificationUseCase implements IUseCase<string,RegisterCustomerOutput>{
+export default class EmailVerificationUseCase implements IUseCase<EmailVerificationUseCaseInputDto,EmailVerificationUseCaseOutputDto>{
     constructor(
         private readonly customerRepository:IUserRepository,
         private readonly passwordHasher:IPasswordHasher,
@@ -21,8 +21,8 @@ export default class EmailVerificationUseCase implements IUseCase<string,Registe
         private readonly EmailSender : IEmailSender
     ){}
 
-    async execute (email:string):Promise<RegisterCustomerOutput>{
-        const user = await this.customerRepository.findByEmail(email)
+    async execute (input:EmailVerificationUseCaseInputDto):Promise<EmailVerificationUseCaseOutputDto>{
+        const user = await this.customerRepository.findByEmail(input.email)
         if (!user) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
 
         const customer = await this.customerRepository.findById(user.id)
@@ -37,21 +37,25 @@ export default class EmailVerificationUseCase implements IUseCase<string,Registe
         const registrationTtl = 10 * 60
         const otpExpiresIn = 60
         const otpExpiresAt = Date.now() + otpExpiresIn * 1000
+
         const path = "reset-password"
+
+        const forPath =  "FORGOT_PASSWORD"
+
         await this.PendingRegistrationStore.save(registrationId,{
             name:user.name,
-            email,
+            email:input.email,
             otpHash,
             attempts:0,
             path,
             otpExpiresAt,
-            for:"FORGOT_PASSWORD",
+            for:forPath,
         },
             registrationTtl
         )
 
         
-        await this.EmailSender.sendOtp(email,otp)
+        await this.EmailSender.sendOtp(input.email,otp)
     
         return {registrationId,expiresIn: otpExpiresIn}
     }

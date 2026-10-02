@@ -18,5 +18,4 @@ export const nameSchema = z.object({
 
 
 
-
 export type NameInputType = z.infer<typeof nameSchema>

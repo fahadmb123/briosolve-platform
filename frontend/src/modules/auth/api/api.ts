@@ -17,7 +17,8 @@ type OtpStatusOut = {
     success: boolean,
     data: {
         attempts: number,
-        expiresIn: number
+        expiresIn: number,
+        email:string
     }
 }
 

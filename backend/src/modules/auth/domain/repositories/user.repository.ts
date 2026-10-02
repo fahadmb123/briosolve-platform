@@ -18,4 +18,5 @@ export interface IUserRepository extends BaseRepository<UserData | null>{
   findByEmail(email: string): Promise<User | null>
   findById(id: string): Promise<UserData | null> 
   updatePassword(id:string,passwordHash: string):Promise<void>
+  update(id:string,data:unknown):Promise<void>
 }

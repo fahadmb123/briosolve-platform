@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, type RegisterInputType } from '../../schemas/validation';
 import {toast} from "react-toastify"
 import { useNavigate } from 'react-router-dom';
-import { isAxiosError } from 'axios';
 import { useRegisterCustomer } from '../../hooks/mutations/use-register-customer';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useResetFlowStore } from '../../../../../store/auth/reset-flow.store';

@@ -1,4 +1,4 @@
-import { Request,Response,NextFunction } from "express"
+import { Request, Response, NextFunction } from "express"
 import { OtpVarificationInput } from "../../application/dto/otpDto.js"
 import { User } from "../../domain/entities/user.entity.js"
 import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
@@ -8,40 +8,47 @@ import { sendSuccess } from "../../../../shared/presentation/http/response/respo
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
 
 class OtpVarificationController {
-    constructor (
-        private readonly otpVarificationUseCase:IUseCase<OtpVarificationInput,{response:User | IPendingCustomerRegistration,for:string}>,
-        private readonly pendingRegistrationStore:IPendingRegistrationStore,
+    constructor(
+        private readonly otpVarificationUseCase: IUseCase<OtpVarificationInput, { response: User | IPendingCustomerRegistration, for: string, email: string, path?: string }>,
+        private readonly pendingRegistrationStore: IPendingRegistrationStore,
         private readonly resendOtpUseCase: IUseCase<string, ResendOtpOutput>
-    ) {}
+    ) { }
 
-    validate = async (req:Request,res:Response,next:NextFunction) => {
+    validate = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const registrationId = req.cookies.registration_id
             const otp = req.body.otp
+            
+            const response = await this.otpVarificationUseCase.execute({ registrationId, otp })
 
-            const response  = await this.otpVarificationUseCase.execute({ registrationId, otp })
 
-            response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password",registrationId,registrationCookie) : null
 
-            return sendSuccess(res,"Acount Created",response.response)
+            response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password", registrationId, registrationCookie) : null
+
+            const message = response.for === "UPDATE" ? 'Updated' : "Acount Created"
+
+         
+            const dataToReturn = { ...response.response, path: response.path }
+
+            return sendSuccess(res, message, dataToReturn)
         } catch (err) {
             next(err)
         }
     }
 
-    resend = async (req:Request,res:Response,next:NextFunction) => {
+    resend = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const registrationId = req.cookies.registration_id
-            
+
             const response = await this.resendOtpUseCase.execute(registrationId)
 
-            return sendSuccess(res,"OTP resent successfully",{expiresIn: response.expiresIn})
+            return sendSuccess(res, "OTP resent successfully", { expiresIn: response.expiresIn })
         } catch (err) {
             next(err)
         }
     }
 
-    getStatus = async (req:Request,res:Response,next:NextFunction) => {
+    getStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const registrationId = req.cookies.registration_id
 
@@ -53,7 +60,7 @@ class OtpVarificationController {
 
             if (response && response.otpExpiresAt) expiresIn = Math.max(0, Math.floor((response.otpExpiresAt - Date.now()) / 1000))
 
-            return sendSuccess(res,"",{attempts:response?.attempts || 0,expiresIn})
+            return sendSuccess(res, "", { attempts: response?.attempts || 0, expiresIn, email: response?.email || "" })
         } catch (err) {
             next(err)
         }

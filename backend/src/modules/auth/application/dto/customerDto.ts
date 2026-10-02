@@ -1,8 +1,23 @@
 
-export type RegisterCustomerOutput = {
+export type EmailVerificationUseCaseOutputDto = {
     expiresIn:number,
     registrationId:string
 }
+export type EmailVerificationUseCaseInputDto = {
+    email:string;
+}
+
+
+export type UpdateEmailUseCaseOutputDto = {
+    expiresIn:number,
+    registrationId:string
+}
+export type UpdateEmailUseCaseInputDto = {
+    email: string;
+    userId: string;
+}
+
+
 
 export type RegisterCustomerInput = {
     name:string,

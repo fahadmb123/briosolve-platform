@@ -1,4 +1,4 @@
-import type { RegisterCustomerInput ,RegisterCustomerOutput} from "../dto/customerDto.js";
+import type { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../dto/customerDto.js";
 import { IUserRepository } from "../../domain/repositories/user.repository.js";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
@@ -10,7 +10,10 @@ import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 
 
 
-export default class RegisterCustomerUseCase implements IUseCase<RegisterCustomerInput,RegisterCustomerOutput> {
+
+
+
+export default class RegisterCustomerUseCase implements IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto> {
     constructor(private readonly customerRepository : IUserRepository,
         readonly passwordHasher:IPasswordHasher,
         readonly otpGenerate:IOtpGenerator,
@@ -18,7 +21,7 @@ export default class RegisterCustomerUseCase implements IUseCase<RegisterCustome
         readonly PendingRegistrationStore:IPendingRegistrationStore
     ){}
 
-    async execute (input:RegisterCustomerInput):Promise<RegisterCustomerOutput>{
+    async execute (input:RegisterCustomerInput):Promise<EmailVerificationUseCaseOutputDto>{
         const isEmailExist = await this.customerRepository.findByEmail(input.email)
         if (isEmailExist) throw new ApplicationError("USER_EMAIL_ALREADY_EXIST","User with email already exist","CONFLICT")
 

@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { resetPasswordSchema, type ResetPasswordInputType } from '../../schemas/validation';
 import { useResetPassword } from '../../hooks/mutations/use-otp-varify';
 import { toast } from 'react-toastify';
-import { isAxiosError } from 'axios';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
 
