@@ -1,6 +1,7 @@
 export interface IPendingCustomerRegistration {
     name: string;
     email: string;
+    phone?:string
     passwordHash?: string;
     otpHash: string;
     attempts: number;

@@ -1,5 +1,5 @@
 import { NextFunction ,Response,Request} from "express"
-import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto, LoginInputDto } from "../../application/dto/authDto.js"
+import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto, LoginInputDto, SendSmsOtpUseCaseInputDto, SendSmsOtpUseCaseOutputDto } from "../../application/dto/authDto.js"
 import { User } from "../../domain/entities/user.entity.js"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js"
 import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.js"
@@ -8,6 +8,7 @@ import { ResetPasswordDto } from "../../application/dto/resetPasswordDtos.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
 import { accessTokenCookie, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
+import { TextBeeSmsService } from "../../../../infrastructure/services/textbee/TextBeeSmsService.js"
 
 
 
@@ -20,6 +21,7 @@ export class AuthController extends BaseController{
         private readonly resetPasswordUseCase:IUseCase<ResetPasswordDto,void>,
         private readonly getProfileUseCase:IUseCase<GetProfileUseCaseInputDto,GetProfileUseCaseOutputDto>,
         private readonly updateEmailUseCase:IUseCase<UpdateEmailUseCaseInputDto,UpdateEmailUseCaseOutputDto>,
+        private readonly sendSmsOtpUseCase:IUseCase<SendSmsOtpUseCaseInputDto,SendSmsOtpUseCaseOutputDto>
         
     ) {super()}
 
@@ -99,5 +101,19 @@ export class AuthController extends BaseController{
             next(err)
         }
     }
-    
+
+    updatePhone = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const user = this.getCurrentUser(req)
+            const path = req.query.path as string
+            
+            const response = await this.sendSmsOtpUseCase.execute({phone:req.body.phone,path,id:user.userId})
+        
+            res.cookie("registration_id",response.registrationId,registrationCookie)
+            
+            return sendSuccess(res,"OTP Sent Successfully",{expiresIn: response.expiresIn}) 
+        } catch (err) {
+            next(err)
+        }
+    }
 }

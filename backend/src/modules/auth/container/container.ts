@@ -22,27 +22,25 @@ import UpdateEmailUseCase from "../application/use-cases/updateEmail.useCase.js"
 import UpdatePasswordUseCase from "../application/use-cases/updatePassword.useCase.js";
 
 
+import { TextBeeSmsService } from "../../../infrastructure/services/textbee/TextBeeSmsService.js";
+import {SendSmsOtpUseCase} from "../application/use-cases/sendSmsOtp.useCase.js";
 
 
 
 
-// Services Shared...
+
+// Services
 const pendingRegistrationStore = new RedisPendingRegistrationStore()
 const emailSender = new NodemailerEmailSender()
 const otpGenerator = new SecureOtpGeneratorService()
 const passwordHasher = new BcryptPasswordHasherService()
 const jwtService = new JwtService()
-
-
-
+const smsService = new TextBeeSmsService()
 
 
 // Repo
 const userRepository = new PrismaUserRepository();
 const customerRepository = new PrismaCustomerRepository();
-
-
-
 
 
 
@@ -103,8 +101,13 @@ const updatePasswordUseCase = new UpdatePasswordUseCase(
   userRepository,
   passwordHasher
 )
-
-
+const sendSmsOtpUseCase = new SendSmsOtpUseCase(
+  smsService,
+  otpGenerator,
+  passwordHasher,
+  pendingRegistrationStore,
+  userRepository
+)
 
 
 // Controllers
@@ -112,7 +115,6 @@ export const customerAuthController = new CustomerAuthController(
   registerCustomerUseCase,
   updateProfileUseCase,
   updatePasswordUseCase
-
 )
 
 export const otpVarificationController = new OtpVarificationController(
@@ -127,5 +129,6 @@ export const authController = new AuthController(
   emailVerificationUseCase,
   resetPasswordUseCase,
   getProfileUseCase,
-  updateEmailUseCase
+  updateEmailUseCase,
+  sendSmsOtpUseCase
 )

@@ -16,6 +16,8 @@ export default function OtpVerification() {
     const [timer, setTimer] = useState(60)
     const [email,setEmail] = useState("")
     const [attempts, setAttempts] = useState(0)
+    const [forTo,setForTo] = useState("")
+    const [phone,setPhone] = useState("")
     const navigate = useNavigate()
     const {register,handleSubmit,formState:{errors}} = useForm<OtpInputType>({
         resolver : zodResolver(otpSchema),mode : "onChange"
@@ -38,6 +40,8 @@ export default function OtpVerification() {
                 setTimer(response.data.expiresIn)
                 setAttempts(response.data.attempts)
                 setEmail(response.data.email)
+                setForTo(response.data.for)
+                setPhone(response.data.phone as string)
             }
         })
     }, [])
@@ -72,8 +76,10 @@ export default function OtpVerification() {
                         useAuthStore.getState().setUser({
                             ...currentUser,
                             email: response.data.email,
-                            email_verified: true
-                        });
+                            email_verified: true,
+                            phone:response.data.phone,
+                            phone_verified: true
+                        })
                     }
                     navigate(`/${response.data.path}`, { state: { activeView: 'contact' } })
                 } else {
@@ -105,7 +111,22 @@ export default function OtpVerification() {
             return `${username.substring(0, 2)}${'*'.repeat(Math.max(0, username.length - 3))}${username.substring(username.length - 1)}@${domain}`;
         }
         return `${username[0]}*@${domain}`;
-    };
+    }
+
+    const maskPhoneNumber = (phoneNumber: string) => {
+        if (!phoneNumber) return "";
+
+        const cleaned = phoneNumber.replace(/[\s-]/g, "");
+
+        if (cleaned.length < 6) return cleaned;
+
+        const start = cleaned.substring(0, 3);
+        const end = cleaned.substring(cleaned.length - 4);
+       
+        const maskLength = Math.max(0, cleaned.length - 7);
+
+        return `${start}${'*'.repeat(maskLength)}${end}`
+    }
 
     return (
         <div className="auth-page-wrapper">
@@ -124,7 +145,10 @@ export default function OtpVerification() {
 
                     <h1 className="h3 mb-2">Two-Step Verification</h1>
                     <p className="text-secondary text-sm mb-6">
-                        Enter the 6-digit verification code sent to your email or mobile device. to {maskEmail(email)}
+                        Enter the 6-digit verification code sent to your {forTo === 'UPDATE_PHONE' ? 'mobile device' : 'email'} to{' '}
+                        <span className="font-medium">
+                            {forTo === 'UPDATE_PHONE' ? maskPhoneNumber(phone) : maskEmail(email)}
+                        </span>
                     </p>
 
                     <form onSubmit={handleSubmit(handleOtp)}>

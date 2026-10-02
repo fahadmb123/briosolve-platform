@@ -25,7 +25,7 @@ class OtpVarificationController {
 
             response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password", registrationId, registrationCookie) : null
 
-            const message = response.for === "UPDATE" ? 'Updated' : "Acount Created"
+            const message = response.for.includes("UPDATE") ? 'Updated' : "Acount Created"
 
          
             const dataToReturn = { ...response.response, path: response.path }
@@ -60,7 +60,7 @@ class OtpVarificationController {
 
             if (response && response.otpExpiresAt) expiresIn = Math.max(0, Math.floor((response.otpExpiresAt - Date.now()) / 1000))
 
-            return sendSuccess(res, "", { attempts: response?.attempts || 0, expiresIn, email: response?.email || "" })
+            return sendSuccess(res, "", { attempts: response?.attempts || 0, expiresIn, email: response?.email || "", phone: response?.phone || "", for: response?.for || "" })
         } catch (err) {
             next(err)
         }

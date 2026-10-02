@@ -32,8 +32,8 @@ export default function ResetPassword() {
                 navigate("/login",{replace:true})
                 toast.success(response.message)
             }
-        });
-    };
+        })
+    }
 
     return (
         <>

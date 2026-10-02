@@ -16,9 +16,9 @@ router.get("/otp-status",otpVarificationController.getStatus)
 router.get("/me",authMiddleware,authController.getMe)
 router.get("/get-profile",authMiddleware,authController.getProfile)
 
-
 router.post("/login",validate(loginSchema),authController.login)
 
+router.post("/update-phone",authMiddleware,authController.updatePhone)
 
 router.post("/email-verify",validate(emailSchema),authController.emailVerify)
 router.post("/reset-password",validate(resetPasswordSchema),authController.resetPassword)
@@ -26,7 +26,6 @@ router.post("/reset-password",validate(resetPasswordSchema),authController.reset
 
 router.post("/otp-varify",validate(otpSchema),otpVarificationController.validate)
 router.post("/resend-otp",otpVarificationController.resend)
-
 
 
 

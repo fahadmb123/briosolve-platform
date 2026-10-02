@@ -44,3 +44,14 @@ export type GetProfileUseCaseInputDto = {
     id:string,
     role:string
 }
+
+
+export type SendSmsOtpUseCaseInputDto = {
+    phone:string,
+    path:string;
+    id:string
+}
+export type SendSmsOtpUseCaseOutputDto = {
+    expiresIn:number,
+    registrationId:string
+}

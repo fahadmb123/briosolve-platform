@@ -11,7 +11,9 @@ type OtpVarifyOutput = {
     message:string,
     data:{
         path:string,
-        email:string
+        email:string,
+        phone?:string | null
+        for:string
     }
 }
 type OtpStatusOut = {
@@ -19,7 +21,9 @@ type OtpStatusOut = {
     data: {
         attempts: number,
         expiresIn: number,
-        email:string
+        email:string;
+        phone?:string | null
+        for:string
     }
 }
 

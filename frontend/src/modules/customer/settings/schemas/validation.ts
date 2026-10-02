@@ -7,7 +7,7 @@ export const emailSchema = z.object({
 })
 
 export const phoneSchema = z.object({
-  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number" })
+  phone: z.string().regex(/^\+[1-9]\d{1,14}$/, { message: "Please include your country code (e.g. +91)" })
 })
 
 export const updatePasswordSchema = z.object({

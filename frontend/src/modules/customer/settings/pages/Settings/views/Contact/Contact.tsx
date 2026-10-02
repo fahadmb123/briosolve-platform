@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { emailSchema, phoneSchema, type EmailInputType, type PhoneInputType } from '../../../../schemas/validation';
-import { useUpdateEmail } from '../../../../hooks/mutations/contact';
+import { useUpdateEmail, useUpdatePhone } from '../../../../hooks/mutations/contact';
 
 
 import { toast } from 'react-toastify';
@@ -13,6 +13,8 @@ export const Contact = () => {
     const user = useAuthStore((state) => state.user);
     const updateEmail = useUpdateEmail()
     const navigate = useNavigate()
+    const updatePhone = useUpdatePhone()
+    const {setOtpFlowStarted} = useResetFlowStore((state)=>state)
 
 
     const {register: registerEmail, handleSubmit: handleEmailSubmit, formState: { errors: emailErrors }} = useForm<EmailInputType>({
@@ -38,7 +40,13 @@ export const Contact = () => {
     };
 
     const onPhoneSubmit = (formData: PhoneInputType) => {
-        console.log("Update Phone:", formData);
+        updatePhone.mutate(formData, {
+            onSuccess: (response) => {
+                setOtpFlowStarted(true)
+                navigate("/otp-verification",{replace:true})
+                toast.success(response.message)
+            }
+        });
     };
 
     return (

@@ -49,6 +49,13 @@ export default class OtpVarificationUseCase implements IUseCase<OtpVarificationI
                 }
                 await this.PendingRegistrationStore.delete(registrationId)
                 break;
+            case "UPDATE_PHONE":
+                response = data
+                if (data.userId) {
+                    await this.UserRepository.update(data.userId, { phone: data.phone })
+                }
+                await this.PendingRegistrationStore.delete(registrationId)
+                break;
         }
 
         return { response: response!, for: data?.for, email: data.email, path: data?.path }
