@@ -20,7 +20,7 @@ export class PrismaUserRepository implements IUserRepository {
             password_hash: data.password,
             role: "CUSTOMER" as const,
             status: "ACTIVE" as const,
-            email_verified: false,
+            email_verified: true,
             phone_verified: false,
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant(),
@@ -28,6 +28,7 @@ export class PrismaUserRepository implements IUserRepository {
 
         await db.orm.public.customer_profiles.create({
             user_id: user.id, 
+            about: "",
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant(),
         } as never)
@@ -51,6 +52,24 @@ export class PrismaUserRepository implements IUserRepository {
     async findById(id: string): Promise<UserData | null> {
         const user = await db.orm.public.users.where({id:id as Varchar<255>}).first()
         return user ? (user as UserData)  : null
+    }
+    
+    async findByPhone(phone: string): Promise<User | null> {
+        const response = await db.orm.public.users.where({phone:phone as Varchar<20>}).first()
+        if (!response) return null
+        const user = new User(
+            response.id,
+            response.name,
+            response.email,
+            response.phone,
+            response.role,
+            response.status,
+            response.email_verified,
+            response.phone_verified,
+            response.created_at,
+            response.updated_at
+        )
+        return user
     }
     async updatePassword(id: string, passwordHash: string): Promise<void> {
         await db.orm.public.users

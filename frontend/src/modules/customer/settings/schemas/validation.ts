@@ -3,11 +3,12 @@ import { z } from "zod";
 
 
 export const emailSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" })
+  email: z.string().min(1, "Email address is required").email({ message: "Please enter a valid email address" })
 })
 
 export const phoneSchema = z.object({
-  phone: z.string().regex(/^\+[1-9]\d{1,14}$/, { message: "Please include your country code (e.g. +91)" })
+  countryCode: z.string().min(1, "Country code required"),
+  phoneNumber: z.string().min(1, "Phone number is required").regex(/^[0-9]{4,14}$/, { message: "Please enter a valid phone number" })
 })
 
 export const updatePasswordSchema = z.object({

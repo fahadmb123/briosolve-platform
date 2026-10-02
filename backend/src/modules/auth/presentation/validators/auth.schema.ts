@@ -7,6 +7,9 @@ export const loginSchema = z.object({
 export const emailSchema = z.object({
     email: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email address" })
 })
+export const phoneSchema = z.object({
+    phone: z.string().min(1, { message: "Phone number is required" }).regex(/^\+[1-9]\d{4,14}$/, { message: "Invalid phone number format" })
+})
 
 export const resetPasswordSchema = z.object({
     password: z
@@ -46,3 +49,4 @@ export type ResetPasswordInputType = z.infer<typeof resetPasswordSchema>
 export type EmailInputType = z.infer<typeof emailSchema>
 export type LoginInputType = z.infer<typeof loginSchema>
 export type UpdatePasswordType = z.infer<typeof updatePasswordSchema>
+export type PhoneInputType = z.infer<typeof phoneSchema>

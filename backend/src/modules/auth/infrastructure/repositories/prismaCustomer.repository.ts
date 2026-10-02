@@ -1,3 +1,4 @@
+import { Temporal } from "@js-temporal/polyfill";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types"
 import { db } from "../../../../infrastructure/persistence/prisma/client.js"
 import { UpdateCustomerProfileInputDto } from "../../application/dto/authDto.js"
@@ -16,7 +17,7 @@ export class PrismaCustomerRepository implements ICustomerRepository {
             password_hash: data.password,
             role: "CUSTOMER" as const,
             status: "ACTIVE" as const,
-            email_verified: false,
+            email_verified: true,
             phone_verified: false,
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant(),
@@ -24,6 +25,7 @@ export class PrismaCustomerRepository implements ICustomerRepository {
 
         await db.orm.public.customer_profiles.create({
             user_id: user.id, 
+            about: "",
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant(),
         } as never)

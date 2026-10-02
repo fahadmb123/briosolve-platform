@@ -26,7 +26,10 @@ export const Contact = () => {
     const {register: registerPhone, handleSubmit: handlePhoneSubmit, formState: { errors: phoneErrors }} = useForm<PhoneInputType>({
         resolver: zodResolver(phoneSchema),
         mode: "onChange",
-        defaultValues: { phone: user?.phone || "" }
+        defaultValues: { 
+            countryCode: "+91", 
+            phoneNumber: user?.phone ? user.phone.replace(/^\+91|^\+1|^\+44|^\+61|^\+81/, '') : "" 
+        }
     });
 
     const onEmailSubmit = (formData: EmailInputType) => {
@@ -40,7 +43,8 @@ export const Contact = () => {
     };
 
     const onPhoneSubmit = (formData: PhoneInputType) => {
-        updatePhone.mutate(formData, {
+        const fullPhone = `${formData.countryCode}${formData.phoneNumber}`;
+        updatePhone.mutate({ phone: fullPhone }, {
             onSuccess: (response) => {
                 setOtpFlowStarted(true)
                 navigate("/otp-verification",{replace:true})
@@ -66,10 +70,10 @@ export const Contact = () => {
                     <label className="form-label text-xs block mb-2" htmlFor="prof-email">Email Address</label>
                     <div className="input-icon-wrapper">
                         <i className="fas fa-envelope"></i>
-                        <input type="email" id="prof-email" className="form-control" {...registerEmail("email")} />
+                        <input type="email" id="prof-email" className={`form-control ${emailErrors.email ? 'border-danger' : ''}`} style={emailErrors.email ? { borderColor: 'red' } : {}} {...registerEmail("email")} />
                     </div>
                     {emailErrors.email && (
-                        <span className="text-red-500 text-xs mt-1 block">{emailErrors.email.message}</span>
+                        <span className="text-danger text-red-500 text-xs mt-1 block">{emailErrors.email.message}</span>
                     )}
                     <p className="text-xs text-secondary mt-2"><i className="fas fa-info-circle mr-1"></i>A verification link will be sent to new emails.</p>
                 </div>
@@ -93,17 +97,31 @@ export const Contact = () => {
                 <p className="text-xs text-secondary mb-4">Update and verify your mobile number.</p>
                 <div className="form-group mb-4 flex-grow">
                     <label className="form-label text-xs block mb-2" htmlFor="prof-phone">Mobile Number</label>
-                    <div className="input-icon-wrapper">
-                        <i className="fas fa-phone"></i>
-                        <input type="tel" id="prof-phone" className="form-control" placeholder="+91 9876543210" {...registerPhone("phone")} />
+                    <div className="flex gap-2">
+                        <select className={`form-control ${phoneErrors.countryCode ? 'border-danger' : ''}`} style={{ maxWidth: "140px", flex: "none", ...(phoneErrors.countryCode ? { borderColor: 'red' } : {}) }} {...registerPhone("countryCode")}>
+                            <option value="+91">IN (+91)</option>
+                            <option value="+1">US (+1)</option>
+                            <option value="+44">UK (+44)</option>
+                            <option value="+61">AU (+61)</option>
+                            <option value="+81">JP (+81)</option>
+                        </select>
+                        <div className="input-icon-wrapper flex-grow">
+                            <i className="fas fa-phone"></i>
+                            <input type="tel" id="prof-phone" className={`form-control ${phoneErrors.phoneNumber ? 'border-danger' : ''}`} style={phoneErrors.phoneNumber ? { borderColor: 'red' } : {}} placeholder="9876543210" {...registerPhone("phoneNumber")} />
+                        </div>
                     </div>
-                    {phoneErrors.phone && (
-                        <span className="text-red-500 text-xs mt-1 block">{phoneErrors.phone.message}</span>
+                    {phoneErrors.phoneNumber && (
+                        <span className="text-danger text-red-500 text-xs mt-1 block">{phoneErrors.phoneNumber.message}</span>
+                    )}
+                    {phoneErrors.countryCode && (
+                        <span className="text-danger text-red-500 text-xs mt-1 block">{phoneErrors.countryCode.message}</span>
                     )}
                     <p className="text-xs text-secondary mt-2"><i className="fas fa-info-circle mr-1"></i>We'll send an OTP to verify ownership.</p>
                 </div>
                 <div className="flex justify-end mt-auto pt-2">
-                    <button type="submit" className="btn btn-primary btn-sm">Update Mobile Number</button>
+                    <button type="submit" disabled={updatePhone.isPending} className="btn btn-primary btn-sm">
+                        {updatePhone.isPending ? 'Sending...' : 'Update Mobile Number'}
+                    </button>
                 </div>
             </form>
         </div>

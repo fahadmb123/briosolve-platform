@@ -17,6 +17,7 @@ export type RegisterCustomerInput = {
 export interface IUserRepository extends BaseRepository<UserData | null>{
   findByEmail(email: string): Promise<User | null>
   findById(id: string): Promise<UserData | null> 
+  findByPhone(phone: string): Promise<User | null> 
   updatePassword(id:string,passwordHash: string):Promise<void>
   update(id: string, data: { email?: string, phone?: string }): Promise<void>
 }

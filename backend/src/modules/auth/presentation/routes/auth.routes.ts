@@ -2,7 +2,7 @@ import { Router } from "express";
 import validate from "../../../../shared/presentation/http/middlewares/validate-request.js";
 import { otpSchema } from "../validators/registerCustomer.schema.js";
 import { otpVarificationController ,authController, customerAuthController} from "../../container/container.js";
-import { emailSchema, loginSchema, resetPasswordSchema } from "../validators/auth.schema.js";
+import { emailSchema, loginSchema, resetPasswordSchema, phoneSchema } from "../validators/auth.schema.js";
 import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
 
 
@@ -18,7 +18,7 @@ router.get("/get-profile",authMiddleware,authController.getProfile)
 
 router.post("/login",validate(loginSchema),authController.login)
 
-router.post("/update-phone",authMiddleware,authController.updatePhone)
+router.post("/update-phone",authMiddleware,validate(phoneSchema),authController.updatePhone)
 
 router.post("/email-verify",validate(emailSchema),authController.emailVerify)
 router.post("/reset-password",validate(resetPasswordSchema),authController.resetPassword)

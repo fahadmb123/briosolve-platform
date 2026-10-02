@@ -22,7 +22,14 @@ export class SendSmsOtpUseCase implements IUseCase<SendSmsOtpUseCaseInputDto,Sen
     ){}
     async execute(input:SendSmsOtpUseCaseInputDto):Promise<SendSmsOtpUseCaseOutputDto>{
         const user = await this.userRepository.findById(input.id)
+
         if (!user) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
+
+        if(user.phone === input.phone) throw new ApplicationError("ALREADY_VERIFIED","Already verified","CONFLICT")
+
+        const isPhoneExist = await this.userRepository.findByPhone(input.phone)
+                
+        if (isPhoneExist) throw new ApplicationError("USER_ALREADY_EXIST", "User with mobile already exist", "CONFLICT")
 
         const otp = this.otpGenerate.generate()
 

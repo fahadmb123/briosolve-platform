@@ -24,9 +24,17 @@ export default class UpdateEmailUseCase implements IUseCase<UpdateEmailUseCaseIn
     ) { }
 
     async execute(input: UpdateEmailUseCaseInputDto): Promise<UpdateEmailUseCaseOutputDto> {
-        const user = await this.userRepository.findByEmail(input.email)
-        if (user) throw new ApplicationError("USER_ALREADY_EXIST", "User with email already exist", "CONFLICT")
 
+        const user = await this.userRepository.findById(input.userId)
+
+        if (!user) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
+
+        if (user?.email === input.email) throw new ApplicationError("ALREADY_VERIFIED", "Already verified", "CONFLICT")
+
+        const isEmailExist = await this.userRepository.findByEmail(input.email)
+        
+        if (isEmailExist) throw new ApplicationError("USER_ALREADY_EXIST", "User with email already exist", "CONFLICT")
+        
         const otp = this.otpGenerate.generate()
         const otpHash = await this.passwordHasher.hash(otp)
 
