@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense } from 'react';
+import { useLocation } from 'react-router-dom';
 import './Settings.css';
 import { SettingsMenuCard } from '../../components/SettingsMenuCard';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
@@ -16,7 +17,8 @@ const Danger = lazy(() => import('./views/Danger/Danger').then(m => ({ default: 
 type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notifications' | 'location' | 'privacy' | 'danger' | 'addresses';
 
 export default function Settings() {
-    const [activeView, setActiveView] = useState<SettingsView>('menu');
+    const location = useLocation();
+    const [activeView, setActiveView] = useState<SettingsView>(location.state?.activeView || 'menu');
 
     const renderMenu = () => (
         <div className="settings-glass-grid">

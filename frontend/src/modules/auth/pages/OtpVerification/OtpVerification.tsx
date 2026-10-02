@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../hooks/mutations/use-otp-varify';
 import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
+import { useAuthStore } from '../../../../store/auth/auth.store';
 
 export default function OtpVerification() {
     const { toggleTheme } = useTheme()
@@ -24,9 +25,17 @@ export default function OtpVerification() {
     const resendOtp = useResendOtp()
     const setOtpVerified = useResetFlowStore((state) => state.setOtpVerified);
 
+    const [endTime, setEndTime] = useState<number | null>(null)
+
     useEffect(() => {
         getOtpStatus.mutate(undefined, {
             onSuccess: (response) => {
+                if (response.data.expiresIn === 0) {
+                    // If backend says no active OTP session exists, reset flow!
+                    useResetFlowStore.getState().setOtpFlowStarted(false);
+                    return;
+                }
+                setEndTime(Date.now() + response.data.expiresIn * 1000)
                 setTimer(response.data.expiresIn)
                 setAttempts(response.data.attempts)
                 setEmail(response.data.email)
@@ -35,18 +44,21 @@ export default function OtpVerification() {
     }, [])
 
     useEffect(() => {
+        if (!endTime) return;
+        
         const interval = setInterval(() => {
-            setTimer(prev => {
-                if (prev <= 1) {
-                    clearInterval(interval)
-                    return 0
-                }
-                return prev - 1
-            })
+            const now = Date.now()
+            const remaining = Math.max(0, Math.floor((endTime - now) / 1000))
+            
+            setTimer(remaining)
+            
+            if (remaining <= 0) {
+                clearInterval(interval)
+            }
         }, 1000)
 
         return () => clearInterval(interval)
-    }, [timer])
+    }, [endTime])
 
     const handleOtp = (data:OtpInputType) => {
         otpVarify.mutate(data, {
@@ -55,7 +67,20 @@ export default function OtpVerification() {
                     setOtpVerified(true);
                 }
                 
-                navigate(`/${response?.data.path}`)
+                if (response.data.path === "settings") {
+                    const currentUser = useAuthStore.getState().user;
+                    if (currentUser && response.data.email) {
+                        useAuthStore.getState().setUser({
+                            ...currentUser,
+                            email: response.data.email,
+                            email_verified: true
+                        });
+                    }
+                    navigate(`/${response.data.path}`, { state: { activeView: 'contact' } })
+                } else {
+                    navigate(`/${response?.data.path}`)
+                }
+
                 if (response.data.path === "login" || response.data.path === "settings") toast.success(response.message)
             }
         })
@@ -65,6 +90,7 @@ export default function OtpVerification() {
         resendOtp.mutate(undefined, {
             onSuccess: (response) => {
                 toast.success(response.message)
+                setEndTime(Date.now() + response?.data.expiresIn * 1000)
                 setTimer(response?.data.expiresIn)
                 setAttempts(prev => prev + 1)
             }
