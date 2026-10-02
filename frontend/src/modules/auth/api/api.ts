@@ -10,7 +10,8 @@ type OtpVarifyOutput = {
     success:boolean,
     message:string,
     data:{
-        path:string
+        path:string,
+        email:string
     }
 }
 type OtpStatusOut = {
