@@ -31,6 +31,20 @@ export const otpSchema = z.object({
   })
 
 
+export const profileSchema = z.object({
+  name: z
+    .string({ error: "Name is required" })
+    .trim()
+    .min(2, { message: "Name must be at least 2 characters" })
+    .max(50, { message: "Name cannot exceed 50 characters" }),
+  about: z
+    .string()
+    .max(500, { message: "Description cannot exceed 500 characters" })
+    .optional(),
+})
+
+
 
 export type OtpInputType = z.infer<typeof otpSchema>;
+export type ProfileSchemaType = z.infer<typeof profileSchema>;
 export type CustomerRegistrationInputType = z.infer<typeof customerRegistrationSchema>;

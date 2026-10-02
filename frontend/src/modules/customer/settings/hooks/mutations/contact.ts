@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import type { ApiError } from "../../../../../shared/api/ApiError";
-import { updateEmail } from "../../api/api";
+import { updateEmail, updatePassword } from "../../api/api";
 import { toast } from "react-toastify";
 
 
@@ -9,4 +9,12 @@ export const useUpdateEmail = () => {
         mutationFn: updateEmail,
         onError: (error: ApiError) => toast.error(error.message),
     });
-};
+}
+
+
+export const useUpdatePassword = ()=>{
+    return useMutation({
+        mutationFn:updatePassword,
+        onError:(error:ApiError)=>toast.error(error.message)
+    })
+}

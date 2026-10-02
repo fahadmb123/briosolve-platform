@@ -19,6 +19,7 @@ import ResetPasswordUseCase from "../application/use-cases/resetPassword.useCase
 import UpdateProfileUseCase from "../application/use-cases/updateCustomerProfile.useCase.js";
 import GetProfileUseCase from "../application/use-cases/getProfile.useCase.js";
 import UpdateEmailUseCase from "../application/use-cases/updateEmail.useCase.js";
+import UpdatePasswordUseCase from "../application/use-cases/updatePassword.useCase.js";
 
 
 
@@ -98,7 +99,10 @@ const updateEmailUseCase = new UpdateEmailUseCase(
   pendingRegistrationStore,
   emailSender
 )
-
+const updatePasswordUseCase = new UpdatePasswordUseCase(
+  userRepository,
+  passwordHasher
+)
 
 
 
@@ -106,7 +110,9 @@ const updateEmailUseCase = new UpdateEmailUseCase(
 // Controllers
 export const customerAuthController = new CustomerAuthController(
   registerCustomerUseCase,
-  updateProfileUseCase
+  updateProfileUseCase,
+  updatePasswordUseCase
+
 )
 
 export const otpVarificationController = new OtpVarificationController(

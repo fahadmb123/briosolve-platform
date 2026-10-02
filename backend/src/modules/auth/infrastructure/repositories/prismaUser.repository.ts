@@ -61,11 +61,4 @@ export class PrismaUserRepository implements IUserRepository {
             } as never);
         return
     }
-
-    async update(id: string,data:unknown): Promise<void> {
-        await db.orm.public.users
-            .where({ id: id as Varchar<255> })
-            .update(data as never);
-        return
-    }
 }

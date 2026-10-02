@@ -31,7 +31,6 @@ export default function OtpVerification() {
         getOtpStatus.mutate(undefined, {
             onSuccess: (response) => {
                 if (response.data.expiresIn === 0) {
-                    // If backend says no active OTP session exists, reset flow!
                     useResetFlowStore.getState().setOtpFlowStarted(false);
                     return;
                 }

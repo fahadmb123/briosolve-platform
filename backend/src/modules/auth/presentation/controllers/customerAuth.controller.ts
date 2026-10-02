@@ -1,6 +1,6 @@
 import { Request,Response,NextFunction } from "express"
 import { RegisterCustomerInput } from "../../domain/repositories/user.repository.js"
-import { EmailVerificationUseCaseOutputDto } from "../../application/dto/customerDto.js"
+import { EmailVerificationUseCaseOutputDto, UpdatePasswordInputDto } from "../../application/dto/customerDto.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
@@ -12,7 +12,8 @@ import { UpdateCustomerProfileInputDto } from "../../application/dto/authDto.js"
 class CustomerAuthController extends BaseController {
     constructor (
         private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto>,
-        private readonly updateCustomerProfileUseCase :IUseCase<UpdateCustomerProfileInputDto,void>
+        private readonly updateCustomerProfileUseCase :IUseCase<UpdateCustomerProfileInputDto,void>,
+        private readonly updatePasswordUseCase :IUseCase<UpdatePasswordInputDto,void>
     ) { super() }
 
     register = async (req:Request,res:Response,next:NextFunction) => {
@@ -31,6 +32,18 @@ class CustomerAuthController extends BaseController {
         try {
             this.getCurrentUser(req)
             await this.updateCustomerProfileUseCase.execute({id:req.user?.userId!,data:req.body})
+
+            return sendSuccess(res,"Updated")
+        } catch (err) {
+            next(err)
+        }
+    }
+    updatePassword = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            this.getCurrentUser(req)
+            
+
+            await this.updatePasswordUseCase.execute({id:req.user?.userId as string,data:req.body})
 
             return sendSuccess(res,"Updated")
         } catch (err) {
