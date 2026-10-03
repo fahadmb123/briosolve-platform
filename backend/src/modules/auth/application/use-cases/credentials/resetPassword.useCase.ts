@@ -1,9 +1,9 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IUserRepository } from "../../domain/repositories/user.repository.js";
-import { ResetPasswordDto } from "../dto/resetPasswordDtos.js";
+import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js";
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service.js";
+import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store.js";
+import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js";
+import { IUserRepository } from "../../../domain/repositories/user.repository.js";
+import { ResetPasswordDto } from "../../dto/resetPasswordDtos.js";
 
 
 

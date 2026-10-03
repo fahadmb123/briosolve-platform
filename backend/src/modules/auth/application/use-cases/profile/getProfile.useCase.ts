@@ -1,10 +1,10 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js"
-import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js"
-import { User } from "../../domain/entities/user.entity.js"
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
-import { ICustomerRepository } from "../../domain/repositories/customer.respository.js"
-import { IUserRepository } from "../../domain/repositories/user.repository.js"
-import { GetProfileUseCaseOutputDto, GetProfileUseCaseInputDto } from "../dto/authDto.js"
+import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js"
+import { CustomerProfile } from "../../../domain/entities/customerProfile.entity.js"
+import { User } from "../../../domain/entities/user.entity.js"
+import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js"
+import { ICustomerRepository } from "../../../domain/repositories/customer.respository.js"
+import { IUserRepository } from "../../../domain/repositories/user.repository.js"
+import { GetProfileUseCaseOutputDto, GetProfileUseCaseInputDto } from "../../dto/authDto.js"
 
 
 

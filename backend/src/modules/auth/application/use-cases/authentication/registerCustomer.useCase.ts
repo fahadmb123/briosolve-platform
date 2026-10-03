@@ -1,12 +1,12 @@
-import type { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../dto/customerDto.js";
-import { IUserRepository } from "../../domain/repositories/user.repository.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js";
-import type { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
+import type { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../dto/customerDto.js";
+import { IUserRepository } from "../../../domain/repositories/user.repository.js";
+import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js";
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service.js";
+import type { IOtpGenerator } from "../../../../../shared/domain/interfaces/IOtpGenerator.service.js";
+import type { IEmailSender } from "../../../../../shared/domain/interfaces/IEmailSender.service.js";
 import { randomUUID } from "crypto";
-import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
+import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store.js";
+import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js";
 
 
 
