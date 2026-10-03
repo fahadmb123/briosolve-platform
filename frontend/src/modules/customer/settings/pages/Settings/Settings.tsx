@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import './Settings.css';
 import { SettingsMenuCard } from '../../components/SettingsMenuCard';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
+import { useAuthStore } from '../../../../../store/auth/auth.store';
 
 const Appearance = lazy(() => import('./views/Appearance/Appearance').then(m => ({ default: m.Appearance })));
 const Contact = lazy(() => import('./views/Contact/Contact').then(m => ({ default: m.Contact })));
@@ -19,6 +20,8 @@ type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notificati
 export default function Settings() {
     const location = useLocation();
     const [activeView, setActiveView] = useState<SettingsView>(location.state?.activeView || 'menu');
+    const user = useAuthStore((state) => state.user);
+    const isContactVerified = user?.email_verified && user?.phone_verified;
 
     const renderMenu = () => (
         <div className="settings-glass-grid">
@@ -34,6 +37,7 @@ export default function Settings() {
                 title="Account & Contact"
                 description="Update your sign-in email and verified mobile number."
                 onClick={() => setActiveView('contact')}
+                badge={isContactVerified ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
             />
 
             <SettingsMenuCard

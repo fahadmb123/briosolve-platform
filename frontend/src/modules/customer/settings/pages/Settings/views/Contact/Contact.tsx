@@ -57,12 +57,12 @@ export const Contact = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Email Box */}
             <form onSubmit={handleEmailSubmit(onEmailSubmit)} className="card p-6 fade-in flex flex-col h-full">
-                <div className="flex justify-between items-center mb-4 border-bottom pb-3">
+                <div className="flex justify-between items-center mb-4 border-bottom" style={{ paddingBottom: '16px' }}>
                     <h2 className="h5 mb-0">Email Address</h2>
                     {user?.email_verified ? (
-                        <span className="badge badge-success text-xs"><i className="fas fa-check-circle mr-1"></i>Verified</span>
+                        <span className="badge badge-success text-xs px-2 py-1 mb-1"><i className="fas fa-check-circle mr-1"></i>Verified</span>
                     ) : (
-                        <span className="badge badge-warning text-xs">Not Verified</span>
+                        <span className="badge badge-warning text-xs px-2 py-1 mb-1">Not Verified</span>
                     )}
                 </div>
                 <p className="text-xs text-secondary mb-4">Update your sign-in email address.</p>
@@ -86,12 +86,12 @@ export const Contact = () => {
 
             {/* Mobile Number Box */}
             <form onSubmit={handlePhoneSubmit(onPhoneSubmit)} className="card p-6 fade-in flex flex-col h-full">
-                <div className="flex justify-between items-center mb-4 border-bottom pb-3">
+                <div className="flex justify-between items-center mb-4 border-bottom" style={{ paddingBottom: '16px' }}>
                     <h2 className="h5 mb-0">Mobile Number</h2>
                     {user?.phone_verified ? (
-                        <span className="badge badge-success text-xs"><i className="fas fa-check-circle mr-1"></i>Verified</span>
+                        <span className="badge badge-success text-xs px-2 py-1 mb-1"><i className="fas fa-check-circle mr-1"></i>Verified</span>
                     ) : (
-                        <span className="badge badge-warning text-xs">Not Verified</span>
+                        <span className="badge badge-warning text-xs px-2 py-1 mb-1">Not Verified</span>
                     )}
                 </div>
                 <p className="text-xs text-secondary mb-4">Update and verify your mobile number.</p>
