@@ -39,3 +39,24 @@ export const updatePasswordSchema = z.object({
 export type EmailInputType = z.infer<typeof emailSchema>;
 export type PhoneInputType = z.infer<typeof phoneSchema>;
 export type UpdatePasswordInputType = z.infer<typeof updatePasswordSchema>;
+
+export const addressSchema = z.object({
+  houseNo: z.string().min(1, "House number is required"),
+  area: z.string().min(1, "Area is required"),
+  city: z.string().min(1, "City is required"),
+  district: z.string().min(1, "District is required"),
+  state: z.string().min(1, "State is required"),
+  country: z.string().min(1, "Country is required"),
+  pincode: z.string().min(1, "Pincode is required"),
+  landmark: z.string().optional()
+});
+
+export type AddressInputType = z.infer<typeof addressSchema>;
+
+export interface AddressPayload extends AddressInputType {
+  id?: string;
+  type: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  isDefault?: boolean;
+}

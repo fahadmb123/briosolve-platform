@@ -1,5 +1,6 @@
 import { Textbee } from "@textbee/sdk";
 import { ISmsService } from "../../../shared/domain/interfaces/ISms.service.js";
+import { ApplicationError } from "../../../shared/application/errors/applicationError.js";
 
 
 export class TextBeeSmsService implements ISmsService {
@@ -15,10 +16,11 @@ export class TextBeeSmsService implements ISmsService {
         try {
             await this.textbee.sendSms({
                 recipients: [phone],
-                message: `OTP ${otp}`
+                message: `otp:${otp}`
             })
         } catch (error) {
             console.error("Failed to send SMS via TextBee:", error);
+            throw new ApplicationError("FAILED_TO_SEND_SMS","Failed to send SMS","INTERNAL")
         }
     }
     

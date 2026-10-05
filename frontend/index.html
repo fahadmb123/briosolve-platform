@@ -11,6 +11,70 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Material Symbols Outlined -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+    <!-- Tailwind CSS (CDN for prototype styles mapped to Global Theme Variables) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "surface": "var(--surface)",
+              "surface-variant": "var(--border)",
+              "surface-container-low": "var(--surface-elevated)",
+              "surface-container-lowest": "var(--surface)",
+              "surface-container-highest": "var(--surface-hover)",
+              "surface-container": "var(--surface)",
+              "on-surface": "var(--text)",
+              "on-surface-variant": "var(--text-secondary)",
+              "primary": "var(--primary)",
+              "primary-container": "var(--primary)",
+              "on-primary-container": "var(--primary-content)",
+              "on-primary": "var(--primary-content)",
+              "secondary": "var(--text-secondary)",
+              "error": "var(--danger)",
+              "outline": "var(--border-light)"
+            },
+            "borderRadius": {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "full": "9999px"
+            },
+            "fontFamily": {
+              "headline-md": ["Inter"],
+              "title-md": ["Inter"],
+              "headline-lg-mobile": ["Inter"],
+              "headline-xl-mobile": ["Inter"],
+              "headline-lg": ["Inter"],
+              "body-lg": ["Inter"],
+              "body-md": ["Inter"],
+              "body-sm": ["Inter"],
+              "headline-xl": ["Inter"],
+              "label-md": ["Inter"],
+              "label-sm": ["Inter"]
+            },
+            "fontSize": {
+              "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+              "title-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "600" }],
+              "headline-lg-mobile": ["1.5rem", { "lineHeight": "2rem", "fontWeight": "600" }],
+              "headline-xl-mobile": ["1.875rem", { "lineHeight": "2.25rem", "fontWeight": "700" }],
+              "headline-lg": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }],
+              "body-lg": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+              "body-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+              "body-sm": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "400" }],
+              "headline-xl": ["2.5rem", { "lineHeight": "3rem", "fontWeight": "700" }],
+              "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+              "label-sm": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "600" }]
+            }
+          },
+        },
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
