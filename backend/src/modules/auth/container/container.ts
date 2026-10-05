@@ -1,7 +1,6 @@
 import { PrismaUserRepository } from "../infrastructure/repositories/prismaUser.repository.js";
 import { PrismaCustomerRepository } from "../infrastructure/repositories/prismaCustomer.repository.js";
 import { BcryptPasswordHasherService } from "../../../shared/infrastructure/security/becryptPasswordHasher.service.js";
-import CustomerAuthController from "../presentation/controllers/customerAuth.controller.js";
 import { SecureOtpGeneratorService } from "../../../shared/infrastructure/security/secureOtpGenerate.service.js";
 import { NodemailerEmailSender } from "../../../shared/infrastructure/email/nodemailer/nodemailerEmail-sender.js";
 import { RedisPendingRegistrationStore } from "../../../shared/infrastructure/cache/redis/redisPendingRegistration.store.js";
@@ -21,6 +20,7 @@ import UpdatePasswordUseCase from "../application/use-cases/credentials/updatePa
 
 import { TextBeeSmsService } from "../../../infrastructure/services/textbee/TextBeeSmsService.js";
 import {SendSmsOtpUseCase} from "../application/use-cases/verification/sendSmsOtp.useCase.js";
+import { SecurityController } from "../presentation/controllers/security.controller.js";
 
 
 
@@ -94,9 +94,6 @@ const sendSmsOtpUseCase = new SendSmsOtpUseCase(
 
 
 // Controllers
-export const customerAuthController = new CustomerAuthController(
-  updatePasswordUseCase
-)
 
 export const otpVarificationController = new OtpVarificationController(
     otpVarificationUseCase,
@@ -108,7 +105,11 @@ export const authController = new AuthController(
   loginUseCase,
   getMeUseCase,
   emailVerificationUseCase,
+  updateEmailUseCase
+)
+
+export const securityController = new SecurityController(
   resetPasswordUseCase,
-  updateEmailUseCase,
-  sendSmsOtpUseCase
+  sendSmsOtpUseCase,
+  updatePasswordUseCase
 )
