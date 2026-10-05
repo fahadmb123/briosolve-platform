@@ -11,20 +11,25 @@ const router = Router()
 
 router.get("/logout",authController.logout)
 
-router.get("/otp-status",otpVarificationController.getStatus)
 
 router.get("/me",authMiddleware,authController.getMe)
-router.get("/get-profile",authMiddleware,authController.getProfile)
+
+router.get("/profile",authMiddleware,authController.getProfile)
 
 router.post("/login",validate(loginSchema),authController.login)
 
-router.post("/update-phone",authMiddleware,validate(phoneSchema),authController.updatePhone)
+
+router.post("/phone",authMiddleware,validate(phoneSchema),authController.updatePhone)
 
 router.post("/email-verify",validate(emailSchema),authController.emailVerify)
 router.post("/reset-password",validate(resetPasswordSchema),authController.resetPassword)
 
 
+
+router.get("/otp-status",otpVarificationController.getStatus)
 router.post("/otp-varify",validate(otpSchema),otpVarificationController.validate)
+
+
 router.post("/resend-otp",otpVarificationController.resend)
 
 

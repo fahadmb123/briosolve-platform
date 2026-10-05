@@ -8,11 +8,11 @@ import type { CustomerProfile, response, User } from "../../../../shared/types/D
 import type { NameInputType } from "../schemas/validation";
 
 export const updateProfile = async (data: NameInputType): Promise<response<null>> => {
-    const response = await apiClient.post("/api/customer/update-profile", data)
+    const response = await apiClient.patch("/api/customer/profile", data)
     return response.data
 }
 
 export const getProfile = async (): Promise<response<{user:User,profile:CustomerProfile}>> => {
-    const response = await apiClient.get("/api/auth/get-profile")
+    const response = await apiClient.get("/api/auth/profile")
     return response.data
 }

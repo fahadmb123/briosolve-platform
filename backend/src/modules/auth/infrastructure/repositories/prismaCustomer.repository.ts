@@ -49,11 +49,30 @@ export class PrismaCustomerRepository implements ICustomerRepository {
     async updateProfile(input:UpdateCustomerProfileInputDto): Promise<void> {
         await db.orm.public.users
             .where({ id: input.id as Varchar<255> })
-            .update({name: input.data.name} as never);
+            .update({
+                name: input.data.name,
+                updated_at: Temporal.Now.instant()
+            } as never);
 
-        await db.orm.public.customer_profiles
+        const profile = await db.orm.public.customer_profiles
             .where({ user_id: input.id as Varchar<255> })
-            .update({about: input.data.about} as never);
+            .first();
+
+        if (profile) {
+            await db.orm.public.customer_profiles
+                .where({ user_id: input.id as Varchar<255> })
+                .update({
+                    about: input.data.about !== undefined ? input.data.about : profile.about,
+                    updated_at: Temporal.Now.instant()
+                } as never);
+        } else {
+            await db.orm.public.customer_profiles.create({
+                user_id: input.id,
+                about: input.data.about || "",
+                created_at: Temporal.Now.instant(),
+                updated_at: Temporal.Now.instant()
+            } as never);
+        }
         return
     }
 

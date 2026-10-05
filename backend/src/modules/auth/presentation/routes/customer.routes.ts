@@ -10,10 +10,14 @@ const router = Router();
 
 router.post("/register",validate(customerRegistrationSchema),customerAuthController.register)
 
-router.post("/update-profile",validate(profileSchema),authMiddleware,customerAuthController.updateProfile)
+
 
 router.post("/email-verify",validate(emailSchema),authMiddleware,authController.emailVerify)
 
-router.post("/update-password",validate(updatePasswordSchema),authMiddleware,customerAuthController.updatePassword)
+
+
+router.patch("/password",validate(updatePasswordSchema),authMiddleware,customerAuthController.updatePassword)
+router.patch("/prfoile",validate(profileSchema),authMiddleware,customerAuthController.updateProfile)
+
 
 export default router
