@@ -1,6 +1,4 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { User } from "../../domain/entities/user.entity.js";
-import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js";
 
 export type LoginInputDto = {
     email:string,
@@ -33,17 +31,6 @@ export type UpdateCustomerProfileInputDataDto = {
 }
 
 
-
-
-
-export type GetProfileUseCaseOutputDto = {
-    user:User,
-    profile:CustomerProfile | null
-}
-export type GetProfileUseCaseInputDto = {
-    id:string,
-    role:string
-}
 
 
 export type SendSmsOtpUseCaseInputDto = {

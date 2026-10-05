@@ -6,6 +6,7 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
 
 
 type UserStatus = "ACTIVE" | "INACTIVE" | "BLOCKED";
+type UserData = User & {password_hash:string}
 
 export class UserRepository implements IUserRepository{
     async getCustomers(input:getCustomersDto): Promise<{users:User[],total:number}> {
@@ -42,7 +43,7 @@ export class UserRepository implements IUserRepository{
     }
     
 
-    async findById(id:string):Promise<User | null>{
+    async findById(id:string):Promise<UserData | null>{
         const data = await db.orm.public.users.where({id}).first()
         return data
     }

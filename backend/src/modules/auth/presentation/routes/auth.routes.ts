@@ -12,7 +12,6 @@ const router = Router()
 
 router.get("/me",authMiddleware,authController.getMe)
 router.get("/logout",authController.logout)
-router.get("/profile",authMiddleware,authController.getProfile)
 router.get("/otp-status",otpVarificationController.getStatus)
 
 router.post("/login",validate(loginSchema),authController.login)

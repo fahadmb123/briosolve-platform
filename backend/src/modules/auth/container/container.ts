@@ -16,7 +16,6 @@ import GetMeUseCase from "../application/use-cases/profile/getMe.useCase.js";
 import EmailVerificationUseCase from "../application/use-cases/verification/emailVerification.useCase.js";
 import ResetPasswordUseCase from "../application/use-cases/credentials/resetPassword.useCase.js";
 import UpdateProfileUseCase from "../application/use-cases/profile/updateCustomerProfile.useCase.js";
-import GetProfileUseCase from "../application/use-cases/profile/getProfile.useCase.js";
 import UpdateEmailUseCase from "../application/use-cases/credentials/updateEmail.useCase.js";
 import UpdatePasswordUseCase from "../application/use-cases/credentials/updatePassword.useCase.js";
 
@@ -79,10 +78,6 @@ const updateProfileUseCase = new UpdateProfileUseCase(
   userRepository,
   customerRepository
 )
-const getProfileUseCase = new GetProfileUseCase(
-  userRepository,
-  customerRepository
-)
 const updateEmailUseCase = new UpdateEmailUseCase(
   userRepository,
   passwordHasher,
@@ -120,7 +115,6 @@ export const authController = new AuthController(
   getMeUseCase,
   emailVerificationUseCase,
   resetPasswordUseCase,
-  getProfileUseCase,
   updateEmailUseCase,
   sendSmsOtpUseCase
 )

@@ -13,6 +13,6 @@ export const updateProfile = async (data: NameInputType): Promise<response<null>
 }
 
 export const getProfile = async (): Promise<response<{user:User,profile:CustomerProfile}>> => {
-    const response = await apiClient.get("/api/auth/profile")
+    const response = await apiClient.get("/api/user/profile")
     return response.data
 }

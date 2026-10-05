@@ -1,10 +1,9 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js"
-import { CustomerProfile } from "../../../domain/entities/customerProfile.entity.js"
-import { User } from "../../../domain/entities/user.entity.js"
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js"
-import { ICustomerRepository } from "../../../domain/repositories/customer.respository.js"
-import { IUserRepository } from "../../../domain/repositories/user.repository.js"
-import { GetProfileUseCaseOutputDto, GetProfileUseCaseInputDto } from "../../dto/authDto.js"
+import { ApplicationError } from "../../../../shared/application/errors/applicationError.js"
+import { User } from "../../domain/entities/user.entity.js"
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
+import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository.js"
+import { IUserRepository } from "../../domain/repositories/IUserRepository.js"
+import { GetProfileUseCaseOutputDto, GetProfileUseCaseInputDto } from "../Dto/userDto.js"
 
 
 
@@ -32,8 +31,8 @@ export default class GetProfileUseCase implements IUseCase<GetProfileUseCaseInpu
             userFound.status,
             userFound.email_verified,
             userFound.phone_verified,
-            new Date(userFound.created_at.epochMilliseconds),
-            new Date(userFound.updated_at.epochMilliseconds)
+            userFound.created_at,
+            userFound.updated_at
         )
 
         let profile = null
