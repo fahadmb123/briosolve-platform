@@ -5,6 +5,7 @@ import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCust
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
 import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../application/Dto/customerDto.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
+import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto.js"
 
 
 
@@ -14,7 +15,8 @@ import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 export class CustomerController extends BaseController{
     constructor (
         private readonly getCustomersUseCase:IGetCustomersUseCase,
-        private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto>
+        private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto>,
+        private readonly updateCustomerProfileUseCase : IUseCase<UpdateCustomerProfileInputDto,void>
     ) {super()}
 
     register = async (req:Request,res:Response,next:NextFunction) => {
@@ -41,6 +43,17 @@ export class CustomerController extends BaseController{
             })
 
             return sendSuccess(res,"",response)
+        } catch (err) {
+            next(err)
+        }
+    }
+
+    updateProfile = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            this.getCurrentUser(req)
+            await this.updateCustomerProfileUseCase.execute({id:req.user?.userId!,data:req.body})
+
+            return sendSuccess(res,"Updated")
         } catch (err) {
             next(err)
         }

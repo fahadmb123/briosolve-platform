@@ -15,7 +15,6 @@ import { JwtService } from "../../../shared/infrastructure/security/jwt.service.
 import GetMeUseCase from "../application/use-cases/profile/getMe.useCase.js";
 import EmailVerificationUseCase from "../application/use-cases/verification/emailVerification.useCase.js";
 import ResetPasswordUseCase from "../application/use-cases/credentials/resetPassword.useCase.js";
-import UpdateProfileUseCase from "../application/use-cases/profile/updateCustomerProfile.useCase.js";
 import UpdateEmailUseCase from "../application/use-cases/credentials/updateEmail.useCase.js";
 import UpdatePasswordUseCase from "../application/use-cases/credentials/updatePassword.useCase.js";
 
@@ -74,10 +73,6 @@ const resetPasswordUseCase = new ResetPasswordUseCase(
   passwordHasher,
   userRepository
 )
-const updateProfileUseCase = new UpdateProfileUseCase(
-  userRepository,
-  customerRepository
-)
 const updateEmailUseCase = new UpdateEmailUseCase(
   userRepository,
   passwordHasher,
@@ -100,7 +95,6 @@ const sendSmsOtpUseCase = new SendSmsOtpUseCase(
 
 // Controllers
 export const customerAuthController = new CustomerAuthController(
-  updateProfileUseCase,
   updatePasswordUseCase
 )
 

@@ -20,18 +20,6 @@ export type UserData = {
 }
 
 
-export type UpdateCustomerProfileInputDto = {
-    id:string,
-    data:UpdateCustomerProfileInputDataDto
-}
-
-export type UpdateCustomerProfileInputDataDto = {
-    name:string,
-    about:string
-}
-
-
-
 
 export type SendSmsOtpUseCaseInputDto = {
     phone:string,

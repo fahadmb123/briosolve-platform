@@ -5,6 +5,7 @@ import { SecureOtpGeneratorService } from "../../../shared/infrastructure/securi
 import GetCustomersUseCase from "../application/use-cases/getCustomers.useCase.js";
 import GetProfileUseCase from "../application/use-cases/getProfile.useCase.js";
 import RegisterCustomerUseCase from "../application/use-cases/registerCustomer.useCase.js";
+import UpdateCustomerProfileUseCase from "../application/use-cases/updateCustomerProfile.useCase.js";
 import UpdateUserStatusUseCase from "../application/use-cases/updateUser.useCase.js";
 import { CustomerRepository } from "../infrastructure/repositories/prismaCustomer.repository.js";
 import { UserRepository } from "../infrastructure/repositories/prismaUser.repository.js";
@@ -35,7 +36,10 @@ const getProfileUseCase = new GetProfileUseCase(
     userRepository,
     customerRepository
 )
-
+const updateCustomerProfileUseCase = new UpdateCustomerProfileUseCase(
+    userRepository,
+    customerRepository
+)
 
 
 
@@ -45,5 +49,6 @@ export const userController = new UserController(
 )
 export const customerController = new CustomerController(
     getCustomerUseCase,
-    registerCustomerUseCase
+    registerCustomerUseCase,
+    updateCustomerProfileUseCase
 )
