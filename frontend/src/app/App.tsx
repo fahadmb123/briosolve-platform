@@ -35,7 +35,7 @@ function App() {
       <div className="app">
         {getMe.isPending ? (<LoadingScreen isLoading={true}/>) : (
           <>
-            <ToastContainer position="top-center" autoClose={1000} hideProgressBar={true} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover toastClassName="custom-premium-toast" closeButton={false} />
+            <ToastContainer position="top-center" autoClose={1000} hideProgressBar={true} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover toastClassName="custom-premium-toast" closeButton={false} stacked />
             <AppRouter />
           </>
         )}
