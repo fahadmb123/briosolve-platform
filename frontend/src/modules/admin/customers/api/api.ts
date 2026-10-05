@@ -12,12 +12,12 @@ type getCustomersInput = {
 
 
 export const getCustomers = async (params:getCustomersInput): Promise<response<{users:User[],total:number,totalPages:number}>> => {
-    const response = await apiClient.get("/api/user/get-users",{params})
+    const response = await apiClient.get("/api/customer/customers",{params})
     return response.data;
 }
 
 
 export const updateStatus = async (data:{id:string,status:string}): Promise<response<{users:User[]}>> => {
-    const response = await apiClient.post("/api/user/update-status",data)
+    const response = await apiClient.patch(`/api/user/status/${data.id}`,data)
     return response.data;
 }

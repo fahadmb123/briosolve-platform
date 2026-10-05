@@ -12,12 +12,12 @@ export type OtpVarifyOutput = {
 
 
 export const updateEmail = async (data:{email:string}): Promise<response<OtpVarifyOutput>> => {
-    const response = await apiClient.post("/api/customer/email-verify",data,{params: {work: "UPDATE"}})
+    const response = await apiClient.patch("/api/auth/email",data,{params: {work: "UPDATE"}})
     return response.data
 }
 
 export const updatePassword = async (data:{currentPassword:string,newPassword:string}): Promise<response<null>> => {
-    const response = await apiClient.patch("/api/customer/password",data)
+    const response = await apiClient.patch("/api/auth/password",data)
     return response.data
 }
 export const updatePhone = async (data:{phone:string}): Promise<response<null>> => {

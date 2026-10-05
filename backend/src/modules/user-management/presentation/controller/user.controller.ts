@@ -9,31 +9,13 @@ import { sendSuccess } from "../../../../shared/presentation/http/response/respo
 
 export class UserController extends BaseController{
     constructor (
-        private readonly updateUserUseCase:IUpdateUserStatusUseCase,
-        private readonly getCustomersUseCase:IGetCustomersUseCase
+        private readonly updateUserUseCase:IUpdateUserStatusUseCase
     ) {super()}
-
-    getCustomers = async (req:Request,res:Response,next:NextFunction) => {
-        try {
-            this.getCurrentUser(req)
     
-            const response = await this.getCustomersUseCase.execute({
-                page:Number(req.query.page) || 1,
-                limit:Number(req.query.limit) || 10,
-                filter:req.query.filter as string | undefined,
-                search:req.query.search as string | undefined
-            })
-
-            return sendSuccess(res,"",response)
-        } catch (err) {
-            next(err)
-        }
-    }
-
     updateUserStatus = async (req:Request,res:Response,next:NextFunction) => {
         try {
             this.getCurrentUser(req)
-            await this.updateUserUseCase.execute(req.body)
+            await this.updateUserUseCase.execute({id:req.params.id as string,status:req.body.status})
 
             return sendSuccess(res,"User Updated")
         } catch (err) {
