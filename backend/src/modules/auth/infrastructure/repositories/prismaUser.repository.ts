@@ -14,7 +14,6 @@ export class PrismaUserRepository implements IUserRepository {
     }
 
 
-
     async findById(id: string): Promise<UserData | null> {
         const user = await db.orm.public.users.where({id:id as Varchar<255>}).first()
         return user ? (user as UserData)  : null

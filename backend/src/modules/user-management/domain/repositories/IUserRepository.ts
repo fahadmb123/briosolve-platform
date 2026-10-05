@@ -9,4 +9,5 @@ export interface IUserRepository extends BaseRepository<User | null>{
   getCustomers(input:getCustomersDto): Promise<{users:User[],total:number}>;
   findById(id:string):Promise<User | null>;
   updateStatus(id:string,status:string):Promise<void>
+  findByEmail(email: string): Promise<User | null>
 }

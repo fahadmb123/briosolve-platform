@@ -2,6 +2,9 @@ import { NextFunction,Request,Response } from "express"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
 import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCustomersUseCase.js"
+import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
+import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../application/Dto/customerDto.js"
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 
 
 
@@ -10,8 +13,21 @@ import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCust
 
 export class CustomerController extends BaseController{
     constructor (
-        private readonly getCustomersUseCase:IGetCustomersUseCase
+        private readonly getCustomersUseCase:IGetCustomersUseCase,
+        private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto>
     ) {super()}
+
+    register = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const response = await this.registerCustomerUseCase.execute(req.body)
+
+            res.cookie("registration_id",response.registrationId,registrationCookie)
+
+            return sendSuccess(res,"OTP sent successfully",{expiresIn: response.expiresIn})
+        } catch (err) {
+            next(err)
+        }
+    }
 
     getCustomers = async (req:Request,res:Response,next:NextFunction) => {
         try {

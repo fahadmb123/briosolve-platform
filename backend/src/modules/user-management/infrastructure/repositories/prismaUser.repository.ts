@@ -1,3 +1,4 @@
+import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
 import { getCustomersDto } from "../../application/Dto/getCustomersDto.js";
 import { User } from "../../domain/entities/user.entity.js";
@@ -34,6 +35,12 @@ export class UserRepository implements IUserRepository{
             total:total.total
         }
     }
+
+    async findByEmail(email: string): Promise<User | null> {
+        const user = await db.orm.public.users.where({email:email as Varchar<255>}).first()
+        return user ? (user as unknown as User) : null
+    }
+    
 
     async findById(id:string):Promise<User | null>{
         const data = await db.orm.public.users.where({id}).first()

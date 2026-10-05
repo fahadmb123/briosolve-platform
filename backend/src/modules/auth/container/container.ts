@@ -1,4 +1,3 @@
-import RegisterCustomerUseCase from "../application/use-cases/authentication/registerCustomer.useCase.js";
 import { PrismaUserRepository } from "../infrastructure/repositories/prismaUser.repository.js";
 import { PrismaCustomerRepository } from "../infrastructure/repositories/prismaCustomer.repository.js";
 import { BcryptPasswordHasherService } from "../../../shared/infrastructure/security/becryptPasswordHasher.service.js";
@@ -45,13 +44,7 @@ const customerRepository = new PrismaCustomerRepository();
 
 
 // Use Cases
-const registerCustomerUseCase = new RegisterCustomerUseCase(
-  userRepository,
-  passwordHasher,
-  otpGenerator,
-  emailSender,
-  pendingRegistrationStore
-)
+
 const otpVarificationUseCase = new OtpVarificationUseCase(
   pendingRegistrationStore,
   passwordHasher,
@@ -112,7 +105,6 @@ const sendSmsOtpUseCase = new SendSmsOtpUseCase(
 
 // Controllers
 export const customerAuthController = new CustomerAuthController(
-  registerCustomerUseCase,
   updateProfileUseCase,
   updatePasswordUseCase
 )

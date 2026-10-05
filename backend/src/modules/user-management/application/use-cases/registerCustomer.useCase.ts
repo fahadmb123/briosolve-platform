@@ -1,12 +1,17 @@
-import type { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../dto/customerDto.js";
-import { IUserRepository } from "../../../domain/repositories/user.repository.js";
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js";
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import type { IOtpGenerator } from "../../../../../shared/domain/interfaces/IOtpGenerator.service.js";
-import type { IEmailSender } from "../../../../../shared/domain/interfaces/IEmailSender.service.js";
+import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
+import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
+import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 import { randomUUID } from "crypto";
-import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js";
+
+import type { EmailVerificationUseCaseOutputDto,RegisterCustomerInput } from "../Dto/customerDto.js";
+import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js";
+import type { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
+
+
+
+
 
 
 
@@ -14,7 +19,7 @@ import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js";
 
 
 export default class RegisterCustomerUseCase implements IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto> {
-    constructor(private readonly customerRepository : IUserRepository,
+    constructor(private readonly userRepository : IUserRepository,
         readonly passwordHasher:IPasswordHasher,
         readonly otpGenerate:IOtpGenerator,
         readonly EmailSender:IEmailSender,
@@ -22,7 +27,7 @@ export default class RegisterCustomerUseCase implements IUseCase<RegisterCustome
     ){}
 
     async execute (input:RegisterCustomerInput):Promise<EmailVerificationUseCaseOutputDto>{
-        const isEmailExist = await this.customerRepository.findByEmail(input.email)
+        const isEmailExist = await this.userRepository.findByEmail(input.email)
         if (isEmailExist) throw new ApplicationError("USER_EMAIL_ALREADY_EXIST","User with email already exist","CONFLICT")
 
         const otp = this.otpGenerate.generate()

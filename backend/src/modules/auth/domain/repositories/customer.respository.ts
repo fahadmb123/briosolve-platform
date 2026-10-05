@@ -8,7 +8,6 @@ import { RegisterCustomerInput } from "./user.repository.js";
 
 
 export interface ICustomerRepository extends BaseRepository<CustomerProfile | null>{
-    createCustomer(data: RegisterCustomerInput): Promise<User>
     updateProfile(data: UpdateCustomerProfileInputDto): Promise<void>;
     findById(id: string): Promise<CustomerProfile | null> 
 }
