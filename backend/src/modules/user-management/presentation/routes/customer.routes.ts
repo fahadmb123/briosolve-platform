@@ -3,16 +3,15 @@ import { authMiddleware } from "../../../../shared/presentation/http/middlewares
 import { customerController } from "../../container/container.js";
 import { customerRegistrationSchema, profileSchema } from "../../../auth/presentation/validators/registerCustomer.schema.js";
 import validate from "../../../../shared/presentation/http/middlewares/validate-request.js";
+import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
 
 
 const router = Router()
 
 
-router.get("/customers",authMiddleware,customerController.getCustomers)
-
 router.post("/register",validate(customerRegistrationSchema),customerController.register)
 
-router.patch("/profile",validate(profileSchema),authMiddleware,customerController.updateProfile)
+router.patch("/profile",validate(profileSchema),authMiddleware,requireRole(["CUSTOMER", "PROVIDER", "ADMIN"]),customerController.updateProfile)
 
 
 

@@ -12,7 +12,7 @@ type getCustomersInput = {
 
 
 export const getCustomers = async (params:getCustomersInput): Promise<response<{users:User[],total:number,totalPages:number}>> => {
-    const response = await apiClient.get("/api/customer/customers",{params})
+    const response = await apiClient.get("/api/user/customers",{params})
     return response.data;
 }
 
