@@ -1,15 +1,18 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { emailSchema, phoneSchema, type EmailInputType, type PhoneInputType } from '../../../../schemas/validation';
 import { useUpdateEmail, useUpdatePhone, useDeletePhone } from '../../../../hooks/mutations/contact';
-
-
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useResetFlowStore } from '../../../../../../../store/auth/reset-flow.store';
 import { useAuthStore } from '../../../../../../../store/auth/auth.store';
+import { ConfirmModal } from '../../../../../../../shared/components/ui/ConfirmModal/ConfirmModal';
+
+
 
 export const Contact = () => {
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const user = useAuthStore((state) => state.user);
     const updateEmail = useUpdateEmail()
     const navigate = useNavigate()
@@ -55,13 +58,12 @@ export const Contact = () => {
     };
 
     const handleDeletePhone = () => {
-        if (window.confirm("Are you sure you want to delete your mobile number?")) {
-            deletePhone.mutate(undefined, {
-                onSuccess: (res) => {
-                    toast.success(res?.message || "Phone number deleted successfully");
-                }
-            });
-        }
+        deletePhone.mutate(undefined, {
+            onSuccess: (res) => {
+                toast.success(res?.message || "Phone number deleted successfully");
+                setIsDeleteModalOpen(false);
+            }
+        });
     };
 
     return (
@@ -131,7 +133,7 @@ export const Contact = () => {
                 </div>
                 <div className="flex justify-end mt-auto pt-2 gap-2">
                     {user?.phone && (
-                        <button type="button" onClick={handleDeletePhone} disabled={deletePhone.isPending} className="btn btn-outline-danger btn-sm border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors px-3 py-1 rounded">
+                        <button type="button" onClick={() => setIsDeleteModalOpen(true)} disabled={deletePhone.isPending} className="btn btn-outline-danger btn-sm border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors px-3 py-1 rounded">
                             {deletePhone.isPending ? 'Deleting...' : 'Delete Phone'}
                         </button>
                     )}
@@ -140,6 +142,18 @@ export const Contact = () => {
                     </button>
                 </div>
             </form>
+            
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                title="Delete Mobile Number"
+                message="Are you sure you want to delete your mobile number? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
+                isDanger={true}
+                isLoading={deletePhone.isPending}
+                onConfirm={handleDeletePhone}
+                onCancel={() => setIsDeleteModalOpen(false)}
+            />
         </div>
     );
 };

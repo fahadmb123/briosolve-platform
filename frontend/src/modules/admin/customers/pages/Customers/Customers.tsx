@@ -3,11 +3,12 @@ import { useGetCustomers, useUpdateStatus } from '../../hooks/mutations/user.mod
 import { toast } from "react-toastify";
 import type { User, response } from '../../../../../shared/types/Dtos';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
+import { ConfirmModal } from "../../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 
 export default function Customers() {
     const [customers,setCustomers] = useState<User[]>([])
     const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null)
-
+    const [customerToChange, setCustomerToChange] = useState<{id: string, status: string} | null>(null)
 
     const [page, setPage] = useState(0)
     const [search, setSearch] = useState("")
@@ -30,13 +31,19 @@ export default function Customers() {
     },[filter,search,page])
 
 
-    const handleStatusButton = (id:string,status:string)=>{
-        const passStatus = status === "ACTIVE" ? "BLOCKED" : "ACTIVE"
-        updateStatus.mutate({id,status:passStatus}, {
+    const handleStatusButton = (id:string, status:string)=>{
+        setCustomerToChange({ id, status })
+    }
+
+    const confirmStatusChange = () => {
+        if (!customerToChange) return;
+        const passStatus = customerToChange.status === "ACTIVE" ? "BLOCKED" : "ACTIVE"
+        updateStatus.mutate({id: customerToChange.id, status: passStatus}, {
             onSuccess: (res: response<{users:User[]}>) => {
                 setCustomers((users:User[])=> 
-                    users.map((user)=>user.id === id ? {...user,status:passStatus} : user)
+                    users.map((user)=>user.id === customerToChange.id ? {...user,status:passStatus} : user)
                 )
+                setCustomerToChange(null)
                 toast.success(res.message)
             }
         })
@@ -289,7 +296,19 @@ export default function Customers() {
                 </div>
             </div>
         </div>
-
+        <ConfirmModal
+            isOpen={!!customerToChange}
+            title={customerToChange?.status === 'ACTIVE' ? "Suspend Customer" : "Activate Customer"}
+            message={customerToChange?.status === 'ACTIVE' 
+                ? "Are you sure you want to suspend this customer? They will immediately lose access to the platform." 
+                : "Are you sure you want to activate this customer account?"}
+            confirmText={customerToChange?.status === 'ACTIVE' ? "Suspend" : "Activate"}
+            cancelText="Cancel"
+            isDanger={customerToChange?.status === 'ACTIVE'}
+            isLoading={updateStatus.isPending}
+            onConfirm={confirmStatusChange}
+            onCancel={() => setCustomerToChange(null)}
+        />
         
         </>
     );
