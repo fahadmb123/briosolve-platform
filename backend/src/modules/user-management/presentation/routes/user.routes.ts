@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
-import { customerController, userController } from "../../container/container.js";
+import { customerController, userController } from "../../infrastructure/composition/index.js";
 import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
 
 
