@@ -16,17 +16,6 @@ export default class GetMeUseCase implements IUseCase<IUserTokenPayload,User>{
     async execute (user:IUserTokenPayload):Promise<User>{
         const foundUser = await this.userRepository.findById(user.userId)
         if (!foundUser) throw new ApplicationError("USER_NOT_FOUND","User not found","NOT_FOUND")
-        return new User(
-            foundUser.id,
-            foundUser.name,
-            foundUser.email,
-            foundUser.phone,
-            foundUser.role,
-            foundUser.status,
-            foundUser.email_verified,
-            foundUser.phone_verified,
-            new Date(foundUser.created_at.epochMilliseconds),
-            new Date(foundUser.updated_at.epochMilliseconds)
-        )
+        return foundUser;
     }
 }

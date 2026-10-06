@@ -7,6 +7,7 @@ import { EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto, Up
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
 import { accessTokenCookie, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
+import { UserResponseMapper } from "../mappers/user-response.mapper.js"
 
 
 
@@ -26,7 +27,10 @@ export class AuthController extends BaseController{
              
             res.cookie("access_token",response.accessToken,accessTokenCookie)
 
-            return sendSuccess(res,"LoggedIn Successfully",response.isExist)
+            return sendSuccess(res,"LoggedIn Successfully",{
+                accessToken: response.accessToken,
+                user: UserResponseMapper.toDto(response.isExist)
+            })
         } catch (err) {
             next(err)
         }
@@ -37,7 +41,7 @@ export class AuthController extends BaseController{
 
             const response = await this.getMeUseCase.execute(user)
 
-            return sendSuccess(res,"",response)
+            return sendSuccess(res,"",UserResponseMapper.toDto(response))
         } catch (err) {
             next(err)
         }

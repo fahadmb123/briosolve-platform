@@ -1,5 +1,4 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository.js"
-import { UserData } from "../../application/dto/authDto.js"
 import { User } from "../entities/user.entity.js"
 
 
@@ -11,15 +10,15 @@ export type RegisterCustomerInput = {
   email : string,
   password:string
 }
-type userDataPartial = Partial<UserData>
+type userPartial = Partial<User>
 
 
 
 
-export interface IUserRepository extends BaseRepository<UserData | null>{
+export interface IUserRepository extends BaseRepository<User | null>{
   findByEmail(email: string): Promise<User | null>
-  findById(id: string): Promise<UserData | null> 
+  findById(id: string): Promise<User | null> 
   findByPhone(phone: string): Promise<User | null> 
   updatePassword(id:string,passwordHash: string):Promise<void>
-  update(id: string, data: userDataPartial): Promise<void>
+  update(id: string, data: userPartial): Promise<void>
 }

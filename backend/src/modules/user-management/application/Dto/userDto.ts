@@ -24,3 +24,26 @@ export type UpdateCustomerProfileInputDataDto = {
     name:string,
     about:string
 }
+
+export type UserResponseDto = {
+    id:string;
+    name: string;
+    email: string;
+    phone:string|null;
+    role: "CUSTOMER" | "ADMIN" | "INVESTIGATOR" | "PROVIDER";
+    status: "ACTIVE" | "INACTIVE" | "BLOCKED";
+    email_verified: boolean;
+    phone_verified: boolean;
+    created_at: Date;
+    updated_at: Date;
+}
+
+export type CustomerProfileResponseDto = {
+    id: string;
+    user_id: string;
+    current_address_id: string | null;
+    profile_image: string | null;
+    about: string;
+    created_at: Date;
+    updated_at: Date;
+}

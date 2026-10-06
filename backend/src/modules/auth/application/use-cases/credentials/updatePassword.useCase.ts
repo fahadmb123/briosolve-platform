@@ -20,7 +20,7 @@ export default class UpdatePasswordUseCase implements IUseCase<UpdatePasswordInp
 
         if (!user) throw new ApplicationError("USER_NOT_FOUND", "User not found","AUTHORIZATION")
         
-        const isMatch = await this.passwordHasher.compare(input.data.currentPassword,user.password_hash)
+        const isMatch = await this.passwordHasher.compare(input.data.currentPassword,user.passwordHash)
 
         if (!isMatch) throw new ApplicationError("INCORRECT_PASSWORD", "Incorrect password","NOT_FOUND")
         

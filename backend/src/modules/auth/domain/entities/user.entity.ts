@@ -4,6 +4,7 @@ export class User {
         public readonly name: string,
         public readonly email: string,
         public readonly phone: string | null,
+        public readonly passwordHash: string,
         public readonly role: string,
         public readonly status: string,
         public readonly email_verified: boolean,

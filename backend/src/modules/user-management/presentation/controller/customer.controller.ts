@@ -6,6 +6,7 @@ import { registrationCookie } from "../../../../shared/presentation/http/cookies
 import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../application/Dto/customerDto.js"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto.js"
+import { UserResponseMapper } from "../mappers/user-response.mapper.js"
 
 
 
@@ -42,7 +43,11 @@ export class CustomerController extends BaseController{
                 search:req.query.search as string | undefined
             })
 
-            return sendSuccess(res,"",response)
+            return sendSuccess(res,"",{
+                users: response.users.map(u => UserResponseMapper.toDto(u)),
+                total: response.total,
+                totalPages: response.totalPages
+            })
         } catch (err) {
             next(err)
         }

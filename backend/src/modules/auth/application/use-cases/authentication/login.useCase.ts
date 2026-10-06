@@ -21,7 +21,7 @@ export default class LoginUseCase implements IUseCase<LoginInputDto,{accessToken
         const user = await this.customerRepository.findById(isExist.id)
         if (!user) throw new ApplicationError("USER_NOT_EXIST","User not exist","NOT_FOUND")
 
-        const isPasswordValid = await this.passwordHasher.compare(input.password,user?.password_hash!)
+        const isPasswordValid = await this.passwordHasher.compare(input.password,user.passwordHash)
         if (!isPasswordValid) throw new ApplicationError("INVALID_PASSWORD","Invalid Password","AUTHORIZATION")
 
         if (user.status === "INACTIVE") throw new ApplicationError("INACTIVE_ACCOUNT","Inactive Account","AUTHORIZATION")
@@ -31,6 +31,6 @@ export default class LoginUseCase implements IUseCase<LoginInputDto,{accessToken
             userId:user.id,
             role:user.role
         })
-        return {accessToken,isExist}
+        return {accessToken, isExist: user}
     }
 }

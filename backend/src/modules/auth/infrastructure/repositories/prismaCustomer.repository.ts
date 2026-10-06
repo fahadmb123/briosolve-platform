@@ -4,6 +4,8 @@ import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js
 import { ICustomerRepository } from "../../domain/repositories/customer.respository.js";
 import { User } from "../../domain/entities/user.entity.js";
 import { RegisterCustomerInput } from "../../domain/repositories/user.repository.js";
+import { UserMapper } from "../mappers/user.mapper.js";
+import { CustomerProfileMapper } from "../mappers/customerProfile.mapper.js";
 
 
 
@@ -29,20 +31,7 @@ export class PrismaCustomerRepository implements ICustomerRepository {
             updated_at: Temporal.Now.instant(),
         } as never)
 
-        const userEntity = new User(
-            user.id,
-            user.name,
-            user.email,
-            user.phone,
-            user.role,
-            user.status,
-            user.email_verified,
-            user.phone_verified,
-            new Date(user.created_at.epochMilliseconds),
-            new Date(user.updated_at.epochMilliseconds)
-        )
-
-        return userEntity
+        return UserMapper.toDomain(user)
     }
 
     async findById(id : string): Promise<CustomerProfile | null> {
@@ -51,14 +40,7 @@ export class PrismaCustomerRepository implements ICustomerRepository {
             .first()
         
         if (!customer) return null
-        return new CustomerProfile(
-            customer.id,
-            customer.user_id,
-            customer.current_address_id,
-            customer.profile_image,
-            customer.about,
-            customer.created_at,
-            customer.updated_at
-        )
+        
+        return CustomerProfileMapper.toDomain(customer)
     }
 }

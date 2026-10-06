@@ -4,6 +4,7 @@ import { db } from "../../../../infrastructure/persistence/prisma/client.js"
 import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto.js"
 import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository.js"
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js"
+import { CustomerProfileMapper } from "../mappers/customer-profile.mapper.js"
 
 
 
@@ -44,14 +45,6 @@ export class CustomerRepository implements ICustomerRepository {
             .first()
         
         if (!customer) return null
-        return new CustomerProfile(
-            customer.id,
-            customer.user_id,
-            customer.current_address_id,
-            customer.profile_image,
-            customer.about,
-            customer.created_at,
-            customer.updated_at
-        )
+        return CustomerProfileMapper.toDomain(customer)
     }
 }

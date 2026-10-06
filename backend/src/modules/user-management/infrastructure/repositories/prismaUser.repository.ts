@@ -5,9 +5,9 @@ import { User } from "../../domain/entities/user.entity.js";
 import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
 
 
-type UserStatus = "ACTIVE" | "INACTIVE" | "BLOCKED";
-type UserData = User & {password_hash:string}
+import { UserMapper } from "../mappers/user.mapper.js";
 
+type UserStatus = "ACTIVE" | "INACTIVE" | "BLOCKED";
 export class UserRepository implements IUserRepository{
     async getCustomers(input:getCustomersDto): Promise<{users:User[],total:number}> {
 
@@ -32,20 +32,22 @@ export class UserRepository implements IUserRepository{
 
         const total = await query.aggregate((agg)=>({total:agg.count()}))
         return {
-            users,
+            users: users.map(user => UserMapper.toDomain(user)),
             total:total.total
         }
     }
 
     async findByEmail(email: string): Promise<User | null> {
         const user = await db.orm.public.users.where({email:email as Varchar<255>}).first()
-        return user ? (user as unknown as User) : null
+        if (!user) return null
+        return UserMapper.toDomain(user)
     }
     
 
-    async findById(id:string):Promise<UserData | null>{
+    async findById(id:string):Promise<User | null>{
         const data = await db.orm.public.users.where({id}).first()
-        return data
+        if (!data) return null
+        return UserMapper.toDomain(data)
     }
     async updateStatus(id:string,status:string):Promise<void>{
         await db.orm.public.users.where({id}).update({status:status as UserStatus})

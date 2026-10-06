@@ -5,18 +5,22 @@ export type LoginInputDto = {
     password:string
 }
 
-export type UserData = {
+export type UserResponseDto = {
     id:string;
     name: string;
     email: string;
-    phone:string|null
-    password_hash: string;
+    phone:string|null;
     role: "CUSTOMER" | "ADMIN" | "INVESTIGATOR" | "PROVIDER";
     status: "ACTIVE" | "INACTIVE" | "BLOCKED";
     email_verified: boolean;
     phone_verified: boolean;
-    created_at: Temporal.Instant;
-    updated_at: Temporal.Instant;
+    created_at: Date;
+    updated_at: Date;
+}
+
+export type AuthResponseDto = {
+    accessToken: string;
+    user: UserResponseDto;
 }
 
 
