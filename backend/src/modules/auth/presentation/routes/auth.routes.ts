@@ -20,11 +20,11 @@ router.post("/reset-password",validate(resetPasswordSchema),securityController.r
 router.post("/otp-varify",validate(otpSchema),otpVarificationController.validate)
 router.post("/resend-otp",otpVarificationController.resend)
 
-router.patch("/phone",authMiddleware,validate(phoneSchema),securityController.updatePhone)
 router.patch("/email",authMiddleware,validate(emailSchema),authController.emailVerify)
 router.patch("/password",validate(updatePasswordSchema),authMiddleware,securityController.updatePassword)
+router.patch("/phone",authMiddleware,validate(phoneSchema),securityController.updatePhone)
 
-
+router.delete("/phone",authMiddleware,securityController.deletePhone)
 
 
 export default router

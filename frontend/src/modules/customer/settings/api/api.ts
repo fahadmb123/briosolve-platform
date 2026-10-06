@@ -24,3 +24,8 @@ export const updatePhone = async (data:{phone:string}): Promise<response<null>> 
     const response = await apiClient.patch("/api/auth/phone",data,{params:{path:"settings"}})
     return response.data
 }
+
+export const deletePhone = async (): Promise<response<null>> => {
+    const response = await apiClient.delete("/api/auth/phone")
+    return response.data
+}

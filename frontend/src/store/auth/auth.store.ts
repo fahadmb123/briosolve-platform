@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getMe } from "../../modules/auth/api/api";
 
 export type UserRole =
     | "CUSTOMER"
@@ -25,6 +26,7 @@ interface IAuthState {
 
     setUser: (user: IAuthUser) => void;
     clearAuth: () => void;
+    fetchUser: () => Promise<void>;
 }
 
 
@@ -43,4 +45,19 @@ export const useAuthStore = create<IAuthState>()((set) => ({
             user: null,
             isAuthenticated: false,
         }),
+    fetchUser: async () => {
+        try {
+            const response = await getMe();
+            set({
+                user: response.data as unknown as IAuthUser,
+                isAuthenticated: true,
+            });
+        } catch (error) {
+            console.log(error)
+            set({
+                user: null,
+                isAuthenticated: false,
+            });
+        }
+    }
 }));

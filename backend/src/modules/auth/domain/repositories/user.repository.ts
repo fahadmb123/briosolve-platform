@@ -11,6 +11,8 @@ export type RegisterCustomerInput = {
   email : string,
   password:string
 }
+type userDataPartial = Partial<UserData>
+
 
 
 
@@ -19,5 +21,5 @@ export interface IUserRepository extends BaseRepository<UserData | null>{
   findById(id: string): Promise<UserData | null> 
   findByPhone(phone: string): Promise<User | null> 
   updatePassword(id:string,passwordHash: string):Promise<void>
-  update(id: string, data: { email?: string, phone?: string }): Promise<void>
+  update(id: string, data: userDataPartial): Promise<void>
 }

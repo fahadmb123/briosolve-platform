@@ -13,7 +13,8 @@ export class SecurityController extends BaseController {
     constructor (
         private readonly resetPasswordUseCase:IUseCase<ResetPasswordDto,void>,
         private readonly sendSmsOtpUseCase:IUseCase<SendSmsOtpUseCaseInputDto,SendSmsOtpUseCaseOutputDto>,
-        private readonly updatePasswordUseCase :IUseCase<UpdatePasswordInputDto,void>
+        private readonly updatePasswordUseCase :IUseCase<UpdatePasswordInputDto,void>,
+        private readonly deletePhoneUseCase : IUseCase<string,void>
     ) {super()}
 
     resetPassword = async (req:Request,res:Response,next:NextFunction) => {
@@ -48,8 +49,19 @@ export class SecurityController extends BaseController {
         try {
             this.getCurrentUser(req)
             
-
             await this.updatePasswordUseCase.execute({id:req.user?.userId as string,data:req.body})
+
+            return sendSuccess(res,"Updated")
+        } catch (err) {
+            next(err)
+        }
+    }
+
+    deletePhone = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            this.getCurrentUser(req)
+            
+            await this.deletePhoneUseCase.execute(req.user?.userId as string)
 
             return sendSuccess(res,"Updated")
         } catch (err) {

@@ -21,6 +21,7 @@ import UpdatePasswordUseCase from "../application/use-cases/credentials/updatePa
 import { TextBeeSmsService } from "../../../infrastructure/services/textbee/TextBeeSmsService.js";
 import {SendSmsOtpUseCase} from "../application/use-cases/verification/sendSmsOtp.useCase.js";
 import { SecurityController } from "../presentation/controllers/security.controller.js";
+import { DeletePhoneUseCase } from "../application/use-cases/credentials/deletePhone.useCase.js";
 
 
 
@@ -91,6 +92,9 @@ const sendSmsOtpUseCase = new SendSmsOtpUseCase(
   pendingRegistrationStore,
   userRepository
 )
+const deletePhoneUseCase = new DeletePhoneUseCase(
+  userRepository
+)
 
 
 // Controllers
@@ -111,5 +115,6 @@ export const authController = new AuthController(
 export const securityController = new SecurityController(
   resetPasswordUseCase,
   sendSmsOtpUseCase,
-  updatePasswordUseCase
+  updatePasswordUseCase,
+  deletePhoneUseCase
 )

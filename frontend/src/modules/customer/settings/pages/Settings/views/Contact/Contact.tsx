@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { emailSchema, phoneSchema, type EmailInputType, type PhoneInputType } from '../../../../schemas/validation';
-import { useUpdateEmail, useUpdatePhone } from '../../../../hooks/mutations/contact';
+import { useUpdateEmail, useUpdatePhone, useDeletePhone } from '../../../../hooks/mutations/contact';
 
 
 import { toast } from 'react-toastify';
@@ -14,19 +14,20 @@ export const Contact = () => {
     const updateEmail = useUpdateEmail()
     const navigate = useNavigate()
     const updatePhone = useUpdatePhone()
+    const deletePhone = useDeletePhone()
     const {setOtpFlowStarted} = useResetFlowStore((state)=>state)
 
 
     const {register: registerEmail, handleSubmit: handleEmailSubmit, formState: { errors: emailErrors }} = useForm<EmailInputType>({
         resolver: zodResolver(emailSchema),
         mode: "onChange",
-        defaultValues: { email: user?.email || "" }
+        values: { email: user?.email || "" }
     });
 
     const {register: registerPhone, handleSubmit: handlePhoneSubmit, formState: { errors: phoneErrors }} = useForm<PhoneInputType>({
         resolver: zodResolver(phoneSchema),
         mode: "onChange",
-        defaultValues: { 
+        values: { 
             countryCode: "+91", 
             phoneNumber: user?.phone ? user.phone.replace(/^\+91|^\+1|^\+44|^\+61|^\+81/, '') : "" 
         }
@@ -51,6 +52,16 @@ export const Contact = () => {
                 toast.success(response.message)
             }
         });
+    };
+
+    const handleDeletePhone = () => {
+        if (window.confirm("Are you sure you want to delete your mobile number?")) {
+            deletePhone.mutate(undefined, {
+                onSuccess: (res) => {
+                    toast.success(res?.message || "Phone number deleted successfully");
+                }
+            });
+        }
     };
 
     return (
@@ -118,7 +129,12 @@ export const Contact = () => {
                     )}
                     <p className="text-xs text-secondary mt-2"><i className="fas fa-info-circle mr-1"></i>We'll send an OTP to verify ownership.</p>
                 </div>
-                <div className="flex justify-end mt-auto pt-2">
+                <div className="flex justify-end mt-auto pt-2 gap-2">
+                    {user?.phone && (
+                        <button type="button" onClick={handleDeletePhone} disabled={deletePhone.isPending} className="btn btn-outline-danger btn-sm border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors px-3 py-1 rounded">
+                            {deletePhone.isPending ? 'Deleting...' : 'Delete Phone'}
+                        </button>
+                    )}
                     <button type="submit" disabled={updatePhone.isPending} className="btn btn-primary btn-sm">
                         {updatePhone.isPending ? 'Sending...' : 'Update Mobile Number'}
                     </button>
