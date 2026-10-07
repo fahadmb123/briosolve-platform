@@ -9,10 +9,13 @@ import { useUpdateProfile } from '../../hooks/mutations/useUpdateProfile';
 import { useGetProfile } from '../../hooks/mutations/useGetProfile';
 import type { CustomerProfile, response, User } from '../../../../../shared/types/Dtos';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
+import { useAuthStore } from '../../../../../store/auth/auth.store';
 
 export default function Profile() {
 
   
+  const user = useAuthStore(state => state.user);
+  const defaultAddress = user?.current_address_id;
   const [isLocModalOpen, setIsLocModalOpen] = useState(false)
   const [,setData] = useState<{name:string,about:string}>({name:"",about:""})
   const {register, handleSubmit, reset, formState:{errors}} = useForm<NameInputType>({
@@ -60,13 +63,13 @@ export default function Profile() {
           <div className="profile-sidebar">
             <div className="profile-card-modern">
               <div className="floating-avatar">
-                <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=6366F1&color=fff&size=140" alt="Aarav Sharma" />
+                <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366F1&color=fff&size=140`} alt={user?.name || 'User'} />
                 <button className="avatar-edit-badge" title="Change Photo">
                   <i className="fas fa-camera"></i>
                 </button>
               </div>
 
-              <h2 className="h4 mb-1">Aarav Sharma</h2>
+              <h2 className="h4 mb-1">{user?.name || 'Customer'}</h2>
               <span className="badge badge-success text-xs mb-3">
                 <i className="fas fa-check-circle mr-1"></i> Email Verified
               </span>
@@ -91,27 +94,44 @@ export default function Profile() {
                   <h3 className="h6 mb-0">Default Location</h3>
                   <p className="text-xs text-secondary mb-0">Primary residence</p>
                 </div>
-                <span className="badge badge-verified text-xs"><i className="fas fa-home mr-1"></i>Home</span>
+                <span className="badge badge-verified text-xs"><i className="fas fa-home mr-1"></i>{defaultAddress?.type || 'Home'}</span>
               </div>
 
               <div className="location-premium-box">
                 <div className="flex items-start gap-3">
                   <i className="fas fa-map-marker-alt text-primary mt-1 text-lg"></i>
                   <div>
-                    <div className="font-bold text-sm text-text">Kodungallur, Thrissur</div>
-                    <div className="text-xs text-secondary mt-1">Kerala, India (10.2201° N, 76.2002° E)</div>
+                    {defaultAddress ? (
+                      <>
+                        <div className="font-bold text-sm text-text">{defaultAddress.area}, {defaultAddress.city}</div>
+                        <div className="text-xs text-secondary mt-1">{defaultAddress.state}, {defaultAddress.country} {defaultAddress.latitude && defaultAddress.longitude ? `(${Number(defaultAddress.latitude).toFixed(4)}° N, ${Number(defaultAddress.longitude).toFixed(4)}° E)` : ''}</div>
+                      </>
+                    ) : (
+                      <div className="font-bold text-sm text-secondary">No default location set</div>
+                    )}
                   </div>
                 </div>
               </div>
 
               <button type="button" className="btn btn-outline btn-sm w-full mb-4" onClick={() => setIsLocModalOpen(true)}>
-                <i className="fas fa-edit mr-1"></i> Change Location
+                <i className="fas fa-eye mr-1"></i> View Location
               </button>
 
-              <div className="mini-map-preview" id="profile-mini-map">
-                <div className="mini-map-overlay-badge">
+              <div className="mini-map-preview" id="profile-mini-map" style={{ position: 'relative', overflow: 'hidden' }}>
+                {defaultAddress?.latitude && defaultAddress?.longitude && (
+                  <iframe 
+                    title="Location Map"
+                    width="100%" 
+                    height="100%" 
+                    frameBorder="0" 
+                    scrolling="no" 
+                    src={`https://maps.google.com/maps?q=${defaultAddress.latitude},${defaultAddress.longitude}&z=14&output=embed`}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0, zIndex: 1 }}
+                  ></iframe>
+                )}
+                <div className="mini-map-overlay-badge" style={{ position: 'absolute', zIndex: 2 }}>
                   <i className="fas fa-map-pin text-primary"></i>
-                  <span>Home: Kodungallur</span>
+                  <span>{defaultAddress?.type || 'Home'}: {defaultAddress?.area || 'Not Set'}</span>
                 </div>
               </div>
             </div>
@@ -167,19 +187,68 @@ export default function Profile() {
         <div className="loc-modal" style={{ maxWidth: '600px' }}>
           <div className="loc-modal-header">
             <div className="flex items-center gap-2">
-              <i className="fas fa-home text-primary"></i>
-              <h3 className="h6 mb-0">Update Default Profile Location</h3>
+              <i className="fas fa-map-marker-alt text-primary"></i>
+              <h3 className="h6 mb-0">Location Details</h3>
             </div>
             <button className="btn-icon" onClick={() => setIsLocModalOpen(false)}>
               <i className="fas fa-times"></i>
             </button>
           </div>
-          <div className="loc-modal-body">
-            <div id="profile-location-picker"></div>
+          <div className="loc-modal-body p-6">
+            {defaultAddress ? (
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col">
+                  <span className="text-xs text-secondary font-semibold uppercase tracking-wider mb-1.5">Location Type</span>
+                  <div className="font-medium text-text bg-surface-container px-3.5 py-2.5 rounded-lg border border-surface-variant flex items-center gap-2 w-max shadow-sm">
+                    <i className={`fas ${defaultAddress.type?.toLowerCase() === 'home' ? 'fa-home' : defaultAddress.type?.toLowerCase() === 'work' ? 'fa-briefcase' : 'fa-map-pin'} text-primary`}></i>
+                    {defaultAddress.type}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-xs text-secondary font-semibold uppercase tracking-wider mb-1.5">House/Flat No.</span>
+                    <div className="font-medium text-text bg-surface-container px-3.5 py-2.5 rounded-lg border border-surface-variant shadow-sm">{defaultAddress.house_no || 'N/A'}</div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-secondary font-semibold uppercase tracking-wider mb-1.5">Area/Locality</span>
+                    <div className="font-medium text-text bg-surface-container px-3.5 py-2.5 rounded-lg border border-surface-variant shadow-sm">{defaultAddress.area || 'N/A'}</div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-secondary font-semibold uppercase tracking-wider mb-1.5">City</span>
+                    <div className="font-medium text-text bg-surface-container px-3.5 py-2.5 rounded-lg border border-surface-variant shadow-sm">{defaultAddress.city || 'N/A'}</div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-secondary font-semibold uppercase tracking-wider mb-1.5">District</span>
+                    <div className="font-medium text-text bg-surface-container px-3.5 py-2.5 rounded-lg border border-surface-variant shadow-sm">{defaultAddress.district || 'N/A'}</div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-secondary font-semibold uppercase tracking-wider mb-1.5">State</span>
+                    <div className="font-medium text-text bg-surface-container px-3.5 py-2.5 rounded-lg border border-surface-variant shadow-sm">{defaultAddress.state || 'N/A'}</div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-secondary font-semibold uppercase tracking-wider mb-1.5">Country</span>
+                    <div className="font-medium text-text bg-surface-container px-3.5 py-2.5 rounded-lg border border-surface-variant shadow-sm">{defaultAddress.country || 'N/A'}</div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-secondary font-semibold uppercase tracking-wider mb-1.5">Pincode</span>
+                    <div className="font-medium text-text bg-surface-container px-3.5 py-2.5 rounded-lg border border-surface-variant shadow-sm">{defaultAddress.pincode || 'N/A'}</div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-secondary font-semibold uppercase tracking-wider mb-1.5">Landmark</span>
+                    <div className="font-medium text-text bg-surface-container px-3.5 py-2.5 rounded-lg border border-surface-variant shadow-sm">{defaultAddress.landmark || 'N/A'}</div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-10 text-secondary">
+                <i className="fas fa-map-marker-slash text-5xl mb-4 opacity-50"></i>
+                <p className="font-medium">No default location set.</p>
+              </div>
+            )}
           </div>
           <div className="loc-modal-footer">
-            <button type="button" className="btn btn-secondary text-xs" onClick={() => setIsLocModalOpen(false)}>Cancel</button>
-            <button type="button" className="btn btn-primary text-xs" onClick={() => setIsLocModalOpen(false)}>Save Default Location</button>
+            <button type="button" className="btn btn-primary w-full shadow-md" onClick={() => setIsLocModalOpen(false)}>Close</button>
           </div>
         </div>
       </div>
