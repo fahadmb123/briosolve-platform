@@ -12,10 +12,10 @@ const Notifications = lazy(() => import('./views/Notifications/Notifications').t
 const Location = lazy(() => import('./views/Location/Location').then(m => ({ default: m.Location })));
 const Privacy = lazy(() => import('./views/Privacy/Privacy').then(m => ({ default: m.Privacy })));
 const Addresses = lazy(() => import('./views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
-const Danger = lazy(() => import('./views/Danger/Danger').then(m => ({ default: m.Danger })));
 
 
-type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notifications' | 'location' | 'privacy' | 'danger' | 'addresses';
+
+type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notifications' | 'location' | 'privacy' | 'addresses';
 
 export default function Settings() {
     const location = useLocation();
@@ -76,13 +76,7 @@ export default function Settings() {
                 badge={user?.current_address_id !== null ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
             />
             
-            <SettingsMenuCard
-                icon="fas fa-exclamation-triangle"
-                title="Danger Zone"
-                description="Permanently close your customer account and cancel all active requests."
-                onClick={() => setActiveView('danger')}
-                danger={true}
-            />
+
         </div>
     );
 
@@ -112,7 +106,7 @@ export default function Settings() {
                     {activeView === 'location' && <Location />}
                     {activeView === 'addresses' && <Addresses />}
                     {activeView === 'privacy' && <Privacy />}
-                    {activeView === 'danger' && <Danger />}
+
                 </Suspense>
             </div>
         </div>
