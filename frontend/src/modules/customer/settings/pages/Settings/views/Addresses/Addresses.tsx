@@ -2,16 +2,19 @@ import { useEffect, useState } from 'react';
 import { AddAddressModal } from '../../../../components/Addresses/AddAddressModal';
 
 import { type AddressPayload } from '../../../../schemas/validation';
-import { useAddAddress, useEditAddress, useGetAddresses } from '../../../../hooks/mutations/address';
+import { useAddAddress, useDeleteAddress, useEditAddress, useGetAddresses } from '../../../../hooks/mutations/address';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../../../../../../../store/auth/auth.store';
 import { SpinnerOverlay } from '../../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
+import { ConfirmModal } from '../../../../../../../shared/components/ui/ConfirmModal/ConfirmModal';
 
 
 export const Addresses = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [addressToEdit, setAddressToEdit] = useState<AddressPayload | null>(null)
+  const [addressToDelete, setAddressToDelete] = useState<string | null>(null)
   const [addresses, setAddresses] = useState<AddressPayload[]>([])
+  const deleteAddress = useDeleteAddress()
   const addAddress = useAddAddress()
   const editAddress = useEditAddress()
   const getAddresses = useGetAddresses()
@@ -35,6 +38,18 @@ export const Addresses = () => {
       })
     })()
   }, [page,search])
+
+  const handleDelete = async ()=>{
+    if (!addressToDelete) return;
+    await deleteAddress.mutate(addressToDelete,{
+      onSuccess:(res)=>{
+        setAddresses((prev) => prev.filter((address) => address.id !== addressToDelete))
+        setAddressToDelete(null)
+        toast.success(res.message)
+      },
+      onError: () => setAddressToDelete(null)
+    })
+  }
 
   const handleSaveAddress = async (payload: AddressPayload) => {
     if (addressToEdit) {
@@ -140,20 +155,22 @@ export const Addresses = () => {
             </div>
           ) : (
             <>
-              {addresses.map((address) => (
-                <div key={address.id} className={`bg-surface-container rounded-xl border ${address.isDefault ? 'border-primary/40 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.45)]' : 'border-surface-variant shadow-md'} p-5 relative overflow-hidden transition-all hover:border-primary/60 flex flex-col justify-between gap-4`}>
-              {address.isDefault && <div className="absolute top-0 left-0 w-1.5 h-full bg-primary"></div>}
+              {addresses.map((address) => {
+                const isDefault = user?.current_address_id?.id === address.id;
+                return (
+                <div key={address.id} className={`bg-surface-container rounded-xl border ${isDefault ? 'border-primary/40 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.45)]' : 'border-surface-variant shadow-md'} p-5 relative overflow-hidden transition-all hover:border-primary/60 flex flex-col justify-between gap-4`}>
+              {isDefault && <div className="absolute top-0 left-0 w-1.5 h-full bg-primary"></div>}
               
               {/* Top Row: Info & Top Actions */}
               <div className="flex items-start justify-between w-full pl-2 gap-4">
                 <div className="flex items-start gap-4 w-full">
-                  <div className={`w-10 h-10 rounded-lg ${address.isDefault ? 'bg-primary/10 border border-primary/30 text-primary' : 'bg-surface-container-high border border-surface-variant text-on-surface-variant'} flex items-center justify-center shrink-0`}>
-                    <span className="material-symbols-outlined text-xl" style={address.isDefault ? { fontVariationSettings: "'FILL' 1" } : {}}>{getIconForType(address.type)}</span>
+                  <div className={`w-10 h-10 rounded-lg ${isDefault ? 'bg-primary/10 border border-primary/30 text-primary' : 'bg-surface-container-high border border-surface-variant text-on-surface-variant'} flex items-center justify-center shrink-0`}>
+                    <span className="material-symbols-outlined text-xl" style={isDefault ? { fontVariationSettings: "'FILL' 1" } : {}}>{getIconForType(address.type)}</span>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <h3 className="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight m-0">{address.type}</h3>
-                      {address.isDefault && (
+                      {isDefault && (
                         <span className="px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/40 text-primary font-label-sm text-[11px] font-bold tracking-wide uppercase">
                           Default
                         </span>
@@ -197,8 +214,12 @@ export const Addresses = () => {
                     <span className="material-symbols-outlined text-sm">edit</span>
                     <span>Edit</span>
                   </button>
-                  {!address.isDefault && (
-                    <button className="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-highest border border-surface-variant text-error transition-colors cursor-pointer flex items-center" title="Delete Address">
+                  {!isDefault && (
+                    <button 
+                      onClick={() => setAddressToDelete(address.id!)}
+                      className="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-highest border border-surface-variant text-error transition-colors cursor-pointer flex items-center" 
+                      title="Delete Address"
+                    >
                       <span className="material-symbols-outlined text-base">delete</span>
                     </button>
                   )}
@@ -207,12 +228,12 @@ export const Addresses = () => {
 
               {/* Bottom Row */}
               <div className="flex items-end justify-between w-full pl-2 mt-2">
-                {address.isDefault ? (
+                {isDefault ? (
                   <span className="text-[11px] text-primary font-medium">Primary shipping destination</span>
                 ) : (
                   <span className="text-[11px] text-on-surface-variant"></span>
                 )}
-                {user?.current_address_id?.id !== address.id ? (
+                {!isDefault ? (
                   <button className="px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-sm text-label-sm transition-colors cursor-pointer bg-transparent">
                     Set as Default
                   </button>
@@ -223,7 +244,7 @@ export const Addresses = () => {
                 )}
               </div>
             </div>
-          ))}
+              )})}
 
           {/* Dashed Interactive Add Slot */}
           <div 
@@ -289,6 +310,17 @@ export const Addresses = () => {
         }} 
         onSave={handleSaveAddress}
         initialData={addressToEdit}
+      />
+      <ConfirmModal 
+        isOpen={!!addressToDelete} 
+        title="Delete Address"
+        message="Are you sure you want to delete this address? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDanger={true}
+        isLoading={deleteAddress.isPending}
+        onConfirm={handleDelete}
+        onCancel={() => setAddressToDelete(null)}
       />
     </>
   );

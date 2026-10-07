@@ -64,4 +64,9 @@ export class AddressRepository implements IAddressRepository{
         }
 
     }
+    async delete(id:string): Promise<void> {
+        await db.orm.public.addresses
+            .where({id:id})
+            .delete()
+    }
 }

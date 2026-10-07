@@ -10,7 +10,8 @@ export class AddressController extends BaseController{
     constructor(
         private readonly addAddressUseCase: IUseCase<AddAddressInputUseCaseDto,Address>,
         private readonly getAddressesUseCase: IUseCase<GetAddressesInputDto,GetAddressesOutputDto>,
-        private readonly editAddressUseCase: IUseCase<EditAddressInputUseCaseDto,Address>
+        private readonly editAddressUseCase: IUseCase<EditAddressInputUseCaseDto,Address>,
+        private readonly deleteAddressUseCase: IUseCase<string,void>
     ){super()}
 
     addAddress = async (req:Request,res:Response,next:NextFunction) => {
@@ -50,6 +51,18 @@ export class AddressController extends BaseController{
             })
             
             return sendSuccess(res,"",response)
+        } catch (err) {
+            next(err)
+        }
+    }
+    delete = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const user = this.getCurrentUser(req)
+            const id = req.params.id
+
+            await this.deleteAddressUseCase.execute(id as string)
+
+            return sendSuccess(res,"Deleted!")
         } catch (err) {
             next(err)
         }

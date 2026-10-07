@@ -19,6 +19,8 @@ router.post("/address",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),valid
 router.patch("/address/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(addressSchema),addressController.editAddress)
 router.patch("/status/:id",authMiddleware,requireRole(["ADMIN"]),userController.updateUserStatus)
 
+router.delete("/address/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),addressController.delete)
+
 
 
 export default router

@@ -1,4 +1,5 @@
 import { AddAddressUseCase } from "../../application/use-cases/addAddress.useCase.js";
+import { DeleteAddressUseCase } from "../../application/use-cases/deleteAddress.useCase.js";
 import { EditAddressUseCase } from "../../application/use-cases/editAddress.useCase.js";
 import { GetAddressesUseCase } from "../../application/use-cases/getAddresses.useCase.js";
 import GetCustomersUseCase from "../../application/use-cases/getCustomers.useCase.js";
@@ -45,5 +46,8 @@ export const getAddressesUseCase = new GetAddressesUseCase(
     addressRepository
 )
 export const editAddressUseCase = new EditAddressUseCase(
+    addressRepository
+)
+export const deleteAddressUseCase = new DeleteAddressUseCase(
     addressRepository
 )

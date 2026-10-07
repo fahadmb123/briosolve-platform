@@ -23,3 +23,7 @@ export const getAddresses = async (params:getAddressesInput): Promise<response<{
     const response = await apiClient.get("/api/user/address",{params})
     return response.data
 }
+export const deleteAddress = async (id:string): Promise<response<null>> => {
+    const response = await apiClient.delete(`/api/user/address/${id}`)
+    return response.data
+}
