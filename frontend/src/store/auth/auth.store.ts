@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getMe } from "../../modules/auth/services/auth.service";
+import type { Address } from "../../shared/Dtos/address";
 
 export type UserRole =
     | "CUSTOMER"
@@ -11,6 +12,7 @@ export interface IAuthUser {
     name: string;
     email: string;
     role: UserRole;
+    current_address_id: Address | null;
     status: 'ACTIVE' | 'BLOCKED' | 'PENDING';
     phone?: string | null;
     email_verified: boolean;

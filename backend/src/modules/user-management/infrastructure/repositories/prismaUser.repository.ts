@@ -19,7 +19,7 @@ export class UserRepository implements IUserRepository{
         let query = await db.orm.public.users.where({role:"CUSTOMER"})
 
         if (search){
-            query = query.where((user)=> user.email.ilike(`%${search}%`))
+            query = query.where((user)=> user.email.ilike(`${search}%`))
         }
         if (filter){
             query = query.where((user)=> user.status.eq(filter as UserStatus))
@@ -46,7 +46,7 @@ export class UserRepository implements IUserRepository{
     
 
     async findById(id:string):Promise<User | null>{
-        const data = await db.orm.public.users.where({id}).first()
+        const data = await db.orm.public.users.where({id}).include("current_address").first()
         if (!data) return null
       
         return UserMapper.toDomain(data)

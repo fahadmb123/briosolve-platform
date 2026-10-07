@@ -2,6 +2,8 @@ import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js
 import { User } from "../../domain/entities/user.entity.js"
 
 
+import { Address } from "../../domain/entities/address.entity.js"
+
 export type UpdateUserStatusDto = {
     id:string,
     status:string
@@ -34,7 +36,7 @@ export type UserResponseDto = {
     status: "ACTIVE" | "INACTIVE" | "BLOCKED";
     email_verified: boolean;
     phone_verified: boolean;
-    current_address_id: string | null;
+    current_address_id: string | Address | null;
     created_at: Date;
     updated_at: Date;
 }

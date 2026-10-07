@@ -3,6 +3,7 @@ import { db } from "../../../../infrastructure/persistence/prisma/client.js";
 import { Address } from "../../domain/entities/address.entity.js";
 import { IAddressRepository } from "../../domain/repositories/IAddressRepository.js";
 import { AddressMapper } from "../mappers/address.mapper.js";
+import { GetAddressesInputDto, GetAddressesOutputDto } from "../../application/Dto/addressDto.js";
 
 
 
@@ -35,13 +36,26 @@ export class AddressRepository implements IAddressRepository{
         return AddressMapper.toDomain(address);
     }
 
-    async getAddresses(id:string): Promise<{addresses:Address[]}> {
-        const addresses = await db.orm.public.addresses
-            .where({user_id:id})
-            .all()
+    async getAddresses(input:GetAddressesInputDto): Promise<Omit<GetAddressesOutputDto,"totalPages">> {
+        const {page,search,limit} = input
+        const skip = (page - 1) * limit
 
-        return {
-            addresses:addresses.map((address)=> AddressMapper.toDomain(address))
+        let query = await db.orm.public.addresses.where({user_id:input.id})
+        if (search){
+            query = query.where((address)=> address.landmark.ilike(`${search}%`))
         }
+
+        const addresses  = await query
+            .orderBy((address)=>address.updated_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        
+        const total = await query.aggregate((agg)=>({total:agg.count()}))
+        return {
+            addresses: addresses.map(address => AddressMapper.toDomain(address)),
+            total:total.total
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
+import { Address } from "../../../user-management/domain/entities/address.entity.js";
 
 export type LoginInputDto = {
     email:string,
@@ -14,7 +15,7 @@ export type UserResponseDto = {
     status: "ACTIVE" | "INACTIVE" | "BLOCKED";
     email_verified: boolean;
     phone_verified: boolean;
-    current_address_id: string | null;
+    current_address_id: string | Address | null;
     created_at: Date;
     updated_at: Date;
 }

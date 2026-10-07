@@ -13,7 +13,7 @@ export class UserMapper {
             data.status,
             data.email_verified,
             data.phone_verified,
-            data.current_address_id,
+            data.current_address || data.current_address_id,
             data.created_at?.epochMilliseconds ? new Date(data.created_at.epochMilliseconds) : new Date(data.created_at),
             data.updated_at?.epochMilliseconds ? new Date(data.updated_at.epochMilliseconds) : new Date(data.updated_at)
         )

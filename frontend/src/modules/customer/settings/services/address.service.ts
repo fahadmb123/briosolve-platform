@@ -5,11 +5,17 @@ import type { AddressPayload } from "../schemas/validation"
 
 
 
-export const addAddress = async (data:AddressPayload): Promise<response<null>> => {
+type getAddressesInput = {
+    page:number,
+    limit:number;
+    search:string;
+}
+
+export const addAddress = async (data:AddressPayload): Promise<response<Address>> => {
     const response = await apiClient.post("/api/user/address",data)
     return response.data
 }
-export const getAddresses = async (): Promise<response<{addresses:Address[]}>> => {
-    const response = await apiClient.get("/api/user/address")
+export const getAddresses = async (params:getAddressesInput): Promise<response<{addresses:Address[],total:number,totalPages:number}>> => {
+    const response = await apiClient.get("/api/user/address",{params})
     return response.data
 }

@@ -4,27 +4,39 @@ import { AddAddressModal } from '../../../../components/Addresses/AddAddressModa
 import { type AddressPayload } from '../../../../schemas/validation';
 import { useAddAddress, useGetAddresses } from '../../../../hooks/mutations/address';
 import { toast } from 'react-toastify';
+import { useAuthStore } from '../../../../../../../store/auth/auth.store';
+
 
 export const Addresses = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [addresses, setAddresses] = useState<AddressPayload[]>([])
   const addAddress = useAddAddress()
   const getAddresses = useGetAddresses()
+  const user = useAuthStore.getState().user
+
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState("")
+  const [limit] = useState(5)
+  const [total, setTotal] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
 
 
   useEffect(()=>{
     (()=>{
-      getAddresses.mutate(undefined,{
+      getAddresses.mutate({page,search,limit},{
         onSuccess:(response)=>{
           setAddresses(response.data.addresses as [])
+          setTotal(response.data.total)
+          setTotalPages(response.data.totalPages)
         }
       })
     })()
-  }, [])
+  }, [page,search])
 
   const handleSaveAddress = async (payload: AddressPayload) => {
     await addAddress.mutate(payload,{
       onSuccess:(response)=>{
+        setAddresses((prev)=>[response.data as unknown as AddressPayload, ...prev])
         toast.success(response.message)
       }
     })
@@ -38,6 +50,28 @@ export const Addresses = () => {
     return 'location_on';
   };
 
+  const getPaginationItems = () => {
+    const cleanItems: (number | string)[] = [];
+    let last = 0;
+    
+    for (let i = 1; i <= totalPages; i++) {
+        let shouldInclude = false;
+        if (i === 1 || i === totalPages) shouldInclude = true;
+        else if (page <= 2 && i <= 3) shouldInclude = true;
+        else if (page >= totalPages - 1 && i >= totalPages - 2) shouldInclude = true;
+        else if (i >= page - 1 && i <= page + 1) shouldInclude = true;
+        
+        if (shouldInclude) {
+            if (last && i - last > 1) {
+                cleanItems.push('...');
+            }
+            cleanItems.push(i);
+            last = i;
+        }
+    }
+    return cleanItems;
+  };
+
   return (
     <>
       <div className="bg-surface-container-low border border-surface-variant rounded-xl p-6 md:p-8 flex flex-col gap-6 shadow-xl">
@@ -49,7 +83,7 @@ export const Addresses = () => {
           </div>
           <div className="flex items-center shrink-0 ml-4">
             <span className="px-3 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm border border-surface-variant whitespace-nowrap">
-              {addresses.length} Saved Location{addresses.length !== 1 && 's'}
+              {addresses.length} Saved Location{total !== 1 && 's'}
             </span>
           </div>
         </div>
@@ -59,7 +93,13 @@ export const Addresses = () => {
           {/* Quick Search Field (Left) */}
           <div className="relative w-full sm:max-w-md">
             <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-base">search</span>
-            <input className="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-lowest border border-surface-variant text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Search saved addresses..." type="text"/>
+            <input className="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-lowest border border-surface-variant text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+              onChange={(e)=>{
+                  setSearch(e.target.value)
+                  setPage(1)
+              }}
+              type="text" placeholder="Search for landmark" id="userSearchInput"  
+            />
           </div>
 
           {/* Add New Address Button (Right) */}
@@ -100,14 +140,27 @@ export const Addresses = () => {
                         </span>
                       )}
                     </div>
-                    <p className="font-body-md text-body-md text-on-surface font-medium m-0">{address.houseNo}</p>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant m-0">{[address.area, address.city, address.district, address.state, address.country].filter(Boolean).join(", ")} — {address.pincode}</p>
+                    <div className="flex flex-col gap-1 mt-0.5">
+                      <p className="font-body-md text-body-md text-on-surface m-0">
+                        <span className="font-semibold">House No:</span> {address.houseNo}
+                      </p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant m-0 leading-relaxed">
+                        {address.area && <><span className="font-medium text-on-surface">Area:</span> {address.area}, </>}
+                        {address.city && <><span className="font-medium text-on-surface">City:</span> {address.city}, </>}
+                        {address.district && <><span className="font-medium text-on-surface">District:</span> {address.district}</>}
+                      </p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant m-0 leading-relaxed">
+                        {address.state && <><span className="font-medium text-on-surface">State:</span> {address.state}, </>}
+                        {address.country && <><span className="font-medium text-on-surface">Country:</span> {address.country}, </>}
+                        <span className="font-medium text-on-surface">Pincode:</span> {address.pincode}
+                      </p>
+                    </div>
                     
                     {address.landmark && (
-                      <div className="flex flex-wrap items-center gap-y-2 gap-x-4 pt-1">
-                        <div className="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-body-sm">
-                          <span className="material-symbols-outlined text-sm text-on-surface-variant">info</span>
-                          <span className="text-on-surface-variant/80">{address.landmark}</span>
+                      <div className="flex flex-wrap items-center gap-y-2 gap-x-4 pt-2">
+                        <div className="flex items-center gap-2 text-on-surface font-title-sm text-title-sm font-semibold bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20">
+                          <span className="material-symbols-outlined text-lg text-primary">flag</span>
+                          <span>Landmark: {address.landmark}</span>
                         </div>
                       </div>
                     )}
@@ -134,7 +187,7 @@ export const Addresses = () => {
                 ) : (
                   <span className="text-[11px] text-on-surface-variant"></span>
                 )}
-                {!address.isDefault ? (
+                {user?.current_address_id?.id !== address.id ? (
                   <button className="px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-sm text-label-sm transition-colors cursor-pointer bg-transparent">
                     Set as Default
                   </button>
@@ -162,19 +215,41 @@ export const Addresses = () => {
           )}
 
           {/* Pagination Container (Bottom Right) */}
-          <div className="flex justify-end pt-4 mt-2 border-t border-surface-variant">
-            <div className="flex items-center gap-2">
-              <button className="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant flex items-center justify-center border border-surface-variant transition-colors cursor-not-allowed opacity-50" disabled>
-                <span className="material-symbols-outlined text-sm">chevron_left</span>
-              </button>
-              <button className="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-label-md font-semibold cursor-pointer border-none">
-                1
-              </button>
-              <button className="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant flex items-center justify-center border border-surface-variant transition-colors cursor-not-allowed opacity-50" disabled>
-                <span className="material-symbols-outlined text-sm">chevron_right</span>
-              </button>
+          {totalPages > 1 && (
+            <div className="flex justify-end pt-4 mt-2 border-t border-surface-variant">
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                  disabled={page === 1}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${page === 1 ? 'bg-surface-container text-on-surface-variant/50 border-surface-variant cursor-not-allowed' : 'bg-surface-container hover:bg-surface-container-highest text-on-surface-variant border-surface-variant cursor-pointer'}`}
+                >
+                  <span className="material-symbols-outlined text-sm">chevron_left</span>
+                </button>
+                <div className="flex items-center gap-1">
+                  {getPaginationItems().map((item, idx) => (
+                    item === '...' ? (
+                      <span key={`ellipsis-${idx}`} className="w-8 h-8 flex items-center justify-center text-on-surface-variant font-medium">...</span>
+                    ) : (
+                      <button 
+                        key={item}
+                        onClick={() => setPage(item as number)}
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center font-label-md font-semibold border-none ${page === item ? 'bg-primary text-on-primary cursor-default shadow-md' : 'bg-transparent text-on-surface-variant hover:bg-surface-container-highest cursor-pointer'}`}
+                      >
+                        {item}
+                      </button>
+                    )
+                  ))}
+                </div>
+                <button 
+                  onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                  disabled={page === totalPages}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${page === totalPages ? 'bg-surface-container text-on-surface-variant/50 border-surface-variant cursor-not-allowed' : 'bg-surface-container hover:bg-surface-container-highest text-on-surface-variant border-surface-variant cursor-pointer'}`}
+                >
+                  <span className="material-symbols-outlined text-sm">chevron_right</span>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

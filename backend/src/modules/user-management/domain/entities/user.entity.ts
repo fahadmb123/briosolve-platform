@@ -1,5 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-
+import { Address } from "./address.entity.js";
 
 export class User {
     constructor(
@@ -11,7 +11,7 @@ export class User {
         public readonly status:string,
         public readonly email_verified:boolean,
         public readonly phone_verified:boolean,
-        public readonly current_address_id: string | null,
+        public readonly current_address_id: string | Address | null,
         public readonly created_at:Date,
         public readonly updated_at:Date,
     ) {}
