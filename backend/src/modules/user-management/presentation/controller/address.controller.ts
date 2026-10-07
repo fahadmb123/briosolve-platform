@@ -8,7 +8,8 @@ import { sendSuccess } from "../../../../shared/presentation/http/response/respo
 
 export class AddressController extends BaseController{
     constructor(
-        private readonly addAddressUseCase: IUseCase<AddAddressInputUseCaseDto,Address>
+        private readonly addAddressUseCase: IUseCase<AddAddressInputUseCaseDto,Address>,
+        private readonly getAddressesUseCase: IUseCase<string,{addresses:Address[]}>
     ){super()}
 
     addAddress = async (req:Request,res:Response,next:NextFunction) => {
@@ -18,6 +19,18 @@ export class AddressController extends BaseController{
             const response = await this.addAddressUseCase.execute({id:user.userId,input:req.body})
             
             return sendSuccess(res,"Added!",response)
+        } catch (err) {
+            next(err)
+        }
+    }
+
+    getAddresses = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const user = this.getCurrentUser(req)
+
+            const response = await this.getAddressesUseCase.execute(user.userId)
+            
+            return sendSuccess(res,"",response)
         } catch (err) {
             next(err)
         }

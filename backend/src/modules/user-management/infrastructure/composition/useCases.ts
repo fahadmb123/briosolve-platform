@@ -1,4 +1,5 @@
 import { AddAddressUseCase } from "../../application/use-cases/addAddress.useCase.js";
+import { GetAddressesUseCase } from "../../application/use-cases/getAddresses.useCase.js";
 import GetCustomersUseCase from "../../application/use-cases/getCustomers.useCase.js";
 import GetProfileUseCase from "../../application/use-cases/getProfile.useCase.js";
 import RegisterCustomerUseCase from "../../application/use-cases/registerCustomer.useCase.js";
@@ -33,4 +34,7 @@ export const updateCustomerProfileUseCase = new UpdateCustomerProfileUseCase(
 export const addAddressUseCase = new AddAddressUseCase(
     addressRepository,
     userRepository
+)
+export const getAddressesUseCase = new GetAddressesUseCase(
+    addressRepository
 )

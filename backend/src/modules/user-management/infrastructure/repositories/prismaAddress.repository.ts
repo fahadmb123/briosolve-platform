@@ -34,4 +34,14 @@ export class AddressRepository implements IAddressRepository{
 
         return AddressMapper.toDomain(address);
     }
+
+    async getAddresses(id:string): Promise<{addresses:Address[]}> {
+        const addresses = await db.orm.public.addresses
+            .where({user_id:id})
+            .all()
+
+        return {
+            addresses:addresses.map((address)=> AddressMapper.toDomain(address))
+        }
+    }
 }

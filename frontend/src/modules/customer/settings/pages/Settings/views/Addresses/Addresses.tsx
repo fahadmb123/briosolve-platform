@@ -1,19 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AddAddressModal } from '../../../../components/Addresses/AddAddressModal';
 
 import { type AddressPayload } from '../../../../schemas/validation';
-import { useAddAddress } from '../../../../hooks/mutations/address';
+import { useAddAddress, useGetAddresses } from '../../../../hooks/mutations/address';
 import { toast } from 'react-toastify';
 
 export const Addresses = () => {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const addAddress = useAddAddress()
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [addresses, setAddresses] = useState<AddressPayload[]>([])
+  const addAddress = useAddAddress()
+  const getAddresses = useGetAddresses()
+
+
+  useEffect(()=>{
+    (()=>{
+      getAddresses.mutate(undefined,{
+        onSuccess:(response)=>{
+          setAddresses(response.data.addresses as [])
+        }
+      })
+    })()
+  }, [])
 
   const handleSaveAddress = async (payload: AddressPayload) => {
     await addAddress.mutate(payload,{
       onSuccess:(response)=>{
-        setAddresses(prev => [...prev,response.data!]);
         toast.success(response.message)
       }
     })
@@ -64,8 +75,14 @@ export const Addresses = () => {
         {/* Address Cards List */}
         <div className="flex flex-col gap-4">
           
-          {addresses.map((address) => (
-            <div key={address.id} className={`bg-surface-container rounded-xl border ${address.isDefault ? 'border-primary/40 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.45)]' : 'border-surface-variant shadow-md'} p-5 relative overflow-hidden transition-all hover:border-primary/60 flex flex-col justify-between gap-4`}>
+          {getAddresses.isPending ? (
+            <div className="flex flex-col items-center justify-center py-12 text-on-surface-variant gap-3 border-2 border-dashed border-surface-variant rounded-xl">
+              <p className="font-body-md m-0">Searching for address...</p>
+            </div>
+          ) : (
+            <>
+              {addresses.map((address) => (
+                <div key={address.id} className={`bg-surface-container rounded-xl border ${address.isDefault ? 'border-primary/40 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.45)]' : 'border-surface-variant shadow-md'} p-5 relative overflow-hidden transition-all hover:border-primary/60 flex flex-col justify-between gap-4`}>
               {address.isDefault && <div className="absolute top-0 left-0 w-1.5 h-full bg-primary"></div>}
               
               {/* Top Row: Info & Top Actions */}
@@ -141,6 +158,8 @@ export const Addresses = () => {
             <h4 className="font-title-md text-title-md text-on-surface font-semibold group-hover:text-primary transition-colors m-0">Add New Address</h4>
             <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm m-0">Set up a new location for instant delivery, bulk dispatches, or regional pickup centers.</p>
           </div>
+          </>
+          )}
 
           {/* Pagination Container (Bottom Right) */}
           <div className="flex justify-end pt-4 mt-2 border-t border-surface-variant">
