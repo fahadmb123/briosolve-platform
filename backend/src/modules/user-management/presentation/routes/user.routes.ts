@@ -17,6 +17,7 @@ router.get("/address",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),addres
 router.post("/address",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(addressSchema),addressController.addAddress)
 
 router.patch("/address/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(addressSchema),addressController.editAddress)
+router.patch("/address-set-default/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),addressController.setDefault)
 router.patch("/status/:id",authMiddleware,requireRole(["ADMIN"]),userController.updateUserStatus)
 
 router.delete("/address/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),addressController.delete)

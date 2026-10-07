@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AddAddressModal } from '../../../../components/Addresses/AddAddressModal';
 
 import { type AddressPayload } from '../../../../schemas/validation';
-import { useAddAddress, useDeleteAddress, useEditAddress, useGetAddresses } from '../../../../hooks/mutations/address';
+import { useAddAddress, useDeleteAddress, useEditAddress, useGetAddresses, useSetDefaultAddress } from '../../../../hooks/mutations/address';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../../../../../../../store/auth/auth.store';
 import { SpinnerOverlay } from '../../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
@@ -16,9 +16,11 @@ export const Addresses = () => {
   const [addresses, setAddresses] = useState<AddressPayload[]>([])
   const deleteAddress = useDeleteAddress()
   const addAddress = useAddAddress()
+  const setDefaultAddress = useSetDefaultAddress()
   const editAddress = useEditAddress()
   const getAddresses = useGetAddresses()
   const user = useAuthStore.getState().user
+  const fetchUser = useAuthStore.getState().fetchUser
 
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
@@ -50,6 +52,16 @@ export const Addresses = () => {
       onError: () => setAddressToDelete(null)
     })
   }
+
+  const handleSetDefault = async (id:string)=>{
+    await setDefaultAddress.mutate(id,{
+      onSuccess:(res)=>{
+        fetchUser()
+        toast.success(res.message)
+      }
+    })
+  }
+
 
   const handleSaveAddress = async (payload: AddressPayload) => {
     if (addressToEdit) {
@@ -105,6 +117,7 @@ export const Addresses = () => {
     <>
     {editAddress.isPending ? (<SpinnerOverlay isLoading={true}/>):null}
     {addAddress.isPending ? (<SpinnerOverlay isLoading={true}/>):null}
+    {setDefaultAddress.isPending ? (<SpinnerOverlay isLoading={true}/>):null}
       <div className="bg-surface-container-low border border-surface-variant rounded-xl p-6 md:p-8 flex flex-col gap-6 shadow-xl">
         {/* Header & Top Action */}
         <div className="flex flex-row items-center justify-between w-full text-left border-b border-surface-variant pb-6">
@@ -234,7 +247,10 @@ export const Addresses = () => {
                   <span className="text-[11px] text-on-surface-variant"></span>
                 )}
                 {!isDefault ? (
-                  <button className="px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-sm text-label-sm transition-colors cursor-pointer bg-transparent">
+                  <button 
+                    onClick={() => handleSetDefault(address.id!)}
+                    className="px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-sm text-label-sm transition-colors cursor-pointer bg-transparent"
+                  >
                     Set as Default
                   </button>
                 ) : (

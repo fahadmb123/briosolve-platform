@@ -1,7 +1,7 @@
 import { NextFunction,Request,Response } from "express"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js";
 import { Address } from "../../domain/entities/address.entity.js";
-import { AddAddressInputUseCaseDto, EditAddressInputUseCaseDto, GetAddressesInputDto, GetAddressesOutputDto } from "../../application/Dto/addressDto.js";
+import { AddAddressInputUseCaseDto, EditAddressInputUseCaseDto, GetAddressesInputDto, GetAddressesOutputDto, SetDefaultAddressInputUseCaseDto } from "../../application/Dto/addressDto.js";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
 
@@ -11,7 +11,8 @@ export class AddressController extends BaseController{
         private readonly addAddressUseCase: IUseCase<AddAddressInputUseCaseDto,Address>,
         private readonly getAddressesUseCase: IUseCase<GetAddressesInputDto,GetAddressesOutputDto>,
         private readonly editAddressUseCase: IUseCase<EditAddressInputUseCaseDto,Address>,
-        private readonly deleteAddressUseCase: IUseCase<string,void>
+        private readonly deleteAddressUseCase: IUseCase<string,void>,
+        private readonly setDefaultAddressUseCase: IUseCase<SetDefaultAddressInputUseCaseDto,void>
     ){super()}
 
     addAddress = async (req:Request,res:Response,next:NextFunction) => {
@@ -63,6 +64,18 @@ export class AddressController extends BaseController{
             await this.deleteAddressUseCase.execute(id as string)
 
             return sendSuccess(res,"Deleted!")
+        } catch (err) {
+            next(err)
+        }
+    }
+    setDefault = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const user = this.getCurrentUser(req)
+            const addressId = req.params.id
+
+            await this.setDefaultAddressUseCase.execute({userId:user.userId,addressId:addressId as string})
+
+            return sendSuccess(res,"Updated!")
         } catch (err) {
             next(err)
         }

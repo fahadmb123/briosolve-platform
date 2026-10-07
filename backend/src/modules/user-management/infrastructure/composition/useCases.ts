@@ -5,6 +5,7 @@ import { GetAddressesUseCase } from "../../application/use-cases/getAddresses.us
 import GetCustomersUseCase from "../../application/use-cases/getCustomers.useCase.js";
 import GetProfileUseCase from "../../application/use-cases/getProfile.useCase.js";
 import RegisterCustomerUseCase from "../../application/use-cases/registerCustomer.useCase.js";
+import { SetDefaultAddressUseCase } from "../../application/use-cases/setDefaulltAddress.useCase.js";
 import UpdateCustomerProfileUseCase from "../../application/use-cases/updateCustomerProfile.useCase.js";
 import UpdateUserStatusUseCase from "../../application/use-cases/updateUser.useCase.js";
 
@@ -50,4 +51,7 @@ export const editAddressUseCase = new EditAddressUseCase(
 )
 export const deleteAddressUseCase = new DeleteAddressUseCase(
     addressRepository
+)
+export const setDefaultAddressUseCase = new SetDefaultAddressUseCase(
+    userRepository
 )

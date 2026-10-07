@@ -11,7 +11,8 @@ import {
     addAddressUseCase,
     getAddressesUseCase,
     editAddressUseCase,
-    deleteAddressUseCase
+    deleteAddressUseCase,
+    setDefaultAddressUseCase
 } from "./useCases.js";
 
 export const userController = new UserController(
@@ -28,5 +29,6 @@ export const addressController = new AddressController(
     addAddressUseCase,
     getAddressesUseCase,
     editAddressUseCase,
-    deleteAddressUseCase
+    deleteAddressUseCase,
+    setDefaultAddressUseCase
 )
