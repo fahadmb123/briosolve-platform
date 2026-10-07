@@ -189,10 +189,7 @@ export const useLocationPicker = (
       type: addressType,
       latitude: coordinates.lat,
       longitude: coordinates.lng,
-    };
-
-    console.log("Valid address data ready for save:", apiPayload);
-    toast.success("Address saved!");
+    }
     onSave(apiPayload);
     onClose();
   });

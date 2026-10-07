@@ -12,6 +12,7 @@ export class UserResponseMapper {
             status: user.status as "ACTIVE" | "INACTIVE" | "BLOCKED",
             email_verified: user.email_verified,
             phone_verified: user.phone_verified,
+            current_address_id: user.current_address_id,
             created_at: user.created_at,
             updated_at: user.updated_at
         };

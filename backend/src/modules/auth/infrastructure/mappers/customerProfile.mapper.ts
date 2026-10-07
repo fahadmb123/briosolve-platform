@@ -2,7 +2,7 @@ import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js
 
 
 export class CustomerProfileMapper {
-    static toDomain(data:CustomerProfile):CustomerProfile{
+    static toDomain(data:any):CustomerProfile{
         return new CustomerProfile(
             data.id,
             data.user_id,

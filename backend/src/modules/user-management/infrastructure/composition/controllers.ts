@@ -1,3 +1,4 @@
+import { AddressController } from "../../presentation/controller/address.controller.js";
 import { CustomerController } from "../../presentation/controller/customer.controller.js";
 import { UserController } from "../../presentation/controller/user.controller.js";
 
@@ -6,7 +7,8 @@ import {
     updateUserStatusUseCase,
     registerCustomerUseCase,
     getProfileUseCase,
-    updateCustomerProfileUseCase
+    updateCustomerProfileUseCase,
+    addAddressUseCase
 } from "./useCases.js";
 
 export const userController = new UserController(
@@ -19,3 +21,6 @@ export const customerController = new CustomerController(
     registerCustomerUseCase,
     updateCustomerProfileUseCase
 );
+export const addressController = new AddressController(
+    addAddressUseCase
+)

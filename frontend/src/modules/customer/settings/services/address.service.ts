@@ -5,6 +5,6 @@ import type { AddressPayload } from "../schemas/validation"
 
 
 export const addAddress = async (data:AddressPayload): Promise<response<null>> => {
-    const response = await apiClient.post("/api/auth/address",data)
+    const response = await apiClient.post("/api/user/address",data)
     return response.data
 }

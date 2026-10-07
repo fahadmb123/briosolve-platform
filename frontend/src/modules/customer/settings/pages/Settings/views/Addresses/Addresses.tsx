@@ -2,47 +2,22 @@ import { useState } from 'react';
 import { AddAddressModal } from '../../../../components/Addresses/AddAddressModal';
 
 import { type AddressPayload } from '../../../../schemas/validation';
+import { useAddAddress } from '../../../../hooks/mutations/address';
+import { toast } from 'react-toastify';
 
 export const Addresses = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  
-  const [addresses, setAddresses] = useState<AddressPayload[]>([
-    {
-      id: "1",
-      type: "Home",
-      isDefault: true,
-      houseNo: "Aspin Courtyard, Block A, Flat 3B",
-      area: "Kodungallur",
-      city: "Thrissur",
-      district: "Thrissur",
-      state: "Kerala",
-      country: "India",
-      pincode: "680664",
-      landmark: "Instruction: Leave at front porch / Security desk",
-    },
-    {
-      id: "2",
-      type: "Work",
-      isDefault: false,
-      houseNo: "TechPark Tower 2, 4th Floor",
-      area: "Infopark",
-      city: "Kochi",
-      district: "Ernakulam",
-      state: "Kerala",
-      country: "India",
-      pincode: "682042",
-      landmark: "Access code required at entrance gates",
-    }
-  ]);
+  const addAddress = useAddAddress()
+  const [addresses, setAddresses] = useState<AddressPayload[]>([])
 
-  const handleSaveAddress = (payload: AddressPayload) => {
+  const handleSaveAddress = async (payload: AddressPayload) => {
+    await addAddress.mutate(payload,{
+      onSuccess:(response)=>{
+        setAddresses(prev => [...prev,response.data!]);
+        toast.success(response.message)
+      }
+    })
     
-    const newAddress = {
-      ...payload,
-      id: Math.random().toString(36).substr(2, 9),
-      isDefault: addresses.length === 0,
-    };
-    setAddresses(prev => [...prev, newAddress]);
     
   };
 

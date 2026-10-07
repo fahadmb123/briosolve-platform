@@ -14,6 +14,7 @@ export type UserResponseDto = {
     status: "ACTIVE" | "INACTIVE" | "BLOCKED";
     email_verified: boolean;
     phone_verified: boolean;
+    current_address_id: string | null;
     created_at: Date;
     updated_at: Date;
 }

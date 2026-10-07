@@ -12,47 +12,73 @@ enum user_role {
 }
 
 model users {
-  id               Uuid               @id @default(uuid())
-  name             VarChar(100)
-  email            VarChar(255)       @unique
-  password_hash    VarChar(255)
-  phone            VarChar(20)?
-  role             user_role
-  status           user_status        @default(ACTIVE)
-  email_verified   Boolean
-  phone_verified   Boolean
-  created_at       DateTime           @default(now())
-  updated_at       DateTime           @default(now())
+  id                 Uuid               @id @default(uuid())
+  name               VarChar(100)
+  email              VarChar(255)       @unique
+  password_hash      VarChar(255)
+  phone              VarChar(20)?
 
-  customer_profile customer_profiles?
+  role               user_role
+  status             user_status        @default(ACTIVE)
+
+  email_verified     Boolean
+  phone_verified     Boolean
+
+  current_address_id Uuid?
+
+  created_at         DateTime           @default(now())
+  updated_at         temporal.updatedAt()
+
+  current_address    addresses?         @relation(
+    "CurrentAddress",
+    fields: [current_address_id],
+    references: [id]
+  )
+
+  addresses          addresses[]        @relation("UserAddresses")
+
+  customer_profile   customer_profiles?
+}
+
+model addresses {
+  id          Uuid            @id @default(uuid())
+  user_id     Uuid
+
+  house_no    VarChar(100)?
+  area        VarChar(255)
+  city        VarChar(100)
+  district    VarChar(100)
+  state       VarChar(100)
+  country     VarChar(100)
+  pincode     VarChar(20)
+  landmark    VarChar(255)?
+  type        VarChar(50)
+
+  latitude    Numeric(10, 7)?
+  longitude   Numeric(10, 7)?
+
+  created_at  DateTime        @default(now())
+  updated_at  temporal.updatedAt()
+
+  user        users           @relation(
+    "UserAddresses",
+    fields: [user_id],
+    references: [id]
+  )
+
+  current_for users[]         @relation("CurrentAddress")
 }
 
 model customer_profiles {
-  id                   Uuid                 @id @default(uuid())
-  user_id              Uuid                 @unique
-  current_address_id   Uuid?
-  profile_image        VarChar(500)?
-  created_at           DateTime             @default(now())
-  updated_at           DateTime             @default(now())
-  about                VarChar(500)
-  user                 users                @relation(fields:[user_id], references:[id])
-  addresses            customer_addresses[] @relation("CustomerAddresses")
-  current_address      customer_addresses?  @relation("CurrentAddress", fields:[current_address_id], references:[id])
-}
+  id            Uuid                 @id @default(uuid())
+  user_id       Uuid                 @unique
+  profile_image VarChar(500)?
+  created_at    DateTime             @default(now())
+  updated_at    temporal.updatedAt()
+  about         VarChar(500)
 
-model customer_addresses {
-  id                  Uuid                @id @default(uuid())
-  customer_profile_id Uuid
-  label               VarChar(50)
-  address             String
-  city                VarChar(100)
-  state               VarChar(100)
-  postal_code         VarChar(20)?
-  latitude            Numeric(10, 7)?
-  longitude           Numeric(10, 7)?
-  created_at          DateTime            @default(now())
-  updated_at          DateTime            @default(now())
-
-  customer_profile    customer_profiles   @relation("CustomerAddresses", fields:[customer_profile_id], references:[id])
-  current_for         customer_profiles[] @relation("CurrentAddress")
+  user          users                @relation(
+    fields: [user_id],
+    references: [id]
+  )
 }

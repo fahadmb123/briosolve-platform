@@ -6,6 +6,7 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
 
 
 import { UserMapper } from "../mappers/user.mapper.js";
+import { UpdateUserRepositoryInput } from "../../application/Dto/userDto.js";
 
 type UserStatus = "ACTIVE" | "INACTIVE" | "BLOCKED";
 export class UserRepository implements IUserRepository{
@@ -47,9 +48,16 @@ export class UserRepository implements IUserRepository{
     async findById(id:string):Promise<User | null>{
         const data = await db.orm.public.users.where({id}).first()
         if (!data) return null
+      
         return UserMapper.toDomain(data)
     }
     async updateStatus(id:string,status:string):Promise<void>{
         await db.orm.public.users.where({id}).update({status:status as UserStatus})
+    }
+    async update(id:string,data:UpdateUserRepositoryInput):Promise<User>{
+        await db.orm.public.users.where({id: id as Varchar<255>}).update(data as never)
+        const updatedUser = await this.findById(id)
+        if (!updatedUser) throw new Error("User not found after update")
+        return updatedUser
     }
 }

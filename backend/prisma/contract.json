@@ -4,8 +4,8 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
-    "customer_addresses": {
-      "model": "customer_addresses",
+    "addresses": {
+      "model": "addresses",
       "namespace": "public"
     },
     "customer_profiles": {
@@ -61,16 +61,29 @@
           }
         },
         "models": {
-          "customer_addresses": {
+          "addresses": {
             "fields": {
-              "address": {
+              "area": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 255
+                  }
                 }
               },
               "city": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              },
+              "country": {
                 "nullable": false,
                 "type": {
                   "codecId": "sql/varchar@1",
@@ -87,11 +100,24 @@
                   "kind": "scalar"
                 }
               },
-              "customer_profile_id": {
+              "district": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/uuid@1",
-                  "kind": "scalar"
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              },
+              "house_no": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
                 }
               },
               "id": {
@@ -101,13 +127,13 @@
                   "kind": "scalar"
                 }
               },
-              "label": {
-                "nullable": false,
+              "landmark": {
+                "nullable": true,
                 "type": {
                   "codecId": "sql/varchar@1",
                   "kind": "scalar",
                   "typeParams": {
-                    "length": 50
+                    "length": 255
                   }
                 }
               },
@@ -133,8 +159,8 @@
                   }
                 }
               },
-              "postal_code": {
-                "nullable": true,
+              "pincode": {
+                "nullable": false,
                 "type": {
                   "codecId": "sql/varchar@1",
                   "kind": "scalar",
@@ -153,10 +179,27 @@
                   }
                 }
               },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 50
+                  }
+                }
+              },
               "updated_at": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "user_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
                   "kind": "scalar"
                 }
               }
@@ -173,46 +216,52 @@
                   ]
                 },
                 "to": {
-                  "model": "customer_profiles",
+                  "model": "users",
                   "namespace": "public"
                 }
               },
-              "customer_profile": {
+              "user": {
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
                   "localFields": [
-                    "customer_profile_id"
+                    "user_id"
                   ],
                   "targetFields": [
                     "id"
                   ]
                 },
                 "to": {
-                  "model": "customer_profiles",
+                  "model": "users",
                   "namespace": "public"
                 }
               }
             },
             "storage": {
               "fields": {
-                "address": {
-                  "column": "address"
+                "area": {
+                  "column": "area"
                 },
                 "city": {
                   "column": "city"
                 },
+                "country": {
+                  "column": "country"
+                },
                 "created_at": {
                   "column": "created_at"
                 },
-                "customer_profile_id": {
-                  "column": "customer_profile_id"
+                "district": {
+                  "column": "district"
+                },
+                "house_no": {
+                  "column": "house_no"
                 },
                 "id": {
                   "column": "id"
                 },
-                "label": {
-                  "column": "label"
+                "landmark": {
+                  "column": "landmark"
                 },
                 "latitude": {
                   "column": "latitude"
@@ -220,18 +269,24 @@
                 "longitude": {
                   "column": "longitude"
                 },
-                "postal_code": {
-                  "column": "postal_code"
+                "pincode": {
+                  "column": "pincode"
                 },
                 "state": {
                   "column": "state"
                 },
+                "type": {
+                  "column": "type"
+                },
                 "updated_at": {
                   "column": "updated_at"
+                },
+                "user_id": {
+                  "column": "user_id"
                 }
               },
               "namespaceId": "public",
-              "table": "customer_addresses"
+              "table": "addresses"
             }
           },
           "customer_profiles": {
@@ -250,13 +305,6 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamptz-temporal@1",
-                  "kind": "scalar"
-                }
-              },
-              "current_address_id": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/uuid@1",
                   "kind": "scalar"
                 }
               },
@@ -293,37 +341,6 @@
               }
             },
             "relations": {
-              "addresses": {
-                "cardinality": "1:N",
-                "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "customer_profile_id"
-                  ]
-                },
-                "to": {
-                  "model": "customer_addresses",
-                  "namespace": "public"
-                }
-              },
-              "current_address": {
-                "cardinality": "N:1",
-                "nullable": true,
-                "on": {
-                  "localFields": [
-                    "current_address_id"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
-                },
-                "to": {
-                  "model": "customer_addresses",
-                  "namespace": "public"
-                }
-              },
               "user": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -349,9 +366,6 @@
                 "created_at": {
                   "column": "created_at"
                 },
-                "current_address_id": {
-                  "column": "current_address_id"
-                },
                 "id": {
                   "column": "id"
                 },
@@ -375,6 +389,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "current_address_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
                   "kind": "scalar"
                 }
               },
@@ -474,6 +495,37 @@
               }
             },
             "relations": {
+              "addresses": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "user_id"
+                  ]
+                },
+                "to": {
+                  "model": "addresses",
+                  "namespace": "public"
+                }
+              },
+              "current_address": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "current_address_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "addresses",
+                  "namespace": "public"
+                }
+              },
               "customer_profile": {
                 "cardinality": "1:1",
                 "nullable": true,
@@ -495,6 +547,9 @@
               "fields": {
                 "created_at": {
                   "column": "created_at"
+                },
+                "current_address_id": {
+                  "column": "current_address_id"
                 },
                 "email": {
                   "column": "email"
@@ -540,14 +595,25 @@
       "public": {
         "entries": {
           "table": {
-            "customer_addresses": {
+            "addresses": {
               "columns": {
-                "address": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false
+                "area": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 255
+                  }
                 },
                 "city": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 100
+                  }
+                },
+                "country": {
                   "codecId": "sql/varchar@1",
                   "nativeType": "character varying",
                   "nullable": false,
@@ -564,22 +630,33 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
-                "customer_profile_id": {
-                  "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
-                  "nullable": false
+                "district": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 100
+                  }
+                },
+                "house_no": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 100
+                  }
                 },
                 "id": {
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
                   "nullable": false
                 },
-                "label": {
+                "landmark": {
                   "codecId": "sql/varchar@1",
                   "nativeType": "character varying",
-                  "nullable": false,
+                  "nullable": true,
                   "typeParams": {
-                    "length": 50
+                    "length": 255
                   }
                 },
                 "latitude": {
@@ -600,10 +677,10 @@
                     "scale": 7
                   }
                 },
-                "postal_code": {
+                "pincode": {
                   "codecId": "sql/varchar@1",
                   "nativeType": "character varying",
-                  "nullable": true,
+                  "nullable": false,
                   "typeParams": {
                     "length": 20
                   }
@@ -616,13 +693,22 @@
                     "length": 100
                   }
                 },
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 50
+                  }
+                },
                 "updated_at": {
                   "codecId": "pg/timestamptz-temporal@1",
-                  "default": {
-                    "expression": "now()",
-                    "kind": "function"
-                  },
                   "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "user_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
                   "nullable": false
                 }
               },
@@ -630,27 +716,27 @@
                 {
                   "source": {
                     "columns": [
-                      "customer_profile_id"
+                      "user_id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "customer_addresses"
+                    "tableName": "addresses"
                   },
                   "target": {
                     "columns": [
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "customer_profiles"
+                    "tableName": "users"
                   }
                 }
               ],
               "indexes": [
                 {
                   "columns": [
-                    "customer_profile_id"
+                    "user_id"
                   ],
-                  "name": "customer_addresses_customer_profile_id_idx_12faf763",
-                  "prefix": "customer_addresses_customer_profile_id_idx",
+                  "name": "addresses_user_id_idx_6c952402",
+                  "prefix": "addresses_user_id_idx",
                   "unique": false
                 }
               ],
@@ -680,11 +766,6 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
-                "current_address_id": {
-                  "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
-                  "nullable": true
-                },
                 "id": {
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
@@ -700,10 +781,6 @@
                 },
                 "updated_at": {
                   "codecId": "pg/timestamptz-temporal@1",
-                  "default": {
-                    "expression": "now()",
-                    "kind": "function"
-                  },
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
@@ -729,34 +806,9 @@
                     "namespaceId": "public",
                     "tableName": "users"
                   }
-                },
-                {
-                  "source": {
-                    "columns": [
-                      "current_address_id"
-                    ],
-                    "namespaceId": "public",
-                    "tableName": "customer_profiles"
-                  },
-                  "target": {
-                    "columns": [
-                      "id"
-                    ],
-                    "namespaceId": "public",
-                    "tableName": "customer_addresses"
-                  }
                 }
               ],
-              "indexes": [
-                {
-                  "columns": [
-                    "current_address_id"
-                  ],
-                  "name": "customer_profiles_current_address_id_idx_451a5e86",
-                  "prefix": "customer_profiles_current_address_id_idx",
-                  "unique": false
-                }
-              ],
+              "indexes": [],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -792,6 +844,11 @@
                   },
                   "nativeType": "timestamptz",
                   "nullable": false
+                },
+                "current_address_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
                 },
                 "email": {
                   "codecId": "sql/varchar@1",
@@ -868,16 +925,38 @@
                 },
                 "updated_at": {
                   "codecId": "pg/timestamptz-temporal@1",
-                  "default": {
-                    "expression": "now()",
-                    "kind": "function"
-                  },
                   "nativeType": "timestamptz",
                   "nullable": false
                 }
               },
-              "foreignKeys": [],
-              "indexes": [],
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "current_address_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "addresses"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "current_address_id"
+                  ],
+                  "name": "users_current_address_id_idx_451a5e86",
+                  "prefix": "users_current_address_id_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -916,10 +995,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "e609c22c50330fda3989ba93fc0d7042b20c944c3c7080163e4febd5886e9d7a"
+    "storageHash": "3622b7f098f95809c174837f52db0b99af2b2c96ee5d4769b03cb449cd5ab799"
   },
   "execution": {
-    "executionHash": "cff43b31509181a9a41f79f66a3c602205a448eee3523ecbf84af51030501098",
+    "executionHash": "160275827b1805527815f42f0046a96024c9e2e282428aea60c0210a61584012",
     "mutations": {
       "defaults": [
         {
@@ -930,7 +1009,22 @@
           "ref": {
             "column": "id",
             "namespace": "public",
-            "table": "customer_addresses"
+            "table": "addresses"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "addresses"
           }
         },
         {
@@ -946,11 +1040,41 @@
         },
         {
           "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "customer_profiles"
+          }
+        },
+        {
+          "onCreate": {
             "id": "uuidv4",
             "kind": "generator"
           },
           "ref": {
             "column": "id",
+            "namespace": "public",
+            "table": "users"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
             "namespace": "public",
             "table": "users"
           }

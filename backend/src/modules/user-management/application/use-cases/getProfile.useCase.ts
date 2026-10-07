@@ -31,6 +31,7 @@ export default class GetProfileUseCase implements IUseCase<GetProfileUseCaseInpu
             userFound.status,
             userFound.email_verified,
             userFound.phone_verified,
+            userFound.current_address_id,
             userFound.created_at,
             userFound.updated_at
         )

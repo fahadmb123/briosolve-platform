@@ -20,15 +20,11 @@ export class PrismaCustomerRepository implements ICustomerRepository {
             status: "ACTIVE" as const,
             email_verified: true,
             phone_verified: false,
-            created_at: Temporal.Now.instant(),
-            updated_at: Temporal.Now.instant(),
         } as never)
 
         await db.orm.public.customer_profiles.create({
             user_id: user.id, 
             about: "",
-            created_at: Temporal.Now.instant(),
-            updated_at: Temporal.Now.instant(),
         } as never)
 
         return UserMapper.toDomain(user)
