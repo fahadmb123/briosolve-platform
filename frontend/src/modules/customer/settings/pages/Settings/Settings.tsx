@@ -73,6 +73,7 @@ export default function Settings() {
                 title="Manage Addresses"
                 description="Save multiple addresses for quick booking and dispatch."
                 onClick={() => setActiveView('addresses')}
+                badge={user?.current_address_id !== null ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
             />
             
             <SettingsMenuCard

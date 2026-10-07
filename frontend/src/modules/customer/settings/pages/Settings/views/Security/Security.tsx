@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { updatePasswordSchema, type UpdatePasswordInputType } from '../../../../schemas/validation';
@@ -12,6 +13,10 @@ export const Security = () => {
         mode: "onChange",
         defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" }
     });
+
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const onSubmit = (data: UpdatePasswordInputType) => {
         updatePassword.mutate({currentPassword:data.currentPassword,newPassword:data.newPassword},{
@@ -37,13 +42,22 @@ export const Security = () => {
                         <h3 className="h6 mb-4 border-bottom pb-3">Verify It's You</h3>
                         <div className="form-group mb-4">
                             <label className="form-label text-xs" htmlFor="curr-pass">Current Password</label>
-                            <input
-                                type="password"
-                                id="curr-pass"
-                                className={`form-control ${errors.currentPassword ? 'border-danger' : ''}`}
-                                placeholder="••••••••"
-                                {...register("currentPassword")}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showCurrentPassword ? "text" : "password"}
+                                    id="curr-pass"
+                                    className={`form-control ${errors.currentPassword ? 'border-danger' : ''} pr-10`}
+                                    placeholder="••••••••"
+                                    {...register("currentPassword")}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer p-0 flex items-center justify-center"
+                                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                >
+                                    <i className={`fas ${showCurrentPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                                </button>
+                            </div>
                             {errors.currentPassword && (
                                 <span className="text-danger text-xs mt-1 block">{errors.currentPassword.message}</span>
                             )}
@@ -55,26 +69,44 @@ export const Security = () => {
                         <h3 className="h6 mb-4 border-bottom pb-3">Create New Password</h3>
                         <div className="form-group mb-4">
                             <label className="form-label text-xs" htmlFor="new-pass">New Password</label>
-                            <input
-                                type="password"
-                                id="new-pass"
-                                className={`form-control ${errors.newPassword ? 'border-danger' : ''}`}
-                                placeholder="At least 8 characters"
-                                {...register("newPassword")}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showNewPassword ? "text" : "password"}
+                                    id="new-pass"
+                                    className={`form-control ${errors.newPassword ? 'border-danger' : ''} pr-10`}
+                                    placeholder="At least 8 characters"
+                                    {...register("newPassword")}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer p-0 flex items-center justify-center"
+                                    onClick={() => setShowNewPassword(!showNewPassword)}
+                                >
+                                    <i className={`fas ${showNewPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                                </button>
+                            </div>
                             {errors.newPassword && (
                                 <span className="text-danger text-xs mt-1 block">{errors.newPassword.message}</span>
                             )}
                         </div>
                         <div className="form-group mb-0">
                             <label className="form-label text-xs" htmlFor="confirm-pass">Confirm Password</label>
-                            <input
-                                type="password"
-                                id="confirm-pass"
-                                className={`form-control ${errors.confirmPassword ? 'border-danger' : ''}`}
-                                placeholder="Must match new password"
-                                {...register("confirmPassword")}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    id="confirm-pass"
+                                    className={`form-control ${errors.confirmPassword ? 'border-danger' : ''} pr-10`}
+                                    placeholder="Must match new password"
+                                    {...register("confirmPassword")}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer p-0 flex items-center justify-center"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                >
+                                    <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                                </button>
+                            </div>
                             {errors.confirmPassword && (
                                 <span className="text-danger text-xs mt-1 block">{errors.confirmPassword.message}</span>
                             )}
