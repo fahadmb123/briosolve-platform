@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import type { ApiError } from "../../../../../shared/api/ApiError";
-import { updateEmail, updatePassword, updatePhone, deletePhone } from "../../api/api";
+import { updateEmail, updatePassword, updatePhone, deletePhone } from "../../services/apiClient";
 import { toast } from "react-toastify";
 import { useAuthStore } from "../../../../../store/auth/auth.store";
 

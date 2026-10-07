@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { registerCustomer } from "../../api/api";
+import { registerCustomer } from "../../services/api.service";
 import { toast } from "react-toastify";
 import type { ApiError } from "../../../../../shared/api/ApiError";
 

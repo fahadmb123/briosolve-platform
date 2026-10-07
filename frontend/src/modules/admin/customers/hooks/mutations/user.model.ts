@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { getCustomers, updateStatus } from '../../api/api';
+import { getCustomers, updateStatus } from '../../services/customers.service';
 import { toast } from "react-toastify";
 import type { ApiError } from "../../../../../shared/api/ApiError";
 

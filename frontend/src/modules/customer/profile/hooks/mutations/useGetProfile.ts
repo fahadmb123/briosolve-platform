@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 import type { ApiError } from "../../../../../shared/api/ApiError"
 import { toast } from "react-toastify"
-import { getProfile } from "../../api/api"
+import { getProfile } from "../../services/profile.service"
 
 
 

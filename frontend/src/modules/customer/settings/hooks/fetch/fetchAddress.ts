@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { fetchAddressWithCoordinates } from "../../api/externalApi";
+import { fetchAddressWithCoordinates } from "../../services/external.service";
 
 interface AddressComponent {
   long_name: string;

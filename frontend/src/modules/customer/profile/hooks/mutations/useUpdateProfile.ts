@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query"
-import { updateProfile } from "../../api/api"
+import { updateProfile } from "../../services/profile.service"
 import type { ApiError } from "../../../../../shared/api/ApiError"
 import { toast } from "react-toastify"
 

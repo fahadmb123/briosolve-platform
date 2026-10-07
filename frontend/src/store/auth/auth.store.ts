@@ -1,11 +1,10 @@
 import { create } from "zustand";
-import { getMe } from "../../modules/auth/api/api";
+import { getMe } from "../../modules/auth/services/auth.service";
 
 export type UserRole =
     | "CUSTOMER"
     | "PROVIDER"
-    | "ADMIN"
-    | "INVESTIGATOR";
+    | "ADMIN";
 
 export interface IAuthUser {
     id: string;

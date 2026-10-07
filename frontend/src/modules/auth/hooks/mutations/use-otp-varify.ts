@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { emailVerify, getMe, getOtpStatus, login, logout, otpVarify, resendOtp, resetPassword } from "../../api/api";
+import { emailVerify, getMe, getOtpStatus, login, logout, otpVarify, resendOtp, resetPassword } from "../../services/auth.service";
 import { toast } from "react-toastify";
 import type { ApiError } from "../../../../shared/api/ApiError";
 

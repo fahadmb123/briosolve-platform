@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query"
-import { addAddress } from "../../api/addressApi"
+import { addAddress } from "../../services/address.service"
 import type { ApiError } from "../../../../../shared/api/ApiError"
 import { toast } from "react-toastify"
 
