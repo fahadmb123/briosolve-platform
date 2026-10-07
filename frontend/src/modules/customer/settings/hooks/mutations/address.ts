@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query"
-import { addAddress, getAddresses } from "../../services/address.service"
+import { addAddress, editAddress, getAddresses } from "../../services/address.service"
 import type { ApiError } from "../../../../../shared/api/ApiError"
 import { toast } from "react-toastify"
 
@@ -14,6 +14,14 @@ export const useAddAddress = ()=>{
         onError:(error:ApiError)=>toast.error(error.message)
     })
 }
+
+export const useEditAddress = ()=>{
+    return useMutation({
+        mutationFn:editAddress,
+        onError:(error:ApiError)=>toast.error(error.message)
+    })
+}
+
 export const useGetAddresses = ()=>{
     return useMutation({
         mutationFn:getAddresses,

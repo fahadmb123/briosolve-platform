@@ -9,7 +9,8 @@ import {
     getProfileUseCase,
     updateCustomerProfileUseCase,
     addAddressUseCase,
-    getAddressesUseCase
+    getAddressesUseCase,
+    editAddressUseCase
 } from "./useCases.js";
 
 export const userController = new UserController(
@@ -24,5 +25,6 @@ export const customerController = new CustomerController(
 );
 export const addressController = new AddressController(
     addAddressUseCase,
-    getAddressesUseCase
+    getAddressesUseCase,
+    editAddressUseCase
 )

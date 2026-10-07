@@ -41,14 +41,14 @@ export type PhoneInputType = z.infer<typeof phoneSchema>;
 export type UpdatePasswordInputType = z.infer<typeof updatePasswordSchema>;
 
 export const addressSchema = z.object({
-  houseNo: z.string().min(1, "House number is required"),
+  house_no: z.string().min(1, "House number is required"),
   area: z.string().min(1, "Area is required"),
   city: z.string().min(1, "City is required"),
   district: z.string().min(1, "District is required"),
   state: z.string().min(1, "State is required"),
   country: z.string().min(1, "Country is required"),
   pincode: z.string().min(1, "Pincode is required"),
-  landmark: z.string().optional()
+  landmark: z.string().min(1, "Landmark is required")
 });
 
 export type AddressInputType = z.infer<typeof addressSchema>;

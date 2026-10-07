@@ -35,6 +35,12 @@ export class AddressRepository implements IAddressRepository{
 
         return AddressMapper.toDomain(address);
     }
+    async update(id:string,data:Partial<Omit<Address, 'id' | 'created_at' | 'updated_at'>>):Promise<Address>{
+        const address = await db.orm.public.addresses
+            .where({id:id})
+            .update(data as any)
+        return AddressMapper.toDomain(address)
+    }
 
     async getAddresses(input:GetAddressesInputDto): Promise<Omit<GetAddressesOutputDto,"totalPages">> {
         const {page,search,limit} = input

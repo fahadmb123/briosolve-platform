@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react';
 import { AddAddressModal } from '../../../../components/Addresses/AddAddressModal';
 
 import { type AddressPayload } from '../../../../schemas/validation';
-import { useAddAddress, useGetAddresses } from '../../../../hooks/mutations/address';
+import { useAddAddress, useEditAddress, useGetAddresses } from '../../../../hooks/mutations/address';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../../../../../../../store/auth/auth.store';
+import { SpinnerOverlay } from '../../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 
 
 export const Addresses = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [addressToEdit, setAddressToEdit] = useState<AddressPayload | null>(null)
   const [addresses, setAddresses] = useState<AddressPayload[]>([])
   const addAddress = useAddAddress()
+  const editAddress = useEditAddress()
   const getAddresses = useGetAddresses()
   const user = useAuthStore.getState().user
 
@@ -34,14 +37,25 @@ export const Addresses = () => {
   }, [page,search])
 
   const handleSaveAddress = async (payload: AddressPayload) => {
-    await addAddress.mutate(payload,{
-      onSuccess:(response)=>{
-        setAddresses((prev)=>[response.data as unknown as AddressPayload, ...prev])
-        toast.success(response.message)
-      }
-    })
-    
-    
+    if (addressToEdit) {
+      await editAddress.mutate({id:addressToEdit.id!,data:payload},{
+        onSuccess:(res)=>{
+          setAddresses((prev)=>
+            prev.map((address)=>
+              address.id === res.data.id ? res.data as unknown as AddressPayload : address as unknown as AddressPayload
+            )
+          )
+          toast.success(res.message)
+        }
+      })
+    } else {
+      await addAddress.mutate(payload,{
+        onSuccess:(response)=>{
+          setAddresses((prev)=>[response.data as unknown as AddressPayload, ...prev])
+          toast.success(response.message)
+        }
+      })
+    }
   };
 
   const getIconForType = (type: string) => {
@@ -74,6 +88,8 @@ export const Addresses = () => {
 
   return (
     <>
+    {editAddress.isPending ? (<SpinnerOverlay isLoading={true}/>):null}
+    {addAddress.isPending ? (<SpinnerOverlay isLoading={true}/>):null}
       <div className="bg-surface-container-low border border-surface-variant rounded-xl p-6 md:p-8 flex flex-col gap-6 shadow-xl">
         {/* Header & Top Action */}
         <div className="flex flex-row items-center justify-between w-full text-left border-b border-surface-variant pb-6">
@@ -104,7 +120,10 @@ export const Addresses = () => {
 
           {/* Add New Address Button (Right) */}
           <button 
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={() => {
+              setAddressToEdit(null);
+              setIsAddModalOpen(true);
+            }}
             className="py-2.5 px-6 rounded-xl bg-primary hover:opacity-90 text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.99] cursor-pointer shrink-0 border-none"
           >
             <span className="material-symbols-outlined text-lg font-bold">add</span>
@@ -142,7 +161,7 @@ export const Addresses = () => {
                     </div>
                     <div className="flex flex-col gap-1 mt-0.5">
                       <p className="font-body-md text-body-md text-on-surface m-0">
-                        <span className="font-semibold">House No:</span> {address.houseNo}
+                        <span className="font-semibold">House No:</span> {address.house_no}
                       </p>
                       <p className="font-body-sm text-body-sm text-on-surface-variant m-0 leading-relaxed">
                         {address.area && <><span className="font-medium text-on-surface">Area:</span> {address.area}, </>}
@@ -168,7 +187,13 @@ export const Addresses = () => {
                 </div>
                 {/* Top Right Edit Button */}
                 <div className="flex items-center gap-2 shrink-0">
-                  <button className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-highest border border-surface-variant text-primary font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1 cursor-pointer">
+                  <button 
+                    onClick={() => {
+                      setAddressToEdit(address);
+                      setIsAddModalOpen(true);
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-highest border border-surface-variant text-primary font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1 cursor-pointer"
+                  >
                     <span className="material-symbols-outlined text-sm">edit</span>
                     <span>Edit</span>
                   </button>
@@ -202,7 +227,10 @@ export const Addresses = () => {
 
           {/* Dashed Interactive Add Slot */}
           <div 
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={() => {
+              setAddressToEdit(null);
+              setIsAddModalOpen(true);
+            }}
             className="border-2 border-dashed border-surface-variant hover:border-primary/50 rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all hover:bg-surface-container/30 group mt-2"
           >
             <div className="w-12 h-12 rounded-full bg-surface-container-highest group-hover:bg-primary/20 text-on-surface-variant group-hover:text-primary flex items-center justify-center transition-colors mb-3">
@@ -255,8 +283,12 @@ export const Addresses = () => {
 
       <AddAddressModal 
         isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)} 
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setAddressToEdit(null);
+        }} 
         onSave={handleSaveAddress}
+        initialData={addressToEdit}
       />
     </>
   );

@@ -21,3 +21,9 @@ export type GetAddressesInputDto = {
     search?:string;
 }
 
+
+
+export type EditAddressInputUseCaseDto = {
+    id:string
+    input: Omit<Address, 'id' | 'created_at' | 'updated_at' | "user_id">
+}

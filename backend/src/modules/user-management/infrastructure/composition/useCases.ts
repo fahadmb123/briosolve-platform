@@ -1,4 +1,5 @@
 import { AddAddressUseCase } from "../../application/use-cases/addAddress.useCase.js";
+import { EditAddressUseCase } from "../../application/use-cases/editAddress.useCase.js";
 import { GetAddressesUseCase } from "../../application/use-cases/getAddresses.useCase.js";
 import GetCustomersUseCase from "../../application/use-cases/getCustomers.useCase.js";
 import GetProfileUseCase from "../../application/use-cases/getProfile.useCase.js";
@@ -14,15 +15,20 @@ import {
     pendingRegistrationStore
 } from "./services.js";
 
-export const getCustomerUseCase = new GetCustomersUseCase(userRepository);
-export const updateUserStatusUseCase = new UpdateUserStatusUseCase(userRepository);
+
 export const registerCustomerUseCase = new RegisterCustomerUseCase(
     userRepository,
     passwordHasher,
     otpGenerate,
     emailSender,
     pendingRegistrationStore
-);
+)
+export const getCustomerUseCase = new GetCustomersUseCase(
+    userRepository
+)
+export const updateUserStatusUseCase = new UpdateUserStatusUseCase(
+    userRepository
+)
 export const getProfileUseCase = new GetProfileUseCase(
     userRepository,
     customerRepository
@@ -36,5 +42,8 @@ export const addAddressUseCase = new AddAddressUseCase(
     userRepository
 )
 export const getAddressesUseCase = new GetAddressesUseCase(
+    addressRepository
+)
+export const editAddressUseCase = new EditAddressUseCase(
     addressRepository
 )

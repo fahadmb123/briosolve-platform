@@ -18,12 +18,14 @@ interface AddAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave?: (data: AddressPayload) => void;
+  initialData?: AddressPayload | null;
 }
 
 export const AddAddressModal: React.FC<AddAddressModalProps> = ({
   isOpen,
   onClose,
   onSave = () => {},
+  initialData = null,
 }) => {
   const {
     step,
@@ -46,7 +48,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
     setShowDropdown,
     handleSelectLocation,
     isGeocoding,
-  } = useLocationPicker(onSave, onClose);
+  } = useLocationPicker(onSave, onClose, initialData, isOpen);
 
   const { register, formState: { errors }, watch } = form;
   const { area, city, pincode } = watch();
@@ -276,11 +278,11 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                   </label>
                   <input
                     type="text"
-                    {...register("houseNo")}
+                    {...register("house_no")}
                     className="w-full h-11 px-4 rounded-lg bg-surface-container-lowest border border-surface-variant text-on-surface font-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                     placeholder="E.g. Flat 3B, Block A"
                   />
-                  {errors.houseNo && <span className="text-error text-xs">{errors.houseNo.message}</span>}
+                  {errors.house_no && <span className="text-error text-xs">{errors.house_no.message}</span>}
                 </div>
 
                 <div className="flex flex-col gap-1.5">
@@ -365,7 +367,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
 
                 <div className="flex flex-col gap-1.5">
                   <label className="font-label-md text-label-md font-medium text-on-surface">
-                    Nearby Landmark (Optional)
+                    Nearby Landmark <span className="text-error">*</span>
                   </label>
                   <input
                     type="text"

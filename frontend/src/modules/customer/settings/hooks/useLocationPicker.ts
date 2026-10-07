@@ -23,29 +23,59 @@ interface PhotonFeature {
 
 export const useLocationPicker = (
   onSave: (data: AddressPayload) => void,
-  onClose: () => void
+  onClose: () => void,
+  initialData: AddressPayload | null = null,
+  isOpen: boolean = false
 ) => {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2>(initialData ? 2 : 1);
   const [isLocating, setIsLocating] = useState(false);
   const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null);
   const [coordinates, setCoordinates] = useState<{
     lat: number | null;
     lng: number | null;
-  }>({ lat: null, lng: null });
+  }>({ lat: initialData?.latitude || null, lng: initialData?.longitude || null });
+  
   const form = useForm<AddressInputType>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      houseNo: "",
-      area: "",
-      city: "",
-      district: "",
-      state: "",
-      country: "",
-      pincode: "",
-      landmark: "",
+      house_no: initialData?.house_no || "",
+      area: initialData?.area || "",
+      city: initialData?.city || "",
+      district: initialData?.district || "",
+      state: initialData?.state || "",
+      country: initialData?.country || "",
+      pincode: initialData?.pincode || "",
+      landmark: initialData?.landmark || "",
     },
   });
-  const [addressType, setAddressType] = useState("Home");
+  const [addressType, setAddressType] = useState(initialData?.type || "Home");
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        form.reset({
+          house_no: initialData.house_no || "",
+          area: initialData.area || "",
+          city: initialData.city || "",
+          district: initialData.district || "",
+          state: initialData.state || "",
+          country: initialData.country || "",
+          pincode: initialData.pincode || "",
+          landmark: initialData.landmark || "",
+        });
+        setAddressType(initialData.type || "Home");
+        setCoordinates({ lat: initialData.latitude, lng: initialData.longitude });
+        setStep(2);
+      } else {
+        form.reset({
+          house_no: "", area: "", city: "", district: "", state: "", country: "", pincode: "", landmark: ""
+        });
+        setAddressType("Home");
+        setCoordinates({ lat: null, lng: null });
+        setStep(1);
+      }
+    }
+  }, [initialData, form, isOpen]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<PhotonFeature[]>([]);
@@ -184,8 +214,9 @@ export const useLocationPicker = (
   };
 
   const handleSaveAddress = form.handleSubmit((data) => {
-    const apiPayload = {
+    const apiPayload: AddressPayload = {
       ...data,
+
       type: addressType,
       latitude: coordinates.lat,
       longitude: coordinates.lng,
