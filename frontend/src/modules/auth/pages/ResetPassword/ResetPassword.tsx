@@ -1,20 +1,16 @@
 import { useState } from 'react';
 import './ResetPassword.css';
 import { useTheme } from '../../../../shared/hooks/useTheme';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { resetPasswordSchema, type ResetPasswordInputType } from '../../schemas/validation';
 import { useResetPassword } from '../../hooks/mutations/use-otp-varify';
-import { toast } from 'react-toastify';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
-import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
 
 export default function ResetPassword() {
     const {toggleTheme} = useTheme()
-    const navigate = useNavigate()
     const resetPassword = useResetPassword()
-    const clearResetFlow = useResetFlowStore((state) => state.clearResetFlow);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -23,16 +19,8 @@ export default function ResetPassword() {
         mode: "onChange"
     });
 
-
-
     const onSubmit = (data: ResetPasswordInputType) => {
-        resetPassword.mutate({password:data.password}, {
-            onSuccess: (response) => {
-                clearResetFlow();
-                navigate("/login",{replace:true})
-                toast.success(response.message)
-            }
-        })
+        resetPassword.mutate({password:data.password});
     }
 
     return (

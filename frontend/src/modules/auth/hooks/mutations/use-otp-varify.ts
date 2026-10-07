@@ -2,10 +2,41 @@ import { useMutation } from "@tanstack/react-query";
 import { emailVerify, getMe, getOtpStatus, login, logout, otpVarify, resendOtp, resetPassword } from "../../services/auth.service";
 import { toast } from "react-toastify";
 import type { ApiError } from "../../../../shared/api/ApiError";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../../../store/auth/auth.store";
+
+import { useResetFlowStore } from "../../../../store/auth/reset-flow.store";
 
 export const useOtpVarify = () => {
+    const navigate = useNavigate();
+
     return useMutation({
         mutationFn: otpVarify,
+        onSuccess: (response) => {
+            if (response.data.path === "reset-password") {
+                useResetFlowStore.getState().setOtpVerified(true);
+            }
+            
+            if (response.data.path === "settings") {
+                const currentUser = useAuthStore.getState().user;
+                if (currentUser && response.data.email) {
+                    useAuthStore.getState().setUser({
+                        ...currentUser,
+                        email: response.data.email,
+                        email_verified: true,
+                        phone: response.data.phone,
+                        phone_verified: true
+                    });
+                }
+                navigate(`/${response.data.path}`, { state: { activeView: 'contact' } });
+            } else {
+                navigate(`/${response?.data.path}`);
+            }
+
+            if (response.data.path === "login" || response.data.path === "settings") {
+                toast.success(response.message);
+            }
+        },
         onError: (error: ApiError) => toast.error(error.message),
     });
 };
@@ -22,8 +53,21 @@ export const useResendOtp = () => {
     });
 };
 export const useLogin = () => {
+    const navigate = useNavigate();
+
     return useMutation({
         mutationFn: login,
+        onSuccess: (response) => {
+            const user = response.data.user;
+            useAuthStore.getState().setUser(user);
+            
+            if (user.role === "CUSTOMER") {
+                navigate("/", { replace: true });
+            } else {
+                navigate(`/${user.role.toLocaleLowerCase()}`, { replace: true });
+            }
+            toast.success(response.message);
+        },
         onError: (error: ApiError) => toast.error(error.message),
     });
 };
@@ -38,14 +82,29 @@ export const useLogout = () => {
     });
 };
 export const useEmailVerify = () => {
+    const navigate = useNavigate();
+
     return useMutation({
         mutationFn: emailVerify,
+        onSuccess: (response) => {
+            useResetFlowStore.getState().setResetFlowStarted(true);
+            useResetFlowStore.getState().setOtpFlowStarted(true);
+            navigate("/otp-verification", { replace: true });
+            toast.success(response.message);
+        },
         onError: (error: ApiError) => toast.error(error.message),
     });
 };
 export const useResetPassword = () => {
+    const navigate = useNavigate();
+
     return useMutation({
         mutationFn: resetPassword,
+        onSuccess: (response) => {
+            useResetFlowStore.getState().clearResetFlow();
+            navigate("/login", { replace: true });
+            toast.success(response.message);
+        },
         onError: (error: ApiError) => toast.error(error.message),
     });
 };

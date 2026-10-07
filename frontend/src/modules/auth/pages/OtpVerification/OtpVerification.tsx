@@ -1,5 +1,5 @@
 import './OtpVerification.css';
-import { Link, useNavigate} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../hooks/mutations/use-otp-varify';
 import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
-import { useAuthStore } from '../../../../store/auth/auth.store';
+import { maskEmail, maskPhoneNumber } from '../../../../shared/utils/masking';
 
 export default function OtpVerification() {
     const { toggleTheme } = useTheme()
@@ -18,14 +18,13 @@ export default function OtpVerification() {
     const [attempts, setAttempts] = useState(0)
     const [forTo,setForTo] = useState("")
     const [phone,setPhone] = useState("")
-    const navigate = useNavigate()
+
     const {register,handleSubmit,formState:{errors}} = useForm<OtpInputType>({
         resolver : zodResolver(otpSchema),mode : "onChange"
     })
     const otpVarify = useOtpVarify()
     const getOtpStatus = useGetOtpStatus()
     const resendOtp = useResendOtp()
-    const setOtpVerified = useResetFlowStore((state) => state.setOtpVerified);
 
     const [endTime, setEndTime] = useState<number | null>(null)
 
@@ -64,31 +63,7 @@ export default function OtpVerification() {
     }, [endTime])
 
     const handleOtp = (data:OtpInputType) => {
-        otpVarify.mutate(data, {
-            onSuccess: (response) => {
-                if (response.data.path === "reset-password") {
-                    setOtpVerified(true);
-                }
-                
-                if (response.data.path === "settings") {
-                    const currentUser = useAuthStore.getState().user;
-                    if (currentUser && response.data.email) {
-                        useAuthStore.getState().setUser({
-                            ...currentUser,
-                            email: response.data.email,
-                            email_verified: true,
-                            phone:response.data.phone,
-                            phone_verified: true
-                        })
-                    }
-                    navigate(`/${response.data.path}`, { state: { activeView: 'contact' } })
-                } else {
-                    navigate(`/${response?.data.path}`)
-                }
-
-                if (response.data.path === "login" || response.data.path === "settings") toast.success(response.message)
-            }
-        })
+        otpVarify.mutate(data)
     }
 
     const handleResend = () => {
@@ -102,31 +77,6 @@ export default function OtpVerification() {
         })
     }
 
-    const maskEmail = (emailAddress: string) => {
-        if (!emailAddress) return "";
-        const [username, domain] = emailAddress.split('@');
-        if (!username || !domain) return emailAddress;
-        
-        if (username.length > 2) {
-            return `${username.substring(0, 2)}${'*'.repeat(Math.max(0, username.length - 3))}${username.substring(username.length - 1)}@${domain}`;
-        }
-        return `${username[0]}*@${domain}`;
-    }
-
-    const maskPhoneNumber = (phoneNumber: string) => {
-        if (!phoneNumber) return "";
-
-        const cleaned = phoneNumber.replace(/[\s-]/g, "");
-
-        if (cleaned.length < 6) return cleaned;
-
-        const start = cleaned.substring(0, 3);
-        const end = cleaned.substring(cleaned.length - 4);
-       
-        const maskLength = Math.max(0, cleaned.length - 7);
-
-        return `${start}${'*'.repeat(maskLength)}${end}`
-    }
 
     return (
         <div className="auth-page-wrapper">

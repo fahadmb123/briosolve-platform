@@ -1,18 +1,15 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginInputType } from '../../schemas/validation';
 import './Login.css';
 import { useLogin } from '../../hooks/mutations/use-otp-varify';
-import { toast } from 'react-toastify';
-import { useAuthStore } from '../../../../store/auth/auth.store';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 
 
 export default function Login() {
-    const navigate = useNavigate()
     const { toggleTheme } = useTheme()
     const login = useLogin()
     const [showPassword, setShowPassword] = useState(false);
@@ -27,20 +24,7 @@ export default function Login() {
     })
 
     const handleLogin = (data: LoginInputType) => {
-        login.mutate(data, {
-            onSuccess: (response) => {
-                useAuthStore.getState().setUser(response.data)
-                console.log(response.data.role)
-                if (response.data.role === "CUSTOMER"){
-                    navigate("/",{replace:true})
-                    console.log("From Login")
-                } else {
-                    console.log("From Other Routes")
-                    navigate(`/${response.data.role.toLocaleLowerCase()}`,{replace:true})
-                }
-                toast.success(response.message)
-            }
-        });
+        login.mutate(data);
     }
 
     return (

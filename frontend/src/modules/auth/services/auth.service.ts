@@ -51,7 +51,7 @@ export const resendOtp = async (): Promise<response<{expiresIn: number}>> => {
     return response.data;
 }
 
-export const login = async (data:LoginInputType): Promise<response<IAuthUser>> => {
+export const login = async (data:LoginInputType): Promise<response<{accessToken: string; user: IAuthUser}>> => {
     const response = await apiClient.post("/api/auth/login",data)
     return response.data;
 }

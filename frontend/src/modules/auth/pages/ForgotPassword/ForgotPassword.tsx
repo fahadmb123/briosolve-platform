@@ -1,36 +1,24 @@
 import './ForgotPassword.css';
 
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { emailSchema, type EmailInputType } from '../../schemas/validation';
 import { useForm } from 'react-hook-form';
 import { useEmailVerify } from '../../hooks/mutations/use-otp-varify';
-import { toast } from 'react-toastify';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
-import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
 
 export default function ForgotPassword() {
 
     const { toggleTheme } = useTheme();
-    const navigate = useNavigate();
     const {register,handleSubmit,formState:{errors}} = useForm<EmailInputType>({
         resolver : zodResolver(emailSchema),mode : "onChange"
     })
     const emailVerify = useEmailVerify()
-    const setResetFlowStarted = useResetFlowStore((state) => state.setResetFlowStarted);
-    const setOtpFlowStarted = useResetFlowStore((state) => state.setOtpFlowStarted);
 
     const handle = (data:EmailInputType) => {
-        emailVerify.mutate(data, {
-            onSuccess: (response) => {
-                setResetFlowStarted(true);
-                setOtpFlowStarted(true);
-                navigate("/otp-verification",{replace:true})
-                toast.success(response.message)
-            }
-        });
+        emailVerify.mutate(data);
     };
 
     return (
