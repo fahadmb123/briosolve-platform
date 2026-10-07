@@ -4,8 +4,7 @@ import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCust
 import { IUpdateUserStatusUseCase } from "../../domain/interfaces/use-cases/IUpdateUserUseCase.js";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
 import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto } from "../../application/Dto/userDto.js";
-import { UserResponseMapper } from "../mappers/user-response.mapper.js";
-import { CustomerProfileResponseMapper } from "../mappers/customer-profile-response.mapper.js";
+import { UserResponseMapper } from "../mappers/userResponse.mapper.js";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 
 
@@ -24,7 +23,7 @@ export class UserController extends BaseController{
 
             return sendSuccess(res,"",{
                 user: UserResponseMapper.toDto(response.user),
-                profile: response.profile ? CustomerProfileResponseMapper.toDto(response.profile) : null
+                profile: response.profile ? response.profile : null
             }) 
         } catch (err) {
             next(err)

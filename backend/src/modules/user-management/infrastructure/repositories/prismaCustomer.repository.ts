@@ -4,7 +4,7 @@ import { db } from "../../../../infrastructure/persistence/prisma/client.js"
 import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto.js"
 import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository.js"
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js"
-import { CustomerProfileMapper } from "../mappers/customer-profile.mapper.js"
+import { CustomerProfileMapper } from "../mappers/customerProfile.mapper.js"
 
 
 

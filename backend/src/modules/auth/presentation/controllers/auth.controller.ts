@@ -7,7 +7,7 @@ import { EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto, Up
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
 import { accessTokenCookie, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
-import { UserResponseMapper } from "../mappers/user-response.mapper.js"
+import { UserResponseMapper } from "../mappers/userResponse.mapper.js"
 
 
 
