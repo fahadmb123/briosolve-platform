@@ -5,8 +5,8 @@ import { type response } from "../../../../../shared/types/Dtos";
 export const useDeleteProfileImage = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => {
-            const response = await apiClient.delete<response<null>>("/api/customer/profile/image");
+        mutationFn: async (imageUrl?: string) => {
+            const response = await apiClient.delete<response<null>>("/api/customer/profile/image", { data: { imageUrl } });
             return response.data;
         },
         onSuccess: () => {

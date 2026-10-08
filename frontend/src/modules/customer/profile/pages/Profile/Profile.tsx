@@ -62,17 +62,17 @@ export default function Profile() {
       onSuccess: (res) => {
         setIsImageModalOpen(false);
         setProfileImage(res.data?.profile_image || null);
-        toast.success("Profile image updated successfully!");
+        toast.success(res.message || "Profile image updated successfully!");
       }
     });
   };
 
   const handleDeleteImage = () => {
-    deleteProfileImage(undefined, {
-      onSuccess: () => {
+    deleteProfileImage(profileImage || undefined, {
+      onSuccess: (res) => {
         setIsImageModalOpen(false);
         setProfileImage(null);
-        toast.success("Profile image deleted successfully!");
+        toast.success(res.message || "Profile image deleted successfully!");
       }
     });
   };

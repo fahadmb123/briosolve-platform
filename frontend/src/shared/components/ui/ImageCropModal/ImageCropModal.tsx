@@ -59,11 +59,16 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
         setCroppedAreaPixels(croppedAreaPixels);
     }, []);
 
+    const getFullImageUrl = (url: string | undefined | null) => {
+        if (!url) return '';
+        return url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${url}`;
+    };
+
     const handleSave = async () => {
-        if (!imageFile || !croppedAreaPixels) return;
+        const targetImage = imageFile ? URL.createObjectURL(imageFile) : getFullImageUrl(currentImageUrl);
+        if (!targetImage || !croppedAreaPixels) return;
         try {
-            const imageUrl = URL.createObjectURL(imageFile);
-            const croppedImageFile = await getCroppedImg(imageUrl, croppedAreaPixels);
+            const croppedImageFile = await getCroppedImg(targetImage, croppedAreaPixels);
             if (croppedImageFile) {
                 onCropCompleteAction(croppedImageFile);
             }
@@ -71,6 +76,8 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
             console.error("Error cropping image", e);
         }
     };
+
+    const hasImageToCrop = !!imageFile || !!currentImageUrl;
 
     if (!isOpen) return null;
 
@@ -90,44 +97,29 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
                     </button>
                 </div>
                 
-                {!imageFile ? (
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleFileChange} 
+                    accept="image/*" 
+                    className="hidden" 
+                />
+
+                {!hasImageToCrop ? (
                     <div className="p-6 flex flex-col items-center justify-center gap-6">
                         <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-surface-variant flex items-center justify-center bg-surface-container-highest">
-                            {currentImageUrl ? (
-                                <img src={`${currentImageUrl.startsWith('http') ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000')}${currentImageUrl}`} alt="Profile" className="w-full h-full object-cover" />
-                            ) : (
-                                <i className="fas fa-user text-6xl text-on-surface-variant opacity-50"></i>
-                            )}
+                            <i className="fas fa-user text-6xl text-on-surface-variant opacity-50"></i>
                         </div>
                         
-                        <input 
-                            type="file" 
-                            ref={fileInputRef} 
-                            onChange={handleFileChange} 
-                            accept="image/*" 
-                            className="hidden" 
-                        />
-                        <div className="flex gap-3">
-                            <button 
-                                type="button"
-                                onClick={() => fileInputRef.current?.click()}
-                                className="px-6 py-2.5 rounded-xl bg-primary text-on-primary font-medium shadow-md hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center gap-2"
-                            >
-                                <i className="fas fa-camera"></i>
-                                {currentImageUrl ? 'Change Photo' : 'Upload Photo'}
-                            </button>
-                            
-                            {currentImageUrl && onDeleteAction && (
-                                <button 
-                                    type="button"
-                                    onClick={onDeleteAction}
-                                    disabled={isLoading}
-                                    className="px-4 py-2.5 rounded-xl bg-error text-on-error font-medium shadow-md hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center gap-2 disabled:opacity-50"
-                                >
-                                    <i className="fas fa-trash-alt"></i> Delete
-                                </button>
-                            )}
-                        </div>
+                        <button 
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-6 py-2.5 rounded-xl bg-primary text-on-primary font-medium shadow-md hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center gap-2"
+                        >
+                            <i className="fas fa-camera"></i>
+                            Upload Photo
+                        </button>
+                        
                         <div className="text-center mt-1">
                             <p className="text-xs text-on-surface-variant opacity-70 m-0">
                                 <i className="fas fa-info-circle mr-1"></i> Supported formats: JPG, PNG, WEBP
@@ -141,7 +133,7 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
                     <>
                         <div className="relative w-full h-[300px] bg-black">
                             <Cropper
-                                image={URL.createObjectURL(imageFile)}
+                                image={imageFile ? URL.createObjectURL(imageFile) : getFullImageUrl(currentImageUrl)}
                                 crop={crop}
                                 zoom={zoom}
                                 aspect={1}
@@ -168,20 +160,34 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
                                 <i className="fas fa-search-plus text-on-surface-variant text-sm"></i>
                             </div>
                             
-                            <div className="flex gap-3 justify-between mt-2">
-                                <button 
-                                    type="button" 
-                                    onClick={() => setImageFile(null)}
-                                    disabled={isLoading}
-                                    className="px-4 py-2 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container-highest transition-colors cursor-pointer border-none bg-transparent disabled:opacity-50"
-                                >
-                                    <i className="fas fa-arrow-left mr-2"></i> Back
-                                </button>
+                            <div className="flex flex-col sm:flex-row gap-3 justify-between mt-2 w-full">
+                                <div className="flex gap-2 w-full sm:w-auto">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => fileInputRef.current?.click()}
+                                        disabled={isLoading}
+                                        className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-surface-container-highest text-on-surface font-medium hover:bg-surface-variant transition-colors cursor-pointer border-none flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        <i className="fas fa-camera"></i> Change
+                                    </button>
+                                    
+                                    {currentImageUrl && onDeleteAction && (
+                                        <button 
+                                            type="button"
+                                            onClick={onDeleteAction}
+                                            disabled={isLoading}
+                                            className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-error/10 text-error font-medium hover:bg-error/20 transition-colors cursor-pointer border-none flex items-center justify-center gap-2 disabled:opacity-50"
+                                        >
+                                            <i className="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    )}
+                                </div>
+
                                 <button 
                                     type="button" 
                                     onClick={handleSave}
                                     disabled={isLoading}
-                                    className="px-6 py-2 rounded-xl bg-primary text-on-primary font-medium shadow-md hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center gap-2 disabled:opacity-50"
+                                    className="w-full sm:w-auto px-6 py-2 rounded-xl bg-primary text-on-primary font-medium shadow-md hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center justify-center gap-2 disabled:opacity-50"
                                 >
                                     {isLoading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-check"></i>}
                                     {isLoading ? 'Saving...' : 'Apply & Save'}

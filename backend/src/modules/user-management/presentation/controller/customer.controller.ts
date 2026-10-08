@@ -76,7 +76,7 @@ export class CustomerController extends BaseController{
                 data: { profile_image: imageUrl }
             })
 
-            return sendSuccess(res,"Profile image updated", { profile_image: imageUrl })
+            return sendSuccess(res,"updated", { profile_image: imageUrl })
         } catch (err) {
             next(err)
         }
@@ -85,12 +85,18 @@ export class CustomerController extends BaseController{
     deleteProfileImage = async (req:Request,res:Response,next:NextFunction) => {
         try {
             this.getCurrentUser(req)
+            const { imageUrl } = req.body;
+
+            if (imageUrl) {
+                await this.imageUploadService.deleteImageByUrl(imageUrl);
+            }
+
             await this.updateCustomerProfileUseCase.execute({
                 id: req.user?.userId!, 
                 data: { profile_image: "" }
             })
 
-            return sendSuccess(res,"Profile image deleted", { profile_image: null })
+            return sendSuccess(res,"deleted", { profile_image: null })
         } catch (err) {
             next(err)
         }

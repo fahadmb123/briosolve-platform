@@ -35,8 +35,29 @@ export class CloudinaryService implements IImageUploadService {
         try {
             await cloudinary.uploader.destroy(publicId);
         } catch (error) {
+            // Using ApplicationError or just logging in the infrastructure layer
             console.error('Cloudinary delete error:', error);
             throw new ApplicationError("IMAGE_DELETION_FAILED", "Image deletion failed", "INTERNAL");
+        }
+    }
+
+    async deleteImageByUrl(url: string): Promise<void> {
+        if (!url || !url.includes('cloudinary.com')) return;
+        
+        try {
+            const splitUrl = url.split('/upload/');
+            if (splitUrl.length > 1) {
+                const pathWithVersion = splitUrl[1];
+                const path = pathWithVersion.replace(/^v\d+\//, '');
+                const publicId = path.substring(0, path.lastIndexOf('.'));
+                
+                if (publicId) {
+                    await this.deleteImage(publicId);
+                }
+            }
+        } catch (error) {
+            // Safe fallback, we log inside the infra layer rather than bubbling up to controller
+            console.error('Failed to parse and delete Cloudinary URL:', error);
         }
     }
 }
