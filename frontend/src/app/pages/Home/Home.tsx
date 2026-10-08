@@ -13,7 +13,9 @@ export default function Home() {
   const navigate = useNavigate();
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const logout = useLogout()
-  const {isAuthenticated} = useAuthStore.getState()
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const user = useAuthStore((state) => state.user);
+  const profile = useAuthStore((state) => state.profile);
 
   const handleLogout = async () => {
     if(!isAuthenticated) return navigate('/login')
@@ -165,8 +167,19 @@ export default function Home() {
                     <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
                         <span>{isAuthenticated ? "Logout" : "Login"}</span>
                     </button>
-                    <Link to="//profile" className="avatar avatar-sm ml-2" title="Profile">
-                        <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=6366F1&color=fff&rounded=true" alt="Aarav" />
+                    <Link to="/profile" className="avatar avatar-sm ml-2" title="Profile">
+                        {profile?.profile_image ? (
+                            <img 
+                                src={`${profile.profile_image.startsWith('http') ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000')}${profile.profile_image}`} 
+                                onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366F1&color=fff&rounded=true`;
+                                }}
+                                alt={user?.name || "User"} 
+                            />
+                        ) : (
+                            <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366F1&color=fff&rounded=true`} alt="User avatar" />
+                        )}
                     </Link>
                 </div>
             </header>

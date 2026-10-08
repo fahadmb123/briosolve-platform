@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Profile.css';
 import '../../../../../shared/styles/location-picker.css';
-import { nameSchema, type NameInputType } from '../../schemas/validation';
+import { nameSchema, imageFileSchema, type NameInputType } from '../../schemas/validation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
@@ -10,6 +10,9 @@ import { useGetProfile } from '../../hooks/mutations/useGetProfile';
 import type { CustomerProfile, response, User } from '../../../../../shared/types/Dtos';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
+import { ImageCropModal } from '../../../../../shared/components/ui/ImageCropModal/ImageCropModal';
+import { useUpdateProfileImage } from '../../hooks/mutations/useUpdateProfileImage';
+import { useDeleteProfileImage } from '../../hooks/mutations/useDeleteProfileImage';
 
 export default function Profile() {
 
@@ -17,6 +20,10 @@ export default function Profile() {
   const user = useAuthStore(state => state.user);
   const defaultAddress = user?.current_address_id;
   const [isLocModalOpen, setIsLocModalOpen] = useState(false)
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const { mutate: updateProfileImage, isPending: isImageUploading } = useUpdateProfileImage();
+  const { mutate: deleteProfileImage, isPending: isImageDeleting } = useDeleteProfileImage();
   const [,setData] = useState<{name:string,about:string}>({name:"",about:""})
   const {register, handleSubmit, reset, formState:{errors}} = useForm<NameInputType>({
           resolver : zodResolver(nameSchema),
@@ -37,6 +44,7 @@ export default function Profile() {
           about: payload.profile?.about || "" 
         };
         setData(fetchedData);
+        setProfileImage(payload.profile?.profile_image || null);
         reset(fetchedData);
       }
     });
@@ -49,6 +57,25 @@ export default function Profile() {
       }
     })
   }
+  const handleCropComplete = (croppedFile: File) => {
+    updateProfileImage(croppedFile, {
+      onSuccess: (res) => {
+        setIsImageModalOpen(false);
+        setProfileImage(res.data?.profile_image || null);
+        toast.success("Profile image updated successfully!");
+      }
+    });
+  };
+
+  const handleDeleteImage = () => {
+    deleteProfileImage(undefined, {
+      onSuccess: () => {
+        setIsImageModalOpen(false);
+        setProfileImage(null);
+        toast.success("Profile image deleted successfully!");
+      }
+    });
+  };
 
   return (
     <>
@@ -63,8 +90,19 @@ export default function Profile() {
           <div className="profile-sidebar">
             <div className="profile-card-modern">
               <div className="floating-avatar">
-                <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366F1&color=fff&size=140`} alt={user?.name || 'User'} />
-                <button className="avatar-edit-badge" title="Change Photo">
+                <img 
+                  src={
+                    profileImage 
+                      ? `${profileImage.startsWith('http') ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000')}${profileImage}`
+                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366F1&color=fff&size=140`
+                  } 
+                  onError={(e) => {
+                    e.currentTarget.onerror = null; // Prevent infinite loop
+                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366F1&color=fff&size=140`;
+                  }}
+                  alt={user?.name || 'User'} 
+                />
+                <button type="button" className="avatar-edit-badge" title="Change Photo" onClick={() => setIsImageModalOpen(true)}>
                   <i className="fas fa-camera"></i>
                 </button>
               </div>
@@ -252,6 +290,16 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* CROP MODAL */}
+      <ImageCropModal 
+        isOpen={isImageModalOpen}
+        onClose={() => setIsImageModalOpen(false)}
+        currentImageUrl={profileImage}
+        onCropCompleteAction={handleCropComplete}
+        onDeleteAction={handleDeleteImage}
+        isLoading={isImageUploading || isImageDeleting}
+      />
     </>
   );
 }

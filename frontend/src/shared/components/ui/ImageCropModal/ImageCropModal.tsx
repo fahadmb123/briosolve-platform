@@ -1,0 +1,196 @@
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import Cropper from 'react-easy-crop';
+import { getCroppedImg } from '../../../utils/cropImage';
+import { toast } from 'react-toastify';
+
+interface ImageCropModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    currentImageUrl?: string | null;
+    onCropCompleteAction: (croppedFile: File) => void;
+    onDeleteAction?: () => void;
+    isLoading?: boolean;
+}
+
+export const ImageCropModal: React.FC<ImageCropModalProps> = ({
+    isOpen,
+    onClose,
+    currentImageUrl,
+    onCropCompleteAction,
+    onDeleteAction,
+    isLoading = false
+}) => {
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setImageFile(null);
+            setZoom(1);
+            setCrop({ x: 0, y: 0 });
+        }
+    }, [isOpen]);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            
+            if (!file.type.startsWith('image/')) {
+                toast.error("Please select a valid image file.");
+                e.target.value = '';
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("Image size must be less than 5MB.");
+                e.target.value = '';
+                return;
+            }
+            
+            setImageFile(file);
+        }
+        e.target.value = '';
+    };
+
+    const onCropComplete = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    }, []);
+
+    const handleSave = async () => {
+        if (!imageFile || !croppedAreaPixels) return;
+        try {
+            const imageUrl = URL.createObjectURL(imageFile);
+            const croppedImageFile = await getCroppedImg(imageUrl, croppedAreaPixels);
+            if (croppedImageFile) {
+                onCropCompleteAction(croppedImageFile);
+            }
+        } catch (e) {
+            console.error("Error cropping image", e);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-surface-container rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between p-4 border-b border-surface-variant">
+                    <h3 className="text-title-md font-semibold text-on-surface m-0 flex items-center gap-2">
+                        <i className="fas fa-image text-primary"></i> Profile Photo
+                    </h3>
+                    <button 
+                        onClick={onClose}
+                        disabled={isLoading}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest transition-colors border-none bg-transparent cursor-pointer disabled:opacity-50"
+                    >
+                        <i className="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                
+                {!imageFile ? (
+                    <div className="p-6 flex flex-col items-center justify-center gap-6">
+                        <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-surface-variant flex items-center justify-center bg-surface-container-highest">
+                            {currentImageUrl ? (
+                                <img src={`${currentImageUrl.startsWith('http') ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000')}${currentImageUrl}`} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                                <i className="fas fa-user text-6xl text-on-surface-variant opacity-50"></i>
+                            )}
+                        </div>
+                        
+                        <input 
+                            type="file" 
+                            ref={fileInputRef} 
+                            onChange={handleFileChange} 
+                            accept="image/*" 
+                            className="hidden" 
+                        />
+                        <div className="flex gap-3">
+                            <button 
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="px-6 py-2.5 rounded-xl bg-primary text-on-primary font-medium shadow-md hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center gap-2"
+                            >
+                                <i className="fas fa-camera"></i>
+                                {currentImageUrl ? 'Change Photo' : 'Upload Photo'}
+                            </button>
+                            
+                            {currentImageUrl && onDeleteAction && (
+                                <button 
+                                    type="button"
+                                    onClick={onDeleteAction}
+                                    disabled={isLoading}
+                                    className="px-4 py-2.5 rounded-xl bg-error text-on-error font-medium shadow-md hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    <i className="fas fa-trash-alt"></i> Delete
+                                </button>
+                            )}
+                        </div>
+                        <div className="text-center mt-1">
+                            <p className="text-xs text-on-surface-variant opacity-70 m-0">
+                                <i className="fas fa-info-circle mr-1"></i> Supported formats: JPG, PNG, WEBP
+                            </p>
+                            <p className="text-xs text-on-surface-variant opacity-70 m-0 mt-1">
+                                Maximum file size: 5MB
+                            </p>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="relative w-full h-[300px] bg-black">
+                            <Cropper
+                                image={URL.createObjectURL(imageFile)}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={1}
+                                cropShape="round"
+                                showGrid={false}
+                                onCropChange={setCrop}
+                                onCropComplete={onCropComplete}
+                                onZoomChange={setZoom}
+                            />
+                        </div>
+
+                        <div className="p-4 flex flex-col gap-4">
+                            <div className="flex items-center gap-3">
+                                <i className="fas fa-search-minus text-on-surface-variant text-sm"></i>
+                                <input
+                                    type="range"
+                                    value={zoom}
+                                    min={1}
+                                    max={3}
+                                    step={0.1}
+                                    onChange={(e) => setZoom(Number(e.target.value))}
+                                    className="w-full h-1 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary"
+                                />
+                                <i className="fas fa-search-plus text-on-surface-variant text-sm"></i>
+                            </div>
+                            
+                            <div className="flex gap-3 justify-between mt-2">
+                                <button 
+                                    type="button" 
+                                    onClick={() => setImageFile(null)}
+                                    disabled={isLoading}
+                                    className="px-4 py-2 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container-highest transition-colors cursor-pointer border-none bg-transparent disabled:opacity-50"
+                                >
+                                    <i className="fas fa-arrow-left mr-2"></i> Back
+                                </button>
+                                <button 
+                                    type="button" 
+                                    onClick={handleSave}
+                                    disabled={isLoading}
+                                    className="px-6 py-2 rounded-xl bg-primary text-on-primary font-medium shadow-md hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    {isLoading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-check"></i>}
+                                    {isLoading ? 'Saving...' : 'Apply & Save'}
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+};

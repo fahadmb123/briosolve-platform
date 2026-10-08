@@ -18,23 +18,9 @@ export default class GetProfileUseCase implements IUseCase<GetProfileUseCaseInpu
     ){}
 
     async execute (input:GetProfileUseCaseInputDto):Promise<GetProfileUseCaseOutputDto>{
-        const userFound = await this.userRepository.findById(input.id)
+        const user = await this.userRepository.findById(input.id)
 
-        if (!userFound) throw new ApplicationError("USER_NOT_FOUND","User not found","NOT_FOUND")
-
-        const user = new User(
-            userFound.id,
-            userFound.name,
-            userFound.email,
-            userFound.phone,
-            userFound.role,
-            userFound.status,
-            userFound.email_verified,
-            userFound.phone_verified,
-            userFound.current_address_id,
-            userFound.created_at,
-            userFound.updated_at
-        )
+        if (!user) throw new ApplicationError("USER_NOT_FOUND","User not found","NOT_FOUND")
 
         let profile = null
 

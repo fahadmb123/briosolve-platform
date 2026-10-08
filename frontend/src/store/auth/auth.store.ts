@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { getMe } from "../../modules/auth/services/auth.service";
 import type { Address } from "../../shared/Dtos/address";
+import type { CustomerProfile } from "../../shared/types/Dtos";
 
 export type UserRole =
     | "CUSTOMER"
@@ -23,9 +24,11 @@ export interface IAuthUser {
 
 interface IAuthState {
     user: IAuthUser | null;
+    profile: CustomerProfile | null;
     isAuthenticated: boolean;
 
     setUser: (user: IAuthUser) => void;
+    setProfile: (profile: CustomerProfile | null) => void;
     clearAuth: () => void;
     fetchUser: () => Promise<void>;
 }
@@ -33,6 +36,7 @@ interface IAuthState {
 
 export const useAuthStore = create<IAuthState>()((set) => ({
     user: null,
+    profile: null,
     isAuthenticated: false,
 
     setUser: (user:IAuthUser) =>
@@ -40,23 +44,33 @@ export const useAuthStore = create<IAuthState>()((set) => ({
             user,
             isAuthenticated: true,
         }),
+        
+    setProfile: (profile: CustomerProfile | null) =>
+        set({
+            profile,
+        }),
 
     clearAuth: () =>
         set({
             user: null,
+            profile: null,
             isAuthenticated: false,
         }),
     fetchUser: async () => {
         try {
             const response = await getMe();
+            const userData = response.data;
+            
             set({
-                user: response.data as unknown as IAuthUser,
+                user: userData,
+                profile: userData.customer_profile || null,
                 isAuthenticated: true,
             });
         } catch (error) {
             console.log(error)
             set({
                 user: null,
+                profile: null,
                 isAuthenticated: false,
             });
         }

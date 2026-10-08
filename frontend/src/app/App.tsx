@@ -24,7 +24,9 @@ function App() {
     (async ()=>{
       try {
         const response = await getMe.mutateAsync()
-        useAuthStore.getState().setUser(response.data as unknown as IAuthUser)
+        const userData = response.data;
+        useAuthStore.getState().setUser(userData)
+        useAuthStore.getState().setProfile(userData.customer_profile || null)
       } catch {
         useAuthStore.getState().clearAuth()
       }

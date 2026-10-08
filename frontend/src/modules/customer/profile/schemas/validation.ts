@@ -19,3 +19,15 @@ export const nameSchema = z.object({
 
 
 export type NameInputType = z.infer<typeof nameSchema>
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+export const imageFileSchema = z.any()
+  .refine((file) => file !== null && file !== undefined, "Please select a file.")
+  .refine((file) => file?.size <= MAX_FILE_SIZE, "Image size must be less than 5MB.")
+  .refine(
+    (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
+    "Only .jpg, .jpeg, .png and .webp formats are supported."
+  );
