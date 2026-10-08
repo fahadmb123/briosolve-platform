@@ -204,8 +204,8 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                     <>
                       <Map
                         defaultCenter={{
-                          lat: coordinates.lat,
-                          lng: coordinates.lng,
+                          lat: Number(coordinates.lat),
+                          lng: Number(coordinates.lng),
                         }}
                         defaultZoom={14}
                         onIdle={(ev) => {
@@ -218,7 +218,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                         gestureHandling={"greedy"}
                         style={{ width: "100%", height: "100%" }}
                       />
-                      <MapUpdater lat={coordinates.lat} lng={coordinates.lng} />
+                      <MapUpdater lat={Number(coordinates.lat)} lng={Number(coordinates.lng)} />
                     </>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-on-surface-variant">
@@ -271,6 +271,27 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
 
             {step === 2 && (
               <div className="flex flex-col gap-5 p-5 sm:p-6 pt-5">
+                
+                {/* Location Map Preview / Edit Button */}
+                <div className="flex items-center justify-between p-3.5 bg-surface-container-lowest border border-primary/20 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-primary text-2xl">location_on</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-on-surface">Map Location Pinned</span>
+                      <span className="text-xs text-on-surface-variant">
+                        {coordinates.lat ? Number(coordinates.lat).toFixed(5) : '0'}°, {coordinates.lng ? Number(coordinates.lng).toFixed(5) : '0'}°
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={handleBackToMap}
+                    className="text-xs font-semibold px-3 py-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition-colors border-none cursor-pointer flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">map</span>
+                    Adjust Pin
+                  </button>
+                </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="font-label-md text-label-md font-medium text-on-surface">
                     House / Flat / Block No.{" "}

@@ -86,9 +86,9 @@ export default function Profile() {
         <div className="profile-banner"></div>
 
         <div className="profile-content-grid">
-          {/* LEFT SIDEBAR - PROFILE CARD */}
-          <div className="profile-sidebar">
-            <div className="profile-card-modern">
+          {/* LEFT SIDEBAR */}
+          <div className="flex flex-col gap-6 w-full">
+            <div className="profile-card-modern w-full">
               <div className="floating-avatar">
                 <img 
                   src={
@@ -126,7 +126,7 @@ export default function Profile() {
             </div>
 
             {/* DEFAULT LOCATION CARD */}
-            <div className="card form-card-modern mt-6 p-5">
+            <div className="form-card-modern p-5 w-full">
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <h3 className="h6 mb-0">Default Location</h3>
