@@ -18,6 +18,7 @@ export type UserResponseDto = {
     current_address_id: string | Address | null;
     created_at: Date;
     updated_at: Date;
+    customer_profile?: any;
 }
 
 export type AuthResponseDto = {

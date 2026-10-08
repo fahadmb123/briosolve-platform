@@ -14,6 +14,7 @@ import {
     deleteAddressUseCase,
     setDefaultAddressUseCase
 } from "./useCases.js";
+import { imageUploadService } from "./services.js";
 
 export const userController = new UserController(
     updateUserStatusUseCase,
@@ -23,7 +24,8 @@ export const userController = new UserController(
 export const customerController = new CustomerController(
     getCustomerUseCase,
     registerCustomerUseCase,
-    updateCustomerProfileUseCase
+    updateCustomerProfileUseCase,
+    imageUploadService
 );
 export const addressController = new AddressController(
     addAddressUseCase,

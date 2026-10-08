@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import router from "./routes.js";
@@ -12,6 +13,8 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(cookieParser())
+
+app.use("/uploads", express.static(path.join(process.cwd(), "public", "uploads")));
 
 app.use("/api", router)
 app.use(errorHandler)

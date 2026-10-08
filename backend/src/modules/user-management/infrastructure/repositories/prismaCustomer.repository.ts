@@ -10,12 +10,14 @@ import { CustomerProfileMapper } from "../mappers/customerProfile.mapper.js"
 
 export class CustomerRepository implements ICustomerRepository {
     async updateProfile(input:UpdateCustomerProfileInputDto): Promise<void> {
-        await db.orm.public.users
-            .where({ id: input.id as Varchar<255> })
-            .update({
-                name: input.data.name,
-                updated_at: Temporal.Now.instant()
-            } as never);
+        if (input.data.name !== undefined) {
+            await db.orm.public.users
+                .where({ id: input.id as Varchar<255> })
+                .update({
+                    name: input.data.name,
+                    updated_at: Temporal.Now.instant()
+                } as never);
+        }
 
         const profile = await db.orm.public.customer_profiles
             .where({ user_id: input.id as Varchar<255> })
@@ -26,12 +28,14 @@ export class CustomerRepository implements ICustomerRepository {
                 .where({ user_id: input.id as Varchar<255> })
                 .update({
                     about: input.data.about !== undefined ? input.data.about : profile.about,
+                    profile_image: input.data.profile_image !== undefined ? input.data.profile_image : profile.profile_image,
                     updated_at: Temporal.Now.instant()
                 } as never);
         } else {
             await db.orm.public.customer_profiles.create({
                 user_id: input.id,
                 about: input.data.about || "",
+                profile_image: input.data.profile_image || null,
                 created_at: Temporal.Now.instant(),
                 updated_at: Temporal.Now.instant()
             } as never);

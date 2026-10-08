@@ -17,7 +17,7 @@ export class PrismaUserRepository implements IUserRepository {
 
 
     async findById(id: string): Promise<User | null> {
-        const user = await db.orm.public.users.where({id:id as Varchar<255>}).include("current_address").first()
+        const user = await db.orm.public.users.where({id:id as Varchar<255>}).include("current_address").include("customer_profile").first()
         if (!user) return null
         return UserMapper.toDomain(user)
     }

@@ -7,7 +7,7 @@ import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto.js"
 import { UserResponseMapper } from "../mappers/userResponse.mapper.js"
-
+import { IImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js"
 
 
 
@@ -17,7 +17,8 @@ export class CustomerController extends BaseController{
     constructor (
         private readonly getCustomersUseCase:IGetCustomersUseCase,
         private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto>,
-        private readonly updateCustomerProfileUseCase : IUseCase<UpdateCustomerProfileInputDto,void>
+        private readonly updateCustomerProfileUseCase : IUseCase<UpdateCustomerProfileInputDto,void>,
+        private readonly imageUploadService: IImageUploadService
     ) {super()}
 
     register = async (req:Request,res:Response,next:NextFunction) => {
@@ -64,5 +65,35 @@ export class CustomerController extends BaseController{
         }
     }
     
+    uploadProfileImage = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            this.getCurrentUser(req)
+            if (!req.file) return sendSuccess(res,"No image uploaded", { status: "error" }) as any
+            const imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'profiles')
+            
+            await this.updateCustomerProfileUseCase.execute({
+                id: req.user?.userId!, 
+                data: { profile_image: imageUrl }
+            })
+
+            return sendSuccess(res,"Profile image updated", { profile_image: imageUrl })
+        } catch (err) {
+            next(err)
+        }
+    }
+    
+    deleteProfileImage = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            this.getCurrentUser(req)
+            await this.updateCustomerProfileUseCase.execute({
+                id: req.user?.userId!, 
+                data: { profile_image: "" }
+            })
+
+            return sendSuccess(res,"Profile image deleted", { profile_image: null })
+        } catch (err) {
+            next(err)
+        }
+    }
     
 }

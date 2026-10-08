@@ -1,4 +1,5 @@
 import { Address } from "../../../user-management/domain/entities/address.entity.js";
+import { CustomerProfile } from "./customerProfile.entity.js";
 
 export class User {
     constructor(
@@ -13,6 +14,7 @@ export class User {
         public readonly phone_verified: boolean,
         public readonly current_address_id: string | Address | null,
         public readonly created_at: Date,
-        public readonly updated_at: Date
+        public readonly updated_at: Date,
+        public readonly customer_profile?: CustomerProfile | null
     ) {}
 }

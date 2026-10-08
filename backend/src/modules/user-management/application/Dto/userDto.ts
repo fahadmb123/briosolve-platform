@@ -23,8 +23,9 @@ export type UpdateCustomerProfileInputDto = {
     data:UpdateCustomerProfileInputDataDto
 }
 export type UpdateCustomerProfileInputDataDto = {
-    name:string,
-    about:string
+    name?:string,
+    about?:string,
+    profile_image?:string
 }
 
 export type UserResponseDto = {

@@ -14,7 +14,8 @@ export class UserResponseMapper {
             phone_verified: user.phone_verified,
             current_address_id: user.current_address_id,
             created_at: user.created_at,
-            updated_at: user.updated_at
+            updated_at: user.updated_at,
+            customer_profile: user.customer_profile
         };
     }
 }
