@@ -51,12 +51,7 @@ export default function AdminLayout() {
                             <span>Providers</span>
                         </NavLink>
                     </li>
-                    <li>
-                        <Link to="#" className="sidebar-item">
-                            <i className="fas fa-user-secret"></i>
-                            <span>Investigators</span>
-                        </Link>
-                    </li>
+
                     <li>
                         <NavLink to="/admin/verification" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-user-check"></i>
@@ -69,16 +64,16 @@ export default function AdminLayout() {
                 <div className="menu-label mt-6">Catalog</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink to="/admin/categories" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-th-large"></i>
                             <span>Categories</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink to="/admin/services" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-concierge-bell"></i>
                             <span>Services</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">

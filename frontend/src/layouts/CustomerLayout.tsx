@@ -134,6 +134,19 @@ export default function CustomerLayout() {
         </aside>
             <main className="app-main">
                 <header className="app-header">
+                {/* Navbar helper */}
+                {(() => {
+                    const getDashboardRoute = () => {
+                        if (!user) return '/login';
+                        switch (user.role) {
+                            case 'ADMIN': return '/admin/dashboard';
+                            case 'PROVIDER': return '/provider/dashboard';
+                            default: return '/dashboard';
+                        }
+                    };
+
+                    return (
+                        <>
                 <div className="flex items-center gap-3">
                     <button id="sidebar-toggle" className="btn-icon mobile-menu-toggle" aria-label="Toggle Sidebar" title="Open Menu" onClick={handleSidebarToggle}>
                         <i className="fas fa-bars"></i>
@@ -147,6 +160,7 @@ export default function CustomerLayout() {
                 <div className="navbar-center hide-mobile">
                     <Link to="/admin/providers" className="nav-item-link">Nearby Providers</Link>
                     <Link to="#" className="nav-item-link">How It Works</Link>
+                    <Link to={getDashboardRoute()} className="nav-item-link font-semibold text-primary">Dashboard</Link>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -177,6 +191,9 @@ export default function CustomerLayout() {
                         )}
                     </Link>
                 </div>
+                </>
+                );
+                })()}
             </header>
 
             {/* Floating Top-Right Action Box */}

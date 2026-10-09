@@ -10,6 +10,15 @@ export const apiClient = axios.create({
     },
 });
 
+apiClient.interceptors.request.use((config) => {
+    // If we are sending a file (FormData), we must remove the application/json header
+    // so Axios can automatically set multipart/form-data with the correct boundary string.
+    if (config.data instanceof FormData) {
+        delete config.headers["Content-Type"];
+    }
+    return config;
+});
+
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {

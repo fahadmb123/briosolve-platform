@@ -25,7 +25,7 @@ export const editAddress = async ({ id, data }: { id: string; data: AddressPaylo
     return response.data
 }
 export const setDefaultAddress = async (id:string): Promise<response<null>> => {
-    const response = await apiClient.patch(`/api/user/address-set-default/${id}`)
+    const response = await apiClient.patch(`/api/user/address/default/${id}`)
     return response.data
 }
 

@@ -1,5 +1,5 @@
 import { Navigate, Route } from 'react-router-dom';
-import { AdminDashboard, AdminNotifications, AdminProviderDetails, AdminProviders, AdminSettings, AdminCustomers, AdminVerification, AdminVerificationDetails } from './admin.lazy';
+import { AdminDashboard, AdminNotifications, AdminProviderDetails, AdminProviders, AdminSettings, AdminCustomers, AdminVerification, AdminVerificationDetails, AdminCategories, AdminServices } from './admin.lazy';
 
 export const adminRoutes = (
   <>
@@ -12,5 +12,7 @@ export const adminRoutes = (
     <Route path="verification/:id" element={<AdminVerificationDetails />} />
     <Route path="settings" element={<AdminSettings />} />
     <Route path="notifications" element={<AdminNotifications />} />
+    <Route path="categories" element={<AdminCategories />} />
+    <Route path="services" element={<AdminServices />} />
   </>
 );

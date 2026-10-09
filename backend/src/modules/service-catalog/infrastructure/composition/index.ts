@@ -1,0 +1,1 @@
+export {categoryController} from "./controller.js"

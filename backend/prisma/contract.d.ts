@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'3622b7f098f95809c174837f52db0b99af2b2c96ee5d4769b03cb449cd5ab799'>;
+  StorageHashBase<'bbf12a8ec3a2924420c64f00f6620423ba3763501a14d0a3bc9d23d786612ec6'>;
 export type ExecutionHash =
-  ExecutionHashBase<'160275827b1805527815f42f0046a96024c9e2e282428aea60c0210a61584012'>;
+  ExecutionHashBase<'dc90455b3ad2f646986b4c8753b51c2b8f3512bbb7637389491d4d1f839aff7e'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -259,6 +259,15 @@ export type FieldOutputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
+    readonly categories: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly name: Varchar<100>;
+      readonly description: Varchar<500> | null;
+      readonly image: Varchar<500> | null;
+      readonly status: 'ACTIVE' | 'INACTIVE';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
     readonly customer_profiles: {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
@@ -267,13 +276,23 @@ export type FieldOutputTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly about: Varchar<500>;
     };
+    readonly services: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly category_id: CodecTypes['pg/uuid@1']['output'];
+      readonly name: Varchar<150>;
+      readonly description: Varchar<1000> | null;
+      readonly image: Varchar<500> | null;
+      readonly status: 'ACTIVE' | 'INACTIVE';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
     readonly users: {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly name: Varchar<100>;
       readonly email: Varchar<255>;
       readonly password_hash: Varchar<255>;
       readonly phone: Varchar<20> | null;
-      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
+      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
       readonly status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
       readonly email_verified: CodecTypes['pg/bool@1']['output'];
       readonly phone_verified: CodecTypes['pg/bool@1']['output'];
@@ -302,6 +321,15 @@ export type FieldInputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
+    readonly categories: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly name: CodecTypes['sql/varchar@1']['input'];
+      readonly description: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly image: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly status: 'ACTIVE' | 'INACTIVE';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
     readonly customer_profiles: {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
@@ -310,13 +338,23 @@ export type FieldInputTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly about: CodecTypes['sql/varchar@1']['input'];
     };
+    readonly services: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly category_id: CodecTypes['pg/uuid@1']['input'];
+      readonly name: CodecTypes['sql/varchar@1']['input'];
+      readonly description: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly image: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly status: 'ACTIVE' | 'INACTIVE';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
     readonly users: {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly name: CodecTypes['sql/varchar@1']['input'];
       readonly email: CodecTypes['sql/varchar@1']['input'];
       readonly password_hash: CodecTypes['sql/varchar@1']['input'];
       readonly phone: CodecTypes['sql/varchar@1']['input'] | null;
-      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
+      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
       readonly status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
       readonly email_verified: CodecTypes['pg/bool@1']['input'];
       readonly phone_verified: CodecTypes['pg/bool@1']['input'];
@@ -345,6 +383,15 @@ export type StorageColumnTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
     };
+    readonly categories: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly description: Varchar<500> | null;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly image: Varchar<500> | null;
+      readonly name: Varchar<100>;
+      readonly status: 'ACTIVE' | 'INACTIVE';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
     readonly customer_profiles: {
       readonly about: Varchar<500>;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -352,6 +399,16 @@ export type StorageColumnTypes = {
       readonly profile_image: Varchar<500> | null;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
+    };
+    readonly services: {
+      readonly category_id: CodecTypes['pg/uuid@1']['output'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly description: Varchar<1000> | null;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly image: Varchar<500> | null;
+      readonly name: Varchar<150>;
+      readonly status: 'ACTIVE' | 'INACTIVE';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
     readonly users: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -363,7 +420,7 @@ export type StorageColumnTypes = {
       readonly password_hash: Varchar<255>;
       readonly phone: Varchar<20> | null;
       readonly phone_verified: CodecTypes['pg/bool@1']['output'];
-      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
+      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
       readonly status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -388,6 +445,15 @@ export type StorageColumnInputTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
     };
+    readonly categories: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly description: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly image: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly name: CodecTypes['sql/varchar@1']['input'];
+      readonly status: 'ACTIVE' | 'INACTIVE';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
     readonly customer_profiles: {
       readonly about: CodecTypes['sql/varchar@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -395,6 +461,16 @@ export type StorageColumnInputTypes = {
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
+    };
+    readonly services: {
+      readonly category_id: CodecTypes['pg/uuid@1']['input'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly description: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly image: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly name: CodecTypes['sql/varchar@1']['input'];
+      readonly status: 'ACTIVE' | 'INACTIVE';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly users: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -406,7 +482,7 @@ export type StorageColumnInputTypes = {
       readonly password_hash: CodecTypes['sql/varchar@1']['input'];
       readonly phone: CodecTypes['sql/varchar@1']['input'] | null;
       readonly phone_verified: CodecTypes['pg/bool@1']['input'];
-      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
+      readonly role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
       readonly status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -420,7 +496,7 @@ export namespace Models {
     email: Varchar<255>;
     password_hash: Varchar<255>;
     phone: Varchar<20> | null;
-    role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | 'INVESTIGATOR';
+    role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
     status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
     email_verified: CodecTypes['pg/bool@1']['output'];
     phone_verified: CodecTypes['pg/bool@1']['output'];
@@ -462,6 +538,29 @@ export namespace Models {
     user: public_users;
     readonly [RelationKeys]?: 'user';
   };
+  export type public_categories = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    name: Varchar<100>;
+    description: Varchar<500> | null;
+    image: Varchar<500> | null;
+    status: 'ACTIVE' | 'INACTIVE';
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    services: public_services[];
+    readonly [RelationKeys]?: 'services';
+  };
+  export type public_services = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    category_id: CodecTypes['pg/uuid@1']['output'];
+    name: Varchar<150>;
+    description: Varchar<1000> | null;
+    image: Varchar<500> | null;
+    status: 'ACTIVE' | 'INACTIVE';
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    category: public_categories;
+    readonly [RelationKeys]?: 'category';
+  };
 }
 
 export declare const models: {
@@ -469,6 +568,8 @@ export declare const models: {
     users: Models.public_users;
     addresses: Models.public_addresses;
     customer_profiles: Models.public_customer_profiles;
+    categories: Models.public_categories;
+    services: Models.public_services;
   };
 };
 
@@ -605,6 +706,57 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly categories: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly name: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 100 };
+                };
+                readonly description: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 500 };
+                };
+                readonly image: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 500 };
+                };
+                readonly status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'ACTIVE'>;
+                  };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updated_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['name'] }];
+              indexes: readonly [];
+              foreignKeys: readonly [];
+            };
             readonly customer_profiles: {
               columns: {
                 readonly id: {
@@ -654,6 +806,82 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'users';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly services: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly category_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly name: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 150 };
+                };
+                readonly description: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 1000 };
+                };
+                readonly image: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 500 };
+                };
+                readonly status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'ACTIVE'>;
+                  };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updated_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'services_category_id_idx_da7213d4';
+                  readonly prefix: 'services_category_id_idx';
+                  readonly columns: readonly ['category_id'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'services';
+                    readonly columns: readonly ['category_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'categories';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -758,9 +986,13 @@ type ContractBase = Omit<
             };
           };
           readonly valueSet: {
+            readonly active_status: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['ACTIVE', 'INACTIVE'];
+            };
             readonly user_role: {
               readonly kind: 'valueSet';
-              readonly values: readonly ['CUSTOMER', 'PROVIDER', 'ADMIN', 'INVESTIGATOR'];
+              readonly values: readonly ['CUSTOMER', 'PROVIDER', 'ADMIN'];
             };
             readonly user_status: {
               readonly kind: 'valueSet';
@@ -783,6 +1015,11 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'customer_profiles';
     };
+    readonly categories: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'categories';
+    };
+    readonly services: { readonly namespace: 'public' & NamespaceId; readonly model: 'services' };
   };
   readonly domain: {
     readonly namespaces: {
@@ -948,6 +1185,82 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly categories: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly name: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 100 };
+                };
+              };
+              readonly description: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 500 };
+                };
+              };
+              readonly image: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 500 };
+                };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly updated_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly services: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'services';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['category_id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'categories';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly name: { readonly column: 'name' };
+                readonly description: { readonly column: 'description' };
+                readonly image: { readonly column: 'image' };
+                readonly status: { readonly column: 'status' };
+                readonly created_at: { readonly column: 'created_at' };
+                readonly updated_at: { readonly column: 'updated_at' };
+              };
+            };
+          };
           readonly customer_profiles: {
             readonly fields: {
               readonly id: {
@@ -1013,6 +1326,88 @@ type ContractBase = Omit<
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
                 readonly about: { readonly column: 'about' };
+              };
+            };
+          };
+          readonly services: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly category_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly name: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 150 };
+                };
+              };
+              readonly description: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 1000 };
+                };
+              };
+              readonly image: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 500 };
+                };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly updated_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly category: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'categories';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['category_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'services';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly category_id: { readonly column: 'category_id' };
+                readonly name: { readonly column: 'name' };
+                readonly description: { readonly column: 'description' };
+                readonly image: { readonly column: 'image' };
+                readonly status: { readonly column: 'status' };
+                readonly created_at: { readonly column: 'created_at' };
+                readonly updated_at: { readonly column: 'updated_at' };
               };
             };
           };
@@ -1161,7 +1556,13 @@ type ContractBase = Omit<
               { readonly name: 'CUSTOMER'; readonly value: 'CUSTOMER' },
               { readonly name: 'PROVIDER'; readonly value: 'PROVIDER' },
               { readonly name: 'ADMIN'; readonly value: 'ADMIN' },
-              { readonly name: 'INVESTIGATOR'; readonly value: 'INVESTIGATOR' },
+            ];
+          };
+          readonly active_status: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'ACTIVE'; readonly value: 'ACTIVE' },
+              { readonly name: 'INACTIVE'; readonly value: 'INACTIVE' },
             ];
           };
         };
@@ -1211,6 +1612,23 @@ type ContractBase = Omit<
         {
           readonly ref: {
             readonly namespace: 'public';
+            readonly table: 'categories';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'categories';
+            readonly column: 'updated_at';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
             readonly table: 'customer_profiles';
             readonly column: 'id';
           };
@@ -1220,6 +1638,23 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'customer_profiles';
+            readonly column: 'updated_at';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'services';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'services';
             readonly column: 'updated_at';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };

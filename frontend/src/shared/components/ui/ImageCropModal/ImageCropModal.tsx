@@ -10,6 +10,10 @@ interface ImageCropModalProps {
     onCropCompleteAction: (croppedFile: File) => void;
     onDeleteAction?: () => void;
     isLoading?: boolean;
+    aspectRatio?: number;
+    cropShape?: "round" | "rect";
+    title?: string;
+    initialFile?: File | null;
 }
 
 export const ImageCropModal: React.FC<ImageCropModalProps> = ({
@@ -18,9 +22,13 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
     currentImageUrl,
     onCropCompleteAction,
     onDeleteAction,
-    isLoading = false
+    isLoading = false,
+    aspectRatio = 1,
+    cropShape = "round",
+    title = "Profile Photo",
+    initialFile = null
 }) => {
-    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(initialFile);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
@@ -28,11 +36,17 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
 
     useEffect(() => {
         if (!isOpen) {
-            setImageFile(null);
+            setImageFile(initialFile);
             setZoom(1);
             setCrop({ x: 0, y: 0 });
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        if (isOpen && initialFile) {
+            setImageFile(initialFile);
+        }
+    }, [isOpen, initialFile]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -86,7 +100,7 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
             <div className="bg-surface-container rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between p-4 border-b border-surface-variant">
                     <h3 className="text-title-md font-semibold text-on-surface m-0 flex items-center gap-2">
-                        <i className="fas fa-image text-primary"></i> Profile Photo
+                        <i className="fas fa-image text-primary"></i> {title}
                     </h3>
                     <button 
                         onClick={onClose}
@@ -136,8 +150,8 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
                                 image={imageFile ? URL.createObjectURL(imageFile) : getFullImageUrl(currentImageUrl)}
                                 crop={crop}
                                 zoom={zoom}
-                                aspect={1}
-                                cropShape="round"
+                                aspect={aspectRatio}
+                                cropShape={cropShape}
                                 showGrid={false}
                                 onCropChange={setCrop}
                                 onCropComplete={onCropComplete}

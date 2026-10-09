@@ -1,0 +1,178 @@
+import { useState } from "react";
+import { AdminPageHeader } from "../../../admin/components/AdminPageHeader";
+import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
+import { AdminPagination } from "../../../admin/components/AdminPagination";
+import { AddCategoryModal } from "../../components/AddCategoryModal";
+import { useAddCategoryService } from "../../hooks/mutations/useCategory";
+import { toast } from "react-toastify";
+import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
+
+
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  image?: string | null;
+  updated_at:string,
+  created_at:string,
+  services:[]
+}
+
+export default function Categories() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("");
+  const totalPages = 1;
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const addCategory = useAddCategoryService()
+
+  const [categories, setCategories] = useState<Category[]>([
+    { id: '1', name: 'Plumbing', description: 'All plumbing related services', status: 'ACTIVE', image: null, createdAt: new Date().toISOString() },
+    { id: '2', name: 'Electrical', description: 'Electrical installations and repairs', status: 'ACTIVE', image: null, createdAt: new Date().toISOString() },
+  ]);
+
+  const handleAddCategory = async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
+    const formData = new FormData()
+    formData.append('name', data.name)
+    formData.append('description', data.description)
+    formData.append('status', data.status)
+    
+    if (data.imageFile) formData.append('image', data.imageFile)
+
+    await addCategory.mutateAsync(formData, {
+      onSuccess:(res)=>{
+        setCategories([res.data,...categories]);
+        toast.success(res.message)
+      }
+    })
+  };
+
+  const columns: TableColumn<Category>[] = [
+    {
+      key: 'name',
+      header: 'Category Name',
+      width: '25%',
+      render: (item) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded bg-surface border border-border flex items-center justify-center overflow-hidden shrink-0">
+            {item.image ? (
+              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            ) : (
+              <i className="fas fa-image text-secondary text-lg"></i>
+            )}
+          </div>
+          <div className="font-medium text-text">{item.name}</div>
+        </div>
+      )
+    },
+    {
+      key: 'description',
+      header: 'Description',
+      width: '35%',
+      render: (item) => <div className="truncate max-w-xs">{item.description}</div>
+    },
+    {
+      key: 'createdAt',
+      header: 'Created At',
+      width: '15%',
+      render: (item) => <div>{new Date(item.createdAt).toLocaleDateString()}</div>
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      width: '10%',
+      render: (item) => (
+        <span className={`badge ${item.status === 'ACTIVE' ? 'badge-verified' : 'badge-danger-alert'}`}>
+          {item.status}
+        </span>
+      )
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      width: '15%',
+      render: () => (
+        <div className="flex items-center gap-2">
+          <button className="btn btn-secondary text-xs py-1 px-2">Edit</button>
+          <button className="btn btn-danger text-xs py-1 px-2">Delete</button>
+        </div>
+      )
+    }
+  ];
+
+  const handleReset = () => {
+    setSearch("");
+    setFilter("");
+    setPage(1);
+  };
+
+  return (
+    <div className="app-content">
+       {addCategory.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
+      <AdminPageHeader 
+        title="Category Management" 
+        description="Manage all service categories available on the platform."
+        actionButton={{
+          label: "Add Category",
+          icon: "fas fa-plus",
+          onClick: () => setIsAddModalOpen(true)
+        }}
+      />
+
+      <div className="admin-filter-bar mb-6">
+        <div className="admin-search-input">
+          <i className="fas fa-search"></i>
+          <input 
+            value={search}
+            onChange={(e)=>{
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            type="text" 
+            placeholder="Search categories..." 
+          />
+        </div>
+
+        <div className="admin-filters-group">
+          <select
+            value={filter}
+            onChange={(e)=>{
+              setFilter(e.target.value);
+              setPage(1);
+            }}
+            className="admin-select"
+          >
+            <option value="">All Statuses</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+
+          <button className="btn btn-secondary text-xs py-2" onClick={handleReset}>
+            <i className="fas fa-undo mr-1"></i>Reset
+          </button>
+        </div>
+      </div>
+
+      <AdminTable 
+        columns={columns}
+        data={categories}
+        isLoading={false}
+        keyExtractor={(item) => item.id}
+        emptyMessage="No categories found."
+      />
+
+      <AdminPagination 
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
+
+      <AddCategoryModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        onAdd={handleAddCategory} 
+      />
+    </div>
+  );
+}

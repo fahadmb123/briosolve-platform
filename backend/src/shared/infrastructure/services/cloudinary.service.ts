@@ -1,8 +1,8 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { IImageUploadService } from '../../domain/interfaces/IImageUpload.service.js';
+import { ImageUploadService } from '../../domain/interfaces/IImageUpload.service.js';
 import { ApplicationError } from "../../application/errors/applicationError.js";
 
-export class CloudinaryService implements IImageUploadService {
+export class CloudinaryService implements ImageUploadService {
     constructor() {
         cloudinary.config({
             cloud_name: process.env.CLOUDINARY_NAME,

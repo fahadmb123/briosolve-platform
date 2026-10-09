@@ -8,7 +8,11 @@ enum user_role {
   CUSTOMER
   PROVIDER
   ADMIN
-  INVESTIGATOR
+}
+
+enum active_status {
+  ACTIVE
+  INACTIVE
 }
 
 model users {
@@ -79,6 +83,42 @@ model customer_profiles {
 
   user          users                @relation(
     fields: [user_id],
+    references: [id]
+  )
+}
+
+
+
+
+
+model categories {
+  id          Uuid          @id @default(uuid())
+  name        VarChar(100)  @unique
+  description VarChar(500)?
+  image       VarChar(500)?
+  status      active_status @default(ACTIVE)
+
+  created_at  DateTime      @default(now())
+  updated_at  temporal.updatedAt()
+
+  services    services[]
+}
+
+
+model services {
+  id           Uuid          @id @default(uuid())
+  category_id  Uuid
+
+  name         VarChar(150)
+  description  VarChar(1000)?
+  image        VarChar(500)?
+  status       active_status @default(ACTIVE)
+
+  created_at   DateTime      @default(now())
+  updated_at   temporal.updatedAt()
+
+  category     categories    @relation(
+    fields: [category_id],
     references: [id]
   )
 }

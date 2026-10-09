@@ -14,7 +14,7 @@ const router = Router()
 
 router.get("/logout",authController.logout)
 router.get("/otp-status",otpVarificationController.getStatus)
-router.get("/me",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),authController.getMe)
+router.get("/me",authMiddleware,requireRole(["CUSTOMER","PROVIDER","ADMIN"]),authController.getMe)
 
 router.post("/login",validate(loginSchema),authController.login)
 router.post("/email-verify",validate(emailSchema),authController.emailVerify)

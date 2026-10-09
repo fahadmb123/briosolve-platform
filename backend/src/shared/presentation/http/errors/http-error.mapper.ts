@@ -18,11 +18,15 @@ const statusMap: Record<ErrorKind, number> = {
 
 export class HttpErrorMapper {
     static map(error: unknown) {
-        if (error instanceof ApplicationError) {
+        const isApplicationError = error instanceof ApplicationError || 
+            (error instanceof Error && error.name === "ApplicationError");
+
+        if (isApplicationError) {
+            const appError = error as ApplicationError;
             return {
-                statusCode: statusMap[error.kind],
-                code: error.code,
-                message: error.message,
+                statusCode: statusMap[appError.kind] || 500,
+                code: appError.code,
+                message: appError.message,
             }
         }
 

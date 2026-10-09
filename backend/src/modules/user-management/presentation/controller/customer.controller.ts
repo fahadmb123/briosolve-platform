@@ -7,7 +7,8 @@ import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
 import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto.js"
 import { UserResponseMapper } from "../mappers/userResponse.mapper.js"
-import { IImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js"
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js"
+import { ApplicationError } from "../../../../shared/application/errors/applicationError.js"
 
 
 
@@ -18,7 +19,7 @@ export class CustomerController extends BaseController{
         private readonly getCustomersUseCase:IGetCustomersUseCase,
         private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto>,
         private readonly updateCustomerProfileUseCase : IUseCase<UpdateCustomerProfileInputDto,void>,
-        private readonly imageUploadService: IImageUploadService
+        private readonly imageUploadService: ImageUploadService
     ) {super()}
 
     register = async (req:Request,res:Response,next:NextFunction) => {
@@ -68,7 +69,7 @@ export class CustomerController extends BaseController{
     uploadProfileImage = async (req:Request,res:Response,next:NextFunction) => {
         try {
             this.getCurrentUser(req)
-            if (!req.file) return sendSuccess(res,"No image uploaded", { status: "error" }) as any
+            if (!req.file) throw new ApplicationError("NO_DATA","No image uploaded","NOT_FOUND")
             const imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'profiles')
             
             await this.updateCustomerProfileUseCase.execute({
@@ -87,9 +88,7 @@ export class CustomerController extends BaseController{
             this.getCurrentUser(req)
             const { imageUrl } = req.body;
 
-            if (imageUrl) {
-                await this.imageUploadService.deleteImageByUrl(imageUrl);
-            }
+            if (imageUrl) await this.imageUploadService.deleteImageByUrl(imageUrl)
 
             await this.updateCustomerProfileUseCase.execute({
                 id: req.user?.userId!, 

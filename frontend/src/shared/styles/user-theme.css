@@ -11,7 +11,7 @@
    ========================================================================== */
 
 /* Primary Button */
-body.theme-user .btn-primary, body.theme-investigator .btn-primary {
+body.theme-user .btn-primary {
     background: var(--primary);
     border-color: transparent;
     color: var(--primary-content) !important;
@@ -19,14 +19,14 @@ body.theme-user .btn-primary, body.theme-investigator .btn-primary {
     transition: all var(--transition-fast);
 }
 
-body.theme-user .btn-primary:hover, body.theme-investigator .btn-primary:hover {
+body.theme-user .btn-primary:hover {
     background: var(--primary-hover);
     color: var(--primary-content) !important;
     box-shadow: 0 6px 20px 0 rgba(0,0,0,0.2);
     transform: translateY(-1px);
 }
 
-body.theme-user .btn-primary:active, body.theme-investigator .btn-primary:active {
+body.theme-user .btn-primary:active {
     transform: translateY(0);
     box-shadow: 0 2px 8px 0 rgba(0,0,0,0.1);
 }

@@ -7,7 +7,7 @@ import '../shared/styles/admin-theme.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ThemeProvider } from './providers/ThemeProvider';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore, type IAuthUser } from '../store/auth/auth.store';
 import { useGetMe } from '../modules/auth/hooks/mutations/use-otp-varify';
 import { LoadingScreen } from '../shared/components/ui/LoadingScreen/LoadingScreen';
@@ -19,6 +19,7 @@ import { LoadingScreen } from '../shared/components/ui/LoadingScreen/LoadingScre
 
 function App() {
   const getMe = useGetMe()
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(()=>{
     (async ()=>{
@@ -29,13 +30,15 @@ function App() {
         useAuthStore.getState().setProfile(userData.customer_profile || null)
       } catch {
         useAuthStore.getState().clearAuth()
+      } finally {
+        setIsInitializing(false);
       }
     })()
   },[])
   return (
     <ThemeProvider>
       <div className="app">
-        {getMe.isPending ? (<LoadingScreen isLoading={true}/>) : (
+        {isInitializing ? (<LoadingScreen isLoading={true}/>) : (
           <>
             <ToastContainer position="top-center" autoClose={1000} hideProgressBar={true} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover toastClassName="custom-premium-toast" closeButton={false} stacked />
             <AppRouter />

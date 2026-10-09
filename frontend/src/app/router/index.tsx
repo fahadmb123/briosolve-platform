@@ -6,12 +6,10 @@ const Home = React.lazy(() => import('../pages/Home/Home'));
 const NotFound = React.lazy(() => import('../pages/NotFound/NotFound'));
 const AdminLayout = React.lazy(() => import('../../layouts/AdminLayout'));
 const ProviderLayout = React.lazy(() => import('../../layouts/ProviderLayout'));
-const InvestigatorLayout = React.lazy(() => import('../../layouts/InvestigatorLayout'));
 const CustomerLayout = React.lazy(() => import('../../layouts/CustomerLayout'));
 
 import { adminRoutes } from './admin/adminRoutes';
 import { providerRoutes } from './provider/providerRoutes';
-import { investigatorRoutes } from './investigator/investigatorRoutes';
 import { customerRoutes } from './customer/customerRoutes';
 import { publicRoutes, verificationRoutes } from './public/publicRoutes';
 import PublicRoute from '../../shared/middlewares/PublicRoute';
@@ -64,9 +62,7 @@ export function AppRouter() {
               </Route>
           </Route>
 
-          <Route path="investigator" element={<InvestigatorLayout />}>
-              {investigatorRoutes}
-          </Route>
+
 
           <Route path="*" element={<NotFound />} />
       </Route>
