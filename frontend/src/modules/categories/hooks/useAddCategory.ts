@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'react-toastify';
 import { addCategorySchema, type AddCategoryFormData } from '../schemas/category.schema';
 import { getCroppedImg } from '../../../shared/utils/cropImage';
 
@@ -30,14 +31,14 @@ export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryPr
     mode: 'onChange',
   });
 
-  // Keep form in sync if initialData changes (e.g. clicking Edit on a different category)
+
   useEffect(() => {
     if (initialData) {
       form.reset({
         name: initialData.name,
         description: initialData.description,
         status: initialData.status,
-        rawImage: undefined as unknown as File, // User must upload a new image if they edit it, or we can make it optional later
+        rawImage: undefined as unknown as File,
       });
     } else {
       form.reset({ name: '', description: '', status: 'ACTIVE', rawImage: undefined as unknown as File });
@@ -67,6 +68,20 @@ export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryPr
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const MAX_FILE_SIZE = 5 * 1024 * 1024;
+      const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+      
+      if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+          toast.error("Only .jpg, .jpeg, .png and .webp formats are supported");
+          if (fileInputRef.current) fileInputRef.current.value = '';
+          return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+          toast.error("Max image size is 5MB");
+          if (fileInputRef.current) fileInputRef.current.value = '';
+          return;
+      }
+
       setValue('rawImage', file, { shouldValidate: true });
       setIsCropping(true);
       setCrop({ x: 0, y: 0 });
@@ -82,7 +97,6 @@ export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryPr
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // If they uploaded a new image, or modified the crop of the existing one, crop it
       let croppedImageFile: File | null = null;
       if (selectedRawFile && croppedAreaPixels) {
         croppedImageFile = await getCroppedImg(URL.createObjectURL(selectedRawFile), croppedAreaPixels);
@@ -90,13 +104,12 @@ export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryPr
         croppedImageFile = await getCroppedImg(initialData.image, croppedAreaPixels);
       }
 
-      // We allow submitting without a new image ONLY if we are editing (initialData exists)
       if (croppedImageFile || initialData) {
         await onAdd({ ...data, imageFile: croppedImageFile });
         reset();
         setCroppedAreaPixels(null);
         setIsCropModified(false);
-        onClose(); // Only closes if onAdd didn't throw an error!
+        onClose(); 
       }
     } catch (err) {
       console.error(err);

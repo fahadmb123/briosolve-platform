@@ -97,6 +97,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, init
                 <div className="flex flex-col items-center text-secondary">
                   <i className="fas fa-image text-3xl mb-2 opacity-50"></i>
                   <span className="text-sm opacity-70">No image selected</span>
+                  <span className="text-xs opacity-50 mt-1">Supported formats: JPG, PNG, WEBP (Max 5MB)</span>
                 </div>
               </div>
               <button 

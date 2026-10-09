@@ -83,14 +83,14 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initia
         <div className="form-group">
           <label className="text-sm font-semibold mb-1 block">Service Image {isEditing ? '' : <span className="text-error">*</span>}</label>
           
-          {selectedRawFile ? (
+          {(selectedRawFile || initialData?.image) ? (
             <div className="flex flex-col gap-3">
               <div className="relative w-full h-64 bg-black rounded-lg overflow-hidden border border-border group">
                 <Cropper
-                  image={URL.createObjectURL(selectedRawFile)}
+                  image={selectedRawFile ? URL.createObjectURL(selectedRawFile) : initialData?.image!}
                   crop={crop}
                   zoom={zoom}
-                  aspect={16/9}
+                  aspect={1}
                   cropShape="rect"
                   showGrid={false}
                   onCropChange={setCrop}
@@ -103,7 +103,7 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initia
                 className="btn btn-secondary text-sm self-start"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <i className="fas fa-image mr-2"></i> Change Image
+                <i className="fas fa-image mr-2"></i> {selectedRawFile ? "Change Image" : "Replace Image"}
               </button>
             </div>
           ) : (
@@ -112,27 +112,18 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initia
                 className="w-full h-40 border-2 border-dashed border-border rounded-lg flex items-center justify-center cursor-pointer hover:bg-surface-hover transition-colors overflow-hidden relative bg-surface"
                 onClick={() => fileInputRef.current?.click()}
               >
-                {isEditing && initialData?.image ? (
-                  <img src={initialData.image} alt={initialData.name} className="w-full h-full object-cover opacity-60" />
-                ) : (
-                  <div className="flex flex-col items-center text-secondary">
-                    <i className="fas fa-image text-3xl mb-2 opacity-50"></i>
-                    <span className="text-sm opacity-70">No image selected</span>
-                  </div>
-                )}
-                {isEditing && initialData?.image && (
-                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <i className="fas fa-camera text-2xl text-white mb-2"></i>
-                    <span className="text-white font-medium text-sm">Replace Image</span>
-                  </div>
-                )}
+                <div className="flex flex-col items-center text-secondary">
+                  <i className="fas fa-image text-3xl mb-2 opacity-50"></i>
+                  <span className="text-sm opacity-70">No image selected</span>
+                  <span className="text-xs opacity-50 mt-1">Supported formats: JPG, PNG, WEBP (Max 5MB)</span>
+                </div>
               </div>
               <button 
                 type="button" 
                 className="btn btn-primary text-sm self-start"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <i className="fas fa-plus mr-2"></i> {isEditing && initialData?.image ? 'Change Image' : 'Add Image'}
+                <i className="fas fa-plus mr-2"></i> Add Image
               </button>
             </div>
           )}
@@ -144,6 +135,7 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initia
             ref={fileInputRef} 
             onChange={handleImageChange} 
           />
+          {errors.rawImage && <span className="text-error text-xs mt-2 block">{errors.rawImage.message}</span>}
         </div>
 
         <div className="form-group">

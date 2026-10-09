@@ -3,10 +3,12 @@ import { UpdateServiceUseCaseDto } from "../Dto/service.js";
 import { Service } from "../../domain/entities/service.entity.js";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository.js";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
 
 export class UpdateServiceUseCase implements IUseCase<UpdateServiceUseCaseDto, Service> {
     constructor(
-        private serviceRepository: IServiceRepository
+        private serviceRepository: IServiceRepository,
+        private readonly imageUploadService: ImageUploadService
     ){}
 
     async execute(input: UpdateServiceUseCaseDto): Promise<Service> {
@@ -15,6 +17,10 @@ export class UpdateServiceUseCase implements IUseCase<UpdateServiceUseCaseDto, S
             throw new ApplicationError("NOT_FOUND", "Service not found", "NOT_FOUND");
         }
         
+        if (input.input.image && existingService.image) {
+            await this.imageUploadService.deleteImageByUrl(existingService.image);
+        }
+
         const service = await this.serviceRepository.update(input);
         if (!service) {
             throw new ApplicationError("INTERNAL_SERVER_ERROR", "Failed to update service", "INTERNAL");

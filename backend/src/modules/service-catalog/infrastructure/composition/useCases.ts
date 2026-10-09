@@ -14,9 +14,9 @@ import { ImageService } from "./services.js";
 export const addCategoryUseCase = new AddCategoryUseCase(categoryRepository)
 export const updateCategoryUseCase = new UpdateCategoryUseCase(categoryRepository,ImageService)
 export const getCategoriesUseCase = new GetCategoriesUseCase(categoryRepository)
-export const deleteCategoryUseCase = new DeleteCategoryUseCase(categoryRepository)
+export const deleteCategoryUseCase = new DeleteCategoryUseCase(categoryRepository, ImageService)
 
 export const addServiceUseCase = new AddServiceUseCase(serviceRepository)
-export const updateServiceUseCase = new UpdateServiceUseCase(serviceRepository)
+export const updateServiceUseCase = new UpdateServiceUseCase(serviceRepository, ImageService)
 export const getServicesUseCase = new GetServicesUseCase(serviceRepository)
-export const deleteServiceUseCase = new DeleteServiceUseCase(serviceRepository)
+export const deleteServiceUseCase = new DeleteServiceUseCase(serviceRepository, ImageService)

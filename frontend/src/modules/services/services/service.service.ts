@@ -1,25 +1,29 @@
-import { axiosInstance } from "../../../../shared/api/axios.js"
+import { apiClient } from "../../../shared/api/Client"
 
 export const getServices = async (params: { page?: number, limit?: number, search?: string, filter?: string }) => {
-    return await axiosInstance.get('/service', { params })
+    const response = await apiClient.get('/api/service', { params })
+    return response.data;
 }
 
 export const addService = async (data: FormData) => {
-    return await axiosInstance.post('/service', data, {
+    const response = await apiClient.post('/api/service', data, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
     })
+    return response.data;
 }
 
 export const updateService = async ({ id, data }: { id: string, data: FormData }) => {
-    return await axiosInstance.patch(`/service/${id}`, data, {
+    const response = await apiClient.patch(`/api/service/${id}`, data, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
     })
+    return response.data;
 }
 
 export const deleteService = async (id: string) => {
-    return await axiosInstance.delete(`/service/${id}`)
+    const response = await apiClient.delete(`/api/service/${id}`)
+    return response.data;
 }

@@ -8,17 +8,9 @@ import { categoryController } from "../../infrastructure/composition/controller.
 
 const router = Router()
 
-
-
 router.get("/",authMiddleware,requireRole(["ADMIN","PROVIDER","CUSTOMER"]),categoryController.getCategories)
-
 router.post("/",authMiddleware,requireRole(["ADMIN"]),upload.single("image"),validate(createCategorySchema),categoryController.addCategory)
-
 router.patch("/:id",authMiddleware,requireRole(["ADMIN"]),upload.single("image"),validate(createCategorySchema),categoryController.updateCategory)
-
 router.delete("/:id",authMiddleware,requireRole(["ADMIN"]),categoryController.deleteCategory)
-
-
-
 
 export default router;
