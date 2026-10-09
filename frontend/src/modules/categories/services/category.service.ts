@@ -21,18 +21,18 @@ type GetCategoriesInput = {
 }
 
 export const getCategories = async (params: GetCategoriesInput = {}): Promise<response<{categories:Category[], total: number, totalPages: number}>> => {
-    const response = await apiClient.get(`/api/category/category`, { params })
+    const response = await apiClient.get(`/api/category`, { params })
     return response.data;
 }
 export const addCategory = async (data: FormData): Promise<response<Category>> => {
-    const response = await apiClient.post("/api/category/category", data);
+    const response = await apiClient.post("/api/category", data);
     return response.data;
 }
 export const updateCategory = async ({ id, formData }: { id: string; formData: FormData }): Promise<response<Category>> => {
-    const response = await apiClient.patch(`/api/category/category/${id}`, formData)
+    const response = await apiClient.patch(`/api/category/${id}`, formData)
     return response.data;
 }
 export const deleteCategory = async (id: string): Promise<response<boolean>> => {
-    const response = await apiClient.delete(`/api/category/category/${id}`)
+    const response = await apiClient.delete(`/api/category/${id}`)
     return response.data;
 }
