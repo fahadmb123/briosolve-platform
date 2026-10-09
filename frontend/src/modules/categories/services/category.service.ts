@@ -15,8 +15,10 @@ interface Category {
 
 
 export const addCategory = async (data: FormData): Promise<response<Category>> => {
-    // Axios automatically sets the correct multipart/form-data headers with the boundary
-    // when you pass a FormData object directly.
     const response = await apiClient.post("/api/category/category", data);
+    return response.data;
+}
+export const updateCategory = async ({ id, formData }: { id: string; formData: FormData }): Promise<response<Category>> => {
+    const response = await apiClient.patch(`/api/category/category/${id}`, formData)
     return response.data;
 }

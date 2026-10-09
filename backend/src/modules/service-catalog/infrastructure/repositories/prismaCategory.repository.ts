@@ -3,7 +3,7 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client.
 import { Category } from "../../domain/entities/category.entity.js";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository.js";
 import { CategoryMapper } from "../mappers/category.mapper..js";
-import { AddCategoryUseCaseInputDto } from "../../application/Dto/category.js";
+import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto } from "../../application/Dto/category.js";
 
 
 
@@ -20,6 +20,13 @@ export class CategoryRepository implements ICategoryRepository{
         return CategoryMapper.toDomain(category as Category)
     }
 
+    async get():Promise<{categories:Category[]}> {
+        const categories = await db.orm.public.categories.all()
+        return {
+            categories:categories.map(category=>CategoryMapper.toDomain(category as Category))
+        }
+    }
+
     async add(input:AddCategoryUseCaseInputDto):Promise<Category | null> {
         const category = await db.orm.public.categories
             .create({
@@ -28,6 +35,14 @@ export class CategoryRepository implements ICategoryRepository{
                 status: input.status,
                 image: input.image
             } as never)
+        if (!category) return null
+        return CategoryMapper.toDomain(category as Category)
+    }
+
+    async update(data:UpdateCategoryUseCaseDto):Promise<Category | null> {
+        const category = await db.orm.public.categories
+            .where({id:data.id})
+            .update(data.input as any)
         if (!category) return null
         return CategoryMapper.toDomain(category as Category)
     }

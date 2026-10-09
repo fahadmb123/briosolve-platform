@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addCategorySchema, type AddCategoryFormData } from '../schemas/category.schema';
@@ -13,21 +13,36 @@ export interface Area {
 }
 
 interface UseAddCategoryProps {
+  initialData?: { id?: string; name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; image?: string | null } | null;
   onAdd: (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => Promise<void> | void;
   onClose: () => void;
 }
 
-export const useAddCategory = ({ onAdd, onClose }: UseAddCategoryProps) => {
+export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryProps) => {
   const form = useForm<AddCategoryFormData>({
     resolver: zodResolver(addCategorySchema),
     defaultValues: {
-      name: '',
-      description: '',
-      status: 'ACTIVE',
+      name: initialData?.name || '',
+      description: initialData?.description || '',
+      status: initialData?.status || 'ACTIVE',
       rawImage: undefined as unknown as File,
     },
     mode: 'onChange',
   });
+
+  // Keep form in sync if initialData changes (e.g. clicking Edit on a different category)
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        name: initialData.name,
+        description: initialData.description,
+        status: initialData.status,
+        rawImage: undefined as unknown as File, // User must upload a new image if they edit it, or we can make it optional later
+      });
+    } else {
+      form.reset({ name: '', description: '', status: 'ACTIVE', rawImage: undefined as unknown as File });
+    }
+  }, [initialData, form]);
 
   const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, watch } = form;
 
@@ -54,18 +69,22 @@ export const useAddCategory = ({ onAdd, onClose }: UseAddCategoryProps) => {
   }, []);
 
   const onSubmit = handleSubmit(async (data) => {
-    if (!selectedRawFile || !croppedAreaPixels) return;
-
     try {
-      const croppedImageFile = await getCroppedImg(URL.createObjectURL(selectedRawFile), croppedAreaPixels);
-      if (croppedImageFile) {
-        await onAdd({ ...data, imageFile: croppedImageFile })
+      // If they uploaded a new image, crop it
+      let croppedImageFile: File | null = null;
+      if (selectedRawFile && croppedAreaPixels) {
+        croppedImageFile = await getCroppedImg(URL.createObjectURL(selectedRawFile), croppedAreaPixels);
+      }
+
+      // We allow submitting without a new image ONLY if we are editing (initialData exists)
+      if (croppedImageFile || initialData) {
+        await onAdd({ ...data, imageFile: croppedImageFile });
         reset();
         setCroppedAreaPixels(null);
-        onClose()
+        onClose(); // Only closes if onAdd didn't throw an error!
       }
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
   });
 

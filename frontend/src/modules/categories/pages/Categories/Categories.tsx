@@ -3,9 +3,10 @@ import { AdminPageHeader } from "../../../admin/components/AdminPageHeader";
 import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { AddCategoryModal } from "../../components/AddCategoryModal";
-import { useAddCategoryService } from "../../hooks/mutations/useCategory";
+import { useAddCategoryService, useUpdateCategoryService } from "../../hooks/mutations/useCategory";
 import { toast } from "react-toastify";
 import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
+import { useCategoryFormData } from "../../hooks/useFormData";
 
 
 interface Category {
@@ -25,7 +26,10 @@ export default function Categories() {
   const [filter, setFilter] = useState("");
   const totalPages = 1;
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const addCategory = useAddCategoryService()
+  const updateCategory = useUpdateCategoryService()
+  const getFormData = useCategoryFormData()
 
   const [categories, setCategories] = useState<Category[]>([
     { id: '1', name: 'Plumbing', description: 'All plumbing related services', status: 'ACTIVE', image: null, createdAt: new Date().toISOString() },
@@ -33,19 +37,31 @@ export default function Categories() {
   ]);
 
   const handleAddCategory = async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
-    const formData = new FormData()
-    formData.append('name', data.name)
-    formData.append('description', data.description)
-    formData.append('status', data.status)
-    
-    if (data.imageFile) formData.append('image', data.imageFile)
+    const formData = getFormData(data.name,data.description,data.status,data.imageFile)
 
     await addCategory.mutateAsync(formData, {
       onSuccess:(res)=>{
         setCategories([res.data,...categories]);
         toast.success(res.message)
+        setIsAddModalOpen(false);
       }
     })
+  };
+
+  const handleEditCategory = async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
+    if (!editingCategory) return;
+    const formData = getFormData(data.name,data.description,data.status,data.imageFile)
+
+    await updateCategory.mutateAsync({ id: editingCategory.id, formData }, {
+      onSuccess:(res)=>{
+        setCategories(prev => 
+          prev.map(c => (c.id === res.data.id ? res.data : c))
+        )
+        setIsAddModalOpen(false);
+        toast.success(res.message)
+      }
+    })
+    setEditingCategory(null)
   };
 
   const columns: TableColumn<Category>[] = [
@@ -92,9 +108,14 @@ export default function Categories() {
       key: 'actions',
       header: 'Actions',
       width: '15%',
-      render: () => (
+      render: (item) => (
         <div className="flex items-center gap-2">
-          <button className="btn btn-secondary text-xs py-1 px-2">Edit</button>
+          <button 
+            className="btn btn-secondary text-xs py-1 px-2"
+            onClick={() => setEditingCategory(item)}
+          >
+            Edit
+          </button>
           <button className="btn btn-danger text-xs py-1 px-2">Delete</button>
         </div>
       )
@@ -110,6 +131,7 @@ export default function Categories() {
   return (
     <div className="app-content">
        {addCategory.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
+       {updateCategory.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
       <AdminPageHeader 
         title="Category Management" 
         description="Manage all service categories available on the platform."
@@ -169,9 +191,13 @@ export default function Categories() {
       />
 
       <AddCategoryModal 
-        isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)} 
-        onAdd={handleAddCategory} 
+        isOpen={isAddModalOpen || !!editingCategory} 
+        initialData={editingCategory}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditingCategory(null);
+        }} 
+        onAdd={editingCategory ? handleEditCategory : handleAddCategory} 
       />
     </div>
   );

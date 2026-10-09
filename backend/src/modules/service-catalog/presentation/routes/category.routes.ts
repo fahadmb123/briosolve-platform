@@ -10,7 +10,11 @@ const router = Router()
 
 
 
+router.get("/category",authMiddleware,requireRole(["ADMIN","PROVIDER","CUSTOMER"]),categoryController.addCategory)
+
 router.post("/category",authMiddleware,requireRole(["ADMIN"]),upload.single("image"),validate(createCategorySchema),categoryController.addCategory)
+
+router.patch("/category/:id",authMiddleware,requireRole(["ADMIN"]),upload.single("image"),validate(createCategorySchema),categoryController.updateCategory)
 
 
 

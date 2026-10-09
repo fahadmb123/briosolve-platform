@@ -5,11 +5,12 @@ import { useAddCategory } from '../hooks/useAddCategory';
 
 interface AddCategoryModalProps {
   isOpen: boolean;
+  initialData?: { id?: string; name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; image?: string | null } | null;
   onClose: () => void;
   onAdd: (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => void;
 }
 
-export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, onAdd }) => {
+export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, initialData, onClose, onAdd }) => {
   const {
     register,
     errors,
@@ -22,21 +23,23 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onCl
     fileInputRef,
     handleImageChange,
     onCropComplete,
-    onSubmit} = useAddCategory({ onAdd, onClose });
+    onSubmit} = useAddCategory({ initialData, onAdd, onClose });
+
+  const isEditing = !!initialData;
 
   const footer = (
     <>
       <button className="btn btn-secondary text-sm" onClick={onClose} type="button">
         Cancel
       </button>
-      <button className="btn btn-primary text-sm" onClick={onSubmit} type="button" disabled={!isValid || !selectedRawFile}>
-        Add Category
+      <button className="btn btn-primary text-sm" onClick={onSubmit} type="button" disabled={!isValid || (!isEditing && !selectedRawFile)}>
+        {isEditing ? 'Save Changes' : 'Add Category'}
       </button>
     </>
   );
 
   return (
-    <AdminModal isOpen={isOpen} onClose={onClose} title="Add New Category" icon="fas fa-plus-circle" footer={footer}>
+    <AdminModal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Category" : "Add New Category"} icon={isEditing ? "fas fa-edit" : "fas fa-plus-circle"} footer={footer}>
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <div className="form-group">
           <label className="text-sm font-semibold mb-1 block">Category Name <span className="text-error">*</span></label>
@@ -60,13 +63,13 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onCl
         </div>
 
         <div className="form-group">
-          <label className="text-sm font-semibold mb-1 block">Category Image <span className="text-error">*</span></label>
+          <label className="text-sm font-semibold mb-1 block">Category Image {!isEditing && <span className="text-error">*</span>}</label>
           
-          {selectedRawFile ? (
+          {(selectedRawFile || initialData?.image) ? (
             <div className="flex flex-col gap-3">
               <div className="relative w-full h-64 bg-black rounded-lg overflow-hidden border border-border group">
                 <Cropper
-                  image={URL.createObjectURL(selectedRawFile)}
+                  image={selectedRawFile ? URL.createObjectURL(selectedRawFile) : initialData?.image!}
                   crop={crop}
                   zoom={zoom}
                   aspect={1}
@@ -82,7 +85,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onCl
                 className="btn btn-secondary text-sm self-start"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <i className="fas fa-image mr-2"></i> Change Image
+                <i className="fas fa-image mr-2"></i> {selectedRawFile ? "Change Image" : "Replace Image"}
               </button>
             </div>
           ) : (
