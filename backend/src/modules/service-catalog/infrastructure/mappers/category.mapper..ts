@@ -1,7 +1,8 @@
 import { Category } from "../../domain/entities/category.entity.js";
+import { ServiceMapper } from "./service.mapper.js";
 
 export class CategoryMapper {
-    static toDomain(raw:Category):Category{
+    static toDomain(raw: any): Category {
         return new Category(
             raw.id,
             raw.name,
@@ -9,7 +10,8 @@ export class CategoryMapper {
             raw.status,
             raw.image,
             raw.created_at,
-            raw.updated_at
+            raw.updated_at,
+            raw.services ? raw.services.map((s: any) => ServiceMapper.toDomain(s)) : undefined
         )
     }
 }

@@ -9,7 +9,7 @@ interface Category {
   image?: string | null;
   updated_at:string,
   created_at:string,
-  services:[]
+  services: any[];
 }
 
 

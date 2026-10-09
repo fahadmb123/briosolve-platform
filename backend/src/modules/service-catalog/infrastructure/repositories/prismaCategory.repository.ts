@@ -10,6 +10,7 @@ import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto 
 export class CategoryRepository implements ICategoryRepository{
     async findById(id: string): Promise<Category | null> {
         const category = await db.orm.public.categories
+            .include("services")
             .where({ id })
             .first()
         if (!category) return null
@@ -18,6 +19,7 @@ export class CategoryRepository implements ICategoryRepository{
 
     async findByName(name:string):Promise<Category | null> {
         const category = await db.orm.public.categories
+            .include("services")
             .where({ name: name.toLowerCase() as Varchar<100> })
             .first()
         if (!category) return null
@@ -38,6 +40,7 @@ export class CategoryRepository implements ICategoryRepository{
         }
 
         const categories = await query
+            .include("services")
             .orderBy((category) => category.updated_at.desc())
             .offset(skip)
             .limit(limit)

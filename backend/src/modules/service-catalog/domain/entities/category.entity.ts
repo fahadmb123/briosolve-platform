@@ -1,4 +1,4 @@
-import { Varchar } from "@prisma/orm-postgres/target/codec-types";
+import { Service } from "./service.entity.js";
 
 export class Category {
     constructor(
@@ -9,5 +9,6 @@ export class Category {
         public readonly image: string,
         public readonly created_at: Date,
         public readonly updated_at: Date,
+        public readonly services?: Service[]
     ){}
 }

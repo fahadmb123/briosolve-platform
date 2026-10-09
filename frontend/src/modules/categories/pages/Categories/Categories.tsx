@@ -18,7 +18,7 @@ interface Category {
   image?: string | null;
   updated_at:string,
   created_at:string,
-  services:[]
+  services: any[];
 }
 
 export default function Categories() {
@@ -103,8 +103,16 @@ export default function Categories() {
     {
       key: 'description',
       header: 'Description',
-      width: '35%',
+      width: '25%',
       render: (item) => <div className="truncate max-w-xs">{item.description}</div>
+    },
+    {
+      key: 'services',
+      header: 'Services',
+      width: '10%',
+      render: (item) => (
+        <div>{item.services?.length ? item.services.length : 'N/A'}</div>
+      )
     },
     {
       key: 'updated_at',
