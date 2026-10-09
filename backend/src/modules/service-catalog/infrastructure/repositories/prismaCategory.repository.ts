@@ -38,7 +38,7 @@ export class CategoryRepository implements ICategoryRepository{
         }
 
         const categories = await query
-            .orderBy((category) => category.created_at.desc())
+            .orderBy((category) => category.updated_at.desc())
             .offset(skip)
             .limit(limit)
             .all();

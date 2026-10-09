@@ -55,9 +55,10 @@ export default function Categories() {
 
     await updateCategory.mutateAsync({ id: editingCategory.id, formData }, {
       onSuccess:(res)=>{
-        setCategories(prev => 
-          prev.map(c => (c.id === res.data.id ? res.data : c))
-        )
+        setCategories(prev => {
+          const filtered = prev.filter(c => c.id !== res.data.id);
+          return [res.data, ...filtered];
+        });
         setIsAddModalOpen(false);
         toast.success(res.message)
       }
@@ -106,10 +107,10 @@ export default function Categories() {
       render: (item) => <div className="truncate max-w-xs">{item.description}</div>
     },
     {
-      key: 'created_at',
-      header: 'Created At',
+      key: 'updated_at',
+      header: 'Last Updated',
       width: '15%',
-      render: (item) => <div>{new Date(item.created_at).toLocaleDateString()}</div>
+      render: (item) => <div>{new Date(item.updated_at).toLocaleDateString()}</div>
     },
     {
       key: 'status',
