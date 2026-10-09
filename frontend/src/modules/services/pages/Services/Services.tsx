@@ -18,6 +18,7 @@ interface Service {
   status: 'ACTIVE' | 'INACTIVE';
   image?: string | null;
   updated_at: string;
+  category?: { id: string; name: string };
 }
 
 export default function Services() {
@@ -118,7 +119,7 @@ export default function Services() {
     {
       key: 'name',
       header: 'Service Name',
-      width: '30%',
+      width: '25%',
       render: (item) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded bg-surface border border-border flex items-center justify-center overflow-hidden shrink-0">
@@ -130,18 +131,25 @@ export default function Services() {
           </div>
           <div className="flex flex-col">
             <span className="font-medium text-text">{item.name}</span>
-            <span className="text-xs text-text-muted mt-0.5">
-              {categories.find(c => c.id === item.category_id)?.name || 'Unknown Category'}
-            </span>
           </div>
         </div>
       )
     },
     {
+      key: 'category',
+      header: 'Category',
+      width: '15%',
+      render: (item) => (
+        <span className="text-sm">
+          {item.category?.name || categories.find(c => c.id === item.category_id)?.name || 'Unknown'}
+        </span>
+      )
+    },
+    {
       key: 'description',
       header: 'Description',
-      width: '30%',
-      render: (item) => <div className="truncate max-w-[250px] text-sm">{item.description}</div>
+      width: '20%',
+      render: (item) => <div className="truncate max-w-[200px] text-sm">{item.description}</div>
     },
     {
       key: 'status',

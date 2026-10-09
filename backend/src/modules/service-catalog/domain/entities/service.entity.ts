@@ -1,3 +1,5 @@
+import { Category } from "./category.entity.js";
+
 export class Service {
     constructor(
         public readonly id: string,
@@ -8,5 +10,6 @@ export class Service {
         public readonly status: "ACTIVE" | "INACTIVE",
         public readonly created_at: Date,
         public readonly updated_at: Date,
+        public readonly category?: Category,
     ){}
 }

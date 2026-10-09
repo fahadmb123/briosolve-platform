@@ -9,6 +9,7 @@ import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } fr
 export class ServiceRepository implements IServiceRepository{
     async findById(id: string): Promise<Service | null> {
         const service = await db.orm.public.services
+            .include("category")
             .where({ id })
             .first()
         if (!service) return null
@@ -17,6 +18,7 @@ export class ServiceRepository implements IServiceRepository{
 
     async findByName(name:string):Promise<Service | null> {
         const service = await db.orm.public.services
+            .include("category")
             .where({ name: name.toLowerCase() as Varchar<150> })
             .first()
         if (!service) return null
@@ -37,6 +39,7 @@ export class ServiceRepository implements IServiceRepository{
         }
 
         const services = await query
+            .include("category")
             .orderBy((service) => service.updated_at.desc())
             .offset(skip)
             .limit(limit)
