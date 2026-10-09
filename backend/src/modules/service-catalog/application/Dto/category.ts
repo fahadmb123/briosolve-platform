@@ -10,3 +10,10 @@ export type UpdateCategoryUseCaseDto = {
     input:UpdateCategoryDto
 }
 export type UpdateCategoryDto = Partial<AddCategoryUseCaseInputDto>
+
+export type GetCategoriesDto = {
+    page: number;
+    limit: number;
+    filter?: string;
+    search?: string;
+}

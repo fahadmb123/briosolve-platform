@@ -9,6 +9,28 @@ interface AdminPaginationProps {
 export const AdminPagination: React.FC<AdminPaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
   if (totalPages === 0) return null;
   
+  const getPaginationItems = () => {
+    const cleanItems: (number | string)[] = [];
+    let last = 0;
+    
+    for (let i = 1; i <= totalPages; i++) {
+        let shouldInclude = false;
+        if (i === 1 || i === totalPages) shouldInclude = true;
+        else if (currentPage <= 2 && i <= 3) shouldInclude = true;
+        else if (currentPage >= totalPages - 1 && i >= totalPages - 2) shouldInclude = true;
+        else if (i >= currentPage - 1 && i <= currentPage + 1) shouldInclude = true;
+        
+        if (shouldInclude) {
+            if (last && i - last > 1) {
+                cleanItems.push('...');
+            }
+            cleanItems.push(i);
+            last = i;
+        }
+    }
+    return cleanItems;
+  };
+
   return (
     <div className="admin-pagination mt-6 flex justify-between items-center">
       <div className="text-sm text-secondary">
@@ -24,18 +46,22 @@ export const AdminPagination: React.FC<AdminPaginationProps> = ({ currentPage, t
           <i className="fas fa-chevron-left text-xs"></i>
         </button>
 
-        {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
-          <button
-            key={pageNumber}
-            className={`page-btn flex items-center justify-center w-8 h-8 rounded border text-sm transition-colors ${
-              currentPage === pageNumber 
-                ? "bg-primary text-on-primary border-primary" 
-                : "border-border bg-surface hover:bg-surface-elevated text-text"
-            }`}
-            onClick={() => onPageChange(pageNumber)}
-          >
-            {pageNumber}
-          </button>
+        {getPaginationItems().map((item, idx) => (
+          item === '...' ? (
+            <span key={`ellipsis-${idx}`} className="w-8 h-8 flex items-center justify-center text-secondary font-medium">...</span>
+          ) : (
+            <button
+              key={item}
+              className={`page-btn flex items-center justify-center w-8 h-8 rounded border text-sm transition-colors ${
+                currentPage === item 
+                  ? "bg-primary text-on-primary border-primary" 
+                  : "border-border bg-surface hover:bg-surface-elevated text-text"
+              }`}
+              onClick={() => onPageChange(item as number)}
+            >
+              {item}
+            </button>
+          )
         ))}
 
         <button

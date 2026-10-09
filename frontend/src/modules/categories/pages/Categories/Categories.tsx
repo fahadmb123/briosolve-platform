@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminPageHeader } from "../../../admin/components/AdminPageHeader";
 import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { AddCategoryModal } from "../../components/AddCategoryModal";
-import { useAddCategoryService, useUpdateCategoryService } from "../../hooks/mutations/useCategory";
+import { useAddCategoryService, useGetCategoriesService, useUpdateCategoryService, useDeleteCategoryService } from "../../hooks/mutations/useCategory";
 import { toast } from "react-toastify";
 import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
+import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { useCategoryFormData } from "../../hooks/useFormData";
 
 
@@ -24,17 +25,17 @@ export default function Categories() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
-  const totalPages = 1;
+  const [totalPages, setTotalPages] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
   const addCategory = useAddCategoryService()
   const updateCategory = useUpdateCategoryService()
+  const deleteCategory = useDeleteCategoryService()
+  const getCategories = useGetCategoriesService()
   const getFormData = useCategoryFormData()
 
-  const [categories, setCategories] = useState<Category[]>([
-    { id: '1', name: 'Plumbing', description: 'All plumbing related services', status: 'ACTIVE', image: null, createdAt: new Date().toISOString() },
-    { id: '2', name: 'Electrical', description: 'Electrical installations and repairs', status: 'ACTIVE', image: null, createdAt: new Date().toISOString() },
-  ]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const handleAddCategory = async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
     const formData = getFormData(data.name,data.description,data.status,data.imageFile)
@@ -64,6 +65,22 @@ export default function Categories() {
     setEditingCategory(null)
   };
 
+  const confirmDelete = async () => {
+    if (!categoryToDelete) return;
+    await deleteCategory.mutateAsync(categoryToDelete.id, {
+      onSuccess: (res) => {
+        setCategories(prev => prev.filter(c => c.id !== categoryToDelete.id));
+        setCategoryToDelete(null);
+        toast.success(res.message || "Category deleted successfully");
+        if (categories.length === 1 && page > 1) {
+          setPage(page - 1);
+        } else {
+          getCategoriesFn();
+        }
+      }
+    });
+  };
+
   const columns: TableColumn<Category>[] = [
     {
       key: 'name',
@@ -89,10 +106,10 @@ export default function Categories() {
       render: (item) => <div className="truncate max-w-xs">{item.description}</div>
     },
     {
-      key: 'createdAt',
+      key: 'created_at',
       header: 'Created At',
       width: '15%',
-      render: (item) => <div>{new Date(item.createdAt).toLocaleDateString()}</div>
+      render: (item) => <div>{new Date(item.created_at).toLocaleDateString()}</div>
     },
     {
       key: 'status',
@@ -116,11 +133,33 @@ export default function Categories() {
           >
             Edit
           </button>
-          <button className="btn btn-danger text-xs py-1 px-2">Delete</button>
+          <button 
+            className="btn btn-danger text-xs py-1 px-2"
+            onClick={() => setCategoryToDelete(item)}
+          >
+            Delete
+          </button>
         </div>
       )
     }
-  ];
+  ]
+
+  const getCategoriesFn = () => {
+    getCategories.mutate({ page, limit: 10, search, filter }, {
+      onSuccess: (res) => {
+        if (res?.data?.categories) {
+          setCategories(res.data.categories);
+          setTotalPages(res.data.totalPages || 1);
+        }
+      }
+    });
+  };
+  
+  useEffect(() => {
+    getCategoriesFn();
+  }, [page, search, filter]);
+
+
 
   const handleReset = () => {
     setSearch("");
@@ -132,6 +171,7 @@ export default function Categories() {
     <div className="app-content">
        {addCategory.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
        {updateCategory.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
+       {deleteCategory.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
       <AdminPageHeader 
         title="Category Management" 
         description="Manage all service categories available on the platform."
@@ -179,7 +219,8 @@ export default function Categories() {
       <AdminTable 
         columns={columns}
         data={categories}
-        isLoading={false}
+        isLoading={getCategories.isPending}
+        loadingMessage="Searching for categories..."
         keyExtractor={(item) => item.id}
         emptyMessage="No categories found."
       />
@@ -199,6 +240,20 @@ export default function Categories() {
         }} 
         onAdd={editingCategory ? handleEditCategory : handleAddCategory} 
       />
+
+      {categoryToDelete && (
+        <ConfirmModal 
+          isOpen={!!categoryToDelete} 
+          title="Delete Category" 
+          message={`Are you sure you want to delete the category "${categoryToDelete.name}"? This action cannot be undone.`} 
+          confirmText="Delete" 
+          cancelText="Cancel" 
+          onConfirm={confirmDelete} 
+          onCancel={() => setCategoryToDelete(null)} 
+          isDanger={true}
+          isLoading={deleteCategory.isPending}
+        />
+      )}
     </div>
   );
 }

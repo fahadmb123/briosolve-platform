@@ -16,8 +16,9 @@ export class UpdateCategoryUseCase implements IUseCase<UpdateCategoryUseCaseDto,
     async execute(data: UpdateCategoryUseCaseDto): Promise<Category> {
 
         if (data.input.name){
+            data.input.name = data.input.name.toLocaleLowerCase()
             const isExist = await this.categoryRepository.findByName(data.input.name)
-            if(isExist) throw new ApplicationError("NAME_ALREADY_EXIST","name already exist","CONFLICT")
+            if(isExist && String(isExist.id) !== String(data.id)) throw new ApplicationError("NAME_ALREADY_EXIST","name already exist","CONFLICT")
         }
         
         if (data.input.image){

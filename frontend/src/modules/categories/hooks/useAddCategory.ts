@@ -51,7 +51,18 @@ export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryPr
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [, setIsCropping] = useState(false);
+  const [isCropModified, setIsCropModified] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCropChange = (newCrop: { x: number, y: number }) => {
+    setCrop(newCrop);
+    setIsCropModified(true);
+  };
+
+  const handleZoomChange = (newZoom: number) => {
+    setZoom(newZoom);
+    setIsCropModified(true);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,6 +71,7 @@ export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryPr
       setIsCropping(true);
       setCrop({ x: 0, y: 0 });
       setZoom(1);
+      setIsCropModified(true);
     }
     e.target.value = '';
   };
@@ -70,10 +82,12 @@ export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryPr
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // If they uploaded a new image, crop it
+      // If they uploaded a new image, or modified the crop of the existing one, crop it
       let croppedImageFile: File | null = null;
       if (selectedRawFile && croppedAreaPixels) {
         croppedImageFile = await getCroppedImg(URL.createObjectURL(selectedRawFile), croppedAreaPixels);
+      } else if (initialData?.image && croppedAreaPixels && isCropModified) {
+        croppedImageFile = await getCroppedImg(initialData.image, croppedAreaPixels);
       }
 
       // We allow submitting without a new image ONLY if we are editing (initialData exists)
@@ -81,6 +95,7 @@ export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryPr
         await onAdd({ ...data, imageFile: croppedImageFile });
         reset();
         setCroppedAreaPixels(null);
+        setIsCropModified(false);
         onClose(); // Only closes if onAdd didn't throw an error!
       }
     } catch (err) {
@@ -94,9 +109,9 @@ export const useAddCategory = ({ initialData, onAdd, onClose }: UseAddCategoryPr
     isValid,
     selectedRawFile,
     crop,
-    setCrop,
+    setCrop: handleCropChange,
     zoom,
-    setZoom,
+    setZoom: handleZoomChange,
     fileInputRef,
     handleImageChange,
     onCropComplete,

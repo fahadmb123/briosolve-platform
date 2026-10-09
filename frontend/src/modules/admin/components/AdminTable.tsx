@@ -1,5 +1,4 @@
 import React from 'react';
-import { SpinnerOverlay } from '../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 
 export interface TableColumn<T> {
   key: string;
@@ -13,6 +12,7 @@ interface AdminTableProps<T> {
   data: T[];
   isLoading: boolean;
   emptyMessage?: string;
+  loadingMessage?: string;
   keyExtractor: (item: T) => string;
   rowStyle?: (item: T) => React.CSSProperties;
 }
@@ -22,12 +22,12 @@ export function AdminTable<T>({
   data, 
   isLoading, 
   emptyMessage = "No records found.", 
+  loadingMessage = "Loading results...",
   keyExtractor,
   rowStyle 
 }: AdminTableProps<T>) {
   return (
     <div className="admin-table-card relative">
-      {isLoading && <SpinnerOverlay isLoading={true} />}
       <div className="table-responsive">
         <table className="admin-table w-full text-left border-collapse">
           <thead>
@@ -60,7 +60,7 @@ export function AdminTable<T>({
               <tr>
                 <td colSpan={columns.length} className="text-center py-10 text-secondary">
                   <div className="flex flex-col items-center justify-center gap-3">
-                    <span className="font-medium">Loading results...</span>
+                    <span className="font-medium">{loadingMessage}</span>
                   </div>
                 </td>
               </tr>

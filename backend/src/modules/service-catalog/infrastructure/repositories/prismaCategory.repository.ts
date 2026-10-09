@@ -3,13 +3,17 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client.
 import { Category } from "../../domain/entities/category.entity.js";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository.js";
 import { CategoryMapper } from "../mappers/category.mapper..js";
-import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto } from "../../application/Dto/category.js";
+import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/Dto/category.js";
 
 
 
 export class CategoryRepository implements ICategoryRepository{
     async findById(id: string): Promise<Category | null> {
-        return null
+        const category = await db.orm.public.categories
+            .where({ id })
+            .first()
+        if (!category) return null
+        return CategoryMapper.toDomain(category as Category)
     }
 
     async findByName(name:string):Promise<Category | null> {
@@ -20,10 +24,30 @@ export class CategoryRepository implements ICategoryRepository{
         return CategoryMapper.toDomain(category as Category)
     }
 
-    async get():Promise<{categories:Category[]}> {
-        const categories = await db.orm.public.categories.all()
+    async get(input: GetCategoriesDto):Promise<{categories:Category[], total: number}> {
+        const { page, search, limit, filter } = input;
+        const skip = (page - 1) * limit;
+
+        let query = db.orm.public.categories;
+
+        if (search) {
+            query = query.where((category) => category.name.ilike(`${search}%`));
+        }
+        if (filter) {
+            query = query.where((category) => category.status.eq(filter as any));
+        }
+
+        const categories = await query
+            .orderBy((category) => category.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all();
+            
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+
         return {
-            categories:categories.map(category=>CategoryMapper.toDomain(category as Category))
+            categories: categories.map(category => CategoryMapper.toDomain(category as Category)),
+            total: totalResult.total
         }
     }
 
@@ -40,10 +64,17 @@ export class CategoryRepository implements ICategoryRepository{
     }
 
     async update(data:UpdateCategoryUseCaseDto):Promise<Category | null> {
-        const category = await db.orm.public.categories
+        await db.orm.public.categories
             .where({id:data.id})
             .update(data.input as any)
-        if (!category) return null
-        return CategoryMapper.toDomain(category as Category)
+            
+        return await this.findById(data.id)
+    }
+
+    async delete(id: string): Promise<boolean> {
+        await db.orm.public.categories
+            .where({ id })
+            .delete();
+        return true;
     }
 }
