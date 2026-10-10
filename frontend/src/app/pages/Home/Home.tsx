@@ -32,7 +32,7 @@ export default function Home() {
         <div id="sidebar-overlay" className={`sidebar-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
 
         
-        <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
+        {user?.role === "CUSTOMER" ? (<aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
             <div className="sidebar-brand flex items-center justify-between">
                 <Link to="/" className="logo flex items-center gap-2">
                     <i className="fas fa-layer-group text-primary"></i>
@@ -133,7 +133,7 @@ export default function Home() {
                     </li>
                 </ul>
             </div>
-        </aside>
+        </aside>):null}
 
         
         <main className="app-main">

@@ -1,5 +1,5 @@
 import { apiClient } from "../../../shared/api/Client";
-import type { LoginInputType, EmailInputType } from "../schemas/validation";
+import type { LoginInputType, EmailInputType, ProviderRegistrationInputType } from "../schemas/validation";
 import type { response } from '../../../shared/types/Dtos';
 import type { IAuthUser } from "../../../store/auth/auth.store";
 import type { CustomerProfile } from "../../../shared/types/Dtos";
@@ -70,5 +70,10 @@ export const emailVerify = async (data: EmailInputType): Promise<response<null>>
 }
 export const resetPassword = async (data:{password:string}): Promise<response<null>> => {
     const response = await apiClient.post("/api/auth/reset-password", data)
+    return response.data;
+}
+
+export const registerProvider = async (data: ProviderRegistrationInputType): Promise<response<{accessToken: string; user: IAuthUser}>> => {
+    const response = await apiClient.post("/api/auth/register-provider", data)
     return response.data;
 }

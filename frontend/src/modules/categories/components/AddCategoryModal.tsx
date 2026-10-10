@@ -23,7 +23,10 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, init
     fileInputRef,
     handleImageChange,
     onCropComplete,
-    onSubmit} = useAddCategory({ initialData, onAdd, onClose });
+    onSubmit,
+    handleFieldChange,
+    handleInteractionStart,
+    hasChanges} = useAddCategory({ initialData, onAdd, onClose });
 
   const isEditing = !!initialData;
 
@@ -32,7 +35,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, init
       <button className="btn btn-secondary text-sm" onClick={onClose} type="button">
         Cancel
       </button>
-      <button className="btn btn-primary text-sm" onClick={onSubmit} type="button" disabled={!isValid || (!isEditing && !selectedRawFile)}>
+      <button className="btn btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed" onClick={onSubmit} type="button" disabled={!isValid || (!isEditing && !selectedRawFile) || !hasChanges}>
         {isEditing ? 'Save Changes' : 'Add Category'}
       </button>
     </>
@@ -40,7 +43,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, init
 
   return (
     <AdminModal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Category" : "Add New Category"} icon={isEditing ? "fas fa-edit" : "fas fa-plus-circle"} footer={footer}>
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <form onSubmit={onSubmit} className="flex flex-col gap-4" onChange={handleFieldChange}>
         <div className="form-group">
           <label className="text-sm font-semibold mb-1 block">Category Name <span className="text-error">*</span></label>
           <input 
@@ -78,6 +81,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, init
                   onCropChange={setCrop}
                   onCropComplete={onCropComplete}
                   onZoomChange={setZoom}
+                  onInteractionStart={handleInteractionStart}
                 />
               </div>
               <button 

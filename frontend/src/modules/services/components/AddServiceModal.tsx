@@ -24,7 +24,10 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initia
     fileInputRef,
     handleImageChange,
     onCropComplete,
-    onSubmit
+    onSubmit,
+    handleFieldChange,
+    handleInteractionStart,
+    hasChanges
   } = useAddService({ initialData, onAdd, onClose, categories });
 
   const isEditing = !!initialData;
@@ -34,7 +37,7 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initia
       <button className="btn btn-secondary text-sm" onClick={onClose} type="button">
         Cancel
       </button>
-      <button className="btn btn-primary text-sm" onClick={onSubmit} type="button" disabled={!isValid || (!isEditing && !selectedRawFile)}>
+      <button className="btn btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed" onClick={onSubmit} type="button" disabled={!isValid || (!isEditing && !selectedRawFile) || !hasChanges}>
         {isEditing ? 'Save Changes' : 'Add Service'}
       </button>
     </>
@@ -42,7 +45,7 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initia
 
   return (
     <AdminModal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Service" : "Add New Service"} icon={isEditing ? "fas fa-edit" : "fas fa-plus-circle"} footer={footer}>
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <form onSubmit={onSubmit} className="flex flex-col gap-4" onChange={handleFieldChange}>
         
         <div className="form-group">
           <label className="text-sm font-semibold mb-1 block">Service Name <span className="text-error">*</span></label>
@@ -96,6 +99,7 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initia
                   onCropChange={setCrop}
                   onCropComplete={onCropComplete}
                   onZoomChange={setZoom}
+                  onInteractionStart={handleInteractionStart}
                 />
               </div>
               <button 

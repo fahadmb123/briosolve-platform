@@ -47,7 +47,7 @@ export const useAddService = ({ initialData, onAdd, onClose, categories }: UseAd
         }
     }, [initialData, form]);
 
-    const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, watch } = form;
+    const { register, handleSubmit, formState: { errors, isValid, dirtyFields }, reset, setValue, watch } = form;
 
     const selectedRawFile = watch('rawImage');
     const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -55,16 +55,28 @@ export const useAddService = ({ initialData, onAdd, onClose, categories }: UseAd
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
     const [, setIsCropping] = useState(false);
     const [isCropModified, setIsCropModified] = useState(false);
+    const [isFormChanged, setIsFormChanged] = useState(false);
+    
+    useEffect(() => {
+        setIsFormChanged(false);
+        setIsCropModified(false);
+    }, [initialData]);
+
+    const handleFieldChange = () => {
+        setIsFormChanged(true);
+    };
     
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleCropChange = (newCrop: { x: number, y: number }) => {
         setCrop(newCrop);
-        setIsCropModified(true);
     };
 
     const handleZoomChange = (newZoom: number) => {
         setZoom(newZoom);
+    };
+
+    const handleInteractionStart = () => {
         setIsCropModified(true);
     };
 
@@ -141,6 +153,9 @@ export const useAddService = ({ initialData, onAdd, onClose, categories }: UseAd
         fileInputRef,
         handleImageChange,
         onCropComplete,
-        onSubmit
+        onSubmit,
+        handleFieldChange,
+        handleInteractionStart,
+        hasChanges: !!initialData ? (isFormChanged || isCropModified) : true
     };
 };
