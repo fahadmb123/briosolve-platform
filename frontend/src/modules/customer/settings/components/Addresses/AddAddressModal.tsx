@@ -48,6 +48,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
     setShowDropdown,
     handleSelectLocation,
     isGeocoding,
+    hasChanges,
   } = useLocationPicker(onSave, onClose, initialData, isOpen);
 
   const { register, formState: { errors }, watch } = form;
@@ -466,7 +467,8 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
             ) : (
               <button
                 onClick={handleSaveAddress}
-                className="w-full py-3.5 rounded-xl bg-primary hover:opacity-90 text-on-primary font-label-lg text-label-lg font-semibold flex items-center justify-center shadow-lg transition-all active:scale-[0.99] border-none cursor-pointer"
+                disabled={!hasChanges}
+                className="w-full py-3.5 rounded-xl bg-primary hover:opacity-90 text-on-primary font-label-lg text-label-lg font-semibold flex items-center justify-center shadow-lg transition-all active:scale-[0.99] border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save Address
               </button>

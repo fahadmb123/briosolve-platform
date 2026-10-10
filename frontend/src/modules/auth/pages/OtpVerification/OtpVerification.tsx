@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../hooks/mutations/use-otp-varify';
 import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
-import { maskEmail, maskPhoneNumber } from '../../../../store/auth/masking';
+import { maskEmail, maskPhoneNumber } from '../../../../shared/utils/masking';
 
 export default function OtpVerification() {
     const { toggleTheme } = useTheme()

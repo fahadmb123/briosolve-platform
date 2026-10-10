@@ -218,12 +218,20 @@ export const useLocationPicker = (
       ...data,
 
       type: addressType,
-      latitude: coordinates.lat,
-      longitude: coordinates.lng,
+      latitude: Number(coordinates.lat),
+      longitude: Number(coordinates.lng),
     }
     onSave(apiPayload);
     onClose();
   });
+
+    const isEditing = !!initialData;
+    const hasChanges = isEditing ? (
+      form.formState.isDirty || 
+      addressType !== initialData.type ||
+      Number(coordinates.lat) !== Number(initialData.latitude) ||
+      Number(coordinates.lng) !== Number(initialData.longitude)
+    ) : true;
 
   return {
     step,
@@ -247,5 +255,6 @@ export const useLocationPicker = (
     setShowDropdown,
     handleSelectLocation,
     isGeocoding,
+    hasChanges,
   };
 };
