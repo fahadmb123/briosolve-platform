@@ -8,7 +8,6 @@ export type CompleteProviderRegistrationInput = {
     registrationId: string;
     services: string[];
     experience: string;
-    skills: string;
     bio: string;
 };
 
@@ -36,7 +35,6 @@ export default class RegisterProviderUseCase implements IUseCase<CompleteProvide
             password: pendingData.passwordHash!,
             businessName: pendingData.businessName!,
             experience: input.experience,
-            skills: input.skills,
             bio: input.bio,
             services: input.services
         });

@@ -13,7 +13,7 @@ export function ProfessionalDetailsStep({ isActive, onNext, onBack }: Profession
     if (!isActive) return null;
 
     const handleNext = async () => {
-        const isStepValid = await trigger(["experience", "skills", "bio"]);
+        const isStepValid = await trigger(["experience", "bio"]);
         if (isStepValid) {
             onNext();
         }
@@ -41,12 +41,7 @@ export function ProfessionalDetailsStep({ isActive, onNext, onBack }: Profession
                 {errors.experience && <span className="text-danger text-xs mt-1 block">{errors.experience.message}</span>}
             </div>
 
-            
-            <div className="form-group mb-6">
-                <label className="form-label" htmlFor="skills-input">Specific Trade Skills (Comma Separated)</label>
-                <input type="text" id="skills-input" className="form-control" placeholder="e.g. Concealed Leak Detection, R32 Gas Refill, Copper Brazing" {...register("skills")} />
-                {errors.skills && <span className="text-danger text-xs mt-1 block">{errors.skills.message}</span>}
-            </div>
+
 
             
             <div className="form-group mb-0">

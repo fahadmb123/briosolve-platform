@@ -21,7 +21,6 @@ export class PrismaProviderRepository implements IProviderRepository {
             user_id: user.id,
             business_name: data.businessName,
             experience: data.experience,
-            skills: data.skills || null,
             bio: data.bio,
             profile_image: null
         } as never);

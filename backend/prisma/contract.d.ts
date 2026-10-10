@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'7dd92152b3800f436a807095493bc06ebd3b881aa33a8e16b77509d0fd0c1abd'>;
+  StorageHashBase<'74d1c21300ed61f3b52a42d9f783c2cf77e2720414fa53278b875aedf8cbd748'>;
 export type ExecutionHash =
   ExecutionHashBase<'da645f131f6acba0ee690e273272ebedc95827b30edca415e666a35dae8d87ae'>;
 export type ProfileHash =
@@ -281,7 +281,6 @@ export type FieldOutputTypes = {
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
       readonly business_name: Varchar<255>;
       readonly experience: Varchar<100>;
-      readonly skills: Varchar<1000> | null;
       readonly bio: Varchar<2000>;
       readonly profile_image: Varchar<500> | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -360,7 +359,6 @@ export type FieldInputTypes = {
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
       readonly business_name: CodecTypes['sql/varchar@1']['input'];
       readonly experience: CodecTypes['sql/varchar@1']['input'];
-      readonly skills: CodecTypes['sql/varchar@1']['input'] | null;
       readonly bio: CodecTypes['sql/varchar@1']['input'];
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -441,7 +439,6 @@ export type StorageColumnTypes = {
       readonly experience: Varchar<100>;
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly profile_image: Varchar<500> | null;
-      readonly skills: Varchar<1000> | null;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
     };
@@ -520,7 +517,6 @@ export type StorageColumnInputTypes = {
       readonly experience: CodecTypes['sql/varchar@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
-      readonly skills: CodecTypes['sql/varchar@1']['input'] | null;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
     };
@@ -583,7 +579,6 @@ export namespace Models {
     user_id: CodecTypes['pg/uuid@1']['output'];
     business_name: Varchar<255>;
     experience: Varchar<100>;
-    skills: Varchar<1000> | null;
     bio: Varchar<2000>;
     profile_image: Varchar<500> | null;
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -929,12 +924,6 @@ type ContractBase = Omit<
                   readonly codecId: 'sql/varchar@1';
                   readonly nullable: false;
                   readonly typeParams: { readonly length: 100 };
-                };
-                readonly skills: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly nullable: true;
-                  readonly typeParams: { readonly length: 1000 };
                 };
                 readonly bio: {
                   readonly nativeType: 'character varying';
@@ -1597,14 +1586,6 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly length: 100 };
                 };
               };
-              readonly skills: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 1000 };
-                };
-              };
               readonly bio: {
                 readonly nullable: false;
                 readonly type: {
@@ -1669,7 +1650,6 @@ type ContractBase = Omit<
                 readonly user_id: { readonly column: 'user_id' };
                 readonly business_name: { readonly column: 'business_name' };
                 readonly experience: { readonly column: 'experience' };
-                readonly skills: { readonly column: 'skills' };
                 readonly bio: { readonly column: 'bio' };
                 readonly profile_image: { readonly column: 'profile_image' };
                 readonly created_at: { readonly column: 'created_at' };

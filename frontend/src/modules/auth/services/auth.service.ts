@@ -73,7 +73,7 @@ export const resetPassword = async (data:{password:string}): Promise<response<nu
     return response.data;
 }
 
-export const registerProvider = async (data: { services: string[], experience: string, skills: string, bio: string }): Promise<response<IAuthUser>> => {
+export const registerProvider = async (data: { services: string[], experience: string, bio: string }): Promise<response<IAuthUser>> => {
     const response = await apiClient.post("/api/provider/register", data)
     return response.data;
 }

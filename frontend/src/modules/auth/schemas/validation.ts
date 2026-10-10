@@ -58,7 +58,6 @@ export const providerRegistrationSchema = z.object({
   businessName: z.string().min(1, "Business name is required"),
   services: z.array(z.string()).min(1, "Please select at least one service"),
   experience: z.string().min(1, "Please select your years of experience"),
-  skills: z.string().optional(),
   bio: z.string().min(10, "Please provide a brief professional overview (min 10 characters)")
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",

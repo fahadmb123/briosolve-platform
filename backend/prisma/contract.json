@@ -576,16 +576,6 @@
                   }
                 }
               },
-              "skills": {
-                "nullable": true,
-                "type": {
-                  "codecId": "sql/varchar@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "length": 1000
-                  }
-                }
-              },
               "updated_at": {
                 "nullable": false,
                 "type": {
@@ -653,9 +643,6 @@
                 },
                 "profile_image": {
                   "column": "profile_image"
-                },
-                "skills": {
-                  "column": "skills"
                 },
                 "updated_at": {
                   "column": "updated_at"
@@ -1461,14 +1448,6 @@
                     "length": 500
                   }
                 },
-                "skills": {
-                  "codecId": "sql/varchar@1",
-                  "nativeType": "character varying",
-                  "nullable": true,
-                  "typeParams": {
-                    "length": 1000
-                  }
-                },
                 "updated_at": {
                   "codecId": "pg/timestamptz-temporal@1",
                   "nativeType": "timestamptz",
@@ -1892,7 +1871,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7dd92152b3800f436a807095493bc06ebd3b881aa33a8e16b77509d0fd0c1abd"
+    "storageHash": "74d1c21300ed61f3b52a42d9f783c2cf77e2720414fa53278b875aedf8cbd748"
   },
   "execution": {
     "executionHash": "da645f131f6acba0ee690e273272ebedc95827b30edca415e666a35dae8d87ae",

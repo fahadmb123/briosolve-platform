@@ -37,7 +37,6 @@ export class ProviderController extends BaseController {
                 registrationId,
                 services: req.body.services,
                 experience: req.body.experience,
-                skills: req.body.skills,
                 bio: req.body.bio
             };
 

@@ -7,7 +7,6 @@ export type CreateProviderInput = {
     password: string;
     businessName: string;
     experience: string;
-    skills: string;
     bio: string;
     services: string[];
 };

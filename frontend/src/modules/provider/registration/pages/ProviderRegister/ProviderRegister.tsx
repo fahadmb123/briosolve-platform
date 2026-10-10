@@ -33,7 +33,6 @@ export default function ProviderRegister() {
     submitRegistration({
       services: data.services,
       experience: data.experience,
-      skills: data.skills || "",
       bio: data.bio
     });
   };
