@@ -56,6 +56,11 @@ export default class OtpVarificationUseCase implements IUseCase<OtpVarificationI
                 }
                 await this.PendingRegistrationStore.delete(registrationId)
                 break;
+            case "CREATE_PROVIDER":
+                response = data;
+                // Extend TTL for 30 minutes while they complete the rest of the wizard
+                await this.PendingRegistrationStore.save(registrationId, data, 30 * 60);
+                break;
         }
 
         return { response: response!, for: data?.for, email: data.email, path: data?.path }

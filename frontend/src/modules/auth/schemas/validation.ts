@@ -45,10 +45,8 @@ export type LoginInputType = z.infer<typeof loginSchema>;
 export type ResetPasswordInputType = z.infer<typeof resetPasswordSchema>;
 
 export const providerRegistrationSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  fullName: z.string().min(1, "Full name is required"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Valid phone number is required"),
   password: z
         .string()
         .min(8, { message: "Password must be at least 8 characters" })
@@ -57,20 +55,14 @@ export const providerRegistrationSchema = z.object({
         .regex(/[0-9]/, { message: "Password must contain at least one number" })
         .regex(/[^A-Za-z0-9]/, { message: "Password must contain at least one special character" }),
   confirmPassword: z.string().min(1, "Please confirm your password"),
-  providerType: z.enum(["INDIVIDUAL", "COMPANY"], { required_error: "Provider type is required" }),
-  businessName: z.string().optional(),
-  primaryCategoryId: z.string().min(1, "Primary service category is required")
+  businessName: z.string().min(1, "Business name is required"),
+  services: z.array(z.string()).min(1, "Please select at least one service"),
+  experience: z.string().min(1, "Please select your years of experience"),
+  skills: z.string().optional(),
+  bio: z.string().min(10, "Please provide a brief professional overview (min 10 characters)")
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
-}).refine((data) => {
-  if (data.providerType === "COMPANY" && (!data.businessName || data.businessName.trim() === "")) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Business name is required for companies",
-  path: ["businessName"]
 });
 
 export type ProviderRegistrationInputType = z.infer<typeof providerRegistrationSchema>;

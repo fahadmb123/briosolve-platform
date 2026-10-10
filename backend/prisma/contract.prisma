@@ -42,6 +42,43 @@ model users {
   addresses          addresses[]        @relation("UserAddresses")
 
   customer_profile   customer_profiles?
+  provider_profile   provider_profiles?
+}
+
+model provider_profiles {
+  id             Uuid                 @id @default(uuid())
+  user_id        Uuid                 @unique
+  business_name  VarChar(255)
+  experience     VarChar(100)
+  skills         VarChar(1000)?
+  bio            VarChar(2000)
+  profile_image  VarChar(500)?
+  created_at     DateTime             @default(now())
+  updated_at     temporal.updatedAt()
+
+  user           users                @relation(
+    fields: [user_id],
+    references: [id]
+  )
+  services       provider_services[]
+}
+
+model provider_services {
+  id          Uuid       @id @default(uuid())
+  provider_id Uuid
+  service_id  Uuid
+  created_at  DateTime   @default(now())
+  
+  provider    provider_profiles @relation(
+    fields: [provider_id],
+    references: [id]
+  )
+  service     services          @relation(
+    fields: [service_id],
+    references: [id]
+  )
+
+  @@unique([provider_id, service_id])
 }
 
 model addresses {

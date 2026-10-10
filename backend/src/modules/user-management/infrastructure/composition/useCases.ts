@@ -5,11 +5,13 @@ import { GetAddressesUseCase } from "../../application/use-cases/getAddresses.us
 import GetCustomersUseCase from "../../application/use-cases/getCustomers.useCase.js";
 import GetProfileUseCase from "../../application/use-cases/getProfile.useCase.js";
 import RegisterCustomerUseCase from "../../application/use-cases/registerCustomer.useCase.js";
+import RegisterProviderUseCase from "../../application/use-cases/registerProvider.useCase.js";
+import PreRegisterProviderUseCase from "../../application/use-cases/preRegisterProvider.useCase.js";
 import { SetDefaultAddressUseCase } from "../../application/use-cases/setDefaulltAddress.useCase.js";
 import UpdateCustomerProfileUseCase from "../../application/use-cases/updateCustomerProfile.useCase.js";
 import UpdateUserStatusUseCase from "../../application/use-cases/updateUser.useCase.js";
 
-import { userRepository, customerRepository, addressRepository } from "./repositories.js";
+import { userRepository, customerRepository, addressRepository, providerRepository } from "./repositories.js";
 import {
     passwordHasher,
     otpGenerate,
@@ -23,6 +25,17 @@ export const registerCustomerUseCase = new RegisterCustomerUseCase(
     passwordHasher,
     otpGenerate,
     emailSender,
+    pendingRegistrationStore
+)
+export const preRegisterProviderUseCase = new PreRegisterProviderUseCase(
+    userRepository,
+    passwordHasher,
+    otpGenerate,
+    emailSender,
+    pendingRegistrationStore
+)
+export const registerProviderUseCase = new RegisterProviderUseCase(
+    providerRepository,
     pendingRegistrationStore
 )
 export const getCustomerUseCase = new GetCustomersUseCase(

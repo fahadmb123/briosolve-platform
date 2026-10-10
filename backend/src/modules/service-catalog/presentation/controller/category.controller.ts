@@ -58,7 +58,6 @@ export class CategoryController extends BaseController{
 
     getCategories = async (req:Request, res:Response, next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             const response = await this.getCategoriesUseCase.execute({
                 page: Number(req.query.page) || 1,
                 limit: Number(req.query.limit) || 10,

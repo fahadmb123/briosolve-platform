@@ -1,7 +1,41 @@
 // @ts-nocheck
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function Settings() {
+  const [isLocating, setIsLocating] = useState(false);
+
+  const handleUseCurrentLocation = () => {
+      setIsLocating(true);
+      
+      if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+              (position) => {
+                  setTimeout(() => {
+                      setIsLocating(false);
+                      const input = document.getElementById('location-search-input') as HTMLInputElement;
+                      if (input) {
+                          input.value = `Current Location (Lat: ${position.coords.latitude.toFixed(2)}, Lng: ${position.coords.longitude.toFixed(2)})`;
+                      }
+                  }, 600);
+              },
+              (error) => {
+                  setIsLocating(false);
+                  alert("Could not access your location. Please check browser permissions.");
+              }
+          );
+      } else {
+          setIsLocating(false);
+          alert("Geolocation is not supported by your browser.");
+      }
+  };
+
+  const handleChangeLocation = () => {
+      const input = document.getElementById('location-search-input') as HTMLInputElement;
+      if (input) {
+          input.value = '';
+          input.focus();
+      }
+  };
   return (
     <>
 <div className="app-content">
@@ -183,7 +217,19 @@ export default function Settings() {
                             <div className="mt-4 pt-3 border-top">
                                 <h3 className="h6 mb-3">Weekly Working Schedule</h3>
                                 <div id="weekly-schedule-container" className="schedule-days-container text-sm">
-                                    
+                                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day, idx) => (
+                                        <div key={day} className="flex justify-between items-center p-3 mb-2 rounded-lg border" style={{ backgroundColor: 'var(--surface-elevated)', borderColor: 'var(--border)' }}>
+                                            <label className="flex items-center cursor-pointer mb-0" style={{ flex: '1', gap: '0.75rem' }}>
+                                                <input type="checkbox" style={{ accentColor: 'var(--primary)', width: '16px', height: '16px', cursor: 'pointer' }} defaultChecked={true} />
+                                                <span className="font-medium text-text">{day}</span>
+                                            </label>
+                                            <div className="flex items-center justify-end" style={{ flex: '2', gap: '0.5rem' }}>
+                                                <input type="time" defaultValue="09:00" className="form-control" style={{ padding: '0.35rem 0.5rem', width: '110px', backgroundColor: 'var(--surface)', fontSize: '0.8125rem' }} />
+                                                <span className="text-secondary text-xs font-medium">to</span>
+                                                <input type="time" defaultValue="17:00" className="form-control" style={{ padding: '0.35rem 0.5rem', width: '110px', backgroundColor: 'var(--surface)', fontSize: '0.8125rem' }} />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
@@ -196,7 +242,10 @@ export default function Settings() {
                                 <p className="text-xs text-secondary mb-3">Set custom hours or take a specific day off. This overrides your weekly schedule.</p>
                                 
                                 <div id="date-overrides-container">
-                                    
+                                    <div className="text-center p-5 border rounded-lg" style={{ borderColor: 'var(--border)', borderStyle: 'dashed', backgroundColor: 'transparent' }}>
+                                        <i className="fas fa-calendar-times text-secondary mb-2 text-xl opacity-50"></i>
+                                        <p className="text-xs text-secondary mb-0">No overrides added yet. Click "Add Date Override" to set holidays or custom off-days.</p>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -355,7 +404,76 @@ export default function Settings() {
                 <button className="btn-icon" onClick={() => {}}><i className="fas fa-times"></i></button>
             </div>
             <div className="loc-modal-body">
-                <div id="settings-location-picker"></div>
+                <div id="settings-location-picker" className="p-5">
+                    <div className="location-picker-card">
+                        {/* Search Bar */}
+                        <div className="input-with-icon mb-4">
+                            <i className="fas fa-search input-icon text-secondary" style={{ left: '1.25rem' }}></i>
+                            <input type="text" id="location-search-input" className="form-control" placeholder="Search city, locality, or landmark (e.g. Kodungallur, Thrissur, Kochi...)" style={{ backgroundColor: 'var(--surface-elevated)', border: 'none', paddingLeft: '3rem', borderRadius: 'var(--radius-md)' }} />
+                        </div>
+                        
+                        {/* Current Location & Hint */}
+                        <div className="flex justify-between items-center mb-4">
+                            <button 
+                                type="button" 
+                                className="btn btn-outline" 
+                                onClick={handleUseCurrentLocation}
+                                disabled={isLocating}
+                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8125rem', backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border)', color: 'var(--text)' }}
+                            >
+                                {isLocating ? (
+                                    <><i className="fas fa-spinner fa-spin mr-1"></i> Locating...</>
+                                ) : (
+                                    <><i className="fas fa-crosshairs mr-1"></i> Use My Current Location</>
+                                )}
+                            </button>
+                            <span className="text-xs text-secondary flex items-center">
+                                <i className="fas fa-info-circle mr-1"></i> Click map to adjust pin position
+                            </span>
+                        </div>
+                        
+                        <hr className="mt-4 mb-4" style={{ borderColor: 'var(--border)', opacity: 0.5 }} />
+                        
+                        {/* Selected Location Box */}
+                        <div className="selected-location-box rounded-lg p-4 flex justify-between items-center mb-4" style={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border)' }}>
+                            <div className="flex items-start gap-3">
+                                <i className="fas fa-map-marker-alt text-primary text-xl mt-1"></i>
+                                <div>
+                                    <h4 className="font-bold text-sm mb-1">Kodungallur, Thrissur</h4>
+                                    <p className="text-xs text-secondary mb-0">Kerala, India</p>
+                                </div>
+                            </div>
+                            <div className="flex">
+                                <button type="button" className="btn btn-outline" onClick={handleChangeLocation} style={{ padding: '0.4rem 0.75rem', fontSize: '0.8125rem', backgroundColor: 'transparent', border: '1px solid var(--border)' }}>
+                                    <i className="fas fa-edit mr-1"></i> Change Location
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <hr className="mt-4 mb-4" style={{ borderColor: 'var(--border)', opacity: 0.5 }} />
+                        
+                        {/* Radius Section */}
+                        <div className="radius-section mt-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <span className="font-medium text-sm text-secondary">Service Coverage Radius</span>
+                                <span className="font-bold text-primary">20 km</span>
+                            </div>
+                            
+                            <input type="range" className="custom-range-slider mb-2" min="5" max="50" defaultValue="20" style={{ width: '100%' }} />
+                            
+                            <div className="flex justify-between text-xs text-secondary mb-4 mt-2">
+                                <span>5 km (Local)</span>
+                                <span>25 km (Regional)</span>
+                                <span>50 km (Metro)</span>
+                            </div>
+                            
+                            <div className="text-xs text-secondary flex items-center">
+                                <i className="fas fa-compass mr-2"></i>
+                                <span>I provide services within <strong className="text-text font-bold ml-1 mr-1">20 km</strong> of my location.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div className="loc-modal-footer">
                 <button type="button" className="btn btn-secondary text-xs" onClick={() => {}}>Cancel</button>

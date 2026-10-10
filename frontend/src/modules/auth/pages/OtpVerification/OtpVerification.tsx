@@ -10,7 +10,12 @@ import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../hooks/mutatio
 import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
 import { maskEmail, maskPhoneNumber } from '../../../../shared/utils/masking';
 
-export default function OtpVerification() {
+interface OtpVerificationProps {
+    isInline?: boolean;
+    onInlineSuccess?: () => void;
+}
+
+export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerificationProps = {}) {
     const { toggleTheme } = useTheme()
     const [otp, setOtp] = useState('')
     const [timer, setTimer] = useState(60)
@@ -22,7 +27,7 @@ export default function OtpVerification() {
     const {register,handleSubmit,formState:{errors}} = useForm<OtpInputType>({
         resolver : zodResolver(otpSchema),mode : "onChange"
     })
-    const otpVarify = useOtpVarify()
+    const otpVarify = useOtpVarify(isInline)
     const getOtpStatus = useGetOtpStatus()
     const resendOtp = useResendOtp()
 
@@ -63,7 +68,13 @@ export default function OtpVerification() {
     }, [endTime])
 
     const handleOtp = (data:OtpInputType) => {
-        otpVarify.mutate(data)
+        otpVarify.mutate(data, {
+            onSuccess: () => {
+                if (isInline && onInlineSuccess) {
+                    onInlineSuccess();
+                }
+            }
+        });
     }
 
     const handleResend = () => {
@@ -79,17 +90,21 @@ export default function OtpVerification() {
 
 
     return (
-        <div className="auth-page-wrapper">
-            <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
-                <i className="fas fa-sun"></i>
-            </button>
+        <div className={isInline ? "" : "auth-page-wrapper"}>
+            {!isInline && (
+                <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
+                    <i className="fas fa-sun"></i>
+                </button>
+            )}
             
-            <div className="auth-card-container">
-                <div className="auth-card otp-card text-center">
-                    <Link to="/" className="logo justify-center mb-5">
-                        <i className="fas fa-layer-group text-primary"></i>
-                        <span>ReverseMarket</span>
-                    </Link>
+            <div className={isInline ? "" : "auth-card-container"}>
+                <div className={`auth-card otp-card text-center ${isInline ? "w-full" : ""}`}>
+                    {!isInline && (
+                        <Link to="/" className="logo justify-center mb-5">
+                            <i className="fas fa-layer-group text-primary"></i>
+                            <span>ReverseMarket</span>
+                        </Link>
+                    )}
 
                    
 
@@ -101,7 +116,12 @@ export default function OtpVerification() {
                         </span>
                     </p>
 
-                    <form onSubmit={handleSubmit(handleOtp)}>
+                    <div onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleSubmit(handleOtp)();
+                        }
+                    }}>
                         <div className="form-group mb-6">
                             <input
                                 {...register("otp", {
@@ -117,11 +137,16 @@ export default function OtpVerification() {
                             {errors.otp && <div className="text-danger text-xs mt-2">{errors.otp.message}</div>}
                         </div>
 
-                        <button type="submit" className="btn btn-primary w-full btn-lg mb-5" disabled={otp.length !== 6}>
-                            <span>Verify Account</span>
-                            <i className="fas fa-check-circle ml-2"></i>
+                        <button 
+                            type="button" 
+                            onClick={handleSubmit(handleOtp)} 
+                            className="btn btn-primary w-full btn-lg mb-5" 
+                            disabled={otp.length !== 6 || otpVarify.isPending}
+                        >
+                            <span>{otpVarify.isPending ? "Verifying..." : "Verify Account"}</span>
+                            {!otpVarify.isPending && <i className="fas fa-check-circle ml-2"></i>}
                         </button>
-                    </form>
+                    </div>
 
                     <div className="text-center text-sm">
                         <p className="text-secondary mb-2">
@@ -137,11 +162,13 @@ export default function OtpVerification() {
                         </button>
                     </div>
 
-                    <div className="text-center text-sm border-top pt-5">
-                        <Link to="/login" className="back-link">
-                            <i className="fas fa-arrow-left mr-1"></i> Back
-                        </Link>
-                    </div>
+                    {!isInline && (
+                        <div className="text-center text-sm border-top pt-5">
+                            <Link to="/login" className="back-link">
+                                <i className="fas fa-arrow-left mr-1"></i> Back
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

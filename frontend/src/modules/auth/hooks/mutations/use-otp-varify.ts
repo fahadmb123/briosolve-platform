@@ -7,7 +7,7 @@ import { useAuthStore } from "../../../../store/auth/auth.store";
 
 import { useResetFlowStore } from "../../../../store/auth/reset-flow.store";
 
-export const useOtpVarify = () => {
+export const useOtpVarify = (isInline?: boolean) => {
     const navigate = useNavigate();
 
     return useMutation({
@@ -28,9 +28,9 @@ export const useOtpVarify = () => {
                         phone_verified: true
                     });
                 }
-                navigate(`/${response.data.path}`, { state: { activeView: 'contact' } });
+                if (!isInline) navigate(`/${response.data.path}`, { state: { activeView: 'contact' } });
             } else {
-                navigate(`/${response?.data.path}`);
+                if (!isInline && response?.data.path) navigate(`/${response.data.path}`);
             }
 
             if (response.data.path === "login" || response.data.path === "settings") {

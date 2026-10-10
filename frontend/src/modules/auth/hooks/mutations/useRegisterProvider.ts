@@ -1,17 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
 import { registerProvider } from "../../services/auth.service";
-import type { ApiError } from "../../../../../shared/api/ApiError";
 import { toast } from "react-toastify";
-import { useAuthStore } from "../../../../../store/auth/auth.store";
+import type { ApiError } from "../../../../shared/api/ApiError";
+import { useNavigate } from "react-router-dom";
 
 export const useRegisterProvider = () => {
-    const login = useAuthStore((state) => state.login);
-    
+    const navigate = useNavigate();
+
     return useMutation({
         mutationFn: registerProvider,
-        onSuccess: (response) => {
-            login(response.data.user, response.data.accessToken);
-            toast.success("Provider registered successfully!");
+        onSuccess: () => {
+            toast.success("Provider registered successfully. Please login.");
+            navigate('/login');
         },
         onError: (error: ApiError) => {
             toast.error(error.message || "Failed to register provider.");

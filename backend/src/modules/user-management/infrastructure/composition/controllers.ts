@@ -1,6 +1,7 @@
 import { AddressController } from "../../presentation/controller/address.controller.js";
 import { CustomerController } from "../../presentation/controller/customer.controller.js";
 import { UserController } from "../../presentation/controller/user.controller.js";
+import { ProviderController } from "../../presentation/controller/provider.controller.js";
 
 import {
     getCustomerUseCase,
@@ -12,7 +13,9 @@ import {
     getAddressesUseCase,
     editAddressUseCase,
     deleteAddressUseCase,
-    setDefaultAddressUseCase
+    setDefaultAddressUseCase,
+    preRegisterProviderUseCase,
+    registerProviderUseCase
 } from "./useCases.js";
 import { imageUploadService } from "./services.js";
 
@@ -34,3 +37,8 @@ export const addressController = new AddressController(
     deleteAddressUseCase,
     setDefaultAddressUseCase
 )
+
+export const providerController = new ProviderController(
+    preRegisterProviderUseCase,
+    registerProviderUseCase
+);

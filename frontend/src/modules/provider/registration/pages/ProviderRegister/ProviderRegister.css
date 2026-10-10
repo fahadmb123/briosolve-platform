@@ -82,46 +82,102 @@
     flex-shrink: 0;
 }
 
-.category-chips-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+/* Modern Services UI */
+.category-services-group {
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
 }
 
-.cat-check-chip {
+.category-divider-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background-color: var(--surface-elevated);
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
+    gap: 1rem;
+    width: 100%;
+}
+
+.category-divider-header .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+}
+
+.category-divider-header .divider-line:first-child {
+    background: linear-gradient(to left, var(--border), transparent);
+}
+
+.category-divider-header .divider-line:last-child {
+    background: linear-gradient(to right, var(--border), transparent);
+}
+
+.category-title {
+    font-size: 1rem;
+    font-weight: 700;
     color: var(--text);
-    transition: all var(--transition-fast);
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+    margin: 0;
+    padding: 0 0.5rem;
+}
+
+.modern-chips-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.modern-service-chip {
+    cursor: pointer;
     user-select: none;
 }
 
-.cat-check-chip input[type="checkbox"] {
-    accent-color: var(--primary);
-    width: 17px;
-    height: 17px;
-    cursor: pointer;
+.modern-service-chip .hidden-checkbox {
+    display: none;
 }
 
-.cat-check-chip:hover {
-    border-color: var(--primary);
+.modern-service-chip .chip-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text);
+    transition: all 0.2s ease-in-out;
+}
+
+.modern-service-chip .check-box-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: transparent;
+    transition: all 0.2s;
+}
+
+.modern-service-chip:hover .chip-content {
+    border-color: rgba(99, 102, 241, 0.4);
     background-color: var(--surface-hover);
 }
 
-.cat-check-chip:has(input:checked) {
+.modern-service-chip .hidden-checkbox:checked + .chip-content {
+    background-color: rgba(99, 102, 241, 0.05);
     border-color: var(--primary);
-    background-color: var(--primary-light);
-    color: var(--primary);
+}
+
+.modern-service-chip .hidden-checkbox:checked + .chip-content .check-box-icon {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
 }
 
 .days-chips-row {

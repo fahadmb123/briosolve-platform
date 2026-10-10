@@ -25,7 +25,14 @@ class OtpVarificationController {
 
             response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password", registrationId, registrationCookie) : null
 
-            const message = response.for.includes("UPDATE") ? 'Updated' : "Acount Created"
+            let message = "Verification Success";
+            if (response.for === "CREATE_PROVIDER") {
+                message = "Email Verified Successfully";
+            } else if (response.for.includes("UPDATE")) {
+                message = "Updated";
+            } else if (response.for === "CREATE_CUSTOMER") {
+                message = "Account Created";
+            }
 
          
             const dataToReturn = { ...response.response, path: response.path }

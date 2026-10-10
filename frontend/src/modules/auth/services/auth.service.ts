@@ -73,7 +73,12 @@ export const resetPassword = async (data:{password:string}): Promise<response<nu
     return response.data;
 }
 
-export const registerProvider = async (data: ProviderRegistrationInputType): Promise<response<{accessToken: string; user: IAuthUser}>> => {
-    const response = await apiClient.post("/api/auth/register-provider", data)
+export const registerProvider = async (data: { services: string[], experience: string, skills: string, bio: string }): Promise<response<IAuthUser>> => {
+    const response = await apiClient.post("/api/provider/register", data)
+    return response.data;
+}
+
+export const preRegisterProvider = async (data: Pick<ProviderRegistrationInputType, "fullName" | "email" | "password" | "businessName">): Promise<response<{expiresIn: number}>> => {
+    const response = await apiClient.post("/api/provider/pre-register", data)
     return response.data;
 }

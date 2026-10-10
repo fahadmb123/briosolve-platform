@@ -1,5 +1,6 @@
 export {
     userController
     ,customerController,
-    addressController
+    addressController,
+    providerController
 } from "./controllers.js";
