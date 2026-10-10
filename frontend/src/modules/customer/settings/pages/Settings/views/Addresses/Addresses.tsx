@@ -47,6 +47,7 @@ export const Addresses = () => {
       onSuccess:(res)=>{
         setAddresses((prev) => prev.filter((address) => address.id !== addressToDelete))
         setAddressToDelete(null)
+        fetchUser()
         toast.success(res.message)
       },
       onError: () => setAddressToDelete(null)
@@ -79,6 +80,7 @@ export const Addresses = () => {
       await addAddress.mutate(payload,{
         onSuccess:(response)=>{
           setAddresses((prev)=>[response.data as unknown as AddressPayload, ...prev])
+          fetchUser()
           toast.success(response.message)
         }
       })

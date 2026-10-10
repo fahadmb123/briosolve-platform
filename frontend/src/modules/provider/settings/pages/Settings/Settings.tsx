@@ -1,9 +1,14 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import './Settings.css';
 import { SettingsMenuCard } from '../../components/SettingsMenuCard';
+import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
+import { useAuthStore } from '../../../../../store/auth/auth.store';
+
+const Addresses = lazy(() => import('../../../../customer/settings/pages/Settings/views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
 
 export default function Settings() {
+  const user = useAuthStore((state) => state.user);
   const [isLocating, setIsLocating] = useState(false);
   const [activeSection, setActiveSection] = useState('grid');
 
@@ -103,6 +108,13 @@ export default function Settings() {
                             title="Privacy & Sessions"
                             description="Manage logged-in devices and public portfolio visibility."
                             onClick={() => setActiveSection('privacy')}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-map-pin"
+                            title="Manage Addresses"
+                            description="Save your business addresses for accurate local search matching."
+                            onClick={() => setActiveSection('addresses')}
+                            badge={user?.current_address_id !== null ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
                         />
                         <SettingsMenuCard
                             icon="fas fa-exclamation-triangle"
@@ -427,6 +439,12 @@ export default function Settings() {
                                 <i className="fas fa-trash-alt mr-1"></i> Deactivate Provider Account
                             </button>
                         </div>
+                        )}
+
+                        {activeSection === 'addresses' && (
+                            <Suspense fallback={<SpinnerOverlay isLoading={true} />}>
+                                <Addresses />
+                            </Suspense>
                         )}
                 </div>
                 )}
