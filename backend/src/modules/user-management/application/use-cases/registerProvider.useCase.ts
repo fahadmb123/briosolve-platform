@@ -28,7 +28,7 @@ export default class RegisterProviderUseCase implements IUseCase<CompleteProvide
             throw new ApplicationError("INVALID_REGISTRATION", "Invalid registration type", "AUTHENTICATION");
         }
 
-        // Create provider
+        
         const user = await this.providerRepository.createProvider({
             name: pendingData.name,
             email: pendingData.email,
@@ -39,7 +39,7 @@ export default class RegisterProviderUseCase implements IUseCase<CompleteProvide
             services: input.services
         });
 
-        // Delete pending registration after successful creation
+        
         await this.pendingRegistrationStore.delete(input.registrationId);
 
         return user;
