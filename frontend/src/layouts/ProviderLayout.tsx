@@ -1,6 +1,7 @@
 import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
 import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
+import '../shared/styles/pro-badge.css';
 
 export default function ProviderLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
@@ -17,8 +18,11 @@ export default function ProviderLayout() {
             <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
             <div className="sidebar-brand flex items-center justify-between">
                 <Link to="/provider/dashboard" className="logo flex items-center gap-2">
-                    <i className="fas fa-tools text-primary"></i>
-                    <span>ReverseMarket <small className="text-xs text-primary font-bold ml-1">PRO</small></span>
+                    <i className="fas fa-tools text-primary text-xl"></i>
+                    <span className="font-black text-lg" style={{ display: 'flex', alignItems: 'center' }}>
+                        ReverseMarket 
+                        <span className="pro-logo-badge ml-2">PRO</span>
+                    </span>
                 </Link>
                 <button className="btn-icon ml-auto sidebar-inner-toggle" aria-label="Toggle Sidebar" onClick={handleSidebarToggle}>
                     <i className="fas fa-bars"></i>

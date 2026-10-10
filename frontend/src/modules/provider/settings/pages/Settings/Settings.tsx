@@ -1,8 +1,11 @@
 // @ts-nocheck
 import React, { useState } from 'react';
+import './Settings.css';
+import { SettingsMenuCard } from '../../components/SettingsMenuCard';
 
 export default function Settings() {
   const [isLocating, setIsLocating] = useState(false);
+  const [activeSection, setActiveSection] = useState('grid');
 
   const handleUseCurrentLocation = () => {
       setIsLocating(true);
@@ -56,52 +59,74 @@ export default function Settings() {
                 </div>
 
                 
+                {activeSection === 'grid' && (
                 <div id="settings-grid-view">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                        <div className="card p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary transition-all shadow-sm" onClick={() => {}}>
-                            <i className="fas fa-user-shield text-4xl text-primary mb-3"></i>
-                            <h3 className="font-bold text-sm">Account &amp; Security</h3>
-                        </div>
-                        <div className="card p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary transition-all shadow-sm" onClick={() => {}}>
-                            <i className="fas fa-briefcase text-4xl text-primary mb-3"></i>
-                            <h3 className="font-bold text-sm">Business Profile</h3>
-                        </div>
-                        <div className="card p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary transition-all shadow-sm" onClick={() => {}}>
-                            <i className="fas fa-wrench text-4xl text-primary mb-3"></i>
-                            <h3 className="font-bold text-sm">Trade Services</h3>
-                        </div>
-                        <div className="card p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary transition-all shadow-sm" onClick={() => {}}>
-                            <i className="fas fa-calendar-alt text-4xl text-primary mb-3"></i>
-                            <h3 className="font-bold text-sm">Working Availability</h3>
-                        </div>
-                        <div className="card p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary transition-all shadow-sm" onClick={() => {}}>
-                            <i className="fas fa-bell text-4xl text-primary mb-3"></i>
-                            <h3 className="font-bold text-sm">Notification Triggers</h3>
-                        </div>
-                        <div className="card p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary transition-all shadow-sm" onClick={() => {}}>
-                            <i className="fas fa-map-marked-alt text-4xl text-primary mb-3"></i>
-                            <h3 className="font-bold text-sm">Service Area &amp; Radius</h3>
-                        </div>
-                        <div className="card p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary transition-all shadow-sm" onClick={() => {}}>
-                            <i className="fas fa-user-lock text-4xl text-primary mb-3"></i>
-                            <h3 className="font-bold text-sm">Privacy &amp; Security</h3>
-                        </div>
-                        <div className="card p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-danger transition-all shadow-sm" onClick={() => {}}>
-                            <i className="fas fa-exclamation-triangle text-4xl text-danger mb-3"></i>
-                            <h3 className="font-bold text-sm text-danger">Danger Zone</h3>
-                        </div>
+                    <div className="settings-glass-grid mb-6">
+                        <SettingsMenuCard
+                            icon="fas fa-user-shield"
+                            title="Account & Security"
+                            description="Configure your sign-in credentials and two-factor auth."
+                            onClick={() => setActiveSection('account')}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-briefcase"
+                            title="Business Profile"
+                            description="Update your business name, bio, and years of experience."
+                            onClick={() => setActiveSection('business')}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-wrench"
+                            title="Trade Services"
+                            description="Manage the service categories you specialize in."
+                            onClick={() => setActiveSection('services')}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-calendar-alt"
+                            title="Working Availability"
+                            description="Configure your daily business hours and specific days off."
+                            onClick={() => setActiveSection('availability')}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-bell"
+                            title="Notification Triggers"
+                            description="Choose which marketplace events send you push alerts."
+                            onClick={() => setActiveSection('notifications')}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-map-marked-alt"
+                            title="Service Area & Radius"
+                            description="Define your operating radius to only receive local jobs."
+                            onClick={() => setActiveSection('service-area')}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-user-lock"
+                            title="Privacy & Sessions"
+                            description="Manage logged-in devices and public portfolio visibility."
+                            onClick={() => setActiveSection('privacy')}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-exclamation-triangle"
+                            title="Danger Zone"
+                            description="Deactivate your account and remove your active profile."
+                            onClick={() => setActiveSection('danger')}
+                            danger={true}
+                        />
                     </div>
                 </div>
+                )}
 
                 
-                <div id="settings-detail-view" style={{"display":"none"}}>
-                    <button className="btn btn-outline btn-sm mb-4" onClick={() => {}}>
-                        <i className="fas fa-arrow-left mr-2"></i> Back to Settings Grid
-                    </button>
+                {activeSection !== 'grid' && (
+                <div id="settings-detail-view">
+                    <div className="settings-header-back" onClick={() => setActiveSection('grid')}>
+                        <i className="fas fa-arrow-left"></i>
+                        <span>Back to Settings Menu</span>
+                    </div>
                     
+                        {activeSection === 'account' && (
                         <div className="settings-card-panel" id="sec-account">
                             <h2 className="h5 mb-4">Account Information &amp; Password</h2>
-                            <div className="grid-2 gap-4 mb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="acc-email">Registered Email</label>
                                     <input type="email" id="acc-email" className="form-control" value="arjun.menon@example.com" />
@@ -129,7 +154,7 @@ export default function Settings() {
                             </div>
 
                             <h3 className="h6 mb-3 pt-3 border-top">Change Account Password</h3>
-                            <div className="grid-3 gap-4 mb-3">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="curr-pwd">Current Password</label>
                                     <input type="password" id="curr-pwd" className="form-control" placeholder="••••••••" />
@@ -147,21 +172,23 @@ export default function Settings() {
                                 Update Password
                             </button>
                         </div>
+                        )}
 
                         
+                        {activeSection === 'business' && (
                         <div className="settings-card-panel" id="sec-business">
                             <h2 className="h5 mb-4">Business Information</h2>
-                            <div className="grid-2 gap-4 mb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div className="form-group">
                                     <label className="form-label">Business / Professional Name</label>
                                     <input type="text" className="form-control" value="Apex Plumbing &amp; HVAC" />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Years of Experience</label>
-                                    <select className="form-control">
+                                    <select className="form-control" defaultValue="8 - 12 Years (Master Tech)">
                                         <option>1 - 3 Years</option>
                                         <option>4 - 7 Years</option>
-                                        <option selected>8 - 12 Years (Master Tech)</option>
+                                        <option>8 - 12 Years (Master Tech)</option>
                                         <option>12+ Years (Industry Veteran)</option>
                                     </select>
                                 </div>
@@ -171,8 +198,10 @@ export default function Settings() {
                                 <textarea className="form-control" rows="4">Licensed master technician with a decade of hands-on expertise specializing in multi-storey residential leak diagnostics, concealed sanitary overhaul, high-pressure CPVC piping, and inverter air conditioner servicing.</textarea>
                             </div>
                         </div>
+                        )}
 
                         
+                        {activeSection === 'services' && (
                         <div className="settings-card-panel" id="sec-services">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="h5 mb-0">Trade &amp; Services</h2>
@@ -185,8 +214,10 @@ export default function Settings() {
                                 
                             </div>
                         </div>
+                        )}
 
                         
+                        {activeSection === 'availability' && (
                         <div className="settings-card-panel" id="sec-availability">
                             <h2 className="h5 mb-2">Availability &amp; Work Status</h2>
                             <p className="text-xs text-secondary mb-4">Pause lead invitations when you are fully booked or on leave</p>
@@ -264,8 +295,10 @@ export default function Settings() {
                                 </div>
                             </div>
                         </div>
+                        )}
 
                         
+                        {activeSection === 'notifications' && (
                         <div className="settings-card-panel" id="sec-notifications">
                             <h2 className="h5 mb-2">Notification Preferences</h2>
                             <p className="text-xs text-secondary mb-4">Choose which marketplace events trigger real-time push alerts</p>
@@ -314,8 +347,10 @@ export default function Settings() {
                                 </label>
                             </div>
                         </div>
+                        )}
 
                         
+                        {activeSection === 'service-area' && (
                         <div className="settings-card-panel" id="sec-service-area">
                             <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
                                 <h2 className="h5 mb-0">Service Area &amp; Travel Radius</h2>
@@ -325,7 +360,7 @@ export default function Settings() {
                             </div>
                             <p className="text-xs text-secondary mb-4">Define your central dispatch location and maximum travel radius for receiving local customer requests.</p>
 
-                            <div className="grid-2 gap-4 mb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div className="p-3 bg-surface-elevated rounded border">
                                     <div className="text-xs text-secondary mb-1">Base Dispatch Location</div>
                                     <div className="font-bold text-sm text-text" id="settings-base-loc">Kodungallur, Thrissur, Kerala</div>
@@ -339,8 +374,10 @@ export default function Settings() {
                                 </div>
                             </div>
                         </div>
+                        )}
 
                         
+                        {activeSection === 'privacy' && (
                         <div className="settings-card-panel" id="sec-privacy">
                             <h2 className="h5 mb-4">Privacy &amp; Security Sessions</h2>
 
@@ -377,8 +414,10 @@ export default function Settings() {
                                 </button>
                             </div>
                         </div>
+                        )}
 
                         
+                        {activeSection === 'danger' && (
                         <div className="settings-card-panel danger-zone-box" id="sec-danger">
                             <h2 className="h5 text-danger mb-1">Danger Zone</h2>
                             <p className="text-xs text-secondary mb-3">
@@ -388,11 +427,10 @@ export default function Settings() {
                                 <i className="fas fa-trash-alt mr-1"></i> Deactivate Provider Account
                             </button>
                         </div>
-                    </div> 
+                        )}
                 </div>
-        
-    
-
+                )}
+            </div>
     
     <div className="loc-modal-overlay" id="settingsLocModal">
         <div className="loc-modal" style={{"maxWidth":"600px"}}>
@@ -505,7 +543,7 @@ export default function Settings() {
                     <p className="text-sm text-secondary mb-4 text-center">Enter the 6-digit OTP sent to your number.</p>
                     <div className="form-group mb-4">
                         <label className="text-xs font-semibold mb-1 block text-center">OTP Code</label>
-                        <input type="text" id="modal-mobile-otp" className="form-control text-center text-xl tracking-[0.5em]" placeholder="------" maxlength="6" />
+                        <input type="text" id="modal-mobile-otp" className="form-control text-center text-xl tracking-[0.5em]" placeholder="------" maxLength={6} />
                     </div>
                     <button type="button" id="modal-btn-verify-otp" className="btn btn-success w-full" onClick={() => {}}>Verify &amp; Save</button>
                     <div className="text-center mt-3">
@@ -529,7 +567,7 @@ export default function Settings() {
             <div className="loc-modal-body p-5">
                 <div className="form-group mb-4">
                     <label className="form-label font-bold">Service Category</label>
-                    <select id="modal-category-select" className="form-control" onchange="renderModalServices()">
+                    <select id="modal-category-select" className="form-control" onChange={() => {}}>
                         
                     </select>
                 </div>
