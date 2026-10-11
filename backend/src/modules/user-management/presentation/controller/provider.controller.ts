@@ -8,11 +8,15 @@ import type {
     RegisterProviderInput,
     UpdateProviderProfileInputDto,
     SetProviderAvailabilityInputDto,
-    GetProviderAvailabilityInputDto
+    GetProviderAvailabilityInputDto,
+    CreateAvailabilityOverrideInputDto,
+    GetAvailabilityOverridesInputDto,
+    DeleteAvailabilityOverrideInputDto
 } from "../../application/Dto/providerDto.js";
 import type { CompleteProviderRegistrationInput } from "../../application/use-cases/registerProvider.useCase.js";
 import type { User } from "../../domain/entities/user.entity.js";
 import type { ProviderAvailability } from "../../domain/entities/providerAvailability.entity.js";
+import type { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity.js";
 
 export class ProviderController extends BaseController {
     constructor(
@@ -20,7 +24,10 @@ export class ProviderController extends BaseController {
         private readonly registerProviderUseCase: IUseCase<CompleteProviderRegistrationInput, User>,
         private readonly updateProviderProfileUseCase: IUseCase<UpdateProviderProfileInputDto, void>,
         private readonly setProviderAvailabilityUseCase?: IUseCase<SetProviderAvailabilityInputDto, ProviderAvailability[]>,
-        private readonly getProviderAvailabilityUseCase?: IUseCase<GetProviderAvailabilityInputDto, ProviderAvailability[]>
+        private readonly getProviderAvailabilityUseCase?: IUseCase<GetProviderAvailabilityInputDto, ProviderAvailability[]>,
+        private readonly getProviderAvailabilityOverridesUseCase?: IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverride[]>,
+        private readonly createProviderAvailabilityOverrideUseCase?: IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverride>,
+        private readonly deleteProviderAvailabilityOverrideUseCase?: IUseCase<DeleteAvailabilityOverrideInputDto, void>
     ) { super(); }
 
     preRegister = async (req: Request, res: Response, next: NextFunction) => {
@@ -88,6 +95,46 @@ export class ProviderController extends BaseController {
                 slots: req.body.slots
             });
             return sendSuccess(res, "Updated!", data);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    getAvailabilityOverrides = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.getCurrentUser(req);
+            const data = await this.getProviderAvailabilityOverridesUseCase!.execute({ userId: req.user?.userId! });
+            return sendSuccess(res, "Overrides fetched successfully", data);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    createAvailabilityOverride = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.getCurrentUser(req);
+            const data = await this.createProviderAvailabilityOverrideUseCase!.execute({
+                userId: req.user?.userId!,
+                override_date: req.body.override_date,
+                type: req.body.type,
+                start_time: req.body.start_time,
+                end_time: req.body.end_time,
+                reason: req.body.reason
+            });
+            return sendSuccess(res, "Override created successfully", data);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    deleteAvailabilityOverride = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.getCurrentUser(req);
+            await this.deleteProviderAvailabilityOverrideUseCase!.execute({
+                userId: req.user?.userId!,
+                overrideId: req.params.id as string
+            });
+            return sendSuccess(res, "Override deleted successfully");
         } catch (err) {
             next(err);
         }

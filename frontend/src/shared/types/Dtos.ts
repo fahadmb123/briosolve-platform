@@ -63,3 +63,25 @@ export interface SetAvailabilitySlotPayload {
     end_time: string;
 }
 
+export type AvailabilityOverrideType = 'DAY_OFF' | 'CUSTOM_HOURS';
+
+export interface ProviderAvailabilityOverrideItem {
+    id: string;
+    provider_id: string;
+    override_date: string;
+    type: AvailabilityOverrideType;
+    start_time: string | null;
+    end_time: string | null;
+    reason: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface CreateAvailabilityOverridePayload {
+    override_date: string;
+    type: AvailabilityOverrideType;
+    start_time?: string | null;
+    end_time?: string | null;
+    reason?: string | null;
+}
+

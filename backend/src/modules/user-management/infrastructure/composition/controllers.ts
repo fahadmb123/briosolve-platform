@@ -18,7 +18,10 @@ import {
     registerProviderUseCase,
     updateProviderProfileUseCase,
     setProviderAvailabilityUseCase,
-    getProviderAvailabilityUseCase
+    getProviderAvailabilityUseCase,
+    getProviderAvailabilityOverridesUseCase,
+    createProviderAvailabilityOverrideUseCase,
+    deleteProviderAvailabilityOverrideUseCase
 } from "./useCases.js";
 import { imageUploadService } from "./services.js";
 
@@ -46,5 +49,8 @@ export const providerController = new ProviderController(
     registerProviderUseCase,
     updateProviderProfileUseCase,
     setProviderAvailabilityUseCase,
-    getProviderAvailabilityUseCase
+    getProviderAvailabilityUseCase,
+    getProviderAvailabilityOverridesUseCase,
+    createProviderAvailabilityOverrideUseCase,
+    deleteProviderAvailabilityOverrideUseCase
 );

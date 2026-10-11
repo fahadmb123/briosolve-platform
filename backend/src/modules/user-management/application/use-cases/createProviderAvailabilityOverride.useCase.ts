@@ -1,0 +1,45 @@
+import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
+import { IProviderRepository } from "../../domain/repositories/IProviderRepository.js";
+import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository.js";
+import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity.js";
+import { CreateAvailabilityOverrideInputDto } from "../Dto/providerDto.js";
+
+export default class CreateProviderAvailabilityOverrideUseCase implements IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverride> {
+    constructor(
+        private readonly providerRepository: IProviderRepository,
+        private readonly availabilityRepository: IProviderAvailabilityRepository
+    ) {}
+
+    async execute(input: CreateAvailabilityOverrideInputDto): Promise<ProviderAvailabilityOverride> {
+        const profile = await this.providerRepository.findById(input.userId);
+        if (!profile) {
+            throw new ApplicationError("PROVIDER_NOT_FOUND", "Provider profile not found", "NOT_FOUND");
+        }
+
+        const targetDate = new Date(input.override_date);
+        const targetIsoDate = targetDate.toISOString().split("T")[0];
+        const existingOverrides = await this.availabilityRepository.findOverridesByProviderId(profile.id);
+        const isDuplicate = existingOverrides.some((o) => o.override_date.toISOString().split("T")[0] === targetIsoDate);
+        if (isDuplicate) {
+            throw new ApplicationError("OVERRIDE_ALREADY_EXISTS", "An override already exists for this date", "CONFLICT");
+        }
+
+        if (input.type === "CUSTOM_HOURS") {
+            if (!input.start_time || !input.end_time) {
+                throw new ApplicationError("INVALID_HOURS", "Start time and end time are required for custom hours", "VALIDATION");
+            }
+            if (input.start_time >= input.end_time) {
+                throw new ApplicationError("INVALID_HOURS", "End time must be after start time", "VALIDATION");
+            }
+        }
+
+        return await this.availabilityRepository.createOverride(profile.id, {
+            override_date: targetDate,
+            type: input.type,
+            start_time: input.type === "CUSTOM_HOURS" ? input.start_time : null,
+            end_time: input.type === "CUSTOM_HOURS" ? input.end_time : null,
+            reason: input.reason
+        });
+    }
+}

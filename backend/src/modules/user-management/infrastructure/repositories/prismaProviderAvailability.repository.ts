@@ -1,8 +1,10 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { IProviderAvailabilityRepository, AvailabilitySlotInput } from "../../domain/repositories/IProviderAvailabilityRepository.js";
+import { IProviderAvailabilityRepository, AvailabilitySlotInput, CreateAvailabilityOverrideInput } from "../../domain/repositories/IProviderAvailabilityRepository.js";
 import { ProviderAvailability } from "../../domain/entities/providerAvailability.entity.js";
+import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity.js";
 import { ProviderAvailabilityMapper, ProviderAvailabilityRaw } from "../mappers/providerAvailability.mapper.js";
+import { ProviderAvailabilityOverrideMapper, ProviderAvailabilityOverrideRaw } from "../mappers/providerAvailabilityOverride.mapper.js";
 
 export class ProviderAvailabilityRepository implements IProviderAvailabilityRepository {
     async findByProviderId(providerId: string): Promise<ProviderAvailability[]> {
@@ -40,5 +42,42 @@ export class ProviderAvailabilityRepository implements IProviderAvailabilityRepo
         }
 
         return created;
+    }
+
+    async findOverridesByProviderId(providerId: string): Promise<ProviderAvailabilityOverride[]> {
+        const rows = await db.orm.public.provider_availability_overrides
+            .where({ provider_id: providerId as never })
+            .all();
+
+        return rows
+            .map((r) => ProviderAvailabilityOverrideMapper.toDomain(r as ProviderAvailabilityOverrideRaw))
+            .sort((a, b) => a.override_date.getTime() - b.override_date.getTime());
+    }
+
+    async createOverride(providerId: string, data: CreateAvailabilityOverrideInput): Promise<ProviderAvailabilityOverride> {
+        const raw = await db.orm.public.provider_availability_overrides.create({
+            provider_id: providerId as never,
+            override_date: Temporal.Instant.from(data.override_date.toISOString()),
+            type: data.type as never,
+            start_time: (data.start_time || null) as never,
+            end_time: (data.end_time || null) as never,
+            reason: (data.reason || null) as never,
+            created_at: Temporal.Now.instant(),
+            updated_at: Temporal.Now.instant()
+        } as never);
+
+        return ProviderAvailabilityOverrideMapper.toDomain(raw as ProviderAvailabilityOverrideRaw);
+    }
+
+    async deleteOverride(providerId: string, overrideId: string): Promise<void> {
+        const existing = await db.orm.public.provider_availability_overrides
+            .where({ id: overrideId as never, provider_id: providerId as never })
+            .first();
+
+        if (existing) {
+            await db.orm.public.provider_availability_overrides
+                .where({ id: existing.id })
+                .delete();
+        }
     }
 }

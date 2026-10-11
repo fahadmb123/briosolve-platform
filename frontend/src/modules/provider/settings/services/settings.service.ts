@@ -1,5 +1,11 @@
 import { apiClient } from "../../../../shared/api/Client";
-import type { response, ProviderAvailabilityItem, SetAvailabilitySlotPayload } from "../../../../shared/types/Dtos";
+import type {
+    response,
+    ProviderAvailabilityItem,
+    SetAvailabilitySlotPayload,
+    ProviderAvailabilityOverrideItem,
+    CreateAvailabilityOverridePayload
+} from "../../../../shared/types/Dtos";
 import type { BusinessProfileInputType } from "../schemas/validation";
 
 export interface PopulatedProviderService {
@@ -80,6 +86,21 @@ export const updateTravelBuffer = async (data: { travel_buffer_minutes: number }
 
 export const updateAcceptingLeads = async (data: { accepting_leads: boolean }): Promise<response<null>> => {
     const response = await apiClient.patch("/api/provider/profile", data);
+    return response.data;
+};
+
+export const getProviderAvailabilityOverrides = async (): Promise<response<ProviderAvailabilityOverrideItem[]>> => {
+    const response = await apiClient.get("/api/provider/availability/overrides");
+    return response.data;
+};
+
+export const createProviderAvailabilityOverride = async (data: CreateAvailabilityOverridePayload): Promise<response<ProviderAvailabilityOverrideItem>> => {
+    const response = await apiClient.post("/api/provider/availability/overrides", data);
+    return response.data;
+};
+
+export const deleteProviderAvailabilityOverride = async (id: string): Promise<response<null>> => {
+    const response = await apiClient.delete(`/api/provider/availability/overrides/${id}`);
     return response.data;
 };
 

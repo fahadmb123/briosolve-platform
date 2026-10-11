@@ -30,3 +30,24 @@ export const useUpdateAcceptingLeads = () => {
         onError: (error: ApiError) => toast.error(error.message)
     });
 };
+
+export const useGetProviderAvailabilityOverrides = () => {
+    return useMutation({
+        mutationFn: SettingsService.getProviderAvailabilityOverrides,
+        onError: (error: ApiError) => toast.error(error.message)
+    });
+};
+
+export const useCreateProviderAvailabilityOverride = () => {
+    return useMutation({
+        mutationFn: SettingsService.createProviderAvailabilityOverride,
+        onError: (error: ApiError) => toast.error(error.message)
+    });
+};
+
+export const useDeleteProviderAvailabilityOverride = () => {
+    return useMutation({
+        mutationFn: SettingsService.deleteProviderAvailabilityOverride,
+        onError: (error: ApiError) => toast.error(error.message)
+    });
+};

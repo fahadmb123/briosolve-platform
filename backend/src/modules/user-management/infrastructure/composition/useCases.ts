@@ -13,6 +13,9 @@ import UpdateProviderProfileUseCase from "../../application/use-cases/updateProv
 import UpdateUserStatusUseCase from "../../application/use-cases/updateUser.useCase.js";
 import SetProviderAvailabilityUseCase from "../../application/use-cases/setProviderAvailability.useCase.js";
 import GetProviderAvailabilityUseCase from "../../application/use-cases/getProviderAvailability.useCase.js";
+import GetProviderAvailabilityOverridesUseCase from "../../application/use-cases/getProviderAvailabilityOverrides.useCase.js";
+import CreateProviderAvailabilityOverrideUseCase from "../../application/use-cases/createProviderAvailabilityOverride.useCase.js";
+import DeleteProviderAvailabilityOverrideUseCase from "../../application/use-cases/deleteProviderAvailabilityOverride.useCase.js";
 
 import { userRepository, customerRepository, addressRepository, providerRepository, providerAvailabilityRepository } from "./repositories.js";
 import {
@@ -39,7 +42,8 @@ export const preRegisterProviderUseCase = new PreRegisterProviderUseCase(
 )
 export const registerProviderUseCase = new RegisterProviderUseCase(
     providerRepository,
-    pendingRegistrationStore
+    pendingRegistrationStore,
+    providerAvailabilityRepository
 )
 export const getCustomerUseCase = new GetCustomersUseCase(
     userRepository
@@ -81,6 +85,18 @@ export const setProviderAvailabilityUseCase = new SetProviderAvailabilityUseCase
     providerAvailabilityRepository
 );
 export const getProviderAvailabilityUseCase = new GetProviderAvailabilityUseCase(
+    providerRepository,
+    providerAvailabilityRepository
+);
+export const getProviderAvailabilityOverridesUseCase = new GetProviderAvailabilityOverridesUseCase(
+    providerRepository,
+    providerAvailabilityRepository
+);
+export const createProviderAvailabilityOverrideUseCase = new CreateProviderAvailabilityOverrideUseCase(
+    providerRepository,
+    providerAvailabilityRepository
+);
+export const deleteProviderAvailabilityOverrideUseCase = new DeleteProviderAvailabilityOverrideUseCase(
     providerRepository,
     providerAvailabilityRepository
 );
