@@ -294,4 +294,8 @@ input:checked + .slider-round:before {
     color: var(--primary);
 }
 
+.border-danger {
+    border-color: var(--danger, #ef4444) !important;
+}
+
 

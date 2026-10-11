@@ -2,6 +2,7 @@
 import React, { useState, lazy, Suspense } from 'react';
 import './Settings.css';
 import { SettingsMenuCard } from '../../components/SettingsMenuCard';
+import { ChangePasswordForm } from '../../components/ChangePasswordForm';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
 
@@ -141,7 +142,7 @@ export default function Settings() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="acc-email">Registered Email</label>
-                                    <input type="email" id="acc-email" className="form-control" value="arjun.menon@example.com" />
+                                    <input type="email" id="acc-email" className="form-control" value={user?.email || ''} disabled readOnly />
                                 </div>
                                 <div className="form-group" id="mobile-container">
                                     <label className="form-label mb-2">Mobile Number</label>
@@ -166,23 +167,7 @@ export default function Settings() {
                             </div>
 
                             <h3 className="h6 mb-3 pt-3 border-top">Change Account Password</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="curr-pwd">Current Password</label>
-                                    <input type="password" id="curr-pwd" className="form-control" placeholder="••••••••" />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="new-pwd">New Password</label>
-                                    <input type="password" id="new-pwd" className="form-control" placeholder="••••••••" />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="conf-new-pwd">Confirm New Password</label>
-                                    <input type="password" id="conf-new-pwd" className="form-control" placeholder="••••••••" />
-                                </div>
-                            </div>
-                            <button className="btn btn-secondary text-xs" onClick={() => {}}>
-                                Update Password
-                            </button>
+                            <ChangePasswordForm />
                         </div>
                         )}
 
