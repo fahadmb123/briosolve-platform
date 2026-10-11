@@ -16,72 +16,61 @@ enum active_status {
 }
 
 model users {
-  id                 Uuid               @id @default(uuid())
+  id                 Uuid                 @id @default(uuid())
   name               VarChar(100)
-  email              VarChar(255)       @unique
+  email              VarChar(255)         @unique
   password_hash      VarChar(255)
   phone              VarChar(20)?
 
   role               user_role
-  status             user_status        @default(ACTIVE)
+  status             user_status          @default(ACTIVE)
 
   email_verified     Boolean
   phone_verified     Boolean
 
   current_address_id Uuid?
 
-  created_at         DateTime           @default(now())
+  created_at         DateTime             @default(now())
   updated_at         temporal.updatedAt()
 
-  current_address    addresses?         @relation(
-    "CurrentAddress",
-    fields: [current_address_id],
-    references: [id]
-  )
+  current_address    addresses?           @relation("CurrentAddress", fields:[current_address_id], references:[id])
 
-  addresses          addresses[]        @relation("UserAddresses")
+  addresses          addresses[]          @relation("UserAddresses")
 
   customer_profile   customer_profiles?
   provider_profile   provider_profiles?
 }
 
 model provider_profiles {
-  id             Uuid                 @id @default(uuid())
-  user_id        Uuid                 @unique
-  business_name  VarChar(255)
-  experience     VarChar(100)
-  bio            VarChar(2000)
-  profile_image  VarChar(500)?
-  created_at     DateTime             @default(now())
-  updated_at     temporal.updatedAt()
+  id                Uuid                 @id @default(uuid())
+  user_id           Uuid                 @unique
+  business_name     VarChar(255)
+  experience        VarChar(100)
+  bio               VarChar(2000)
+  profile_image     VarChar(500)?
+  skills            VarChar(1000)?
+  service_radius_km Int?                 @default(20)
+  created_at        DateTime             @default(now())
+  updated_at        temporal.updatedAt()
 
-  user           users                @relation(
-    fields: [user_id],
-    references: [id]
-  )
-  services       provider_services[]
+  user              users                @relation(fields:[user_id], references:[id])
+  services          provider_services[]
 }
 
 model provider_services {
-  id          Uuid       @id @default(uuid())
+  id          Uuid              @id @default(uuid())
   provider_id Uuid
   service_id  Uuid
-  created_at  DateTime   @default(now())
-  
-  provider    provider_profiles @relation(
-    fields: [provider_id],
-    references: [id]
-  )
-  service     services          @relation(
-    fields: [service_id],
-    references: [id]
-  )
+  created_at  DateTime          @default(now())
+
+  provider    provider_profiles @relation(fields:[provider_id], references:[id])
+  service     services          @relation(fields:[service_id], references:[id])
 
   @@unique([provider_id, service_id])
 }
 
 model addresses {
-  id          Uuid            @id @default(uuid())
+  id          Uuid                 @id @default(uuid())
   user_id     Uuid
 
   house_no    VarChar(100)?
@@ -97,16 +86,12 @@ model addresses {
   latitude    Numeric(10, 7)?
   longitude   Numeric(10, 7)?
 
-  created_at  DateTime        @default(now())
+  created_at  DateTime             @default(now())
   updated_at  temporal.updatedAt()
 
-  user        users           @relation(
-    "UserAddresses",
-    fields: [user_id],
-    references: [id]
-  )
+  user        users                @relation("UserAddresses", fields:[user_id], references:[id])
 
-  current_for users[]         @relation("CurrentAddress")
+  current_for users[]              @relation("CurrentAddress")
 }
 
 model customer_profiles {
@@ -117,44 +102,33 @@ model customer_profiles {
   updated_at    temporal.updatedAt()
   about         VarChar(500)
 
-  user          users                @relation(
-    fields: [user_id],
-    references: [id]
-  )
+  user          users                @relation(fields:[user_id], references:[id])
 }
 
-
-
-
-
 model categories {
-  id          Uuid          @id @default(uuid())
-  name        VarChar(100)  @unique
+  id          Uuid                 @id @default(uuid())
+  name        VarChar(100)         @unique
   description VarChar(500)?
   image       VarChar(500)?
-  status      active_status @default(ACTIVE)
+  status      active_status        @default(ACTIVE)
 
-  created_at  DateTime      @default(now())
+  created_at  DateTime             @default(now())
   updated_at  temporal.updatedAt()
 
   services    services[]
 }
 
-
 model services {
-  id           Uuid          @id @default(uuid())
-  category_id  Uuid
+  id          Uuid                 @id @default(uuid())
+  category_id Uuid
 
-  name         VarChar(150)
-  description  VarChar(1000)?
-  image        VarChar(500)?
-  status       active_status @default(ACTIVE)
+  name        VarChar(150)
+  description VarChar(1000)?
+  image       VarChar(500)?
+  status      active_status        @default(ACTIVE)
 
-  created_at   DateTime      @default(now())
-  updated_at   temporal.updatedAt()
+  created_at  DateTime             @default(now())
+  updated_at  temporal.updatedAt()
 
-  category     categories    @relation(
-    fields: [category_id],
-    references: [id]
-  )
+  category    categories           @relation(fields:[category_id], references:[id])
 }

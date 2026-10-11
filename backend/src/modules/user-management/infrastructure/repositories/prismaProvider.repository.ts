@@ -62,6 +62,7 @@ export class ProviderRepository implements IProviderRepository {
                     experience: input.data.experience !== undefined ? input.data.experience : profile.experience,
                     bio: input.data.bio !== undefined ? input.data.bio : profile.bio,
                     profile_image: input.data.profile_image !== undefined ? input.data.profile_image : profile.profile_image,
+                    service_radius_km: input.data.service_radius_km !== undefined ? input.data.service_radius_km : profile.service_radius_km,
                     updated_at: Temporal.Now.instant()
                 } as never);
         } else {
@@ -71,6 +72,7 @@ export class ProviderRepository implements IProviderRepository {
                 experience: input.data.experience || "",
                 bio: input.data.bio || "",
                 profile_image: input.data.profile_image || null,
+                service_radius_km: input.data.service_radius_km !== undefined ? input.data.service_radius_km : 20,
                 created_at: Temporal.Now.instant(),
                 updated_at: Temporal.Now.instant()
             } as never);

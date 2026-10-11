@@ -8,5 +8,6 @@ export class ProviderProfile {
         public readonly profile_image: string | null,
         public readonly created_at: Date,
         public readonly updated_at: Date,
+        public readonly service_radius_km?: number | null
     ) {}
 }

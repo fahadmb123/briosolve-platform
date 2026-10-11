@@ -33,7 +33,12 @@ export const updatePassword = async (data: { currentPassword: string; newPasswor
     return response.data;
 };
 
-export const updateBusinessProfile = async (data: BusinessProfileInputType): Promise<response<null>> => {
+export const updateBusinessProfile = async (data: Partial<BusinessProfileInputType> & { service_radius_km?: number }): Promise<response<null>> => {
+    const response = await apiClient.patch("/api/provider/profile", data);
+    return response.data;
+};
+
+export const updateServiceRadius = async (data: { service_radius_km: number }): Promise<response<null>> => {
     const response = await apiClient.patch("/api/provider/profile", data);
     return response.data;
 };

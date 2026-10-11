@@ -66,3 +66,9 @@ export const businessProfileSchema = z.object({
 });
 
 export type BusinessProfileInputType = z.infer<typeof businessProfileSchema>;
+
+export const serviceRadiusSchema = z.object({
+  service_radius_km: z.number().int().min(1).max(500)
+});
+
+export type ServiceRadiusInputType = z.infer<typeof serviceRadiusSchema>;

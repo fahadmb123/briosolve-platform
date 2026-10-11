@@ -59,6 +59,12 @@ export const providerProfileSchema = z.object({
   profile_image: z
     .string()
     .nullable()
+    .optional(),
+  service_radius_km: z
+    .number()
+    .int({ message: "Radius must be an integer" })
+    .min(1, { message: "Radius must be at least 1 km" })
+    .max(500, { message: "Radius cannot exceed 500 km" })
     .optional()
 });
 

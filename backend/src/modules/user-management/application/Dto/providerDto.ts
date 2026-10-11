@@ -17,6 +17,7 @@ export type UpdateProviderProfileInputDataDto = {
     experience?: string;
     bio?: string;
     profile_image?: string | null;
+    service_radius_km?: number | null;
 };
 
 export type UpdateProviderProfileInputDto = {
@@ -31,6 +32,7 @@ export interface ProviderProfileRaw {
     experience: string;
     bio: string;
     profile_image: string | null;
+    service_radius_km?: number | null;
     created_at: Date | { epochMilliseconds: number } | string;
     updated_at: Date | { epochMilliseconds: number } | string;
 }

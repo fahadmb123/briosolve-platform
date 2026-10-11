@@ -576,6 +576,23 @@
                   }
                 }
               },
+              "service_radius_km": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "skills": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 1000
+                  }
+                }
+              },
               "updated_at": {
                 "nullable": false,
                 "type": {
@@ -643,6 +660,12 @@
                 },
                 "profile_image": {
                   "column": "profile_image"
+                },
+                "service_radius_km": {
+                  "column": "service_radius_km"
+                },
+                "skills": {
+                  "column": "skills"
                 },
                 "updated_at": {
                   "column": "updated_at"
@@ -1448,6 +1471,23 @@
                     "length": 500
                   }
                 },
+                "service_radius_km": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 20
+                  },
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "skills": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 1000
+                  }
+                },
                 "updated_at": {
                   "codecId": "pg/timestamptz-temporal@1",
                   "nativeType": "timestamptz",
@@ -1871,7 +1911,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "74d1c21300ed61f3b52a42d9f783c2cf77e2720414fa53278b875aedf8cbd748"
+    "storageHash": "da9fee4a5c156e482fcb6c32aca485830eca42261b8520d859b9808f9e1f1f45"
   },
   "execution": {
     "executionHash": "da645f131f6acba0ee690e273272ebedc95827b30edca415e666a35dae8d87ae",

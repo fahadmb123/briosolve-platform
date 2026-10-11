@@ -7,6 +7,7 @@ import { ChangePasswordForm } from '../../components/ChangePasswordForm';
 import { ContactInfo } from '../../components/ContactInfo';
 import { BusinessProfileForm } from '../../components/BusinessProfileForm';
 import { TradeServices } from '../../components/TradeServices';
+import { ServiceAreaRadius } from '../../components/ServiceAreaRadius';
 import { useGetProviderServices } from '../../hooks/mutations/useTradeService';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
@@ -16,10 +17,14 @@ const Addresses = lazy(() => import('../../../../customer/settings/pages/Setting
 export default function Settings() {
   const location = useLocation();
   const user = useAuthStore((state) => state.user);
-  const [isLocating, setIsLocating] = useState(false);
   const [activeSection, setActiveSection] = useState((location.state as any)?.activeSection || 'grid');
   const [tradeServicesInfo, setTradeServicesInfo] = useState<{ total: number; active: number } | null>(null);
   const getProviderServices = useGetProviderServices();
+
+  const currentAddress =
+    user?.current_address_id && typeof user.current_address_id === 'object'
+      ? user.current_address_id
+      : null;
 
   useEffect(() => {
     getProviderServices.mutate(undefined, {
@@ -53,38 +58,7 @@ export default function Settings() {
   const isContactVerified = Boolean(user?.email_verified && user?.phone_verified);
   const isAddressVerified = Boolean(user?.current_address_id);
 
-  const handleUseCurrentLocation = () => {
-      setIsLocating(true);
-      
-      if ('geolocation' in navigator) {
-          navigator.geolocation.getCurrentPosition(
-              (position) => {
-                  setTimeout(() => {
-                      setIsLocating(false);
-                      const input = document.getElementById('location-search-input') as HTMLInputElement;
-                      if (input) {
-                          input.value = `Current Location (Lat: ${position.coords.latitude.toFixed(2)}, Lng: ${position.coords.longitude.toFixed(2)})`;
-                      }
-                  }, 600);
-              },
-              (error) => {
-                  setIsLocating(false);
-                  alert("Could not access your location. Please check browser permissions.");
-              }
-          );
-      } else {
-          setIsLocating(false);
-          alert("Geolocation is not supported by your browser.");
-      }
-  };
 
-  const handleChangeLocation = () => {
-      const input = document.getElementById('location-search-input') as HTMLInputElement;
-      if (input) {
-          input.value = '';
-          input.focus();
-      }
-  };
   return (
     <>
 <div className="app-content">
@@ -139,6 +113,7 @@ export default function Settings() {
                             title="Service Area & Radius"
                             description="Define your operating radius to only receive local jobs."
                             onClick={() => setActiveSection('service-area')}
+                            badge={currentAddress ? { text: 'Configured', type: 'success' } : { text: 'Action Required', type: 'warning' }}
                         />
                         <SettingsMenuCard
                             icon="fas fa-user-lock"
@@ -348,29 +323,7 @@ export default function Settings() {
 
                         
                         {activeSection === 'service-area' && (
-                        <div className="settings-card-panel" id="sec-service-area">
-                            <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
-                                <h2 className="h5 mb-0">Service Area &amp; Travel Radius</h2>
-                                <button type="button" className="btn btn-primary btn-sm" onClick={() => {}}>
-                                    <i className="fas fa-map-pin mr-1"></i> Manage Service Area
-                                </button>
-                            </div>
-                            <p className="text-xs text-secondary mb-4">Define your central dispatch location and maximum travel radius for receiving local customer requests.</p>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div className="p-3 bg-surface-elevated rounded border">
-                                    <div className="text-xs text-secondary mb-1">Base Dispatch Location</div>
-                                    <div className="font-bold text-sm text-text" id="settings-base-loc">Kodungallur, Thrissur, Kerala</div>
-                                    <div className="text-xs text-muted mt-1" id="settings-base-coords">Coordinates: 10.2201° N, 76.2002° E</div>
-                                </div>
-
-                                <div className="p-3 bg-surface-elevated rounded border">
-                                    <div className="text-xs text-secondary mb-1">Maximum Service Radius</div>
-                                    <div className="font-bold text-sm text-primary" id="settings-radius-display">20 km Travel Radius</div>
-                                    <div className="text-xs text-muted mt-1">Lead alerts enabled within this perimeter</div>
-                                </div>
-                            </div>
-                        </div>
+                            <ServiceAreaRadius onManageAddress={() => setActiveSection('addresses')} />
                         )}
 
                         
@@ -434,102 +387,6 @@ export default function Settings() {
                 </div>
                 )}
             </div>
-    
-    <div className="loc-modal-overlay" id="settingsLocModal">
-        <div className="loc-modal" style={{"maxWidth":"600px"}}>
-            <div className="loc-modal-header">
-                <div className="flex items-center gap-2">
-                    <i className="fas fa-map-marked-alt text-primary"></i>
-                    <h3 className="h6 mb-0">Configure Service Area &amp; Coverage</h3>
-                </div>
-                <button className="btn-icon" onClick={() => {}}><i className="fas fa-times"></i></button>
-            </div>
-            <div className="loc-modal-body">
-                <div id="settings-location-picker" className="p-5">
-                    <div className="location-picker-card">
-                        {/* Search Bar */}
-                        <div className="input-with-icon mb-4">
-                            <i className="fas fa-search input-icon text-secondary" style={{ left: '1.25rem' }}></i>
-                            <input type="text" id="location-search-input" className="form-control" placeholder="Search city, locality, or landmark (e.g. Kodungallur, Thrissur, Kochi...)" style={{ backgroundColor: 'var(--surface-elevated)', border: 'none', paddingLeft: '3rem', borderRadius: 'var(--radius-md)' }} />
-                        </div>
-                        
-                        {/* Current Location & Hint */}
-                        <div className="flex justify-between items-center mb-4">
-                            <button 
-                                type="button" 
-                                className="btn btn-outline" 
-                                onClick={handleUseCurrentLocation}
-                                disabled={isLocating}
-                                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8125rem', backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border)', color: 'var(--text)' }}
-                            >
-                                {isLocating ? (
-                                    <><i className="fas fa-spinner fa-spin mr-1"></i> Locating...</>
-                                ) : (
-                                    <><i className="fas fa-crosshairs mr-1"></i> Use My Current Location</>
-                                )}
-                            </button>
-                            <span className="text-xs text-secondary flex items-center">
-                                <i className="fas fa-info-circle mr-1"></i> Click map to adjust pin position
-                            </span>
-                        </div>
-                        
-                        <hr className="mt-4 mb-4" style={{ borderColor: 'var(--border)', opacity: 0.5 }} />
-                        
-                        {/* Selected Location Box */}
-                        <div className="selected-location-box rounded-lg p-4 flex justify-between items-center mb-4" style={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border)' }}>
-                            <div className="flex items-start gap-3">
-                                <i className="fas fa-map-marker-alt text-primary text-xl mt-1"></i>
-                                <div>
-                                    <h4 className="font-bold text-sm mb-1">Kodungallur, Thrissur</h4>
-                                    <p className="text-xs text-secondary mb-0">Kerala, India</p>
-                                </div>
-                            </div>
-                            <div className="flex">
-                                <button type="button" className="btn btn-outline" onClick={handleChangeLocation} style={{ padding: '0.4rem 0.75rem', fontSize: '0.8125rem', backgroundColor: 'transparent', border: '1px solid var(--border)' }}>
-                                    <i className="fas fa-edit mr-1"></i> Change Location
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <hr className="mt-4 mb-4" style={{ borderColor: 'var(--border)', opacity: 0.5 }} />
-                        
-                        {/* Radius Section */}
-                        <div className="radius-section mt-4">
-                            <div className="flex justify-between items-center mb-4">
-                                <span className="font-medium text-sm text-secondary">Service Coverage Radius</span>
-                                <span className="font-bold text-primary">20 km</span>
-                            </div>
-                            
-                            <input type="range" className="custom-range-slider mb-2" min="5" max="50" defaultValue="20" style={{ width: '100%' }} />
-                            
-                            <div className="flex justify-between text-xs text-secondary mb-4 mt-2">
-                                <span>5 km (Local)</span>
-                                <span>25 km (Regional)</span>
-                                <span>50 km (Metro)</span>
-                            </div>
-                            
-                            <div className="text-xs text-secondary flex items-center">
-                                <i className="fas fa-compass mr-2"></i>
-                                <span>I provide services within <strong className="text-text font-bold ml-1 mr-1">20 km</strong> of my location.</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="loc-modal-footer">
-                <button type="button" className="btn btn-secondary text-xs" onClick={() => {}}>Cancel</button>
-                <button type="button" className="btn btn-primary text-xs" onClick={() => {}}>Save Preferences</button>
-            </div>
-        </div>
-    </div>
-
-
-
-
-    
-    
-    
-    
     </>
   );
 }

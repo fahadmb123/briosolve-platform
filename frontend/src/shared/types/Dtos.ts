@@ -37,6 +37,7 @@ export type ProviderProfile = {
     experience: string;
     bio: string;
     profile_image: string | null;
+    service_radius_km?: number | null;
     created_at: Temporal.Instant | string | Date;
     updated_at: Temporal.Instant | string | Date;
 };
