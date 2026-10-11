@@ -8,6 +8,7 @@ import { ContactInfo } from '../../components/ContactInfo';
 import { BusinessProfileForm } from '../../components/BusinessProfileForm';
 import { TradeServices } from '../../components/TradeServices';
 import { ServiceAreaRadius } from '../../components/ServiceAreaRadius';
+import { AvailabilitySettings } from '../../components/AvailabilitySettings';
 import { useGetProviderServices } from '../../hooks/mutations/useTradeService';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
@@ -190,83 +191,7 @@ export default function Settings() {
 
                         
                         {activeSection === 'availability' && (
-                        <div className="settings-card-panel" id="sec-availability">
-                            <h2 className="h5 mb-2">Availability &amp; Work Status</h2>
-                            <p className="text-xs text-secondary mb-4">Pause lead invitations when you are fully booked or on leave</p>
-
-                            <div className="toggle-switch-row">
-                                <div>
-                                    <div className="font-bold text-sm text-text">Accepting New Service Leads</div>
-                                    <div className="text-xs text-secondary">Your profile appears in local homeowner search results</div>
-                                </div>
-                                <label className="switch-slider-ctrl">
-                                    <input type="checkbox" checked />
-                                    <span className="slider-round"></span>
-                                </label>
-                            </div>
-
-                            <div className="toggle-switch-row">
-                                <div>
-                                    <div className="font-bold text-sm text-text">Emergency Callout Dispatch</div>
-                                    <div className="text-xs text-secondary">Receive urgent high-priority plumbing leak notices after 8:00 PM</div>
-                                </div>
-                                <label className="switch-slider-ctrl">
-                                    <input type="checkbox" checked />
-                                    <span className="slider-round"></span>
-                                </label>
-                            </div>
-
-                            
-                            <div className="mt-4 pt-3 border-top">
-                                <h3 className="h6 mb-3">Weekly Working Schedule</h3>
-                                <div id="weekly-schedule-container" className="schedule-days-container text-sm">
-                                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day, idx) => (
-                                        <div key={day} className="flex justify-between items-center p-3 mb-2 rounded-lg border" style={{ backgroundColor: 'var(--surface-elevated)', borderColor: 'var(--border)' }}>
-                                            <label className="flex items-center cursor-pointer mb-0" style={{ flex: '1', gap: '0.75rem' }}>
-                                                <input type="checkbox" style={{ accentColor: 'var(--primary)', width: '16px', height: '16px', cursor: 'pointer' }} defaultChecked={true} />
-                                                <span className="font-medium text-text">{day}</span>
-                                            </label>
-                                            <div className="flex items-center justify-end" style={{ flex: '2', gap: '0.5rem' }}>
-                                                <input type="time" defaultValue="09:00" className="form-control" style={{ padding: '0.35rem 0.5rem', width: '110px', backgroundColor: 'var(--surface)', fontSize: '0.8125rem' }} />
-                                                <span className="text-secondary text-xs font-medium">to</span>
-                                                <input type="time" defaultValue="17:00" className="form-control" style={{ padding: '0.35rem 0.5rem', width: '110px', backgroundColor: 'var(--surface)', fontSize: '0.8125rem' }} />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            
-                            <div className="mt-4 pt-3 border-top">
-                                <div className="flex justify-between items-center mb-3">
-                                    <h3 className="h6 mb-0">Specific Date Overrides</h3>
-                                    <button className="btn btn-outline btn-xs" onClick={() => {}}>Add Date Override</button>
-                                </div>
-                                <p className="text-xs text-secondary mb-3">Set custom hours or take a specific day off. This overrides your weekly schedule.</p>
-                                
-                                <div id="date-overrides-container">
-                                    <div className="text-center p-5 border rounded-lg" style={{ borderColor: 'var(--border)', borderStyle: 'dashed', backgroundColor: 'transparent' }}>
-                                        <i className="fas fa-calendar-times text-secondary mb-2 text-xl opacity-50"></i>
-                                        <p className="text-xs text-secondary mb-0">No overrides added yet. Click "Add Date Override" to set holidays or custom off-days.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            
-                            <div className="mt-4 pt-3 border-top">
-                                <div className="form-group mb-0">
-                                    <label className="form-label">Travel Buffer Time (Minutes)</label>
-                                    <p className="text-xs text-secondary mb-2">Time reserved between jobs to account for travel and delays.</p>
-                                    <select id="buffer-time-select" className="form-control text-sm" style={{"width":"150px"}}>
-                                        <option value="0">0 mins</option>
-                                        <option value="15">15 mins</option>
-                                        <option value="30">30 mins</option>
-                                        <option value="45">45 mins</option>
-                                        <option value="60">60 mins</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                            <AvailabilitySettings />
                         )}
 
                         

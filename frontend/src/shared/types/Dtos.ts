@@ -39,7 +39,27 @@ export type ProviderProfile = {
     bio: string;
     profile_image: string | null;
     service_radius_km?: number | null;
+    accepting_leads?: boolean;
+    travel_buffer_minutes?: number;
     created_at: Temporal.Instant | string | Date;
     updated_at: Temporal.Instant | string | Date;
 };
+
+export type Weekday = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
+
+export interface ProviderAvailabilityItem {
+    id: string;
+    provider_id: string;
+    day_of_week: Weekday;
+    start_time: string;
+    end_time: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface SetAvailabilitySlotPayload {
+    day_of_week: Weekday;
+    start_time: string;
+    end_time: string;
+}
 

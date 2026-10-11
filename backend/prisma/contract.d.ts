@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'4514b1d9dda71a6c3d9cdd0128ea399bb08fe9c09a369be2b7a322593b2e28fb'>;
+  StorageHashBase<'31a9261b161bab8ca1def100afa47c48e6dd7e316b2d3784cd7403dbceaa997d'>;
 export type ExecutionHash =
-  ExecutionHashBase<'da645f131f6acba0ee690e273272ebedc95827b30edca415e666a35dae8d87ae'>;
+  ExecutionHashBase<'2c0614e863f67bd4f7783b7ab064ce4b276835e6f9489613c5129fb95c37cddf'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -277,6 +277,27 @@ export type FieldOutputTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly about: Varchar<500>;
     };
+    readonly provider_availability: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly day_of_week:
+        'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
+      readonly start_time: Varchar<5>;
+      readonly end_time: Varchar<5>;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
+    readonly provider_availability_overrides: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly override_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly type: 'DAY_OFF' | 'CUSTOM_HOURS';
+      readonly start_time: Varchar<5> | null;
+      readonly end_time: Varchar<5> | null;
+      readonly reason: Varchar<255> | null;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
     readonly provider_profiles: {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
@@ -286,6 +307,8 @@ export type FieldOutputTypes = {
       readonly profile_image: Varchar<500> | null;
       readonly skills: Varchar<1000> | null;
       readonly service_radius_km: CodecTypes['pg/int4@1']['output'] | null;
+      readonly accepting_leads: CodecTypes['pg/bool@1']['output'];
+      readonly travel_buffer_minutes: CodecTypes['pg/int4@1']['output'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -358,6 +381,27 @@ export type FieldInputTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly about: CodecTypes['sql/varchar@1']['input'];
     };
+    readonly provider_availability: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly day_of_week:
+        'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
+      readonly start_time: CodecTypes['sql/varchar@1']['input'];
+      readonly end_time: CodecTypes['sql/varchar@1']['input'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly provider_availability_overrides: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly override_date: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly type: 'DAY_OFF' | 'CUSTOM_HOURS';
+      readonly start_time: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly end_time: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly reason: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
     readonly provider_profiles: {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
@@ -367,6 +411,8 @@ export type FieldInputTypes = {
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
       readonly skills: CodecTypes['sql/varchar@1']['input'] | null;
       readonly service_radius_km: CodecTypes['pg/int4@1']['input'] | null;
+      readonly accepting_leads: CodecTypes['pg/bool@1']['input'];
+      readonly travel_buffer_minutes: CodecTypes['pg/int4@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -439,7 +485,29 @@ export type StorageColumnTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
     };
+    readonly provider_availability: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly day_of_week:
+        'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
+      readonly end_time: Varchar<5>;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly start_time: Varchar<5>;
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
+    readonly provider_availability_overrides: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly end_time: Varchar<5> | null;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly override_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly reason: Varchar<255> | null;
+      readonly start_time: Varchar<5> | null;
+      readonly type: 'DAY_OFF' | 'CUSTOM_HOURS';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
     readonly provider_profiles: {
+      readonly accepting_leads: CodecTypes['pg/bool@1']['output'];
       readonly bio: Varchar<2000>;
       readonly business_name: Varchar<255>;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -448,6 +516,7 @@ export type StorageColumnTypes = {
       readonly profile_image: Varchar<500> | null;
       readonly service_radius_km: CodecTypes['pg/int4@1']['output'] | null;
       readonly skills: Varchar<1000> | null;
+      readonly travel_buffer_minutes: CodecTypes['pg/int4@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
     };
@@ -520,7 +589,29 @@ export type StorageColumnInputTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
     };
+    readonly provider_availability: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly day_of_week:
+        'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
+      readonly end_time: CodecTypes['sql/varchar@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly start_time: CodecTypes['sql/varchar@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly provider_availability_overrides: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly end_time: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly override_date: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly reason: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly start_time: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly type: 'DAY_OFF' | 'CUSTOM_HOURS';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
     readonly provider_profiles: {
+      readonly accepting_leads: CodecTypes['pg/bool@1']['input'];
       readonly bio: CodecTypes['sql/varchar@1']['input'];
       readonly business_name: CodecTypes['sql/varchar@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -529,6 +620,7 @@ export type StorageColumnInputTypes = {
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
       readonly service_radius_km: CodecTypes['pg/int4@1']['input'] | null;
       readonly skills: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly travel_buffer_minutes: CodecTypes['pg/int4@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
     };
@@ -595,11 +687,39 @@ export namespace Models {
     profile_image: Varchar<500> | null;
     skills: Varchar<1000> | null;
     service_radius_km: CodecTypes['pg/int4@1']['output'] | null;
+    accepting_leads: CodecTypes['pg/bool@1']['output'];
+    travel_buffer_minutes: CodecTypes['pg/int4@1']['output'];
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    availabilities: public_provider_availability[];
+    overrides: public_provider_availability_overrides[];
     services: public_provider_services[];
     user: public_users;
-    readonly [RelationKeys]?: 'services' | 'user';
+    readonly [RelationKeys]?: 'availabilities' | 'overrides' | 'services' | 'user';
+  };
+  export type public_provider_availability = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    provider_id: CodecTypes['pg/uuid@1']['output'];
+    day_of_week: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
+    start_time: Varchar<5>;
+    end_time: Varchar<5>;
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    provider: public_provider_profiles;
+    readonly [RelationKeys]?: 'provider';
+  };
+  export type public_provider_availability_overrides = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    provider_id: CodecTypes['pg/uuid@1']['output'];
+    override_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    type: 'DAY_OFF' | 'CUSTOM_HOURS';
+    start_time: Varchar<5> | null;
+    end_time: Varchar<5> | null;
+    reason: Varchar<255> | null;
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    provider: public_provider_profiles;
+    readonly [RelationKeys]?: 'provider';
   };
   export type public_provider_services = {
     id: CodecTypes['pg/uuid@1']['output'];
@@ -670,6 +790,8 @@ export declare const models: {
   public: {
     users: Models.public_users;
     provider_profiles: Models.public_provider_profiles;
+    provider_availability: Models.public_provider_availability;
+    provider_availability_overrides: Models.public_provider_availability_overrides;
     provider_services: Models.public_provider_services;
     addresses: Models.public_addresses;
     customer_profiles: Models.public_customer_profiles;
@@ -925,6 +1047,149 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly provider_availability: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly provider_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly day_of_week: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly start_time: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 5 };
+                };
+                readonly end_time: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 5 };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updated_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'provider_availability_provider_id_idx_d89e110d';
+                  readonly prefix: 'provider_availability_provider_id_idx';
+                  readonly columns: readonly ['provider_id'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_availability';
+                    readonly columns: readonly ['provider_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_profiles';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly provider_availability_overrides: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly provider_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly override_date: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+                readonly type: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly start_time: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 5 };
+                };
+                readonly end_time: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 5 };
+                };
+                readonly reason: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 255 };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updated_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'provider_availability_overrides_provider_id_idx_d89e110d';
+                  readonly prefix: 'provider_availability_overrides_provider_id_idx';
+                  readonly columns: readonly ['provider_id'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_availability_overrides';
+                    readonly columns: readonly ['provider_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_profiles';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly provider_profiles: {
               columns: {
                 readonly id: {
@@ -974,6 +1239,24 @@ type ContractBase = Omit<
                   readonly default: {
                     readonly kind: 'literal';
                     readonly value: DefaultLiteralValue<'pg/int4@1', 20>;
+                  };
+                };
+                readonly accepting_leads: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
+                  };
+                };
+                readonly travel_buffer_minutes: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 30>;
                   };
                 };
                 readonly created_at: {
@@ -1252,6 +1535,10 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['ACTIVE', 'INACTIVE'];
             };
+            readonly availability_override_type: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['DAY_OFF', 'CUSTOM_HOURS'];
+            };
             readonly user_role: {
               readonly kind: 'valueSet';
               readonly values: readonly ['CUSTOMER', 'PROVIDER', 'ADMIN'];
@@ -1259,6 +1546,18 @@ type ContractBase = Omit<
             readonly user_status: {
               readonly kind: 'valueSet';
               readonly values: readonly ['ACTIVE', 'INACTIVE', 'BLOCKED'];
+            };
+            readonly weekday: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'MONDAY',
+                'TUESDAY',
+                'WEDNESDAY',
+                'THURSDAY',
+                'FRIDAY',
+                'SATURDAY',
+                'SUNDAY',
+              ];
             };
           };
         };
@@ -1275,6 +1574,14 @@ type ContractBase = Omit<
     readonly provider_profiles: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'provider_profiles';
+    };
+    readonly provider_availability: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'provider_availability';
+    };
+    readonly provider_availability_overrides: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'provider_availability_overrides';
     };
     readonly provider_services: {
       readonly namespace: 'public' & NamespaceId;
@@ -1604,6 +1911,169 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly provider_availability: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly provider_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly day_of_week: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly start_time: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 5 };
+                };
+              };
+              readonly end_time: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 5 };
+                };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly updated_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly provider: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_profiles';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['provider_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'provider_availability';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly provider_id: { readonly column: 'provider_id' };
+                readonly day_of_week: { readonly column: 'day_of_week' };
+                readonly start_time: { readonly column: 'start_time' };
+                readonly end_time: { readonly column: 'end_time' };
+                readonly created_at: { readonly column: 'created_at' };
+                readonly updated_at: { readonly column: 'updated_at' };
+              };
+            };
+          };
+          readonly provider_availability_overrides: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly provider_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly override_date: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly type: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly start_time: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 5 };
+                };
+              };
+              readonly end_time: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 5 };
+                };
+              };
+              readonly reason: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 255 };
+                };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly updated_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly provider: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_profiles';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['provider_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'provider_availability_overrides';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly provider_id: { readonly column: 'provider_id' };
+                readonly override_date: { readonly column: 'override_date' };
+                readonly type: { readonly column: 'type' };
+                readonly start_time: { readonly column: 'start_time' };
+                readonly end_time: { readonly column: 'end_time' };
+                readonly reason: { readonly column: 'reason' };
+                readonly created_at: { readonly column: 'created_at' };
+                readonly updated_at: { readonly column: 'updated_at' };
+              };
+            };
+          };
           readonly provider_profiles: {
             readonly fields: {
               readonly id: {
@@ -1658,6 +2128,14 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
+              readonly accepting_leads: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly travel_buffer_minutes: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
               readonly created_at: {
                 readonly nullable: false;
                 readonly type: {
@@ -1674,6 +2152,28 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
+              readonly availabilities: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_availability';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['provider_id'];
+                };
+              };
+              readonly overrides: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_availability_overrides';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['provider_id'];
+                };
+              };
               readonly services: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -1710,6 +2210,8 @@ type ContractBase = Omit<
                 readonly profile_image: { readonly column: 'profile_image' };
                 readonly skills: { readonly column: 'skills' };
                 readonly service_radius_km: { readonly column: 'service_radius_km' };
+                readonly accepting_leads: { readonly column: 'accepting_leads' };
+                readonly travel_buffer_minutes: { readonly column: 'travel_buffer_minutes' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
               };
@@ -2022,6 +2524,25 @@ type ContractBase = Omit<
               { readonly name: 'INACTIVE'; readonly value: 'INACTIVE' },
             ];
           };
+          readonly weekday: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'MONDAY'; readonly value: 'MONDAY' },
+              { readonly name: 'TUESDAY'; readonly value: 'TUESDAY' },
+              { readonly name: 'WEDNESDAY'; readonly value: 'WEDNESDAY' },
+              { readonly name: 'THURSDAY'; readonly value: 'THURSDAY' },
+              { readonly name: 'FRIDAY'; readonly value: 'FRIDAY' },
+              { readonly name: 'SATURDAY'; readonly value: 'SATURDAY' },
+              { readonly name: 'SUNDAY'; readonly value: 'SUNDAY' },
+            ];
+          };
+          readonly availability_override_type: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'DAY_OFF'; readonly value: 'DAY_OFF' },
+              { readonly name: 'CUSTOM_HOURS'; readonly value: 'CUSTOM_HOURS' },
+            ];
+          };
         };
       };
     };
@@ -2095,6 +2616,40 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'customer_profiles';
+            readonly column: 'updated_at';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'provider_availability';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'provider_availability';
+            readonly column: 'updated_at';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'provider_availability_overrides';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'provider_availability_overrides';
             readonly column: 'updated_at';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };

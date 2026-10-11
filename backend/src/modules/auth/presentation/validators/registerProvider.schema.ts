@@ -65,6 +65,15 @@ export const providerProfileSchema = z.object({
     .int({ message: "Radius must be an integer" })
     .min(1, { message: "Radius must be at least 1 km" })
     .max(500, { message: "Radius cannot exceed 500 km" })
+    .optional(),
+  travel_buffer_minutes: z
+    .number()
+    .int({ message: "Buffer must be an integer" })
+    .min(30, { message: "Travel buffer must be at least 30 minutes" })
+    .max(120, { message: "Travel buffer cannot exceed 120 minutes" })
+    .optional(),
+  accepting_leads: z
+    .boolean()
     .optional()
 });
 

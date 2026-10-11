@@ -35,7 +35,7 @@ export class UserController extends BaseController{
             this.getCurrentUser(req)
             await this.updateUserUseCase.execute({id:req.params.id as string,status:req.body.status})
 
-            return sendSuccess(res,"User Updated")
+            return sendSuccess(res,"Updated!")
         } catch (err) {
             next(err)
         }

@@ -63,6 +63,8 @@ export class ProviderRepository implements IProviderRepository {
                     bio: input.data.bio !== undefined ? input.data.bio : profile.bio,
                     profile_image: input.data.profile_image !== undefined ? input.data.profile_image : profile.profile_image,
                     service_radius_km: input.data.service_radius_km !== undefined ? input.data.service_radius_km : profile.service_radius_km,
+                    accepting_leads: input.data.accepting_leads !== undefined ? input.data.accepting_leads : profile.accepting_leads,
+                    travel_buffer_minutes: input.data.travel_buffer_minutes !== undefined ? input.data.travel_buffer_minutes : profile.travel_buffer_minutes,
                     updated_at: Temporal.Now.instant()
                 } as never);
         } else {
@@ -73,6 +75,8 @@ export class ProviderRepository implements IProviderRepository {
                 bio: input.data.bio || "",
                 profile_image: input.data.profile_image || null,
                 service_radius_km: input.data.service_radius_km !== undefined ? input.data.service_radius_km : 20,
+                accepting_leads: input.data.accepting_leads !== undefined ? input.data.accepting_leads : true,
+                travel_buffer_minutes: input.data.travel_buffer_minutes !== undefined ? input.data.travel_buffer_minutes : 30,
                 created_at: Temporal.Now.instant(),
                 updated_at: Temporal.Now.instant()
             } as never);

@@ -60,7 +60,7 @@ export class CustomerController extends BaseController{
             this.getCurrentUser(req)
             await this.updateCustomerProfileUseCase.execute({id:req.user?.userId!,data:req.body})
 
-            return sendSuccess(res,"Updated")
+            return sendSuccess(res,"Updated!")
         } catch (err) {
             next(err)
         }
@@ -77,7 +77,7 @@ export class CustomerController extends BaseController{
                 data: { profile_image: imageUrl }
             })
 
-            return sendSuccess(res,"updated", { profile_image: imageUrl })
+            return sendSuccess(res,"Updated!", { profile_image: imageUrl })
         } catch (err) {
             next(err)
         }
@@ -95,7 +95,7 @@ export class CustomerController extends BaseController{
                 data: { profile_image: "" }
             })
 
-            return sendSuccess(res,"deleted", { profile_image: null })
+            return sendSuccess(res,"Deleted!", { profile_image: null })
         } catch (err) {
             next(err)
         }

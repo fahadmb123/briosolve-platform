@@ -1,5 +1,5 @@
 import { apiClient } from "../../../../shared/api/Client";
-import type { response } from "../../../../shared/types/Dtos";
+import type { response, ProviderAvailabilityItem, SetAvailabilitySlotPayload } from "../../../../shared/types/Dtos";
 import type { BusinessProfileInputType } from "../schemas/validation";
 
 export interface PopulatedProviderService {
@@ -60,6 +60,26 @@ export const deleteProviderService = async (id: string): Promise<response<Popula
 
 export const deleteProviderCategory = async (categoryId: string): Promise<response<PopulatedProviderService[]>> => {
     const response = await apiClient.delete(`/api/provider/service/category/${categoryId}`);
+    return response.data;
+};
+
+export const getProviderAvailability = async (): Promise<response<ProviderAvailabilityItem[]>> => {
+    const response = await apiClient.get("/api/provider/availability");
+    return response.data;
+};
+
+export const setProviderAvailability = async (slots: SetAvailabilitySlotPayload[]): Promise<response<ProviderAvailabilityItem[]>> => {
+    const response = await apiClient.put("/api/provider/availability", { slots });
+    return response.data;
+};
+
+export const updateTravelBuffer = async (data: { travel_buffer_minutes: number }): Promise<response<null>> => {
+    const response = await apiClient.patch("/api/provider/profile", data);
+    return response.data;
+};
+
+export const updateAcceptingLeads = async (data: { accepting_leads: boolean }): Promise<response<null>> => {
+    const response = await apiClient.patch("/api/provider/profile", data);
     return response.data;
 };
 

@@ -1,3 +1,5 @@
+import { Weekday } from "../../domain/entities/providerAvailability.entity.js";
+
 export type EmailVerificationUseCaseOutputDto = {
     expiresIn: number;
     registrationId: string;
@@ -18,6 +20,8 @@ export type UpdateProviderProfileInputDataDto = {
     bio?: string;
     profile_image?: string | null;
     service_radius_km?: number | null;
+    accepting_leads?: boolean;
+    travel_buffer_minutes?: number;
 };
 
 export type UpdateProviderProfileInputDto = {
@@ -33,6 +37,23 @@ export interface ProviderProfileRaw {
     bio: string;
     profile_image: string | null;
     service_radius_km?: number | null;
+    accepting_leads?: boolean;
+    travel_buffer_minutes?: number;
     created_at: Date | { epochMilliseconds: number } | string;
     updated_at: Date | { epochMilliseconds: number } | string;
+}
+
+export interface AvailabilitySlotDto {
+    day_of_week: Weekday;
+    start_time: string;
+    end_time: string;
+}
+
+export interface SetProviderAvailabilityInputDto {
+    userId: string;
+    slots: AvailabilitySlotDto[];
+}
+
+export interface GetProviderAvailabilityInputDto {
+    userId: string;
 }

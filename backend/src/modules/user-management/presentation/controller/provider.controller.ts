@@ -3,15 +3,24 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import type { EmailVerificationUseCaseOutputDto, RegisterProviderInput, UpdateProviderProfileInputDto } from "../../application/Dto/providerDto.js";
+import type {
+    EmailVerificationUseCaseOutputDto,
+    RegisterProviderInput,
+    UpdateProviderProfileInputDto,
+    SetProviderAvailabilityInputDto,
+    GetProviderAvailabilityInputDto
+} from "../../application/Dto/providerDto.js";
 import type { CompleteProviderRegistrationInput } from "../../application/use-cases/registerProvider.useCase.js";
 import type { User } from "../../domain/entities/user.entity.js";
+import type { ProviderAvailability } from "../../domain/entities/providerAvailability.entity.js";
 
 export class ProviderController extends BaseController {
     constructor(
         private readonly preRegisterProviderUseCase: IUseCase<RegisterProviderInput, EmailVerificationUseCaseOutputDto>,
         private readonly registerProviderUseCase: IUseCase<CompleteProviderRegistrationInput, User>,
-        private readonly updateProviderProfileUseCase: IUseCase<UpdateProviderProfileInputDto, void>
+        private readonly updateProviderProfileUseCase: IUseCase<UpdateProviderProfileInputDto, void>,
+        private readonly setProviderAvailabilityUseCase?: IUseCase<SetProviderAvailabilityInputDto, ProviderAvailability[]>,
+        private readonly getProviderAvailabilityUseCase?: IUseCase<GetProviderAvailabilityInputDto, ProviderAvailability[]>
     ) { super(); }
 
     preRegister = async (req: Request, res: Response, next: NextFunction) => {
@@ -55,7 +64,30 @@ export class ProviderController extends BaseController {
         try {
             this.getCurrentUser(req);
             await this.updateProviderProfileUseCase.execute({ id: req.user?.userId!, data: req.body });
-            return sendSuccess(res, "Updated");
+            return sendSuccess(res, "Updated!");
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    getAvailability = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.getCurrentUser(req);
+            const data = await this.getProviderAvailabilityUseCase!.execute({ userId: req.user?.userId! });
+            return sendSuccess(res, "Provider availability fetched successfully", data);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    setAvailability = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.getCurrentUser(req);
+            const data = await this.setProviderAvailabilityUseCase!.execute({
+                userId: req.user?.userId!,
+                slots: req.body.slots
+            });
+            return sendSuccess(res, "Updated!", data);
         } catch (err) {
             next(err);
         }

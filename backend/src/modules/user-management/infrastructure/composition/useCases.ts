@@ -11,8 +11,10 @@ import { SetDefaultAddressUseCase } from "../../application/use-cases/setDefaull
 import UpdateCustomerProfileUseCase from "../../application/use-cases/updateCustomerProfile.useCase.js";
 import UpdateProviderProfileUseCase from "../../application/use-cases/updateProviderProfile.useCase.js";
 import UpdateUserStatusUseCase from "../../application/use-cases/updateUser.useCase.js";
+import SetProviderAvailabilityUseCase from "../../application/use-cases/setProviderAvailability.useCase.js";
+import GetProviderAvailabilityUseCase from "../../application/use-cases/getProviderAvailability.useCase.js";
 
-import { userRepository, customerRepository, addressRepository, providerRepository } from "./repositories.js";
+import { userRepository, customerRepository, addressRepository, providerRepository, providerAvailabilityRepository } from "./repositories.js";
 import {
     passwordHasher,
     otpGenerate,
@@ -73,4 +75,12 @@ export const deleteAddressUseCase = new DeleteAddressUseCase(
 )
 export const setDefaultAddressUseCase = new SetDefaultAddressUseCase(
     userRepository
-)
+);
+export const setProviderAvailabilityUseCase = new SetProviderAvailabilityUseCase(
+    providerRepository,
+    providerAvailabilityRepository
+);
+export const getProviderAvailabilityUseCase = new GetProviderAvailabilityUseCase(
+    providerRepository,
+    providerAvailabilityRepository
+);

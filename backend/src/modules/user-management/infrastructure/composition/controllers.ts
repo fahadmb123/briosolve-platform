@@ -16,7 +16,9 @@ import {
     setDefaultAddressUseCase,
     preRegisterProviderUseCase,
     registerProviderUseCase,
-    updateProviderProfileUseCase
+    updateProviderProfileUseCase,
+    setProviderAvailabilityUseCase,
+    getProviderAvailabilityUseCase
 } from "./useCases.js";
 import { imageUploadService } from "./services.js";
 
@@ -42,5 +44,7 @@ export const addressController = new AddressController(
 export const providerController = new ProviderController(
     preRegisterProviderUseCase,
     registerProviderUseCase,
-    updateProviderProfileUseCase
+    updateProviderProfileUseCase,
+    setProviderAvailabilityUseCase,
+    getProviderAvailabilityUseCase
 );

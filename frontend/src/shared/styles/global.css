@@ -1317,6 +1317,7 @@ input::-ms-clear {
     font-family: var(--font-family) !important;
     padding: 0.75rem 1rem !important;
     margin-bottom: 1rem !important;
+    text-align: center !important;
 }
 
 .custom-premium-toast .Toastify__toast-body {
@@ -1324,6 +1325,13 @@ input::-ms-clear {
     font-size: 0.875rem !important;
     font-weight: 500 !important;
     color: var(--text) !important;
+    text-align: center !important;
+    justify-content: center !important;
+}
+
+.custom-premium-toast .Toastify__toast-body > div:last-child {
+    text-align: center !important;
+    width: 100% !important;
 }
 
 .custom-premium-toast .Toastify__close-button {
