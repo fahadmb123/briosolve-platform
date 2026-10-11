@@ -1,1 +1,1 @@
-export {categoryController} from "./controller.js"
+export { categoryController, serviceController, providerServiceController } from "./controller.js"

@@ -6,6 +6,7 @@ import { SettingsMenuCard } from '../../components/SettingsMenuCard';
 import { ChangePasswordForm } from '../../components/ChangePasswordForm';
 import { ContactInfo } from '../../components/ContactInfo';
 import { BusinessProfileForm } from '../../components/BusinessProfileForm';
+import { TradeServices } from '../../components/TradeServices';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
 
@@ -187,16 +188,11 @@ export default function Settings() {
                         
                         {activeSection === 'services' && (
                         <div className="settings-card-panel" id="sec-services">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="h5 mb-0">Trade &amp; Services</h2>
-                                <button type="button" className="btn btn-outline btn-sm" onClick={() => {}}>
-                                    <i className="fas fa-plus mr-1"></i> Add Service Category
-                                </button>
+                            <div className="mb-5">
+                                <h2 className="h5 mb-1">Trade &amp; Services</h2>
+                                <p className="text-xs text-secondary">Manage your trade categories, specialized skills, and active service offerings.</p>
                             </div>
-                            
-                            <div id="display-services-container" className="flex flex-col gap-4">
-                                
-                            </div>
+                            <TradeServices />
                         </div>
                         )}
 
@@ -511,37 +507,7 @@ export default function Settings() {
     </div>
 
 
-    
-    <div className="loc-modal-overlay" id="servicesEditModal">
-        <div className="loc-modal" style={{"maxWidth":"500px"}}>
-            <div className="loc-modal-header">
-                <div className="flex items-center gap-2">
-                    <i className="fas fa-wrench text-primary"></i>
-                    <h3 className="h6 mb-0">Edit Trade &amp; Services</h3>
-                </div>
-                <button className="btn-icon" onClick={() => {}}><i className="fas fa-times"></i></button>
-            </div>
-            <div className="loc-modal-body p-5">
-                <div className="form-group mb-4">
-                    <label className="form-label font-bold">Service Category</label>
-                    <select id="modal-category-select" className="form-control" onChange={() => {}}>
-                        
-                    </select>
-                </div>
-                
-                <div className="form-group mb-0">
-                    <label className="form-label font-bold">Available Services</label>
-                    <div id="modal-services-container" className="bg-surface-elevated border rounded p-3" style={{"maxHeight":"250px","overflowY":"auto"}}>
-                        
-                    </div>
-                </div>
-            </div>
-            <div className="loc-modal-footer">
-                <button type="button" className="btn btn-secondary text-xs" onClick={() => {}}>Cancel</button>
-                <button type="button" className="btn btn-primary text-xs" onClick={() => {}}>Save Changes</button>
-            </div>
-        </div>
-    </div>
+
 
     
     

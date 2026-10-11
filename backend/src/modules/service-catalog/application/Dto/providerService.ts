@@ -1,0 +1,7 @@
+export interface ProviderServiceRaw {
+    id: string;
+    provider_id: string;
+    service_id: string;
+    created_at: Date | { epochMilliseconds: number } | string;
+    service?: unknown;
+}
