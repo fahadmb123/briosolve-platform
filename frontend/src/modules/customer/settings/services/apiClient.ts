@@ -29,3 +29,8 @@ export const deletePhone = async (): Promise<response<null>> => {
     const response = await apiClient.delete("/api/auth/phone")
     return response.data
 }
+
+export const updateServiceRadius = async (data: { service_radius_km: number }): Promise<response<null>> => {
+    const response = await apiClient.patch("/api/customer/profile", data);
+    return response.data;
+};

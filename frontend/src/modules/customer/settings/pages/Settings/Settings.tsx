@@ -15,13 +15,17 @@ const Addresses = lazy(() => import('./views/Addresses/Addresses').then(m => ({ 
 
 
 
-type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notifications' | 'location' | 'privacy' | 'addresses';
+type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notifications' | 'location' | 'service-area' | 'privacy' | 'addresses';
 
 export default function Settings() {
     const location = useLocation();
     const [activeView, setActiveView] = useState<SettingsView>(location.state?.activeView || 'menu');
     const user = useAuthStore((state) => state.user);
     const isContactVerified = user?.email_verified && user?.phone_verified;
+    const currentAddress =
+        user?.current_address_id && typeof user.current_address_id === 'object'
+            ? user.current_address_id
+            : null;
 
     const renderMenu = () => (
         <div className="settings-glass-grid">
@@ -55,10 +59,11 @@ export default function Settings() {
             />
 
             <SettingsMenuCard
-                icon="fas fa-map-marker-alt"
-                title="Location Preferences"
-                description="Manage default address auto-fill and browser GPS permission preferences."
-                onClick={() => setActiveView('location')}
+                icon="fas fa-map-marked-alt"
+                title="Service Area & Radius"
+                description="Define your search radius to find nearby verified specialists."
+                onClick={() => setActiveView('service-area')}
+                badge={currentAddress ? { text: 'Configured', type: 'success' } : { text: 'Action Required', type: 'warning' }}
             />
 
             <SettingsMenuCard
@@ -69,13 +74,12 @@ export default function Settings() {
             />
             
             <SettingsMenuCard
-                icon="fas fa-map-marked-alt"
+                icon="fas fa-map-pin"
                 title="Manage Addresses"
                 description="Save multiple addresses for quick booking and dispatch."
                 onClick={() => setActiveView('addresses')}
-                badge={user?.current_address_id !== null ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
+                badge={currentAddress ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
             />
-            
 
         </div>
     );
@@ -103,10 +107,11 @@ export default function Settings() {
                     {activeView === 'contact' && <Contact />}
                     {activeView === 'security' && <Security />}
                     {activeView === 'notifications' && <Notifications />}
-                    {activeView === 'location' && <Location />}
+                    {(activeView === 'location' || activeView === 'service-area') && (
+                        <Location onManageAddresses={() => setActiveView('addresses')} />
+                    )}
                     {activeView === 'addresses' && <Addresses />}
                     {activeView === 'privacy' && <Privacy />}
-
                 </Suspense>
             </div>
         </div>

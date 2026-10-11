@@ -30,8 +30,10 @@ export type UpdateCustomerProfileInputDto = {
 }
 
 export type UpdateCustomerProfileInputDataDto = {
-    name:string,
-    about:string
+    name?: string,
+    about?: string,
+    profile_image?: string,
+    service_radius_km?: number | null
 }
 
 

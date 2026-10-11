@@ -26,7 +26,8 @@ export type UpdateCustomerProfileInputDto = {
 export type UpdateCustomerProfileInputDataDto = {
     name?:string,
     about?:string,
-    profile_image?:string
+    profile_image?:string,
+    service_radius_km?:number | null
 }
 
 export type UserResponseDto = {
@@ -49,6 +50,7 @@ export type CustomerProfileResponseDto = {
     current_address_id: string | null;
     profile_image: string | null;
     about: string;
+    service_radius_km?: number | null;
     created_at: Date;
     updated_at: Date;
 }

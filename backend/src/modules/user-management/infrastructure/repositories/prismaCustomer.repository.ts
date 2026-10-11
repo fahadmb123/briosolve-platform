@@ -29,6 +29,7 @@ export class CustomerRepository implements ICustomerRepository {
                 .update({
                     about: input.data.about !== undefined ? input.data.about : profile.about,
                     profile_image: input.data.profile_image !== undefined ? input.data.profile_image : profile.profile_image,
+                    service_radius_km: input.data.service_radius_km !== undefined ? input.data.service_radius_km : profile.service_radius_km,
                     updated_at: Temporal.Now.instant()
                 } as never);
         } else {
@@ -36,6 +37,7 @@ export class CustomerRepository implements ICustomerRepository {
                 user_id: input.id,
                 about: input.data.about || "",
                 profile_image: input.data.profile_image || null,
+                service_radius_km: input.data.service_radius_km ?? 20,
                 created_at: Temporal.Now.instant(),
                 updated_at: Temporal.Now.instant()
             } as never);

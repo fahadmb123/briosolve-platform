@@ -33,13 +33,20 @@ export const otpSchema = z.object({
 
 export const profileSchema = z.object({
   name: z
-    .string({ error: "Name is required" })
+    .string()
     .trim()
     .min(2, { message: "Name must be at least 2 characters" })
-    .max(50, { message: "Name cannot exceed 50 characters" }),
+    .max(50, { message: "Name cannot exceed 50 characters" })
+    .optional(),
   about: z
     .string()
     .max(500, { message: "Description cannot exceed 500 characters" })
+    .optional(),
+  service_radius_km: z
+    .number()
+    .int()
+    .min(1)
+    .max(500)
     .optional(),
 })
 

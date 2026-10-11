@@ -95,14 +95,15 @@ model addresses {
 }
 
 model customer_profiles {
-  id            Uuid                 @id @default(uuid())
-  user_id       Uuid                 @unique
-  profile_image VarChar(500)?
-  created_at    DateTime             @default(now())
-  updated_at    temporal.updatedAt()
-  about         VarChar(500)
+  id                Uuid                 @id @default(uuid())
+  user_id           Uuid                 @unique
+  profile_image     VarChar(500)?
+  service_radius_km Int?                 @default(20)
+  created_at        DateTime             @default(now())
+  updated_at        temporal.updatedAt()
+  about             VarChar(500)
 
-  user          users                @relation(fields:[user_id], references:[id])
+  user              users                @relation(fields:[user_id], references:[id])
 }
 
 model categories {

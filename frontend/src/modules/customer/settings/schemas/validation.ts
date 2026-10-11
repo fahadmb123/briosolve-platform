@@ -60,3 +60,9 @@ export interface AddressPayload extends AddressInputType {
   longitude?: number | null;
   isDefault?: boolean;
 }
+
+export const serviceRadiusSchema = z.object({
+  service_radius_km: z.number().int().min(1).max(500)
+});
+
+export type ServiceRadiusInputType = z.infer<typeof serviceRadiusSchema>;

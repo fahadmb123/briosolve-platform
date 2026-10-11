@@ -25,6 +25,7 @@ export class PrismaCustomerRepository implements ICustomerRepository {
         await db.orm.public.customer_profiles.create({
             user_id: user.id, 
             about: "",
+            service_radius_km: 20,
         } as never)
 
         return UserMapper.toDomain(user)

@@ -26,8 +26,9 @@ export type CustomerProfile = {
     current_address_id: string | null,
     profile_image: string | null,
     about: string,
-    created_at: Temporal.Instant,
-    updated_at: Temporal.Instant,
+    service_radius_km?: number | null,
+    created_at: Temporal.Instant | string | Date,
+    updated_at: Temporal.Instant | string | Date,
 }
 
 export type ProviderProfile = {

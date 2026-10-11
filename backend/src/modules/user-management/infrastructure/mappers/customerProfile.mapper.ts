@@ -9,7 +9,8 @@ export class CustomerProfileMapper {
             raw.profile_image,
             raw.about,
             raw.created_at?.epochMilliseconds ? new Date(raw.created_at.epochMilliseconds) : new Date(raw.created_at),
-            raw.updated_at?.epochMilliseconds ? new Date(raw.updated_at.epochMilliseconds) : new Date(raw.updated_at)
+            raw.updated_at?.epochMilliseconds ? new Date(raw.updated_at.epochMilliseconds) : new Date(raw.updated_at),
+            raw.service_radius_km
         );
     }
 }
