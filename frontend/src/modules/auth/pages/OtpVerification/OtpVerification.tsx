@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../hooks/mutations/use-otp-varify';
 import { useResetFlowStore } from '../../../../store/auth/reset-flow.store';
+import { useAuthStore } from '../../../../store/auth/auth.store';
 import { maskEmail, maskPhoneNumber } from '../../../../shared/utils/masking';
 
 interface OtpVerificationProps {
@@ -23,6 +24,12 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
     const [attempts, setAttempts] = useState(0)
     const [forTo,setForTo] = useState("")
     const [phone,setPhone] = useState("")
+    const currentUser = useAuthStore((state) => state.user);
+    const backDestination = currentUser?.role === "PROVIDER" 
+        ? "/provider/settings" 
+        : currentUser?.role === "CUSTOMER" 
+            ? "/settings" 
+            : "/login";
 
     const {register,handleSubmit,formState:{errors}} = useForm<OtpInputType>({
         resolver : zodResolver(otpSchema),mode : "onChange"
@@ -164,7 +171,7 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
 
                     {!isInline && (
                         <div className="text-center text-sm border-top pt-5">
-                            <Link to="/login" className="back-link">
+                            <Link to={backDestination} className="back-link">
                                 <i className="fas fa-arrow-left mr-1"></i> Back
                             </Link>
                         </div>

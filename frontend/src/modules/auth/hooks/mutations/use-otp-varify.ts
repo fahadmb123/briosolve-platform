@@ -12,23 +12,41 @@ export const useOtpVarify = (isInline?: boolean) => {
 
     return useMutation({
         mutationFn: otpVarify,
-        onSuccess: (response) => {
+        onSuccess: async (response) => {
             if (response.data.path === "reset-password") {
                 useResetFlowStore.getState().setOtpVerified(true);
             }
             
             if (response.data.path === "settings") {
-                const currentUser = useAuthStore.getState().user;
-                if (currentUser && response.data.email) {
+                useResetFlowStore.getState().setOtpFlowStarted(false);
+                let currentUser = useAuthStore.getState().user;
+                if (!currentUser) {
+                    try {
+                        await useAuthStore.getState().fetchUser();
+                        currentUser = useAuthStore.getState().user;
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                if (currentUser) {
                     useAuthStore.getState().setUser({
                         ...currentUser,
-                        email: response.data.email,
-                        email_verified: true,
-                        phone: response.data.phone,
-                        phone_verified: true
+                        ...(response.data.email ? { email: response.data.email, email_verified: true } : {}),
+                        ...(response.data.phone ? { phone: response.data.phone, phone_verified: true } : {})
                     });
+                    useAuthStore.getState().fetchUser();
                 }
-                if (!isInline) navigate(`/${response.data.path}`, { state: { activeView: 'contact' } });
+
+                if (!isInline) {
+                    if (currentUser?.role === "PROVIDER") {
+                        navigate("/provider/settings", { replace: true, state: { activeSection: 'account' } });
+                    } else if (currentUser?.role === "ADMIN") {
+                        navigate("/admin/settings", { replace: true });
+                    } else {
+                        navigate(`/${response.data.path}`, { replace: true, state: { activeView: 'contact' } });
+                    }
+                }
             } else {
                 if (!isInline && response?.data.path) navigate(`/${response.data.path}`);
             }

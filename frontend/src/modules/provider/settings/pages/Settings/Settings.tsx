@@ -1,17 +1,26 @@
 // @ts-nocheck
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { useLocation } from 'react-router-dom';
 import './Settings.css';
 import { SettingsMenuCard } from '../../components/SettingsMenuCard';
 import { ChangePasswordForm } from '../../components/ChangePasswordForm';
+import { ContactInfo } from '../../components/ContactInfo';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
 
 const Addresses = lazy(() => import('../../../../customer/settings/pages/Settings/views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
 
 export default function Settings() {
+  const location = useLocation();
   const user = useAuthStore((state) => state.user);
   const [isLocating, setIsLocating] = useState(false);
-  const [activeSection, setActiveSection] = useState('grid');
+  const [activeSection, setActiveSection] = useState((location.state as any)?.activeSection || 'account');
+
+  useEffect(() => {
+    if ((location.state as any)?.activeSection) {
+      setActiveSection((location.state as any).activeSection);
+    }
+  }, [location.state]);
 
   const handleUseCurrentLocation = () => {
       setIsLocating(true);
@@ -138,36 +147,19 @@ export default function Settings() {
                     
                         {activeSection === 'account' && (
                         <div className="settings-card-panel" id="sec-account">
-                            <h2 className="h5 mb-4">Account Information &amp; Password</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="acc-email">Registered Email</label>
-                                    <input type="email" id="acc-email" className="form-control" value={user?.email || ''} disabled readOnly />
-                                </div>
-                                <div className="form-group" id="mobile-container">
-                                    <label className="form-label mb-2">Mobile Number</label>
-                                    <div className="flex items-center justify-between p-3 bg-surface border rounded">
-                                        <div className="flex items-center gap-3">
-                                            <div className="icon-circle bg-surface-elevated text-secondary w-10 h-10 rounded-full flex items-center justify-center">
-                                                <i className="fas fa-phone"></i>
-                                            </div>
-                                            <div>
-                                                <div className="text-sm font-bold text-text mb-1 flex items-center gap-2">
-                                                    <span id="verified-number-display">Not added</span>
-                                                    <span id="phone-status-badge" className="badge badge-warning text-xs">Not Verified</span>
-                                                </div>
-                                                <div className="text-xs text-secondary">Used for urgent dispatch alerts</div>
-                                            </div>
-                                        </div>
-                                        <button type="button" id="btn-start-verify" className="btn btn-outline btn-sm" onClick={() => {}}>
-                                            Add / Change Number
-                                        </button>
-                                    </div>
-                                </div>
+                            <div className="mb-5">
+                                <h2 className="h5 mb-1">Account &amp; Security</h2>
+                                <p className="text-xs text-secondary">Manage your verified contact info, mobile alerts, and sign-in credentials.</p>
                             </div>
 
-                            <h3 className="h6 mb-3 pt-3 border-top">Change Account Password</h3>
-                            <ChangePasswordForm />
+                            {/* Email and Mobile in two separate cards/tables */}
+                            <ContactInfo />
+
+                            {/* Password in two separate cards/tables */}
+                            <div className="pt-4 border-top">
+                                <h3 className="h6 mb-4 font-bold">Change Account Password</h3>
+                                <ChangePasswordForm />
+                            </div>
                         </div>
                         )}
 
@@ -523,39 +515,6 @@ export default function Settings() {
         </div>
     </div>
 
-    
-    <div className="loc-modal-overlay" id="mobileOtpModal">
-        <div className="loc-modal" style={{"maxWidth":"450px"}}>
-            <div className="loc-modal-header">
-                <div className="flex items-center gap-2">
-                    <i className="fas fa-mobile-alt text-primary"></i>
-                    <h3 className="h6 mb-0">Verify Mobile Number</h3>
-                </div>
-                <button className="btn-icon" onClick={() => {}}><i className="fas fa-times"></i></button>
-            </div>
-            <div className="loc-modal-body p-5">
-                <div id="modal-mv-step-1">
-                    <p className="text-sm text-secondary mb-4">We will send an OTP to verify this number. This number will be used for urgent dispatch alerts.</p>
-                    <div className="input-icon-wrapper mb-4">
-                        <i className="fas fa-phone"></i>
-                        <input type="tel" id="modal-acc-phone" className="form-control" placeholder="+91 XXXXXXXXXX" value="" />
-                    </div>
-                    <button type="button" id="modal-btn-send-otp" className="btn btn-primary w-full" onClick={() => {}}>Send OTP</button>
-                </div>
-                <div id="modal-mv-step-2" style={{"display":"none"}}>
-                    <p className="text-sm text-secondary mb-4 text-center">Enter the 6-digit OTP sent to your number.</p>
-                    <div className="form-group mb-4">
-                        <label className="text-xs font-semibold mb-1 block text-center">OTP Code</label>
-                        <input type="text" id="modal-mobile-otp" className="form-control text-center text-xl tracking-[0.5em]" placeholder="------" maxLength={6} />
-                    </div>
-                    <button type="button" id="modal-btn-verify-otp" className="btn btn-success w-full" onClick={() => {}}>Verify &amp; Save</button>
-                    <div className="text-center mt-3">
-                        <button type="button" className="btn btn-link text-xs" onClick={() => {}}>Change Number</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     
     <div className="loc-modal-overlay" id="servicesEditModal">
