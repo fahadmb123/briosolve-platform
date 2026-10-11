@@ -5,6 +5,7 @@ import './Settings.css';
 import { SettingsMenuCard } from '../../components/SettingsMenuCard';
 import { ChangePasswordForm } from '../../components/ChangePasswordForm';
 import { ContactInfo } from '../../components/ContactInfo';
+import { BusinessProfileForm } from '../../components/BusinessProfileForm';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
 
@@ -175,26 +176,11 @@ export default function Settings() {
                         
                         {activeSection === 'business' && (
                         <div className="settings-card-panel" id="sec-business">
-                            <h2 className="h5 mb-4">Business Information</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div className="form-group">
-                                    <label className="form-label">Business / Professional Name</label>
-                                    <input type="text" className="form-control" value="Apex Plumbing &amp; HVAC" />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label">Years of Experience</label>
-                                    <select className="form-control" defaultValue="8 - 12 Years (Master Tech)">
-                                        <option>1 - 3 Years</option>
-                                        <option>4 - 7 Years</option>
-                                        <option>8 - 12 Years (Master Tech)</option>
-                                        <option>12+ Years (Industry Veteran)</option>
-                                    </select>
-                                </div>
+                            <div className="mb-5">
+                                <h2 className="h5 mb-1">Business Profile</h2>
+                                <p className="text-xs text-secondary">Manage your public business identity, trade credentials, and client pitch.</p>
                             </div>
-                            <div className="form-group mb-0">
-                                <label className="form-label">Professional Overview / Bio</label>
-                                <textarea className="form-control" rows="4">Licensed master technician with a decade of hands-on expertise specializing in multi-storey residential leak diagnostics, concealed sanitary overhaul, high-pressure CPVC piping, and inverter air conditioner servicing.</textarea>
-                            </div>
+                            <BusinessProfileForm />
                         </div>
                         )}
 

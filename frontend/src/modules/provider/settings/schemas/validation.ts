@@ -46,3 +46,23 @@ export const updatePasswordSchema = z
   });
 
 export type UpdatePasswordInputType = z.infer<typeof updatePasswordSchema>;
+
+export const businessProfileSchema = z.object({
+  businessName: z
+    .string()
+    .trim()
+    .min(1, { message: "Business name is required" })
+    .min(2, { message: "Business name must be at least 2 characters" })
+    .max(100, { message: "Business name cannot exceed 100 characters" }),
+  experience: z
+    .string()
+    .min(1, { message: "Please select your years of experience" }),
+  bio: z
+    .string()
+    .trim()
+    .min(1, { message: "Professional bio is required" })
+    .min(10, { message: "Professional bio must be at least 10 characters" })
+    .max(2000, { message: "Bio cannot exceed 2000 characters" })
+});
+
+export type BusinessProfileInputType = z.infer<typeof businessProfileSchema>;

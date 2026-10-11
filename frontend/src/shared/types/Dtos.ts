@@ -29,3 +29,15 @@ export type CustomerProfile = {
     created_at: Temporal.Instant,
     updated_at: Temporal.Instant,
 }
+
+export type ProviderProfile = {
+    id: string;
+    user_id: string;
+    business_name: string;
+    experience: string;
+    bio: string;
+    profile_image: string | null;
+    created_at: Temporal.Instant | string | Date;
+    updated_at: Temporal.Instant | string | Date;
+};
+
