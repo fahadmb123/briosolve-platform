@@ -5,10 +5,7 @@ import { requireRole } from "../../../../shared/presentation/http/middlewares/ro
 import validate from "../../../../shared/presentation/http/middlewares/validate-request.js";
 import { addressSchema } from "../validators/address.js";
 
-
-
 const router = Router();
-
 
 router.get("/customers",authMiddleware,requireRole(["ADMIN"]),customerController.getCustomers)
 router.get("/profile",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),userController.getProfile)
@@ -18,7 +15,5 @@ router.patch("/address/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),
 router.patch("/address/default/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),addressController.setDefault)
 router.patch("/status/:id",authMiddleware,requireRole(["ADMIN"]),userController.updateUserStatus)
 router.delete("/address/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),addressController.delete)
-
-
 
 export default router

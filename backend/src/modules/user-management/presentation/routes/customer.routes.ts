@@ -10,13 +10,9 @@ import { imageFileSchema } from "../../../../shared/presentation/http/validators
 
 const router = Router()
 
-
-
 router.post("/register",validate(customerRegistrationSchema),customerController.register)
 router.post("/profile/image", authMiddleware, requireRole(["CUSTOMER"]), upload.single("image"), validateFile(imageFileSchema),customerController.uploadProfileImage)
 router.patch("/profile",validate(profileSchema),authMiddleware,requireRole(["CUSTOMER"]),customerController.updateProfile)
 router.delete("/profile/image", authMiddleware, requireRole(["CUSTOMER"]), customerController.deleteProfileImage)
-
-
 
 export default router

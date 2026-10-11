@@ -6,11 +6,7 @@ import { emailSchema, loginSchema, resetPasswordSchema, phoneSchema, updatePassw
 import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
 import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
 
-
-
 const router = Router()
-
-
 
 router.get("/logout",authController.logout)
 router.get("/otp-status",otpVarificationController.getStatus)
@@ -25,8 +21,6 @@ router.post("/resend-otp",otpVarificationController.resend)
 router.patch("/email",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(emailSchema),authController.emailVerify)
 router.patch("/password",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(updatePasswordSchema),authMiddleware,securityController.updatePassword)
 router.patch("/phone",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(phoneSchema),securityController.updatePhone)
-
 router.delete("/phone",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),securityController.deletePhone)
-
 
 export default router

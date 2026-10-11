@@ -1,13 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
 import './Profile.css';
+import { useState } from 'react';
 import '../../../../../shared/styles/location-picker.css';
-import { nameSchema, imageFileSchema, type NameInputType } from '../../schemas/validation';
+import { nameSchema, type NameInputType } from '../../schemas/validation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import { useUpdateProfile } from '../../hooks/mutations/useUpdateProfile';
 import { useGetProfile } from '../../hooks/mutations/useGetProfile';
-import type { CustomerProfile, response, User } from '../../../../../shared/types/Dtos';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
 import { ImageCropModal } from '../../../../../shared/components/ui/ImageCropModal/ImageCropModal';
@@ -24,35 +23,20 @@ export default function Profile() {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const { mutate: updateProfileImage, isPending: isImageUploading } = useUpdateProfileImage();
   const { mutate: deleteProfileImage, isPending: isImageDeleting } = useDeleteProfileImage();
-  const [,setData] = useState<{name:string,about:string}>({name:"",about:""})
-  const {register, handleSubmit, reset, formState:{errors}} = useForm<NameInputType>({
+  const {profile,fetchUser} = useAuthStore.getState()
+  const {register, handleSubmit, formState:{errors}} = useForm<NameInputType>({
           resolver : zodResolver(nameSchema),
           mode : "onChange",
-          defaultValues: { name: "", about: "" }
+          defaultValues: { name:user?.name || '', about:profile?.about || ""}
   })
-
-
   const { mutate: updateProfile, isPending } = useUpdateProfile()
   const getProfile = useGetProfile()
-
-  useEffect(() => {
-    getProfile.mutate(undefined, {
-      onSuccess: (res: response<{user:User,profile:CustomerProfile}>) => {
-        const payload = res.data || res;
-        const fetchedData = { 
-          name: payload.user?.name || "", 
-          about: payload.profile?.about || "" 
-        };
-        setData(fetchedData);
-        setProfileImage(payload.profile?.profile_image || null);
-        reset(fetchedData);
-      }
-    });
-  }, []);
+  
 
   const onSubmitForm = (data: NameInputType) => {
     updateProfile(data, {
       onSuccess: (response) => {
+        fetchUser()
         toast.success(response.message)
       }
     })
@@ -132,17 +116,17 @@ export default function Profile() {
                   <h3 className="h6 mb-0">Default Location</h3>
                   <p className="text-xs text-secondary mb-0">Primary residence</p>
                 </div>
-                <span className="badge badge-verified text-xs"><i className="fas fa-home mr-1"></i>{defaultAddress?.type || 'Home'}</span>
+                <span className="badge badge-verified text-xs"><i className="fas fa-home mr-1"></i>{user?.current_address_id?.type || 'Home'}</span>
               </div>
 
               <div className="location-premium-box">
                 <div className="flex items-start gap-3">
                   <i className="fas fa-map-marker-alt text-primary mt-1 text-lg"></i>
                   <div>
-                    {defaultAddress ? (
+                    {user?.current_address_id ? (
                       <>
-                        <div className="font-bold text-sm text-text">{defaultAddress.area}, {defaultAddress.city}</div>
-                        <div className="text-xs text-secondary mt-1">{defaultAddress.state}, {defaultAddress.country} {defaultAddress.latitude && defaultAddress.longitude ? `(${Number(defaultAddress.latitude).toFixed(4)}° N, ${Number(defaultAddress.longitude).toFixed(4)}° E)` : ''}</div>
+                        <div className="font-bold text-sm text-text">{user?.current_address_id.area}, {user?.current_address_id.city}</div>
+                        <div className="text-xs text-secondary mt-1">{user?.current_address_id.state}, {user?.current_address_id.country} {user?.current_address_id.latitude && user?.current_address_id.longitude ? `(${Number(user?.current_address_id.latitude).toFixed(4)}° N, ${Number(user?.current_address_id.longitude).toFixed(4)}° E)` : ''}</div>
                       </>
                     ) : (
                       <div className="font-bold text-sm text-secondary">No default location set</div>
@@ -156,20 +140,20 @@ export default function Profile() {
               </button>
 
               <div className="mini-map-preview" id="profile-mini-map" style={{ position: 'relative', overflow: 'hidden' }}>
-                {defaultAddress?.latitude && defaultAddress?.longitude && (
+                {user?.current_address_id?.latitude && user?.current_address_id?.longitude && (
                   <iframe 
                     title="Location Map"
                     width="100%" 
                     height="100%" 
                     frameBorder="0" 
                     scrolling="no" 
-                    src={`https://maps.google.com/maps?q=${defaultAddress.latitude},${defaultAddress.longitude}&z=14&output=embed`}
+                    src={`https://maps.google.com/maps?q=${user?.current_address_id.latitude},${user?.current_address_id.longitude}&z=14&output=embed`}
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0, zIndex: 1 }}
                   ></iframe>
                 )}
                 <div className="mini-map-overlay-badge" style={{ position: 'absolute', zIndex: 2 }}>
                   <i className="fas fa-map-pin text-primary"></i>
-                  <span>{defaultAddress?.type || 'Home'}: {defaultAddress?.area || 'Not Set'}</span>
+                  <span>{user?.current_address_id?.type || 'Home'}: {user?.current_address_id?.area || 'Not Set'}</span>
                 </div>
               </div>
             </div>

@@ -1,12 +1,25 @@
-import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
+import { useAuthStore } from '../store/auth/auth.store';
+import { useLogout } from '../modules/auth/hooks/mutations/use-otp-varify';
 import '../shared/styles/pro-badge.css';
 
 export default function ProviderLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
     const { theme, toggleTheme } = useTheme();
     const location = useLocation();
+    const navigate = useNavigate();
+    const clearAuth = useAuthStore((state) => state.clearAuth);
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const logout = useLogout();
+
+    const handleLogout = async () => {
+        if (!isAuthenticated) return navigate('/login');
+        await logout.mutateAsync();
+        clearAuth();
+        navigate('/login');
+    };
 
     if (location.pathname.endsWith('/register') || location.pathname.endsWith('/register/')) {
         return <Outlet />;
@@ -102,10 +115,10 @@ export default function ProviderLayout() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/login" className="sidebar-item text-danger">
+                        <button onClick={handleLogout} className="sidebar-item text-danger" style={{ width: '100%', background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' }}>
                             <i className="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </Link>
+                            <span>{isAuthenticated ? "Logout" : "Login"}</span>
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -137,9 +150,10 @@ export default function ProviderLayout() {
                             <span className="notif-badge-count" id="notif-badge">3</span>
                         </button>
                     </div>
-                    <Link to="/login" className="btn btn-primary btn-sm hide-mobile">
-                        <i className="fas fa-sign-out-alt mr-1"></i> Logout
-                    </Link>
+                    <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
+                        <i className="fas fa-sign-out-alt mr-1"></i>
+                        <span>{isAuthenticated ? "Logout" : "Login"}</span>
+                    </button>
                     <Link to="/provider/profile" className="avatar avatar-sm ml-2" title="Arjun Menon (Verified Master Tech)">
                         <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&amp;auto=format&amp;fit=crop&amp;q=80" alt="Arjun Menon" style={{borderRadius: '50%'}} />
                     </Link>
