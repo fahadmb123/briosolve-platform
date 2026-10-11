@@ -3,13 +3,14 @@ import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 import { ProviderService } from "../../domain/entities/providerService.entity.js";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
-import { AddProviderServicesInputDto, DeleteProviderServiceInputDto } from "../../application/Dto/providerService.js";
+import { AddProviderServicesInputDto, DeleteProviderServiceInputDto, DeleteProviderCategoryInputDto } from "../../application/Dto/providerService.js";
 
 export class ProviderServiceController extends BaseController {
     constructor(
         private readonly getProviderServicesUseCase: IUseCase<string, ProviderService[]>,
         private readonly addProviderServicesUseCase: IUseCase<AddProviderServicesInputDto, ProviderService[]>,
-        private readonly deleteProviderServiceUseCase: IUseCase<DeleteProviderServiceInputDto, ProviderService[]>
+        private readonly deleteProviderServiceUseCase: IUseCase<DeleteProviderServiceInputDto, ProviderService[]>,
+        private readonly deleteProviderCategoryUseCase: IUseCase<DeleteProviderCategoryInputDto, ProviderService[]>
     ) {
         super();
     }
@@ -47,6 +48,20 @@ export class ProviderServiceController extends BaseController {
                 serviceId: id
             });
             return sendSuccess(res, "Service removed", services);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    deleteProviderCategory = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const user = this.getCurrentUser(req);
+            const id = req.params.id as string;
+            const services = await this.deleteProviderCategoryUseCase.execute({
+                userId: user.userId,
+                categoryId: id
+            });
+            return sendSuccess(res, "Category removed", services);
         } catch (error) {
             next(error);
         }

@@ -7,6 +7,7 @@ import { ChangePasswordForm } from '../../components/ChangePasswordForm';
 import { ContactInfo } from '../../components/ContactInfo';
 import { BusinessProfileForm } from '../../components/BusinessProfileForm';
 import { TradeServices } from '../../components/TradeServices';
+import { useGetProviderServices } from '../../hooks/mutations/useTradeService';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
 
@@ -17,6 +18,31 @@ export default function Settings() {
   const user = useAuthStore((state) => state.user);
   const [isLocating, setIsLocating] = useState(false);
   const [activeSection, setActiveSection] = useState((location.state as any)?.activeSection || 'grid');
+  const [tradeServicesInfo, setTradeServicesInfo] = useState<{ total: number; active: number } | null>(null);
+  const getProviderServices = useGetProviderServices();
+
+  useEffect(() => {
+    getProviderServices.mutate(undefined, {
+      onSuccess: (res) => {
+        const services = res.data || [];
+        const active = services.filter(
+          (s) => s.service?.status === 'ACTIVE' && s.service?.category?.status === 'ACTIVE'
+        ).length;
+        setTradeServicesInfo({ total: services.length, active });
+      }
+    });
+  }, []);
+
+  const getTradeServicesBadge = () => {
+    if (!tradeServicesInfo) return undefined;
+    if (tradeServicesInfo.active > 0) {
+      return { text: `${tradeServicesInfo.active} Active`, type: 'success' as const };
+    }
+    if (tradeServicesInfo.total > 0) {
+      return { text: 'Inactive', type: 'warning' as const };
+    }
+    return { text: 'Action Required', type: 'warning' as const };
+  };
 
   useEffect(() => {
     if ((location.state as any)?.activeSection) {
@@ -70,12 +96,6 @@ export default function Settings() {
                             Configure your account security, working schedule availability, lead notification triggers, and operational privacy.
                         </p>
                     </div>
-                    <div className="flex items-center">
-                        <div id="save-toast" className="text-success text-sm font-bold mr-3" style={{"display":"none"}}><i className="fas fa-check-circle mr-1"></i> Availability saved</div>
-                        <button className="btn btn-primary" onClick={() => {}}>
-                            <i className="fas fa-save mr-1"></i> Save Changes
-                        </button>
-                    </div>
                 </div>
 
                 
@@ -100,6 +120,7 @@ export default function Settings() {
                             title="Trade Services"
                             description="Manage the service categories you specialize in."
                             onClick={() => setActiveSection('services')}
+                            badge={getTradeServicesBadge()}
                         />
                         <SettingsMenuCard
                             icon="fas fa-calendar-alt"
@@ -188,11 +209,7 @@ export default function Settings() {
                         
                         {activeSection === 'services' && (
                         <div className="settings-card-panel" id="sec-services">
-                            <div className="mb-5">
-                                <h2 className="h5 mb-1">Trade &amp; Services</h2>
-                                <p className="text-xs text-secondary">Manage your trade categories, specialized skills, and active service offerings.</p>
-                            </div>
-                            <TradeServices />
+                            <TradeServices onServicesChange={(info) => setTradeServicesInfo(info)} />
                         </div>
                         )}
 

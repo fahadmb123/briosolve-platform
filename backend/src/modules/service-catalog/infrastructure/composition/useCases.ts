@@ -9,6 +9,7 @@ import { DeleteServiceUseCase } from "../../application/use-cases/deleteService.
 import { GetProviderServicesUseCase } from "../../application/use-cases/getProviderServices.useCase.js";
 import { AddProviderServicesUseCase } from "../../application/use-cases/addProviderServices.useCase.js";
 import { DeleteProviderServiceUseCase } from "../../application/use-cases/deleteProviderService.useCase.js";
+import { DeleteProviderCategoryUseCase } from "../../application/use-cases/deleteProviderCategory.useCase.js";
 import { categoryRepository, serviceRepository, providerServiceRepository } from "./respositories.js";
 import { providerRepository } from "../../../user-management/infrastructure/composition/repositories.js";
 
@@ -27,3 +28,4 @@ export const deleteServiceUseCase = new DeleteServiceUseCase(serviceRepository, 
 export const getProviderServicesUseCase = new GetProviderServicesUseCase(providerServiceRepository, providerRepository)
 export const addProviderServicesUseCase = new AddProviderServicesUseCase(providerServiceRepository, providerRepository)
 export const deleteProviderServiceUseCase = new DeleteProviderServiceUseCase(providerServiceRepository, providerRepository)
+export const deleteProviderCategoryUseCase = new DeleteProviderCategoryUseCase(providerServiceRepository, providerRepository)

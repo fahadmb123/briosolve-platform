@@ -60,4 +60,23 @@ export class ProviderServiceRepository implements IProviderServiceRepository {
 
         return this.findByProviderId(providerId);
     }
+
+    async deleteProviderCategory(providerId: string, categoryId: string): Promise<ProviderService[]> {
+        const records = await db.orm.public.provider_services
+            .where({ provider_id: providerId })
+            .include("service")
+            .all();
+
+        for (const record of records) {
+            const service = record.service as { category_id?: string } | null;
+            if (service && service.category_id === categoryId) {
+                await db.orm.public.provider_services
+                    .where({ id: record.id })
+                    .delete();
+            }
+        }
+
+        return this.findByProviderId(providerId);
+    }
 }
+

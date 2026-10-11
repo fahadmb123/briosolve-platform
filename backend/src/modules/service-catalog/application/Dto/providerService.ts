@@ -15,3 +15,8 @@ export interface DeleteProviderServiceInputDto {
     userId: string;
     serviceId: string;
 }
+
+export interface DeleteProviderCategoryInputDto {
+    userId: string;
+    categoryId: string;
+}

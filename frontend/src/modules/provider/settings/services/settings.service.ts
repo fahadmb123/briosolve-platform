@@ -53,3 +53,9 @@ export const deleteProviderService = async (id: string): Promise<response<Popula
     return response.data;
 };
 
+export const deleteProviderCategory = async (categoryId: string): Promise<response<PopulatedProviderService[]>> => {
+    const response = await apiClient.delete(`/api/provider/service/category/${categoryId}`);
+    return response.data;
+};
+
+

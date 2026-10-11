@@ -13,9 +13,10 @@ import {
     deleteServiceUseCase,
     getProviderServicesUseCase,
     addProviderServicesUseCase,
-    deleteProviderServiceUseCase
+    deleteProviderServiceUseCase,
+    deleteProviderCategoryUseCase
 } from "./useCases.js";
 
 export const categoryController = new CategoryController(addCategoryUseCase,ImageService,updateCategoryUseCase,getCategoriesUseCase,deleteCategoryUseCase);
 export const serviceController = new ServiceController(addServiceUseCase,ImageService,updateServiceUseCase,getServicesUseCase,deleteServiceUseCase);
-export const providerServiceController = new ProviderServiceController(getProviderServicesUseCase, addProviderServicesUseCase, deleteProviderServiceUseCase);
+export const providerServiceController = new ProviderServiceController(getProviderServicesUseCase, addProviderServicesUseCase, deleteProviderServiceUseCase, deleteProviderCategoryUseCase);

@@ -1,9 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { useGetCategoriesService } from '../../../categories/hooks/mutations/useCategory';
-import { useGetProviderServices } from '../hooks/mutations/useGetProviderServices';
-import { useAddProviderServices } from '../hooks/mutations/useAddProviderServices';
-import { useDeleteProviderService } from '../hooks/mutations/useDeleteProviderService';
+import {
+    useGetProviderServices,
+    useAddProviderServices,
+    useDeleteProviderService,
+    useDeleteProviderCategory
+} from '../hooks/mutations/useTradeService';
 import type { PopulatedProviderService } from '../services/settings.service';
 
 interface CatalogService {
@@ -26,18 +29,23 @@ interface CategoryGroup {
     category: {
         id: string;
         name: string;
+        status?: string;
     };
     services: PopulatedProviderService[];
 }
 
-export const TradeServices: React.FC = () => {
+interface TradeServicesProps {
+    onServicesChange?: (info: { total: number; active: number }) => void;
+}
+
+export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }) => {
     const getCategories = useGetCategoriesService();
     const getProviderServices = useGetProviderServices();
     const addProviderServices = useAddProviderServices();
     const deleteProviderService = useDeleteProviderService();
+    const deleteProviderCategory = useDeleteProviderCategory();
     const [catalogCategories, setCatalogCategories] = useState<CatalogCategory[]>([]);
     const [providerServices, setProviderServices] = useState<PopulatedProviderService[]>([]);
-    const [isSaving, setIsSaving] = useState(false);
 
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
     const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
@@ -56,6 +64,16 @@ export const TradeServices: React.FC = () => {
         });
     }, []);
 
+    const activeServicesCount = useMemo(() => {
+        return providerServices.filter(
+            (item) => item.service?.status === 'ACTIVE' && item.service?.category?.status === 'ACTIVE'
+        ).length;
+    }, [providerServices]);
+
+    useEffect(() => {
+        onServicesChange?.({ total: providerServices.length, active: activeServicesCount });
+    }, [providerServices, activeServicesCount, onServicesChange]);
+
     const groupedCategories = useMemo(() => {
         const groups: Record<string, CategoryGroup> = {};
 
@@ -65,7 +83,7 @@ export const TradeServices: React.FC = () => {
 
             if (!groups[cat.id]) {
                 groups[cat.id] = {
-                    category: { id: cat.id, name: cat.name },
+                    category: { id: cat.id, name: cat.name, status: cat.status },
                     services: []
                 };
             }
@@ -211,24 +229,13 @@ export const TradeServices: React.FC = () => {
     const handleConfirmRemoveCategory = () => {
         if (!categoryToDelete) return;
 
-        setProviderServices((prev) =>
-            prev.filter((item) => item.service?.category?.id !== categoryToDelete.id)
-        );
-        toast.info(`Removed ${categoryToDelete.name} category`);
-        setCategoryToDelete(null);
-    };
-
-    const handleSave = () => {
-        if (providerServices.length === 0) {
-            toast.warning('Please add at least one category and service');
-            return;
-        }
-
-        setIsSaving(true);
-        setTimeout(() => {
-            setIsSaving(false);
-            toast.success('Trade and services saved successfully');
-        }, 500);
+        deleteProviderCategory.mutate(categoryToDelete.id, {
+            onSuccess: (res) => {
+                setProviderServices(res.data || []);
+                toast.success(`Removed ${categoryToDelete.name} category`);
+                setCategoryToDelete(null);
+            }
+        });
     };
 
     return (
@@ -236,7 +243,16 @@ export const TradeServices: React.FC = () => {
             <div className="card p-6 fade-in">
                 <div className="flex justify-between items-center mb-6 pb-4 border-bottom flex-wrap gap-3">
                     <div>
-                        <h2 className="h5 mb-1 font-bold">My Trade &amp; Services</h2>
+                        <div className="flex items-center gap-2 mb-1">
+                            <h2 className="h5 mb-0 font-bold">My Trade &amp; Services</h2>
+                            {!getProviderServices.isPending && (
+                                <span className={`badge badge-${activeServicesCount > 0 ? 'success' : 'warning'} text-xs font-semibold px-2 py-0.5`}>
+                                    {activeServicesCount > 0
+                                        ? `${activeServicesCount} Active`
+                                        : (providerServices.length > 0 ? 'Inactive' : 'Action Required')}
+                                </span>
+                            )}
+                        </div>
                         <p className="text-xs text-secondary mb-0">
                             Customize your specialized trade categories and the services you provide.
                         </p>
@@ -294,10 +310,17 @@ export const TradeServices: React.FC = () => {
                                             <i className="fas fa-wrench text-xs"></i>
                                         </div>
                                         <div>
-                                            <span className="font-bold text-sm text-text capitalize">
-                                                {category.name}
-                                            </span>
-                                            <span className="text-xs text-secondary ml-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-bold text-sm text-text capitalize">
+                                                    {category.name}
+                                                </span>
+                                                {category.status !== 'ACTIVE' && (
+                                                    <span className="badge badge-warning text-xs px-2 py-0.5 font-medium">
+                                                        Inactive
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <span className="text-xs text-secondary">
                                                 ({services.length} services)
                                             </span>
                                         </div>
@@ -314,6 +337,7 @@ export const TradeServices: React.FC = () => {
                                         <button
                                             type="button"
                                             onClick={() => setCategoryToDelete(category)}
+                                            disabled={deleteProviderCategory.isPending}
                                             className="btn btn-outline text-danger btn-xs"
                                             title="Remove Category"
                                         >
@@ -329,29 +353,40 @@ export const TradeServices: React.FC = () => {
                                         </div>
                                     ) : (
                                         <div className="divide-y" style={{ borderColor: 'var(--border-light, var(--border))' }}>
-                                            {services.map((item) => (
-                                                <div
-                                                    key={item.id || item.service_id}
-                                                    className="flex justify-between items-center px-5 py-3 hover:bg-surface-elevated transition-colors"
-                                                >
-                                                    <div className="flex items-center gap-2.5">
-                                                        <i className="fas fa-check-circle text-xs text-primary"></i>
-                                                        <span className="font-medium text-xs text-text">
-                                                            {item.service?.name}
-                                                        </span>
-                                                    </div>
+                                            {services.map((item) => {
+                                                const isServiceInactive = item.service?.status !== 'ACTIVE';
+                                                const isCategoryInactive = item.service?.category?.status !== 'ACTIVE';
+                                                const isInactive = isServiceInactive || isCategoryInactive;
 
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setServiceToDelete({ id: item.id || item.service_id, name: item.service?.name || 'this service' })}
-                                                        disabled={deleteProviderService.isPending}
-                                                        className="text-secondary hover:text-danger text-xs p-1.5 transition-colors cursor-pointer bg-transparent border-0"
-                                                        title="Delete Service"
+                                                return (
+                                                    <div
+                                                        key={item.id || item.service_id}
+                                                        className="flex justify-between items-center px-5 py-3 hover:bg-surface-elevated transition-colors"
                                                     >
-                                                        <i className="fas fa-trash-alt text-xs"></i>
-                                                    </button>
-                                                </div>
-                                            ))}
+                                                        <div className="flex items-center gap-2.5">
+                                                            <i className={`fas fa-check-circle text-xs ${isInactive ? 'text-secondary opacity-40' : 'text-primary'}`}></i>
+                                                            <span className={`font-medium text-xs ${isInactive ? 'text-secondary opacity-75' : 'text-text'}`}>
+                                                                {item.service?.name}
+                                                            </span>
+                                                            {isInactive && (
+                                                                <span className="badge badge-warning text-xs px-2 py-0.5 ml-2 font-medium">
+                                                                    Inactive
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setServiceToDelete({ id: item.id || item.service_id, name: item.service?.name || 'this service' })}
+                                                            disabled={deleteProviderService.isPending}
+                                                            className="text-secondary hover:text-danger text-xs p-1.5 transition-colors cursor-pointer bg-transparent border-0"
+                                                            title="Delete Service"
+                                                        >
+                                                            <i className="fas fa-trash-alt text-xs"></i>
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     )}
                                 </div>
@@ -359,25 +394,6 @@ export const TradeServices: React.FC = () => {
                         ))}
                     </div>
                 )}
-
-                <div className="flex justify-end pt-5 mt-4 border-top">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        className="btn btn-primary btn-sm"
-                    >
-                        {isSaving ? (
-                            <>
-                                <i className="fas fa-spinner fa-spin mr-1"></i> Saving...
-                            </>
-                        ) : (
-                            <>
-                                <i className="fas fa-save mr-1"></i> Save Changes
-                            </>
-                        )}
-                    </button>
-                </div>
             </div>
 
             {isAddCategoryModalOpen && (
@@ -600,6 +616,7 @@ export const TradeServices: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setCategoryToDelete(null)}
+                                disabled={deleteProviderCategory.isPending}
                                 className="btn btn-outline btn-sm"
                             >
                                 Cancel
@@ -607,10 +624,14 @@ export const TradeServices: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={handleConfirmRemoveCategory}
-                                className="btn btn-danger btn-sm"
+                                disabled={deleteProviderCategory.isPending}
+                                className="btn btn-danger btn-sm flex items-center gap-1.5"
                                 style={{ backgroundColor: '#ef4444', color: '#ffffff', borderColor: '#ef4444' }}
                             >
-                                Remove Category
+                                {deleteProviderCategory.isPending && (
+                                    <i className="fas fa-spinner fa-spin text-xs"></i>
+                                )}
+                                <span>Remove Category</span>
                             </button>
                         </div>
                     </div>
