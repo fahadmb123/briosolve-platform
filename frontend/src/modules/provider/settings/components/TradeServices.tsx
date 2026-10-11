@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { useGetCategoriesService } from '../../../categories/hooks/mutations/useCategory';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
+import { useGetProviderServices } from '../hooks/mutations/useGetProviderServices';
+import { useAddProviderServices } from '../hooks/mutations/useAddProviderServices';
+import type { PopulatedProviderService } from '../services/settings.service';
 
 interface CatalogService {
     id: string;
@@ -19,143 +21,152 @@ interface CatalogCategory {
     services?: CatalogService[];
 }
 
-interface ProviderServiceItem {
-    id: string;
-    name: string;
-}
-
-interface ProviderCategoryItem {
-    id: string;
-    name: string;
-    services: ProviderServiceItem[];
+interface CategoryGroup {
+    category: {
+        id: string;
+        name: string;
+    };
+    services: PopulatedProviderService[];
 }
 
 export const TradeServices: React.FC = () => {
     const getCategories = useGetCategoriesService();
+    const getProviderServices = useGetProviderServices();
+    const addProviderServices = useAddProviderServices();
     const [catalogCategories, setCatalogCategories] = useState<CatalogCategory[]>([]);
-    const [myCategories, setMyCategories] = useState<ProviderCategoryItem[]>([]);
+    const [providerServices, setProviderServices] = useState<PopulatedProviderService[]>([]);
     const [isSaving, setIsSaving] = useState(false);
 
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
-    const [selectedServiceIdsByCat, setSelectedServiceIdsByCat] = useState<Record<string, string[]>>({});
+    const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
 
-    const [serviceModalCategory, setServiceModalCategory] = useState<ProviderCategoryItem | null>(null);
+    const [serviceModalCategory, setServiceModalCategory] = useState<{ id: string; name: string } | null>(null);
     const [selectedServiceIdsToAdd, setSelectedServiceIdsToAdd] = useState<string[]>([]);
 
-    const [categoryToDelete, setCategoryToDelete] = useState<ProviderCategoryItem | null>(null);
+    const [categoryToDelete, setCategoryToDelete] = useState<{ id: string; name: string } | null>(null);
 
     useEffect(() => {
+        getProviderServices.mutate(undefined, {
+            onSuccess: (res) => {
+                setProviderServices(res.data || []);
+            }
+        });
+    }, []);
+
+    const groupedCategories = useMemo(() => {
+        const groups: Record<string, CategoryGroup> = {};
+
+        providerServices.forEach((item) => {
+            const cat = item.service?.category;
+            if (!cat) return;
+
+            if (!groups[cat.id]) {
+                groups[cat.id] = {
+                    category: { id: cat.id, name: cat.name },
+                    services: []
+                };
+            }
+
+            groups[cat.id].services.push(item);
+        });
+
+        return Object.values(groups);
+    }, [providerServices]);
+
+    const availableCategoriesForAdd = useMemo(() => {
+        const existingServiceIds = new Set(
+            providerServices.map((ps) => ps.service_id || ps.service?.id).filter(Boolean)
+        );
+
+        return catalogCategories
+            .filter((cat) => cat.status === 'ACTIVE')
+            .map((cat) => ({
+                ...cat,
+                services: (cat.services || []).filter(
+                    (s) => s.status === 'ACTIVE' && !existingServiceIds.has(s.id)
+                )
+            }))
+            .filter((cat) => cat.services.length > 0);
+    }, [catalogCategories, providerServices]);
+
+    const availableServicesForCurrentCat = useMemo(() => {
+        if (!serviceModalCategory) return [];
+        const catalogCat = catalogCategories.find(
+            (c) => c.id === serviceModalCategory.id && c.status === 'ACTIVE'
+        );
+        if (!catalogCat) return [];
+
+        const existingServiceIds = new Set(
+            providerServices
+                .filter((ps) => ps.service?.category?.id === serviceModalCategory.id)
+                .map((ps) => ps.service_id || ps.service?.id)
+                .filter(Boolean)
+        );
+        return (catalogCat.services || []).filter(
+            (s) => s.status === 'ACTIVE' && !existingServiceIds.has(s.id)
+        );
+    }, [serviceModalCategory, catalogCategories, providerServices]);
+
+    const handleOpenAddCategoryModal = () => {
+        setSelectedServiceIds([]);
+        setIsAddCategoryModalOpen(true);
         getCategories.mutate(
             { page: 1, limit: 100, filter: 'ACTIVE' },
             {
                 onSuccess: (res) => {
-                    const fetched = (res.data?.categories || []) as CatalogCategory[];
-                    setCatalogCategories(fetched);
-
-                    if (fetched.length > 0) {
-                        const firstCat = fetched[0];
-                        const initialServices: ProviderServiceItem[] = (firstCat.services || []).slice(0, 2).map((s) => ({
-                            id: s.id,
-                            name: s.name
-                        }));
-
-                        setMyCategories([
-                            {
-                                id: firstCat.id,
-                                name: firstCat.name,
-                                services: initialServices
-                            }
-                        ]);
-                    }
+                    setCatalogCategories((res.data?.categories || []) as CatalogCategory[]);
                 }
             }
         );
-    }, []);
+    };
 
-    const availableCatalogCategories = useMemo(() => {
-        const existingCatIds = new Set(myCategories.map((c) => c.id));
-        return catalogCategories.filter(
-            (c) => !existingCatIds.has(c.id) && c.services && c.services.length > 0
+    const toggleService = (serviceId: string) => {
+        setSelectedServiceIds((prev) =>
+            prev.includes(serviceId)
+                ? prev.filter((id) => id !== serviceId)
+                : [...prev, serviceId]
         );
-    }, [catalogCategories, myCategories]);
-
-    const totalSelectedServicesToAdd = useMemo(() => {
-        return Object.values(selectedServiceIdsByCat).reduce((acc, list) => acc + list.length, 0);
-    }, [selectedServiceIdsByCat]);
-
-    const availableServicesForCurrentCat = useMemo(() => {
-        if (!serviceModalCategory) return [];
-        const catalogCat = catalogCategories.find((c) => c.id === serviceModalCategory.id);
-        if (!catalogCat) return [];
-
-        const existingServiceIds = new Set(serviceModalCategory.services.map((s) => s.id));
-        return (catalogCat.services || []).filter((s) => !existingServiceIds.has(s.id));
-    }, [serviceModalCategory, catalogCategories]);
-
-    const handleOpenAddCategoryModal = () => {
-        setSelectedServiceIdsByCat({});
-        setIsAddCategoryModalOpen(true);
     };
 
-    const toggleServiceInModal = (categoryId: string, serviceId: string) => {
-        setSelectedServiceIdsByCat((prev) => {
-            const current = prev[categoryId] || [];
-            const next = current.includes(serviceId)
-                ? current.filter((id) => id !== serviceId)
-                : [...current, serviceId];
-            return {
-                ...prev,
-                [categoryId]: next
-            };
-        });
-    };
-
-    const toggleAllForCategory = (cat: CatalogCategory) => {
-        const allIds = (cat.services || []).map((s) => s.id);
-        setSelectedServiceIdsByCat((prev) => {
-            const current = prev[cat.id] || [];
-            const isAll = current.length === allIds.length && allIds.length > 0;
-            return {
-                ...prev,
-                [cat.id]: isAll ? [] : allIds
-            };
-        });
+    const toggleAllForCategory = (catServices: CatalogService[]) => {
+        const ids = catServices.map((s) => s.id);
+        const allSelected = ids.length > 0 && ids.every((id) => selectedServiceIds.includes(id));
+        setSelectedServiceIds((prev) =>
+            allSelected
+                ? prev.filter((id) => !ids.includes(id))
+                : Array.from(new Set([...prev, ...ids]))
+        );
     };
 
     const handleConfirmAddCategories = () => {
-        const categoriesToAdd: ProviderCategoryItem[] = [];
-
-        availableCatalogCategories.forEach((cat) => {
-            const selectedIds = selectedServiceIdsByCat[cat.id] || [];
-            if (selectedIds.length > 0) {
-                const servicesToAdd: ProviderServiceItem[] = (cat.services || [])
-                    .filter((s) => selectedIds.includes(s.id))
-                    .map((s) => ({ id: s.id, name: s.name }));
-
-                if (servicesToAdd.length > 0) {
-                    categoriesToAdd.push({
-                        id: cat.id,
-                        name: cat.name,
-                        services: servicesToAdd
-                    });
-                }
-            }
-        });
-
-        if (categoriesToAdd.length === 0) {
+        if (selectedServiceIds.length === 0) {
             toast.warning('Please select at least one service');
             return;
         }
 
-        setMyCategories((prev) => [...prev, ...categoriesToAdd]);
-        setIsAddCategoryModalOpen(false);
-        setSelectedServiceIdsByCat({});
-        toast.success(`Added ${categoriesToAdd.length} trade category${categoriesToAdd.length > 1 ? 'ies' : ''}`);
+        addProviderServices.mutate(selectedServiceIds, {
+            onSuccess: (res) => {
+                setProviderServices(res.data || []);
+                setIsAddCategoryModalOpen(false);
+                setSelectedServiceIds([]);
+                toast.success('Categories and services added successfully');
+            }
+        });
     };
 
-    const handleOpenAddServiceModal = (cat: ProviderCategoryItem) => {
+    const handleOpenAddServiceModal = (cat: { id: string; name: string }) => {
         setServiceModalCategory(cat);
         setSelectedServiceIdsToAdd([]);
+        if (catalogCategories.length === 0) {
+            getCategories.mutate(
+                { page: 1, limit: 100, filter: 'ACTIVE' },
+                {
+                    onSuccess: (res) => {
+                        setCatalogCategories((res.data?.categories || []) as CatalogCategory[]);
+                    }
+                }
+            );
+        }
     };
 
     const toggleServiceCheckboxToAdd = (serviceId: string) => {
@@ -168,40 +179,24 @@ export const TradeServices: React.FC = () => {
 
     const handleConfirmAddServices = () => {
         if (!serviceModalCategory) return;
-
-        const newServices: ProviderServiceItem[] = [];
-
-        availableServicesForCurrentCat.forEach((s) => {
-            if (selectedServiceIdsToAdd.includes(s.id)) {
-                newServices.push({ id: s.id, name: s.name });
-            }
-        });
-
-        if (newServices.length === 0) {
+        if (selectedServiceIdsToAdd.length === 0) {
             toast.warning('Please select at least one service');
             return;
         }
 
-        setMyCategories((prev) =>
-            prev.map((c) =>
-                c.id === serviceModalCategory.id
-                    ? { ...c, services: [...c.services, ...newServices] }
-                    : c
-            )
-        );
-
-        setServiceModalCategory(null);
-        setSelectedServiceIdsToAdd([]);
-        toast.success('Services added successfully');
+        addProviderServices.mutate(selectedServiceIdsToAdd, {
+            onSuccess: (res) => {
+                setProviderServices(res.data || []);
+                setServiceModalCategory(null);
+                setSelectedServiceIdsToAdd([]);
+                toast.success('Services added successfully');
+            }
+        });
     };
 
-    const handleRemoveService = (categoryId: string, serviceId: string) => {
-        setMyCategories((prev) =>
-            prev.map((c) =>
-                c.id === categoryId
-                    ? { ...c, services: c.services.filter((s) => s.id !== serviceId) }
-                    : c
-            )
+    const handleRemoveService = (serviceId: string) => {
+        setProviderServices((prev) =>
+            prev.filter((item) => item.service?.id !== serviceId && item.service_id !== serviceId)
         );
         toast.info('Service removed');
     };
@@ -209,14 +204,15 @@ export const TradeServices: React.FC = () => {
     const handleConfirmRemoveCategory = () => {
         if (!categoryToDelete) return;
 
-        setMyCategories((prev) => prev.filter((c) => c.id !== categoryToDelete.id));
+        setProviderServices((prev) =>
+            prev.filter((item) => item.service?.category?.id !== categoryToDelete.id)
+        );
         toast.info(`Removed ${categoryToDelete.name} category`);
         setCategoryToDelete(null);
     };
 
     const handleSave = () => {
-        const totalServices = myCategories.reduce((acc, c) => acc + c.services.length, 0);
-        if (myCategories.length === 0 || totalServices === 0) {
+        if (providerServices.length === 0) {
             toast.warning('Please add at least one category and service');
             return;
         }
@@ -230,8 +226,6 @@ export const TradeServices: React.FC = () => {
 
     return (
         <>
-            <SpinnerOverlay isLoading={getCategories.isPending || isSaving} />
-
             <div className="card p-6 fade-in">
                 <div className="flex justify-between items-center mb-6 pb-4 border-bottom flex-wrap gap-3">
                     <div>
@@ -244,14 +238,20 @@ export const TradeServices: React.FC = () => {
                     <button
                         type="button"
                         onClick={handleOpenAddCategoryModal}
-                        disabled={availableCatalogCategories.length === 0}
+                        disabled={getCategories.isPending}
                         className="btn btn-primary btn-sm"
                     >
                         <i className="fas fa-plus mr-1.5"></i> Add Trade Category
                     </button>
                 </div>
 
-                {myCategories.length === 0 ? (
+                {getProviderServices.isPending ? (
+                    <div className="text-center py-14 my-4 border border-dashed rounded-xl" style={{ borderColor: 'var(--border)' }}>
+                        <i className="fas fa-spinner fa-spin text-2xl text-primary mb-2.5 block"></i>
+                        <p className="font-semibold text-text text-sm mb-1">Loading Trade &amp; Services</p>
+                        <p className="text-xs text-secondary mb-0">Fetching your assigned trade categories and services...</p>
+                    </div>
+                ) : groupedCategories.length === 0 ? (
                     <div className="text-center py-12 border border-dashed rounded-xl my-4" style={{ borderColor: 'var(--border)' }}>
                         <i className="fas fa-tools text-2xl text-secondary mb-2 opacity-50 block"></i>
                         <p className="font-semibold text-text text-sm mb-1">No Trade Categories Added</p>
@@ -261,7 +261,7 @@ export const TradeServices: React.FC = () => {
                         <button
                             type="button"
                             onClick={handleOpenAddCategoryModal}
-                            disabled={availableCatalogCategories.length === 0}
+                            disabled={getCategories.isPending}
                             className="btn btn-outline btn-xs"
                         >
                             <i className="fas fa-plus mr-1"></i> Add Category
@@ -269,7 +269,7 @@ export const TradeServices: React.FC = () => {
                     </div>
                 ) : (
                     <div className="flex flex-col gap-5 my-2">
-                        {myCategories.map((category) => (
+                        {groupedCategories.map(({ category, services }) => (
                             <div
                                 key={category.id}
                                 className="border rounded-xl overflow-hidden"
@@ -291,7 +291,7 @@ export const TradeServices: React.FC = () => {
                                                 {category.name}
                                             </span>
                                             <span className="text-xs text-secondary ml-2">
-                                                ({category.services.length} services)
+                                                ({services.length} services)
                                             </span>
                                         </div>
                                     </div>
@@ -316,27 +316,27 @@ export const TradeServices: React.FC = () => {
                                 </div>
 
                                 <div className="p-0">
-                                    {category.services.length === 0 ? (
+                                    {services.length === 0 ? (
                                         <div className="text-center py-6 text-xs text-secondary">
                                             No services added to this category yet. Click &quot;+ Add Service&quot; above.
                                         </div>
                                     ) : (
                                         <div className="divide-y" style={{ borderColor: 'var(--border-light, var(--border))' }}>
-                                            {category.services.map((service) => (
+                                            {services.map((item) => (
                                                 <div
-                                                    key={service.id}
+                                                    key={item.id || item.service_id}
                                                     className="flex justify-between items-center px-5 py-3 hover:bg-surface-elevated transition-colors"
                                                 >
                                                     <div className="flex items-center gap-2.5">
                                                         <i className="fas fa-check-circle text-xs text-primary"></i>
                                                         <span className="font-medium text-xs text-text">
-                                                            {service.name}
+                                                            {item.service?.name}
                                                         </span>
                                                     </div>
 
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleRemoveService(category.id, service.id)}
+                                                        onClick={() => handleRemoveService(item.service_id || item.service?.id || item.id)}
                                                         className="text-secondary hover:text-danger text-xs p-1 transition-colors cursor-pointer"
                                                         title="Remove Service"
                                                     >
@@ -395,18 +395,21 @@ export const TradeServices: React.FC = () => {
                         </div>
 
                         <div className="overflow-y-auto flex-1 pr-1 flex flex-col gap-4 mb-3" style={{ maxHeight: '55vh' }}>
-                            {availableCatalogCategories.length === 0 ? (
+                            {getCategories.isPending ? (
+                                <div className="text-center py-8 text-secondary text-sm">
+                                    <i className="fas fa-spinner fa-spin mr-2 text-primary text-xl mb-2"></i>
+                                    <p>Loading services...</p>
+                                </div>
+                            ) : availableCategoriesForAdd.length === 0 ? (
                                 <div className="text-center py-8 text-xs text-secondary">
                                     <i className="fas fa-check-circle text-2xl text-primary mb-2 block opacity-70"></i>
-                                    All available trade categories are already added to your profile.
+                                    All available services are already added to your profile.
                                 </div>
                             ) : (
-                                availableCatalogCategories.map((category) => {
-                                    const selectedForThisCat = selectedServiceIdsByCat[category.id] || [];
-                                    const allCategoryServices = category.services || [];
+                                availableCategoriesForAdd.map((category) => {
                                     const isAllSelected =
-                                        allCategoryServices.length > 0 &&
-                                        selectedForThisCat.length === allCategoryServices.length;
+                                        category.services.length > 0 &&
+                                        category.services.every((s) => selectedServiceIds.includes(s.id));
 
                                     return (
                                         <div
@@ -428,16 +431,11 @@ export const TradeServices: React.FC = () => {
                                                     <span className="text-sm font-bold capitalize text-text">
                                                         {category.name}
                                                     </span>
-                                                    {selectedForThisCat.length > 0 && (
-                                                        <span className="text-xs text-primary font-semibold">
-                                                            ({selectedForThisCat.length} selected)
-                                                        </span>
-                                                    )}
                                                 </div>
 
                                                 <button
                                                     type="button"
-                                                    onClick={() => toggleAllForCategory(category)}
+                                                    onClick={() => toggleAllForCategory(category.services)}
                                                     className="text-xs text-primary hover:underline cursor-pointer bg-transparent border-0 p-0 font-medium"
                                                 >
                                                     {isAllSelected ? 'Deselect All' : 'Select All'}
@@ -446,14 +444,14 @@ export const TradeServices: React.FC = () => {
 
                                             <div className="p-4" style={{ backgroundColor: 'var(--surface-elevated)' }}>
                                                 <div className="modern-chips-wrapper" style={{ justifyContent: 'flex-start' }}>
-                                                    {allCategoryServices.map((service) => {
-                                                        const isChecked = selectedForThisCat.includes(service.id);
+                                                    {category.services.map((service) => {
+                                                        const isChecked = selectedServiceIds.includes(service.id);
                                                         return (
                                                             <label key={service.id} className="modern-service-chip">
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={isChecked}
-                                                                    onChange={() => toggleServiceInModal(category.id, service.id)}
+                                                                    onChange={() => toggleService(service.id)}
                                                                     className="hidden-checkbox"
                                                                 />
                                                                 <span className="chip-content">
@@ -475,7 +473,7 @@ export const TradeServices: React.FC = () => {
 
                         <div className="flex justify-between items-center pt-3 border-top gap-2">
                             <span className="text-xs text-secondary">
-                                {totalSelectedServicesToAdd} service{totalSelectedServicesToAdd !== 1 ? 's' : ''} selected
+                                {selectedServiceIds.length} service{selectedServiceIds.length !== 1 ? 's' : ''} selected
                             </span>
                             <div className="flex items-center gap-2">
                                 <button
@@ -488,10 +486,13 @@ export const TradeServices: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={handleConfirmAddCategories}
-                                    disabled={totalSelectedServicesToAdd === 0}
-                                    className="btn btn-primary btn-sm"
+                                    disabled={selectedServiceIds.length === 0 || addProviderServices.isPending}
+                                    className="btn btn-primary btn-sm flex items-center gap-1.5"
                                 >
-                                    Add Categories
+                                    {addProviderServices.isPending && (
+                                        <i className="fas fa-spinner fa-spin text-xs"></i>
+                                    )}
+                                    <span>Add Categories</span>
                                 </button>
                             </div>
                         </div>
@@ -567,10 +568,13 @@ export const TradeServices: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={handleConfirmAddServices}
-                                disabled={selectedServiceIdsToAdd.length === 0}
-                                className="btn btn-primary btn-sm"
+                                disabled={selectedServiceIdsToAdd.length === 0 || addProviderServices.isPending}
+                                className="btn btn-primary btn-sm flex items-center gap-1.5"
                             >
-                                Add Services
+                                {addProviderServices.isPending && (
+                                    <i className="fas fa-spinner fa-spin text-xs"></i>
+                                )}
+                                <span>Add Services</span>
                             </button>
                         </div>
                     </div>

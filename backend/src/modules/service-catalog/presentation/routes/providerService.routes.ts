@@ -6,5 +6,6 @@ import { providerServiceController } from "../../infrastructure/composition/cont
 const route = Router();
 
 route.get("/", authMiddleware, requireRole(["PROVIDER"]), providerServiceController.getProviderServices);
+route.post("/", authMiddleware, requireRole(["PROVIDER"]), providerServiceController.addProviderServices);
 
 export default route;

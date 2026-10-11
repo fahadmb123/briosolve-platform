@@ -5,3 +5,8 @@ export interface ProviderServiceRaw {
     created_at: Date | { epochMilliseconds: number } | string;
     service?: unknown;
 }
+
+export interface AddProviderServicesInputDto {
+    userId: string;
+    serviceIds: string[];
+}

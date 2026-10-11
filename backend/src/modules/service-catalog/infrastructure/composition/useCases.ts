@@ -7,6 +7,7 @@ import { UpdateServiceUseCase } from "../../application/use-cases/updateService.
 import { GetServicesUseCase } from "../../application/use-cases/getServices.useCase.js";
 import { DeleteServiceUseCase } from "../../application/use-cases/deleteService.useCase.js";
 import { GetProviderServicesUseCase } from "../../application/use-cases/getProviderServices.useCase.js";
+import { AddProviderServicesUseCase } from "../../application/use-cases/addProviderServices.useCase.js";
 import { categoryRepository, serviceRepository, providerServiceRepository } from "./respositories.js";
 
 import { ImageService } from "./services.js";
@@ -22,3 +23,4 @@ export const getServicesUseCase = new GetServicesUseCase(serviceRepository)
 export const deleteServiceUseCase = new DeleteServiceUseCase(serviceRepository, ImageService)
 
 export const getProviderServicesUseCase = new GetProviderServicesUseCase(providerServiceRepository)
+export const addProviderServicesUseCase = new AddProviderServicesUseCase(providerServiceRepository)
