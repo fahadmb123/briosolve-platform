@@ -10,3 +10,8 @@ export interface AddProviderServicesInputDto {
     userId: string;
     serviceIds: string[];
 }
+
+export interface DeleteProviderServiceInputDto {
+    userId: string;
+    serviceId: string;
+}

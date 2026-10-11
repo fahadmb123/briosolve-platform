@@ -47,3 +47,9 @@ export const addProviderServices = async (serviceIds: string[]): Promise<respons
     const response = await apiClient.post("/api/provider/service", { serviceIds });
     return response.data;
 };
+
+export const deleteProviderService = async (id: string): Promise<response<PopulatedProviderService[]>> => {
+    const response = await apiClient.delete(`/api/provider/service/${id}`);
+    return response.data;
+};
+

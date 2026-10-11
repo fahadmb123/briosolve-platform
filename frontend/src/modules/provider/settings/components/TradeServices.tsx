@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { useGetCategoriesService } from '../../../categories/hooks/mutations/useCategory';
 import { useGetProviderServices } from '../hooks/mutations/useGetProviderServices';
 import { useAddProviderServices } from '../hooks/mutations/useAddProviderServices';
+import { useDeleteProviderService } from '../hooks/mutations/useDeleteProviderService';
 import type { PopulatedProviderService } from '../services/settings.service';
 
 interface CatalogService {
@@ -33,6 +34,7 @@ export const TradeServices: React.FC = () => {
     const getCategories = useGetCategoriesService();
     const getProviderServices = useGetProviderServices();
     const addProviderServices = useAddProviderServices();
+    const deleteProviderService = useDeleteProviderService();
     const [catalogCategories, setCatalogCategories] = useState<CatalogCategory[]>([]);
     const [providerServices, setProviderServices] = useState<PopulatedProviderService[]>([]);
     const [isSaving, setIsSaving] = useState(false);
@@ -44,6 +46,7 @@ export const TradeServices: React.FC = () => {
     const [selectedServiceIdsToAdd, setSelectedServiceIdsToAdd] = useState<string[]>([]);
 
     const [categoryToDelete, setCategoryToDelete] = useState<{ id: string; name: string } | null>(null);
+    const [serviceToDelete, setServiceToDelete] = useState<{ id: string; name: string } | null>(null);
 
     useEffect(() => {
         getProviderServices.mutate(undefined, {
@@ -194,11 +197,15 @@ export const TradeServices: React.FC = () => {
         });
     };
 
-    const handleRemoveService = (serviceId: string) => {
-        setProviderServices((prev) =>
-            prev.filter((item) => item.service?.id !== serviceId && item.service_id !== serviceId)
-        );
-        toast.info('Service removed');
+    const handleConfirmDeleteService = () => {
+        if (!serviceToDelete) return;
+        deleteProviderService.mutate(serviceToDelete.id, {
+            onSuccess: (res) => {
+                setProviderServices(res.data || []);
+                setServiceToDelete(null);
+                toast.success('Service removed successfully');
+            }
+        });
     };
 
     const handleConfirmRemoveCategory = () => {
@@ -336,11 +343,12 @@ export const TradeServices: React.FC = () => {
 
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleRemoveService(item.service_id || item.service?.id || item.id)}
-                                                        className="text-secondary hover:text-danger text-xs p-1 transition-colors cursor-pointer"
-                                                        title="Remove Service"
+                                                        onClick={() => setServiceToDelete({ id: item.id || item.service_id, name: item.service?.name || 'this service' })}
+                                                        disabled={deleteProviderService.isPending}
+                                                        className="text-secondary hover:text-danger text-xs p-1.5 transition-colors cursor-pointer bg-transparent border-0"
+                                                        title="Delete Service"
                                                     >
-                                                        <i className="fas fa-times"></i>
+                                                        <i className="fas fa-trash-alt text-xs"></i>
                                                     </button>
                                                 </div>
                                             ))}
@@ -603,6 +611,38 @@ export const TradeServices: React.FC = () => {
                                 style={{ backgroundColor: '#ef4444', color: '#ffffff', borderColor: '#ef4444' }}
                             >
                                 Remove Category
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {serviceToDelete && (
+                <div className="confirm-modal-overlay">
+                    <div className="confirm-modal-content">
+                        <h3 className="h6 mb-2 font-bold text-danger">Remove Service?</h3>
+                        <p className="text-xs text-secondary mb-4 leading-relaxed">
+                            Are you sure you want to remove <strong className="text-text">{serviceToDelete.name}</strong> from your profile?
+                        </p>
+                        <div className="flex justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setServiceToDelete(null)}
+                                disabled={deleteProviderService.isPending}
+                                className="btn btn-outline btn-sm"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleConfirmDeleteService}
+                                disabled={deleteProviderService.isPending}
+                                className="btn btn-danger btn-sm flex items-center gap-1.5"
+                                style={{ backgroundColor: '#ef4444', color: '#ffffff', borderColor: '#ef4444' }}
+                            >
+                                {deleteProviderService.isPending && (
+                                    <i className="fas fa-spinner fa-spin text-xs"></i>
+                                )}
+                                <span>Remove Service</span>
                             </button>
                         </div>
                     </div>

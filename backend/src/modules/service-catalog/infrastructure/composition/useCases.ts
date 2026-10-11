@@ -8,7 +8,9 @@ import { GetServicesUseCase } from "../../application/use-cases/getServices.useC
 import { DeleteServiceUseCase } from "../../application/use-cases/deleteService.useCase.js";
 import { GetProviderServicesUseCase } from "../../application/use-cases/getProviderServices.useCase.js";
 import { AddProviderServicesUseCase } from "../../application/use-cases/addProviderServices.useCase.js";
+import { DeleteProviderServiceUseCase } from "../../application/use-cases/deleteProviderService.useCase.js";
 import { categoryRepository, serviceRepository, providerServiceRepository } from "./respositories.js";
+import { providerRepository } from "../../../user-management/infrastructure/composition/repositories.js";
 
 import { ImageService } from "./services.js";
 
@@ -22,5 +24,6 @@ export const updateServiceUseCase = new UpdateServiceUseCase(serviceRepository, 
 export const getServicesUseCase = new GetServicesUseCase(serviceRepository)
 export const deleteServiceUseCase = new DeleteServiceUseCase(serviceRepository, ImageService)
 
-export const getProviderServicesUseCase = new GetProviderServicesUseCase(providerServiceRepository)
-export const addProviderServicesUseCase = new AddProviderServicesUseCase(providerServiceRepository)
+export const getProviderServicesUseCase = new GetProviderServicesUseCase(providerServiceRepository, providerRepository)
+export const addProviderServicesUseCase = new AddProviderServicesUseCase(providerServiceRepository, providerRepository)
+export const deleteProviderServiceUseCase = new DeleteProviderServiceUseCase(providerServiceRepository, providerRepository)
