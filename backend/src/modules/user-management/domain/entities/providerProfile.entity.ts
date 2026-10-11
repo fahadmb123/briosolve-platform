@@ -1,0 +1,12 @@
+export class ProviderProfile {
+    constructor(
+        public readonly id: string,
+        public readonly user_id: string,
+        public readonly business_name: string,
+        public readonly experience: string,
+        public readonly bio: string,
+        public readonly profile_image: string | null,
+        public readonly created_at: Date,
+        public readonly updated_at: Date
+    ) {}
+}

@@ -3,14 +3,15 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import type { EmailVerificationUseCaseOutputDto, RegisterProviderInput } from "../../application/Dto/providerDto.js";
+import type { EmailVerificationUseCaseOutputDto, RegisterProviderInput, UpdateProviderProfileInputDto } from "../../application/Dto/providerDto.js";
 import type { CompleteProviderRegistrationInput } from "../../application/use-cases/registerProvider.useCase.js";
 import type { User } from "../../domain/entities/user.entity.js";
 
 export class ProviderController extends BaseController {
     constructor(
         private readonly preRegisterProviderUseCase: IUseCase<RegisterProviderInput, EmailVerificationUseCaseOutputDto>,
-        private readonly registerProviderUseCase: IUseCase<CompleteProviderRegistrationInput, User>
+        private readonly registerProviderUseCase: IUseCase<CompleteProviderRegistrationInput, User>,
+        private readonly updateProviderProfileUseCase: IUseCase<UpdateProviderProfileInputDto, void>
     ) { super(); }
 
     preRegister = async (req: Request, res: Response, next: NextFunction) => {
@@ -45,6 +46,16 @@ export class ProviderController extends BaseController {
             res.clearCookie("registration_id");
 
             return sendSuccess(res, "Provider account created successfully", user);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.getCurrentUser(req);
+            await this.updateProviderProfileUseCase.execute({ id: req.user?.userId!, data: req.body });
+            return sendSuccess(res, "Updated");
         } catch (err) {
             next(err);
         }

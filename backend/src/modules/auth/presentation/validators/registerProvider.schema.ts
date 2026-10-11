@@ -28,3 +28,38 @@ export const providerRegistrationSchema = z.object({
 });
 
 export type ProviderRegistrationInputType = z.infer<typeof providerRegistrationSchema>;
+
+export const providerProfileSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, { message: "Name must be at least 2 characters" })
+    .max(50, { message: "Name cannot exceed 50 characters" })
+    .optional(),
+  businessName: z
+    .string()
+    .trim()
+    .min(1, { message: "Business name cannot be empty" })
+    .max(255, { message: "Business name cannot exceed 255 characters" })
+    .optional(),
+  business_name: z
+    .string()
+    .trim()
+    .min(1, { message: "Business name cannot be empty" })
+    .max(255, { message: "Business name cannot exceed 255 characters" })
+    .optional(),
+  experience: z
+    .string()
+    .max(100, { message: "Experience cannot exceed 100 characters" })
+    .optional(),
+  bio: z
+    .string()
+    .max(2000, { message: "Bio cannot exceed 2000 characters" })
+    .optional(),
+  profile_image: z
+    .string()
+    .nullable()
+    .optional()
+});
+
+export type ProviderProfileSchemaType = z.infer<typeof providerProfileSchema>;

@@ -1,4 +1,5 @@
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js"
+import { ProviderProfile } from "../../domain/entities/providerProfile.entity.js"
 import { User } from "../../domain/entities/user.entity.js"
 
 
@@ -11,7 +12,7 @@ export type UpdateUserStatusDto = {
 
 export type GetProfileUseCaseOutputDto = {
     user:User,
-    profile:CustomerProfile | null
+    profile:CustomerProfile | ProviderProfile | null
 }
 export type GetProfileUseCaseInputDto = {
     id:string,

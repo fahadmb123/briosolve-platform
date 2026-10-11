@@ -9,6 +9,7 @@ import RegisterProviderUseCase from "../../application/use-cases/registerProvide
 import PreRegisterProviderUseCase from "../../application/use-cases/preRegisterProvider.useCase.js";
 import { SetDefaultAddressUseCase } from "../../application/use-cases/setDefaulltAddress.useCase.js";
 import UpdateCustomerProfileUseCase from "../../application/use-cases/updateCustomerProfile.useCase.js";
+import UpdateProviderProfileUseCase from "../../application/use-cases/updateProviderProfile.useCase.js";
 import UpdateUserStatusUseCase from "../../application/use-cases/updateUser.useCase.js";
 
 import { userRepository, customerRepository, addressRepository, providerRepository } from "./repositories.js";
@@ -46,11 +47,16 @@ export const updateUserStatusUseCase = new UpdateUserStatusUseCase(
 )
 export const getProfileUseCase = new GetProfileUseCase(
     userRepository,
-    customerRepository
+    customerRepository,
+    providerRepository
 );
 export const updateCustomerProfileUseCase = new UpdateCustomerProfileUseCase(
     userRepository,
     customerRepository
+)
+export const updateProviderProfileUseCase = new UpdateProviderProfileUseCase(
+    userRepository,
+    providerRepository
 )
 export const addAddressUseCase = new AddAddressUseCase(
     addressRepository,

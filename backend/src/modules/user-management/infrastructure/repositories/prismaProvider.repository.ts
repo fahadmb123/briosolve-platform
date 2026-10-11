@@ -1,12 +1,15 @@
+import { Temporal } from "@js-temporal/polyfill";
+import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
 import { IProviderRepository, CreateProviderInput } from "../../domain/repositories/IProviderRepository.js";
 import { User } from "../../domain/entities/user.entity.js";
+import { ProviderProfile } from "../../domain/entities/providerProfile.entity.js";
 import { UserMapper } from "../mappers/user.mapper.js";
-import { Varchar } from "@prisma/orm-postgres/target/codec-types";
+import { ProviderProfileMapper, ProviderProfileRaw } from "../mappers/providerProfile.mapper.js";
+import { UpdateProviderProfileInputDto } from "../../application/Dto/providerDto.js";
 
-export class PrismaProviderRepository implements IProviderRepository {
+export class ProviderRepository implements IProviderRepository {
     async createProvider(data: CreateProviderInput): Promise<User> {
-        // Run as transaction if needed, but for now we'll do sequential creates
         const user = await db.orm.public.users.create({
             name: data.name,
             email: data.email,
@@ -25,7 +28,6 @@ export class PrismaProviderRepository implements IProviderRepository {
             profile_image: null
         } as never);
 
-        // Add services
         for (const serviceId of data.services) {
             await db.orm.public.provider_services.create({
                 provider_id: profile.id,
@@ -36,23 +38,56 @@ export class PrismaProviderRepository implements IProviderRepository {
         return UserMapper.toDomain(user);
     }
 
-    async update(id: string, data: Partial<User>): Promise<void> {
-        // Implement if needed
-    }
+    async updateProfile(input: UpdateProviderProfileInputDto): Promise<void> {
+        if (input.data.name !== undefined) {
+            await db.orm.public.users
+                .where({ id: input.id as Varchar<255> })
+                .update({
+                    name: input.data.name,
+                    updated_at: Temporal.Now.instant()
+                } as never);
+        }
 
-    async delete(id: string): Promise<void> {
-        // Implement if needed
-    }
-
-    async findById(id: string): Promise<User | null> {
-        const user = await db.orm.public.users
-            .where({ id: id as Varchar<255> })
+        const profile = await db.orm.public.provider_profiles
+            .where({ user_id: input.id as Varchar<255> })
             .first();
-        if (!user) return null;
-        return UserMapper.toDomain(user);
+
+        const businessName = input.data.business_name !== undefined ? input.data.business_name : input.data.businessName;
+
+        if (profile) {
+            await db.orm.public.provider_profiles
+                .where({ user_id: input.id as Varchar<255> })
+                .update({
+                    business_name: businessName !== undefined ? businessName : profile.business_name,
+                    experience: input.data.experience !== undefined ? input.data.experience : profile.experience,
+                    bio: input.data.bio !== undefined ? input.data.bio : profile.bio,
+                    profile_image: input.data.profile_image !== undefined ? input.data.profile_image : profile.profile_image,
+                    updated_at: Temporal.Now.instant()
+                } as never);
+        } else {
+            await db.orm.public.provider_profiles.create({
+                user_id: input.id,
+                business_name: businessName || "",
+                experience: input.data.experience || "",
+                bio: input.data.bio || "",
+                profile_image: input.data.profile_image || null,
+                created_at: Temporal.Now.instant(),
+                updated_at: Temporal.Now.instant()
+            } as never);
+        }
+        return;
     }
 
-    async findAll(): Promise<User[]> {
-        return [];
+    async findById(id: string): Promise<ProviderProfile | null> {
+        const provider = await db.orm.public.provider_profiles
+            .where({ user_id: id as Varchar<255> })
+            .first();
+
+        if (!provider) return null;
+        return ProviderProfileMapper.toDomain(provider as ProviderProfileRaw);
+    }
+
+    async findProfileByUserId(userId: string): Promise<ProviderProfile | null> {
+        return this.findById(userId);
     }
 }
