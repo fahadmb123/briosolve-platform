@@ -8,6 +8,7 @@ import {
     useUpdateAcceptingLeads
 } from '../hooks/mutations/useAvailability';
 import type { ProviderProfile, Weekday } from '../../../../shared/types/Dtos';
+import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 
 interface DaySchedule {
     day: string;
@@ -206,6 +207,7 @@ export const AvailabilitySettings: React.FC = () => {
 
     return (
         <div className="flex flex-col gap-6">
+            {getAvailability.isPending ? (<SpinnerOverlay isLoading={true}/>):null}
             <div className="settings-card-panel fade-in" id="sec-working-availability">
                 <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
                     <div>
