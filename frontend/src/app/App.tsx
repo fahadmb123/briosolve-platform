@@ -8,33 +8,18 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { useEffect, useState } from 'react';
-import { useAuthStore, type IAuthUser } from '../store/auth/auth.store';
-import { useGetMe } from '../modules/auth/hooks/mutations/use-otp-varify';
+import { useAuthStore } from '../store/auth/auth.store';
 import { LoadingScreen } from '../shared/components/ui/LoadingScreen/LoadingScreen';
 
-
-
-
-
-
 function App() {
-  const getMe = useGetMe()
+  const fetchUser = useAuthStore((state) => state.fetchUser);
   const [isInitializing, setIsInitializing] = useState(true);
 
-  useEffect(()=>{
-    (async ()=>{
-      try {
-        const response = await getMe.mutateAsync()
-        const userData = response.data;
-        useAuthStore.getState().setUser(userData)
-        useAuthStore.getState().setProfile(userData.customer_profile || null)
-      } catch {
-        useAuthStore.getState().clearAuth()
-      } finally {
-        setIsInitializing(false);
-      }
-    })()
-  },[])
+  useEffect(() => {
+    fetchUser().finally(() => {
+      setIsInitializing(false);
+    });
+  }, [fetchUser]);
   return (
     <ThemeProvider>
       <div className="app">

@@ -78,6 +78,7 @@ export const useLogin = () => {
         onSuccess: (response) => {
             const user = response.data.user;
             useAuthStore.getState().setUser(user);
+            useAuthStore.getState().setProfile(user.customer_profile || user.provider_profile || null);
             
             if (user.role === "CUSTOMER") {
                 navigate("/", { replace: true });

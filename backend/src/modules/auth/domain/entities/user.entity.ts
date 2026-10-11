@@ -1,5 +1,6 @@
 import { Address } from "../../../user-management/domain/entities/address.entity.js";
 import { CustomerProfile } from "./customerProfile.entity.js";
+import { ProviderProfile } from "./providerProfile.entity.js";
 
 export class User {
     constructor(
@@ -15,6 +16,7 @@ export class User {
         public readonly current_address_id: string | Address | null,
         public readonly created_at: Date,
         public readonly updated_at: Date,
-        public readonly customer_profile?: CustomerProfile | null
+        public readonly customer_profile?: CustomerProfile | null,
+        public readonly provider_profile?: ProviderProfile | null
     ) {}
 }

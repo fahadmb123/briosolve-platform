@@ -21,6 +21,7 @@ router.post("/resend-otp",otpVarificationController.resend)
 router.patch("/email",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(emailSchema),authController.emailVerify)
 router.patch("/password",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(updatePasswordSchema),authMiddleware,securityController.updatePassword)
 router.patch("/phone",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(phoneSchema),securityController.updatePhone)
+
 router.delete("/phone",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),securityController.deletePhone)
 
 export default router

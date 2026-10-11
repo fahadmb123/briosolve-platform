@@ -4,60 +4,61 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import { businessProfileSchema, type BusinessProfileInputType } from '../schemas/validation';
 import { useUpdateBusinessProfile } from '../hooks/mutations/useUpdateBusinessProfile';
-import { useGetProviderProfile } from '../hooks/mutations/useGetProviderProfile';
 import { useAuthStore } from '../../../../store/auth/auth.store';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
+import type { ProviderProfile } from '../../../../shared/types/Dtos';
 
 export const BusinessProfileForm: React.FC = () => {
     const updateProfile = useUpdateBusinessProfile();
-    const getProfile = useGetProviderProfile();
-    const { fetchUser } = useAuthStore();
+    const { profile, fetchUser } = useAuthStore();
+    const providerProfile = profile as ProviderProfile | null;
 
     const {
         register,
         handleSubmit,
-        formState: { errors, isDirty },
+        formState: { errors },
         reset,
         watch
     } = useForm<BusinessProfileInputType>({
         resolver: zodResolver(businessProfileSchema),
         mode: "onChange",
         defaultValues: {
-            businessName: "",
-            experience: "",
-            bio: ""
+            businessName: providerProfile?.business_name || "",
+            experience: providerProfile?.experience || "",
+            bio: providerProfile?.bio || ""
         }
     });
 
     const watchBio = watch("bio", "");
 
     useEffect(() => {
-        getProfile.mutate(undefined, {
-            onSuccess: (res) => {
-                if (res.data?.profile) {
-                    reset({
-                        businessName: res.data.profile.business_name || "",
-                        experience: res.data.profile.experience || "",
-                        bio: res.data.profile.bio || ""
-                    });
-                }
-            }
-        });
-    }, []);
+        if (!profile) {
+            fetchUser();
+        }
+    }, [profile, fetchUser]);
+
+    useEffect(() => {
+        if (providerProfile) {
+            reset({
+                businessName: providerProfile.business_name || "",
+                experience: providerProfile.experience || "",
+                bio: providerProfile.bio || ""
+            });
+        }
+    }, [providerProfile, reset]);
 
     const onSubmit = (formData: BusinessProfileInputType) => {
         updateProfile.mutate(formData, {
             onSuccess: (response) => {
                 fetchUser();
                 toast.success(response.message || "Business profile updated successfully");
-                reset(formData);
             }
         });
     };
 
     return (
         <>
-            <SpinnerOverlay isLoading={getProfile.isPending || updateProfile.isPending} />
+            <SpinnerOverlay isLoading={updateProfile.isPending} />
             <form onSubmit={handleSubmit(onSubmit)} className="fade-in">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div className="card p-6 flex flex-col h-full">

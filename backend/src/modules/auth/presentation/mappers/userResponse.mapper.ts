@@ -15,7 +15,8 @@ export class UserResponseMapper {
             current_address_id: user.current_address_id,
             created_at: user.created_at,
             updated_at: user.updated_at,
-            customer_profile: user.customer_profile
+            customer_profile: user.customer_profile,
+            provider_profile: user.provider_profile
         };
     }
 }

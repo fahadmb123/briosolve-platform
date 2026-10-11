@@ -1,16 +1,18 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Address } from "../../../user-management/domain/entities/address.entity.js";
+import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js";
+import { ProviderProfile } from "../../domain/entities/providerProfile.entity.js";
 
 export type LoginInputDto = {
-    email:string,
-    password:string
-}
+    email: string;
+    password: string;
+};
 
 export type UserResponseDto = {
-    id:string;
+    id: string;
     name: string;
     email: string;
-    phone:string|null;
+    phone: string | null;
     role: "CUSTOMER" | "ADMIN" | "INVESTIGATOR" | "PROVIDER";
     status: "ACTIVE" | "INACTIVE" | "BLOCKED";
     email_verified: boolean;
@@ -18,22 +20,22 @@ export type UserResponseDto = {
     current_address_id: string | Address | null;
     created_at: Date;
     updated_at: Date;
-    customer_profile?: any;
-}
+    customer_profile?: CustomerProfile | null;
+    provider_profile?: ProviderProfile | null;
+};
 
 export type AuthResponseDto = {
     accessToken: string;
     user: UserResponseDto;
-}
-
-
+};
 
 export type SendSmsOtpUseCaseInputDto = {
-    phone:string,
-    path:string;
-    id:string
-}
+    phone: string;
+    path: string;
+    id: string;
+};
+
 export type SendSmsOtpUseCaseOutputDto = {
-    expiresIn:number,
-    registrationId:string
-}
+    expiresIn: number;
+    registrationId: string;
+};
