@@ -14,13 +14,16 @@ export default function Settings() {
   const location = useLocation();
   const user = useAuthStore((state) => state.user);
   const [isLocating, setIsLocating] = useState(false);
-  const [activeSection, setActiveSection] = useState((location.state as any)?.activeSection || 'account');
+  const [activeSection, setActiveSection] = useState((location.state as any)?.activeSection || 'grid');
 
   useEffect(() => {
     if ((location.state as any)?.activeSection) {
       setActiveSection((location.state as any).activeSection);
     }
   }, [location.state]);
+
+  const isContactVerified = Boolean(user?.email_verified && user?.phone_verified);
+  const isAddressVerified = Boolean(user?.current_address_id);
 
   const handleUseCurrentLocation = () => {
       setIsLocating(true);
@@ -82,6 +85,7 @@ export default function Settings() {
                             title="Account & Security"
                             description="Configure your sign-in credentials and two-factor auth."
                             onClick={() => setActiveSection('account')}
+                            badge={isContactVerified ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
                         />
                         <SettingsMenuCard
                             icon="fas fa-briefcase"
@@ -124,7 +128,7 @@ export default function Settings() {
                             title="Manage Addresses"
                             description="Save your business addresses for accurate local search matching."
                             onClick={() => setActiveSection('addresses')}
-                            badge={user?.current_address_id !== null ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
+                            badge={isAddressVerified ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
                         />
                         <SettingsMenuCard
                             icon="fas fa-exclamation-triangle"
@@ -147,9 +151,14 @@ export default function Settings() {
                     
                         {activeSection === 'account' && (
                         <div className="settings-card-panel" id="sec-account">
-                            <div className="mb-5">
-                                <h2 className="h5 mb-1">Account &amp; Security</h2>
-                                <p className="text-xs text-secondary">Manage your verified contact info, mobile alerts, and sign-in credentials.</p>
+                            <div className="mb-5 flex justify-between items-center">
+                                <div>
+                                    <h2 className="h5 mb-1">Account &amp; Security</h2>
+                                    <p className="text-xs text-secondary">Manage your verified contact info, mobile alerts, and sign-in credentials.</p>
+                                </div>
+                                <span className={`badge badge-${isContactVerified ? 'success' : 'warning'} text-xs font-semibold px-2.5 py-1`}>
+                                    {isContactVerified ? 'Verified' : 'Action Required'}
+                                </span>
                             </div>
 
                             {/* Email and Mobile in two separate cards/tables */}
