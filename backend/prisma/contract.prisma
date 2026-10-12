@@ -56,62 +56,105 @@ enum availability_override_type {
   CUSTOM_HOURS
 }
 
-model provider_profiles {
-  id                    Uuid                 @id @default(uuid())
-  user_id               Uuid                 @unique
-  business_name         VarChar(255)
-  experience            VarChar(100)
-  bio                   VarChar(2000)
-  profile_image         VarChar(500)?
-  skills                VarChar(1000)?
-  service_radius_km     Int?                 @default(20)
-  accepting_leads       Boolean              @default(true)
-  travel_buffer_minutes Int                  @default(30)
-  created_at            DateTime             @default(now())
-  updated_at            temporal.updatedAt()
+enum kyc_status {
+  NOT_SUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+}
 
-  user                  users                @relation(fields:[user_id], references:[id])
-  services              provider_services[]
-  availabilities        provider_availability[]
-  overrides             provider_availability_overrides[]
+enum verification_document_type {
+  IDENTITY
+  CERTIFICATE
+}
+
+enum verification_document_status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model provider_profiles {
+  id                     Uuid                              @id @default(uuid())
+  user_id                Uuid                              @unique
+  business_name          VarChar(255)
+  experience             VarChar(100)
+  bio                    VarChar(2000)
+  profile_image          VarChar(500)?
+  skills                 VarChar(1000)?
+  service_radius_km      Int?                              @default(20)
+  accepting_leads        Boolean                           @default(true)
+  travel_buffer_minutes  Int                               @default(30)
+  completed_jobs         Int                               @default(0)
+  kyc_status             kyc_status                        @default(NOT_SUBMITTED)
+  created_at             DateTime                          @default(now())
+  updated_at             temporal.updatedAt()
+
+  user                   users                             @relation(fields:[user_id], references:[id])
+  services               provider_services[]
+  availabilities         provider_availability[]
+  overrides              provider_availability_overrides[]
+  verification_documents provider_verification_documents[]
+}
+
+model provider_verification_documents {
+  id               Uuid                          @id @default(uuid())
+  provider_id      Uuid
+
+  document_type    verification_document_type
+  document_name    VarChar(100)
+  status           verification_document_status  @default(PENDING)
+  rejection_reason VarChar(500)?
+
+  created_at       DateTime                      @default(now())
+  updated_at       temporal.updatedAt()
+
+  provider         provider_profiles             @relation(fields:[provider_id], references:[id])
+
+  files            provider_verification_files[]
+}
+
+model provider_verification_files {
+  id          Uuid                            @id @default(uuid())
+  document_id Uuid
+
+  file_url    VarChar(1000)
+
+  created_at  DateTime                        @default(now())
+
+  document    provider_verification_documents @relation(fields:[document_id], references:[id])
 }
 
 model provider_availability {
-  id          Uuid      @id @default(uuid())
+  id          Uuid                 @id @default(uuid())
   provider_id Uuid
   day_of_week weekday
 
   start_time  VarChar(5)
   end_time    VarChar(5)
 
-  created_at  DateTime  @default(now())
+  created_at  DateTime             @default(now())
   updated_at  temporal.updatedAt()
 
-  provider    provider_profiles @relation(
-    fields: [provider_id],
-    references: [id]
-  )
+  provider    provider_profiles    @relation(fields:[provider_id], references:[id])
 }
 
 model provider_availability_overrides {
-  id          Uuid      @id @default(uuid())
-  provider_id Uuid
+  id            Uuid                       @id @default(uuid())
+  provider_id   Uuid
   override_date DateTime
 
-  type        availability_override_type
+  type          availability_override_type
 
-  start_time  VarChar(5)?
-  end_time    VarChar(5)?
+  start_time    VarChar(5)?
+  end_time      VarChar(5)?
 
-  reason      VarChar(255)?
+  reason        VarChar(255)?
 
-  created_at  DateTime  @default(now())
-  updated_at  temporal.updatedAt()
+  created_at    DateTime                   @default(now())
+  updated_at    temporal.updatedAt()
 
-  provider    provider_profiles @relation(
-    fields: [provider_id],
-    references: [id]
-  )
+  provider      provider_profiles          @relation(fields:[provider_id], references:[id])
 }
 
 model provider_services {

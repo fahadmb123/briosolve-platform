@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'31a9261b161bab8ca1def100afa47c48e6dd7e316b2d3784cd7403dbceaa997d'>;
+  StorageHashBase<'3e8bf71a53066d962a21115682df4986f9056274ef907b559d7b86513d767c4e'>;
 export type ExecutionHash =
-  ExecutionHashBase<'2c0614e863f67bd4f7783b7ab064ce4b276835e6f9489613c5129fb95c37cddf'>;
+  ExecutionHashBase<'18f6862dcf8ee8160a302bc98280c16cb827d64082e0189b3b21ee77768c6a86'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -309,6 +309,8 @@ export type FieldOutputTypes = {
       readonly service_radius_km: CodecTypes['pg/int4@1']['output'] | null;
       readonly accepting_leads: CodecTypes['pg/bool@1']['output'];
       readonly travel_buffer_minutes: CodecTypes['pg/int4@1']['output'];
+      readonly completed_jobs: CodecTypes['pg/int4@1']['output'];
+      readonly kyc_status: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED';
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -316,6 +318,22 @@ export type FieldOutputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly provider_id: CodecTypes['pg/uuid@1']['output'];
       readonly service_id: CodecTypes['pg/uuid@1']['output'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
+    readonly provider_verification_documents: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly document_type: 'IDENTITY' | 'CERTIFICATE';
+      readonly document_name: Varchar<100>;
+      readonly status: 'PENDING' | 'APPROVED' | 'REJECTED';
+      readonly rejection_reason: Varchar<500> | null;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
+    readonly provider_verification_files: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly document_id: CodecTypes['pg/uuid@1']['output'];
+      readonly file_url: Varchar<1000>;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
     readonly services: {
@@ -413,6 +431,8 @@ export type FieldInputTypes = {
       readonly service_radius_km: CodecTypes['pg/int4@1']['input'] | null;
       readonly accepting_leads: CodecTypes['pg/bool@1']['input'];
       readonly travel_buffer_minutes: CodecTypes['pg/int4@1']['input'];
+      readonly completed_jobs: CodecTypes['pg/int4@1']['input'];
+      readonly kyc_status: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED';
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -420,6 +440,22 @@ export type FieldInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly provider_id: CodecTypes['pg/uuid@1']['input'];
       readonly service_id: CodecTypes['pg/uuid@1']['input'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly provider_verification_documents: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly document_type: 'IDENTITY' | 'CERTIFICATE';
+      readonly document_name: CodecTypes['sql/varchar@1']['input'];
+      readonly status: 'PENDING' | 'APPROVED' | 'REJECTED';
+      readonly rejection_reason: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly provider_verification_files: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly document_id: CodecTypes['pg/uuid@1']['input'];
+      readonly file_url: CodecTypes['sql/varchar@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly services: {
@@ -510,9 +546,11 @@ export type StorageColumnTypes = {
       readonly accepting_leads: CodecTypes['pg/bool@1']['output'];
       readonly bio: Varchar<2000>;
       readonly business_name: Varchar<255>;
+      readonly completed_jobs: CodecTypes['pg/int4@1']['output'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly experience: Varchar<100>;
       readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly kyc_status: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED';
       readonly profile_image: Varchar<500> | null;
       readonly service_radius_km: CodecTypes['pg/int4@1']['output'] | null;
       readonly skills: Varchar<1000> | null;
@@ -525,6 +563,22 @@ export type StorageColumnTypes = {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly provider_id: CodecTypes['pg/uuid@1']['output'];
       readonly service_id: CodecTypes['pg/uuid@1']['output'];
+    };
+    readonly provider_verification_documents: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly document_name: Varchar<100>;
+      readonly document_type: 'IDENTITY' | 'CERTIFICATE';
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly rejection_reason: Varchar<500> | null;
+      readonly status: 'PENDING' | 'APPROVED' | 'REJECTED';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
+    readonly provider_verification_files: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly document_id: CodecTypes['pg/uuid@1']['output'];
+      readonly file_url: Varchar<1000>;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
     };
     readonly services: {
       readonly category_id: CodecTypes['pg/uuid@1']['output'];
@@ -614,9 +668,11 @@ export type StorageColumnInputTypes = {
       readonly accepting_leads: CodecTypes['pg/bool@1']['input'];
       readonly bio: CodecTypes['sql/varchar@1']['input'];
       readonly business_name: CodecTypes['sql/varchar@1']['input'];
+      readonly completed_jobs: CodecTypes['pg/int4@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly experience: CodecTypes['sql/varchar@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly kyc_status: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED';
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
       readonly service_radius_km: CodecTypes['pg/int4@1']['input'] | null;
       readonly skills: CodecTypes['sql/varchar@1']['input'] | null;
@@ -629,6 +685,22 @@ export type StorageColumnInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly provider_id: CodecTypes['pg/uuid@1']['input'];
       readonly service_id: CodecTypes['pg/uuid@1']['input'];
+    };
+    readonly provider_verification_documents: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly document_name: CodecTypes['sql/varchar@1']['input'];
+      readonly document_type: 'IDENTITY' | 'CERTIFICATE';
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly rejection_reason: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly status: 'PENDING' | 'APPROVED' | 'REJECTED';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly provider_verification_files: {
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly document_id: CodecTypes['pg/uuid@1']['input'];
+      readonly file_url: CodecTypes['sql/varchar@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
     };
     readonly services: {
       readonly category_id: CodecTypes['pg/uuid@1']['input'];
@@ -689,13 +761,38 @@ export namespace Models {
     service_radius_km: CodecTypes['pg/int4@1']['output'] | null;
     accepting_leads: CodecTypes['pg/bool@1']['output'];
     travel_buffer_minutes: CodecTypes['pg/int4@1']['output'];
+    completed_jobs: CodecTypes['pg/int4@1']['output'];
+    kyc_status: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED';
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     availabilities: public_provider_availability[];
     overrides: public_provider_availability_overrides[];
     services: public_provider_services[];
     user: public_users;
-    readonly [RelationKeys]?: 'availabilities' | 'overrides' | 'services' | 'user';
+    verification_documents: public_provider_verification_documents[];
+    readonly [RelationKeys]?:
+      'availabilities' | 'overrides' | 'services' | 'user' | 'verification_documents';
+  };
+  export type public_provider_verification_documents = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    provider_id: CodecTypes['pg/uuid@1']['output'];
+    document_type: 'IDENTITY' | 'CERTIFICATE';
+    document_name: Varchar<100>;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    rejection_reason: Varchar<500> | null;
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    files: public_provider_verification_files[];
+    provider: public_provider_profiles;
+    readonly [RelationKeys]?: 'files' | 'provider';
+  };
+  export type public_provider_verification_files = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    document_id: CodecTypes['pg/uuid@1']['output'];
+    file_url: Varchar<1000>;
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    document: public_provider_verification_documents;
+    readonly [RelationKeys]?: 'document';
   };
   export type public_provider_availability = {
     id: CodecTypes['pg/uuid@1']['output'];
@@ -790,6 +887,8 @@ export declare const models: {
   public: {
     users: Models.public_users;
     provider_profiles: Models.public_provider_profiles;
+    provider_verification_documents: Models.public_provider_verification_documents;
+    provider_verification_files: Models.public_provider_verification_files;
     provider_availability: Models.public_provider_availability;
     provider_availability_overrides: Models.public_provider_availability_overrides;
     provider_services: Models.public_provider_services;
@@ -1259,6 +1358,24 @@ type ContractBase = Omit<
                     readonly value: DefaultLiteralValue<'pg/int4@1', 30>;
                   };
                 };
+                readonly completed_jobs: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                };
+                readonly kyc_status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'NOT_SUBMITTED'>;
+                  };
+                };
                 readonly created_at: {
                   readonly nativeType: 'timestamptz';
                   readonly codecId: 'pg/timestamptz-temporal@1';
@@ -1351,6 +1468,131 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'services';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly provider_verification_documents: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly provider_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly document_type: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly document_name: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 100 };
+                };
+                readonly status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'PENDING'>;
+                  };
+                };
+                readonly rejection_reason: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 500 };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updated_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'provider_verification_documents_provider_id_idx_d89e110d';
+                  readonly prefix: 'provider_verification_documents_provider_id_idx';
+                  readonly columns: readonly ['provider_id'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_verification_documents';
+                    readonly columns: readonly ['provider_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_profiles';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly provider_verification_files: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly document_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly file_url: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 1000 };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'provider_verification_files_document_id_idx_d3d0944e';
+                  readonly prefix: 'provider_verification_files_document_id_idx';
+                  readonly columns: readonly ['document_id'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_verification_files';
+                    readonly columns: readonly ['document_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_verification_documents';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -1539,6 +1781,10 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['DAY_OFF', 'CUSTOM_HOURS'];
             };
+            readonly kyc_status: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['NOT_SUBMITTED', 'PENDING', 'APPROVED', 'REJECTED'];
+            };
             readonly user_role: {
               readonly kind: 'valueSet';
               readonly values: readonly ['CUSTOMER', 'PROVIDER', 'ADMIN'];
@@ -1546,6 +1792,14 @@ type ContractBase = Omit<
             readonly user_status: {
               readonly kind: 'valueSet';
               readonly values: readonly ['ACTIVE', 'INACTIVE', 'BLOCKED'];
+            };
+            readonly verification_document_status: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['PENDING', 'APPROVED', 'REJECTED'];
+            };
+            readonly verification_document_type: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['IDENTITY', 'CERTIFICATE'];
             };
             readonly weekday: {
               readonly kind: 'valueSet';
@@ -1574,6 +1828,14 @@ type ContractBase = Omit<
     readonly provider_profiles: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'provider_profiles';
+    };
+    readonly provider_verification_documents: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'provider_verification_documents';
+    };
+    readonly provider_verification_files: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'provider_verification_files';
     };
     readonly provider_availability: {
       readonly namespace: 'public' & NamespaceId;
@@ -2136,6 +2398,14 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
+              readonly completed_jobs: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly kyc_status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly created_at: {
                 readonly nullable: false;
                 readonly type: {
@@ -2197,6 +2467,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
+              readonly verification_documents: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_verification_documents';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['provider_id'];
+                };
+              };
             };
             readonly storage: {
               readonly table: 'provider_profiles';
@@ -2212,6 +2493,8 @@ type ContractBase = Omit<
                 readonly service_radius_km: { readonly column: 'service_radius_km' };
                 readonly accepting_leads: { readonly column: 'accepting_leads' };
                 readonly travel_buffer_minutes: { readonly column: 'travel_buffer_minutes' };
+                readonly completed_jobs: { readonly column: 'completed_jobs' };
+                readonly kyc_status: { readonly column: 'kyc_status' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
               };
@@ -2272,6 +2555,146 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly provider_id: { readonly column: 'provider_id' };
                 readonly service_id: { readonly column: 'service_id' };
+                readonly created_at: { readonly column: 'created_at' };
+              };
+            };
+          };
+          readonly provider_verification_documents: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly provider_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly document_type: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly document_name: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 100 };
+                };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly rejection_reason: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 500 };
+                };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly updated_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly files: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_verification_files';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['document_id'];
+                };
+              };
+              readonly provider: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_profiles';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['provider_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'provider_verification_documents';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly provider_id: { readonly column: 'provider_id' };
+                readonly document_type: { readonly column: 'document_type' };
+                readonly document_name: { readonly column: 'document_name' };
+                readonly status: { readonly column: 'status' };
+                readonly rejection_reason: { readonly column: 'rejection_reason' };
+                readonly created_at: { readonly column: 'created_at' };
+                readonly updated_at: { readonly column: 'updated_at' };
+              };
+            };
+          };
+          readonly provider_verification_files: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly document_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly file_url: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 1000 };
+                };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly document: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_verification_documents';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['document_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'provider_verification_files';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly document_id: { readonly column: 'document_id' };
+                readonly file_url: { readonly column: 'file_url' };
                 readonly created_at: { readonly column: 'created_at' };
               };
             };
@@ -2543,6 +2966,30 @@ type ContractBase = Omit<
               { readonly name: 'CUSTOM_HOURS'; readonly value: 'CUSTOM_HOURS' },
             ];
           };
+          readonly kyc_status: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'NOT_SUBMITTED'; readonly value: 'NOT_SUBMITTED' },
+              { readonly name: 'PENDING'; readonly value: 'PENDING' },
+              { readonly name: 'APPROVED'; readonly value: 'APPROVED' },
+              { readonly name: 'REJECTED'; readonly value: 'REJECTED' },
+            ];
+          };
+          readonly verification_document_type: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'IDENTITY'; readonly value: 'IDENTITY' },
+              { readonly name: 'CERTIFICATE'; readonly value: 'CERTIFICATE' },
+            ];
+          };
+          readonly verification_document_status: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'PENDING'; readonly value: 'PENDING' },
+              { readonly name: 'APPROVED'; readonly value: 'APPROVED' },
+              { readonly name: 'REJECTED'; readonly value: 'REJECTED' },
+            ];
+          };
         };
       };
     };
@@ -2676,6 +3123,31 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'provider_services';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'provider_verification_documents';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'provider_verification_documents';
+            readonly column: 'updated_at';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'provider_verification_files';
             readonly column: 'id';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };

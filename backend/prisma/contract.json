@@ -32,6 +32,14 @@
       "model": "provider_services",
       "namespace": "public"
     },
+    "provider_verification_documents": {
+      "model": "provider_verification_documents",
+      "namespace": "public"
+    },
+    "provider_verification_files": {
+      "model": "provider_verification_files",
+      "namespace": "public"
+    },
     "services": {
       "model": "services",
       "namespace": "public"
@@ -71,6 +79,27 @@
               }
             ]
           },
+          "kyc_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "NOT_SUBMITTED",
+                "value": "NOT_SUBMITTED"
+              },
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "APPROVED",
+                "value": "APPROVED"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
+              }
+            ]
+          },
           "user_role": {
             "codecId": "pg/text@1",
             "members": [
@@ -102,6 +131,36 @@
               {
                 "name": "BLOCKED",
                 "value": "BLOCKED"
+              }
+            ]
+          },
+          "verification_document_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "APPROVED",
+                "value": "APPROVED"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
+              }
+            ]
+          },
+          "verification_document_type": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "IDENTITY",
+                "value": "IDENTITY"
+              },
+              {
+                "name": "CERTIFICATE",
+                "value": "CERTIFICATE"
               }
             ]
           },
@@ -856,6 +915,13 @@
                   }
                 }
               },
+              "completed_jobs": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "created_at": {
                 "nullable": false,
                 "type": {
@@ -878,6 +944,19 @@
                 "type": {
                   "codecId": "pg/uuid@1",
                   "kind": "scalar"
+                }
+              },
+              "kyc_status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "kyc_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
                 }
               },
               "profile_image": {
@@ -990,6 +1069,21 @@
                   "model": "users",
                   "namespace": "public"
                 }
+              },
+              "verification_documents": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "provider_id"
+                  ]
+                },
+                "to": {
+                  "model": "provider_verification_documents",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -1003,6 +1097,9 @@
                 "business_name": {
                   "column": "business_name"
                 },
+                "completed_jobs": {
+                  "column": "completed_jobs"
+                },
                 "created_at": {
                   "column": "created_at"
                 },
@@ -1011,6 +1108,9 @@
                 },
                 "id": {
                   "column": "id"
+                },
+                "kyc_status": {
+                  "column": "kyc_status"
                 },
                 "profile_image": {
                   "column": "profile_image"
@@ -1117,6 +1217,218 @@
               },
               "namespaceId": "public",
               "table": "provider_services"
+            }
+          },
+          "provider_verification_documents": {
+            "fields": {
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "document_name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              },
+              "document_type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "verification_document_type",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "rejection_reason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 500
+                  }
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "verification_document_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updated_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "files": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "document_id"
+                  ]
+                },
+                "to": {
+                  "model": "provider_verification_files",
+                  "namespace": "public"
+                }
+              },
+              "provider": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "provider_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "provider_profiles",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "created_at": {
+                  "column": "created_at"
+                },
+                "document_name": {
+                  "column": "document_name"
+                },
+                "document_type": {
+                  "column": "document_type"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "provider_id": {
+                  "column": "provider_id"
+                },
+                "rejection_reason": {
+                  "column": "rejection_reason"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updated_at": {
+                  "column": "updated_at"
+                }
+              },
+              "namespaceId": "public",
+              "table": "provider_verification_documents"
+            }
+          },
+          "provider_verification_files": {
+            "fields": {
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "document_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "file_url": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 1000
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "document": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "document_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "provider_verification_documents",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "created_at": {
+                  "column": "created_at"
+                },
+                "document_id": {
+                  "column": "document_id"
+                },
+                "file_url": {
+                  "column": "file_url"
+                },
+                "id": {
+                  "column": "id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "provider_verification_files"
             }
           },
           "services": {
@@ -1995,6 +2307,13 @@
               "uniques": []
             },
             "provider_profiles": {
+              "checks": [
+                {
+                  "expression": "\"kyc_status\" IN ('NOT_SUBMITTED', 'PENDING', 'APPROVED', 'REJECTED')",
+                  "name": "provider_profiles_kyc_status_check_624ac8d0",
+                  "prefix": "provider_profiles_kyc_status_check"
+                }
+              ],
               "columns": {
                 "accepting_leads": {
                   "codecId": "pg/bool@1",
@@ -2021,6 +2340,15 @@
                     "length": 255
                   }
                 },
+                "completed_jobs": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
                 "created_at": {
                   "codecId": "pg/timestamptz-temporal@1",
                   "default": {
@@ -2042,6 +2370,21 @@
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
                   "nullable": false
+                },
+                "kyc_status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "NOT_SUBMITTED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "kyc_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "profile_image": {
                   "codecId": "sql/varchar@1",
@@ -2212,6 +2555,187 @@
                   ]
                 }
               ]
+            },
+            "provider_verification_documents": {
+              "checks": [
+                {
+                  "expression": "\"document_type\" IN ('IDENTITY', 'CERTIFICATE')",
+                  "name": "provider_verification_documents_document_type_check_c7e0d7aa",
+                  "prefix": "provider_verification_documents_document_type_check"
+                },
+                {
+                  "expression": "\"status\" IN ('PENDING', 'APPROVED', 'REJECTED')",
+                  "name": "provider_verification_documents_status_check_56005a61",
+                  "prefix": "provider_verification_documents_status_check"
+                }
+              ],
+              "columns": {
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "document_name": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 100
+                  }
+                },
+                "document_type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "verification_document_type",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "provider_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "rejection_reason": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 500
+                  }
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "verification_document_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "provider_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "provider_verification_documents"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "provider_profiles"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "provider_id"
+                  ],
+                  "name": "provider_verification_documents_provider_id_idx_d89e110d",
+                  "prefix": "provider_verification_documents_provider_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "provider_verification_files": {
+              "columns": {
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "document_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "file_url": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 1000
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "document_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "provider_verification_files"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "provider_verification_documents"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "document_id"
+                  ],
+                  "name": "provider_verification_files_document_id_idx_d3d0944e",
+                  "prefix": "provider_verification_files_document_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
             },
             "services": {
               "checks": [
@@ -2485,6 +3009,15 @@
                 "CUSTOM_HOURS"
               ]
             },
+            "kyc_status": {
+              "kind": "valueSet",
+              "values": [
+                "NOT_SUBMITTED",
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ]
+            },
             "user_role": {
               "kind": "valueSet",
               "values": [
@@ -2499,6 +3032,21 @@
                 "ACTIVE",
                 "INACTIVE",
                 "BLOCKED"
+              ]
+            },
+            "verification_document_status": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ]
+            },
+            "verification_document_type": {
+              "kind": "valueSet",
+              "values": [
+                "IDENTITY",
+                "CERTIFICATE"
               ]
             },
             "weekday": {
@@ -2519,10 +3067,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "31a9261b161bab8ca1def100afa47c48e6dd7e316b2d3784cd7403dbceaa997d"
+    "storageHash": "3e8bf71a53066d962a21115682df4986f9056274ef907b559d7b86513d767c4e"
   },
   "execution": {
-    "executionHash": "2c0614e863f67bd4f7783b7ab064ce4b276835e6f9489613c5129fb95c37cddf",
+    "executionHash": "18f6862dcf8ee8160a302bc98280c16cb827d64082e0189b3b21ee77768c6a86",
     "mutations": {
       "defaults": [
         {
@@ -2690,6 +3238,43 @@
             "column": "id",
             "namespace": "public",
             "table": "provider_services"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "provider_verification_documents"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "provider_verification_documents"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "provider_verification_files"
           }
         },
         {

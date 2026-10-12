@@ -22,7 +22,7 @@ export default function Dashboard() {
                         <Link to="#" className="btn btn-primary">
                             <i className="fas fa-search-dollar mr-1"></i> Browse Service Requests
                         </Link>
-                        <Link to="/provider/verification" className="btn btn-outline text-xs">
+                        <Link to="/provider/kyc" className="btn btn-outline text-xs">
                             <i className="fas fa-shield-alt mr-1"></i> Verified Status
                         </Link>
                     </div>
@@ -326,7 +326,7 @@ export default function Dashboard() {
                             <p className="text-xs text-secondary mb-3">
                                 Your verified profile is recommended to clients in 98% of relevant searches in Mumbai.
                             </p>
-                            <Link to="/provider/verification" className="btn btn-outline text-xs w-full text-center">
+                            <Link to="/provider/kyc" className="btn btn-outline text-xs w-full text-center">
                                 Manage Verification Badges
                             </Link>
                         </div>

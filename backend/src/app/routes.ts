@@ -6,6 +6,7 @@ import categoryRouter from "../modules/service-catalog/presentation/routes/categ
 import serviceRouter from "../modules/service-catalog/presentation/routes/service.routes.js"
 import providerRoute from "../modules/user-management/presentation/routes/provider.routes.js"
 import providerServiceRoute from "../modules/service-catalog/presentation/routes/providerService.routes.js"
+import verificationRoutes from "../modules/kyc-verification/presentation/routes/verification.routes.js"
 
 const router = Router();
 
@@ -13,7 +14,9 @@ router.use("/auth",authRoutes)
 router.use("/user",userRoutes)
 router.use("/customer",customerRoute)
 router.use("/provider/service",providerServiceRoute)
+router.use("/provider/verification",verificationRoutes)
 router.use("/provider",providerRoute)
+router.use("/verification",verificationRoutes)
 router.use("/service",serviceRouter)
 router.use("/category",categoryRouter)
 

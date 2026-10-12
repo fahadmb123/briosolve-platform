@@ -1,0 +1,45 @@
+import { Temporal } from "@js-temporal/polyfill";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
+import { VerificationFile } from "../../domain/entities/verificationFile.entity.js";
+import { IVerificationFileRepository } from "../../domain/repositories/IVerificationFileRepository.js";
+import { VerificationFileMapper } from "../mappers/verificationFile.mapper.js";
+import { VerificationFileRaw } from "../../application/Dto/verificationDto.js";
+
+export class VerificationFileRepository implements IVerificationFileRepository {
+    async create(documentId: string, fileUrl: string): Promise<VerificationFile> {
+        const record = await db.orm.public.provider_verification_files.create({
+            document_id: documentId as never,
+            file_url: fileUrl as never,
+            created_at: Temporal.Now.instant()
+        } as never)
+
+        return VerificationFileMapper.toDomain(record as unknown as VerificationFileRaw)
+    }
+
+    async createMany(documentId: string, fileUrls: string[]): Promise<VerificationFile[]> {
+        const results: VerificationFile[] = [];
+        for (const fileUrl of fileUrls) {
+            const file = await this.create(documentId, fileUrl);
+            results.push(VerificationFileMapper.toDomain(file));
+        }
+        return results
+    }
+
+    async findByDocumentId(documentId: string): Promise<VerificationFile[]> {
+        const records = await db.orm.public.provider_verification_files
+            .where({ document_id: documentId as never })
+            .all();
+
+        return records.map((record) =>
+            VerificationFileMapper.toDomain(record as VerificationFileRaw)
+        )
+    }
+
+    async deleteByDocumentId(documentId: string): Promise<boolean> {
+        await db.orm.public.provider_verification_files
+            .where({ document_id: documentId as never })
+            .delete();
+
+        return true
+    }
+}

@@ -93,9 +93,9 @@ export default function ProviderLayout() {
                 <div className="menu-label mt-6">Professional Profile</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <NavLink to="/provider/verification" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+                        <NavLink to="/provider/kyc" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-shield-alt"></i>
-                            <span>Verification</span>
+                            <span>KYC</span>
                             <span className="badge badge-success ml-auto"><i className="fas fa-check"></i></span>
                         </NavLink>
                     </li>
