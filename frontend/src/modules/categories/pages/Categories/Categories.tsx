@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { AdminPageHeader } from "../../../admin/components/AdminPageHeader";
 import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
@@ -29,48 +29,63 @@ export default function Categories() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
-  const addCategory = useAddCategoryService()
-  const updateCategory = useUpdateCategoryService()
-  const deleteCategory = useDeleteCategoryService()
-  const getCategories = useGetCategoriesService()
-  const getFormData = useCategoryFormData()
+  const addCategory = useAddCategoryService();
+  const updateCategory = useUpdateCategoryService();
+  const deleteCategory = useDeleteCategoryService();
+  const getCategories = useGetCategoriesService();
+  const getFormData = useCategoryFormData();
 
   const [categories, setCategories] = useState<Category[]>([]);
 
-  const handleAddCategory = async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
-    const formData = getFormData(data.name,data.description,data.status,data.imageFile)
+  const getCategoriesFn = useCallback(() => {
+    getCategories.mutate({ page, limit: 10, search, filter }, {
+      onSuccess: (res) => {
+        if (res?.data?.categories) {
+          setCategories(res.data.categories);
+          setTotalPages(res.data.totalPages || 1);
+        }
+      }
+    });
+  }, [getCategories, page, search, filter]);
+  
+  useEffect(() => {
+    getCategoriesFn();
+  }, [getCategoriesFn]);
+
+  const handleAddCategory = useCallback(async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
+    const formData = getFormData(data.name, data.description, data.status, data.imageFile);
 
     await addCategory.mutateAsync(formData, {
-      onSuccess:(res)=>{
-        setCategories([res.data,...categories]);
-        toast.success(res.message)
+      onSuccess: (res) => {
+        setCategories((prev) => [res.data, ...prev]);
+        toast.success(res.message);
         setIsAddModalOpen(false);
       }
-    })
-  };
+    });
+  }, [addCategory, getFormData]);
 
-  const handleEditCategory = async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
+  const handleEditCategory = useCallback(async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
     if (!editingCategory) return;
-    const formData = getFormData(data.name,data.description,data.status,data.imageFile)
+    const formData = getFormData(data.name, data.description, data.status, data.imageFile);
 
     await updateCategory.mutateAsync({ id: editingCategory.id, formData }, {
-      onSuccess:(res)=>{
-        setCategories(prev => {
-          const filtered = prev.filter(c => c.id !== res.data.id);
+      onSuccess: (res) => {
+        setCategories((prev) => {
+          const filtered = prev.filter((c) => c.id !== res.data.id);
           return [res.data, ...filtered];
         });
         setIsAddModalOpen(false);
-        toast.success(res.message)
+        toast.success(res.message);
       }
-    })
-    setEditingCategory(null)
-  };
+    });
+    setEditingCategory(null);
+  }, [editingCategory, getFormData, updateCategory]);
 
-  const confirmDelete = async () => {
+  const confirmDelete = useCallback(async () => {
     if (!categoryToDelete) return;
     await deleteCategory.mutateAsync(categoryToDelete.id, {
       onSuccess: (res) => {
-        setCategories(prev => prev.filter(c => c.id !== categoryToDelete.id));
+        setCategories((prev) => prev.filter((c) => c.id !== categoryToDelete.id));
         setCategoryToDelete(null);
         toast.success(res.message || "Category deleted successfully");
         if (categories.length === 1 && page > 1) {
@@ -80,9 +95,30 @@ export default function Categories() {
         }
       }
     });
-  };
+  }, [categoryToDelete, deleteCategory, categories.length, page, getCategoriesFn]);
 
-  const columns: TableColumn<Category>[] = [
+  const handleReset = useCallback(() => {
+    setSearch("");
+    setFilter("");
+    setPage(1);
+  }, []);
+
+  const handleOpenAddModal = useCallback(() => {
+    setIsAddModalOpen(true);
+  }, []);
+
+  const handleCloseAddModal = useCallback(() => {
+    setIsAddModalOpen(false);
+    setEditingCategory(null);
+  }, []);
+
+  const handleCancelDelete = useCallback(() => {
+    setCategoryToDelete(null);
+  }, []);
+
+  const keyExtractor = useCallback((item: Category) => item.id, []);
+
+  const columns: TableColumn<Category>[] = useMemo(() => [
     {
       key: 'name',
       header: 'Category Name',
@@ -151,30 +187,7 @@ export default function Categories() {
         </div>
       )
     }
-  ]
-
-  const getCategoriesFn = () => {
-    getCategories.mutate({ page, limit: 10, search, filter }, {
-      onSuccess: (res) => {
-        if (res?.data?.categories) {
-          setCategories(res.data.categories);
-          setTotalPages(res.data.totalPages || 1);
-        }
-      }
-    });
-  };
-  
-  useEffect(() => {
-    getCategoriesFn();
-  }, [page, search, filter]);
-
-
-
-  const handleReset = () => {
-    setSearch("");
-    setFilter("");
-    setPage(1);
-  };
+  ], []);
 
   return (
     <div className="app-content">
@@ -187,7 +200,7 @@ export default function Categories() {
         actionButton={{
           label: "Add Category",
           icon: "fas fa-plus",
-          onClick: () => setIsAddModalOpen(true)
+          onClick: handleOpenAddModal
         }}
       />
 
@@ -230,7 +243,7 @@ export default function Categories() {
         data={categories}
         isLoading={getCategories.isPending}
         loadingMessage="Searching for categories..."
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         emptyMessage="No categories found."
       />
 
@@ -243,10 +256,7 @@ export default function Categories() {
       <AddCategoryModal 
         isOpen={isAddModalOpen || !!editingCategory} 
         initialData={editingCategory}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          setEditingCategory(null);
-        }} 
+        onClose={handleCloseAddModal} 
         onAdd={editingCategory ? handleEditCategory : handleAddCategory} 
       />
 
@@ -258,7 +268,7 @@ export default function Categories() {
           confirmText="Delete" 
           cancelText="Cancel" 
           onConfirm={confirmDelete} 
-          onCancel={() => setCategoryToDelete(null)} 
+          onCancel={handleCancelDelete} 
           isDanger={true}
           isLoading={deleteCategory.isPending}
         />

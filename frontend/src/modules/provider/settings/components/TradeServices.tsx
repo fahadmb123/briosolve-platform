@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { useGetCategoriesService } from '../../../categories/hooks/mutations/useCategory';
 import {
@@ -38,7 +38,7 @@ interface TradeServicesProps {
     onServicesChange?: (info: { total: number; active: number }) => void;
 }
 
-export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }) => {
+const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange }) => {
     const getCategories = useGetCategoriesService();
     const getProviderServices = useGetProviderServices();
     const addProviderServices = useAddProviderServices();
@@ -128,7 +128,7 @@ export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }
         );
     }, [serviceModalCategory, catalogCategories, providerServices]);
 
-    const handleOpenAddCategoryModal = () => {
+    const handleOpenAddCategoryModal = useCallback(() => {
         setSelectedServiceIds([]);
         setIsAddCategoryModalOpen(true);
         getCategories.mutate(
@@ -139,27 +139,27 @@ export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }
                 }
             }
         );
-    };
+    }, [getCategories]);
 
-    const toggleService = (serviceId: string) => {
+    const toggleService = useCallback((serviceId: string) => {
         setSelectedServiceIds((prev) =>
             prev.includes(serviceId)
                 ? prev.filter((id) => id !== serviceId)
                 : [...prev, serviceId]
         );
-    };
+    }, []);
 
-    const toggleAllForCategory = (catServices: CatalogService[]) => {
+    const toggleAllForCategory = useCallback((catServices: CatalogService[]) => {
         const ids = catServices.map((s) => s.id);
-        const allSelected = ids.length > 0 && ids.every((id) => selectedServiceIds.includes(id));
-        setSelectedServiceIds((prev) =>
-            allSelected
+        setSelectedServiceIds((prev) => {
+            const allSelected = ids.length > 0 && ids.every((id) => prev.includes(id));
+            return allSelected
                 ? prev.filter((id) => !ids.includes(id))
-                : Array.from(new Set([...prev, ...ids]))
-        );
-    };
+                : Array.from(new Set([...prev, ...ids]));
+        });
+    }, []);
 
-    const handleConfirmAddCategories = () => {
+    const handleConfirmAddCategories = useCallback(() => {
         if (selectedServiceIds.length === 0) {
             toast.warning('Please select at least one service');
             return;
@@ -173,9 +173,9 @@ export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }
                 toast.success('Categories and services added successfully');
             }
         });
-    };
+    }, [selectedServiceIds, addProviderServices]);
 
-    const handleOpenAddServiceModal = (cat: { id: string; name: string }) => {
+    const handleOpenAddServiceModal = useCallback((cat: { id: string; name: string }) => {
         setServiceModalCategory(cat);
         setSelectedServiceIdsToAdd([]);
         if (catalogCategories.length === 0) {
@@ -188,17 +188,17 @@ export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }
                 }
             );
         }
-    };
+    }, [catalogCategories.length, getCategories]);
 
-    const toggleServiceCheckboxToAdd = (serviceId: string) => {
+    const toggleServiceCheckboxToAdd = useCallback((serviceId: string) => {
         setSelectedServiceIdsToAdd((prev) =>
             prev.includes(serviceId)
                 ? prev.filter((id) => id !== serviceId)
                 : [...prev, serviceId]
         );
-    };
+    }, []);
 
-    const handleConfirmAddServices = () => {
+    const handleConfirmAddServices = useCallback(() => {
         if (!serviceModalCategory) return;
         if (selectedServiceIdsToAdd.length === 0) {
             toast.warning('Please select at least one service');
@@ -213,9 +213,9 @@ export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }
                 toast.success('Services added successfully');
             }
         });
-    };
+    }, [serviceModalCategory, selectedServiceIdsToAdd, addProviderServices]);
 
-    const handleConfirmDeleteService = () => {
+    const handleConfirmDeleteService = useCallback(() => {
         if (!serviceToDelete) return;
         deleteProviderService.mutate(serviceToDelete.id, {
             onSuccess: (res) => {
@@ -224,9 +224,9 @@ export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }
                 toast.success('Service removed successfully');
             }
         });
-    };
+    }, [serviceToDelete, deleteProviderService]);
 
-    const handleConfirmRemoveCategory = () => {
+    const handleConfirmRemoveCategory = useCallback(() => {
         if (!categoryToDelete) return;
 
         deleteProviderCategory.mutate(categoryToDelete.id, {
@@ -236,7 +236,7 @@ export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }
                 setCategoryToDelete(null);
             }
         });
-    };
+    }, [categoryToDelete, deleteProviderCategory]);
 
     return (
         <>
@@ -672,3 +672,5 @@ export const TradeServices: React.FC<TradeServicesProps> = ({ onServicesChange }
         </>
     );
 };
+
+export const TradeServices = React.memo(TradeServicesComponent);

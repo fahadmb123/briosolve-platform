@@ -17,7 +17,7 @@ interface AdminTableProps<T> {
   rowStyle?: (item: T) => React.CSSProperties;
 }
 
-export function AdminTable<T>({ 
+function AdminTableComponent<T>({ 
   columns, 
   data, 
   isLoading, 
@@ -71,3 +71,5 @@ export function AdminTable<T>({
     </div>
   );
 }
+
+export const AdminTable = React.memo(AdminTableComponent) as typeof AdminTableComponent;

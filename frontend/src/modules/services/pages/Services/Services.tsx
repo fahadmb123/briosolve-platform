@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { AdminPageHeader } from "../../../admin/components/AdminPageHeader";
 import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
@@ -51,7 +51,7 @@ export default function Services() {
     });
   }, []);
 
-  const getServicesFn = () => {
+  const getServicesFn = useCallback(() => {
     getServicesMut.mutate({ page, limit: 10, search, filter }, {
       onSuccess: (res) => {
         if (res?.data?.services) {
@@ -60,24 +60,24 @@ export default function Services() {
         }
       }
     });
-  };
+  }, [getServicesMut, page, search, filter]);
 
   useEffect(() => {
     getServicesFn();
-  }, [page, search, filter]);
+  }, [getServicesFn]);
 
-  const handleAddService = async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
+  const handleAddService = useCallback(async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
     const formData = getFormData(data.name, data.categoryId, data.description, data.status, data.imageFile);
     await addService.mutateAsync(formData, {
       onSuccess: (res) => {
-        setServices([res.data, ...services]);
+        setServices((prev) => [res.data, ...prev]);
         toast.success(res.message);
         setIsAddModalOpen(false);
       }
     });
-  };
+  }, [addService, getFormData]);
 
-  const handleEditService = async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
+  const handleEditService = useCallback(async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
     if (!editingService) return;
     const formData = getFormData(data.name, data.categoryId, data.description, data.status, data.imageFile);
     await updateService.mutateAsync({ id: editingService.id, data: formData }, {
@@ -91,9 +91,9 @@ export default function Services() {
         toast.success(res.message);
       }
     });
-  };
+  }, [editingService, getFormData, updateService]);
 
-  const confirmDelete = async () => {
+  const confirmDelete = useCallback(async () => {
     if (!serviceToDelete) return;
     await deleteService.mutateAsync(serviceToDelete.id, {
       onSuccess: (res) => {
@@ -107,15 +107,48 @@ export default function Services() {
         }
       }
     });
-  };
+  }, [serviceToDelete, deleteService, services.length, page, getServicesFn]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setSearch("");
     setFilter("");
     setPage(1);
-  };
+  }, []);
 
-  const columns: TableColumn<Service>[] = [
+  const handleOpenAddModal = useCallback(() => {
+    setIsAddModalOpen(true);
+  }, []);
+
+  const handleCloseAddModal = useCallback(() => {
+    setIsAddModalOpen(false);
+    setEditingService(null);
+  }, []);
+
+  const handleCancelDelete = useCallback(() => {
+    setServiceToDelete(null);
+  }, []);
+
+  const keyExtractor = useCallback((item: Service) => item.id, []);
+
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    categories.forEach((c) => map.set(c.id, c.name));
+    return map;
+  }, [categories]);
+
+  const modalInitialData = useMemo(() => {
+    if (!editingService) return null;
+    return {
+      id: editingService.id,
+      categoryId: editingService.category_id,
+      name: editingService.name,
+      description: editingService.description,
+      status: editingService.status,
+      image: editingService.image
+    };
+  }, [editingService]);
+
+  const columns: TableColumn<Service>[] = useMemo(() => [
     {
       key: 'name',
       header: 'Service Name',
@@ -141,7 +174,7 @@ export default function Services() {
       width: '15%',
       render: (item) => (
         <span className="text-sm">
-          {item.category?.name || categories.find(c => c.id === item.category_id)?.name || 'Unknown'}
+          {item.category?.name || categoryNameMap.get(item.category_id) || 'Unknown'}
         </span>
       )
     },
@@ -188,7 +221,7 @@ export default function Services() {
         </div>
       )
     }
-  ];
+  ], [categoryNameMap]);
 
   return (
     <div className="app-content">
@@ -200,7 +233,7 @@ export default function Services() {
         actionButton={{
           label: "Add Service",
           icon: "fas fa-plus",
-          onClick: () => setIsAddModalOpen(true)
+          onClick: handleOpenAddModal
         }}
       />
 
@@ -243,7 +276,7 @@ export default function Services() {
         data={services}
         isLoading={getServicesMut.isPending}
         loadingMessage="Searching for services..."
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         emptyMessage="No services found."
       />
 
@@ -255,18 +288,8 @@ export default function Services() {
 
       <AddServiceModal 
         isOpen={isAddModalOpen || !!editingService} 
-        initialData={editingService ? {
-          id: editingService.id,
-          categoryId: editingService.category_id,
-          name: editingService.name,
-          description: editingService.description,
-          status: editingService.status,
-          image: editingService.image
-        } : null}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          setEditingService(null);
-        }} 
+        initialData={modalInitialData}
+        onClose={handleCloseAddModal} 
         onAdd={editingService ? handleEditService : handleAddService} 
         categories={categories}
       />
@@ -279,7 +302,7 @@ export default function Services() {
           confirmText="Delete" 
           cancelText="Cancel" 
           onConfirm={confirmDelete} 
-          onCancel={() => setServiceToDelete(null)} 
+          onCancel={handleCancelDelete} 
           isDanger={true}
           isLoading={deleteService.isPending}
         />

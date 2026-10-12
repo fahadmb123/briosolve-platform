@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../../../../store/auth/auth.store';
 import {
@@ -34,7 +34,7 @@ const DEFAULT_SCHEDULE: DaySchedule[] = [
 
 const BUFFER_PRESETS = [30, 45, 60, 90];
 
-export const AvailabilitySettings: React.FC = () => {
+const AvailabilitySettingsComponent: React.FC = () => {
     const { profile, fetchUser } = useAuthStore();
     const providerProfile = profile as ProviderProfile | null;
 
@@ -113,19 +113,19 @@ export const AvailabilitySettings: React.FC = () => {
         });
     }, []);
 
-    const handleToggleDay = (idx: number) => {
+    const handleToggleDay = useCallback((idx: number) => {
         setSchedule((prev) =>
             prev.map((item, i) => (i === idx ? { ...item, isEnabled: !item.isEnabled } : item))
         );
-    };
+    }, []);
 
-    const handleTimeChange = (idx: number, field: 'startTime' | 'endTime', val: string) => {
+    const handleTimeChange = useCallback((idx: number, field: 'startTime' | 'endTime', val: string) => {
         setSchedule((prev) =>
             prev.map((item, i) => (i === idx ? { ...item, [field]: val } : item))
         );
-    };
+    }, []);
 
-    const handleApplyWeekdayDefaults = () => {
+    const handleApplyWeekdayDefaults = useCallback(() => {
         setSchedule((prev) =>
             prev.map((item) => {
                 if (item.day === 'Saturday' || item.day === 'Sunday') {
@@ -135,16 +135,35 @@ export const AvailabilitySettings: React.FC = () => {
             })
         );
         toast.info('Applied 9:00 AM - 5:00 PM for weekdays');
-    };
+    }, []);
 
-    const handleCloseOverrideModal = () => {
+    const handleCloseOverrideModal = useCallback(() => {
         setNewOverrideDate('');
         setNewOverrideLabel('');
         setNewOverrideIsOff(true);
         setNewOverrideStartTime('09:00');
         setNewOverrideEndTime('17:00');
         setIsAddingOverride(false);
-    };
+    }, []);
+
+    const formattedDateOverrides = useMemo(() => {
+        return dateOverrides.map((override) => {
+            const rawDate = override.override_date.split('T')[0];
+            const [y, m, d] = rawDate.split('-').map(Number);
+            const dateObj = (!isNaN(y) && !isNaN(m) && !isNaN(d)) ? new Date(y, m - 1, d) : new Date(override.override_date);
+            const formattedDate = !isNaN(dateObj.getTime())
+                ? dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                : rawDate;
+            const weekdayName = !isNaN(dateObj.getTime())
+                ? dateObj.toLocaleDateString('en-US', { weekday: 'short' })
+                : '';
+            return {
+                ...override,
+                formattedDate,
+                weekdayName
+            };
+        });
+    }, [dateOverrides]);
 
     const todayString = new Date().toISOString().split('T')[0];
     const isDateAlreadyOverridden = Boolean(
@@ -200,7 +219,7 @@ export const AvailabilitySettings: React.FC = () => {
         );
     };
 
-    const handleConfirmDeleteOverride = () => {
+    const handleConfirmDeleteOverride = useCallback(() => {
         if (!overrideToDelete) return;
         deleteOverride.mutate(overrideToDelete, {
             onSuccess: () => {
@@ -212,22 +231,22 @@ export const AvailabilitySettings: React.FC = () => {
                 setOverrideToDelete(null);
             }
         });
-    };
+    }, [overrideToDelete, deleteOverride]);
 
-    const handleStepBuffer = (step: number) => {
+    const handleStepBuffer = useCallback((step: number) => {
         setBufferMinutes((prev) => {
             const next = prev + step;
             if (next < 30) return 30;
             if (next > 120) return 120;
             return next;
         });
-    };
+    }, []);
 
     const isSavingSchedule = setAvailability.isPending || updateAcceptingLeads.isPending;
     const isSavingBuffer = updateTravelBuffer.isPending;
     const isLoadingAvailability = getAvailability.isPending;
 
-    const handleSaveSchedule = () => {
+    const handleSaveSchedule = useCallback(() => {
         const enabledSlots = schedule
             .filter((item) => item.isEnabled)
             .map((item) => ({
@@ -248,16 +267,16 @@ export const AvailabilitySettings: React.FC = () => {
                 toast.success('Saved!');
             }
         });
-    };
+    }, [schedule, setAvailability, providerProfile?.accepting_leads, acceptingLeads, updateAcceptingLeads, fetchUser]);
 
-    const handleSaveBuffer = () => {
+    const handleSaveBuffer = useCallback(() => {
         updateTravelBuffer.mutate({ travel_buffer_minutes: bufferMinutes }, {
             onSuccess: () => {
                 fetchUser();
                 toast.success(`Travel buffer updated to ${bufferMinutes} mins!`);
             }
         });
-    };
+    }, [updateTravelBuffer, bufferMinutes, fetchUser]);
 
     return (
         <div className="flex flex-col gap-6">
@@ -446,30 +465,19 @@ export const AvailabilitySettings: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {dateOverrides.map((override) => {
-                                    const rawDate = override.override_date.split('T')[0];
-                                    const [y, m, d] = rawDate.split('-').map(Number);
-                                    const dateObj = (!isNaN(y) && !isNaN(m) && !isNaN(d)) ? new Date(y, m - 1, d) : new Date(override.override_date);
-                                    const formattedDate = !isNaN(dateObj.getTime())
-                                        ? dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                                        : rawDate;
-                                    const weekdayName = !isNaN(dateObj.getTime())
-                                        ? dateObj.toLocaleDateString('en-US', { weekday: 'short' })
-                                        : '';
-
-                                    return (
-                                        <tr key={override.id} className="border-b transition-colors hover:bg-[rgba(255,255,255,0.02)]" style={{ borderColor: 'var(--border)' }}>
-                                            <td className="py-3.5 px-4 align-middle">
-                                                <div className="flex items-center gap-2">
-                                                    <i className="far fa-calendar-alt text-primary text-xs"></i>
-                                                    <div>
-                                                        <span className="font-semibold text-text text-xs">{formattedDate}</span>
-                                                        {weekdayName && (
-                                                            <span className="text-[11px] text-secondary ml-1.5 font-normal">({weekdayName})</span>
-                                                        )}
-                                                    </div>
+                                {formattedDateOverrides.map((override) => (
+                                    <tr key={override.id} className="border-b transition-colors hover:bg-[rgba(255,255,255,0.02)]" style={{ borderColor: 'var(--border)' }}>
+                                        <td className="py-3.5 px-4 align-middle">
+                                            <div className="flex items-center gap-2">
+                                                <i className="far fa-calendar-alt text-primary text-xs"></i>
+                                                <div>
+                                                    <span className="font-semibold text-text text-xs">{override.formattedDate}</span>
+                                                    {override.weekdayName && (
+                                                        <span className="text-[11px] text-secondary ml-1.5 font-normal">({override.weekdayName})</span>
+                                                    )}
                                                 </div>
-                                            </td>
+                                            </div>
+                                        </td>
                                             <td className="py-3.5 px-4 align-middle">
                                                 {override.type === 'DAY_OFF' ? (
                                                     <span
@@ -516,8 +524,7 @@ export const AvailabilitySettings: React.FC = () => {
                                                 </button>
                                             </td>
                                         </tr>
-                                    );
-                                })}
+                                ))}
                             </tbody>
                         </table>
                     </div>
@@ -875,3 +882,5 @@ export const AvailabilitySettings: React.FC = () => {
         </div>
     );
 };
+
+export const AvailabilitySettings = React.memo(AvailabilitySettingsComponent);

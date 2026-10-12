@@ -43,11 +43,13 @@ export default function Profile() {
   }, []);
 
   useEffect(() => {
-    if (providerProfile?.profile_image) {
-      setProfileImage(providerProfile.profile_image);
-    } else {
-      setProfileImage(null);
-    }
+    (()=>{
+      if (providerProfile?.profile_image) {
+        setProfileImage(providerProfile.profile_image);
+      } else {
+        setProfileImage(null);
+      }
+    })()
   }, [providerProfile?.profile_image]);
 
   const handleCropComplete = (croppedFile: File) => {

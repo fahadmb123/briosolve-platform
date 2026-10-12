@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 interface AdminPaginationProps {
   currentPage: number;
@@ -6,10 +6,10 @@ interface AdminPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export const AdminPagination: React.FC<AdminPaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+const AdminPaginationComponent: React.FC<AdminPaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
   if (totalPages === 0) return null;
   
-  const getPaginationItems = () => {
+  const paginationItems = useMemo(() => {
     const cleanItems: (number | string)[] = [];
     let last = 0;
     
@@ -29,7 +29,7 @@ export const AdminPagination: React.FC<AdminPaginationProps> = ({ currentPage, t
         }
     }
     return cleanItems;
-  };
+  }, [currentPage, totalPages]);
 
   return (
     <div className="admin-pagination mt-6 flex justify-between items-center">
@@ -46,7 +46,7 @@ export const AdminPagination: React.FC<AdminPaginationProps> = ({ currentPage, t
           <i className="fas fa-chevron-left text-xs"></i>
         </button>
 
-        {getPaginationItems().map((item, idx) => (
+        {paginationItems.map((item, idx) => (
           item === '...' ? (
             <span key={`ellipsis-${idx}`} className="w-8 h-8 flex items-center justify-center text-secondary font-medium">...</span>
           ) : (
@@ -75,3 +75,5 @@ export const AdminPagination: React.FC<AdminPaginationProps> = ({ currentPage, t
     </div>
   );
 };
+
+export const AdminPagination = React.memo(AdminPaginationComponent);

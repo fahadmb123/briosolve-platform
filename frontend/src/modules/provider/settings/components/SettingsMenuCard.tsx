@@ -9,7 +9,7 @@ interface SettingsMenuCardProps {
     badge?: { text: string; type: 'success' | 'warning' | 'danger' | 'info' };
 }
 
-export const SettingsMenuCard: React.FC<SettingsMenuCardProps> = ({ icon, title, description, onClick, danger = false, badge }) => {
+const SettingsMenuCardComponent: React.FC<SettingsMenuCardProps> = ({ icon, title, description, onClick, danger = false, badge }) => {
     return (
         <div 
             className="settings-glass-card relative" 
@@ -41,3 +41,5 @@ export const SettingsMenuCard: React.FC<SettingsMenuCardProps> = ({ icon, title,
         </div>
     );
 };
+
+export const SettingsMenuCard = React.memo(SettingsMenuCardComponent);

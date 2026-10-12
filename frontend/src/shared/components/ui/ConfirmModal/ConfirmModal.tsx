@@ -13,7 +13,7 @@ export interface ConfirmModalProps {
     onCancel: () => void;
 }
 
-export const ConfirmModal: React.FC<ConfirmModalProps> = ({
+const ConfirmModalComponent: React.FC<ConfirmModalProps> = ({
     isOpen,
     title,
     message,
@@ -66,3 +66,5 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         </div>
     );
 };
+
+export const ConfirmModal = React.memo(ConfirmModalComponent);

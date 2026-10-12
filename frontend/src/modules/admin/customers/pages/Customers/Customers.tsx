@@ -1,59 +1,77 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useGetCustomers, useUpdateStatus } from '../../hooks/mutations/user.model';
 import { toast } from "react-toastify";
 import type { User, response } from '../../../../../shared/types/Dtos';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from "../../../../../shared/components/ui/ConfirmModal/ConfirmModal";
+import CustomerRow from "../../components/CustomerRaw";
+
+
 
 export default function Customers() {
-    const [customers,setCustomers] = useState<User[]>([])
-    const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null)
-    const [customerToChange, setCustomerToChange] = useState<{id: string, status: string} | null>(null)
+    const [customers, setCustomers] = useState<User[]>([]);
+    const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null);
+    const [customerToChange, setCustomerToChange] = useState<{ id: string; status: string } | null>(null);
 
-    const [page, setPage] = useState(0)
-    const [search, setSearch] = useState("")
-    const [filter,setFilter] = useState("")
-    const [limit] = useState(10)
-    const [, setTotal] = useState(0)
-    const [totalPages, setTotalPages] = useState(0)
+    const [page, setPage] = useState(0);
+    const [search, setSearch] = useState("");
+    const [filter, setFilter] = useState("");
+    const [limit] = useState(10);
+    const [, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
+    const getCustomers = useGetCustomers();
+    const updateStatus = useUpdateStatus();
 
-    const getCustomers = useGetCustomers()
-    const updateStatus = useUpdateStatus()
-    useEffect(()=>{
-        getCustomers.mutate({page,search,filter,limit}, {
-            onSuccess: (res: response<{users:User[],total:number,totalPages:number}>) => {
-                setCustomers(res.data.users)
-                setTotal(res.data.total)
-                setTotalPages(res.data.totalPages)
+    useEffect(() => {
+        getCustomers.mutate({ page, search, filter, limit }, {
+            onSuccess: (res: response<{ users: User[]; total: number; totalPages: number }>) => {
+                setCustomers(res.data.users);
+                setTotal(res.data.total);
+                setTotalPages(res.data.totalPages);
             }
-        })
-    },[filter,search,page])
+        });
+    }, [filter, search, page]);
 
+    const handleStatusButton = useCallback((id: string, status: string) => {
+        setCustomerToChange({ id, status });
+    }, []);
 
-    const handleStatusButton = (id:string, status:string)=>{
-        setCustomerToChange({ id, status })
-    }
+    const handleViewCustomer = useCallback((customer: User) => {
+        setSelectedCustomer(customer);
+    }, []);
 
-    const confirmStatusChange = () => {
+    const handleCloseCustomerModal = useCallback(() => {
+        setSelectedCustomer(null);
+    }, []);
+
+    const handleCancelStatusChange = useCallback(() => {
+        setCustomerToChange(null);
+    }, []);
+
+    const confirmStatusChange = useCallback(() => {
         if (!customerToChange) return;
-        const passStatus = customerToChange.status === "ACTIVE" ? "BLOCKED" : "ACTIVE"
-        updateStatus.mutate({id: customerToChange.id, status: passStatus}, {
-            onSuccess: (res: response<{users:User[]}>) => {
-                setCustomers((users:User[])=> 
-                    users.map((user)=>user.id === customerToChange.id ? {...user,status:passStatus} : user)
-                )
-                setCustomerToChange(null)
-                toast.success(res.message)
+        const passStatus = customerToChange.status === "ACTIVE" ? "BLOCKED" : "ACTIVE";
+        updateStatus.mutate({ id: customerToChange.id, status: passStatus }, {
+            onSuccess: (res: response<{ users: User[] }>) => {
+                setCustomers((users: User[]) => 
+                    users.map((user) => user.id === customerToChange.id ? { ...user, status: passStatus } : user)
+                );
+                setCustomerToChange(null);
+                toast.success(res.message);
             }
-        })
-    }
+        });
+    }, [customerToChange, updateStatus]);
 
-    const handleReset = () => {
-        setSearch("")
-        setFilter("")
-        setPage(1)
-    }
+    const handleReset = useCallback(() => {
+        setSearch("");
+        setFilter("");
+        setPage(1);
+    }, []);
+
+    const pageNumbers = useMemo(() => {
+        return Array.from({ length: totalPages }, (_, index) => index + 1);
+    }, [totalPages]);
     return (
         <>
         {updateStatus.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
@@ -130,27 +148,12 @@ export default function Customers() {
                                 </tr>
                             ) : customers.length > 0 ? (
                                 customers.map((customer) => (
-                                    <tr key={customer.id} style={customer.status === "BLOCKED" ? { backgroundColor: "rgba(239, 68, 68, 0.03)" } : {}}>
-                                        <td>
-                                            <div className="font-medium text-text">{customer.name}</div>
-                                        </td>
-                                        <td>{customer.email}</td>
-                                        <td>{customer.phone || 'N/A'}</td>
-                                        <td>{new Date(customer.created_at.toString()).toLocaleDateString()}</td>
-                                        <td>
-                                            <span className={`badge ${customer.status === 'ACTIVE' ? 'badge-verified' : customer.status === 'BLOCKED' ? 'badge-danger-alert' : 'badge-pending'}`}>
-                                                {customer.status === 'ACTIVE' ? 'Active' : customer.status === 'BLOCKED' ? 'Suspended' : customer.status}
-                                            </span>
-                                        </td>
-                                        <td className="text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button className="btn btn-secondary text-xs py-1 px-2" onClick={() => setSelectedCustomer(customer)}>View</button>
-                                                <button onClick={() => handleStatusButton(customer.id,customer.status)} className={`btn text-xs py-1 px-2 ${customer.status === 'ACTIVE' ? 'btn-danger' : 'btn-success'}`}>
-                                                    {customer.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <CustomerRow
+                                        key={customer.id}
+                                        customer={customer}
+                                        onView={handleViewCustomer}
+                                        onToggleStatus={handleStatusButton}
+                                    />
                                 ))
                             ) : (
                                 <tr>
@@ -183,10 +186,7 @@ export default function Customers() {
                             <i className="fas fa-chevron-left"></i>
                         </button>
 
-                        {Array.from(
-                            { length: totalPages },
-                            (_, index) => index + 1
-                        ).map((pageNumber) => (
+                        {pageNumbers.map((pageNumber) => (
                             <button
                                 key={pageNumber}
                                 className={`page-btn ${
@@ -221,7 +221,7 @@ export default function Customers() {
                         <i className="fas fa-id-card text-primary"></i>
                         <h3 className="h6 mb-0">Platform User Dossier</h3>
                     </div>
-                    <button className="btn-icon" onClick={() => setSelectedCustomer(null)}><i className="fas fa-times"></i></button>
+                    <button className="btn-icon" onClick={handleCloseCustomerModal}><i className="fas fa-times"></i></button>
                 </div>
                 <div className="admin-modal-body">
                     {selectedCustomer && (
@@ -260,7 +260,7 @@ export default function Customers() {
                     )}
                 </div>
                 <div className="admin-modal-footer">
-                    <button className="btn btn-secondary text-xs" onClick={() => setSelectedCustomer(null)}>Close</button>
+                    <button className="btn btn-secondary text-xs" onClick={handleCloseCustomerModal}>Close</button>
                 </div>
             </div>
         </div>
@@ -307,7 +307,7 @@ export default function Customers() {
             isDanger={customerToChange?.status === 'ACTIVE'}
             isLoading={updateStatus.isPending}
             onConfirm={confirmStatusChange}
-            onCancel={() => setCustomerToChange(null)}
+            onCancel={handleCancelStatusChange}
         />
         
         </>

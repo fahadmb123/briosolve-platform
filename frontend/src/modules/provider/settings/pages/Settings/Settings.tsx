@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense, useMemo, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Settings.css';
 import { SettingsMenuCard } from '../../components/SettingsMenuCard';
@@ -20,11 +20,6 @@ export default function Settings() {
   const [tradeServicesInfo, setTradeServicesInfo] = useState<{ total: number; active: number } | null>(null);
   const getProviderServices = useGetProviderServices();
 
-  const currentAddress =
-    user?.current_address_id && typeof user.current_address_id === 'object'
-      ? user.current_address_id
-      : null;
-
   useEffect(() => {
     getProviderServices.mutate(undefined, {
       onSuccess: (res) => {
@@ -37,7 +32,7 @@ export default function Settings() {
     });
   }, []);
 
-  const getTradeServicesBadge = () => {
+  const tradeServicesBadge = useMemo(() => {
     if (!tradeServicesInfo) return undefined;
     if (tradeServicesInfo.active > 0) {
       return { text: `${tradeServicesInfo.active} Active`, type: 'success' as const };
@@ -46,7 +41,7 @@ export default function Settings() {
       return { text: 'Inactive', type: 'warning' as const };
     }
     return { text: 'Action Required', type: 'warning' as const };
-  };
+  }, [tradeServicesInfo]);
 
   useEffect(() => {
     if ((location.state as { activeSection?: string })?.activeSection) {
@@ -57,6 +52,25 @@ export default function Settings() {
   const isContactVerified = Boolean(user?.email_verified && user?.phone_verified);
   const isAddressVerified = Boolean(user?.current_address_id);
 
+  const contactBadge = useMemo(() => (
+    isContactVerified ? { text: 'Verified', type: 'success' as const } : { text: 'Action Required', type: 'warning' as const }
+  ), [isContactVerified]);
+
+  const addressBadge = useMemo(() => (
+    isAddressVerified ? { text: 'Verified', type: 'success' as const } : { text: 'Action Required', type: 'warning' as const }
+  ), [isAddressVerified]);
+
+  const handleSelectAccount = useCallback(() => setActiveSection('account'), []);
+  const handleSelectBusiness = useCallback(() => setActiveSection('business'), []);
+  const handleSelectServices = useCallback(() => setActiveSection('services'), []);
+  const handleSelectAvailability = useCallback(() => setActiveSection('availability'), []);
+  const handleSelectNotifications = useCallback(() => setActiveSection('notifications'), []);
+  const handleSelectAddresses = useCallback(() => setActiveSection('addresses'), []);
+  const handleBackToGrid = useCallback(() => setActiveSection('grid'), []);
+
+  const handleServicesChange = useCallback((info: { total: number; active: number }) => {
+    setTradeServicesInfo(info);
+  }, []);
 
   return (
     <>
@@ -79,40 +93,40 @@ export default function Settings() {
                             icon="fas fa-user-shield"
                             title="Account & Security"
                             description="Configure your sign-in credentials and two-factor auth."
-                            onClick={() => setActiveSection('account')}
-                            badge={isContactVerified ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
+                            onClick={handleSelectAccount}
+                            badge={contactBadge}
                         />
                         <SettingsMenuCard
                             icon="fas fa-briefcase"
                             title="Business Profile"
                             description="Update your business name, bio, and years of experience."
-                            onClick={() => setActiveSection('business')}
+                            onClick={handleSelectBusiness}
                         />
                         <SettingsMenuCard
                             icon="fas fa-wrench"
                             title="Trade Services"
                             description="Manage the service categories you specialize in."
-                            onClick={() => setActiveSection('services')}
-                            badge={getTradeServicesBadge()}
+                            onClick={handleSelectServices}
+                            badge={tradeServicesBadge}
                         />
                         <SettingsMenuCard
                             icon="fas fa-calendar-alt"
                             title="Working Availability"
                             description="Configure your daily business hours and specific days off."
-                            onClick={() => setActiveSection('availability')}
+                            onClick={handleSelectAvailability}
                         />
                         <SettingsMenuCard
                             icon="fas fa-bell"
                             title="Notification Triggers"
                             description="Choose which marketplace events send you push alerts."
-                            onClick={() => setActiveSection('notifications')}
+                            onClick={handleSelectNotifications}
                         />
                         <SettingsMenuCard
                             icon="fas fa-map-pin"
                             title="Manage Addresses"
                             description="Save your business addresses for accurate local search matching."
-                            onClick={() => setActiveSection('addresses')}
-                            badge={isAddressVerified ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
+                            onClick={handleSelectAddresses}
+                            badge={addressBadge}
                         />
                     </div>
                 </div>
@@ -121,7 +135,7 @@ export default function Settings() {
                 
                 {activeSection !== 'grid' && (
                 <div id="settings-detail-view">
-                    <div className="settings-header-back" onClick={() => setActiveSection('grid')}>
+                    <div className="settings-header-back" onClick={handleBackToGrid}>
                         <i className="fas fa-arrow-left"></i>
                         <span>Back to Settings Menu</span>
                     </div>
@@ -163,7 +177,7 @@ export default function Settings() {
                         
                         {activeSection === 'services' && (
                         <div className="settings-card-panel" id="sec-services">
-                            <TradeServices onServicesChange={(info) => setTradeServicesInfo(info)} />
+                            <TradeServices onServicesChange={handleServicesChange} />
                         </div>
                         )}
 
