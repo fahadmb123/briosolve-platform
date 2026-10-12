@@ -52,5 +52,6 @@ export const providerController = new ProviderController(
     getProviderAvailabilityUseCase,
     getProviderAvailabilityOverridesUseCase,
     createProviderAvailabilityOverrideUseCase,
-    deleteProviderAvailabilityOverrideUseCase
+    deleteProviderAvailabilityOverrideUseCase,
+    imageUploadService
 );

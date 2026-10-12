@@ -22,7 +22,8 @@ import {
     passwordHasher,
     otpGenerate,
     emailSender,
-    pendingRegistrationStore
+    pendingRegistrationStore,
+    imageUploadService
 } from "./services.js";
 
 
@@ -62,7 +63,8 @@ export const updateCustomerProfileUseCase = new UpdateCustomerProfileUseCase(
 )
 export const updateProviderProfileUseCase = new UpdateProviderProfileUseCase(
     userRepository,
-    providerRepository
+    providerRepository,
+    imageUploadService
 )
 export const addAddressUseCase = new AddAddressUseCase(
     addressRepository,

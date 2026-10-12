@@ -3,6 +3,8 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
 import type {
     EmailVerificationUseCaseOutputDto,
     RegisterProviderInput,
@@ -23,11 +25,12 @@ export class ProviderController extends BaseController {
         private readonly preRegisterProviderUseCase: IUseCase<RegisterProviderInput, EmailVerificationUseCaseOutputDto>,
         private readonly registerProviderUseCase: IUseCase<CompleteProviderRegistrationInput, User>,
         private readonly updateProviderProfileUseCase: IUseCase<UpdateProviderProfileInputDto, void>,
-        private readonly setProviderAvailabilityUseCase?: IUseCase<SetProviderAvailabilityInputDto, ProviderAvailability[]>,
-        private readonly getProviderAvailabilityUseCase?: IUseCase<GetProviderAvailabilityInputDto, ProviderAvailability[]>,
-        private readonly getProviderAvailabilityOverridesUseCase?: IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverride[]>,
-        private readonly createProviderAvailabilityOverrideUseCase?: IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverride>,
-        private readonly deleteProviderAvailabilityOverrideUseCase?: IUseCase<DeleteAvailabilityOverrideInputDto, void>
+        private readonly setProviderAvailabilityUseCase: IUseCase<SetProviderAvailabilityInputDto, ProviderAvailability[]>,
+        private readonly getProviderAvailabilityUseCase: IUseCase<GetProviderAvailabilityInputDto, ProviderAvailability[]>,
+        private readonly getProviderAvailabilityOverridesUseCase: IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverride[]>,
+        private readonly createProviderAvailabilityOverrideUseCase: IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverride>,
+        private readonly deleteProviderAvailabilityOverrideUseCase: IUseCase<DeleteAvailabilityOverrideInputDto, void>,
+        private readonly imageUploadService: ImageUploadService
     ) { super(); }
 
     preRegister = async (req: Request, res: Response, next: NextFunction) => {
@@ -134,7 +137,40 @@ export class ProviderController extends BaseController {
                 userId: req.user?.userId!,
                 overrideId: req.params.id as string
             });
-            return sendSuccess(res, "Override deleted successfully");
+            return sendSuccess(res, "Deleted!");
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    uploadProfileImage = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.getCurrentUser(req)
+            if (!req.file) throw new ApplicationError("NO_DATA", "No image uploaded", "NOT_FOUND")
+    
+            const imageUrl = await this.imageUploadService!.uploadImage(req.file.buffer, 'profiles')
+
+            await this.updateProviderProfileUseCase.execute({
+                id: req.user?.userId!,
+                data: { profile_image: imageUrl }
+            });
+
+            return sendSuccess(res, "Updated!", { profile_image: imageUrl });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    deleteProfileImage = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.getCurrentUser(req);
+
+            await this.updateProviderProfileUseCase.execute({
+                id: req.user?.userId!,
+                data: { profile_image: "" }
+            });
+
+            return sendSuccess(res, "Deleted!", { profile_image: null });
         } catch (err) {
             next(err);
         }

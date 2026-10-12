@@ -3,6 +3,7 @@ import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
 import { useAuthStore } from '../store/auth/auth.store';
 import { useLogout } from '../modules/auth/hooks/mutations/use-otp-varify';
+import type { ProviderProfile } from '../shared/types/Dtos';
 import '../shared/styles/pro-badge.css';
 
 export default function ProviderLayout() {
@@ -12,6 +13,8 @@ export default function ProviderLayout() {
     const navigate = useNavigate();
     const clearAuth = useAuthStore((state) => state.clearAuth);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const user = useAuthStore((state) => state.user);
+    const profile = useAuthStore((state) => state.profile) as ProviderProfile | null;
     const logout = useLogout();
 
     const handleLogout = async () => {
@@ -154,8 +157,15 @@ export default function ProviderLayout() {
                         <i className="fas fa-sign-out-alt mr-1"></i>
                         <span>{isAuthenticated ? "Logout" : "Login"}</span>
                     </button>
-                    <Link to="/provider/profile" className="avatar avatar-sm ml-2" title="Arjun Menon (Verified Master Tech)">
-                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&amp;auto=format&amp;fit=crop&amp;q=80" alt="Arjun Menon" style={{borderRadius: '50%'}} />
+                    <Link to="/provider/profile" className="avatar avatar-sm ml-2" title={`${user?.name || profile?.business_name || "Provider"} (Verified Pro)`}>
+                        <img
+                            src={profile?.profile_image || "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=80"}
+                            alt={user?.name || "Provider"}
+                            style={{borderRadius: '50%'}}
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=80";
+                            }}
+                        />
                     </Link>
                 </div>
             </header>

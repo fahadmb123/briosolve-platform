@@ -9,13 +9,9 @@ const Appearance = lazy(() => import('./views/Appearance/Appearance').then(m => 
 const Contact = lazy(() => import('./views/Contact/Contact').then(m => ({ default: m.Contact })));
 const Security = lazy(() => import('./views/Security/Security').then(m => ({ default: m.Security })));
 const Notifications = lazy(() => import('./views/Notifications/Notifications').then(m => ({ default: m.Notifications })));
-const Location = lazy(() => import('./views/Location/Location').then(m => ({ default: m.Location })));
-const Privacy = lazy(() => import('./views/Privacy/Privacy').then(m => ({ default: m.Privacy })));
 const Addresses = lazy(() => import('./views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
 
-
-
-type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notifications' | 'location' | 'service-area' | 'privacy' | 'addresses';
+type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notifications' | 'addresses';
 
 export default function Settings() {
     const location = useLocation();
@@ -58,21 +54,7 @@ export default function Settings() {
                 onClick={() => setActiveView('notifications')}
             />
 
-            <SettingsMenuCard
-                icon="fas fa-map-marked-alt"
-                title="Service Area & Radius"
-                description="Define your search radius to find nearby verified specialists."
-                onClick={() => setActiveView('service-area')}
-                badge={currentAddress ? { text: 'Configured', type: 'success' } : { text: 'Action Required', type: 'warning' }}
-            />
 
-            <SettingsMenuCard
-                icon="fas fa-laptop-house"
-                title="Privacy & Sessions"
-                description="Manage connected devices and data visibility."
-                onClick={() => setActiveView('privacy')}
-            />
-            
             <SettingsMenuCard
                 icon="fas fa-map-pin"
                 title="Manage Addresses"
@@ -107,11 +89,7 @@ export default function Settings() {
                     {activeView === 'contact' && <Contact />}
                     {activeView === 'security' && <Security />}
                     {activeView === 'notifications' && <Notifications />}
-                    {(activeView === 'location' || activeView === 'service-area') && (
-                        <Location onManageAddresses={() => setActiveView('addresses')} />
-                    )}
                     {activeView === 'addresses' && <Addresses />}
-                    {activeView === 'privacy' && <Privacy />}
                 </Suspense>
             </div>
         </div>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Settings.css';
@@ -7,7 +6,6 @@ import { ChangePasswordForm } from '../../components/ChangePasswordForm';
 import { ContactInfo } from '../../components/ContactInfo';
 import { BusinessProfileForm } from '../../components/BusinessProfileForm';
 import { TradeServices } from '../../components/TradeServices';
-import { ServiceAreaRadius } from '../../components/ServiceAreaRadius';
 import { AvailabilitySettings } from '../../components/AvailabilitySettings';
 import { useGetProviderServices } from '../../hooks/mutations/useTradeService';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
@@ -18,7 +16,7 @@ const Addresses = lazy(() => import('../../../../customer/settings/pages/Setting
 export default function Settings() {
   const location = useLocation();
   const user = useAuthStore((state) => state.user);
-  const [activeSection, setActiveSection] = useState((location.state as any)?.activeSection || 'grid');
+  const [activeSection, setActiveSection] = useState((location.state as { activeSection?: string })?.activeSection || 'grid');
   const [tradeServicesInfo, setTradeServicesInfo] = useState<{ total: number; active: number } | null>(null);
   const getProviderServices = useGetProviderServices();
 
@@ -51,8 +49,8 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    if ((location.state as any)?.activeSection) {
-      setActiveSection((location.state as any).activeSection);
+    if ((location.state as { activeSection?: string })?.activeSection) {
+      setActiveSection((location.state as { activeSection?: string }).activeSection!);
     }
   }, [location.state]);
 
@@ -110,31 +108,11 @@ export default function Settings() {
                             onClick={() => setActiveSection('notifications')}
                         />
                         <SettingsMenuCard
-                            icon="fas fa-map-marked-alt"
-                            title="Service Area & Radius"
-                            description="Define your operating radius to only receive local jobs."
-                            onClick={() => setActiveSection('service-area')}
-                            badge={currentAddress ? { text: 'Configured', type: 'success' } : { text: 'Action Required', type: 'warning' }}
-                        />
-                        <SettingsMenuCard
-                            icon="fas fa-user-lock"
-                            title="Privacy & Sessions"
-                            description="Manage logged-in devices and public portfolio visibility."
-                            onClick={() => setActiveSection('privacy')}
-                        />
-                        <SettingsMenuCard
                             icon="fas fa-map-pin"
                             title="Manage Addresses"
                             description="Save your business addresses for accurate local search matching."
                             onClick={() => setActiveSection('addresses')}
                             badge={isAddressVerified ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
-                        />
-                        <SettingsMenuCard
-                            icon="fas fa-exclamation-triangle"
-                            title="Danger Zone"
-                            description="Deactivate your account and remove your active profile."
-                            onClick={() => setActiveSection('danger')}
-                            danger={true}
                         />
                     </div>
                 </div>
@@ -243,64 +221,6 @@ export default function Settings() {
                                     <span className="slider-round"></span>
                                 </label>
                             </div>
-                        </div>
-                        )}
-
-                        
-                        {activeSection === 'service-area' && (
-                            <ServiceAreaRadius onManageAddress={() => setActiveSection('addresses')} />
-                        )}
-
-                        
-                        {activeSection === 'privacy' && (
-                        <div className="settings-card-panel" id="sec-privacy">
-                            <h2 className="h5 mb-4">Privacy &amp; Security Sessions</h2>
-
-                            <div className="toggle-switch-row">
-                                <div>
-                                    <div className="font-bold text-sm text-text">Public Portfolio Visibility</div>
-                                    <div className="text-xs text-secondary">Display your past job photographs to prospective clients</div>
-                                </div>
-                                <label className="switch-slider-ctrl">
-                                    <input type="checkbox" checked />
-                                    <span className="slider-round"></span>
-                                </label>
-                            </div>
-
-                            <h3 className="h6 mb-2 mt-4 pt-3 border-top">Active Logged-in Devices</h3>
-                            <div className="session-device-row">
-                                <div>
-                                    <strong className="text-text block">Windows Chrome (Current Session)</strong>
-                                    <span className="text-xs text-muted">Mumbai, India • Active Now</span>
-                                </div>
-                                <span className="badge badge-success text-xs">Current</span>
-                            </div>
-                            <div className="session-device-row">
-                                <div>
-                                    <strong className="text-text block">Android Mobile App</strong>
-                                    <span className="text-xs text-muted">Mumbai, India • Last active 1 hour ago</span>
-                                </div>
-                                <button className="btn btn-outline btn-xs" onClick={() => {}}>Revoke</button>
-                            </div>
-
-                            <div className="mt-3">
-                                <button className="btn btn-outline text-xs text-danger" onClick={() => {}}>
-                                    <i className="fas fa-sign-out-alt mr-1"></i> Log Out from All Other Devices
-                                </button>
-                            </div>
-                        </div>
-                        )}
-
-                        
-                        {activeSection === 'danger' && (
-                        <div className="settings-card-panel danger-zone-box" id="sec-danger">
-                            <h2 className="h5 text-danger mb-1">Danger Zone</h2>
-                            <p className="text-xs text-secondary mb-3">
-                                Deactivating your provider account will permanently withdraw all active quotations and unlist your verified profile.
-                            </p>
-                            <button className="btn btn-outline text-xs text-danger" onClick={() => {}}>
-                                <i className="fas fa-trash-alt mr-1"></i> Deactivate Provider Account
-                            </button>
                         </div>
                         )}
 
