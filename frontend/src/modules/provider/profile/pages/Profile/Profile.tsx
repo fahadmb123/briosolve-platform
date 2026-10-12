@@ -6,6 +6,8 @@ import { ImageCropModal } from '../../../../../shared/components/ui/ImageCropMod
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useUpdateProfileImage } from '../../hooks/mutations/useUpdateProfileImage';
 import { useDeleteProfileImage } from '../../hooks/mutations/useDeleteProfileImage';
+import { useGetProviderServices } from '../../../settings/hooks/mutations/useTradeService';
+import type { PopulatedProviderService } from '../../../settings/services/settings.service';
 import type { ProviderProfile } from '../../../../../shared/types/Dtos';
 import './Profile.css';
 
@@ -18,8 +20,11 @@ export default function Profile() {
 
   const [profileImage, setProfileImage] = useState<string | null>(providerProfile?.profile_image || null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [services, setServices] = useState<PopulatedProviderService[]>([]);
+
   const { mutate: updateProfileImage, isPending: isImageUploading } = useUpdateProfileImage();
   const { mutate: deleteProfileImage, isPending: isImageDeleting } = useDeleteProfileImage();
+  const getProviderServices = useGetProviderServices();
 
   useEffect(() => {
     if (!user || !profile) {
@@ -28,13 +33,21 @@ export default function Profile() {
   }, [user, profile, fetchUser]);
 
   useEffect(() => {
-    (()=>{
-      if (providerProfile?.profile_image) {
-        setProfileImage(providerProfile.profile_image);
-      } else {
-        setProfileImage(null);
+    getProviderServices.mutate(undefined, {
+      onSuccess: (res) => {
+        if (res.data) {
+          setServices(res.data);
+        }
       }
-    })()
+    });
+  }, []);
+
+  useEffect(() => {
+    if (providerProfile?.profile_image) {
+      setProfileImage(providerProfile.profile_image);
+    } else {
+      setProfileImage(null);
+    }
   }, [providerProfile?.profile_image]);
 
   const handleCropComplete = (croppedFile: File) => {
@@ -104,7 +117,9 @@ export default function Profile() {
       <SpinnerOverlay isLoading={isImageUploading || isImageDeleting} />
 
       <div className="profile-premium-wrapper">
-        <div className="profile-banner"></div>
+        <div className="profile-banner flex items-start justify-end p-4">
+          
+        </div>
 
         <div className="profile-content-grid">
           <div className="flex flex-col gap-6 w-full">
@@ -130,9 +145,6 @@ export default function Profile() {
 
               <h2 className="h4 mb-1">{displayName}</h2>
               <div className="flex flex-wrap gap-1 justify-center mb-3">
-                <span className="badge badge-warning text-xs">
-                  <i className="fas fa-shield-alt mr-1"></i> Level 3 Master Pro
-                </span>
                 {providerProfile?.service_radius_km ? (
                   <span className="badge badge-primary text-xs">
                     <i className="fas fa-map-marker-alt mr-1"></i> {providerProfile.service_radius_km} km Radius
@@ -285,19 +297,27 @@ export default function Profile() {
           </div>
 
           <div className="profile-main-content">
+            <div className="bg-surface border border-border rounded-xl p-4 mb-6 flex justify-between items-center flex-wrap gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <i className="fas fa-user-cog"></i>
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-text">Want to edit your profile?</div>
+                  <div className="text-xs text-secondary">If you want to edit your profile details, business name, bio, or working availability, visit <Link to="/provider/settings" className="text-primary font-medium hover:underline">Settings</Link>.</div>
+                </div>
+              </div>
+              <Link to="/provider/settings" className="btn btn-outline btn-sm">
+                <i className="fas fa-cog mr-1"></i> Visit Settings
+              </Link>
+            </div>
+
             <div className="form-card-modern mb-6">
               <div className="flex justify-between items-center mb-4 pb-4 border-bottom">
                 <div>
                   <h3 className="h4 mb-0">About & Trade Background</h3>
                   <span className="badge badge-primary text-xs mt-2">{experienceText}</span>
                 </div>
-                <Link
-                  to="/provider/settings"
-                  state={{ activeSection: 'business' }}
-                  className="btn btn-outline btn-sm"
-                >
-                  <i className="fas fa-edit mr-1"></i> Edit
-                </Link>
               </div>
               <p className="text-sm text-secondary leading-relaxed m-0 mt-2">{bioText}</p>
 
@@ -327,186 +347,30 @@ export default function Profile() {
 
             <div className="form-card-modern mb-6">
               <div className="flex justify-between items-center mb-6 pb-4 border-bottom">
-                <div>
-                  <h3 className="h4 mb-0">Specialized Technical Skills</h3>
-                  <span className="text-xs text-secondary block mt-1">6 Core Competencies</span>
-                </div>
-                <Link
-                  to="/provider/settings"
-                  state={{ activeSection: 'services' }}
-                  className="btn btn-outline btn-sm"
-                >
-                  <i className="fas fa-plus mr-1"></i> Add
-                </Link>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <span className="badge badge-outline px-3 py-2 text-sm">
-                  <i className="fas fa-search text-xs mr-1"></i> Concealed Leak Detection
-                </span>
-                <span className="badge badge-outline px-3 py-2 text-sm">
-                  <i className="fas fa-gas-pump text-xs mr-1"></i> R32 & R410A Refrigerant
-                </span>
-                <span className="badge badge-outline px-3 py-2 text-sm">
-                  <i className="fas fa-fire text-xs mr-1"></i> CPVC / PPR Heat Welding
-                </span>
-                <span className="badge badge-outline px-3 py-2 text-sm">
-                  <i className="fas fa-tachometer-alt text-xs mr-1"></i> Pressure Pump Overhaul
-                </span>
-                <span className="badge badge-outline px-3 py-2 text-sm">
-                  <i className="fas fa-sliders-h text-xs mr-1"></i> Thermostatic Valve Balancing
-                </span>
-                <span className="badge badge-outline px-3 py-2 text-sm">
-                  <i className="fas fa-spray-can text-xs mr-1"></i> Anti-Bacterial Jet Washing
-                </span>
-              </div>
-            </div>
-
-            <div className="form-card-modern mb-6">
-              <div className="flex justify-between items-center mb-6 pb-4 border-bottom">
                 <h3 className="h4 mb-0">Active Service Categories</h3>
-                <Link
-                  to="/provider/settings"
-                  state={{ activeSection: 'services' }}
-                  className="btn btn-outline btn-sm"
-                >
-                  Manage Rates
-                </Link>
               </div>
               <div className="flex flex-col gap-3">
-                <div className="p-4 rounded-xl border border-border bg-surface-hover flex justify-between items-center transition-all hover:border-primary">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0">
-                      <i className="fas fa-faucet"></i>
+                {services.length > 0 ? (
+                  services.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-4 rounded-xl border border-border bg-surface-hover flex items-center justify-between transition-all hover:border-primary"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0">
+                          <i className="fas fa-tools"></i>
+                        </div>
+                        <div className="font-bold text-text">
+                          {item.service?.name || 'Service'}
+                        </div>
+                      </div>
                     </div>
-                    <div className="font-bold text-text">Residential Plumbing</div>
+                  ))
+                ) : (
+                  <div className="text-secondary text-sm py-4 text-center">
+                    No active services found
                   </div>
-                  <div className="text-right">
-                    <div className="text-xs text-secondary mb-1">94 Completed Jobs</div>
-                    <div className="font-bold text-text">From ₹1,200</div>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl border border-border bg-surface-hover flex justify-between items-center transition-all hover:border-primary">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0">
-                      <i className="fas fa-snowflake"></i>
-                    </div>
-                    <div className="font-bold text-text">AC Repair & Maintenance</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-secondary mb-1">38 Completed Jobs</div>
-                    <div className="font-bold text-text">From ₹1,800</div>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl border border-border bg-surface-hover flex justify-between items-center transition-all hover:border-primary">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0">
-                      <i className="fas fa-bolt"></i>
-                    </div>
-                    <div className="font-bold text-text">Appliance Electricals</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-secondary mb-1">10 Completed Jobs</div>
-                    <div className="font-bold text-text">From ₹800</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="form-card-modern mb-6">
-              <div className="flex justify-between items-center mb-6 pb-4 border-bottom">
-                <div>
-                  <h3 className="h4 mb-0">Completed Job Portfolio</h3>
-                  <p className="text-xs text-secondary mt-1 mb-0">
-                    Verified before & after work showcases attached to quotation proposals
-                  </p>
-                </div>
-                <button type="button" className="btn btn-outline btn-sm">
-                  <i className="fas fa-plus mr-1"></i> Add Project
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="rounded-xl overflow-hidden border border-border bg-surface relative group cursor-pointer">
-                  <div className="h-40 relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop&q=80"
-                      alt="Concealed Pipe Repair"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <span className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold">
-                      <i className="fas fa-check mr-1"></i> 90-Day Warranty
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <div className="font-bold text-sm text-text mb-1 truncate">Concealed Sink Manifold</div>
-                    <div className="flex justify-between text-xs text-secondary">
-                      <span>{currentAddress?.city ? `${currentAddress.city} West` : 'Andheri West'}</span>
-                      <span>Oct 2026</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl overflow-hidden border border-border bg-surface relative group cursor-pointer">
-                  <div className="h-40 relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&auto=format&fit=crop&q=80"
-                      alt="AC Coil Jet Cleaning"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <span className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold">
-                      <i className="fas fa-snowflake mr-1"></i> Deep Sanitized
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <div className="font-bold text-sm text-text mb-1 truncate">Split AC Foam Jet Wash</div>
-                    <div className="flex justify-between text-xs text-secondary">
-                      <span>{currentAddress?.city ? `${currentAddress.city} Central` : 'Bandra West'}</span>
-                      <span>Sep 2026</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl overflow-hidden border border-border bg-surface relative group cursor-pointer">
-                  <div className="h-40 relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=600&auto=format&fit=crop&q=80"
-                      alt="Brass Diverter Assembly"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <span className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold">
-                      <i className="fas fa-certificate mr-1"></i> OEM Brass
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <div className="font-bold text-sm text-text mb-1 truncate">Brass Diverter Assembly</div>
-                    <div className="flex justify-between text-xs text-secondary">
-                      <span>{currentAddress?.city ? `${currentAddress.city} East` : 'Borivali East'}</span>
-                      <span>Aug 2026</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl overflow-hidden border border-border bg-surface relative group cursor-pointer">
-                  <div className="h-40 relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=600&auto=format&fit=crop&q=80"
-                      alt="Copper Coil Wiring"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <span className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold">
-                      <i className="fas fa-bolt mr-1"></i> Polycab Wire
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <div className="font-bold text-sm text-text mb-1 truncate">Copper Coil Wiring</div>
-                    <div className="flex justify-between text-xs text-secondary">
-                      <span>{currentAddress?.city ? `${currentAddress.city} North` : 'Goregaon'}</span>
-                      <span>Jul 2026</span>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
