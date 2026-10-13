@@ -42,6 +42,8 @@ export type UserResponseDto = {
     current_address_id: string | Address | null;
     created_at: Date;
     updated_at: Date;
+    customer_profile?: CustomerProfile | null;
+    provider_profile?: ProviderProfile | null;
 }
 
 export type CustomerProfileResponseDto = {

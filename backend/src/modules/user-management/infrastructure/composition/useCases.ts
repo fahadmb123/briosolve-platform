@@ -3,6 +3,7 @@ import { DeleteAddressUseCase } from "../../application/use-cases/deleteAddress.
 import { EditAddressUseCase } from "../../application/use-cases/editAddress.useCase.js";
 import { GetAddressesUseCase } from "../../application/use-cases/getAddresses.useCase.js";
 import GetCustomersUseCase from "../../application/use-cases/getCustomers.useCase.js";
+import GetProvidersUseCase from "../../application/use-cases/getProviders.useCase.js";
 import GetProfileUseCase from "../../application/use-cases/getProfile.useCase.js";
 import RegisterCustomerUseCase from "../../application/use-cases/registerCustomer.useCase.js";
 import RegisterProviderUseCase from "../../application/use-cases/registerProvider.useCase.js";
@@ -47,6 +48,9 @@ export const registerProviderUseCase = new RegisterProviderUseCase(
     providerAvailabilityRepository
 )
 export const getCustomerUseCase = new GetCustomersUseCase(
+    userRepository
+)
+export const getProvidersUseCase = new GetProvidersUseCase(
     userRepository
 )
 export const updateUserStatusUseCase = new UpdateUserStatusUseCase(

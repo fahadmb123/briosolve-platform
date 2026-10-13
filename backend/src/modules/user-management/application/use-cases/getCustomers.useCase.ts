@@ -12,7 +12,10 @@ export default class GetCustomersUseCase implements IGetCustomersUseCase{
     ){}
 
     async execute (input:getCustomersDto):Promise<{users:User[],total:number,totalPages:number}>{
-        const response = await this.userRepository.getCustomers(input)
+        const response = await this.userRepository.getUsersWithRole({
+            role: "CUSTOMER",
+            ...input
+        });
 
         const totalPages = Math.ceil(response.total / input.limit)
         return {

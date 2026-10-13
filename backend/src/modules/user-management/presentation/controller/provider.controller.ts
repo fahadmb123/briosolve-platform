@@ -3,6 +3,8 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
+import { IGetProvidersUseCase } from "../../domain/interfaces/use-cases/IGetProvidersUseCase.js";
+import { UserResponseMapper } from "../mappers/userResponse.mapper.js";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
 import type {
@@ -30,8 +32,30 @@ export class ProviderController extends BaseController {
         private readonly getProviderAvailabilityOverridesUseCase: IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverride[]>,
         private readonly createProviderAvailabilityOverrideUseCase: IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverride>,
         private readonly deleteProviderAvailabilityOverrideUseCase: IUseCase<DeleteAvailabilityOverrideInputDto, void>,
-        private readonly imageUploadService: ImageUploadService
+        private readonly imageUploadService: ImageUploadService,
+        private readonly getProvidersUseCase: IGetProvidersUseCase
     ) { super(); }
+
+    getProviders = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.getCurrentUser(req);
+
+            const response = await this.getProvidersUseCase.execute({
+                page: Number(req.query.page) || 1,
+                limit: Number(req.query.limit) || 10,
+                filter: req.query.filter as string | undefined,
+                search: req.query.search as string | undefined
+            });
+
+            return sendSuccess(res, "", {
+                users: response.users.map(u => UserResponseMapper.toDto(u)),
+                total: response.total,
+                totalPages: response.totalPages
+            });
+        } catch (err) {
+            next(err);
+        }
+    }
 
     preRegister = async (req: Request, res: Response, next: NextFunction) => {
         try {

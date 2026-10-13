@@ -1,0 +1,19 @@
+import { apiClient } from '../../../../shared/api/Client';
+import type { response, User } from '../../../../shared/types/Dtos';
+
+type getProvidersInput = {
+    page: number;
+    limit: number;
+    search: string;
+    filter: string;
+};
+
+export const getProviders = async (params: getProvidersInput): Promise<response<{ users: User[]; total: number; totalPages: number }>> => {
+    const response = await apiClient.get("/api/user/providers", { params });
+    return response.data;
+};
+
+export const updateStatus = async (data: { id: string; status: string }): Promise<response<{ users: User[] }>> => {
+    const response = await apiClient.patch(`/api/user/status/${data.id}`, data);
+    return response.data;
+};

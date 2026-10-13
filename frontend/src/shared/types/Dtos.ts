@@ -10,13 +10,15 @@ export type User = {
     name: string;
     email: string;
     phone:string|null
-    password_hash: string;
+    password_hash?: string;
     role: "CUSTOMER" | "ADMIN" | "PROVIDER";
     status: "ACTIVE" | "INACTIVE" | "BLOCKED";
     email_verified: boolean;
     phone_verified: boolean;
-    created_at: Temporal.Instant;
-    updated_at: Temporal.Instant;
+    created_at: Temporal.Instant | string | Date;
+    updated_at: Temporal.Instant | string | Date;
+    customer_profile?: CustomerProfile | null;
+    provider_profile?: ProviderProfile | null;
 }
 
 

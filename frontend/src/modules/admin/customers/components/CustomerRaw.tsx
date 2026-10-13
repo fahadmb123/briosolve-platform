@@ -8,10 +8,22 @@ interface CustomerRowProps {
 }
 
 const CustomerRow = React.memo<CustomerRowProps>(({ customer, onView, onToggleStatus }) => {
+    const profile = customer.customer_profile;
+
     return (
         <tr style={customer.status === "BLOCKED" ? { backgroundColor: "rgba(239, 68, 68, 0.03)" } : {}}>
             <td>
-                <div className="font-medium text-text">{customer.name}</div>
+                <div className="customer-info-cell flex items-center gap-2">
+                    <img
+                        src={profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(customer.name)}&background=6B7C98&color=fff`}
+                        className="avatar avatar-sm rounded-full"
+                        alt={customer.name}
+                        style={{ width: '36px', height: '36px', objectFit: 'cover' }}
+                    />
+                    <div>
+                        <div className="font-medium text-text">{customer.name}</div>
+                    </div>
+                </div>
             </td>
             <td>{customer.email}</td>
             <td>{customer.phone || 'N/A'}</td>

@@ -227,7 +227,12 @@ export default function Customers() {
                     {selectedCustomer && (
                         <>
                             <div className="text-center mb-6">
-                                <img src={`https://ui-avatars.com/api/?name=${selectedCustomer.name}&background=6366F1&color=fff`} className="avatar avatar-lg mx-auto mb-3 border border-border" alt="Avatar" style={{ width: '80px', height: '80px' }} />
+                                <img
+                                    src={selectedCustomer.customer_profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedCustomer.name)}&background=6366F1&color=fff`}
+                                    className="avatar avatar-lg mx-auto mb-3 border border-border rounded-full"
+                                    alt="Avatar"
+                                    style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                                />
                                 <h4 className="h5 mb-1 text-text">{selectedCustomer.name}</h4>
                                 <span className={`badge ${selectedCustomer.status === 'ACTIVE' ? 'badge-verified' : selectedCustomer.status === 'BLOCKED' ? 'badge-danger-alert' : 'badge-pending'} text-xs`}>
                                     {selectedCustomer.status}
