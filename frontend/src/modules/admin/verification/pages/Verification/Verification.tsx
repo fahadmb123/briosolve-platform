@@ -13,6 +13,7 @@ import {
 } from "../../hooks/useAdminVerifications";
 import type {
   AdminKycDossier,
+  AdminKycDocument,
   AdminKycStats,
 } from "../../types/verification.types";
 
@@ -32,10 +33,14 @@ export default function Verification() {
   const [selectedDossier, setSelectedDossier] = useState<AdminKycDossier | null>(
     null
   );
-  const [dossierToApprove, setDossierToApprove] =
-    useState<AdminKycDossier | null>(null);
-  const [dossierToReject, setDossierToReject] =
-    useState<AdminKycDossier | null>(null);
+  const [docToApprove, setDocToApprove] = useState<{
+    dossier: AdminKycDossier;
+    doc: AdminKycDocument;
+  } | null>(null);
+  const [docToReject, setDocToReject] = useState<{
+    dossier: AdminKycDossier;
+    doc: AdminKycDocument;
+  } | null>(null);
 
   const getVerifications = useGetAdminVerifications();
   const updateKycStatus = useUpdateKycStatus();
@@ -67,56 +72,61 @@ export default function Verification() {
     fetchVerifications();
   }, [fetchVerifications]);
 
-  const handleApprove = useCallback((dossier: AdminKycDossier) => {
-    setDossierToApprove(dossier);
-  }, []);
 
-  const confirmApprove = useCallback(() => {
-    if (!dossierToApprove) return;
+  const handleApproveDocument = useCallback(
+    (dossier: AdminKycDossier, doc: AdminKycDocument) => {
+      setDocToApprove({ dossier, doc });
+    },
+    []
+  );
+
+  const confirmApproveDocument = useCallback(() => {
+    if (!docToApprove) return;
     updateKycStatus.mutate(
       {
-        providerId: dossierToApprove.id,
+        providerId: docToApprove.dossier.id,
+        documentId: docToApprove.doc.id,
         status: "APPROVED",
       },
       {
         onSuccess: (res) => {
-          toast.success(
-            res?.message || "Provider verification approved successfully."
-          );
-          setDossierToApprove(null);
+          toast.success(res?.message || "Document approved successfully.");
+          setDocToApprove(null);
           setSelectedDossier(null);
           fetchVerifications();
         },
       }
     );
-  }, [dossierToApprove, updateKycStatus, fetchVerifications]);
+  }, [docToApprove, updateKycStatus, fetchVerifications]);
 
-  const handleReject = useCallback((dossier: AdminKycDossier) => {
-    setDossierToReject(dossier);
-  }, []);
+  const handleRejectDocument = useCallback(
+    (dossier: AdminKycDossier, doc: AdminKycDocument) => {
+      setDocToReject({ dossier, doc });
+    },
+    []
+  );
 
-  const confirmReject = useCallback(
+  const confirmRejectDocument = useCallback(
     (reason: string) => {
-      if (!dossierToReject) return;
+      if (!docToReject) return;
       updateKycStatus.mutate(
         {
-          providerId: dossierToReject.id,
+          providerId: docToReject.dossier.id,
+          documentId: docToReject.doc.id,
           status: "REJECTED",
           rejectionReason: reason,
         },
         {
           onSuccess: (res) => {
-            toast.success(
-              res?.message || "Provider verification rejected successfully."
-            );
-            setDossierToReject(null);
+            toast.success(res?.message || "Document rejected successfully.");
+            setDocToReject(null);
             setSelectedDossier(null);
             fetchVerifications();
           },
         }
       );
     },
-    [dossierToReject, updateKycStatus, fetchVerifications]
+    [docToReject, updateKycStatus, fetchVerifications]
   );
 
   const handleResetFilters = useCallback(() => {
@@ -345,28 +355,27 @@ export default function Verification() {
         onClose={() => setSelectedDossier(null)}
         dossier={selectedDossier}
         isLoading={updateKycStatus.isPending}
-        onApprove={handleApprove}
-        onReject={handleReject}
+        onApproveDocument={handleApproveDocument}
+        onRejectDocument={handleRejectDocument}
       />
 
+
       <ConfirmModal
-        isOpen={!!dossierToApprove}
-        title="Approve Provider Verification"
-        message={`Are you sure you want to verify and approve ${
-          dossierToApprove?.user.name || "this provider"
-        }? This will grant them marketplace verified status.`}
-        confirmText="Approve Verification"
+        isOpen={!!docToApprove}
+        title="Approve Document"
+        message={`Approve the "${docToApprove?.doc.document_name || docToApprove?.doc.document_type}" submitted by ${docToApprove?.dossier.user.name || "this provider"}?`}
+        confirmText="Approve Document"
         isLoading={updateKycStatus.isPending}
-        onConfirm={confirmApprove}
-        onCancel={() => setDossierToApprove(null)}
+        onConfirm={confirmApproveDocument}
+        onCancel={() => setDocToApprove(null)}
       />
 
       <RejectKycModal
-        isOpen={!!dossierToReject}
-        onClose={() => setDossierToReject(null)}
-        providerName={dossierToReject?.user.name || "Provider"}
+        isOpen={!!docToReject}
+        onClose={() => setDocToReject(null)}
+        providerName={`${docToReject?.doc.document_name || docToReject?.doc.document_type} — ${docToReject?.dossier.user.name || "Provider"}`}
         isLoading={updateKycStatus.isPending}
-        onConfirm={confirmReject}
+        onConfirm={confirmRejectDocument}
       />
     </>
   );

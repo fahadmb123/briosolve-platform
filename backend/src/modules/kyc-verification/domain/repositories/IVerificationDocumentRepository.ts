@@ -1,5 +1,6 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository.js";
 import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../entities/verificationDocument.entity.js";
+import { VerificationProfile } from "../entities/verificationProfile.entity.js";
 import { CreateVerificationDocumentInputDto, UpdateVerificationDocumentRepositoryDto } from "../../application/Dto/verificationDto.js";
 
 export interface GetAdminKycRequestsInput {
@@ -58,11 +59,10 @@ export interface GetAdminKycResponse {
     stats: AdminKycStats;
 }
 
-export interface UpdateKycStatusInput {
-    providerId: string;
+export interface UpdateDocumentStatusInput {
+    documentId: string;
     status: "APPROVED" | "REJECTED";
-    rejectionReason?: string;
-    documentId?: string;
+    rejectionReason?: string | null;
 }
 
 export interface IVerificationDocumentRepository extends BaseRepository<VerificationDocument | null> {
@@ -74,5 +74,8 @@ export interface IVerificationDocumentRepository extends BaseRepository<Verifica
     updateStatus(id: string, status: VerificationDocumentStatus, rejectionReason?: string | null): Promise<VerificationDocument | null>;
     deleteDocument(id: string): Promise<boolean>;
     getAdminKycRequests(input: GetAdminKycRequestsInput): Promise<GetAdminKycResponse>;
-    updateKycStatus(input: UpdateKycStatusInput): Promise<void>;
+    getAllProfilesWithVerifications(): Promise<VerificationProfile[]>;
+    resolveProviderProfileId(providerId: string): Promise<string>;
+    updateDocumentStatus(input: UpdateDocumentStatusInput): Promise<void>;
+    updateProviderKycStatus(profileId: string, kycStatus: string): Promise<void>;
 }

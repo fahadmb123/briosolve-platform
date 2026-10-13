@@ -5,11 +5,13 @@ import {
     IVerificationDocumentRepository,
     GetAdminKycRequestsInput,
     GetAdminKycResponse,
-    UpdateKycStatusInput,
+    UpdateDocumentStatusInput,
     AdminKycDossier,
     AdminKycStats
 } from "../../domain/repositories/IVerificationDocumentRepository.js";
 import { VerificationDocumentMapper } from "../mappers/verificationDocument.mapper.js";
+import { VerificationProfile } from "../../domain/entities/verificationProfile.entity.js";
+import { VerificationProfileMapper } from "../mappers/verificationProfile.mapper.js";
 import { CreateVerificationDocumentInputDto, UpdateVerificationDocumentRepositoryDto, VerificationDocumentRaw } from "../../application/Dto/verificationDto.js";
 
 export class VerificationDocumentRepository implements IVerificationDocumentRepository {
@@ -92,7 +94,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
             .where({ id: input.provider_id as never })
             .first();
 
-        if (profile && profile.kyc_status !== 'APPROVED') {
+        if (profile) {
             await db.orm.public.provider_profiles
                 .where({ id: input.provider_id as never })
                 .update({
@@ -149,7 +151,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
                 .where({ id: doc.provider_id as never })
                 .first();
 
-            if (profile && profile.kyc_status !== 'APPROVED') {
+            if (profile) {
                 await db.orm.public.provider_profiles
                     .where({ id: doc.provider_id as never })
                     .update({
@@ -200,9 +202,31 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
                     kyc_status: 'NOT_SUBMITTED',
                     updated_at: Temporal.Now.instant()
                 } as never);
+        } else {
+            const hasIdentityApproved = remainingDocs.some((d) => d.document_type === "IDENTITY" && d.status === "APPROVED");
+            const hasCertificateApproved = remainingDocs.some((d) => d.document_type === "CERTIFICATE" && d.status === "APPROVED");
+            const bothApproved = hasIdentityApproved && hasCertificateApproved;
+            const allRejected = remainingDocs.every((d) => d.status === "REJECTED");
+            const newKycStatus = bothApproved ? "APPROVED" : allRejected ? "REJECTED" : "PENDING";
+            await db.orm.public.provider_profiles
+                .where({ id: doc.provider_id as never })
+                .update({
+                    kyc_status: newKycStatus,
+                    updated_at: Temporal.Now.instant()
+                } as never);
         }
 
         return true;
+    }
+
+    async getAllProfilesWithVerifications(): Promise<VerificationProfile[]> {
+        const records = await db.orm.public.provider_profiles
+            .include("user")
+            .include("services", (s) => s.include("service"))
+            .include("verification_documents", (d) => d.include("files"))
+            .all();
+
+        return records.map((record) => VerificationProfileMapper.toDomain(record));
     }
 
     async getAdminKycRequests(input: GetAdminKycRequestsInput): Promise<GetAdminKycResponse> {
@@ -210,91 +234,55 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
         const limit = input.limit || 10;
         const skip = (page - 1) * limit;
 
-        const allProfiles = await db.orm.public.provider_profiles
-            .include("user")
-            .include("services", (s) => s.include("service"))
-            .include("verification_documents", (d) => d.include("files"))
-            .all();
-
-        const submittedProfiles = allProfiles.filter(
-            (p) => p.kyc_status !== "NOT_SUBMITTED" || (p.verification_documents && p.verification_documents.length > 0)
-        );
+        const allProfiles = await this.getAllProfilesWithVerifications();
+        const submittedProfiles = allProfiles.filter((p) => p.hasUploadedDocuments());
 
         const stats: AdminKycStats = {
-            pending: submittedProfiles.filter((p) => p.kyc_status === "PENDING").length,
-            approved: submittedProfiles.filter((p) => p.kyc_status === "APPROVED").length,
-            rejected: submittedProfiles.filter((p) => p.kyc_status === "REJECTED").length,
+            pending: submittedProfiles.filter((p) => p.hasPendingDocuments()).length,
+            approved: submittedProfiles.filter((p) => p.areAllDocumentsApproved()).length,
+            rejected: submittedProfiles.filter((p) => p.hasRejectedDocuments()).length,
             total: submittedProfiles.length,
         };
 
         let filtered = submittedProfiles;
 
         if (input.status && input.status !== "ALL") {
-            filtered = filtered.filter((p) => p.kyc_status === input.status);
+            if (input.status === "PENDING") {
+                filtered = filtered.filter((p) => p.hasPendingDocuments());
+            } else if (input.status === "APPROVED") {
+                filtered = filtered.filter((p) => p.areAllDocumentsApproved());
+            } else if (input.status === "REJECTED") {
+                filtered = filtered.filter((p) => p.hasRejectedDocuments());
+            }
         }
 
         if (input.search) {
-            const q = input.search.trim().toLowerCase();
-            filtered = filtered.filter((p: any) =>
-                p.user?.email?.toLowerCase().includes(q)
-            );
+            filtered = filtered.filter((p) => p.matchesSearch(input.search!));
         }
 
         if (input.sort === "asc") {
-            filtered.sort((a, b) => new Date(a.created_at.toString()).getTime() - new Date(b.created_at.toString()).getTime());
+            filtered.sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
         } else {
-            filtered.sort((a, b) => new Date(b.created_at.toString()).getTime() - new Date(a.created_at.toString()).getTime());
+            filtered.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
         }
 
         const total = filtered.length;
         const totalPages = Math.ceil(total / limit) || 1;
         const paginated = filtered.slice(skip, skip + limit);
 
-        const dossiers: AdminKycDossier[] = paginated.map((p: any) => ({
-            id: p.id,
-            user_id: p.user_id,
-            business_name: p.business_name,
-            experience: p.experience,
-            bio: p.bio,
-            profile_image: p.profile_image,
-            kyc_status: p.kyc_status,
-            created_at: p.created_at,
-            updated_at: p.updated_at,
-            user: {
-                id: p.user?.id,
-                name: p.user?.name,
-                email: p.user?.email,
-                phone: p.user?.phone ?? null,
-            },
-            services: (p.services || []).map((s: any) => ({
-                id: s.service?.id || s.id,
-                name: s.service?.name || "Service",
-            })),
-            documents: (p.verification_documents || []).map((d: any) => ({
-                id: d.id,
-                document_type: d.document_type,
-                document_name: d.document_name,
-                status: d.status,
-                rejection_reason: d.rejection_reason ?? null,
-                created_at: d.created_at,
-                files: (d.files || []).map((f: any) => ({
-                    id: f.id,
-                    file_url: f.file_url,
-                })),
-            })),
-        }));
+        const dossiers = paginated.map((profile) => VerificationProfileMapper.toDossier(profile));
 
         return { dossiers, total, totalPages, stats };
     }
 
-    async updateKycStatus(input: UpdateKycStatusInput): Promise<void> {
+    async resolveProviderProfileId(providerId: string): Promise<string> {
         let profile = await db.orm.public.provider_profiles
-            .where({ id: input.providerId as never })
+            .where({ id: providerId as never })
             .first();
 
         if (!profile) {
             profile = await db.orm.public.provider_profiles
-                .where({ user_id: input.providerId as never })
+                .where({ user_id: providerId as never })
                 .first();
         }
 
@@ -302,51 +290,25 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
             throw new Error("Provider profile not found");
         }
 
-        if (input.documentId) {
-            await db.orm.public.provider_verification_documents
-                .where({ id: input.documentId as never })
-                .update({
-                    status: input.status as never,
-                    rejection_reason: (input.status === "REJECTED" ? input.rejectionReason || "Verification rejected" : null) as never,
-                    updated_at: Temporal.Now.instant(),
-                } as never);
+        return (profile as any).id as string;
+    }
 
-            const allDocs = await db.orm.public.provider_verification_documents
-                .where({ provider_id: profile.id as never })
-                .all();
+    async updateDocumentStatus(input: UpdateDocumentStatusInput): Promise<void> {
+        await db.orm.public.provider_verification_documents
+            .where({ id: input.documentId as never })
+            .update({
+                status: input.status as never,
+                rejection_reason: (input.status === "REJECTED" ? input.rejectionReason || "Verification rejected" : null) as never,
+                updated_at: Temporal.Now.instant(),
+            } as never);
+    }
 
-            const hasRejected = allDocs.some((d) => d.status === "REJECTED");
-            const allApproved = allDocs.length > 0 && allDocs.every((d) => d.status === "APPROVED");
-
-            const newKycStatus = hasRejected ? "REJECTED" : allApproved ? "APPROVED" : "PENDING";
-
-            await db.orm.public.provider_profiles
-                .where({ id: profile.id as never })
-                .update({
-                    kyc_status: newKycStatus as never,
-                    updated_at: Temporal.Now.instant(),
-                } as never);
-        } else {
-            await db.orm.public.provider_profiles
-                .where({ id: profile.id as never })
-                .update({
-                    kyc_status: input.status as never,
-                    updated_at: Temporal.Now.instant(),
-                } as never);
-
-            const docs = await db.orm.public.provider_verification_documents
-                .where({ provider_id: profile.id as never })
-                .all();
-
-            for (const doc of docs) {
-                await db.orm.public.provider_verification_documents
-                    .where({ id: (doc as any).id as never })
-                    .update({
-                        status: input.status as never,
-                        rejection_reason: (input.status === "REJECTED" ? input.rejectionReason || "Verification rejected" : null) as never,
-                        updated_at: Temporal.Now.instant(),
-                    } as never);
-            }
-        }
+    async updateProviderKycStatus(profileId: string, kycStatus: string): Promise<void> {
+        await db.orm.public.provider_profiles
+            .where({ id: profileId as never })
+            .update({
+                kyc_status: kycStatus as never,
+                updated_at: Temporal.Now.instant(),
+            } as never);
     }
 }

@@ -48,6 +48,12 @@ export const updatePasswordSchema = z
 export type UpdatePasswordInputType = z.infer<typeof updatePasswordSchema>;
 
 export const businessProfileSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: "Full name is required" })
+    .min(2, { message: "Full name must be at least 2 characters" })
+    .max(50, { message: "Full name cannot exceed 50 characters" }),
   businessName: z
     .string()
     .trim()

@@ -9,8 +9,8 @@ interface VerificationReviewModalProps {
   onClose: () => void;
   dossier: AdminKycDossier | null;
   isLoading?: boolean;
-  onApprove: (dossier: AdminKycDossier) => void;
-  onReject: (dossier: AdminKycDossier) => void;
+  onApproveDocument?: (dossier: AdminKycDossier, doc: AdminKycDocument) => void;
+  onRejectDocument?: (dossier: AdminKycDossier, doc: AdminKycDocument) => void;
 }
 
 const formatDocType = (type: string): string =>
@@ -24,8 +24,8 @@ export const VerificationReviewModal: React.FC<VerificationReviewModalProps> = (
   onClose,
   dossier,
   isLoading,
-  onApprove,
-  onReject,
+  onApproveDocument,
+  onRejectDocument,
 }) => {
   const [previewImage, setPreviewImage] = useState<{ url: string; title?: string } | null>(null);
 
@@ -51,32 +51,10 @@ export const VerificationReviewModal: React.FC<VerificationReviewModalProps> = (
       >
         Close
       </button>
-
       {isPending && (
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="btn btn-danger text-xs"
-            disabled={isLoading}
-            onClick={() => onReject(dossier)}
-          >
-            <i className="fas fa-times-circle mr-1"></i>
-            <span>Reject Application</span>
-          </button>
-          <button
-            type="button"
-            className="btn btn-success text-xs font-semibold"
-            disabled={isLoading}
-            onClick={() => onApprove(dossier)}
-          >
-            <i
-              className={`fas ${
-                isLoading ? "fa-spinner fa-spin" : "fa-check-circle"
-              } mr-1`}
-            ></i>
-            <span>{isLoading ? "Approving..." : "Approve Verification"}</span>
-          </button>
-        </div>
+        <span className="text-[11px] text-muted italic">
+          Review each document below to approve or reject individually.
+        </span>
       )}
     </div>
   );
@@ -185,17 +163,39 @@ export const VerificationReviewModal: React.FC<VerificationReviewModalProps> = (
                             </div>
                           </div>
                         </div>
-                        <span
-                          className={`badge text-[10px] uppercase px-2 py-0.5 rounded ${
-                            doc.status === "APPROVED"
-                              ? "bg-success/15 text-success border border-success/20"
-                              : doc.status === "REJECTED"
-                              ? "bg-danger/15 text-danger border border-danger/20"
-                              : "bg-warning/15 text-warning border border-warning/20"
-                          }`}
-                        >
-                          {doc.status}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`badge text-[10px] uppercase px-2 py-0.5 rounded ${
+                              doc.status === "APPROVED"
+                                ? "bg-success/15 text-success border border-success/20"
+                                : doc.status === "REJECTED"
+                                ? "bg-danger/15 text-danger border border-danger/20"
+                                : "bg-warning/15 text-warning border border-warning/20"
+                            }`}
+                          >
+                            {doc.status}
+                          </span>
+                          {doc.status === "PENDING" && onApproveDocument && onRejectDocument && (
+                            <>
+                              <button
+                                type="button"
+                                className="btn btn-xs text-success border border-success/30 bg-success/10 hover:bg-success/20 px-2 py-0.5 rounded text-[10px] font-medium"
+                                disabled={isLoading}
+                                onClick={() => onApproveDocument(dossier, doc)}
+                              >
+                                <i className="fas fa-check mr-0.5"></i>Approve
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-xs text-danger border border-danger/30 bg-danger/10 hover:bg-danger/20 px-2 py-0.5 rounded text-[10px] font-medium"
+                                disabled={isLoading}
+                                onClick={() => onRejectDocument(dossier, doc)}
+                              >
+                                <i className="fas fa-times mr-0.5"></i>Reject
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
 
                       {doc.rejection_reason && (

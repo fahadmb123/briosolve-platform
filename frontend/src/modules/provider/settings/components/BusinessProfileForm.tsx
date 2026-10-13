@@ -10,7 +10,7 @@ import type { ProviderProfile } from '../../../../shared/types/Dtos';
 
 export const BusinessProfileForm: React.FC = () => {
     const updateProfile = useUpdateBusinessProfile();
-    const { profile, fetchUser } = useAuthStore();
+    const { user, profile, fetchUser } = useAuthStore();
     const providerProfile = profile as ProviderProfile | null;
 
     const {
@@ -23,6 +23,7 @@ export const BusinessProfileForm: React.FC = () => {
         resolver: zodResolver(businessProfileSchema),
         mode: "onChange",
         defaultValues: {
+            name: user?.name || "",
             businessName: providerProfile?.business_name || "",
             experience: providerProfile?.experience || "",
             bio: providerProfile?.bio || ""
@@ -38,14 +39,15 @@ export const BusinessProfileForm: React.FC = () => {
     }, [profile, fetchUser]);
 
     useEffect(() => {
-        if (providerProfile) {
+        if (providerProfile || user) {
             reset({
-                businessName: providerProfile.business_name || "",
-                experience: providerProfile.experience || "",
-                bio: providerProfile.bio || ""
+                name: user?.name || "",
+                businessName: providerProfile?.business_name || "",
+                experience: providerProfile?.experience || "",
+                bio: providerProfile?.bio || ""
             });
         }
-    }, [providerProfile, reset]);
+    }, [providerProfile, user, reset]);
 
     const onSubmit = (formData: BusinessProfileInputType) => {
         updateProfile.mutate(formData, {
@@ -66,6 +68,26 @@ export const BusinessProfileForm: React.FC = () => {
                             <h2 className="h5 mb-0 font-bold">Business Credentials</h2>
                         </div>
                         <p className="text-xs text-secondary mb-4">Set up your business name and industry experience.</p>
+
+                        <div className="form-group mb-4">
+                            <label className="form-label text-xs block mb-2" htmlFor="provider-name">
+                                Full Name <span className="text-danger">*</span>
+                            </label>
+                            <div className="input-icon-wrapper">
+                                <i className="fas fa-user"></i>
+                                <input
+                                    type="text"
+                                    id="provider-name"
+                                    className={`form-control ${errors.name ? 'border-danger' : ''}`}
+                                    style={errors.name ? { borderColor: 'red' } : {}}
+                                    placeholder="e.g. John Doe"
+                                    {...register("name")}
+                                />
+                            </div>
+                            {errors.name && (
+                                <span className="text-danger text-red-500 text-xs mt-1 block">{errors.name.message}</span>
+                            )}
+                        </div>
 
                         <div className="form-group mb-4">
                             <label className="form-label text-xs block mb-2" htmlFor="biz-name">

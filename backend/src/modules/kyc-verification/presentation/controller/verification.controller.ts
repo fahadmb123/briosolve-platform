@@ -3,7 +3,8 @@ import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 import { VerificationDocument } from "../../domain/entities/verificationDocument.entity.js";
 import { UploadVerificationInputDto, UpdateVerificationInputDto } from "../../application/Dto/verificationDto.js";
-import { GetAdminKycRequestsInput, GetAdminKycResponse, UpdateKycStatusInput } from "../../domain/repositories/IVerificationDocumentRepository.js";
+import { GetAdminKycRequestsInput, GetAdminKycResponse } from "../../domain/repositories/IVerificationDocumentRepository.js";
+import { UpdateKycStatusInput } from "../../application/use-cases/updateKycStatus.useCase.js";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 

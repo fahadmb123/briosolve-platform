@@ -7,9 +7,19 @@ import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverl
 import { useUpdateProfileImage } from '../../hooks/mutations/useUpdateProfileImage';
 import { useDeleteProfileImage } from '../../hooks/mutations/useDeleteProfileImage';
 import { useGetProviderServices } from '../../../settings/hooks/mutations/useTradeService';
+import { useGetProviderVerifications } from '../../../../verification/hooks/mutations/useVerification';
+import { getAddresses } from '../../../../customer/settings/services/address.service';
 import type { PopulatedProviderService } from '../../../settings/services/settings.service';
-import type { ProviderProfile } from '../../../../../shared/types/Dtos';
+import type { ProviderProfile, response } from '../../../../../shared/types/Dtos';
+import type { VerificationDocument } from '../../../../verification/types/kyc.types';
+import type { Address } from '../../../../../shared/Dtos/address';
 import './Profile.css';
+
+const formatDocType = (type: string): string =>
+  type
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
 
 export default function Profile() {
   const user = useAuthStore((state) => state.user);
@@ -21,10 +31,17 @@ export default function Profile() {
   const [profileImage, setProfileImage] = useState<string | null>(providerProfile?.profile_image || null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [services, setServices] = useState<PopulatedProviderService[]>([]);
+  const [documents, setDocuments] = useState<VerificationDocument[]>([]);
+  const [address, setAddress] = useState<Address | null>(
+    user?.current_address_id && typeof user.current_address_id === 'object'
+      ? (user.current_address_id as Address)
+      : null
+  );
 
   const { mutate: updateProfileImage, isPending: isImageUploading } = useUpdateProfileImage();
   const { mutate: deleteProfileImage, isPending: isImageDeleting } = useDeleteProfileImage();
   const getProviderServices = useGetProviderServices();
+  const getProviderVerifications = useGetProviderVerifications();
 
   useEffect(() => {
     if (!user || !profile) {
@@ -40,16 +57,38 @@ export default function Profile() {
         }
       }
     });
+
+    getProviderVerifications.mutate(undefined, {
+      onSuccess: (res: response<VerificationDocument[]>) => {
+        if (res.data) {
+          setDocuments(res.data);
+        }
+      }
+    });
+
+    if (!address) {
+      getAddresses({ page: 1, limit: 5, search: '' })
+        .then((res: response<{ addresses: Address[]; total: number; totalPages: number }>) => {
+          if (res.data?.addresses && res.data.addresses.length > 0) {
+            setAddress(res.data.addresses[0]);
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
-    (()=>{
-      if (providerProfile?.profile_image) {
-        setProfileImage(providerProfile.profile_image);
-      } else {
-        setProfileImage(null);
-      }
-    })()
+    if (user?.current_address_id && typeof user.current_address_id === 'object') {
+      setAddress(user.current_address_id as Address);
+    }
+  }, [user?.current_address_id]);
+
+  useEffect(() => {
+    if (providerProfile?.profile_image) {
+      setProfileImage(providerProfile.profile_image);
+    } else {
+      setProfileImage(null);
+    }
   }, [providerProfile?.profile_image]);
 
   const handleCropComplete = (croppedFile: File) => {
@@ -74,11 +113,6 @@ export default function Profile() {
     });
   };
 
-  const currentAddress =
-    user?.current_address_id && typeof user.current_address_id === 'object'
-      ? user.current_address_id
-      : null;
-
   const joinedDate = (() => {
     const rawDate = user?.created_at || providerProfile?.created_at;
     if (!rawDate) return 'Jan 2025';
@@ -97,12 +131,12 @@ export default function Profile() {
       if (exp.toLowerCase().includes('year')) return exp;
       return `${exp} Experience`;
     }
-    return '10+ Years Experience';
+    return 'Experience N/A';
   })();
 
-  const displayName = user?.name || providerProfile?.business_name || 'Arjun Menon';
+  const displayName = user?.name || providerProfile?.business_name || 'Provider';
   const businessName =
-    providerProfile?.business_name || (user?.name ? `${user.name} Services` : 'Apex Plumbing & HVAC');
+    providerProfile?.business_name || (user?.name ? `${user.name} Services` : 'Provider Business');
 
   const avatarSrc = profileImage
     ? `${profileImage.startsWith('http') ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000')}${profileImage}`
@@ -110,9 +144,28 @@ export default function Profile() {
 
   const bioText =
     providerProfile?.bio ||
-    'Licensed master technician with hands-on expertise specializing in multi-storey residential leak diagnostics, concealed sanitary overhaul, high-pressure CPVC piping, and inverter air conditioner servicing. Equipped with state-of-the-art ultrasonic acoustic leak listening sensors and digital manifold gauges for zero-destruction troubleshooting.';
+    'No professional bio provided yet. Update your business profile in Settings.';
 
-  const isContactVerified = Boolean(user?.email_verified && user?.phone_verified);
+  const hasIdentityApproved = documents.some((d) => d.document_type === 'IDENTITY' && d.status === 'APPROVED');
+  const hasCertApproved = documents.some((d) => d.document_type === 'CERTIFICATE' && d.status === 'APPROVED');
+  const bothKycApproved = hasIdentityApproved && hasCertApproved;
+  const allDocsRejected = documents.length > 0 && documents.every((d) => d.status === 'REJECTED');
+
+  const kycStatus = documents.length === 0
+    ? (providerProfile?.kyc_status || 'NOT_SUBMITTED')
+    : bothKycApproved
+    ? 'APPROVED'
+    : allDocsRejected
+    ? 'REJECTED'
+    : 'PENDING';
+
+  const isAllVerified = Boolean(
+    user?.email_verified &&
+    user?.phone_verified &&
+    Boolean(address) &&
+    kycStatus === 'APPROVED' &&
+    (documents.length === 0 || bothKycApproved)
+  );
 
   return (
     <>
@@ -159,13 +212,13 @@ export default function Profile() {
 
               <div className="profile-stats-modern">
                 <div className="stat-box">
-                  <span className="stat-value">142</span>
+                  <span className="stat-value">{providerProfile?.completed_jobs ?? 0}</span>
                   <span className="stat-label">
                     <i className="fas fa-briefcase text-primary mr-1"></i> Jobs
                   </span>
                 </div>
                 <div className="stat-box">
-                  <span className="stat-value text-warning">4.92</span>
+                  <span className="stat-value text-warning">5.0</span>
                   <span className="stat-label">
                     <i className="fas fa-star text-warning mr-1"></i> Rating
                   </span>
@@ -176,80 +229,169 @@ export default function Profile() {
             <div className="form-card-modern p-5 w-full">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="h6 mb-0">Verification Badges</h3>
-                <span className={`badge ${isContactVerified ? 'badge-success' : 'badge-warning'} text-xs`}>
-                  {isContactVerified ? 'All Clear' : 'In Progress'}
+                <span className={`badge ${isAllVerified ? 'badge-success' : 'badge-warning'} text-xs font-semibold px-2 py-0.5`}>
+                  {isAllVerified ? 'All Verified' : 'In Progress'}
                 </span>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start gap-3">
                   <i
-                    className={`fas ${user?.email_verified ? 'fa-check-circle text-success' : 'fa-clock text-warning'} text-lg`}
+                    className={`fas ${user?.email_verified ? 'fa-check-circle text-success' : 'fa-clock text-warning'} text-lg mt-0.5`}
                   ></i>
                   <div className="min-w-0 flex-1">
-                    <div className="font-bold text-sm text-text truncate">
-                      {user?.email || 'Email Verification'}
-                    </div>
-                    <div className="text-xs text-secondary">
-                      {user?.email_verified ? 'Verified' : 'Verification Pending'}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <i
-                    className={`fas ${user?.phone_verified ? 'fa-check-circle text-success' : 'fa-clock text-warning'} text-lg`}
-                  ></i>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-bold text-sm text-text truncate">
-                      {user?.phone ? `Phone: ${user.phone}` : 'Phone Verification'}
-                    </div>
-                    <div className="text-xs text-secondary">
-                      {user?.phone_verified ? 'Verified' : user?.phone ? 'Verification Pending' : 'Not Provided'}
-                    </div>
-                  </div>
-                </div>
-
-                {currentAddress && (
-                  <div className="flex items-center gap-3">
-                    <i className="fas fa-check-circle text-success text-lg"></i>
-                    <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
                       <div className="font-bold text-sm text-text truncate">
-                        {currentAddress.city ? `${currentAddress.city}, ${currentAddress.state || ''}` : 'Operational Base'}
+                        {user?.email || 'Email Address'}
                       </div>
-                      <div className="text-xs text-secondary">Address Registered</div>
+                      <span className={`badge ${user?.email_verified ? 'badge-success' : 'badge-warning'} text-2xs uppercase px-2 py-0.5`}>
+                        {user?.email_verified ? 'Verified' : 'Pending'}
+                      </span>
                     </div>
+                    <div className="text-xs text-secondary mt-0.5">
+                      {user?.email_verified ? 'Email address verified' : 'Verification pending'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <i
+                    className={`fas ${user?.phone_verified ? 'fa-check-circle text-success' : 'fa-clock text-warning'} text-lg mt-0.5`}
+                  ></i>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-bold text-sm text-text truncate">
+                        {user?.phone ? user.phone : 'Phone Number'}
+                      </div>
+                      <span className={`badge ${user?.phone_verified ? 'badge-success' : 'badge-warning'} text-2xs uppercase px-2 py-0.5`}>
+                        {user?.phone_verified ? 'Verified' : user?.phone ? 'Pending' : 'Not Added'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-secondary mt-0.5">
+                      {user?.phone_verified
+                        ? 'Phone number verified'
+                        : user?.phone
+                        ? 'Verification pending'
+                        : 'No phone number provided'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <i
+                    className={`fas ${address ? 'fa-check-circle text-success' : 'fa-clock text-warning'} text-lg mt-0.5`}
+                  ></i>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-bold text-sm text-text truncate">
+                        {address
+                          ? [address.area, address.city, address.state].filter(Boolean).join(', ')
+                          : 'Operating Address'}
+                      </div>
+                      <span className={`badge ${address ? 'badge-success' : 'badge-warning'} text-2xs uppercase px-2 py-0.5`}>
+                        {address ? 'Verified' : 'Action Required'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-secondary mt-0.5">
+                      {address
+                        ? address.pincode ? `Postal Code: ${address.pincode}` : 'Operational base registered'
+                        : 'No default address configured'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <i
+                    className={`fas ${
+                      kycStatus === 'APPROVED'
+                        ? 'fa-check-circle text-success'
+                        : kycStatus === 'REJECTED'
+                        ? 'fa-times-circle text-danger'
+                        : kycStatus === 'PENDING'
+                        ? 'fa-clock text-warning'
+                        : 'fa-shield-alt text-secondary'
+                    } text-lg mt-0.5`}
+                  ></i>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-bold text-sm text-text truncate">
+                        KYC & Identity Verification
+                      </div>
+                      <span
+                        className={`badge ${
+                          kycStatus === 'APPROVED'
+                            ? 'badge-success'
+                            : kycStatus === 'REJECTED'
+                            ? 'badge-danger'
+                            : kycStatus === 'PENDING'
+                            ? 'badge-warning'
+                            : 'badge-neutral'
+                        } text-2xs uppercase px-2 py-0.5`}
+                      >
+                        {kycStatus === 'APPROVED'
+                          ? 'Approved'
+                          : kycStatus === 'REJECTED'
+                          ? 'Rejected'
+                          : kycStatus === 'PENDING'
+                          ? 'In Review'
+                          : 'Not Submitted'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-secondary mt-0.5">
+                      {kycStatus === 'APPROVED'
+                        ? 'Government & professional identity verified'
+                        : kycStatus === 'REJECTED'
+                        ? 'Documents rejected, update required'
+                        : kycStatus === 'PENDING'
+                        ? 'Submitted credentials under admin review'
+                        : 'Submit verification documents to get verified badge'}
+                    </div>
+                  </div>
+                </div>
+
+                {documents.length > 0 && (
+                  <div className="mt-1 pt-3 border-t border-surface-variant flex flex-col gap-2.5">
+                    <span className="text-2xs font-semibold text-secondary uppercase tracking-wider">
+                      Submitted Documents ({documents.length})
+                    </span>
+                    {documents.map((doc) => (
+                      <div key={doc.id} className="flex items-center justify-between p-2 rounded-lg bg-surface border border-border">
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <i className="fas fa-file-contract text-primary text-xs shrink-0"></i>
+                          <div className="truncate">
+                            <span className="text-xs font-medium text-text block truncate">
+                              {doc.document_name}
+                            </span>
+                            <span className="text-2xs text-secondary block truncate">
+                              {formatDocType(doc.document_type)}
+                            </span>
+                          </div>
+                        </div>
+                        <span
+                          className={`badge ${
+                            doc.status === 'APPROVED'
+                              ? 'badge-success'
+                              : doc.status === 'REJECTED'
+                              ? 'badge-danger'
+                              : 'badge-warning'
+                          } text-2xs uppercase px-2 py-0.5 shrink-0`}
+                        >
+                          {doc.status === 'APPROVED' ? 'Verified' : doc.status === 'REJECTED' ? 'Rejected' : 'Pending'}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                <div className="flex items-center gap-3">
-                  <i className="fas fa-check-circle text-success text-lg"></i>
-                  <div>
-                    <div className="font-bold text-sm text-text">Government Aadhaar ID</div>
-                    <div className="text-xs text-secondary">Verified</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <i className="fas fa-check-circle text-success text-lg"></i>
-                  <div>
-                    <div className="font-bold text-sm text-text">Sanitary Trade Diploma</div>
-                    <div className="text-xs text-secondary">Verified</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <i className="fas fa-check-circle text-success text-lg"></i>
-                  <div>
-                    <div className="font-bold text-sm text-text">HVAC Refrigeration License</div>
-                    <div className="text-xs text-secondary">Verified</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <i className="fas fa-check-circle text-success text-lg"></i>
-                  <div>
-                    <div className="font-bold text-sm text-text">Bank Account</div>
-                    <div className="text-xs text-secondary">Verified</div>
-                  </div>
-                </div>
+                {kycStatus !== 'APPROVED' && (
+                  <Link
+                    to="/provider/verification"
+                    className="btn btn-outline btn-sm w-full mt-2 text-xs flex items-center justify-center gap-1.5"
+                  >
+                    <i className="fas fa-shield-alt text-primary"></i>
+                    <span>{documents.length > 0 ? 'Manage Verification Documents' : 'Submit KYC Documents'}</span>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -259,7 +401,7 @@ export default function Profile() {
               </div>
 
               <div className="mb-4">
-                <div className="text-3xl font-black text-warning">4.92</div>
+                <div className="text-3xl font-black text-warning">5.0</div>
                 <div className="text-warning text-sm mt-1 mb-1">
                   <i className="fas fa-star"></i>
                   <i className="fas fa-star"></i>
@@ -267,34 +409,26 @@ export default function Profile() {
                   <i className="fas fa-star"></i>
                   <i className="fas fa-star"></i>
                 </div>
-                <div className="font-bold text-text text-sm">Master Rating</div>
+                <div className="font-bold text-text text-sm">Provider Rating</div>
                 <p className="text-xs text-secondary mt-1 mb-0">
-                  Based on 186 verified client ratings in {currentAddress?.city || 'Mumbai'}
+                  {address?.city ? `Operational in ${address.city}` : 'Marketplace Verified Provider'}
                 </p>
               </div>
 
               <div className="flex flex-col gap-3 border-t border-surface-variant pt-4 mb-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-secondary">Job Completion Rate</span>
-                  <span className="text-sm font-bold text-success">99.4%</span>
+                  <span className="text-sm font-bold text-success">100%</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-secondary">On-Time Arrival</span>
-                  <span className="text-sm font-bold text-success">98.2%</span>
+                  <span className="text-sm font-bold text-success">100%</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-secondary">5-Star Review Ratio</span>
-                  <span className="text-sm font-bold text-warning">88%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-secondary">Quote Response Speed</span>
-                  <span className="text-sm font-bold text-text">8 Min Avg</span>
+                  <span className="text-sm font-medium text-secondary">Service Quality</span>
+                  <span className="text-sm font-bold text-warning">Verified</span>
                 </div>
               </div>
-
-              <button type="button" className="btn btn-outline btn-block text-sm">
-                <i className="fas fa-comment-dots mr-2"></i> Read All 186 Reviews
-              </button>
             </div>
           </div>
 
@@ -317,7 +451,7 @@ export default function Profile() {
             <div className="form-card-modern mb-6">
               <div className="flex justify-between items-center mb-4 pb-4 border-bottom">
                 <div>
-                  <h3 className="h4 mb-0">About & Trade Background</h3>
+                  <h3 className="h4 mb-0">About &amp; Trade Background</h3>
                   <span className="badge badge-primary text-xs mt-2">{experienceText}</span>
                 </div>
               </div>
@@ -329,18 +463,22 @@ export default function Profile() {
                     <i className="fas fa-certificate"></i>
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm mb-1 text-text">ITI Trade Certified</h4>
-                    <p className="text-xs text-secondary mb-0">Govt Sanitary & HVAC</p>
+                    <h4 className="font-bold text-sm mb-1 text-text">
+                      {kycStatus === 'APPROVED' ? 'Verified Credentials' : 'Identity Verification'}
+                    </h4>
+                    <p className="text-xs text-secondary mb-0">
+                      {kycStatus === 'APPROVED' ? 'KYC Compliance Approved' : 'Verification In Progress'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 bg-surface-hover p-4 rounded-xl border border-border">
                   <div className="w-12 h-12 rounded-lg bg-warning/10 text-warning flex items-center justify-center text-xl shrink-0">
-                    <i className="fas fa-award"></i>
+                    <i className="fas fa-map-marker-alt"></i>
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm mb-1 text-text">Top 1% Rated Pro</h4>
+                    <h4 className="font-bold text-sm mb-1 text-text">Service Region</h4>
                     <p className="text-xs text-secondary mb-0">
-                      {currentAddress?.city ? `${currentAddress.city} Metro Region` : 'Mumbai Metro Region'}
+                      {address?.city ? `${address.city} Region` : 'Operational Region'}
                     </p>
                   </div>
                 </div>
