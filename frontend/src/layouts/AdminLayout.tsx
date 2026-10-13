@@ -59,6 +59,13 @@ export default function AdminLayout() {
                             <span className="badge badge-warning ml-auto">18</span>
                         </NavLink>
                     </li>
+
+                    <li>
+                        <NavLink to="/admin/reactivations" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+                            <i className="fas fa-user-shield"></i>
+                            <span>Reactivations</span>
+                        </NavLink>
+                    </li>
                     </ul>
 
                 <div className="menu-label mt-6">Catalog</div>

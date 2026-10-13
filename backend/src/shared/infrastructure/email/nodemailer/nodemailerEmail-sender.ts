@@ -95,7 +95,7 @@ export class NodemailerEmailSender implements IEmailSender {
     }
     async sendActivationEmail(email: string): Promise<void> {
             const baseUrl = process.env.APP_URL || 'http://localhost:5173';
-            const appealLink = `${baseUrl}/lgoin`;
+            const appealLink = `${baseUrl}/login`;
             await this.transporter.sendMail({
                 from: process.env.EMAIL_FROM,
                 to: email,
@@ -184,5 +184,57 @@ export class NodemailerEmailSender implements IEmailSender {
                 </div>
                         `.trim(),
             });
+    }
+
+    async sendRequestDeniedEmail(email: string, reason: string): Promise<void> {
+        const baseUrl = process.env.APP_URL || 'http://localhost:5173';
+        const appealLink = `${baseUrl}/account/request`;
+        await this.transporter.sendMail({
+            from: process.env.EMAIL_FROM,
+            to: email,
+            subject: "Update on Your Appeal: Request Denied",
+            text: `
+    Hello,
+
+    Thank you for reaching out to us. We have reviewed your appeal request regarding your account status.
+
+    After careful consideration, we regret to inform you that your request has been denied.
+
+    Reason for denial: ${reason}
+
+    Please note that this decision is final and your account will remain restricted.
+
+    Regards,
+    Support Team
+            `.trim(),
+            html: `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+        <h2 style="color: #d9534f; margin-top: 0;">Appeal Request Denied</h2>
+        <p style="color: #333333; font-size: 16px;">Hello,</p>
+        <p style="color: #333333; font-size: 16px;">Thank you for reaching out to us. We have thoroughly reviewed your recent appeal request regarding your account status.</p>
+        
+        <p style="color: #333333; font-size: 16px;">After careful consideration, we regret to inform you that your request has been <strong>denied</strong>.</p>
+        
+        <div style="background-color: #fdf5f5; color: #b71c1c; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #f5c6cb;">
+            <strong style="display: block; margin-bottom: 5px;">Reason for denial:</strong>
+            ${reason}
+        </div>
+        <a href="${appealLink}" style="display: inline-block; background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin: 10px 0;">
+                Submit Appeal Request
+            </a>
+        
+        <p style="color: #333333; font-size: 14px; line-height: 1.5;">
+            Please note that this decision is final in accordance with our platform's policies, and your account will remain restricted. We are unable to process further appeals for this action.
+        </p>
+
+        <hr style="border: 0; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+        
+        <p style="color: #555555; font-size: 14px;">
+            Regards,<br>
+            <strong>Support Team</strong>
+        </p>
+    </div>
+            `.trim(),
+        });
     }
 }

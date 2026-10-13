@@ -10,3 +10,4 @@ export const AdminSettings = React.lazy(() => import('../../../modules/admin/set
 export const AdminNotifications = React.lazy(() => import('../../../modules/admin/notifications/pages/Notifications/Notifications'));
 export const AdminCategories = React.lazy(() => import('../../../modules/categories/pages/Categories/Categories'));
 export const AdminServices = React.lazy(() => import('../../../modules/services/pages/Services/Services'));
+export const AdminReactivations = React.lazy(() => import('../../../modules/reactivations/pages/Reactivations/Reactivations'));

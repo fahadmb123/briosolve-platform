@@ -1,4 +1,6 @@
 import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity.js";
+import { UserMapper } from "./user.mapper.js";
+import { UserAccountBlockMapper } from "./userAccountBlock.mapper.js";
 
 export class AccountReactivationRequestMapper {
     static toDomain(raw: any): AccountReactivationRequest {
@@ -11,7 +13,10 @@ export class AccountReactivationRequestMapper {
             raw.reviewed_by || null,
             raw.reviewed_at ? (raw.reviewed_at?.epochMilliseconds ? new Date(raw.reviewed_at.epochMilliseconds) : new Date(raw.reviewed_at)) : null,
             raw.created_at?.epochMilliseconds ? new Date(raw.created_at.epochMilliseconds) : new Date(raw.created_at),
-            raw.updated_at?.epochMilliseconds ? new Date(raw.updated_at.epochMilliseconds) : new Date(raw.updated_at)
+            raw.updated_at?.epochMilliseconds ? new Date(raw.updated_at.epochMilliseconds) : new Date(raw.updated_at),
+            raw.user ? UserMapper.toDomain(raw.user) : undefined,
+            raw.block ? UserAccountBlockMapper.toDomain(raw.block) : undefined,
+            raw.reviewer ? UserMapper.toDomain(raw.reviewer) : null
         );
     }
 }

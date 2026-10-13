@@ -18,6 +18,7 @@ import GetProviderAvailabilityOverridesUseCase from "../../application/use-cases
 import CreateProviderAvailabilityOverrideUseCase from "../../application/use-cases/createProviderAvailabilityOverride.useCase.js";
 import DeleteProviderAvailabilityOverrideUseCase from "../../application/use-cases/deleteProviderAvailabilityOverride.useCase.js";
 import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/createAccountReactivationRequest.useCase.js";
+import { GetReactivationRequestsUseCase } from "../../application/use-cases/getReactivationRequests.useCase.js";
 
 import { userRepository, customerRepository, addressRepository, providerRepository, providerAvailabilityRepository, userAccountBlockRepository, accountReactivationRequestRepository } from "./repositories.js";
 import {
@@ -57,13 +58,17 @@ export const getProvidersUseCase = new GetProvidersUseCase(
 export const updateUserStatusUseCase = new UpdateUserStatusUseCase(
     userRepository,
     userAccountBlockRepository,
-    emailSender
+    emailSender,
+    accountReactivationRequestRepository
 )
 export const createAccountReactivationRequestUseCase = new CreateAccountReactivationRequestUseCase(
     userRepository,
     userAccountBlockRepository,
     accountReactivationRequestRepository,
     emailSender
+)
+export const getReactivationRequestsUseCase = new GetReactivationRequestsUseCase(
+    accountReactivationRequestRepository
 )
 export const getProfileUseCase = new GetProfileUseCase(
     userRepository,

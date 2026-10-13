@@ -16,6 +16,5 @@ router.patch("/address/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),
 router.patch("/address/default/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),addressController.setDefault)
 router.patch("/status/:id",authMiddleware,requireRole(["ADMIN"]),userController.updateUserStatus)
 router.delete("/address/:id",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),addressController.delete)
-router.post("/reactivation-request", userController.requestReactivation)
 
 export default router

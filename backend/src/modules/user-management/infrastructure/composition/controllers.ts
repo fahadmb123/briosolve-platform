@@ -2,6 +2,7 @@ import { AddressController } from "../../presentation/controller/address.control
 import { CustomerController } from "../../presentation/controller/customer.controller.js";
 import { UserController } from "../../presentation/controller/user.controller.js";
 import { ProviderController } from "../../presentation/controller/provider.controller.js";
+import { ReactivationController } from "../../presentation/controller/reactivation.controller.js";
 
 import {
     getCustomerUseCase,
@@ -23,14 +24,19 @@ import {
     createProviderAvailabilityOverrideUseCase,
     deleteProviderAvailabilityOverrideUseCase,
     getProvidersUseCase,
-    createAccountReactivationRequestUseCase
+    createAccountReactivationRequestUseCase,
+    getReactivationRequestsUseCase
 } from "./useCases.js";
 import { imageUploadService } from "./services.js";
 
 export const userController = new UserController(
     updateUserStatusUseCase,
-    getProfileUseCase,
-    createAccountReactivationRequestUseCase
+    getProfileUseCase
+);
+
+export const reactivationController = new ReactivationController(
+    createAccountReactivationRequestUseCase,
+    getReactivationRequestsUseCase
 );
 
 export const customerController = new CustomerController(

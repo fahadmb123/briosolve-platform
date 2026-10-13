@@ -1,3 +1,6 @@
+import { User } from "./user.entity.js";
+import { UserAccountBlock } from "./userAccountBlock.entity.js";
+
 export class AccountReactivationRequest {
     constructor(
         public readonly id: string,
@@ -8,6 +11,9 @@ export class AccountReactivationRequest {
         public readonly reviewed_by: string | null,
         public readonly reviewed_at: Date | null,
         public readonly created_at: Date,
-        public readonly updated_at: Date
+        public readonly updated_at: Date,
+        public readonly user?: User,
+        public readonly block?: UserAccountBlock,
+        public readonly reviewer?: User | null
     ) {}
 }

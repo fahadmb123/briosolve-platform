@@ -7,6 +7,6 @@ export type ReactivationRequestInput = {
 };
 
 export const submitReactivationRequest = async (data: ReactivationRequestInput): Promise<response<any>> => {
-    const res = await apiClient.post("/api/user/reactivation-request", data);
+    const res = await apiClient.post("/api/reactivation/request", data);
     return res.data;
 };
