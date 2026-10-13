@@ -1,18 +1,7 @@
 import React from "react";
 import { useLocationPicker } from "../../hooks/useLocationPicker";
 import { type AddressPayload } from "../../schemas/validation";
-import { APIProvider, Map, useMap } from "@vis.gl/react-google-maps";
-
-const MapUpdater = ({lat,lng,}: {lat: number | null;lng: number | null;}) => {
-
-  const map = useMap();
-  React.useEffect(() => {
-    if (map && lat && lng) {
-      map.panTo({ lat, lng });
-    }
-  }, [map, lat, lng]);
-  return null;
-}
+import { LeafletMap } from "./LeafletMap";
 
 interface AddAddressModalProps {
   isOpen: boolean;
@@ -57,10 +46,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <APIProvider
-      apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY"}
-    >
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6">
         {/* Backdrop */}
         <div
           className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity cursor-pointer"
@@ -202,25 +188,11 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                 {/* Map Area */}
                 <div className="relative w-full h-[300px] bg-slate-200 dark:bg-slate-800 border border-surface-variant rounded-xl overflow-hidden">
                   {coordinates.lat && coordinates.lng ? (
-                    <>
-                      <Map
-                        defaultCenter={{
-                          lat: Number(coordinates.lat),
-                          lng: Number(coordinates.lng),
-                        }}
-                        defaultZoom={14}
-                        onIdle={(ev) => {
-                          const center = ev.map.getCenter();
-                          if (center) {
-                            handleMapMoveEnd(center.lat(), center.lng());
-                          }
-                        }}
-                        disableDefaultUI={true}
-                        gestureHandling={"greedy"}
-                        style={{ width: "100%", height: "100%" }}
-                      />
-                      <MapUpdater lat={Number(coordinates.lat)} lng={Number(coordinates.lng)} />
-                    </>
+                    <LeafletMap
+                      lat={Number(coordinates.lat)}
+                      lng={Number(coordinates.lng)}
+                      onMoveEnd={handleMapMoveEnd}
+                    />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-on-surface-variant">
                       <span className="material-symbols-outlined text-4xl mb-2">
@@ -232,7 +204,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
 
                   {/* Fixed Center Pin Overlay */}
                   {coordinates.lat && coordinates.lng && (
-                    <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center pb-8">
+                    <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center pb-8 z-[500]">
                       <span
                         className="material-symbols-outlined text-[42px] text-red-500 drop-shadow-md"
                         style={{ fontVariationSettings: "'FILL' 1" }}
@@ -476,6 +448,5 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
           </div>
         </div>
       </div>
-    </APIProvider>
   );
 };

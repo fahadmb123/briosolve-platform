@@ -64,7 +64,7 @@ export const useLocationPicker = (
           landmark: initialData.landmark || "",
         });
         setAddressType(initialData.type || "Home");
-        setCoordinates({ lat: initialData.latitude, lng: initialData.longitude });
+        setCoordinates({ lat: initialData.latitude ?? null, lng: initialData.longitude ?? null });
         setStep(2);
       } else {
         form.reset({
