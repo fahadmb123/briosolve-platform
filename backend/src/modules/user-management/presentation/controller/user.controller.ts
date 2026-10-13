@@ -10,10 +10,13 @@ import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 
 
 
+import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/createAccountReactivationRequest.useCase.js";
+
 export class UserController extends BaseController{
     constructor (
         private readonly updateUserUseCase:IUpdateUserStatusUseCase,
-        private readonly getProfileUseCase : IUseCase<GetProfileUseCaseInputDto,GetProfileUseCaseOutputDto>
+        private readonly getProfileUseCase : IUseCase<GetProfileUseCaseInputDto,GetProfileUseCaseOutputDto>,
+        private readonly createAccountReactivationRequestUseCase: CreateAccountReactivationRequestUseCase
     ) {super()}
 
     getProfile = async (req:Request,res:Response,next:NextFunction) => {
@@ -33,12 +36,26 @@ export class UserController extends BaseController{
     updateUserStatus = async (req:Request,res:Response,next:NextFunction) => {
         try {
             this.getCurrentUser(req)
-            await this.updateUserUseCase.execute({id:req.params.id as string,status:req.body.status})
+            await this.updateUserUseCase.execute({
+                id: req.params.id as string,
+                status: req.body.status,
+                reason: req.body.reason,
+                adminId: req.user?.userId
+            })
 
             return sendSuccess(res,"Updated!")
         } catch (err) {
             next(err)
         }
     }
-    
+
+    requestReactivation = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { email, reason } = req.body;
+            const result = await this.createAccountReactivationRequestUseCase.execute({ email, reason });
+            return sendSuccess(res, "Submited!", result);
+        } catch (err) {
+            next(err);
+        }
+    }
 }

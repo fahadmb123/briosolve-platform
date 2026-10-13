@@ -46,11 +46,11 @@ export default function Categories() {
         }
       }
     });
-  }, [getCategories, page, search, filter]);
+  }, [page, search, filter]);
   
   useEffect(() => {
     getCategoriesFn();
-  }, [getCategoriesFn]);
+  }, [page, search, filter]);
 
   const handleAddCategory = useCallback(async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
     const formData = getFormData(data.name, data.description, data.status, data.imageFile);

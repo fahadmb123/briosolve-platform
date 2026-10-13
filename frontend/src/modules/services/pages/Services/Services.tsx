@@ -60,11 +60,11 @@ export default function Services() {
         }
       }
     });
-  }, [getServicesMut, page, search, filter]);
+  }, [page, search, filter]);
 
   useEffect(() => {
     getServicesFn();
-  }, [getServicesFn]);
+  }, [page, search, filter]);
 
   const handleAddService = useCallback(async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
     const formData = getFormData(data.name, data.categoryId, data.description, data.status, data.imageFile);

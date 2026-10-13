@@ -1,5 +1,5 @@
 import { Route } from 'react-router-dom';
-import {  EmailVerification, ForgotPassword, Login, ResetPassword, OtpVerification } from './public.lazy';
+import {  EmailVerification, ForgotPassword, Login, ResetPassword, OtpVerification, AccountRequest } from './public.lazy';
 
 import ResetPasswordRoute from '../../../shared/middlewares/ResetPasswordRoute';
 import OtpFlowRoute from '../../../shared/middlewares/OtpFlowRoute';
@@ -10,6 +10,7 @@ export const publicRoutes = (
     <>
         <Route path="login" element={<Login />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="account/request" element={<AccountRequest />} />
         <Route element={<ResetPasswordRoute />}>
             <Route path="reset-password" element={<ResetPassword />} />
         </Route>

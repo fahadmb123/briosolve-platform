@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import type { User, response } from '../../../../../shared/types/Dtos';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from "../../../../../shared/components/ui/ConfirmModal/ConfirmModal";
+import { BlockReasonModal } from "../../../components/BlockReasonModal";
 import CustomerRow from "../../components/CustomerRaw";
 
 
@@ -11,7 +12,9 @@ import CustomerRow from "../../components/CustomerRaw";
 export default function Customers() {
     const [customers, setCustomers] = useState<User[]>([]);
     const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null);
-    const [customerToChange, setCustomerToChange] = useState<{ id: string; status: string } | null>(null);
+    const [customerToBlock, setCustomerToBlock] = useState<{ id: string; name: string } | null>(null);
+    const [pendingBlockConfirmation, setPendingBlockConfirmation] = useState<{ id: string; name: string; reason: string } | null>(null);
+    const [customerToActivate, setCustomerToActivate] = useState<{ id: string; name: string } | null>(null);
 
     const [page, setPage] = useState(0);
     const [search, setSearch] = useState("");
@@ -34,8 +37,23 @@ export default function Customers() {
     }, [filter, search, page]);
 
     const handleStatusButton = useCallback((id: string, status: string) => {
-        setCustomerToChange({ id, status });
-    }, []);
+        const target = customers.find((u) => u.id === id);
+        if (status === "ACTIVE") {
+            setCustomerToBlock({ id, name: target?.name || "Customer" });
+        } else {
+            setCustomerToActivate({ id, name: target?.name || "Customer" });
+        }
+    }, [customers]);
+
+    const handleProceedToBlockConfirm = useCallback((reason: string) => {
+        if (!customerToBlock) return;
+        setPendingBlockConfirmation({
+            id: customerToBlock.id,
+            name: customerToBlock.name,
+            reason
+        });
+        setCustomerToBlock(null);
+    }, [customerToBlock]);
 
     const handleViewCustomer = useCallback((customer: User) => {
         setSelectedCustomer(customer);
@@ -45,23 +63,38 @@ export default function Customers() {
         setSelectedCustomer(null);
     }, []);
 
-    const handleCancelStatusChange = useCallback(() => {
-        setCustomerToChange(null);
-    }, []);
-
-    const confirmStatusChange = useCallback(() => {
-        if (!customerToChange) return;
-        const passStatus = customerToChange.status === "ACTIVE" ? "BLOCKED" : "ACTIVE";
-        updateStatus.mutate({ id: customerToChange.id, status: passStatus }, {
+    const confirmBlock = useCallback(() => {
+        if (!pendingBlockConfirmation) return;
+        updateStatus.mutate({
+            id: pendingBlockConfirmation.id,
+            status: "BLOCKED",
+            reason: pendingBlockConfirmation.reason
+        }, {
             onSuccess: (res: response<{ users: User[] }>) => {
                 setCustomers((users: User[]) => 
-                    users.map((user) => user.id === customerToChange.id ? { ...user, status: passStatus } : user)
+                    users.map((user) => user.id === pendingBlockConfirmation.id ? { ...user, status: "BLOCKED" } : user)
                 );
-                setCustomerToChange(null);
+                setPendingBlockConfirmation(null);
                 toast.success(res.message);
             }
         });
-    }, [customerToChange, updateStatus]);
+    }, [pendingBlockConfirmation, updateStatus]);
+
+    const confirmActivate = useCallback(() => {
+        if (!customerToActivate) return;
+        updateStatus.mutate({
+            id: customerToActivate.id,
+            status: "ACTIVE"
+        }, {
+            onSuccess: (res: response<{ users: User[] }>) => {
+                setCustomers((users: User[]) => 
+                    users.map((user) => user.id === customerToActivate.id ? { ...user, status: "ACTIVE" } : user)
+                );
+                setCustomerToActivate(null);
+                toast.success(res.message);
+            }
+        });
+    }, [customerToActivate, updateStatus]);
 
     const handleReset = useCallback(() => {
         setSearch("");
@@ -271,50 +304,38 @@ export default function Customers() {
         </div>
 
         
-        <div className="admin-modal-overlay" id="suspendModal">
-            <div className="admin-modal">
-                <div className="admin-modal-header">
-                    <div className="flex items-center gap-2 text-danger">
-                        <i className="fas fa-exclamation-triangle"></i>
-                        <h3 className="h6 mb-0 text-danger">Confirm Account Suspension</h3>
-                    </div>
-                    <button className="btn-icon" onClick={() => {}}><i className="fas fa-times"></i></button>
-                </div>
-                <div className="admin-modal-body">
-                    <p className="text-sm mb-3">Are you sure you want to suspend <strong id="suspendUserName">User</strong> (<span id="suspendUserId">#ID</span>)?</p>
-                    <div className="form-group mb-3">
-                        <label className="form-label text-xs">Reason for Administrative Suspension (Logged to Audit Trail)</label>
-                        <select className="form-control text-xs" id="suspendReason">
-                            <option value="spam">Excessive spam inquiries or fraudulent bidding</option>
-                            <option value="investigation">Unresolved contract investigation or policy violation</option>
-                            <option value="safety">Customer safety report / verbal misconduct</option>
-                            <option value="investigation">Temporary administrative freeze pending review</option>
-                        </select>
-                    </div>
-                    <div className="p-3 bg-danger-light border rounded text-xs text-danger">
-                        <i className="fas fa-info-circle mr-1"></i>Suspended users will immediately lose platform access until reinstated by an administrator.
-                    </div>
-                </div>
-                <div className="admin-modal-footer">
-                    <button className="btn btn-secondary text-xs" onClick={() => {}}>Cancel</button>
-                    <button className="btn btn-danger text-xs" onClick={() => {}}>Confirm Suspension</button>
-                </div>
-            </div>
-        </div>
-        <ConfirmModal
-            isOpen={!!customerToChange}
-            title={customerToChange?.status === 'ACTIVE' ? "Suspend Customer" : "Activate Customer"}
-            message={customerToChange?.status === 'ACTIVE' 
-                ? "Are you sure you want to suspend this customer? They will immediately lose access to the platform." 
-                : "Are you sure you want to activate this customer account?"}
-            confirmText={customerToChange?.status === 'ACTIVE' ? "Suspend" : "Activate"}
-            cancelText="Cancel"
-            isDanger={customerToChange?.status === 'ACTIVE'}
-            isLoading={updateStatus.isPending}
-            onConfirm={confirmStatusChange}
-            onCancel={handleCancelStatusChange}
-        />
-        
+            <BlockReasonModal
+                isOpen={!!customerToBlock}
+                userName={customerToBlock?.name || "Customer"}
+                userId={customerToBlock?.id || ""}
+                isLoading={updateStatus.isPending}
+                onConfirm={handleProceedToBlockConfirm}
+                onClose={() => setCustomerToBlock(null)}
+            />
+
+            <ConfirmModal
+                isOpen={!!pendingBlockConfirmation}
+                title="Confirm Account Suspension"
+                message={`Are you sure you want to block ${pendingBlockConfirmation?.name}? Reason: "${pendingBlockConfirmation?.reason}"`}
+                confirmText="Confirm Block"
+                cancelText="Cancel"
+                isDanger={true}
+                isLoading={updateStatus.isPending}
+                onConfirm={confirmBlock}
+                onCancel={() => setPendingBlockConfirmation(null)}
+            />
+
+            <ConfirmModal
+                isOpen={!!customerToActivate}
+                title="Activate Customer"
+                message={`Are you sure you want to activate ${customerToActivate?.name}'s account?`}
+                confirmText="Activate"
+                cancelText="Cancel"
+                isDanger={false}
+                isLoading={updateStatus.isPending}
+                onConfirm={confirmActivate}
+                onCancel={() => setCustomerToActivate(null)}
+            />
         </>
     );
 }

@@ -22,13 +22,15 @@ import {
     getProviderAvailabilityOverridesUseCase,
     createProviderAvailabilityOverrideUseCase,
     deleteProviderAvailabilityOverrideUseCase,
-    getProvidersUseCase
+    getProvidersUseCase,
+    createAccountReactivationRequestUseCase
 } from "./useCases.js";
 import { imageUploadService } from "./services.js";
 
 export const userController = new UserController(
     updateUserStatusUseCase,
-    getProfileUseCase
+    getProfileUseCase,
+    createAccountReactivationRequestUseCase
 );
 
 export const customerController = new CustomerController(

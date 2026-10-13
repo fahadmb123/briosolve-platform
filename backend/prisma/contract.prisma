@@ -15,30 +15,42 @@ enum active_status {
   INACTIVE
 }
 
+enum reactivation_request_status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model users {
-  id                 Uuid                 @id @default(uuid())
-  name               VarChar(100)
-  email              VarChar(255)         @unique
-  password_hash      VarChar(255)
-  phone              VarChar(20)?
+  id                             Uuid                            @id @default(uuid())
+  name                           VarChar(100)
+  email                          VarChar(255)                    @unique
+  password_hash                  VarChar(255)
+  phone                          VarChar(20)?
 
-  role               user_role
-  status             user_status          @default(ACTIVE)
+  role                           user_role
+  status                         user_status                     @default(ACTIVE)
 
-  email_verified     Boolean
-  phone_verified     Boolean
+  email_verified                 Boolean
+  phone_verified                 Boolean
 
-  current_address_id Uuid?
+  current_address_id             Uuid?
 
-  created_at         DateTime             @default(now())
-  updated_at         temporal.updatedAt()
+  created_at                     DateTime                        @default(now())
+  updated_at                     temporal.updatedAt()
 
-  current_address    addresses?           @relation("CurrentAddress", fields:[current_address_id], references:[id])
+  current_address                addresses?                      @relation("CurrentAddress", fields:[current_address_id], references:[id])
 
-  addresses          addresses[]          @relation("UserAddresses")
+  addresses                      addresses[]                     @relation("UserAddresses")
 
-  customer_profile   customer_profiles?
-  provider_profile   provider_profiles?
+  customer_profile               customer_profiles?
+  provider_profile               provider_profiles?
+
+  blocked_records                user_account_blocks[]           @relation("BlockedUser")
+  blocked_by_admin               user_account_blocks[]           @relation("BlockerAdmin")
+
+  reactivation_requests          account_reactivation_requests[] @relation("UserReactivationRequests")
+  reviewed_reactivation_requests account_reactivation_requests[] @relation("ReviewedReactivationRequests")
 }
 
 enum weekday {
@@ -232,4 +244,45 @@ model services {
   updated_at  temporal.updatedAt()
 
   category    categories           @relation(fields:[category_id], references:[id])
+}
+
+model user_account_blocks {
+  id                    Uuid                            @id @default(uuid())
+
+  user_id               Uuid
+  blocked_by            Uuid
+
+  reason                VarChar(1000)
+
+  blocked_at            DateTime                        @default(now())
+  unblocked_at          DateTime?
+
+  created_at            DateTime                        @default(now())
+  updated_at            temporal.updatedAt()
+
+  user                  users                           @relation("BlockedUser", fields:[user_id], references:[id])
+  blocked_by_user       users                           @relation("BlockerAdmin", fields:[blocked_by], references:[id])
+
+  reactivation_requests account_reactivation_requests[]
+}
+
+model account_reactivation_requests {
+  id          Uuid                        @id @default(uuid())
+
+  user_id     Uuid
+  block_id    Uuid
+
+  reason      VarChar(1000)
+
+  status      reactivation_request_status @default(PENDING)
+
+  reviewed_by Uuid?
+  reviewed_at DateTime?
+
+  created_at  DateTime                    @default(now())
+  updated_at  temporal.updatedAt()
+
+  user        users                       @relation("UserReactivationRequests", fields:[user_id], references:[id])
+  block       user_account_blocks         @relation(fields:[block_id], references:[id])
+  reviewer    users?                      @relation("ReviewedReactivationRequests", fields:[reviewed_by], references:[id])
 }

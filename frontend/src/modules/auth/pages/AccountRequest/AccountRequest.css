@@ -1,0 +1,311 @@
+/* ==========================================================================
+   Account Reactivation Page — Steam / Support Portal Style
+   Full-page layout with top header, divided sections, and aligned form rows
+   ========================================================================== */
+
+.account-request-page-wrapper {
+    min-height: 100vh;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top Header */
+.account-request-topbar {
+    width: 100%;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.account-request-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+}
+
+.account-request-brand i {
+    font-size: 1.35rem;
+}
+
+.account-request-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Main Content Area */
+.account-request-main {
+    flex: 1;
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem 2rem;
+}
+
+/* Breadcrumb / Category */
+.account-request-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--secondary);
+    margin-bottom: 1rem;
+}
+
+.account-request-breadcrumb a {
+    color: var(--secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.account-request-breadcrumb a:hover {
+    color: var(--primary);
+}
+
+.account-request-breadcrumb i {
+    font-size: 0.7rem;
+    opacity: 0.6;
+}
+
+/* Page Title & Intro */
+.account-request-page-header {
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.account-request-page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+}
+
+.account-request-page-desc {
+    font-size: 0.95rem;
+    color: var(--secondary);
+    margin: 0;
+    line-height: 1.6;
+    max-width: 720px;
+}
+
+/* Divided Form Sections (Steam Help Style) */
+.account-request-section {
+    padding-bottom: 2.25rem;
+    margin-bottom: 2.25rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.account-request-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 1rem;
+    margin-bottom: 0;
+}
+
+.account-request-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.4rem 0;
+}
+
+.account-request-section-hint {
+    font-size: 0.875rem;
+    color: var(--secondary);
+    margin: 0 0 1.25rem 0;
+    line-height: 1.5;
+}
+
+/* Aligned Input Fields */
+.account-request-input-wrapper {
+    max-width: 640px;
+}
+
+.account-request-text-input {
+    width: 100%;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.95rem;
+    color: var(--text);
+    background-color: var(--surface-hover);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.account-request-text-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+    background-color: var(--surface);
+}
+
+.account-request-text-input.is-invalid {
+    border-color: var(--danger, #ef4444);
+}
+
+.account-request-textarea-input {
+    width: 100%;
+    min-height: 140px;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.95rem;
+    color: var(--text);
+    background-color: var(--surface-hover);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+}
+
+.account-request-textarea-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+    background-color: var(--surface);
+}
+
+.account-request-textarea-input.is-invalid {
+    border-color: var(--danger, #ef4444);
+}
+
+.account-request-error-text {
+    display: block;
+    color: var(--danger, #ef4444);
+    font-size: 0.825rem;
+    margin-top: 0.5rem;
+}
+
+.account-request-error-banner {
+    padding: 0.9rem 1.25rem;
+    border-radius: 8px;
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: var(--danger, #ef4444);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Actions Section */
+.account-request-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-top: 1rem;
+}
+
+.account-request-submit-btn {
+    padding: 0.85rem 2rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.account-request-submit-btn:hover:not(:disabled) {
+    filter: brightness(0.92);
+}
+
+.account-request-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.account-request-cancel-btn {
+    color: var(--secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.account-request-cancel-btn:hover {
+    color: var(--text);
+}
+
+/* Submission Success State */
+.account-request-success-box {
+    padding: 2.5rem 0;
+}
+
+.account-request-success-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    background-color: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.account-request-success-summary {
+    max-width: 600px;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 10px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.account-request-summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.account-request-summary-row:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.account-request-summary-label {
+    color: var(--secondary);
+}
+
+.account-request-summary-val {
+    font-weight: 600;
+    color: var(--text);
+}
+
+@media (max-width: 768px) {
+    .account-request-topbar {
+        padding: 1rem 1.25rem;
+    }
+
+    .account-request-main {
+        padding: 2rem 1.25rem 4rem 1.25rem;
+    }
+
+    .account-request-page-title {
+        font-size: 1.6rem;
+    }
+
+    .account-request-input-wrapper {
+        max-width: 100%;
+    }
+}

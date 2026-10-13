@@ -17,8 +17,9 @@ import GetProviderAvailabilityUseCase from "../../application/use-cases/getProvi
 import GetProviderAvailabilityOverridesUseCase from "../../application/use-cases/getProviderAvailabilityOverrides.useCase.js";
 import CreateProviderAvailabilityOverrideUseCase from "../../application/use-cases/createProviderAvailabilityOverride.useCase.js";
 import DeleteProviderAvailabilityOverrideUseCase from "../../application/use-cases/deleteProviderAvailabilityOverride.useCase.js";
+import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/createAccountReactivationRequest.useCase.js";
 
-import { userRepository, customerRepository, addressRepository, providerRepository, providerAvailabilityRepository } from "./repositories.js";
+import { userRepository, customerRepository, addressRepository, providerRepository, providerAvailabilityRepository, userAccountBlockRepository, accountReactivationRequestRepository } from "./repositories.js";
 import {
     passwordHasher,
     otpGenerate,
@@ -54,7 +55,15 @@ export const getProvidersUseCase = new GetProvidersUseCase(
     userRepository
 )
 export const updateUserStatusUseCase = new UpdateUserStatusUseCase(
-    userRepository
+    userRepository,
+    userAccountBlockRepository,
+    emailSender
+)
+export const createAccountReactivationRequestUseCase = new CreateAccountReactivationRequestUseCase(
+    userRepository,
+    userAccountBlockRepository,
+    accountReactivationRequestRepository,
+    emailSender
 )
 export const getProfileUseCase = new GetProfileUseCase(
     userRepository,

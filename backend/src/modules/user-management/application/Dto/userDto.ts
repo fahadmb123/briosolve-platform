@@ -6,8 +6,10 @@ import { User } from "../../domain/entities/user.entity.js"
 import { Address } from "../../domain/entities/address.entity.js"
 
 export type UpdateUserStatusDto = {
-    id:string,
-    status:string
+    id: string;
+    status: string;
+    reason?: string;
+    adminId?: string;
 }
 
 export type GetProfileUseCaseOutputDto = {

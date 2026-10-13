@@ -5,12 +5,15 @@ import { toast } from "react-toastify";
 import type { User, response } from '../../../../../shared/types/Dtos';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from "../../../../../shared/components/ui/ConfirmModal/ConfirmModal";
+import { BlockReasonModal } from "../../../components/BlockReasonModal";
 import ProviderRow from "../../components/ProviderRow";
 
 export default function Providers() {
     const [providers, setProviders] = useState<User[]>([]);
     const [selectedProvider, setSelectedProvider] = useState<User | null>(null);
-    const [providerToChange, setProviderToChange] = useState<{ id: string; status: string } | null>(null);
+    const [providerToBlock, setProviderToBlock] = useState<{ id: string; name: string } | null>(null);
+    const [pendingBlockConfirmation, setPendingBlockConfirmation] = useState<{ id: string; name: string; reason: string } | null>(null);
+    const [providerToActivate, setProviderToActivate] = useState<{ id: string; name: string } | null>(null);
 
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
@@ -33,8 +36,23 @@ export default function Providers() {
     }, [filter, search, page]);
 
     const handleStatusButton = useCallback((id: string, status: string) => {
-        setProviderToChange({ id, status });
-    }, []);
+        const target = providers.find((u) => u.id === id);
+        if (status === "ACTIVE") {
+            setProviderToBlock({ id, name: target?.name || "Provider" });
+        } else {
+            setProviderToActivate({ id, name: target?.name || "Provider" });
+        }
+    }, [providers]);
+
+    const handleProceedToBlockConfirm = useCallback((reason: string) => {
+        if (!providerToBlock) return;
+        setPendingBlockConfirmation({
+            id: providerToBlock.id,
+            name: providerToBlock.name,
+            reason
+        });
+        setProviderToBlock(null);
+    }, [providerToBlock]);
 
     const handleViewProvider = useCallback((provider: User) => {
         setSelectedProvider(provider);
@@ -44,23 +62,38 @@ export default function Providers() {
         setSelectedProvider(null);
     }, []);
 
-    const handleCancelStatusChange = useCallback(() => {
-        setProviderToChange(null);
-    }, []);
-
-    const confirmStatusChange = useCallback(() => {
-        if (!providerToChange) return;
-        const passStatus = providerToChange.status === "ACTIVE" ? "BLOCKED" : "ACTIVE";
-        updateStatus.mutate({ id: providerToChange.id, status: passStatus }, {
+    const confirmBlock = useCallback(() => {
+        if (!pendingBlockConfirmation) return;
+        updateStatus.mutate({
+            id: pendingBlockConfirmation.id,
+            status: "BLOCKED",
+            reason: pendingBlockConfirmation.reason
+        }, {
             onSuccess: (res: response<{ users: User[] }>) => {
                 setProviders((users: User[]) => 
-                    users.map((user) => user.id === providerToChange.id ? { ...user, status: passStatus } : user)
+                    users.map((user) => user.id === pendingBlockConfirmation.id ? { ...user, status: "BLOCKED" } : user)
                 );
-                setProviderToChange(null);
+                setPendingBlockConfirmation(null);
                 toast.success(res.message);
             }
         });
-    }, [providerToChange, updateStatus]);
+    }, [pendingBlockConfirmation, updateStatus]);
+
+    const confirmActivate = useCallback(() => {
+        if (!providerToActivate) return;
+        updateStatus.mutate({
+            id: providerToActivate.id,
+            status: "ACTIVE"
+        }, {
+            onSuccess: (res: response<{ users: User[] }>) => {
+                setProviders((users: User[]) => 
+                    users.map((user) => user.id === providerToActivate.id ? { ...user, status: "ACTIVE" } : user)
+                );
+                setProviderToActivate(null);
+                toast.success(res.message);
+            }
+        });
+    }, [providerToActivate, updateStatus]);
 
     const handleReset = useCallback(() => {
         setSearch("");
@@ -276,18 +309,37 @@ export default function Providers() {
                 </div>
             </div>
 
-            <ConfirmModal
-                isOpen={!!providerToChange}
-                title={providerToChange?.status === 'ACTIVE' ? "Suspend Provider" : "Activate Provider"}
-                message={providerToChange?.status === 'ACTIVE'
-                    ? "Are you sure you want to suspend this service provider? They will immediately lose access to the platform and cannot receive new leads."
-                    : "Are you sure you want to activate this service provider account?"}
-                confirmText={providerToChange?.status === 'ACTIVE' ? "Suspend" : "Activate"}
-                cancelText="Cancel"
-                isDanger={providerToChange?.status === 'ACTIVE'}
+            <BlockReasonModal
+                isOpen={!!providerToBlock}
+                userName={providerToBlock?.name || "Provider"}
+                userId={providerToBlock?.id || ""}
                 isLoading={updateStatus.isPending}
-                onConfirm={confirmStatusChange}
-                onCancel={handleCancelStatusChange}
+                onConfirm={handleProceedToBlockConfirm}
+                onClose={() => setProviderToBlock(null)}
+            />
+
+            <ConfirmModal
+                isOpen={!!pendingBlockConfirmation}
+                title="Confirm Account Suspension"
+                message={`Are you sure you want to block ${pendingBlockConfirmation?.name}? Reason: "${pendingBlockConfirmation?.reason}"`}
+                confirmText="Confirm Block"
+                cancelText="Cancel"
+                isDanger={true}
+                isLoading={updateStatus.isPending}
+                onConfirm={confirmBlock}
+                onCancel={() => setPendingBlockConfirmation(null)}
+            />
+
+            <ConfirmModal
+                isOpen={!!providerToActivate}
+                title="Activate Provider"
+                message={`Are you sure you want to activate ${providerToActivate?.name}'s account?`}
+                confirmText="Activate"
+                cancelText="Cancel"
+                isDanger={false}
+                isLoading={updateStatus.isPending}
+                onConfirm={confirmActivate}
+                onCancel={() => setProviderToActivate(null)}
             />
         </>
     );

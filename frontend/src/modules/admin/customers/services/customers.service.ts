@@ -17,7 +17,7 @@ export const getCustomers = async (params:getCustomersInput): Promise<response<{
 }
 
 
-export const updateStatus = async (data:{id:string,status:string}): Promise<response<{users:User[]}>> => {
-    const response = await apiClient.patch(`/api/user/status/${data.id}`,data)
+export const updateStatus = async (data: { id: string; status: string; reason?: string }): Promise<response<{ users: User[] }>> => {
+    const response = await apiClient.patch(`/api/user/status/${data.id}`, data);
     return response.data;
-}
+};

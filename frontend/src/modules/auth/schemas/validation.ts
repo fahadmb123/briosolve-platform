@@ -65,3 +65,16 @@ export const providerRegistrationSchema = z.object({
 });
 
 export type ProviderRegistrationInputType = z.infer<typeof providerRegistrationSchema>;
+
+export const accountReactivationSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "Email is required" })
+    .email({ message: "Invalid email address" }),
+  reason: z
+    .string()
+    .min(1, { message: "Reason is required" })
+    .min(11, { message: "Reason must be greater than 10 characters" })
+});
+
+export type AccountReactivationInputType = z.infer<typeof accountReactivationSchema>;

@@ -13,7 +13,7 @@ export const getProviders = async (params: getProvidersInput): Promise<response<
     return response.data;
 };
 
-export const updateStatus = async (data: { id: string; status: string }): Promise<response<{ users: User[] }>> => {
+export const updateStatus = async (data: { id: string; status: string; reason?: string }): Promise<response<{ users: User[] }>> => {
     const response = await apiClient.patch(`/api/user/status/${data.id}`, data);
     return response.data;
 };
