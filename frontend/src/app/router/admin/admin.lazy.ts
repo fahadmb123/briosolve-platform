@@ -5,7 +5,6 @@ export const AdminCustomers = React.lazy(() => import('../../../modules/admin/cu
 export const AdminProviders = React.lazy(() => import('../../../modules/admin/providers/pages/Providers/Providers'));
 export const AdminProviderDetails = React.lazy(() => import('../../../modules/admin/providers/pages/ProviderDetails/ProviderDetails'));
 export const AdminVerification = React.lazy(() => import('../../../modules/admin/verification/pages/Verification/Verification'));
-export const AdminVerificationDetails = React.lazy(() => import('../../../modules/admin/verification/pages/VerificationDetails/VerificationDetails'));
 export const AdminSettings = React.lazy(() => import('../../../modules/admin/settings/pages/Settings/Settings'));
 export const AdminNotifications = React.lazy(() => import('../../../modules/admin/notifications/pages/Notifications/Notifications'));
 export const AdminCategories = React.lazy(() => import('../../../modules/categories/pages/Categories/Categories'));

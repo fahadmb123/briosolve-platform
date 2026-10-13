@@ -35,23 +35,18 @@ export class UpdateVerificationDocumentUseCase implements IUseCase<UpdateVerific
             );
         }
 
-        let keptFileIds = input.kept_file_ids;
-        if (existingDoc.document_type === "IDENTITY" && newFileUrls.length > 0) {
-            keptFileIds = [];
-        }
+        const keptFileIds = input.kept_file_ids !== undefined
+            ? input.kept_file_ids
+            : (existingDoc.files?.map((f) => f.id) || []);
 
-        const currentFilesCount = keptFileIds !== undefined
-            ? keptFileIds.length
-            : (existingDoc.files?.length || 0);
+        const currentFilesCount = keptFileIds.length;
 
         if (currentFilesCount + newFileUrls.length === 0) {
             throw new ApplicationError("BAD_REQUEST", "At least one verification document file is required", "VALIDATION");
         }
 
         if (existingDoc.files && existingDoc.files.length > 0) {
-            const filesToDelete = keptFileIds !== undefined
-                ? existingDoc.files.filter((f) => !keptFileIds!.includes(f.id))
-                : (newFileUrls.length > 0 ? existingDoc.files : []);
+            const filesToDelete = existingDoc.files.filter((f) => !keptFileIds.includes(f.id));
 
             if (filesToDelete.length > 0) {
                 await Promise.all(

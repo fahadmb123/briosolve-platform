@@ -2,6 +2,8 @@ import { UploadVerificationDocumentUseCase } from "../../application/use-cases/u
 import { GetProviderVerificationsUseCase } from "../../application/use-cases/getProviderVerifications.useCase.js";
 import { UpdateVerificationDocumentUseCase } from "../../application/use-cases/updateVerificationDocument.useCase.js";
 import { DeleteVerificationDocumentUseCase } from "../../application/use-cases/deleteVerificationDocument.useCase.js";
+import { GetAdminVerificationsUseCase } from "../../application/use-cases/getAdminVerifications.useCase.js";
+import { UpdateKycStatusUseCase } from "../../application/use-cases/updateKycStatus.useCase.js";
 import { verificationDocumentRepository } from "./repositories.js";
 import { providerRepository } from "../../../user-management/infrastructure/composition/repositories.js";
 import { imageService } from "./services.js";
@@ -27,4 +29,12 @@ export const deleteVerificationDocumentUseCase = new DeleteVerificationDocumentU
     verificationDocumentRepository,
     providerRepository,
     imageService
+);
+
+export const getAdminVerificationsUseCase = new GetAdminVerificationsUseCase(
+    verificationDocumentRepository
+);
+
+export const updateKycStatusUseCase = new UpdateKycStatusUseCase(
+    verificationDocumentRepository
 );

@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
 import { VerificationDocument } from "../../domain/entities/verificationDocument.entity.js";
 import { UploadVerificationInputDto, UpdateVerificationInputDto } from "../../application/Dto/verificationDto.js";
+import { GetAdminKycRequestsInput, GetAdminKycResponse, UpdateKycStatusInput } from "../../domain/repositories/IVerificationDocumentRepository.js";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
 
@@ -11,7 +12,9 @@ export class VerificationController extends BaseController {
         private readonly uploadVerificationDocumentUseCase: IUseCase<UploadVerificationInputDto, VerificationDocument>,
         private readonly getProviderVerificationsUseCase: IUseCase<string, VerificationDocument[]>,
         private readonly updateVerificationDocumentUseCase: IUseCase<UpdateVerificationInputDto, VerificationDocument>,
-        private readonly deleteVerificationDocumentUseCase: IUseCase<{ id: string; userId: string }, boolean>
+        private readonly deleteVerificationDocumentUseCase: IUseCase<{ id: string; userId: string }, boolean>,
+        private readonly getAdminVerificationsUseCase: IUseCase<GetAdminKycRequestsInput, GetAdminKycResponse>,
+        private readonly updateKycStatusUseCase: IUseCase<UpdateKycStatusInput, void>
     ) {
         super();
     }
@@ -119,6 +122,46 @@ export class VerificationController extends BaseController {
             const user = this.getCurrentUser(req);
             const documents = await this.getProviderVerificationsUseCase.execute(user.userId);
             return sendSuccess(res, "Verification documents retrieved successfully", documents);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    getAdminVerifications = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+            const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
+            const search = req.query.search as string | undefined;
+            const status = req.query.status as string | undefined;
+            const sort = req.query.sort as "asc" | "desc" | undefined;
+
+            const result = await this.getAdminVerificationsUseCase.execute({
+                page,
+                limit,
+                search,
+                status,
+                sort
+            });
+            return sendSuccess(res, "Admin verification requests retrieved successfully", result);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    updateKycStatus = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const providerId = req.params.id || req.body.providerId;
+            const status = req.body.status;
+            const rejectionReason = req.body.rejectionReason || req.body.rejection_reason;
+            const documentId = req.body.documentId;
+
+            await this.updateKycStatusUseCase.execute({
+                providerId,
+                status,
+                rejectionReason,
+                documentId
+            });
+            return sendSuccess(res, `KYC status updated to ${status}!`, null);
         } catch (error) {
             next(error);
         }

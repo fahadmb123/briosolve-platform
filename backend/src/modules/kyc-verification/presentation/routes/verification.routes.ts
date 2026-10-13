@@ -8,6 +8,9 @@ import { verificationController } from "../../infrastructure/composition/control
 
 const router = Router();
 
+router.get("/admin", authMiddleware, requireRole(["ADMIN"]), verificationController.getAdminVerifications);
+router.patch("/admin/:id/status", authMiddleware, requireRole(["ADMIN"]), verificationController.updateKycStatus);
+
 router.get("/", authMiddleware, requireRole(["PROVIDER"]), verificationController.getProviderVerifications);
 router.post("/", authMiddleware, requireRole(["PROVIDER"]), upload.array("files"), validate(uploadVerificationSchema), verificationController.uploadVerification);
 router.patch("/:id", authMiddleware, requireRole(["PROVIDER"]), upload.array("files"), verificationController.updateVerification);

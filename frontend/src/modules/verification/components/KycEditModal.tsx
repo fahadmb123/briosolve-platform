@@ -119,14 +119,9 @@ export const KycEditModal = memo(({
   }, []);
 
   const handleRestoreExistingFile = useCallback((fileId: string) => {
-    if (isIdentity) {
-      setKeptFileIds([fileId]);
-      setNewFiles([]);
-    } else {
-      setKeptFileIds((prev) => [...prev, fileId]);
-    }
+    setKeptFileIds((prev) => (prev.includes(fileId) ? prev : [...prev, fileId]));
     setErrorMsg('');
-  }, [isIdentity]);
+  }, []);
 
   const handleRemoveNewFile = useCallback((id: string) => {
     setNewFiles((prev) => prev.filter((item) => item.id !== id));
