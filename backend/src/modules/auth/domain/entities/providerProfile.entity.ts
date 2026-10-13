@@ -1,3 +1,5 @@
+export type KycStatus = "NOT_SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED";
+
 export class ProviderProfile {
     constructor(
         public readonly id: string,
@@ -10,6 +12,9 @@ export class ProviderProfile {
         public readonly updated_at: Date,
         public readonly service_radius_km?: number | null,
         public readonly accepting_leads?: boolean,
-        public readonly travel_buffer_minutes?: number
+        public readonly travel_buffer_minutes?: number,
+        public readonly completed_jobs?: number,
+        public readonly kyc_status?: KycStatus,
+        public readonly skills?: string | null
     ) {}
 }

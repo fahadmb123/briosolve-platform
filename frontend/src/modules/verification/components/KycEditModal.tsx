@@ -203,26 +203,30 @@ export const KycEditModal = memo(({
   if (!isOpen) return null;
 
   return (
-    <div className="kyc-modal-overlay" onClick={onClose}>
-      <div className="kyc-modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="kyc-modal-header">
-          <div>
-            <h3 className="kyc-modal-header-title">
-              Edit {isIdentity ? 'Identity Document' : 'Additional Certificate'}
-            </h3>
-            <p className="kyc-modal-header-subtitle">
-              Update the document name or replace/add files for verification review.
-            </p>
+    <>
+      <div 
+        className="kyc-modal-overlay" 
+        onClick={isSubmitting || isDeleting ? undefined : onClose}
+      >
+        <div className="kyc-modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="kyc-modal-header">
+            <div>
+              <h3 className="kyc-modal-header-title">
+                Edit {isIdentity ? 'Identity Document' : 'Additional Certificate'}
+              </h3>
+              <p className="kyc-modal-header-subtitle">
+                Update the document name or replace/add files for verification review.
+              </p>
+            </div>
+            <button
+              className="kyc-modal-close-btn"
+              onClick={onClose}
+              aria-label="Close edit modal"
+              disabled={isSubmitting || isDeleting}
+            >
+              <i className="fas fa-times"></i>
+            </button>
           </div>
-          <button
-            className="kyc-modal-close-btn"
-            onClick={onClose}
-            aria-label="Close edit modal"
-            disabled={isSubmitting}
-          >
-            <i className="fas fa-times"></i>
-          </button>
-        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="kyc-modal-body">
@@ -449,30 +453,35 @@ export const KycEditModal = memo(({
           </div>
         </form>
       </div>
-
-      <ConfirmModal
-        isOpen={showDeleteConfirm}
-        title="Delete Verification Document?"
-        message={`Are you sure you want to delete "${document.document_name}"? This action will remove the document and its uploaded files. You will need to submit a new verification document for review.`}
-        confirmText="Delete Document"
-        cancelText="Cancel"
-        isDanger={true}
-        isLoading={isDeleting}
-        onConfirm={async () => {
-          if (!onDelete) return;
-          setIsDeleting(true);
-          try {
-            await onDelete(document.id);
-            setShowDeleteConfirm(false);
-            onClose();
-          } catch {
-            setIsDeleting(false);
-          }
-        }}
-        onCancel={() => setShowDeleteConfirm(false)}
-      />
     </div>
-  );
+
+    <ConfirmModal
+      isOpen={showDeleteConfirm}
+      title="Delete Verification Document?"
+      message={`Are you sure you want to delete "${document.document_name}"? This action will remove the document and its uploaded files. You will need to submit a new verification document for review.`}
+      confirmText="Delete Document"
+      cancelText="Cancel"
+      isDanger={true}
+      isLoading={isDeleting}
+      onConfirm={async () => {
+        if (!onDelete) return;
+        setIsDeleting(true);
+        try {
+          await onDelete(document.id);
+          setShowDeleteConfirm(false);
+          onClose();
+        } catch {
+          setIsDeleting(false);
+        }
+      }}
+      onCancel={() => {
+        if (!isDeleting) {
+          setShowDeleteConfirm(false);
+        }
+      }}
+    />
+  </>
+);
 });
 
 KycEditModal.displayName = 'KycEditModal';

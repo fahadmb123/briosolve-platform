@@ -8,6 +8,7 @@ interface KycDetailsModalProps {
   onRequestNew: (type: VerificationDocumentType) => void;
   onPreviewImage: (url: string, title?: string) => void;
   onEdit?: (document: VerificationDocument) => void;
+  onDelete?: (document: VerificationDocument) => void;
 }
 
 export const KycDetailsModal = memo(({
@@ -17,6 +18,7 @@ export const KycDetailsModal = memo(({
   onRequestNew,
   onPreviewImage,
   onEdit,
+  onDelete,
 }: KycDetailsModalProps) => {
   const isRejected = document?.status === 'REJECTED';
   const isPending = document?.status === 'PENDING';
@@ -39,6 +41,13 @@ export const KycDetailsModal = memo(({
       onEdit(document);
     }
   }, [document, onClose, onEdit]);
+
+  const handleDeleteClick = useCallback(() => {
+    if (document && onDelete) {
+      onClose();
+      onDelete(document);
+    }
+  }, [document, onDelete, onClose]);
 
   const statusBadge = useMemo(() => {
     if (isApproved) {
@@ -206,22 +215,35 @@ export const KycDetailsModal = memo(({
         </div>
 
         <div className="kyc-modal-footer flex items-center justify-between">
-          <button
-            type="button"
-            className="btn btn-secondary py-2 px-4 rounded-lg text-sm"
-            onClick={onClose}
-          >
-            Close
-          </button>
-          {onEdit && (
+          {onDelete && isApproved ? (
             <button
               type="button"
-              className="btn btn-primary py-2 px-4 rounded-lg text-sm flex items-center gap-1.5"
-              onClick={handleEditClick}
+              className="btn btn-danger py-2 px-4 rounded-lg text-sm flex items-center gap-1.5"
+              onClick={handleDeleteClick}
             >
-              <i className="fas fa-edit"></i> Edit Document
+              <i className="fas fa-trash-alt"></i> Delete Document
             </button>
+          ) : (
+            <div />
           )}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="btn btn-secondary py-2 px-4 rounded-lg text-sm"
+              onClick={onClose}
+            >
+              Close
+            </button>
+            {onEdit && !isApproved && (
+              <button
+                type="button"
+                className="btn btn-primary py-2 px-4 rounded-lg text-sm flex items-center gap-1.5"
+                onClick={handleEditClick}
+              >
+                <i className="fas fa-edit"></i> Edit Document
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

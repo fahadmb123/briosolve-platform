@@ -39,6 +39,9 @@ export interface ProviderProfileRaw {
     service_radius_km?: number | null;
     accepting_leads?: boolean;
     travel_buffer_minutes?: number;
+    completed_jobs?: number;
+    kyc_status?: "NOT_SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED";
+    skills?: string | null;
     created_at: Date | { epochMilliseconds: number } | string;
     updated_at: Date | { epochMilliseconds: number } | string;
 }

@@ -10,6 +10,7 @@ interface KycDocumentCardProps {
   onRequestVerification: (type: VerificationDocumentType) => void;
   onViewRequest: (document: VerificationDocument) => void;
   onEditVerification?: (document: VerificationDocument) => void;
+  onDeleteVerification?: (document: VerificationDocument) => void;
 }
 
 export const KycDocumentCard = memo(({
@@ -21,6 +22,7 @@ export const KycDocumentCard = memo(({
   onRequestVerification,
   onViewRequest,
   onEditVerification,
+  onDeleteVerification,
 }: KycDocumentCardProps) => {
   const status = document?.status || 'NOT_SUBMITTED';
   const isRejected = status === 'REJECTED';
@@ -45,6 +47,12 @@ export const KycDocumentCard = memo(({
       onRequestVerification(documentType);
     }
   }, [document, onEditVerification, onRequestVerification, documentType]);
+
+  const handleDeleteClick = useCallback(() => {
+    if (document && onDeleteVerification) {
+      onDeleteVerification(document);
+    }
+  }, [document, onDeleteVerification]);
 
   const fileCount = useMemo(() => {
     return document?.files?.length || 0;
@@ -159,15 +167,15 @@ export const KycDocumentCard = memo(({
               className="btn btn-secondary flex-1 py-2 text-sm rounded-lg flex items-center justify-center gap-1.5"
               onClick={handleViewClick}
             >
-              <i className="fas fa-certificate"></i> View
+              <i className="fas fa-eye"></i> View
             </button>
-            {onEditVerification && (
+            {onDeleteVerification && (
               <button
                 type="button"
-                className="btn btn-outline flex-1 py-2 text-sm rounded-lg flex items-center justify-center gap-1.5"
-                onClick={handleEditClick}
+                className="btn btn-danger flex-1 py-2 text-sm rounded-lg flex items-center justify-center gap-1.5"
+                onClick={handleDeleteClick}
               >
-                <i className="fas fa-edit"></i> Update
+                <i className="fas fa-trash-alt"></i> Delete
               </button>
             )}
           </div>

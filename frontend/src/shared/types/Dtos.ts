@@ -41,6 +41,9 @@ export type ProviderProfile = {
     service_radius_km?: number | null;
     accepting_leads?: boolean;
     travel_buffer_minutes?: number;
+    completed_jobs?: number;
+    kyc_status?: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED';
+    skills?: string | null;
     created_at: Temporal.Instant | string | Date;
     updated_at: Temporal.Instant | string | Date;
 };

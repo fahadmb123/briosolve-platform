@@ -1,4 +1,4 @@
-import { ProviderProfile } from "../../domain/entities/providerProfile.entity.js";
+import { ProviderProfile, KycStatus } from "../../domain/entities/providerProfile.entity.js";
 
 export interface ProviderProfileRaw {
     id: string;
@@ -10,6 +10,9 @@ export interface ProviderProfileRaw {
     service_radius_km?: number | null;
     accepting_leads?: boolean;
     travel_buffer_minutes?: number;
+    completed_jobs?: number;
+    kyc_status?: KycStatus;
+    skills?: string | null;
     created_at: Date | { epochMilliseconds: number } | string;
     updated_at: Date | { epochMilliseconds: number } | string;
 }
@@ -33,7 +36,10 @@ export class ProviderProfileMapper {
                 ? Number(raw.service_radius_km)
                 : 20,
             raw.accepting_leads !== undefined ? Boolean(raw.accepting_leads) : true,
-            raw.travel_buffer_minutes !== undefined && raw.travel_buffer_minutes !== null ? Number(raw.travel_buffer_minutes) : 30
+            raw.travel_buffer_minutes !== undefined && raw.travel_buffer_minutes !== null ? Number(raw.travel_buffer_minutes) : 30,
+            raw.completed_jobs !== undefined && raw.completed_jobs !== null ? Number(raw.completed_jobs) : 0,
+            (raw.kyc_status as KycStatus) || "NOT_SUBMITTED",
+            raw.skills || null
         );
     }
 }

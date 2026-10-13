@@ -1,16 +1,30 @@
 import { memo, useMemo } from 'react';
 import type { VerificationDocument } from '../types/kyc.types';
+import { useAuthStore } from '../../../store/auth/auth.store';
+import type { ProviderProfile } from '../../../shared/types/Dtos';
 
 interface KycStatusBannerProps {
   documents: VerificationDocument[];
 }
 
 export const KycStatusBanner = memo(({ documents }: KycStatusBannerProps) => {
-  const { hasRejected, allApproved, hasPending } = useMemo(() => ({
-    hasRejected: documents.some((doc) => doc.status === 'REJECTED'),
-    allApproved: documents.length > 0 && documents.every((doc) => doc.status === 'APPROVED'),
-    hasPending: documents.some((doc) => doc.status === 'PENDING'),
-  }), [documents]);
+  const profile = useAuthStore((state) => state.profile) as ProviderProfile | null;
+
+  const { hasRejected, allApproved, hasPending } = useMemo(() => {
+    // Check real-time documents prop directly for instant updates
+    const docHasRejected = documents.some((doc) => doc.status === 'REJECTED');
+    const docHasPending = documents.some((doc) => doc.status === 'PENDING');
+    const docAllApproved = documents.length > 0 && documents.every((doc) => doc.status === 'APPROVED');
+
+    // Fall back to profile kyc_status if no documents are loaded yet
+    const kycStatus = profile?.kyc_status;
+
+    return {
+      hasRejected: docHasRejected || (documents.length === 0 && kycStatus === 'REJECTED'),
+      hasPending: docHasPending || (documents.length === 0 && kycStatus === 'PENDING'),
+      allApproved: docAllApproved || (documents.length === 0 && kycStatus === 'APPROVED'),
+    };
+  }, [documents, profile?.kyc_status]);
 
   if (allApproved) {
     return (

@@ -1,10 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import type {
-  VerificationDocument,
-  VerificationDocumentType,
-  KycSubmissionPayload,
-  KycEditSubmissionPayload,
-} from '../../types/kyc.types';
+import type {VerificationDocument,VerificationDocumentType,KycSubmissionPayload,KycEditSubmissionPayload,} from '../../types/kyc.types';
 import { KycStatusBanner } from '../../components/KycStatusBanner';
 import { KycDocumentCard } from '../../components/KycDocumentCard';
 import { KycRequestModal } from '../../components/KycRequestModal';
@@ -17,14 +12,20 @@ import {
   useUpdateVerificationDocument,
   useDeleteVerificationDocument,
 } from '../../hooks/mutations/useVerification';
+
 import { toast } from 'react-toastify';
 import '../../components/kyc.css';
+import { ConfirmModal } from '../../../../shared/components/ui/ConfirmModal/ConfirmModal';
+import { useAuthStore } from '../../../../store/auth/auth.store';
+
+
 
 export default function Verification() {
   const [documents, setDocuments] = useState<VerificationDocument[]>([]);
   const [activeRequestType, setActiveRequestType] = useState<VerificationDocumentType | null>(null);
   const [selectedDetailsDoc, setSelectedDetailsDoc] = useState<VerificationDocument | null>(null);
   const [selectedEditDoc, setSelectedEditDoc] = useState<VerificationDocument | null>(null);
+  const [documentToDelete, setDocumentToDelete] = useState<VerificationDocument | null>(null);
   const [previewImage, setPreviewImage] = useState<{ url: string; title?: string } | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
 
@@ -32,6 +33,7 @@ export default function Verification() {
   const uploadDocMut = useUploadVerificationDocument();
   const updateDocMut = useUpdateVerificationDocument();
   const deleteDocMut = useDeleteVerificationDocument();
+  const {fetchUser} = useAuthStore.getState()
 
   useEffect(() => {
     getVerificationsMut.mutate(undefined, {
@@ -77,6 +79,16 @@ export default function Verification() {
     setSelectedEditDoc(null);
   }, []);
 
+  const handleOpenDelete = useCallback((doc: VerificationDocument) => {
+    setDocumentToDelete(doc);
+  }, []);
+
+  const handleCloseDelete = useCallback(() => {
+    if (!deleteDocMut.isPending) {
+      setDocumentToDelete(null);
+    }
+  }, [deleteDocMut.isPending]);
+
   const handlePreviewImage = useCallback((url: string, title?: string) => {
     setPreviewImage({ url, title });
   }, []);
@@ -102,16 +114,17 @@ export default function Verification() {
     const res = await uploadDocMut.mutateAsync(formData);
     if (res?.data) {
       const savedDoc = res.data;
+      fetchUser()
       setDocuments((prev) => {
         const filtered = prev.filter((d) => d.document_type !== savedDoc.document_type);
         return [...filtered, savedDoc];
       });
-      toast.success(`${savedDoc.document_name} submitted successfully!`);
+      toast.success(`${savedDoc.document_name} Submitted!`);
       setNotification(
-        `${savedDoc.document_name} verification request submitted successfully! It is now pending review.`
+        `${savedDoc.document_name} Submitted!`
       );
     }
-  }, [uploadDocMut]);
+  }, [uploadDocMut,fetchUser]);
 
   const handleEditSubmission = useCallback(async (payload: KycEditSubmissionPayload) => {
     const formData = new FormData();
@@ -123,8 +136,9 @@ export default function Verification() {
       }
     });
 
-    const res = await updateDocMut.mutateAsync({ id: payload.id, data: formData });
+    const res = await updateDocMut.mutateAsync({ id: payload.id, data: formData })
     if (res?.data) {
+      fetchUser()
       const updatedDoc = res.data;
       setDocuments((prev) => {
         const exists = prev.some((d) => d.id === updatedDoc.id);
@@ -136,17 +150,34 @@ export default function Verification() {
       });
       toast.success(`${updatedDoc.document_name} updated successfully!`);
       setNotification(
-        `${updatedDoc.document_name} updated successfully! It is now pending review.`
+        `${updatedDoc.document_name} Updated!`
       );
     }
-  }, [updateDocMut]);
+  }, [updateDocMut,fetchUser]);
 
   const handleDeleteSubmission = useCallback(async (id: string) => {
-    await deleteDocMut.mutateAsync(id);
-    setDocuments((prev) => prev.filter((d) => d.id !== id));
-    toast.success('Verification document deleted successfully');
-    setNotification('Verification document deleted successfully.');
-  }, [deleteDocMut]);
+    try {
+      const res = await deleteDocMut.mutateAsync(id)
+      fetchUser()
+      setDocuments((prev) => prev.filter((d) => d.id !== id));
+      const message = res?.message || 'Document deleted successfully';
+      toast.success(message);
+      setNotification(message);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }, [deleteDocMut,fetchUser]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!documentToDelete) return;
+    try {
+      await handleDeleteSubmission(documentToDelete.id);
+      setDocumentToDelete(null);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [documentToDelete, handleDeleteSubmission]);
 
   return (
     <div className="app-content">
@@ -197,6 +228,7 @@ export default function Verification() {
               onRequestVerification={handleOpenRequest}
               onViewRequest={handleOpenDetails}
               onEditVerification={handleOpenEdit}
+              onDeleteVerification={handleOpenDelete}
             />
 
             <KycDocumentCard
@@ -208,6 +240,7 @@ export default function Verification() {
               onRequestVerification={handleOpenRequest}
               onViewRequest={handleOpenDetails}
               onEditVerification={handleOpenEdit}
+              onDeleteVerification={handleOpenDelete}
             />
           </div>
         )}
@@ -242,8 +275,21 @@ export default function Verification() {
           onRequestNew={handleOpenRequest}
           onPreviewImage={handlePreviewImage}
           onEdit={handleOpenEdit}
+          onDelete={handleOpenDelete}
         />
       )}
+
+      <ConfirmModal
+        isOpen={!!documentToDelete}
+        title="Delete Verification Document?"
+        message={`Are you sure you want to delete "${documentToDelete?.document_name}"? This action will remove the document and its uploaded files. You will need to submit a new verification document for review.`}
+        confirmText="Delete Document"
+        cancelText="Cancel"
+        isDanger={true}
+        isLoading={deleteDocMut.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCloseDelete}
+      />
 
       {previewImage && (
         <KycImageViewerModal

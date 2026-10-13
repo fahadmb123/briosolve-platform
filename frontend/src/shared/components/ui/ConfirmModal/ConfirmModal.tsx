@@ -39,8 +39,8 @@ const ConfirmModalComponent: React.FC<ConfirmModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="confirm-modal-overlay">
-            <div className="confirm-modal-content">
+        <div className="confirm-modal-overlay" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-modal-content" onClick={(e) => e.stopPropagation()}>
                 <h3 className="h5 mb-2" style={{ fontWeight: 600 }}>{title}</h3>
                 <p className="text-secondary text-sm mb-6">{message}</p>
                 <div className="flex gap-3 justify-end">
@@ -59,7 +59,12 @@ const ConfirmModalComponent: React.FC<ConfirmModalProps> = ({
                         onClick={onConfirm}
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Processing...' : confirmText}
+                        {isLoading ? (
+                            <span className="flex items-center gap-1.5">
+                                <i className="fas fa-spinner fa-spin"></i>
+                                <span>Processing...</span>
+                            </span>
+                        ) : confirmText}
                     </button>
                 </div>
             </div>

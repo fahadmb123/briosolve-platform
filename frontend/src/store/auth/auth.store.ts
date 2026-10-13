@@ -20,6 +20,8 @@ export interface IAuthUser {
     phone_verified: boolean;
     created_at: string;
     updated_at: string;
+    customer_profile?: CustomerProfile | null;
+    provider_profile?: ProviderProfile | null;
 }
 
 interface IAuthState {
