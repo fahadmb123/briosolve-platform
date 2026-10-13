@@ -26,9 +26,12 @@ import {
     getProvidersUseCase,
     createAccountReactivationRequestUseCase,
     getReactivationRequestsUseCase,
-    sendReactivationOtpUseCase
+    sendReactivationOtpUseCase,
+    sendBecomeProviderOtpUseCase,
+    becomeProviderUseCase
 } from "./useCases.js";
 import { imageUploadService } from "./services.js";
+import { jwtService } from "../../../auth/infrastructure/composition/services.js";
 
 export const userController = new UserController(
     updateUserStatusUseCase,
@@ -45,7 +48,10 @@ export const customerController = new CustomerController(
     getCustomerUseCase,
     registerCustomerUseCase,
     updateCustomerProfileUseCase,
-    imageUploadService
+    imageUploadService,
+    sendBecomeProviderOtpUseCase,
+    becomeProviderUseCase,
+    jwtService
 );
 export const addressController = new AddressController(
     addAddressUseCase,

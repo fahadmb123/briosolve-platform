@@ -15,4 +15,7 @@ router.post("/profile/image", authMiddleware, requireRole(["CUSTOMER"]), upload.
 router.patch("/profile",validate(profileSchema),authMiddleware,requireRole(["CUSTOMER"]),customerController.updateProfile)
 router.delete("/profile/image", authMiddleware, requireRole(["CUSTOMER"]), customerController.deleteProfileImage)
 
+router.post("/become-provider/send-otp", authMiddleware, requireRole(["CUSTOMER"]), customerController.sendBecomeProviderOtp)
+router.post("/become-provider", authMiddleware, requireRole(["CUSTOMER"]), customerController.becomeProvider)
+
 export default router

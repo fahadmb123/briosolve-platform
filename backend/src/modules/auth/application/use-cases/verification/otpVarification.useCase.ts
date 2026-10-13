@@ -57,13 +57,17 @@ export default class OtpVarificationUseCase implements IUseCase<OtpVarificationI
                 await this.PendingRegistrationStore.delete(registrationId)
                 break;
             case "CREATE_PROVIDER":
-                response = data;
-                await this.PendingRegistrationStore.save(registrationId, data, 30 * 60);
-                break;
-            case "REACTIVATE_ACCOUNT":
-                response = data;
-                await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
-                break;
+    response = data;
+    await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+    break;
+case "BECOME_PROVIDER":
+    response = data;
+    await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+    break;
+case "REACTIVATE_ACCOUNT":
+    response = data;
+    await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+    break;
         }
 
         return { response: response!, for: data?.for, email: data.email, path: data?.path }

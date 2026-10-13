@@ -10,8 +10,9 @@ const Contact = lazy(() => import('./views/Contact/Contact').then(m => ({ defaul
 const Security = lazy(() => import('./views/Security/Security').then(m => ({ default: m.Security })));
 const Notifications = lazy(() => import('./views/Notifications/Notifications').then(m => ({ default: m.Notifications })));
 const Addresses = lazy(() => import('./views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
+const BecomeProvider = lazy(() => import('./views/BecomeProvider/BecomeProvider').then(m => ({ default: m.BecomeProvider })));
 
-type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notifications' | 'addresses';
+type SettingsView = 'menu' | 'appearance' | 'contact' | 'security' | 'notifications' | 'addresses' | 'become-provider';
 
 export default function Settings() {
     const location = useLocation();
@@ -63,6 +64,13 @@ export default function Settings() {
                 badge={currentAddress ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
             />
 
+            <SettingsMenuCard
+                icon="fas fa-store"
+                title="Become a Provider"
+                description="Switch your account and start offering services on the marketplace."
+                onClick={() => setActiveView('become-provider')}
+            />
+
         </div>
     );
 
@@ -90,6 +98,7 @@ export default function Settings() {
                     {activeView === 'security' && <Security />}
                     {activeView === 'notifications' && <Notifications />}
                     {activeView === 'addresses' && <Addresses />}
+                    {activeView === 'become-provider' && <BecomeProvider />}
                 </Suspense>
             </div>
         </div>

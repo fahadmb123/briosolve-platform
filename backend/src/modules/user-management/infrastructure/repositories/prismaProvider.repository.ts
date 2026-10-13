@@ -1,7 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { IProviderRepository, CreateProviderInput } from "../../domain/repositories/IProviderRepository.js";
+import { IProviderRepository, CreateProviderInput, CreateProviderProfileInput } from "../../domain/repositories/IProviderRepository.js";
 import { User } from "../../domain/entities/user.entity.js";
 import { ProviderProfile } from "../../domain/entities/providerProfile.entity.js";
 import { UserMapper } from "../mappers/user.mapper.js";
@@ -36,6 +36,25 @@ export class ProviderRepository implements IProviderRepository {
         }
 
         return UserMapper.toDomain(user);
+    }
+
+    async createProviderProfile(data: CreateProviderProfileInput): Promise<{ id: string }> {
+        const profile = await db.orm.public.provider_profiles.create({
+            user_id: data.userId,
+            business_name: data.businessName,
+            experience: data.experience,
+            bio: data.bio,
+            profile_image: null
+        } as never);
+
+        for (const serviceId of data.services) {
+            await db.orm.public.provider_services.create({
+                provider_id: profile.id,
+                service_id: serviceId as never
+            } as never);
+        }
+
+        return { id: profile.id };
     }
 
     async updateProfile(input: UpdateProviderProfileInputDto): Promise<void> {

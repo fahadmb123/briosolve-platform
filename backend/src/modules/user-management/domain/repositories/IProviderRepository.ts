@@ -13,8 +13,17 @@ export type CreateProviderInput = {
     services: string[];
 };
 
+export type CreateProviderProfileInput = {
+    userId: string;
+    businessName: string;
+    experience: string;
+    bio: string;
+    services: string[];
+};
+
 export interface IProviderRepository extends BaseRepository<ProviderProfile | null> {
     createProvider(data: CreateProviderInput): Promise<User>;
+    createProviderProfile(data: CreateProviderProfileInput): Promise<{ id: string }>;
     updateProfile(data: UpdateProviderProfileInputDto): Promise<void>;
     findById(id: string): Promise<ProviderProfile | null>;
     findProfileByUserId?(userId: string): Promise<ProviderProfile | null>;

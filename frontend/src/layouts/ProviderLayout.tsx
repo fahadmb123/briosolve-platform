@@ -140,10 +140,7 @@ export default function ProviderLayout() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <span className="badge badge-success text-xs py-1 px-2.5 flex items-center gap-1.5" title="You are receiving live customer requests in Andheri West">
-                        <span className="pulse-dot-green"></span>
-                        <span>Receiving Leads</span>
-                    </span>
+                    
                     <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
                         <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
@@ -154,16 +151,16 @@ export default function ProviderLayout() {
                         </button>
                     </div>
                     <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
-                        <i className="fas fa-sign-out-alt mr-1"></i>
+                       
                         <span>{isAuthenticated ? "Logout" : "Login"}</span>
                     </button>
                     <Link to="/provider/profile" className="avatar avatar-sm ml-2" title={`${user?.name || profile?.business_name || "Provider"} (Verified Pro)`}>
                         <img
-                            src={profile?.profile_image || "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=80"}
+                            src={profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366F1&color=fff&rounded=true`}
                             alt={user?.name || "Provider"}
                             style={{borderRadius: '50%'}}
                             onError={(e) => {
-                                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=80";
+                                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366F1&color=fff&rounded=true`;
                             }}
                         />
                     </Link>

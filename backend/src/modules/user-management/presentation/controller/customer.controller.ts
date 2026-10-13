@@ -1,4 +1,5 @@
 import { NextFunction,Request,Response } from "express"
+import { accessTokenCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
 import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCustomersUseCase.js"
@@ -9,6 +10,9 @@ import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto.js"
 import { UserResponseMapper } from "../mappers/userResponse.mapper.js"
 import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js"
 import { ApplicationError } from "../../../../shared/application/errors/applicationError.js"
+import { SendBecomeProviderOtpUseCase } from "../../application/use-cases/sendBecomeProviderOtp.useCase.js"
+import { BecomeProviderInput, BecomeProviderUseCase } from "../../application/use-cases/becomeProvider.useCase.js"
+import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.service.js"
 
 
 
@@ -19,7 +23,10 @@ export class CustomerController extends BaseController{
         private readonly getCustomersUseCase:IGetCustomersUseCase,
         private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto>,
         private readonly updateCustomerProfileUseCase : IUseCase<UpdateCustomerProfileInputDto,void>,
-        private readonly imageUploadService: ImageUploadService
+        private readonly imageUploadService: ImageUploadService,
+        private readonly sendBecomeProviderOtpUseCase: IUseCase<string,{ registrationId: string; expiresIn: number }>,
+        private readonly becomeProviderUseCase: IUseCase<BecomeProviderInput,void>,
+        private readonly jwtService : IJwtService
     ) {super()}
 
     register = async (req:Request,res:Response,next:NextFunction) => {
@@ -100,5 +107,33 @@ export class CustomerController extends BaseController{
             next(err)
         }
     }
-    
+
+    sendBecomeProviderOtp = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const { userId } = this.getCurrentUser(req)
+            const response = await this.sendBecomeProviderOtpUseCase.execute(userId)
+            res.cookie("registration_id", response.registrationId, registrationCookie)
+            return sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn })
+        } catch (err) {
+            next(err)
+        }
+    }
+
+    becomeProvider = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+         
+            const user = this.getCurrentUser(req)
+            const registrationId = req.cookies.registration_id
+            const { businessName, experience, bio, services } = req.body
+            await this.becomeProviderUseCase.execute({ registrationId, businessName, experience, bio, services })
+            
+            const newToken = await this.jwtService.generate({ userId: user.userId, role: "PROVIDER" })
+            res.cookie("access_token", newToken, accessTokenCookie)
+            if (registrationId) res.clearCookie("registration_id")
+            return sendSuccess(res, "Switched to Provider!")
+        } catch (err) {
+            console.error("becomeProvider error:", err)
+            next(err)
+        }
+    }
 }

@@ -17,7 +17,7 @@ export const useOtpVarify = (isInline?: boolean) => {
                 useResetFlowStore.getState().setOtpVerified(true);
             }
             
-            if (response.data.path === "settings") {
+            if (response.data.path && response.data.path.endsWith("settings")) {
                 useResetFlowStore.getState().setOtpFlowStarted(false);
                 let currentUser = useAuthStore.getState().user;
                 if (!currentUser) {
@@ -39,7 +39,11 @@ export const useOtpVarify = (isInline?: boolean) => {
                 }
 
                 if (!isInline) {
-                    if (currentUser?.role === "PROVIDER") {
+                    console.log("Heyoooooo")
+                    if (response.data.for && response.data.for.includes("BECOME_PROVIDER")) {
+                        useAuthStore.getState().clearAuth();
+                        navigate("/login", { replace: true });
+                    } else if (currentUser?.role === "PROVIDER") {
                         navigate("/provider/settings", { replace: true, state: { activeSection: 'account' } });
                     } else if (currentUser?.role === "ADMIN") {
                         navigate("/admin/settings", { replace: true });

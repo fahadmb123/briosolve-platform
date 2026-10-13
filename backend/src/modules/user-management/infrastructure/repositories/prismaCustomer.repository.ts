@@ -53,4 +53,10 @@ export class CustomerRepository implements ICustomerRepository {
         if (!customer) return null
         return CustomerProfileMapper.toDomain(customer)
     }
+
+    async deleteByUserId(userId: string): Promise<void> {
+        await db.orm.public.customer_profiles
+            .where({ user_id: userId as Varchar<255> })
+            .delete();
+    }
 }

@@ -20,6 +20,8 @@ import DeleteProviderAvailabilityOverrideUseCase from "../../application/use-cas
 import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/createAccountReactivationRequest.useCase.js";
 import { GetReactivationRequestsUseCase } from "../../application/use-cases/getReactivationRequests.useCase.js";
 import { SendReactivationOtpUseCase } from "../../application/use-cases/sendReactivationOtp.useCase.js";
+import { SendBecomeProviderOtpUseCase } from "../../application/use-cases/sendBecomeProviderOtp.useCase.js";
+import { BecomeProviderUseCase } from "../../application/use-cases/becomeProvider.useCase.js";
 
 import { userRepository, customerRepository, addressRepository, providerRepository, providerAvailabilityRepository, userAccountBlockRepository, accountReactivationRequestRepository } from "./repositories.js";
 import {
@@ -130,4 +132,18 @@ export const createProviderAvailabilityOverrideUseCase = new CreateProviderAvail
 export const deleteProviderAvailabilityOverrideUseCase = new DeleteProviderAvailabilityOverrideUseCase(
     providerRepository,
     providerAvailabilityRepository
+);
+export const sendBecomeProviderOtpUseCase = new SendBecomeProviderOtpUseCase(
+    userRepository,
+    passwordHasher,
+    otpGenerate,
+    emailSender,
+    pendingRegistrationStore
+);
+export const becomeProviderUseCase = new BecomeProviderUseCase(
+    userRepository,
+    customerRepository,
+    providerRepository,
+    providerAvailabilityRepository,
+    pendingRegistrationStore
 );
