@@ -25,7 +25,8 @@ import {
     deleteProviderAvailabilityOverrideUseCase,
     getProvidersUseCase,
     createAccountReactivationRequestUseCase,
-    getReactivationRequestsUseCase
+    getReactivationRequestsUseCase,
+    sendReactivationOtpUseCase
 } from "./useCases.js";
 import { imageUploadService } from "./services.js";
 
@@ -36,7 +37,8 @@ export const userController = new UserController(
 
 export const reactivationController = new ReactivationController(
     createAccountReactivationRequestUseCase,
-    getReactivationRequestsUseCase
+    getReactivationRequestsUseCase,
+    sendReactivationOtpUseCase
 );
 
 export const customerController = new CustomerController(

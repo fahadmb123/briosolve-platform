@@ -10,3 +10,8 @@ export const submitReactivationRequest = async (data: ReactivationRequestInput):
     const res = await apiClient.post("/api/reactivation/request", data);
     return res.data;
 };
+
+export const sendReactivationOtp = async (data: { email: string }): Promise<response<{ expiresIn: number }>> => {
+    const res = await apiClient.post("/api/reactivation/send-otp", data);
+    return res.data;
+};

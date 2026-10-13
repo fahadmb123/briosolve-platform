@@ -60,6 +60,10 @@ export default class OtpVarificationUseCase implements IUseCase<OtpVarificationI
                 response = data;
                 await this.PendingRegistrationStore.save(registrationId, data, 30 * 60);
                 break;
+            case "REACTIVATE_ACCOUNT":
+                response = data;
+                await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+                break;
         }
 
         return { response: response!, for: data?.for, email: data.email, path: data?.path }

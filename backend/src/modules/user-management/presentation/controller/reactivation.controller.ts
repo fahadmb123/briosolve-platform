@@ -1,21 +1,43 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
+import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js";
 import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/createAccountReactivationRequest.useCase.js";
 import { GetReactivationRequestsUseCase } from "../../application/use-cases/getReactivationRequests.useCase.js";
+import { SendReactivationOtpUseCase } from "../../application/use-cases/sendReactivationOtp.useCase.js";
 
 export class ReactivationController extends BaseController {
     constructor(
         private readonly createAccountReactivationRequestUseCase: CreateAccountReactivationRequestUseCase,
-        private readonly getReactivationRequestsUseCase: GetReactivationRequestsUseCase
+        private readonly getReactivationRequestsUseCase: GetReactivationRequestsUseCase,
+        private readonly sendReactivationOtpUseCase: SendReactivationOtpUseCase
     ) {
         super();
     }
 
+    sendOtp = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { email } = req.body;
+            const response = await this.sendReactivationOtpUseCase.execute({ email });
+            res.cookie("registration_id", response.registrationId, registrationCookie);
+            return sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn });
+        } catch (err) {
+            next(err);
+        }
+    };
+
     requestReactivation = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { email, reason } = req.body;
-            const result = await this.createAccountReactivationRequestUseCase.execute({ email, reason });
+            const registrationId = req.cookies.registration_id;
+            const result = await this.createAccountReactivationRequestUseCase.execute({
+                email,
+                reason,
+                registrationId
+            });
+            if (registrationId) {
+                res.clearCookie("registration_id");
+            }
             return sendSuccess(res, "", result);
         } catch (err) {
             next(err);

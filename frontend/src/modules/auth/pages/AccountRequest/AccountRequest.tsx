@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from '../../../../shared/hooks/useTheme';
-import { useAccountReactivation } from '../../hooks/mutations/useAccountReactivation';
+import { useAccountReactivation, useSendReactivationOtp } from '../../hooks/mutations/useAccountReactivation';
 import {
     accountReactivationSchema,
     type AccountReactivationInputType,
 } from '../../schemas/validation';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
+import { OtpModal } from '../../components/OtpModal';
 import { toast } from 'react-toastify';
 import './AccountRequest.css';
 import type { ApiError } from '../../../../shared/api/ApiError';
@@ -17,8 +18,11 @@ export default function AccountRequest() {
     const { theme, toggleTheme } = useTheme();
     const [submitted, setSubmitted] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [showOtpModal, setShowOtpModal] = useState(false);
+    const [pendingData, setPendingData] = useState<AccountReactivationInputType | null>(null);
 
     const reactivationMut = useAccountReactivation();
+    const sendOtpMut = useSendReactivationOtp();
 
     const {
         register,
@@ -34,9 +38,26 @@ export default function AccountRequest() {
 
     const onSubmit = (data: AccountReactivationInputType) => {
         setErrorMessage(null);
-        reactivationMut.mutate(data, {
+        setPendingData(data);
+        sendOtpMut.mutate(
+            { email: data.email },
+            {
+                onSuccess: () => {
+                    setShowOtpModal(true);
+                },
+                onError: (err: ApiError) => {
+                    setErrorMessage(err?.message || 'Failed to send verification code');
+                },
+            }
+        );
+    };
+
+    const handleOtpSuccess = () => {
+        setShowOtpModal(false);
+        if (!pendingData) return;
+        reactivationMut.mutate(pendingData, {
             onSuccess: (res) => {
-                toast.success(res.message || 'Request submitted successfully');
+                toast.success(res.message || 'Submitted!');
                 setSubmitted(true);
             },
             onError: (err: ApiError) => {
@@ -47,9 +68,8 @@ export default function AccountRequest() {
 
     return (
         <div className="account-request-page-wrapper">
-            {reactivationMut.isPending && <SpinnerOverlay isLoading={true} />}
+            {(reactivationMut.isPending || sendOtpMut.isPending) && <SpinnerOverlay isLoading={true} />}
 
-            {/* Top Navigation Bar with Logo in the Proper Place */}
             <header className="account-request-topbar">
                 <Link to="/" className="account-request-brand">
                     <i className="fas fa-layer-group text-primary"></i>
@@ -72,7 +92,6 @@ export default function AccountRequest() {
                 </div>
             </header>
 
-            {/* Main Content — Full Page Layout with Aligned & Divided Sections */}
             <main className="account-request-main">
                 <nav className="account-request-breadcrumb" aria-label="Breadcrumb">
                     <Link to="/">Home</Link>
@@ -102,7 +121,6 @@ export default function AccountRequest() {
                             </div>
                         )}
 
-                        {/* Section 1: Email Address */}
                         <div className="account-request-section">
                             <h2 className="account-request-section-title">1. Account Email Address</h2>
                             <p className="account-request-section-hint">
@@ -124,7 +142,6 @@ export default function AccountRequest() {
                             </div>
                         </div>
 
-                        {/* Section 2: Reason for Reactivation */}
                         <div className="account-request-section">
                             <h2 className="account-request-section-title">2. Reason for Reactivation</h2>
                             <p className="account-request-section-hint">
@@ -146,16 +163,23 @@ export default function AccountRequest() {
                             </div>
                         </div>
 
-                        {/* Section 3: Submission & Actions */}
                         <div className="account-request-section">
                             <div className="account-request-actions-bar">
                                 <button
                                     type="submit"
-                                    disabled={reactivationMut.isPending}
+                                    disabled={reactivationMut.isPending || sendOtpMut.isPending}
                                     className="account-request-submit-btn"
                                 >
-                                    <span>{reactivationMut.isPending ? 'Submitting...' : 'Submit Request'}</span>
-                                    {!reactivationMut.isPending && <i className="fas fa-arrow-right"></i>}
+                                    <span>
+                                        {sendOtpMut.isPending
+                                            ? 'Sending Code...'
+                                            : reactivationMut.isPending
+                                            ? 'Submitting...'
+                                            : 'Submit Request'}
+                                    </span>
+                                    {!(reactivationMut.isPending || sendOtpMut.isPending) && (
+                                        <i className="fas fa-arrow-right"></i>
+                                    )}
                                 </button>
                                 <Link to="/login" className="account-request-cancel-btn">
                                     Cancel and Return to Sign In
@@ -194,6 +218,13 @@ export default function AccountRequest() {
                     </div>
                 )}
             </main>
+
+            <OtpModal
+                isOpen={showOtpModal}
+                onClose={() => setShowOtpModal(false)}
+                onSuccess={handleOtpSuccess}
+                email={submittedEmail}
+            />
         </div>
     );
 }

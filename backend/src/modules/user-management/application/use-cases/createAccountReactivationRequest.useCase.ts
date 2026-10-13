@@ -4,10 +4,12 @@ import { IUserAccountBlockRepository } from "../../domain/repositories/IUserAcco
 import { IAccountReactivationRequestRepository } from "../../domain/repositories/IAccountReactivationRequestRepository.js";
 import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity.js";
 import { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
+import type { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
 
 export type RequestReactivationDto = {
     email: string;
     reason: string;
+    registrationId?: string;
 };
 
 export class CreateAccountReactivationRequestUseCase {
@@ -15,7 +17,8 @@ export class CreateAccountReactivationRequestUseCase {
         private readonly userRepository: IUserRepository,
         private readonly userAccountBlockRepository: IUserAccountBlockRepository,
         private readonly reactivationRequestRepository: IAccountReactivationRequestRepository,
-        private readonly emailSender: IEmailSender
+        private readonly emailSender: IEmailSender,
+        private readonly pendingRegistrationStore: IPendingRegistrationStore
     ) {}
 
     async execute(input: RequestReactivationDto): Promise<AccountReactivationRequest> {
@@ -24,6 +27,19 @@ export class CreateAccountReactivationRequestUseCase {
 
         if (!email) throw new ApplicationError("BAD_REQUEST", "Email address is required", "VALIDATION");
         if (!reason || reason.length < 10) throw new ApplicationError("BAD_REQUEST", "Please provide a detailed explanation (minimum 10 characters)", "VALIDATION");
+
+        if (!input.registrationId) {
+            throw new ApplicationError("UNAUTHORIZED", "Verification session expired. Please verify your email again.", "AUTHENTICATION");
+        }
+
+        const session = await this.pendingRegistrationStore.get(input.registrationId);
+        if (!session || session.for !== "REACTIVATE_ACCOUNT" || !(session as any).isVerified) {
+            throw new ApplicationError("UNAUTHORIZED", "Please verify your email before submitting the request", "AUTHENTICATION");
+        }
+
+        if (session.email.toLowerCase() !== email) {
+            throw new ApplicationError("BAD_REQUEST", "Submitted email does not match verified email", "VALIDATION");
+        }
 
         const user = await this.userRepository.findByEmail(email);
         if (!user) throw new ApplicationError("NOT_FOUND", "No account found with this email address", "NOT_FOUND");
@@ -41,7 +57,10 @@ export class CreateAccountReactivationRequestUseCase {
         if (pending) {
             throw new ApplicationError("CONFLICT", "A reactivation request is already under review for this account", "CONFLICT");
         }
-        await this.emailSender.sendSubmitRequest(user.email)
+
+        await this.pendingRegistrationStore.delete(input.registrationId);
+        await this.emailSender.sendSubmitRequest(user.email);
+
         return await this.reactivationRequestRepository.create({
             user_id: user.id,
             block_id: block.id,
