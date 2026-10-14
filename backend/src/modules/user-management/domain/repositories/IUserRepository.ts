@@ -12,7 +12,6 @@ export type GetUsersWithRoleInput = {
 
 export interface IUserRepository extends BaseRepository<User | null>{
   getUsersWithRole(input: GetUsersWithRoleInput): Promise<{ users: User[]; total: number }>;
-  findById(id:string):Promise<User | null>;
   updateStatus(id:string,status:string):Promise<void>;
   findByEmail(email: string): Promise<User | null>;
   update(id: string, data: UpdateUserRepositoryInput): Promise<User>;

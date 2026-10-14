@@ -66,7 +66,6 @@ export interface UpdateDocumentStatusInput {
 }
 
 export interface IVerificationDocumentRepository extends BaseRepository<VerificationDocument | null> {
-    findById(id: string): Promise<VerificationDocument | null>;
     findByProviderId(providerId: string): Promise<VerificationDocument[]>;
     findByProviderAndType(providerId: string, documentType: VerificationDocumentType): Promise<VerificationDocument | null>;
     createOrUpdate(input: CreateVerificationDocumentInputDto): Promise<VerificationDocument>;

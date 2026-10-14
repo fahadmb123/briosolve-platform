@@ -3,7 +3,6 @@ import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } fr
 import { Service } from "../entities/service.entity.js";
 
 export interface IServiceRepository extends BaseRepository<Service | null>{
-    findById(id: string): Promise<Service | null>;
     findByName(name: string): Promise<Service | null>;
     get(input: GetServicesDto): Promise<{services:Service[], total: number}> 
     add(input:AddServiceUseCaseInputDto): Promise<Service | null>
