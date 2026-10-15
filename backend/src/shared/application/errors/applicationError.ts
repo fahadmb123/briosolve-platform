@@ -1,4 +1,4 @@
-import { ErrorKind } from "./errorKind.js";
+import { ErrorKind } from "./errorKind";
 
 export class ApplicationError extends Error {
     constructor(public readonly code: string,message: string,public readonly kind: ErrorKind) {

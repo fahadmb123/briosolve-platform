@@ -1,9 +1,9 @@
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js";
+import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import type { NextFunction, Request, Response } from "express";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { ProviderService } from "../../domain/entities/providerService.entity.js";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
-import { AddProviderServicesInputDto, DeleteProviderServiceInputDto, DeleteProviderCategoryInputDto } from "../../application/Dto/providerService.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { ProviderService } from "../../domain/entities/providerService.entity";
+import { sendSuccess } from "../../../../shared/presentation/http/response/response";
+import { AddProviderServicesInputDto, DeleteProviderServiceInputDto, DeleteProviderCategoryInputDto } from "../../application/Dto/providerService";
 
 export class ProviderServiceController extends BaseController {
     constructor(

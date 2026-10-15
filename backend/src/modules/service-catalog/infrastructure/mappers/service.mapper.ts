@@ -1,5 +1,5 @@
-import { Service } from "../../domain/entities/service.entity.js";
-import { CategoryMapper } from "./category.mapper..js";
+import { Service } from "../../domain/entities/service.entity";
+import { CategoryMapper } from "./category.mapper.";
 
 export class ServiceMapper {
     static toDomain(raw: any): Service {

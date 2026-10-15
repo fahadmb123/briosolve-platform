@@ -1,9 +1,9 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IProviderRepository } from "../../domain/repositories/IProviderRepository.js";
-import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository.js";
-import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity.js";
-import { GetAvailabilityOverridesInputDto } from "../Dto/providerDto.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
+import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
+import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity";
+import { GetAvailabilityOverridesInputDto } from "../Dto/providerDto";
 
 export default class GetProviderAvailabilityOverridesUseCase implements IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverride[]> {
     constructor(

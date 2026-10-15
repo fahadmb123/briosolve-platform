@@ -1,9 +1,9 @@
-import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js"
-import { ProviderProfile } from "../../domain/entities/providerProfile.entity.js"
-import { User } from "../../domain/entities/user.entity.js"
+import { CustomerProfile } from "../../domain/entities/customerProfile.entity"
+import { ProviderProfile } from "../../domain/entities/providerProfile.entity"
+import { User } from "../../domain/entities/user.entity"
 
 
-import { Address } from "../../domain/entities/address.entity.js"
+import { Address } from "../../domain/entities/address.entity"
 
 export type UpdateUserStatusDto = {
     id: string;

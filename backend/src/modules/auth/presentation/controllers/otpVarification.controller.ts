@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express"
-import { OtpVarificationInput } from "../../application/dto/otpDto.js"
-import { User } from "../../domain/entities/user.entity.js"
-import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js"
-import { ResendOtpOutput } from "../../application/use-cases/verification/resendOtp.useCase.js"
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
-import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
-import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
+import { OtpVarificationInput } from "../../application/dto/otpDto"
+import { User } from "../../domain/entities/user.entity"
+import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store"
+import { ResendOtpOutput } from "../../application/use-cases/verification/resendOtp.useCase"
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase"
+import { sendSuccess } from "../../../../shared/presentation/http/response/response"
+import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
 
 class OtpVarificationController {
     constructor(

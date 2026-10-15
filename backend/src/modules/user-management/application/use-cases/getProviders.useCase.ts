@@ -1,7 +1,7 @@
-import { User } from "../../domain/entities/user.entity.js";
-import { IGetProvidersUseCase } from "../../domain/interfaces/use-cases/IGetProvidersUseCase.js";
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { getProvidersDto } from "../Dto/getProvidersDto.js";
+import { User } from "../../domain/entities/user.entity";
+import { IGetProvidersUseCase } from "../../domain/interfaces/use-cases/IGetProvidersUseCase";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { getProvidersDto } from "../Dto/getProvidersDto";
 
 export default class GetProvidersUseCase implements IGetProvidersUseCase {
     constructor(

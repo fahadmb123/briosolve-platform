@@ -2,4 +2,4 @@ export {
   authController,
   securityController,
   otpVarificationController
-} from "./controllers.js";
+} from "./controllers";

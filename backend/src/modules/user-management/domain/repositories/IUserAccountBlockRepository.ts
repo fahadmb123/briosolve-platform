@@ -1,4 +1,4 @@
-import { UserAccountBlock } from "../entities/userAccountBlock.entity.js";
+import { UserAccountBlock } from "../entities/userAccountBlock.entity";
 
 export type CreateUserAccountBlockInput = {
     user_id: string;

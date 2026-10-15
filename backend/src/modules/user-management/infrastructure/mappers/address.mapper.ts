@@ -1,4 +1,4 @@
-import { Address } from "../../domain/entities/address.entity.js";
+import { Address } from "../../domain/entities/address.entity";
 
 export class AddressMapper {
     static toDomain(raw: any): Address {

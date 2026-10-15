@@ -1,11 +1,11 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types"
-import { db } from "../../../../infrastructure/persistence/prisma/client.js"
-import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js"
-import { ICustomerRepository } from "../../domain/repositories/customer.respository.js";
-import { User } from "../../domain/entities/user.entity.js";
-import { RegisterCustomerInput } from "../../domain/repositories/user.repository.js";
-import { UserMapper } from "../mappers/user.mapper.js";
-import { CustomerProfileMapper } from "../mappers/customerProfile.mapper.js";
+import { db } from "../../../../infrastructure/persistence/prisma/client"
+import { CustomerProfile } from "../../domain/entities/customerProfile.entity"
+import { ICustomerRepository } from "../../domain/repositories/customer.respository";
+import { User } from "../../domain/entities/user.entity";
+import { RegisterCustomerInput } from "../../domain/repositories/user.repository";
+import { UserMapper } from "../mappers/user.mapper";
+import { CustomerProfileMapper } from "../mappers/customerProfile.mapper";
 
 
 

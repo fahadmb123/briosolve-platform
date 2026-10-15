@@ -1,8 +1,8 @@
-import { Address } from "../../domain/entities/address.entity.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
-import { IAddressRepository } from "../../domain/repositories/IAddressRepository.js"
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js"
-import { GetAddressesInputDto, GetAddressesOutputDto } from "../Dto/addressDto.js";
+import { Address } from "../../domain/entities/address.entity";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase"
+import { IAddressRepository } from "../../domain/repositories/IAddressRepository"
+import { ApplicationError } from "../../../../shared/application/errors/applicationError"
+import { GetAddressesInputDto, GetAddressesOutputDto } from "../Dto/addressDto";
 
 
 export class GetAddressesUseCase implements IUseCase<GetAddressesInputDto,GetAddressesOutputDto>{

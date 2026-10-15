@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
-import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IGetProvidersUseCase } from "../../domain/interfaces/use-cases/IGetProvidersUseCase.js";
-import { UserResponseMapper } from "../mappers/userResponse.mapper.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
+import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
+import { sendSuccess } from "../../../../shared/presentation/http/response/response";
+import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IGetProvidersUseCase } from "../../domain/interfaces/use-cases/IGetProvidersUseCase";
+import { UserResponseMapper } from "../mappers/userResponse.mapper";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
 import type {
     EmailVerificationUseCaseOutputDto,
     RegisterProviderInput,
@@ -16,11 +16,11 @@ import type {
     CreateAvailabilityOverrideInputDto,
     GetAvailabilityOverridesInputDto,
     DeleteAvailabilityOverrideInputDto
-} from "../../application/Dto/providerDto.js";
-import type { CompleteProviderRegistrationInput } from "../../application/use-cases/registerProvider.useCase.js";
-import type { User } from "../../domain/entities/user.entity.js";
-import type { ProviderAvailability } from "../../domain/entities/providerAvailability.entity.js";
-import type { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity.js";
+} from "../../application/Dto/providerDto";
+import type { CompleteProviderRegistrationInput } from "../../application/use-cases/registerProvider.useCase";
+import type { User } from "../../domain/entities/user.entity";
+import type { ProviderAvailability } from "../../domain/entities/providerAvailability.entity";
+import type { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity";
 
 export class ProviderController extends BaseController {
     constructor(

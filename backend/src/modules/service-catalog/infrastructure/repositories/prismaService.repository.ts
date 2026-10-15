@@ -1,9 +1,9 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { Service } from "../../domain/entities/service.entity.js";
-import { IServiceRepository } from "../../domain/repositories/IServiceRepository.js";
-import { ServiceMapper } from "../mappers/service.mapper.js";
-import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/Dto/service.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { Service } from "../../domain/entities/service.entity";
+import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
+import { ServiceMapper } from "../mappers/service.mapper";
+import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/Dto/service";
 
 
 export class ServiceRepository implements IServiceRepository{

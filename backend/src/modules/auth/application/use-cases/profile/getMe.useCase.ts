@@ -1,9 +1,9 @@
-import { IJwtService } from "../../../../../shared/application/Dto/services/jwtDto.service.js"
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js"
-import { IUserTokenPayload } from "../../../../../shared/domain/interfaces/IToken.js"
-import { User } from "../../../domain/entities/user.entity.js"
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js"
-import { IUserRepository } from "../../../domain/repositories/user.repository.js"
+import { IJwtService } from "../../../../../shared/application/Dto/services/jwtDto.service"
+import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
+import { IUserTokenPayload } from "../../../../../shared/domain/interfaces/IToken"
+import { User } from "../../../domain/entities/user.entity"
+import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase"
+import { IUserRepository } from "../../../domain/repositories/user.repository"
 
 
 

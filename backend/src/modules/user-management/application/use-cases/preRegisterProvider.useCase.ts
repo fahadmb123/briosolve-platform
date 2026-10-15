@@ -1,13 +1,13 @@
-import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
+import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 import { randomUUID } from "crypto";
 
-import type { EmailVerificationUseCaseOutputDto, RegisterProviderInput } from "../Dto/providerDto.js";
-import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service.js";
-import type { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
+import type { EmailVerificationUseCaseOutputDto, RegisterProviderInput } from "../Dto/providerDto";
+import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service";
+import type { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service";
 
 export default class PreRegisterProviderUseCase implements IUseCase<RegisterProviderInput, EmailVerificationUseCaseOutputDto> {
     constructor(

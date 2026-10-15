@@ -1,9 +1,9 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { User } from "../../domain/entities/user.entity.js";
-import { IUserRepository } from "../../domain/repositories/user.repository.js";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
+import { User } from "../../domain/entities/user.entity";
+import { IUserRepository } from "../../domain/repositories/user.repository";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { UserMapper } from "../mappers/user.mapper.js";
+import { UserMapper } from "../mappers/user.mapper";
 
 type userPartial = Partial<User>;
 

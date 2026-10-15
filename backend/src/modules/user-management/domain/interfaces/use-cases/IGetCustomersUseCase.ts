@@ -1,5 +1,5 @@
-import { getCustomersDto } from "../../../application/Dto/getCustomersDto.js";
-import { User } from "../../entities/user.entity.js";
+import { getCustomersDto } from "../../../application/Dto/getCustomersDto";
+import { User } from "../../entities/user.entity";
 
 
 export interface IGetCustomersUseCase {

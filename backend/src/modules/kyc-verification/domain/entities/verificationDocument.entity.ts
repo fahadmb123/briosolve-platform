@@ -1,4 +1,4 @@
-import { VerificationFile } from "./verificationFile.entity.js";
+import { VerificationFile } from "./verificationFile.entity";
 
 export type VerificationDocumentType = 'IDENTITY' | 'CERTIFICATE';
 export type VerificationDocumentStatus = 'PENDING' | 'APPROVED' | 'REJECTED';

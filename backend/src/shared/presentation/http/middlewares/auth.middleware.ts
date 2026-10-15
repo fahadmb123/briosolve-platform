@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { JwtService } from "../../../infrastructure/security/jwt.service.js";
+import { JwtService } from "../../../infrastructure/security/jwt.service";
 
 const jwtService = new JwtService();
 

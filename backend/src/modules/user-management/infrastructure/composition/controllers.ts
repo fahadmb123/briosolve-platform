@@ -1,8 +1,8 @@
-import { AddressController } from "../../presentation/controller/address.controller.js";
-import { CustomerController } from "../../presentation/controller/customer.controller.js";
-import { UserController } from "../../presentation/controller/user.controller.js";
-import { ProviderController } from "../../presentation/controller/provider.controller.js";
-import { ReactivationController } from "../../presentation/controller/reactivation.controller.js";
+import { AddressController } from "../../presentation/controller/address.controller";
+import { CustomerController } from "../../presentation/controller/customer.controller";
+import { UserController } from "../../presentation/controller/user.controller";
+import { ProviderController } from "../../presentation/controller/provider.controller";
+import { ReactivationController } from "../../presentation/controller/reactivation.controller";
 
 import {
     getCustomerUseCase,
@@ -29,9 +29,9 @@ import {
     sendReactivationOtpUseCase,
     sendBecomeProviderOtpUseCase,
     becomeProviderUseCase
-} from "./useCases.js";
-import { imageUploadService } from "./services.js";
-import { jwtService } from "../../../auth/infrastructure/composition/services.js";
+} from "./useCases";
+import { imageUploadService } from "./services";
+import { jwtService } from "../../../auth/infrastructure/composition/services";
 
 export const userController = new UserController(
     updateUserStatusUseCase,

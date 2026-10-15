@@ -1,10 +1,10 @@
-import { IUpdateUserStatusUseCase } from "../../domain/interfaces/use-cases/IUpdateUserUseCase.js";
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { IUserAccountBlockRepository } from "../../domain/repositories/IUserAccountBlockRepository.js";
-import { UpdateUserStatusDto } from "../Dto/userDto.js";
-import { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IAccountReactivationRequestRepository } from "../../domain/repositories/IAccountReactivationRequestRepository.js";
+import { IUpdateUserStatusUseCase } from "../../domain/interfaces/use-cases/IUpdateUserUseCase";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { IUserAccountBlockRepository } from "../../domain/repositories/IUserAccountBlockRepository";
+import { UpdateUserStatusDto } from "../Dto/userDto";
+import { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IAccountReactivationRequestRepository } from "../../domain/repositories/IAccountReactivationRequestRepository";
 
 export default class UpdateUserStatusUseCase implements IUpdateUserStatusUseCase {
     constructor(

@@ -1,13 +1,13 @@
 import { NextFunction ,Response,Request} from "express"
-import {LoginInputDto} from "../../application/dto/authDto.js"
-import { User } from "../../domain/entities/user.entity.js"
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js"
-import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken.js"
-import { EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto, UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto } from "../../application/dto/customerDto.js"
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js"
-import { sendSuccess } from "../../../../shared/presentation/http/response/response.js"
-import { accessTokenCookie, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js"
-import { UserResponseMapper } from "../mappers/userResponse.mapper.js"
+import {LoginInputDto} from "../../application/dto/authDto"
+import { User } from "../../domain/entities/user.entity"
+import { BaseController } from "../../../../shared/presentation/http/controller/baseController"
+import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken"
+import { EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto, UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto } from "../../application/dto/customerDto"
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase"
+import { sendSuccess } from "../../../../shared/presentation/http/response/response"
+import { accessTokenCookie, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
+import { UserResponseMapper } from "../mappers/userResponse.mapper"
 
 
 

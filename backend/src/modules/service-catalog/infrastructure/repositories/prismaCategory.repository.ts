@@ -1,9 +1,9 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { Category } from "../../domain/entities/category.entity.js";
-import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository.js";
-import { CategoryMapper } from "../mappers/category.mapper..js";
-import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/Dto/category.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { Category } from "../../domain/entities/category.entity";
+import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
+import { CategoryMapper } from "../mappers/category.mapper.";
+import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/Dto/category";
 
 
 

@@ -1,11 +1,11 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js";
-import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { OtpVarificationInput } from "../../dto/otpDto.js";
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import { ICustomerRepository } from "../../../domain/repositories/customer.respository.js";
-import { User } from "../../../domain/entities/user.entity.js";
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js";
-import { IUserRepository } from "../../../domain/repositories/user.repository.js";
+import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
+import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store";
+import { OtpVarificationInput } from "../../dto/otpDto";
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service";
+import { ICustomerRepository } from "../../../domain/repositories/customer.respository";
+import { User } from "../../../domain/entities/user.entity";
+import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase";
+import { IUserRepository } from "../../../domain/repositories/user.repository";
 
 
 

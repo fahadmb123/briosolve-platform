@@ -1,9 +1,9 @@
 import { NextFunction,Request,Response } from "express"
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js";
-import { Address } from "../../domain/entities/address.entity.js";
-import { AddAddressInputUseCaseDto, EditAddressInputUseCaseDto, GetAddressesInputDto, GetAddressesOutputDto, SetDefaultAddressInputUseCaseDto } from "../../application/Dto/addressDto.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
+import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
+import { Address } from "../../domain/entities/address.entity";
+import { AddAddressInputUseCaseDto, EditAddressInputUseCaseDto, GetAddressesInputDto, GetAddressesOutputDto, SetDefaultAddressInputUseCaseDto } from "../../application/Dto/addressDto";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 
 
 export class AddressController extends BaseController{

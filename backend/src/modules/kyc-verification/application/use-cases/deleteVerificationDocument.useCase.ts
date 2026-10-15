@@ -1,8 +1,8 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository.js";
-import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository.js";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository";
+import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 
 interface DeleteVerificationInputDto {
     id: string;

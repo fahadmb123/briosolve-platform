@@ -1,8 +1,8 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js"
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service.js"
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js"
-import { IUserRepository } from "../../../domain/repositories/user.repository.js"
-import { UpdatePasswordInputDto } from "../../dto/customerDto.js"
+import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service"
+import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase"
+import { IUserRepository } from "../../../domain/repositories/user.repository"
+import { UpdatePasswordInputDto } from "../../dto/customerDto"
 
 
 

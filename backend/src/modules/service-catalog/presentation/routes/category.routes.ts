@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
-import { upload } from "../../../../shared/infrastructure/utils/multer.js";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request.js";
-import { createCategorySchema } from "../schemas/create-category.schema.js";
-import { categoryController } from "../../infrastructure/composition/controller.js";
+import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
+import { upload } from "../../../../shared/infrastructure/utils/multer";
+import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import { createCategorySchema } from "../schemas/create-category.schema";
+import { categoryController } from "../../infrastructure/composition/controller";
 
 const router = Router()
 

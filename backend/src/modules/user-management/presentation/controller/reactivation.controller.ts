@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
-import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig.js";
-import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/createAccountReactivationRequest.useCase.js";
-import { GetReactivationRequestsUseCase } from "../../application/use-cases/getReactivationRequests.useCase.js";
-import { SendReactivationOtpUseCase } from "../../application/use-cases/sendReactivationOtp.useCase.js";
+import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
+import { sendSuccess } from "../../../../shared/presentation/http/response/response";
+import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
+import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/createAccountReactivationRequest.useCase";
+import { GetReactivationRequestsUseCase } from "../../application/use-cases/getReactivationRequests.useCase";
+import { SendReactivationOtpUseCase } from "../../application/use-cases/sendReactivationOtp.useCase";
 
 export class ReactivationController extends BaseController {
     constructor(

@@ -1,8 +1,8 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { UserAccountBlock } from "../../domain/entities/userAccountBlock.entity.js";
-import { IUserAccountBlockRepository, CreateUserAccountBlockInput } from "../../domain/repositories/IUserAccountBlockRepository.js";
-import { UserAccountBlockMapper } from "../mappers/userAccountBlock.mapper.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { UserAccountBlock } from "../../domain/entities/userAccountBlock.entity";
+import { IUserAccountBlockRepository, CreateUserAccountBlockInput } from "../../domain/repositories/IUserAccountBlockRepository";
+import { UserAccountBlockMapper } from "../mappers/userAccountBlock.mapper";
 
 export class UserAccountBlockRepository implements IUserAccountBlockRepository {
     async create(data: CreateUserAccountBlockInput): Promise<UserAccountBlock> {
@@ -25,7 +25,7 @@ export class UserAccountBlockRepository implements IUserAccountBlockRepository {
         await db.orm.public.user_account_blocks.where({ user_id: userId }).delete();
     }
 
-    async updateUnblockedAt(userId: string): Promise<void> {
+    async updateUnblockedAt(userId: string, unblockedAt: Date): Promise<void> {
         await db.orm.public.user_account_blocks.where({ user_id: userId }).update({
             unblocked_at: Temporal.Now.instant()
         } as never);

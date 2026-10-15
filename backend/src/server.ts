@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
-import app from "./app/app.js";
-import { connectRedis } from "./shared/infrastructure/cache/redis/redis.client.js";
+import app from "./app/app";
+import { connectRedis } from "./shared/infrastructure/cache/redis/redis.client";
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {

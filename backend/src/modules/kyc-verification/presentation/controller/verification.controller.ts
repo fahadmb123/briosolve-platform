@@ -1,12 +1,12 @@
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js";
+import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import type { NextFunction, Request, Response } from "express";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { VerificationDocument } from "../../domain/entities/verificationDocument.entity.js";
-import { UploadVerificationInputDto, UpdateVerificationInputDto } from "../../application/Dto/verificationDto.js";
-import { GetAdminKycRequestsInput, GetAdminKycResponse } from "../../domain/repositories/IVerificationDocumentRepository.js";
-import { UpdateKycStatusInput } from "../../application/use-cases/updateKycStatus.useCase.js";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { VerificationDocument } from "../../domain/entities/verificationDocument.entity";
+import { UploadVerificationInputDto, UpdateVerificationInputDto } from "../../application/Dto/verificationDto";
+import { GetAdminKycRequestsInput, GetAdminKycResponse } from "../../domain/repositories/IVerificationDocumentRepository";
+import { UpdateKycStatusInput } from "../../application/use-cases/updateKycStatus.useCase";
+import { sendSuccess } from "../../../../shared/presentation/http/response/response";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 
 export class VerificationController extends BaseController {
     constructor(

@@ -1,8 +1,8 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IProviderRepository } from "../../domain/repositories/IProviderRepository.js";
-import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository.js";
-import { DeleteAvailabilityOverrideInputDto } from "../Dto/providerDto.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
+import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
+import { DeleteAvailabilityOverrideInputDto } from "../Dto/providerDto";
 
 export default class DeleteProviderAvailabilityOverrideUseCase implements IUseCase<DeleteAvailabilityOverrideInputDto, void> {
     constructor(

@@ -1,6 +1,6 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../../domain/entities/verificationDocument.entity.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../../domain/entities/verificationDocument.entity";
 import {
     IVerificationDocumentRepository,
     GetAdminKycRequestsInput,
@@ -8,11 +8,11 @@ import {
     UpdateDocumentStatusInput,
     AdminKycDossier,
     AdminKycStats
-} from "../../domain/repositories/IVerificationDocumentRepository.js";
-import { VerificationDocumentMapper } from "../mappers/verificationDocument.mapper.js";
-import { VerificationProfile } from "../../domain/entities/verificationProfile.entity.js";
-import { VerificationProfileMapper } from "../mappers/verificationProfile.mapper.js";
-import { CreateVerificationDocumentInputDto, UpdateVerificationDocumentRepositoryDto, VerificationDocumentRaw } from "../../application/Dto/verificationDto.js";
+} from "../../domain/repositories/IVerificationDocumentRepository";
+import { VerificationDocumentMapper } from "../mappers/verificationDocument.mapper";
+import { VerificationProfile } from "../../domain/entities/verificationProfile.entity";
+import { VerificationProfileMapper } from "../mappers/verificationProfile.mapper";
+import { CreateVerificationDocumentInputDto, UpdateVerificationDocumentRepositoryDto, VerificationDocumentRaw } from "../../application/Dto/verificationDto";
 
 export class VerificationDocumentRepository implements IVerificationDocumentRepository {
     async findById(id: string): Promise<VerificationDocument | null> {

@@ -1,8 +1,8 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository.js";
-import { UpdateCustomerProfileInputDto } from "../Dto/userDto.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository";
+import { UpdateCustomerProfileInputDto } from "../Dto/userDto";
 
 
 

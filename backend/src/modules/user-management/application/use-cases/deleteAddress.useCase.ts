@@ -1,5 +1,5 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IAddressRepository } from "../../domain/repositories/IAddressRepository.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
 
 
 export class DeleteAddressUseCase implements IUseCase<string,void>{

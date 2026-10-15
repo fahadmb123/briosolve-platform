@@ -1,4 +1,4 @@
-import { AccountReactivationRequest } from "../entities/accountReactivationRequest.entity.js";
+import { AccountReactivationRequest } from "../entities/accountReactivationRequest.entity";
 
 export type CreateReactivationRequestInput = {
     user_id: string;

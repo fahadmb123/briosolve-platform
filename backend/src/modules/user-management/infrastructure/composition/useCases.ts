@@ -1,36 +1,36 @@
-import { AddAddressUseCase } from "../../application/use-cases/addAddress.useCase.js";
-import { DeleteAddressUseCase } from "../../application/use-cases/deleteAddress.useCase.js";
-import { EditAddressUseCase } from "../../application/use-cases/editAddress.useCase.js";
-import { GetAddressesUseCase } from "../../application/use-cases/getAddresses.useCase.js";
-import GetCustomersUseCase from "../../application/use-cases/getCustomers.useCase.js";
-import GetProvidersUseCase from "../../application/use-cases/getProviders.useCase.js";
-import GetProfileUseCase from "../../application/use-cases/getProfile.useCase.js";
-import RegisterCustomerUseCase from "../../application/use-cases/registerCustomer.useCase.js";
-import RegisterProviderUseCase from "../../application/use-cases/registerProvider.useCase.js";
-import PreRegisterProviderUseCase from "../../application/use-cases/preRegisterProvider.useCase.js";
-import { SetDefaultAddressUseCase } from "../../application/use-cases/setDefaulltAddress.useCase.js";
-import UpdateCustomerProfileUseCase from "../../application/use-cases/updateCustomerProfile.useCase.js";
-import UpdateProviderProfileUseCase from "../../application/use-cases/updateProviderProfile.useCase.js";
-import UpdateUserStatusUseCase from "../../application/use-cases/updateUser.useCase.js";
-import SetProviderAvailabilityUseCase from "../../application/use-cases/setProviderAvailability.useCase.js";
-import GetProviderAvailabilityUseCase from "../../application/use-cases/getProviderAvailability.useCase.js";
-import GetProviderAvailabilityOverridesUseCase from "../../application/use-cases/getProviderAvailabilityOverrides.useCase.js";
-import CreateProviderAvailabilityOverrideUseCase from "../../application/use-cases/createProviderAvailabilityOverride.useCase.js";
-import DeleteProviderAvailabilityOverrideUseCase from "../../application/use-cases/deleteProviderAvailabilityOverride.useCase.js";
-import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/createAccountReactivationRequest.useCase.js";
-import { GetReactivationRequestsUseCase } from "../../application/use-cases/getReactivationRequests.useCase.js";
-import { SendReactivationOtpUseCase } from "../../application/use-cases/sendReactivationOtp.useCase.js";
-import { SendBecomeProviderOtpUseCase } from "../../application/use-cases/sendBecomeProviderOtp.useCase.js";
-import { BecomeProviderUseCase } from "../../application/use-cases/becomeProvider.useCase.js";
+import { AddAddressUseCase } from "../../application/use-cases/addAddress.useCase";
+import { DeleteAddressUseCase } from "../../application/use-cases/deleteAddress.useCase";
+import { EditAddressUseCase } from "../../application/use-cases/editAddress.useCase";
+import { GetAddressesUseCase } from "../../application/use-cases/getAddresses.useCase";
+import GetCustomersUseCase from "../../application/use-cases/getCustomers.useCase";
+import GetProvidersUseCase from "../../application/use-cases/getProviders.useCase";
+import GetProfileUseCase from "../../application/use-cases/getProfile.useCase";
+import RegisterCustomerUseCase from "../../application/use-cases/registerCustomer.useCase";
+import RegisterProviderUseCase from "../../application/use-cases/registerProvider.useCase";
+import PreRegisterProviderUseCase from "../../application/use-cases/preRegisterProvider.useCase";
+import { SetDefaultAddressUseCase } from "../../application/use-cases/setDefaulltAddress.useCase";
+import UpdateCustomerProfileUseCase from "../../application/use-cases/updateCustomerProfile.useCase";
+import UpdateProviderProfileUseCase from "../../application/use-cases/updateProviderProfile.useCase";
+import UpdateUserStatusUseCase from "../../application/use-cases/updateUser.useCase";
+import SetProviderAvailabilityUseCase from "../../application/use-cases/setProviderAvailability.useCase";
+import GetProviderAvailabilityUseCase from "../../application/use-cases/getProviderAvailability.useCase";
+import GetProviderAvailabilityOverridesUseCase from "../../application/use-cases/getProviderAvailabilityOverrides.useCase";
+import CreateProviderAvailabilityOverrideUseCase from "../../application/use-cases/createProviderAvailabilityOverride.useCase";
+import DeleteProviderAvailabilityOverrideUseCase from "../../application/use-cases/deleteProviderAvailabilityOverride.useCase";
+import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/createAccountReactivationRequest.useCase";
+import { GetReactivationRequestsUseCase } from "../../application/use-cases/getReactivationRequests.useCase";
+import { SendReactivationOtpUseCase } from "../../application/use-cases/sendReactivationOtp.useCase";
+import { SendBecomeProviderOtpUseCase } from "../../application/use-cases/sendBecomeProviderOtp.useCase";
+import { BecomeProviderUseCase } from "../../application/use-cases/becomeProvider.useCase";
 
-import { userRepository, customerRepository, addressRepository, providerRepository, providerAvailabilityRepository, userAccountBlockRepository, accountReactivationRequestRepository } from "./repositories.js";
+import { userRepository, customerRepository, addressRepository, providerRepository, providerAvailabilityRepository, userAccountBlockRepository, accountReactivationRequestRepository } from "./repositories";
 import {
     passwordHasher,
     otpGenerate,
     emailSender,
     pendingRegistrationStore,
     imageUploadService
-} from "./services.js";
+} from "./services";
 
 
 export const registerCustomerUseCase = new RegisterCustomerUseCase(

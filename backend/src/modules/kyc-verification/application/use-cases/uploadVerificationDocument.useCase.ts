@@ -1,10 +1,10 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { VerificationDocument } from "../../domain/entities/verificationDocument.entity.js";
-import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository.js";
-import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository.js";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { UploadVerificationInputDto } from "../Dto/verificationDto.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { VerificationDocument } from "../../domain/entities/verificationDocument.entity";
+import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository";
+import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { UploadVerificationInputDto } from "../Dto/verificationDto";
 
 export class UploadVerificationDocumentUseCase implements IUseCase<UploadVerificationInputDto, VerificationDocument> {
     constructor(

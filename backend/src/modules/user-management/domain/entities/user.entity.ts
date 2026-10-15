@@ -1,7 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { Address } from "./address.entity.js";
-import { CustomerProfile } from "./customerProfile.entity.js";
-import { ProviderProfile } from "./providerProfile.entity.js";
+import { Address } from "./address.entity";
+import { CustomerProfile } from "./customerProfile.entity";
+import { ProviderProfile } from "./providerProfile.entity";
 
 export class User {
     constructor(

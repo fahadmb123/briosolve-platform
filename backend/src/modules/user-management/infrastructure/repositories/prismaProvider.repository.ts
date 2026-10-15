@@ -1,12 +1,12 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { IProviderRepository, CreateProviderInput, CreateProviderProfileInput } from "../../domain/repositories/IProviderRepository.js";
-import { User } from "../../domain/entities/user.entity.js";
-import { ProviderProfile } from "../../domain/entities/providerProfile.entity.js";
-import { UserMapper } from "../mappers/user.mapper.js";
-import { ProviderProfileMapper, ProviderProfileRaw } from "../mappers/providerProfile.mapper.js";
-import { UpdateProviderProfileInputDto } from "../../application/Dto/providerDto.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { IProviderRepository, CreateProviderInput, CreateProviderProfileInput } from "../../domain/repositories/IProviderRepository";
+import { User } from "../../domain/entities/user.entity";
+import { ProviderProfile } from "../../domain/entities/providerProfile.entity";
+import { UserMapper } from "../mappers/user.mapper";
+import { ProviderProfileMapper, ProviderProfileRaw } from "../mappers/providerProfile.mapper";
+import { UpdateProviderProfileInputDto } from "../../application/Dto/providerDto";
 
 export class ProviderRepository implements IProviderRepository {
     async createProvider(data: CreateProviderInput): Promise<User> {

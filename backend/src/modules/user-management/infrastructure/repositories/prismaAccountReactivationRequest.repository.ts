@@ -1,12 +1,12 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity";
 import {
     IAccountReactivationRequestRepository,
     CreateReactivationRequestInput,
     GetReactivationRequestsInput
-} from "../../domain/repositories/IAccountReactivationRequestRepository.js";
-import { AccountReactivationRequestMapper } from "../mappers/accountReactivationRequest.mapper.js";
+} from "../../domain/repositories/IAccountReactivationRequestRepository";
+import { AccountReactivationRequestMapper } from "../mappers/accountReactivationRequest.mapper";
 
 export class AccountReactivationRequestRepository implements IAccountReactivationRequestRepository {
     async create(data: CreateReactivationRequestInput): Promise<AccountReactivationRequest> {

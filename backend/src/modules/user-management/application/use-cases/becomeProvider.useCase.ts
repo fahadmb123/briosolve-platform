@@ -1,10 +1,10 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository.js";
-import { IProviderRepository } from "../../domain/repositories/IProviderRepository.js";
-import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository.js";
-import type { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository";
+import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
+import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
+import type { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 
 export type BecomeProviderInput = {
     registrationId: string;

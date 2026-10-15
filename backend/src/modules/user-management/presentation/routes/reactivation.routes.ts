@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
-import { reactivationController } from "../../infrastructure/composition/index.js";
+import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
+import { reactivationController } from "../../infrastructure/composition/index";
 
 const router = Router();
 

@@ -1,9 +1,9 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { VerificationFile } from "../../domain/entities/verificationFile.entity.js";
-import { IVerificationFileRepository } from "../../domain/repositories/IVerificationFileRepository.js";
-import { VerificationFileMapper } from "../mappers/verificationFile.mapper.js";
-import { VerificationFileRaw } from "../../application/Dto/verificationDto.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { VerificationFile } from "../../domain/entities/verificationFile.entity";
+import { IVerificationFileRepository } from "../../domain/repositories/IVerificationFileRepository";
+import { VerificationFileMapper } from "../mappers/verificationFile.mapper";
+import { VerificationFileRaw } from "../../application/Dto/verificationDto";
 
 export class VerificationFileRepository implements IVerificationFileRepository {
     async create(documentId: string, fileUrl: string): Promise<VerificationFile> {

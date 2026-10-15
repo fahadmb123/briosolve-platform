@@ -1,7 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { Address } from "../../../user-management/domain/entities/address.entity.js";
-import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js";
-import { ProviderProfile } from "../../domain/entities/providerProfile.entity.js";
+import { Address } from "../../../user-management/domain/entities/address.entity";
+import { CustomerProfile } from "../../domain/entities/customerProfile.entity";
+import { ProviderProfile } from "../../domain/entities/providerProfile.entity";
 
 export type LoginInputDto = {
     email: string;

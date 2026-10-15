@@ -1,5 +1,5 @@
-import { ProviderAvailability, Weekday } from "../entities/providerAvailability.entity.js";
-import { ProviderAvailabilityOverride, AvailabilityOverrideType } from "../entities/providerAvailabilityOverride.entity.js";
+import { ProviderAvailability, Weekday } from "../entities/providerAvailability.entity";
+import { ProviderAvailabilityOverride, AvailabilityOverrideType } from "../entities/providerAvailabilityOverride.entity";
 
 export interface AvailabilitySlotInput {
     day_of_week: Weekday;

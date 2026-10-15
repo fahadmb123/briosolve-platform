@@ -1,5 +1,5 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository.js"
-import { User } from "../entities/user.entity.js"
+import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository"
+import { User } from "../entities/user.entity"
 
 
 

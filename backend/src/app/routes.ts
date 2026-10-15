@@ -1,13 +1,13 @@
 import { Router } from "express";
-import authRoutes from "../modules/auth/presentation/routes/auth.routes.js"
-import userRoutes from "../modules/user-management/presentation/routes/user.routes.js"
-import customerRoute from "../modules/user-management/presentation/routes/customer.routes.js"
-import categoryRouter from "../modules/service-catalog/presentation/routes/category.routes.js"
-import serviceRouter from "../modules/service-catalog/presentation/routes/service.routes.js"
-import providerRoute from "../modules/user-management/presentation/routes/provider.routes.js"
-import providerServiceRoute from "../modules/service-catalog/presentation/routes/providerService.routes.js"
-import verificationRoutes from "../modules/kyc-verification/presentation/routes/verification.routes.js"
-import reactivationRoutes from "../modules/user-management/presentation/routes/reactivation.routes.js"
+import authRoutes from "../modules/auth/presentation/routes/auth.routes"
+import userRoutes from "../modules/user-management/presentation/routes/user.routes"
+import customerRoute from "../modules/user-management/presentation/routes/customer.routes"
+import categoryRouter from "../modules/service-catalog/presentation/routes/category.routes"
+import serviceRouter from "../modules/service-catalog/presentation/routes/service.routes"
+import providerRoute from "../modules/user-management/presentation/routes/provider.routes"
+import providerServiceRoute from "../modules/service-catalog/presentation/routes/providerService.routes"
+import verificationRoutes from "../modules/kyc-verification/presentation/routes/verification.routes"
+import reactivationRoutes from "../modules/user-management/presentation/routes/reactivation.routes"
 
 const router = Router();
 

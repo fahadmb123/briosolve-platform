@@ -1,10 +1,10 @@
-import { IJwtService } from "../../../../../shared/application/Dto/services/jwtDto.service.js";
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js";
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import { User } from "../../../domain/entities/user.entity.js";
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js";
-import { IUserRepository } from "../../../domain/repositories/user.repository.js";
-import { LoginInputDto } from "../../dto/authDto.js";
+import { IJwtService } from "../../../../../shared/application/Dto/services/jwtDto.service";
+import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service";
+import { User } from "../../../domain/entities/user.entity";
+import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase";
+import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { LoginInputDto } from "../../dto/authDto";
 
 
 export default class LoginUseCase implements IUseCase<LoginInputDto,{accessToken:string,isExist:User}>{

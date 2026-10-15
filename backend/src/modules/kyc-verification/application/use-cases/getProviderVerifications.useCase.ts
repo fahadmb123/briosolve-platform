@@ -1,7 +1,7 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { VerificationDocument } from "../../domain/entities/verificationDocument.entity.js";
-import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository.js";
-import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { VerificationDocument } from "../../domain/entities/verificationDocument.entity";
+import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository";
+import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 
 export class GetProviderVerificationsUseCase implements IUseCase<string, VerificationDocument[]> {
     constructor(

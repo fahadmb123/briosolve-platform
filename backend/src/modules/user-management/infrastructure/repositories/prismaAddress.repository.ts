@@ -1,9 +1,9 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { db } from "../../../../infrastructure/persistence/prisma/client.js";
-import { Address } from "../../domain/entities/address.entity.js";
-import { IAddressRepository } from "../../domain/repositories/IAddressRepository.js";
-import { AddressMapper } from "../mappers/address.mapper.js";
-import { GetAddressesInputDto, GetAddressesOutputDto } from "../../application/Dto/addressDto.js";
+import { db } from "../../../../infrastructure/persistence/prisma/client";
+import { Address } from "../../domain/entities/address.entity";
+import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
+import { AddressMapper } from "../mappers/address.mapper";
+import { GetAddressesInputDto, GetAddressesOutputDto } from "../../application/Dto/addressDto";
 
 
 

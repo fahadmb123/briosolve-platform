@@ -1,5 +1,5 @@
-import {IPendingCustomerRegistration,IPendingRegistrationStore,} from "../../../domain/interfaces/IPendingRegistration-store.js";
-import { redisClient } from "./redis.client.js";
+import {IPendingCustomerRegistration,IPendingRegistrationStore,} from "../../../domain/interfaces/IPendingRegistration-store";
+import { redisClient } from "./redis.client";
 
 
 

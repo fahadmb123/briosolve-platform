@@ -1,4 +1,4 @@
-import { ProviderProfile, KycStatus } from "../../domain/entities/providerProfile.entity.js";
+import { ProviderProfile, KycStatus } from "../../domain/entities/providerProfile.entity";
 
 export interface ProviderProfileRaw {
     id: string;

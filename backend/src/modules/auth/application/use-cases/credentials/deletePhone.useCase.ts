@@ -1,12 +1,6 @@
-import { randomUUID } from "node:crypto";
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js";
-import { IOtpGenerator } from "../../../../../shared/domain/interfaces/IOtpGenerator.service.js";
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import { ISmsService } from "../../../../../shared/domain/interfaces/ISms.service.js";
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js";
-import { SendSmsOtpUseCaseInputDto, SendSmsOtpUseCaseOutputDto } from "../../dto/authDto.js";
-import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { IUserRepository } from "../../../domain/repositories/user.repository.js";
+import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
+import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase";
+import { IUserRepository } from "../../../domain/repositories/user.repository";
 
 
 

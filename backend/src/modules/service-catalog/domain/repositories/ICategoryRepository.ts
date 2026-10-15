@@ -1,6 +1,6 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository.js";
-import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/Dto/category.js";
-import { Category } from "../entities/category.entity.js";
+import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/Dto/category";
+import { Category } from "../entities/category.entity";
 
 export interface ICategoryRepository extends BaseRepository<Category | null>{
     findByName(name: string): Promise<Category | null>;

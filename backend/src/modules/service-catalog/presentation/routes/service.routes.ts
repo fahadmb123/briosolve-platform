@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { upload } from "../../../../shared/infrastructure/utils/multer.js";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request.js";
-import { createServiceSchema } from "../schemas/create-service.schema.js";
-import { serviceController } from "../../infrastructure/composition/controller.js";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
+import { upload } from "../../../../shared/infrastructure/utils/multer";
+import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import { createServiceSchema } from "../schemas/create-service.schema";
+import { serviceController } from "../../infrastructure/composition/controller";
+import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
 
 const router = Router();
 

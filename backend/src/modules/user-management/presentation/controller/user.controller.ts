@@ -1,10 +1,10 @@
 import { NextFunction ,Response,Request} from "express"
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController.js";
-import { IUpdateUserStatusUseCase } from "../../domain/interfaces/use-cases/IUpdateUserUseCase.js";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response.js";
-import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto } from "../../application/Dto/userDto.js";
-import { UserResponseMapper } from "../mappers/userResponse.mapper.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
+import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
+import { IUpdateUserStatusUseCase } from "../../domain/interfaces/use-cases/IUpdateUserUseCase";
+import { sendSuccess } from "../../../../shared/presentation/http/response/response";
+import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto } from "../../application/Dto/userDto";
+import { UserResponseMapper } from "../mappers/userResponse.mapper";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 
 export class UserController extends BaseController{
     constructor (

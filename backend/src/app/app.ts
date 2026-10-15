@@ -2,8 +2,8 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import router from "./routes.js";
-import { errorHandler } from "../shared/presentation/http/middlewares/error-handler.js"; 
+import router from "./routes";
+import { errorHandler } from "../shared/presentation/http/middlewares/error-handler"; 
 
 const app = express()
 

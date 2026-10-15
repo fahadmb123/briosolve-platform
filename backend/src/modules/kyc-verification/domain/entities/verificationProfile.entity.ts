@@ -1,4 +1,4 @@
-import { VerificationDocument } from "./verificationDocument.entity.js";
+import { VerificationDocument } from "./verificationDocument.entity";
 
 export interface VerificationProfileUser {
     id: string;

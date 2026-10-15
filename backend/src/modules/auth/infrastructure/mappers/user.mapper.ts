@@ -1,6 +1,6 @@
-import { User } from "../../domain/entities/user.entity.js";
-import { CustomerProfileMapper } from "./customerProfile.mapper.js";
-import { ProviderProfileMapper, ProviderProfileRaw } from "./providerProfile.mapper.js";
+import { User } from "../../domain/entities/user.entity";
+import { CustomerProfileMapper } from "./customerProfile.mapper";
+import { ProviderProfileMapper, ProviderProfileRaw } from "./providerProfile.mapper";
 
 export class UserMapper {
     static toDomain(data: any): User {

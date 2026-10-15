@@ -1,4 +1,4 @@
-import { Category } from "./category.entity.js";
+import { Category } from "./category.entity";
 
 export class Service {
     constructor(

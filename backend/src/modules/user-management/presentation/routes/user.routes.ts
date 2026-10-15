@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
-import { addressController, customerController, providerController, userController } from "../../infrastructure/composition/index.js";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request.js";
-import { addressSchema } from "../validators/address.js";
+import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
+import { addressController, customerController, providerController, userController } from "../../infrastructure/composition/index";
+import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
+import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import { addressSchema } from "../validators/address";
 
 const router = Router();
 

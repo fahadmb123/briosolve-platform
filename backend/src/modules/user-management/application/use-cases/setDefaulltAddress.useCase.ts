@@ -1,7 +1,7 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IAddressRepository } from "../../domain/repositories/IAddressRepository.js";
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { SetDefaultAddressInputUseCaseDto } from "../Dto/addressDto.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { SetDefaultAddressInputUseCaseDto } from "../Dto/addressDto";
 
 
 export class SetDefaultAddressUseCase implements IUseCase<SetDefaultAddressInputUseCaseDto,void>{

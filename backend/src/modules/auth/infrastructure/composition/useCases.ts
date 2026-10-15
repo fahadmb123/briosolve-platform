@@ -1,15 +1,15 @@
-import OtpVarificationUseCase from "../../application/use-cases/verification/otpVarification.useCase.js";
-import ResendOtpUseCase from "../../application/use-cases/verification/resendOtp.useCase.js";
-import LoginUseCase from "../../application/use-cases/authentication/login.useCase.js";
-import GetMeUseCase from "../../application/use-cases/profile/getMe.useCase.js";
-import EmailVerificationUseCase from "../../application/use-cases/verification/emailVerification.useCase.js";
-import ResetPasswordUseCase from "../../application/use-cases/credentials/resetPassword.useCase.js";
-import UpdateEmailUseCase from "../../application/use-cases/credentials/updateEmail.useCase.js";
-import UpdatePasswordUseCase from "../../application/use-cases/credentials/updatePassword.useCase.js";
-import { SendSmsOtpUseCase } from "../../application/use-cases/verification/sendSmsOtp.useCase.js";
-import { DeletePhoneUseCase } from "../../application/use-cases/credentials/deletePhone.useCase.js";
+import OtpVarificationUseCase from "../../application/use-cases/verification/otpVarification.useCase";
+import ResendOtpUseCase from "../../application/use-cases/verification/resendOtp.useCase";
+import LoginUseCase from "../../application/use-cases/authentication/login.useCase";
+import GetMeUseCase from "../../application/use-cases/profile/getMe.useCase";
+import EmailVerificationUseCase from "../../application/use-cases/verification/emailVerification.useCase";
+import ResetPasswordUseCase from "../../application/use-cases/credentials/resetPassword.useCase";
+import UpdateEmailUseCase from "../../application/use-cases/credentials/updateEmail.useCase";
+import UpdatePasswordUseCase from "../../application/use-cases/credentials/updatePassword.useCase";
+import { SendSmsOtpUseCase } from "../../application/use-cases/verification/sendSmsOtp.useCase";
+import { DeletePhoneUseCase } from "../../application/use-cases/credentials/deletePhone.useCase";
 
-import { userRepository, customerRepository } from "./repositories.js";
+import { userRepository, customerRepository } from "./repositories";
 import {
   pendingRegistrationStore,
   passwordHasher,
@@ -17,7 +17,7 @@ import {
   emailSender,
   jwtService,
   smsService
-} from "./services.js";
+} from "./services";
 
 export const otpVarificationUseCase = new OtpVarificationUseCase(
   pendingRegistrationStore,

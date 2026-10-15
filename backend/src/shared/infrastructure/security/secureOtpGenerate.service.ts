@@ -1,5 +1,5 @@
 import { randomInt } from "crypto";
-import { IOtpGenerator } from "../../domain/interfaces/IOtpGenerator.service.js";
+import { IOtpGenerator } from "../../domain/interfaces/IOtpGenerator.service";
 
 
 export class SecureOtpGeneratorService implements IOtpGenerator {

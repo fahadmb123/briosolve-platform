@@ -1,6 +1,6 @@
-import { CategoryRepository } from "../repositories/prismaCategory.repository.js";
-import { ServiceRepository } from "../repositories/prismaService.repository.js";
-import { ProviderServiceRepository } from "../repositories/prismaProviderService.repository.js";
+import { CategoryRepository } from "../repositories/prismaCategory.repository";
+import { ServiceRepository } from "../repositories/prismaService.repository";
+import { ProviderServiceRepository } from "../repositories/prismaProviderService.repository";
 
 export const categoryRepository = new CategoryRepository();
 export const serviceRepository = new ServiceRepository();

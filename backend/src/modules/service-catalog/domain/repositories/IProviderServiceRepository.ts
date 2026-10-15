@@ -1,4 +1,4 @@
-import { ProviderService } from "../entities/providerService.entity.js";
+import { ProviderService } from "../entities/providerService.entity";
 
 export interface IProviderServiceRepository {
     getProviderServices(providerId: string): Promise<ProviderService[]>;

@@ -1,9 +1,9 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
-import { Category } from "../../domain/entities/category.entity.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository.js";
-import { UpdateCategoryUseCaseDto, UpdateCategoryDto } from "../Dto/category.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
+import { Category } from "../../domain/entities/category.entity";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
+import { UpdateCategoryUseCaseDto, UpdateCategoryDto } from "../Dto/category";
 
 
 

@@ -1,7 +1,7 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository.js";
-import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../entities/verificationDocument.entity.js";
-import { VerificationProfile } from "../entities/verificationProfile.entity.js";
-import { CreateVerificationDocumentInputDto, UpdateVerificationDocumentRepositoryDto } from "../../application/Dto/verificationDto.js";
+import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../entities/verificationDocument.entity";
+import { VerificationProfile } from "../entities/verificationProfile.entity";
+import { CreateVerificationDocumentInputDto, UpdateVerificationDocumentRepositoryDto } from "../../application/Dto/verificationDto";
 
 export interface GetAdminKycRequestsInput {
     page?: number;

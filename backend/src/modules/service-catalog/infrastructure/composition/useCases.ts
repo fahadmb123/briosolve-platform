@@ -1,19 +1,19 @@
-import { AddCategoryUseCase } from "../../application/use-cases/addCategory.useCase.js";
-import { UpdateCategoryUseCase } from "../../application/use-cases/updateCategory.useCase.js";
-import { GetCategoriesUseCase } from "../../application/use-cases/getCategories.useCase.js";
-import { DeleteCategoryUseCase } from "../../application/use-cases/deleteCategory.useCase.js";
-import { AddServiceUseCase } from "../../application/use-cases/addService.useCase.js";
-import { UpdateServiceUseCase } from "../../application/use-cases/updateService.useCase.js";
-import { GetServicesUseCase } from "../../application/use-cases/getServices.useCase.js";
-import { DeleteServiceUseCase } from "../../application/use-cases/deleteService.useCase.js";
-import { GetProviderServicesUseCase } from "../../application/use-cases/getProviderServices.useCase.js";
-import { AddProviderServicesUseCase } from "../../application/use-cases/addProviderServices.useCase.js";
-import { DeleteProviderServiceUseCase } from "../../application/use-cases/deleteProviderService.useCase.js";
-import { DeleteProviderCategoryUseCase } from "../../application/use-cases/deleteProviderCategory.useCase.js";
-import { categoryRepository, serviceRepository, providerServiceRepository } from "./respositories.js";
-import { providerRepository } from "../../../user-management/infrastructure/composition/repositories.js";
+import { AddCategoryUseCase } from "../../application/use-cases/addCategory.useCase";
+import { UpdateCategoryUseCase } from "../../application/use-cases/updateCategory.useCase";
+import { GetCategoriesUseCase } from "../../application/use-cases/getCategories.useCase";
+import { DeleteCategoryUseCase } from "../../application/use-cases/deleteCategory.useCase";
+import { AddServiceUseCase } from "../../application/use-cases/addService.useCase";
+import { UpdateServiceUseCase } from "../../application/use-cases/updateService.useCase";
+import { GetServicesUseCase } from "../../application/use-cases/getServices.useCase";
+import { DeleteServiceUseCase } from "../../application/use-cases/deleteService.useCase";
+import { GetProviderServicesUseCase } from "../../application/use-cases/getProviderServices.useCase";
+import { AddProviderServicesUseCase } from "../../application/use-cases/addProviderServices.useCase";
+import { DeleteProviderServiceUseCase } from "../../application/use-cases/deleteProviderService.useCase";
+import { DeleteProviderCategoryUseCase } from "../../application/use-cases/deleteProviderCategory.useCase";
+import { categoryRepository, serviceRepository, providerServiceRepository } from "./respositories";
+import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
 
-import { ImageService } from "./services.js";
+import { ImageService } from "./services";
 
 export const addCategoryUseCase = new AddCategoryUseCase(categoryRepository)
 export const updateCategoryUseCase = new UpdateCategoryUseCase(categoryRepository,ImageService)

@@ -1,9 +1,9 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { User } from "../../domain/entities/user.entity.js";
-import { IUserRepository, GetUsersWithRoleInput } from "../../domain/repositories/IUserRepository.js";
-import { UserMapper } from "../mappers/user.mapper.js";
-import { UpdateUserRepositoryInput } from "../../application/Dto/userDto.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { User } from "../../domain/entities/user.entity";
+import { IUserRepository, GetUsersWithRoleInput } from "../../domain/repositories/IUserRepository";
+import { UserMapper } from "../mappers/user.mapper";
+import { UpdateUserRepositoryInput } from "../../application/Dto/userDto";
 
 type UserStatus = "ACTIVE" | "INACTIVE" | "BLOCKED";
 export class UserRepository implements IUserRepository{

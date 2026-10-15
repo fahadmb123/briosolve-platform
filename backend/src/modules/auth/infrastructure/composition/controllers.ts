@@ -1,6 +1,6 @@
-import OtpVarificationController from "../../presentation/controllers/otpVarification.controller.js";
-import { AuthController } from "../../presentation/controllers/auth.controller.js";
-import { SecurityController } from "../../presentation/controllers/security.controller.js";
+import OtpVarificationController from "../../presentation/controllers/otpVarification.controller";
+import { AuthController } from "../../presentation/controllers/auth.controller";
+import { SecurityController } from "../../presentation/controllers/security.controller";
 
 import {
   otpVarificationUseCase,
@@ -13,9 +13,9 @@ import {
   sendSmsOtpUseCase,
   updatePasswordUseCase,
   deletePhoneUseCase
-} from "./useCases.js";
+} from "./useCases";
 
-import { pendingRegistrationStore } from "./services.js";
+import { pendingRegistrationStore } from "./services";
 
 export const otpVarificationController = new OtpVarificationController(
   otpVarificationUseCase,

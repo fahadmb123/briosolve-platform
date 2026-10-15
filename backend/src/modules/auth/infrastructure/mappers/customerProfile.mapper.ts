@@ -1,4 +1,4 @@
-import { CustomerProfile } from "../../domain/entities/customerProfile.entity.js";
+import { CustomerProfile } from "../../domain/entities/customerProfile.entity";
 
 
 export class CustomerProfileMapper {

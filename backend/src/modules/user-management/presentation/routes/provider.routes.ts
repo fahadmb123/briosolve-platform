@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { providerController } from "../../infrastructure/composition/controllers.js";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request.js";
-import { providerRegistrationSchema, providerProfileSchema } from "../../../auth/presentation/validators/registerProvider.schema.js";
-import { completeProviderRegistrationSchema } from "../../../auth/presentation/validators/completeProviderRegistration.schema.js";
-import { setProviderAvailabilitySchema, createAvailabilityOverrideSchema } from "../validators/availability.js";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
-import { upload } from "../../../../shared/infrastructure/utils/multer.js";
-import { validateFile } from "../../../../shared/presentation/http/middlewares/validate-file.js";
-import { imageFileSchema } from "../../../../shared/presentation/http/validators/imageFile.schema.js";
+import { providerController } from "../../infrastructure/composition/controllers";
+import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import { providerRegistrationSchema, providerProfileSchema } from "../../../auth/presentation/validators/registerProvider.schema";
+import { completeProviderRegistrationSchema } from "../../../auth/presentation/validators/completeProviderRegistration.schema";
+import { setProviderAvailabilitySchema, createAvailabilityOverrideSchema } from "../validators/availability";
+import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
+import { upload } from "../../../../shared/infrastructure/utils/multer";
+import { validateFile } from "../../../../shared/presentation/http/middlewares/validate-file";
+import { imageFileSchema } from "../../../../shared/presentation/http/validators/imageFile.schema";
 
 const router = Router();
 

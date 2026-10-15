@@ -1,10 +1,10 @@
 import { Router } from "express";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request.js";
-import { otpSchema } from "../validators/registerCustomer.schema.js";
-import { otpVarificationController ,authController, securityController} from "../../infrastructure/composition/index.js";
-import { emailSchema, loginSchema, resetPasswordSchema, phoneSchema, updatePasswordSchema } from "../validators/auth.schema.js";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
+import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import { otpSchema } from "../validators/registerCustomer.schema";
+import { otpVarificationController ,authController, securityController} from "../../infrastructure/composition/index";
+import { emailSchema, loginSchema, resetPasswordSchema, phoneSchema, updatePasswordSchema } from "../validators/auth.schema";
+import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
 
 const router = Router()
 

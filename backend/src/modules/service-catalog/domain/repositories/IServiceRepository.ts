@@ -1,6 +1,6 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository.js";
-import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/Dto/service.js";
-import { Service } from "../entities/service.entity.js";
+import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/Dto/service";
+import { Service } from "../entities/service.entity";
 
 export interface IServiceRepository extends BaseRepository<Service | null>{
     findByName(name: string): Promise<Service | null>;

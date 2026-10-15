@@ -1,7 +1,7 @@
-import { CategoryController } from "../../presentation/controller/category.controller.js";
-import { ServiceController } from "../../presentation/controller/service.controller.js";
-import { ProviderServiceController } from "../../presentation/controller/providerService.controller.js";
-import { ImageService } from "./services.js";
+import { CategoryController } from "../../presentation/controller/category.controller";
+import { ServiceController } from "../../presentation/controller/service.controller";
+import { ProviderServiceController } from "../../presentation/controller/providerService.controller";
+import { ImageService } from "./services";
 import { 
     addCategoryUseCase, 
     updateCategoryUseCase, 
@@ -15,7 +15,7 @@ import {
     addProviderServicesUseCase,
     deleteProviderServiceUseCase,
     deleteProviderCategoryUseCase
-} from "./useCases.js";
+} from "./useCases";
 
 export const categoryController = new CategoryController(addCategoryUseCase,ImageService,updateCategoryUseCase,getCategoriesUseCase,deleteCategoryUseCase);
 export const serviceController = new ServiceController(addServiceUseCase,ImageService,updateServiceUseCase,getServicesUseCase,deleteServiceUseCase);

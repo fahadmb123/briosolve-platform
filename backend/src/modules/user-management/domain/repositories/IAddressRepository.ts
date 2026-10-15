@@ -1,6 +1,6 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository.js";
-import { GetAddressesInputDto, GetAddressesOutputDto } from "../../application/Dto/addressDto.js";
-import { Address } from "../entities/address.entity.js";
+import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { GetAddressesInputDto, GetAddressesOutputDto } from "../../application/Dto/addressDto";
+import { Address } from "../entities/address.entity";
 
 
 

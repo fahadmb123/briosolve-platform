@@ -1,7 +1,7 @@
-import { User } from "../../domain/entities/user.entity.js"
-import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCustomersUseCase.js"
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js"
-import { getCustomersDto } from "../Dto/getCustomersDto.js"
+import { User } from "../../domain/entities/user.entity"
+import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCustomersUseCase"
+import { IUserRepository } from "../../domain/repositories/IUserRepository"
+import { getCustomersDto } from "../Dto/getCustomersDto"
 
 
 

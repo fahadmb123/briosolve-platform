@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import type { IEmailSender } from "../../../domain/interfaces/IEmailSender.service.js";
+import type { IEmailSender } from "../../../domain/interfaces/IEmailSender.service";
 
 
 

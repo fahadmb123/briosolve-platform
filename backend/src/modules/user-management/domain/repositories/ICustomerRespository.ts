@@ -1,6 +1,6 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository.js";
-import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto.js";
-import { CustomerProfile } from "../entities/customerProfile.entity.js";
+import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto";
+import { CustomerProfile } from "../entities/customerProfile.entity";
 
 
 

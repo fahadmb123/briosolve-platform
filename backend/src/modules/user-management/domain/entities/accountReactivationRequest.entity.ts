@@ -1,5 +1,5 @@
-import { User } from "./user.entity.js";
-import { UserAccountBlock } from "./userAccountBlock.entity.js";
+import { User } from "./user.entity";
+import { UserAccountBlock } from "./userAccountBlock.entity";
 
 export class AccountReactivationRequest {
     constructor(

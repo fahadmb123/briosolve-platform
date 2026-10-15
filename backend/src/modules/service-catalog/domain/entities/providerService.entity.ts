@@ -1,4 +1,4 @@
-import { Service } from "./service.entity.js";
+import { Service } from "./service.entity";
 
 export class ProviderService {
     constructor(

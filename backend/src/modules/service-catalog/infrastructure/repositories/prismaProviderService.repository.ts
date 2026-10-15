@@ -1,8 +1,8 @@
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { ProviderService } from "../../domain/entities/providerService.entity.js";
-import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository.js";
-import { ProviderServiceMapper } from "../mappers/providerService.mapper.js";
-import { ProviderServiceRaw } from "../../application/Dto/providerService.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { ProviderService } from "../../domain/entities/providerService.entity";
+import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
+import { ProviderServiceMapper } from "../mappers/providerService.mapper";
+import { ProviderServiceRaw } from "../../application/Dto/providerService";
 
 export class ProviderServiceRepository implements IProviderServiceRepository {
     async getProviderServices(providerId: string): Promise<ProviderService[]> {

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { JwtPayload,IJwtService } from "../../application/Dto/services/jwtDto.service.js";
+import { JwtPayload,IJwtService } from "../../application/Dto/services/jwtDto.service";
 
 
 

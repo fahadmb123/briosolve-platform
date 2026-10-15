@@ -1,5 +1,5 @@
-import { VerificationFile } from "../../domain/entities/verificationFile.entity.js";
-import { VerificationFileRaw } from "../../application/Dto/verificationDto.js";
+import { VerificationFile } from "../../domain/entities/verificationFile.entity";
+import { VerificationFileRaw } from "../../application/Dto/verificationDto";
 
 export class VerificationFileMapper {
     static toDomain(raw: VerificationFileRaw): VerificationFile {

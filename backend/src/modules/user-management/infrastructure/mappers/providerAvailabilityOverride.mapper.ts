@@ -1,4 +1,4 @@
-import { ProviderAvailabilityOverride, AvailabilityOverrideType } from "../../domain/entities/providerAvailabilityOverride.entity.js";
+import { ProviderAvailabilityOverride, AvailabilityOverrideType } from "../../domain/entities/providerAvailabilityOverride.entity";
 
 export interface ProviderAvailabilityOverrideRaw {
     id: string;

@@ -4,4 +4,4 @@ export {
     addressController,
     providerController,
     reactivationController
-} from "./controllers.js";
+} from "./controllers";

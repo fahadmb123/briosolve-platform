@@ -1,6 +1,6 @@
-import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity.js";
-import { UserMapper } from "./user.mapper.js";
-import { UserAccountBlockMapper } from "./userAccountBlock.mapper.js";
+import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity";
+import { UserMapper } from "./user.mapper";
+import { UserAccountBlockMapper } from "./userAccountBlock.mapper";
 
 export class AccountReactivationRequestMapper {
     static toDomain(raw: any): AccountReactivationRequest {

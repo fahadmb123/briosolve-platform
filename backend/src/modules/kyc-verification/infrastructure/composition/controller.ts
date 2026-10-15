@@ -1,4 +1,4 @@
-import { VerificationController } from "../../presentation/controller/verification.controller.js";
+import { VerificationController } from "../../presentation/controller/verification.controller";
 import {
     uploadVerificationDocumentUseCase,
     getProviderVerificationsUseCase,
@@ -6,7 +6,7 @@ import {
     deleteVerificationDocumentUseCase,
     getAdminVerificationsUseCase,
     updateKycStatusUseCase
-} from "./useCases.js";
+} from "./useCases";
 
 export const verificationController = new VerificationController(
     uploadVerificationDocumentUseCase,

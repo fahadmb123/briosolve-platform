@@ -1,9 +1,9 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IProviderRepository } from "../../domain/repositories/IProviderRepository.js";
-import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository.js";
-import { ProviderAvailability } from "../../domain/entities/providerAvailability.entity.js";
-import { GetProviderAvailabilityInputDto } from "../Dto/providerDto.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
+import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
+import { ProviderAvailability } from "../../domain/entities/providerAvailability.entity";
+import { GetProviderAvailabilityInputDto } from "../Dto/providerDto";
 
 export default class GetProviderAvailabilityUseCase implements IUseCase<GetProviderAvailabilityInputDto, ProviderAvailability[]> {
     constructor(

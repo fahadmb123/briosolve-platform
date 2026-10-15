@@ -1,6 +1,6 @@
-import { VerificationProfile } from "../../domain/entities/verificationProfile.entity.js";
-import { AdminKycDossier } from "../../domain/repositories/IVerificationDocumentRepository.js";
-import { VerificationDocumentMapper } from "./verificationDocument.mapper.js";
+import { VerificationProfile } from "../../domain/entities/verificationProfile.entity";
+import { AdminKycDossier } from "../../domain/repositories/IVerificationDocumentRepository";
+import { VerificationDocumentMapper } from "./verificationDocument.mapper";
 
 export class VerificationProfileMapper {
     static toDomain(raw: any): VerificationProfile {

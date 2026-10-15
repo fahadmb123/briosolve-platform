@@ -1,7 +1,7 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository.js";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
 
 export class DeleteCategoryUseCase implements IUseCase<string, boolean> {
     constructor(

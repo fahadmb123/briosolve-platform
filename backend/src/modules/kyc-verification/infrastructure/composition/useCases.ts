@@ -1,12 +1,12 @@
-import { UploadVerificationDocumentUseCase } from "../../application/use-cases/uploadVerificationDocument.useCase.js";
-import { GetProviderVerificationsUseCase } from "../../application/use-cases/getProviderVerifications.useCase.js";
-import { UpdateVerificationDocumentUseCase } from "../../application/use-cases/updateVerificationDocument.useCase.js";
-import { DeleteVerificationDocumentUseCase } from "../../application/use-cases/deleteVerificationDocument.useCase.js";
-import { GetAdminVerificationsUseCase } from "../../application/use-cases/getAdminVerifications.useCase.js";
-import { UpdateKycStatusUseCase } from "../../application/use-cases/updateKycStatus.useCase.js";
-import { verificationDocumentRepository } from "./repositories.js";
-import { providerRepository } from "../../../user-management/infrastructure/composition/repositories.js";
-import { imageService } from "./services.js";
+import { UploadVerificationDocumentUseCase } from "../../application/use-cases/uploadVerificationDocument.useCase";
+import { GetProviderVerificationsUseCase } from "../../application/use-cases/getProviderVerifications.useCase";
+import { UpdateVerificationDocumentUseCase } from "../../application/use-cases/updateVerificationDocument.useCase";
+import { DeleteVerificationDocumentUseCase } from "../../application/use-cases/deleteVerificationDocument.useCase";
+import { GetAdminVerificationsUseCase } from "../../application/use-cases/getAdminVerifications.useCase";
+import { UpdateKycStatusUseCase } from "../../application/use-cases/updateKycStatus.useCase";
+import { verificationDocumentRepository } from "./repositories";
+import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
+import { imageService } from "./services";
 
 export const uploadVerificationDocumentUseCase = new UploadVerificationDocumentUseCase(
     verificationDocumentRepository,

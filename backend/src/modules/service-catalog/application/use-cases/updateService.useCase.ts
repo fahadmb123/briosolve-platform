@@ -1,9 +1,9 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { UpdateServiceUseCaseDto } from "../Dto/service.js";
-import { Service } from "../../domain/entities/service.entity.js";
-import { IServiceRepository } from "../../domain/repositories/IServiceRepository.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { UpdateServiceUseCaseDto } from "../Dto/service";
+import { Service } from "../../domain/entities/service.entity";
+import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
 
 export class UpdateServiceUseCase implements IUseCase<UpdateServiceUseCaseDto, Service> {
     constructor(

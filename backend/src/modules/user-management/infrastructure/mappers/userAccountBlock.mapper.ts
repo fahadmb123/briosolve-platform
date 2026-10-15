@@ -1,4 +1,4 @@
-import { UserAccountBlock } from "../../domain/entities/userAccountBlock.entity.js";
+import { UserAccountBlock } from "../../domain/entities/userAccountBlock.entity";
 
 export class UserAccountBlockMapper {
     static toDomain(raw: any): UserAccountBlock {

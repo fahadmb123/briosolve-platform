@@ -1,4 +1,4 @@
-import { ProviderAvailability, Weekday } from "../../domain/entities/providerAvailability.entity.js";
+import { ProviderAvailability, Weekday } from "../../domain/entities/providerAvailability.entity";
 
 export interface ProviderAvailabilityRaw {
     id: string;

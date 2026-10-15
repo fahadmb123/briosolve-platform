@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware.js";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware.js";
-import { providerServiceController } from "../../infrastructure/composition/controller.js";
+import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
+import { providerServiceController } from "../../infrastructure/composition/controller";
 
 const route = Router();
 

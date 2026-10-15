@@ -1,10 +1,10 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { User } from "../../domain/entities/user.entity.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository.js";
-import { IProviderRepository } from "../../domain/repositories/IProviderRepository.js";
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { GetProfileUseCaseOutputDto, GetProfileUseCaseInputDto } from "../Dto/userDto.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { User } from "../../domain/entities/user.entity";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository";
+import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { GetProfileUseCaseOutputDto, GetProfileUseCaseInputDto } from "../Dto/userDto";
 
 export default class GetProfileUseCase implements IUseCase<GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto> {
     constructor(

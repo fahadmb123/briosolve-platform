@@ -1,4 +1,4 @@
-import { Weekday } from "../../domain/entities/providerAvailability.entity.js";
+import { Weekday } from "../../domain/entities/providerAvailability.entity";
 
 export type EmailVerificationUseCaseOutputDto = {
     expiresIn: number;

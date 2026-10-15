@@ -1,6 +1,6 @@
-import { Address } from "../../../user-management/domain/entities/address.entity.js";
-import { CustomerProfile } from "./customerProfile.entity.js";
-import { ProviderProfile } from "./providerProfile.entity.js";
+import { Address } from "../../../user-management/domain/entities/address.entity";
+import { CustomerProfile } from "./customerProfile.entity";
+import { ProviderProfile } from "./providerProfile.entity";
 
 export class User {
     constructor(

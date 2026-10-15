@@ -1,6 +1,6 @@
-import { VerificationDocument } from "../../domain/entities/verificationDocument.entity.js";
-import { VerificationDocumentRaw } from "../../application/Dto/verificationDto.js";
-import { VerificationFileMapper } from "./verificationFile.mapper.js";
+import { VerificationDocument } from "../../domain/entities/verificationDocument.entity";
+import { VerificationDocumentRaw } from "../../application/Dto/verificationDto";
+import { VerificationFileMapper } from "./verificationFile.mapper";
 
 export class VerificationDocumentMapper {
     static toDomain(raw: VerificationDocumentRaw): VerificationDocument {

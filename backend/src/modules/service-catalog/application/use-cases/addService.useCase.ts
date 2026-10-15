@@ -1,8 +1,8 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { AddServiceUseCaseInputDto } from "../Dto/service.js";
-import { Service } from "../../domain/entities/service.entity.js";
-import { IServiceRepository } from "../../domain/repositories/IServiceRepository.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { AddServiceUseCaseInputDto } from "../Dto/service";
+import { Service } from "../../domain/entities/service.entity";
+import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 
 export class AddServiceUseCase implements IUseCase<AddServiceUseCaseInputDto, Service> {
     constructor(

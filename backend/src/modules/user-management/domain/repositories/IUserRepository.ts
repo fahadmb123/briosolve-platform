@@ -1,6 +1,6 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository.js";
-import { UpdateUserStatusDto, UpdateUserRepositoryInput } from "../../application/Dto/userDto.js";
-import { User } from "../entities/user.entity.js";
+import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { UpdateUserStatusDto, UpdateUserRepositoryInput } from "../../application/Dto/userDto";
+import { User } from "../entities/user.entity";
 
 export type GetUsersWithRoleInput = {
   role: "CUSTOMER" | "PROVIDER" | "ADMIN";

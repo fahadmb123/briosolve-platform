@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { ImageUploadService } from '../../domain/interfaces/IImageUpload.service.js';
-import { ApplicationError } from "../../application/errors/applicationError.js";
+import { ImageUploadService } from '../../domain/interfaces/IImageUpload.service';
+import { ApplicationError } from "../../application/errors/applicationError";
 
 export class CloudinaryService implements ImageUploadService {
     constructor() {

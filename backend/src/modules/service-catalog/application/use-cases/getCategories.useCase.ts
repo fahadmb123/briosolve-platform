@@ -1,8 +1,8 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { Category } from "../../domain/entities/category.entity.js";
-import { GetCategoriesDto } from "../Dto/category.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { Category } from "../../domain/entities/category.entity";
+import { GetCategoriesDto } from "../Dto/category";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
 
 
 

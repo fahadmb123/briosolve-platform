@@ -1,6 +1,6 @@
 import type { Request } from "express";
-import { IUserTokenPayload } from "../../../domain/interfaces/IToken.js";
-import { ApplicationError } from "../../../application/errors/applicationError.js";
+import { IUserTokenPayload } from "../../../domain/interfaces/IToken";
+import { ApplicationError } from "../../../application/errors/applicationError";
 
 
 

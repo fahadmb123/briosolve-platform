@@ -1,9 +1,9 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IProviderRepository } from "../../domain/repositories/IProviderRepository.js";
-import { User } from "../../domain/entities/user.entity.js";
-import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
+import { User } from "../../domain/entities/user.entity";
+import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
 
 export type CompleteProviderRegistrationInput = {
     registrationId: string;

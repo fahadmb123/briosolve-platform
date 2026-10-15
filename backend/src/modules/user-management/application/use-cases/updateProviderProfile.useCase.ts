@@ -1,9 +1,9 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { IProviderRepository } from "../../domain/repositories/IProviderRepository.js";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service.js";
-import { UpdateProviderProfileInputDto } from "../Dto/providerDto.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
+import { UpdateProviderProfileInputDto } from "../Dto/providerDto";
 
 export default class UpdateProviderProfileUseCase implements IUseCase<UpdateProviderProfileInputDto, void> {
     constructor(

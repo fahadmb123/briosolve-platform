@@ -1,4 +1,4 @@
-import { VerificationDocumentType, VerificationDocumentStatus } from "../../domain/entities/verificationDocument.entity.js";
+import { VerificationDocumentType, VerificationDocumentStatus } from "../../domain/entities/verificationDocument.entity";
 
 export interface UploadVerificationInputDto {
     userId: string;

@@ -1,9 +1,9 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError.js";
-import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store.js";
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service.js";
-import type { IOtpGenerator } from "../../../../../shared/domain/interfaces/IOtpGenerator.service.js";
-import type { IEmailSender } from "../../../../../shared/domain/interfaces/IEmailSender.service.js";
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase.js";
+import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
+import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store";
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service";
+import type { IOtpGenerator } from "../../../../../shared/domain/interfaces/IOtpGenerator.service";
+import type { IEmailSender } from "../../../../../shared/domain/interfaces/IEmailSender.service";
+import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase";
 
 export type ResendOtpOutput = {
     expiresIn: number;

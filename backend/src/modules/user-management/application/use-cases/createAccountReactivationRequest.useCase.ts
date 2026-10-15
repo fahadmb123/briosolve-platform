@@ -1,10 +1,10 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
-import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
-import { IUserAccountBlockRepository } from "../../domain/repositories/IUserAccountBlockRepository.js";
-import { IAccountReactivationRequestRepository } from "../../domain/repositories/IAccountReactivationRequestRepository.js";
-import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity.js";
-import { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service.js";
-import type { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store.js";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { IUserAccountBlockRepository } from "../../domain/repositories/IUserAccountBlockRepository";
+import { IAccountReactivationRequestRepository } from "../../domain/repositories/IAccountReactivationRequestRepository";
+import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity";
+import { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service";
+import type { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
 
 export type RequestReactivationDto = {
     email: string;

@@ -1,6 +1,6 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase.js";
-import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository.js";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError.js";
+import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository";
+import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 
 export interface UpdateKycStatusInput {
     providerId: string;

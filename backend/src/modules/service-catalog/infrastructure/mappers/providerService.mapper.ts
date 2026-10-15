@@ -1,6 +1,6 @@
-import { ProviderServiceRaw } from "../../application/Dto/providerService.js";
-import { ProviderService } from "../../domain/entities/providerService.entity.js";
-import { ServiceMapper } from "./service.mapper.js";
+import { ProviderServiceRaw } from "../../application/Dto/providerService";
+import { ProviderService } from "../../domain/entities/providerService.entity";
+import { ServiceMapper } from "./service.mapper";
 
 export class ProviderServiceMapper {
     static toDomain(raw: ProviderServiceRaw): ProviderService {

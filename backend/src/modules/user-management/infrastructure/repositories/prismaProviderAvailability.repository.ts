@@ -1,10 +1,10 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client.js";
-import { IProviderAvailabilityRepository, AvailabilitySlotInput, CreateAvailabilityOverrideInput } from "../../domain/repositories/IProviderAvailabilityRepository.js";
-import { ProviderAvailability } from "../../domain/entities/providerAvailability.entity.js";
-import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity.js";
-import { ProviderAvailabilityMapper, ProviderAvailabilityRaw } from "../mappers/providerAvailability.mapper.js";
-import { ProviderAvailabilityOverrideMapper, ProviderAvailabilityOverrideRaw } from "../mappers/providerAvailabilityOverride.mapper.js";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { IProviderAvailabilityRepository, AvailabilitySlotInput, CreateAvailabilityOverrideInput } from "../../domain/repositories/IProviderAvailabilityRepository";
+import { ProviderAvailability } from "../../domain/entities/providerAvailability.entity";
+import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity";
+import { ProviderAvailabilityMapper, ProviderAvailabilityRaw } from "../mappers/providerAvailability.mapper";
+import { ProviderAvailabilityOverrideMapper, ProviderAvailabilityOverrideRaw } from "../mappers/providerAvailabilityOverride.mapper";
 
 export class ProviderAvailabilityRepository implements IProviderAvailabilityRepository {
     async findByProviderId(providerId: string): Promise<ProviderAvailability[]> {
