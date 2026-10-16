@@ -1,5 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { db } from "../../../../infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
 import { Address } from "../../domain/entities/address.entity";
 import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
 import { AddressMapper } from "../mappers/address.mapper";
