@@ -5,9 +5,11 @@ import cookieParser from "cookie-parser";
 import router from "./routes";
 import { envConfig } from "../shared/infrastructure/config/env.config";
 import { errorHandler } from "../shared/presentation/http/middlewares/error-handler";
+import helmet from "helmet";
 
 const app = express()
 
+app.use(helmet())
 app.use(cors({
   origin: envConfig.CORS_ORIGIN,
   credentials: true,
