@@ -4,6 +4,6 @@ export type JwtPayload = {
 };
 
 export interface IJwtService {
-    generate(payload: JwtPayload): string;
+    generate(payload: JwtPayload, expiresIn?: string): string;
     verify(token: string): JwtPayload;
 }

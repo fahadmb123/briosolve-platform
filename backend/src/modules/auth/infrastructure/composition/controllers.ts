@@ -12,7 +12,9 @@ import {
   resetPasswordUseCase,
   sendSmsOtpUseCase,
   updatePasswordUseCase,
-  deletePhoneUseCase
+  deletePhoneUseCase,
+  refreshTokenUseCase,
+  logoutUseCase
 } from "./useCases";
 
 import { pendingRegistrationStore } from "./services";
@@ -27,7 +29,9 @@ export const authController = new AuthController(
   loginUseCase,
   getMeUseCase,
   emailVerificationUseCase,
-  updateEmailUseCase
+  updateEmailUseCase,
+  refreshTokenUseCase,
+  logoutUseCase
 );
 
 export const securityController = new SecurityController(

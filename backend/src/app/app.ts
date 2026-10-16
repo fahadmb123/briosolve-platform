@@ -3,12 +3,13 @@ import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import router from "./routes";
-import { errorHandler } from "../shared/presentation/http/middlewares/error-handler"; 
+import { envConfig } from "../shared/infrastructure/config/env.config";
+import { errorHandler } from "../shared/presentation/http/middlewares/error-handler";
 
 const app = express()
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  origin: envConfig.CORS_ORIGIN,
   credentials: true,
 }))
 app.use(express.json())

@@ -51,6 +51,7 @@ model users {
 
   reactivation_requests          account_reactivation_requests[] @relation("UserReactivationRequests")
   reviewed_reactivation_requests account_reactivation_requests[] @relation("ReviewedReactivationRequests")
+  refresh_sessions               refresh_sessions[]
 }
 
 enum weekday {
@@ -286,3 +287,21 @@ model account_reactivation_requests {
   block       user_account_blocks         @relation(fields:[block_id], references:[id])
   reviewer    users?                      @relation("ReviewedReactivationRequests", fields:[reviewed_by], references:[id])
 }
+
+model refresh_sessions {
+  id          Uuid                        @id @default(uuid())
+  user_id     Uuid
+  token_hash  VarChar(255)                @unique
+  family_id   Uuid                        @default(uuid())
+  user_agent  VarChar(500)?
+  ip_address  VarChar(100)?
+  expires_at  DateTime
+  revoked_at  DateTime?
+  created_at  DateTime                    @default(now())
+  updated_at  temporal.updatedAt()
+
+  user        users                       @relation(fields:[user_id], references:[id])
+
+  @@index([user_id])
+}
+

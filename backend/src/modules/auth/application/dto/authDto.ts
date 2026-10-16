@@ -1,11 +1,34 @@
-import { Temporal } from "@js-temporal/polyfill";
 import { Address } from "../../../user-management/domain/entities/address.entity";
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity";
 import { ProviderProfile } from "../../domain/entities/providerProfile.entity";
+import { User } from "../../domain/entities/user.entity";
 
 export type LoginInputDto = {
     email: string;
     password: string;
+    userAgent?: string | null;
+    ipAddress?: string | null;
+};
+
+export type LoginOutputDto = {
+    accessToken: string;
+    refreshToken: string;
+    isExist: User;
+};
+
+export type RefreshTokenInputDto = {
+    refreshToken: string;
+    userAgent?: string | null;
+    ipAddress?: string | null;
+};
+
+export type RefreshTokenOutputDto = {
+    accessToken: string;
+    refreshToken: string;
+};
+
+export type LogoutInputDto = {
+    refreshToken?: string | null;
 };
 
 export type UserResponseDto = {
