@@ -4,7 +4,7 @@ import { AdminTable, type TableColumn } from "../../../admin/components/AdminTab
 import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { AddServiceModal } from "../../components/AddServiceModal";
 import { useGetCategoriesService } from "../../../categories/hooks/mutations/useCategory";
-import { useGetServices, useAddServiceMut, useUpdateServiceMut, useDeleteServiceMut } from "../../../services/hooks/mutations/useService";
+import { useGetServices, useAddServiceMut, useUpdateServiceMut, useDeleteServiceMut } from "../../hooks/mutations/useService";
 import { useServiceFormData } from "../../hooks/useFormData";
 import { toast } from "react-toastify";
 import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";

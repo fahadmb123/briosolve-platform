@@ -1,5 +1,5 @@
 import './Profile.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../../../../../shared/styles/location-picker.css';
 import { nameSchema, type NameInputType } from '../../schemas/validation';
 import { useForm } from 'react-hook-form';
@@ -12,40 +12,62 @@ import { useAuthStore } from '../../../../../store/auth/auth.store';
 import { ImageCropModal } from '../../../../../shared/components/ui/ImageCropModal/ImageCropModal';
 import { useUpdateProfileImage } from '../../hooks/mutations/useUpdateProfileImage';
 import { useDeleteProfileImage } from '../../hooks/mutations/useDeleteProfileImage';
+import type { CustomerProfile } from '../../../../../shared/types/Dtos';
 
 export default function Profile() {
-
-  
   const user = useAuthStore(state => state.user);
+  const profile = useAuthStore(state => state.profile);
+  const fetchUser = useAuthStore(state => state.fetchUser);
+  const customerProfile = profile as CustomerProfile | null;
+
   const defaultAddress = user?.current_address_id;
-  const [isLocModalOpen, setIsLocModalOpen] = useState(false)
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isLocModalOpen, setIsLocModalOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(customerProfile?.profile_image || null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const { mutate: updateProfileImage, isPending: isImageUploading } = useUpdateProfileImage();
   const { mutate: deleteProfileImage, isPending: isImageDeleting } = useDeleteProfileImage();
-  const {profile,fetchUser} = useAuthStore.getState()
-  const {register, handleSubmit, formState:{errors}} = useForm<NameInputType>({
-          resolver : zodResolver(nameSchema),
-          mode : "onChange",
-          defaultValues: { name:user?.name || '', about:profile?.about || ""}
-  })
-  const { mutate: updateProfile, isPending } = useUpdateProfile()
-  const getProfile = useGetProfile()
-  
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<NameInputType>({
+    resolver: zodResolver(nameSchema),
+    mode: "onChange",
+    defaultValues: { name: user?.name || '', about: customerProfile?.about || '' }
+  });
+
+  const { mutate: updateProfile, isPending } = useUpdateProfile();
+  const getProfile = useGetProfile();
+
+  useEffect(() => {
+    if (customerProfile?.profile_image) {
+      setProfileImage(customerProfile.profile_image);
+    } else {
+      setProfileImage(null);
+    }
+  }, [customerProfile?.profile_image]);
+
+  useEffect(() => {
+    if (user?.name !== undefined || customerProfile?.about !== undefined) {
+      reset({
+        name: user?.name || '',
+        about: customerProfile?.about || ''
+      });
+    }
+  }, [user?.name, customerProfile?.about, reset]);
 
   const onSubmitForm = (data: NameInputType) => {
     updateProfile(data, {
       onSuccess: (response) => {
-        fetchUser()
-        toast.success(response.message)
+        fetchUser();
+        toast.success(response.message);
       }
-    })
-  }
+    });
+  };
+
   const handleCropComplete = (croppedFile: File) => {
     updateProfileImage(croppedFile, {
       onSuccess: (res) => {
         setIsImageModalOpen(false);
         setProfileImage(res.data?.profile_image || null);
+        fetchUser();
         toast.success(res.message || "Profile image updated successfully!");
       }
     });
@@ -56,6 +78,7 @@ export default function Profile() {
       onSuccess: (res) => {
         setIsImageModalOpen(false);
         setProfileImage(null);
+        fetchUser();
         toast.success(res.message || "Profile image deleted successfully!");
       }
     });

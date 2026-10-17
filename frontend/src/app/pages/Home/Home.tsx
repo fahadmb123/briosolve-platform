@@ -5,7 +5,7 @@ import './Home.css';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { useAuthStore } from '../../../store/auth/auth.store';
-import { useLogout } from '../../../modules/auth/hooks/mutations/use-otp-varify';
+import { useLogout } from '../../../features/auth/hooks/mutations/use-otp-varify';
 
 export default function Home() {
   const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();

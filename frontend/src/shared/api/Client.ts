@@ -221,11 +221,15 @@ if (typeof window !== "undefined" && typeof window.addEventListener === "functio
     });
 }
 
-useAuthStore.subscribe((state, prevState) => {
-    if (prevState.isAuthenticated && !state.isAuthenticated) {
-        clearAuthCoordinationState(false);
-    }
-});
+if (typeof window !== "undefined") {
+    queueMicrotask(() => {
+        useAuthStore.subscribe((state, prevState) => {
+            if (prevState.isAuthenticated && !state.isAuthenticated) {
+                clearAuthCoordinationState(false);
+            }
+        });
+    });
+}
 
 function isExcludedAuthEndpoint(url: string | undefined): boolean {
     if (!url) return false;

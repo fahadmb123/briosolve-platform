@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getMe } from "../../modules/auth/services/auth.service";
+import { getMe } from "../../features/auth/services/auth.service";
 import type { Address } from "../../shared/Dtos/address";
 import type { CustomerProfile, ProviderProfile } from "../../shared/types/Dtos";
 

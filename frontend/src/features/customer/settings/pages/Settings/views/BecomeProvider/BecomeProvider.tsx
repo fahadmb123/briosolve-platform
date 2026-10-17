@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { OtpModal } from '../../../../../../auth/components/OtpModal';
 import { useSendBecomeProviderOtp, useBecomeProvider } from '../../../../hooks/mutations/useBecomeProvider';
 import { useAuthStore } from '../../../../../../../store/auth/auth.store';
-import ServiceSelection from '../../../../../../customer/settings/components/ServiceSelection';
+import ServiceSelection from '../../../../components/ServiceSelection';
 import { useGetCategoriesService } from '../../../../../../categories/hooks/mutations/useCategory';
 import type { ApiError } from '../../../../../../../shared/api/ApiError';
 import { SpinnerOverlay } from '../../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
