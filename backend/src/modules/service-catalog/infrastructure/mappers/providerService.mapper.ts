@@ -1,19 +1,24 @@
-import { ProviderServiceRaw } from "../../application/Dto/providerService";
+import type { Prisma } from "@prisma/client";
 import { ProviderService } from "../../domain/entities/providerService.entity";
-import { ServiceMapper } from "./service.mapper";
+import { ServiceMapper, ServiceRecord } from "./service.mapper";
+
+export type ProviderServiceRecord = Prisma.ProviderServiceGetPayload<{}>;
+export type ProviderServiceRaw = ProviderServiceRecord;
 
 export class ProviderServiceMapper {
-    static toDomain(raw: ProviderServiceRaw): ProviderService {
+    static toDomain(record: ProviderServiceRecord): ProviderService {
+        const createdAtRaw: any = record.created_at;
+
         return new ProviderService(
-            raw.id,
-            raw.provider_id,
-            raw.service_id,
-            raw.created_at instanceof Date
-                ? raw.created_at
-                : typeof raw.created_at === "object" && raw.created_at && "epochMilliseconds" in raw.created_at
-                ? new Date(raw.created_at.epochMilliseconds)
-                : new Date(raw.created_at),
-            raw.service ? ServiceMapper.toDomain(raw.service) : undefined
+            record.id,
+            record.provider_id,
+            record.service_id,
+            createdAtRaw instanceof Date
+                ? createdAtRaw
+                : typeof createdAtRaw === "object" && createdAtRaw && "epochMilliseconds" in createdAtRaw
+                ? new Date(Number(createdAtRaw.epochMilliseconds))
+                : new Date(createdAtRaw),
+            record.service ? ServiceMapper.toDomain(record.service as ServiceRecord) : undefined
         );
     }
 }

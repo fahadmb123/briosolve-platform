@@ -1,23 +1,29 @@
+import type { Prisma } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
-import { CustomerProfileMapper } from "./customerProfile.mapper";
-import { ProviderProfileMapper, ProviderProfileRaw } from "./providerProfile.mapper";
+import { CustomerProfileMapper, CustomerProfileRecord } from "./customerProfile.mapper";
+import { ProviderProfileMapper, ProviderProfileRecord } from "./providerProfile.mapper";
+
+export type UserRecord = Prisma.UserGetPayload<{}>;
 
 export class UserMapper {
-    static toDomain(raw: any): User {
+    static toDomain(record: UserRecord): User {
+        const createdAtRaw: any = record.created_at;
+        const updatedAtRaw: any = record.updated_at;
+
         return new User(
-            raw.id,
-            raw.name,
-            raw.email,
-            raw.phone,
-            raw.role,
-            raw.status,
-            raw.email_verified,
-            raw.phone_verified,
-            raw.current_address || raw.current_address_id,
-            raw.created_at?.epochMilliseconds ? new Date(raw.created_at.epochMilliseconds) : new Date(raw.created_at),
-            raw.updated_at?.epochMilliseconds ? new Date(raw.updated_at.epochMilliseconds) : new Date(raw.updated_at),
-            raw.customer_profile ? CustomerProfileMapper.toDomain(raw.customer_profile) : null,
-            raw.provider_profile ? ProviderProfileMapper.toDomain(raw.provider_profile as ProviderProfileRaw) : null
+            record.id,
+            record.name,
+            record.email,
+            record.phone ?? null,
+            record.role,
+            record.status,
+            record.email_verified,
+            record.phone_verified,
+            (record as any).current_address || record.current_address_id,
+            createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
+            updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw),
+            record.customer_profile ? CustomerProfileMapper.toDomain(record.customer_profile as CustomerProfileRecord) : null,
+            record.provider_profile ? ProviderProfileMapper.toDomain(record.provider_profile as ProviderProfileRecord) : null
         );
     }
 }

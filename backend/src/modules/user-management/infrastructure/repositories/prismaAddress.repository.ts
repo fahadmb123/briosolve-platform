@@ -39,7 +39,7 @@ export class AddressRepository implements IAddressRepository{
         const address = await db.orm.public.addresses
             .where({id:id})
             .update(data as any)
-        return AddressMapper.toDomain(address)
+        return AddressMapper.toDomain(address!);
     }
 
     async getAddresses(input:GetAddressesInputDto): Promise<Omit<GetAddressesOutputDto,"totalPages">> {

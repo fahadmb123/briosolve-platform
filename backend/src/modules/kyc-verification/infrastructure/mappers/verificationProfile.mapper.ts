@@ -1,38 +1,44 @@
+import type { Prisma } from "@prisma/client";
 import { VerificationProfile } from "../../domain/entities/verificationProfile.entity";
 import { AdminKycDossier } from "../../domain/repositories/IVerificationDocumentRepository";
-import { VerificationDocumentMapper } from "./verificationDocument.mapper";
+import { VerificationDocumentMapper, VerificationDocumentRecord } from "./verificationDocument.mapper";
+
+export type VerificationProfileRecord = Prisma.ProviderProfileGetPayload<{}>;
 
 export class VerificationProfileMapper {
-    static toDomain(raw: any): VerificationProfile {
-        const documents = (raw.verification_documents || []).map((doc: any) =>
-            VerificationDocumentMapper.toDomain(doc)
+    static toDomain(record: VerificationProfileRecord): VerificationProfile {
+        const documents = (record.verification_documents || []).map((doc: any) =>
+            VerificationDocumentMapper.toDomain(doc as VerificationDocumentRecord)
         );
 
-        const createdAt = raw.created_at && typeof raw.created_at === "object" && "epochMilliseconds" in raw.created_at
-            ? new Date(raw.created_at.epochMilliseconds)
-            : new Date(raw.created_at);
+        const createdAtRaw: any = record.created_at;
+        const updatedAtRaw: any = record.updated_at;
 
-        const updatedAt = raw.updated_at && typeof raw.updated_at === "object" && "epochMilliseconds" in raw.updated_at
-            ? new Date(raw.updated_at.epochMilliseconds)
-            : new Date(raw.updated_at);
+        const createdAt = createdAtRaw && typeof createdAtRaw === "object" && "epochMilliseconds" in createdAtRaw
+            ? new Date(Number(createdAtRaw.epochMilliseconds))
+            : new Date(createdAtRaw);
+
+        const updatedAt = updatedAtRaw && typeof updatedAtRaw === "object" && "epochMilliseconds" in updatedAtRaw
+            ? new Date(Number(updatedAtRaw.epochMilliseconds))
+            : new Date(updatedAtRaw);
 
         return new VerificationProfile(
-            raw.id,
-            raw.user_id,
-            raw.business_name || "",
-            raw.experience || "",
-            raw.bio || "",
-            raw.profile_image ?? null,
-            raw.kyc_status || "NOT_SUBMITTED",
+            record.id,
+            record.user_id,
+            record.business_name || "",
+            record.experience || "",
+            record.bio || "",
+            record.profile_image ?? null,
+            record.kyc_status || "NOT_SUBMITTED",
             createdAt,
             updatedAt,
             {
-                id: raw.user?.id || "",
-                name: raw.user?.name || "",
-                email: raw.user?.email || "",
-                phone: raw.user?.phone ?? null,
+                id: record.user?.id || "",
+                name: record.user?.name || "",
+                email: record.user?.email || "",
+                phone: record.user?.phone ?? null,
             },
-            (raw.services || []).map((s: any) => ({
+            (record.services || []).map((s: any) => ({
                 id: s.service?.id || s.id,
                 name: s.service?.name || "Service",
             })),

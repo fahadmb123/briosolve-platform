@@ -1,24 +1,30 @@
+import type { Prisma } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
-import { CustomerProfileMapper } from "./customerProfile.mapper";
-import { ProviderProfileMapper, ProviderProfileRaw } from "./providerProfile.mapper";
+import { CustomerProfileMapper, CustomerProfileRecord } from "./customerProfile.mapper";
+import { ProviderProfileMapper, ProviderProfileRecord } from "./providerProfile.mapper";
+
+export type UserRecord = Prisma.UserGetPayload<{}>;
 
 export class UserMapper {
-    static toDomain(data: any): User {
+    static toDomain(record: UserRecord): User {
+        const createdAtRaw: any = record.created_at;
+        const updatedAtRaw: any = record.updated_at;
+
         return new User(
-            data.id,
-            data.name,
-            data.email,
-            data.phone,
-            data.password_hash,
-            data.role,
-            data.status,
-            data.email_verified,
-            data.phone_verified,
-            data.current_address || data.current_address_id,
-            data.created_at?.epochMilliseconds ? new Date(data.created_at.epochMilliseconds) : new Date(data.created_at),
-            data.updated_at?.epochMilliseconds ? new Date(data.updated_at.epochMilliseconds) : new Date(data.updated_at),
-            data.customer_profile ? CustomerProfileMapper.toDomain(data.customer_profile) : null,
-            data.provider_profile ? ProviderProfileMapper.toDomain(data.provider_profile as ProviderProfileRaw) : null
+            record.id,
+            record.name,
+            record.email,
+            record.phone ?? null,
+            record.password_hash,
+            record.role,
+            record.status,
+            record.email_verified,
+            record.phone_verified,
+            (record as any).current_address || record.current_address_id,
+            createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
+            updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw),
+            record.customer_profile ? CustomerProfileMapper.toDomain(record.customer_profile as CustomerProfileRecord) : null,
+            record.provider_profile ? ProviderProfileMapper.toDomain(record.provider_profile as ProviderProfileRecord) : null
         );
     }
 }

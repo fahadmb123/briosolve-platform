@@ -1,16 +1,24 @@
+import type { Prisma } from "@prisma/client";
 import { UserAccountBlock } from "../../domain/entities/userAccountBlock.entity";
 
+export type UserAccountBlockRecord = Prisma.UserAccountBlockGetPayload<{}>;
+
 export class UserAccountBlockMapper {
-    static toDomain(raw: any): UserAccountBlock {
+    static toDomain(record: UserAccountBlockRecord): UserAccountBlock {
+        const blockedAtRaw: any = record.blocked_at;
+        const unblockedAtRaw: any = record.unblocked_at;
+        const createdAtRaw: any = record.created_at;
+        const updatedAtRaw: any = record.updated_at;
+
         return new UserAccountBlock(
-            raw.id,
-            raw.user_id,
-            raw.blocked_by,
-            raw.reason,
-            raw.blocked_at?.epochMilliseconds ? new Date(raw.blocked_at.epochMilliseconds) : new Date(raw.blocked_at),
-            raw.unblocked_at ? (raw.unblocked_at?.epochMilliseconds ? new Date(raw.unblocked_at.epochMilliseconds) : new Date(raw.unblocked_at)) : null,
-            raw.created_at?.epochMilliseconds ? new Date(raw.created_at.epochMilliseconds) : new Date(raw.created_at),
-            raw.updated_at?.epochMilliseconds ? new Date(raw.updated_at.epochMilliseconds) : new Date(raw.updated_at)
+            record.id,
+            record.user_id,
+            record.blocked_by,
+            record.reason,
+            blockedAtRaw?.epochMilliseconds ? new Date(Number(blockedAtRaw.epochMilliseconds)) : new Date(blockedAtRaw),
+            unblockedAtRaw ? (unblockedAtRaw?.epochMilliseconds ? new Date(Number(unblockedAtRaw.epochMilliseconds)) : new Date(unblockedAtRaw)) : null,
+            createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
+            updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw)
         );
     }
 }

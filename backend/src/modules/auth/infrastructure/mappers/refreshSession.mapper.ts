@@ -1,31 +1,27 @@
+import type { Prisma } from "@prisma/client";
 import { RefreshSession } from "../../domain/entities/refreshSession.entity";
 
-export type RefreshSessionRaw = {
-    id: string;
-    user_id: string;
-    token_hash: string;
-    family_id: string;
-    expires_at: any;
-    revoked_at?: any | null;
-    user_agent?: string | null;
-    ip_address?: string | null;
-    created_at: any;
-    updated_at: any;
-};
+export type RefreshSessionRecord = Prisma.RefreshSessionGetPayload<{}>;
+export type RefreshSessionRaw = RefreshSessionRecord;
 
 export class RefreshSessionMapper {
-    static toDomain(data: RefreshSessionRaw): RefreshSession {
+    static toDomain(record: RefreshSessionRecord): RefreshSession {
+        const expiresAtRaw: any = record.expires_at;
+        const revokedAtRaw: any = record.revoked_at;
+        const createdAtRaw: any = record.created_at;
+        const updatedAtRaw: any = record.updated_at;
+
         return new RefreshSession(
-            data.id,
-            data.user_id,
-            data.token_hash,
-            data.family_id,
-            data.expires_at?.epochMilliseconds ? new Date(data.expires_at.epochMilliseconds) : new Date(data.expires_at),
-            data.revoked_at ? (data.revoked_at?.epochMilliseconds ? new Date(data.revoked_at.epochMilliseconds) : new Date(data.revoked_at)) : null,
-            data.user_agent ?? null,
-            data.ip_address ?? null,
-            data.created_at?.epochMilliseconds ? new Date(data.created_at.epochMilliseconds) : new Date(data.created_at),
-            data.updated_at?.epochMilliseconds ? new Date(data.updated_at.epochMilliseconds) : new Date(data.updated_at)
+            record.id,
+            record.user_id,
+            record.token_hash,
+            record.family_id,
+            expiresAtRaw?.epochMilliseconds ? new Date(Number(expiresAtRaw.epochMilliseconds)) : new Date(expiresAtRaw),
+            revokedAtRaw ? (revokedAtRaw?.epochMilliseconds ? new Date(Number(revokedAtRaw.epochMilliseconds)) : new Date(revokedAtRaw)) : null,
+            record.user_agent ?? null,
+            record.ip_address ?? null,
+            createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
+            updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw)
         );
     }
 }

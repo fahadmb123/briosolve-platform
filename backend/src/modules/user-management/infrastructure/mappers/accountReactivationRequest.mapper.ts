@@ -1,22 +1,29 @@
+import type { Prisma } from "@prisma/client";
 import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity";
-import { UserMapper } from "./user.mapper";
-import { UserAccountBlockMapper } from "./userAccountBlock.mapper";
+import { UserMapper, UserRecord } from "./user.mapper";
+import { UserAccountBlockMapper, UserAccountBlockRecord } from "./userAccountBlock.mapper";
+
+export type AccountReactivationRequestRecord = Prisma.AccountReactivationRequestGetPayload<{}>;
 
 export class AccountReactivationRequestMapper {
-    static toDomain(raw: any): AccountReactivationRequest {
+    static toDomain(record: AccountReactivationRequestRecord): AccountReactivationRequest {
+        const reviewedAtRaw: any = record.reviewed_at;
+        const createdAtRaw: any = record.created_at;
+        const updatedAtRaw: any = record.updated_at;
+
         return new AccountReactivationRequest(
-            raw.id,
-            raw.user_id,
-            raw.block_id,
-            raw.reason,
-            raw.status,
-            raw.reviewed_by || null,
-            raw.reviewed_at ? (raw.reviewed_at?.epochMilliseconds ? new Date(raw.reviewed_at.epochMilliseconds) : new Date(raw.reviewed_at)) : null,
-            raw.created_at?.epochMilliseconds ? new Date(raw.created_at.epochMilliseconds) : new Date(raw.created_at),
-            raw.updated_at?.epochMilliseconds ? new Date(raw.updated_at.epochMilliseconds) : new Date(raw.updated_at),
-            raw.user ? UserMapper.toDomain(raw.user) : undefined,
-            raw.block ? UserAccountBlockMapper.toDomain(raw.block) : undefined,
-            raw.reviewer ? UserMapper.toDomain(raw.reviewer) : null
+            record.id,
+            record.user_id,
+            record.block_id,
+            record.reason,
+            record.status,
+            record.reviewed_by || null,
+            reviewedAtRaw ? (reviewedAtRaw?.epochMilliseconds ? new Date(Number(reviewedAtRaw.epochMilliseconds)) : new Date(reviewedAtRaw)) : null,
+            createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
+            updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw),
+            record.user ? UserMapper.toDomain(record.user as UserRecord) : undefined,
+            record.block ? UserAccountBlockMapper.toDomain(record.block as UserAccountBlockRecord) : undefined,
+            record.reviewer ? UserMapper.toDomain(record.reviewer as UserRecord) : null
         );
     }
 }

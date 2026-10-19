@@ -1,17 +1,22 @@
+import type { Prisma } from "@prisma/client";
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity";
 
+export type CustomerProfileRecord = Prisma.CustomerProfileGetPayload<{}>;
 
 export class CustomerProfileMapper {
-    static toDomain(data:any):CustomerProfile{
+    static toDomain(record: CustomerProfileRecord): CustomerProfile {
+        const createdAtRaw: any = record.created_at;
+        const updatedAtRaw: any = record.updated_at;
+
         return new CustomerProfile(
-            data.id,
-            data.user_id,
-            data.current_address_id,
-            data.profile_image,
-            data.about,
-            data.created_at,
-            data.updated_at,
-            data.service_radius_km
-        )
+            record.id,
+            record.user_id,
+            (record as any).current_address_id ?? null,
+            record.profile_image ?? null,
+            record.about,
+            createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
+            updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw),
+            record.service_radius_km ?? null
+        );
     }
 }
