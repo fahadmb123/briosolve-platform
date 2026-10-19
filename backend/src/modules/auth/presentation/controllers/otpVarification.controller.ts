@@ -21,8 +21,6 @@ class OtpVarificationController {
             
             const response = await this.otpVarificationUseCase.execute({ registrationId, otp })
 
-
-
             response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password", registrationId, registrationCookie) : null
 
             let message = "Verification Success";

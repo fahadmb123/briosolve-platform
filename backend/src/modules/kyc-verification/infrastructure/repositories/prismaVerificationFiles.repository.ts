@@ -17,12 +17,18 @@ export class VerificationFileRepository implements IVerificationFileRepository {
     }
 
     async createMany(documentId: string, fileUrls: string[]): Promise<VerificationFile[]> {
-        const results: VerificationFile[] = [];
-        for (const fileUrl of fileUrls) {
-            const file = await this.create(documentId, fileUrl);
-            results.push(VerificationFileMapper.toDomain(file));
-        }
-        return results
+        return await db.transaction(async (tx) => {
+            const results: VerificationFile[] = [];
+            for (const fileUrl of fileUrls) {
+                const record = await tx.orm.public.provider_verification_files.create({
+                    document_id: documentId as never,
+                    file_url: fileUrl as never,
+                    created_at: Temporal.Now.instant()
+                } as never);
+                results.push(VerificationFileMapper.toDomain(record as unknown as VerificationFileRaw));
+            }
+            return results;
+        });
     }
 
     async findByDocumentId(documentId: string): Promise<VerificationFile[]> {

@@ -48,120 +48,137 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
     }
 
     async createOrUpdate(input: CreateVerificationDocumentInputDto): Promise<VerificationDocument> {
-        const existing = await this.findByProviderAndType(input.provider_id, input.document_type);
-        let documentId: string;
+        return await db.transaction(async (tx) => {
+            const existing = await tx.orm.public.provider_verification_documents
+                .where({ provider_id: input.provider_id as never, document_type: input.document_type as never })
+                .first();
 
-        if (existing) {
-            documentId = existing.id;
-            await db.orm.public.provider_verification_documents
-                .where({ id: documentId as never })
-                .update({
-                    document_name: input.document_name,
-                    status: 'PENDING',
-                    rejection_reason: null,
-                    updated_at: Temporal.Now.instant()
-                } as never);
+            let documentId: string;
 
-            const existingFiles = await db.orm.public.provider_verification_files
-                .where({ document_id: documentId as never })
-                .all();
+            if (existing) {
+                documentId = (existing as { id: string }).id;
+                await tx.orm.public.provider_verification_documents
+                    .where({ id: documentId as never })
+                    .update({
+                        document_name: input.document_name,
+                        status: 'PENDING',
+                        rejection_reason: null,
+                        updated_at: Temporal.Now.instant()
+                    } as never);
 
-            for (const f of existingFiles) {
-                await db.orm.public.provider_verification_files
-                    .where({ id: (f as { id: string }).id as never })
-                    .delete();
-            }
-        } else {
-            const created = await db.orm.public.provider_verification_documents.create({
-                provider_id: input.provider_id as never,
-                document_type: input.document_type as never,
-                document_name: input.document_name as never,
-                status: 'PENDING',
-                rejection_reason: null
-            } as never);
+                const existingFiles = await tx.orm.public.provider_verification_files
+                    .where({ document_id: documentId as never })
+                    .all();
 
-            documentId = (created as unknown as { id: string }).id;
-        }
-
-        for (const fileUrl of input.file_urls) {
-            await db.orm.public.provider_verification_files.create({
-                document_id: documentId as never,
-                file_url: fileUrl as never
-            } as never);
-        }
-
-        const profile = await db.orm.public.provider_profiles
-            .where({ id: input.provider_id as never })
-            .first();
-
-        if (profile) {
-            await db.orm.public.provider_profiles
-                .where({ id: input.provider_id as never })
-                .update({
-                    kyc_status: 'PENDING',
-                    updated_at: Temporal.Now.instant()
-                } as never);
-        }
-
-        const result = await this.findById(documentId);
-        return result!;
-    }
-
-    async updateDocument(id: string, input: UpdateVerificationDocumentRepositoryDto): Promise<VerificationDocument | null> {
-        const updateData: Record<string, unknown> = {
-            status: 'PENDING',
-            rejection_reason: null,
-            updated_at: Temporal.Now.instant()
-        };
-        if (input.document_name) {
-            updateData.document_name = input.document_name;
-        }
-
-        await db.orm.public.provider_verification_documents
-            .where({ id: id as never })
-            .update(updateData as never);
-
-        if (input.kept_file_ids !== undefined) {
-            const currentFiles = await db.orm.public.provider_verification_files
-                .where({ document_id: id as never })
-                .all();
-
-            for (const f of currentFiles) {
-                const fileId = (f as { id: string }).id;
-                if (!input.kept_file_ids.includes(fileId)) {
-                    await db.orm.public.provider_verification_files
-                        .where({ id: fileId as never })
+                for (const f of existingFiles) {
+                    await tx.orm.public.provider_verification_files
+                        .where({ id: (f as { id: string }).id as never })
                         .delete();
                 }
-            }
-        }
+            } else {
+                const created = await tx.orm.public.provider_verification_documents.create({
+                    provider_id: input.provider_id as never,
+                    document_type: input.document_type as never,
+                    document_name: input.document_name as never,
+                    status: 'PENDING',
+                    rejection_reason: null
+                } as never);
 
-        if (input.new_file_urls && input.new_file_urls.length > 0) {
-            for (const fileUrl of input.new_file_urls) {
-                await db.orm.public.provider_verification_files.create({
-                    document_id: id as never,
+                documentId = (created as unknown as { id: string }).id;
+            }
+
+            for (const fileUrl of input.file_urls) {
+                await tx.orm.public.provider_verification_files.create({
+                    document_id: documentId as never,
                     file_url: fileUrl as never
                 } as never);
             }
-        }
 
-        const doc = await this.findById(id);
-        if (doc) {
-            const profile = await db.orm.public.provider_profiles
-                .where({ id: doc.provider_id as never })
+            const profile = await tx.orm.public.provider_profiles
+                .where({ id: input.provider_id as never })
                 .first();
 
             if (profile) {
-                await db.orm.public.provider_profiles
-                    .where({ id: doc.provider_id as never })
+                await tx.orm.public.provider_profiles
+                    .where({ id: input.provider_id as never })
                     .update({
                         kyc_status: 'PENDING',
                         updated_at: Temporal.Now.instant()
                     } as never);
             }
-        }
 
-        return doc;
+            const record = await tx.orm.public.provider_verification_documents
+                .where({ id: documentId as never })
+                .include("files")
+                .first();
+
+            return VerificationDocumentMapper.toDomain(record as VerificationDocumentRaw);
+        });
+    }
+
+    async updateDocument(id: string, input: UpdateVerificationDocumentRepositoryDto): Promise<VerificationDocument | null> {
+        return await db.transaction(async (tx) => {
+            const updateData: Record<string, unknown> = {
+                status: 'PENDING',
+                rejection_reason: null,
+                updated_at: Temporal.Now.instant()
+            };
+            if (input.document_name) {
+                updateData.document_name = input.document_name;
+            }
+
+            await tx.orm.public.provider_verification_documents
+                .where({ id: id as never })
+                .update(updateData as never);
+
+            if (input.kept_file_ids !== undefined) {
+                const currentFiles = await tx.orm.public.provider_verification_files
+                    .where({ document_id: id as never })
+                    .all();
+
+                for (const f of currentFiles) {
+                    const fileId = (f as { id: string }).id;
+                    if (!input.kept_file_ids.includes(fileId)) {
+                        await tx.orm.public.provider_verification_files
+                            .where({ id: fileId as never })
+                            .delete();
+                    }
+                }
+            }
+
+            if (input.new_file_urls && input.new_file_urls.length > 0) {
+                for (const fileUrl of input.new_file_urls) {
+                    await tx.orm.public.provider_verification_files.create({
+                        document_id: id as never,
+                        file_url: fileUrl as never
+                    } as never);
+                }
+            }
+
+            const docRecord = await tx.orm.public.provider_verification_documents
+                .where({ id: id as never })
+                .include("files")
+                .first();
+
+            if (docRecord) {
+                const profile = await tx.orm.public.provider_profiles
+                    .where({ id: docRecord.provider_id as never })
+                    .first();
+
+                if (profile) {
+                    await tx.orm.public.provider_profiles
+                        .where({ id: docRecord.provider_id as never })
+                        .update({
+                            kyc_status: 'PENDING',
+                            updated_at: Temporal.Now.instant()
+                        } as never);
+                }
+
+                return VerificationDocumentMapper.toDomain(docRecord as VerificationDocumentRaw);
+            }
+
+            return null;
+        });
     }
 
     async updateStatus(id: string, status: VerificationDocumentStatus, rejectionReason?: string | null): Promise<VerificationDocument | null> {
@@ -177,46 +194,59 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
     }
 
     async deleteDocument(id: string): Promise<boolean> {
-        const doc = await this.findById(id);
-        if (!doc) return false;
+        return await db.transaction(async (tx) => {
+            const doc = await tx.orm.public.provider_verification_documents
+                .where({ id: id as never })
+                .first();
 
-        const files = await db.orm.public.provider_verification_files
-            .where({ document_id: id as never })
-            .all();
+            if (!doc) return false;
 
-        for (const file of files) {
-            await db.orm.public.provider_verification_files
-                .where({ id: (file as { id: string }).id as never })
+            const files = await tx.orm.public.provider_verification_files
+                .where({ document_id: id as never })
+                .all();
+
+            for (const file of files) {
+                await tx.orm.public.provider_verification_files
+                    .where({ id: (file as { id: string }).id as never })
+                    .delete();
+            }
+
+            await tx.orm.public.provider_verification_documents
+                .where({ id: id as never })
                 .delete();
-        }
 
-        await db.orm.public.provider_verification_documents
-            .where({ id: id as never })
-            .delete();
+            const remainingDocsRecords = await tx.orm.public.provider_verification_documents
+                .where({ provider_id: doc.provider_id as never })
+                .include("files")
+                .all();
 
-        const remainingDocs = await this.findByProviderId(doc.provider_id);
-        if (remainingDocs.length === 0) {
-            await db.orm.public.provider_profiles
-                .where({ id: doc.provider_id as never })
-                .update({
-                    kyc_status: 'NOT_SUBMITTED',
-                    updated_at: Temporal.Now.instant()
-                } as never);
-        } else {
-            const hasIdentityApproved = remainingDocs.some((d) => d.document_type === "IDENTITY" && d.status === "APPROVED");
-            const hasCertificateApproved = remainingDocs.some((d) => d.document_type === "CERTIFICATE" && d.status === "APPROVED");
-            const bothApproved = hasIdentityApproved && hasCertificateApproved;
-            const allRejected = remainingDocs.every((d) => d.status === "REJECTED");
-            const newKycStatus = bothApproved ? "APPROVED" : allRejected ? "REJECTED" : "PENDING";
-            await db.orm.public.provider_profiles
-                .where({ id: doc.provider_id as never })
-                .update({
-                    kyc_status: newKycStatus,
-                    updated_at: Temporal.Now.instant()
-                } as never);
-        }
+            const remainingDocs = remainingDocsRecords.map((r) =>
+                VerificationDocumentMapper.toDomain(r as VerificationDocumentRaw)
+            );
 
-        return true;
+            if (remainingDocs.length === 0) {
+                await tx.orm.public.provider_profiles
+                    .where({ id: doc.provider_id as never })
+                    .update({
+                        kyc_status: 'NOT_SUBMITTED',
+                        updated_at: Temporal.Now.instant()
+                    } as never);
+            } else {
+                const hasIdentityApproved = remainingDocs.some((d) => d.document_type === "IDENTITY" && d.status === "APPROVED");
+                const hasCertificateApproved = remainingDocs.some((d) => d.document_type === "CERTIFICATE" && d.status === "APPROVED");
+                const bothApproved = hasIdentityApproved && hasCertificateApproved;
+                const allRejected = remainingDocs.every((d) => d.status === "REJECTED");
+                const newKycStatus = bothApproved ? "APPROVED" : allRejected ? "REJECTED" : "PENDING";
+                await tx.orm.public.provider_profiles
+                    .where({ id: doc.provider_id as never })
+                    .update({
+                        kyc_status: newKycStatus,
+                        updated_at: Temporal.Now.instant()
+                    } as never);
+            }
+
+            return true;
+        });
     }
 
     async getAllProfilesWithVerifications(): Promise<VerificationProfile[]> {

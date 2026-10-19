@@ -21,20 +21,29 @@ export class ProviderServiceRepository implements IProviderServiceRepository {
     }
 
     async addProviderServices(providerId: string, serviceIds: string[]): Promise<ProviderService[]> {
-        for (const serviceId of serviceIds) {
-            const existing = await db.orm.public.provider_services
-                .where({ provider_id: providerId, service_id: serviceId as never })
-                .first();
+        return await db.transaction(async (tx) => {
+            for (const serviceId of serviceIds) {
+                const existing = await tx.orm.public.provider_services
+                    .where({ provider_id: providerId, service_id: serviceId as never })
+                    .first();
 
-            if (!existing) {
-                await db.orm.public.provider_services.create({
-                    provider_id: providerId,
-                    service_id: serviceId as never
-                } as never);
+                if (!existing) {
+                    await tx.orm.public.provider_services.create({
+                        provider_id: providerId,
+                        service_id: serviceId as never
+                    } as never);
+                }
             }
-        }
 
-        return this.findByProviderId(providerId);
+            const records = await tx.orm.public.provider_services
+                .where({ provider_id: providerId })
+                .include("service", (q) => q.include("category"))
+                .all();
+
+            return records.map((record) =>
+                ProviderServiceMapper.toDomain(record as unknown as ProviderServiceRaw)
+            );
+        });
     }
 
     async deleteProviderService(providerId: string, serviceId: string): Promise<ProviderService[]> {
@@ -62,21 +71,30 @@ export class ProviderServiceRepository implements IProviderServiceRepository {
     }
 
     async deleteProviderCategory(providerId: string, categoryId: string): Promise<ProviderService[]> {
-        const records = await db.orm.public.provider_services
-            .where({ provider_id: providerId })
-            .include("service")
-            .all();
+        return await db.transaction(async (tx) => {
+            const records = await tx.orm.public.provider_services
+                .where({ provider_id: providerId })
+                .include("service")
+                .all();
 
-        for (const record of records) {
-            const service = record.service as { category_id?: string } | null;
-            if (service && service.category_id === categoryId) {
-                await db.orm.public.provider_services
-                    .where({ id: record.id })
-                    .delete();
+            for (const record of records) {
+                const service = record.service as { category_id?: string } | null;
+                if (service && service.category_id === categoryId) {
+                    await tx.orm.public.provider_services
+                        .where({ id: record.id })
+                        .delete();
+                }
             }
-        }
 
-        return this.findByProviderId(providerId);
+            const remaining = await tx.orm.public.provider_services
+                .where({ provider_id: providerId })
+                .include("service", (q) => q.include("category"))
+                .all();
+
+            return remaining.map((record) =>
+                ProviderServiceMapper.toDomain(record as unknown as ProviderServiceRaw)
+            );
+        });
     }
 }
 

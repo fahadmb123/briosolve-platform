@@ -16,32 +16,32 @@ export class ProviderAvailabilityRepository implements IProviderAvailabilityRepo
     }
 
     async setAvailability(providerId: string, slots: AvailabilitySlotInput[]): Promise<ProviderAvailability[]> {
-        const existing = await db.orm.public.provider_availability
-            .where({ provider_id: providerId as never })
-            .all();
+        return await db.transaction(async (tx) => {
+            const existing = await tx.orm.public.provider_availability
+                .where({ provider_id: providerId as never })
+                .all();
 
-        await Promise.all(
-            existing.map((item) =>
-                db.orm.public.provider_availability
+            for (const item of existing) {
+                await tx.orm.public.provider_availability
                     .where({ id: item.id })
-                    .delete()
-            )
-        );
+                    .delete();
+            }
 
-        const created: ProviderAvailability[] = [];
-        for (const slot of slots) {
-            const raw = await db.orm.public.provider_availability.create({
-                provider_id: providerId as never,
-                day_of_week: slot.day_of_week as never,
-                start_time: slot.start_time as never,
-                end_time: slot.end_time as never,
-                created_at: Temporal.Now.instant(),
-                updated_at: Temporal.Now.instant()
-            } as never);
-            created.push(ProviderAvailabilityMapper.toDomain(raw as ProviderAvailabilityRaw));
-        }
+            const created: ProviderAvailability[] = [];
+            for (const slot of slots) {
+                const raw = await tx.orm.public.provider_availability.create({
+                    provider_id: providerId as never,
+                    day_of_week: slot.day_of_week as never,
+                    start_time: slot.start_time as never,
+                    end_time: slot.end_time as never,
+                    created_at: Temporal.Now.instant(),
+                    updated_at: Temporal.Now.instant()
+                } as never);
+                created.push(ProviderAvailabilityMapper.toDomain(raw as ProviderAvailabilityRaw));
+            }
 
-        return created;
+            return created;
+        });
     }
 
     async findOverridesByProviderId(providerId: string): Promise<ProviderAvailabilityOverride[]> {
