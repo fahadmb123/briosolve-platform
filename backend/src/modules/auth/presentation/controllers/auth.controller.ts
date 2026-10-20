@@ -1,8 +1,8 @@
 import { NextFunction, Response, Request } from "express";
 import { User } from "../../domain/entities/user.entity";
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken";
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUserTokenPayload } from "../../../../shared/application/interfaces/IToken";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { accessTokenCookie, refreshTokenCookie, clearAccessTokenCookieOptions, clearRefreshTokenCookieOptions, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";

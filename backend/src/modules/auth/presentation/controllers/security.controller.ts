@@ -1,6 +1,6 @@
 import { NextFunction,Response,Request } from "express";
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
 import { ResetPasswordDto } from "../../application/dto/request/reset-password.dto";

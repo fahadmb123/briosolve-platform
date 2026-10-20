@@ -1,13 +1,13 @@
-import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
+import { IPendingRegistrationStore } from "../../../../shared/application/interfaces/IPendingRegistration-store";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { IPasswordHasher } from "../../../../shared/domain/interfaces/services/IPasswordHasher.service";
+import { IPasswordHasher } from "../../../../shared/application/interfaces/services/IPasswordHasher.service";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { randomUUID } from "crypto";
 
 import type { EmailVerificationUseCaseOutputDto,RegisterCustomerInput } from "../Dto/customerDto";
-import type { IOtpGenerator } from "../../../../shared/domain/interfaces/services/IOtpGenerator.service";
-import type { IEmailSender } from "../../../../shared/domain/interfaces/services/IEmailSender.service";
+import type { IOtpGenerator } from "../../../../shared/application/interfaces/services/IOtpGenerator.service";
+import type { IEmailSender } from "../../../../shared/application/interfaces/services/IEmailSender.service";
 
 
 

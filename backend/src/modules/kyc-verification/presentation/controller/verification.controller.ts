@@ -1,6 +1,6 @@
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import type { NextFunction, Request, Response } from "express";
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { VerificationDocument } from "../../domain/entities/verificationDocument.entity";
 import { UploadVerificationInputDto, UpdateVerificationInputDto } from "../../application/Dto/verificationDto";
 import { GetAdminKycRequestsInput, GetAdminKycResponse } from "../../domain/repositories/IVerificationDocumentRepository";

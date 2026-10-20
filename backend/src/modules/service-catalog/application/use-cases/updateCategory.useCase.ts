@@ -1,7 +1,7 @@
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";
+import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
 import { Category } from "../../domain/entities/category.entity";
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
 import { UpdateCategoryUseCaseDto, UpdateCategoryDto } from "../Dto/category";
 

@@ -1,8 +1,8 @@
 import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";
+import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 
 interface DeleteVerificationInputDto {
     id: string;

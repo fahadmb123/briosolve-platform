@@ -1,4 +1,4 @@
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
 
 

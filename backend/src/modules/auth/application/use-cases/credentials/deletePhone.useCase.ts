@@ -1,5 +1,5 @@
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
-import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 
 

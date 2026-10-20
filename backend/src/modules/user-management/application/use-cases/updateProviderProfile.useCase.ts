@@ -1,8 +1,8 @@
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";
+import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
 import { UpdateProviderProfileInputDto } from "../Dto/providerDto";
 
 export default class UpdateProviderProfileUseCase implements IUseCase<UpdateProviderProfileInputDto, void> {

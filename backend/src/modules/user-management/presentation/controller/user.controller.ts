@@ -4,7 +4,7 @@ import { IUpdateUserStatusUseCase } from "../../application/interfaces/use-cases
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto } from "../../application/Dto/userDto";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 
 export class UserController extends BaseController{
     constructor (

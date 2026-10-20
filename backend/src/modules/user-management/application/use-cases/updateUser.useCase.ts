@@ -2,7 +2,7 @@ import { IUpdateUserStatusUseCase } from "../interfaces/use-cases/users/update-u
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IUserAccountBlockRepository } from "../../domain/repositories/IUserAccountBlockRepository";
 import { UpdateUserStatusDto } from "../Dto/userDto";
-import { IEmailSender } from "../../../../shared/domain/interfaces/services/IEmailSender.service";
+import { IEmailSender } from "../../../../shared/application/interfaces/services/IEmailSender.service";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { IAccountReactivationRequestRepository } from "../../domain/repositories/IAccountReactivationRequestRepository";
 

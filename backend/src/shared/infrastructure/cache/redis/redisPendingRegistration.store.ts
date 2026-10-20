@@ -1,4 +1,4 @@
-import {IPendingCustomerRegistration,IPendingRegistrationStore,} from "../../../domain/interfaces/IPendingRegistration-store";
+import {IPendingCustomerRegistration,IPendingRegistrationStore,} from "../../../application/interfaces/IPendingRegistration-store";
 import { redisClient } from "./redis.client";
 
 

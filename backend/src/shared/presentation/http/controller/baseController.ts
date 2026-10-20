@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import { IUserTokenPayload } from "../../../domain/interfaces/IToken";
+import { IUserTokenPayload } from "../../../application/interfaces/IToken";
 import { ApplicationError } from "../../../application/errors/applicationError";
 
 

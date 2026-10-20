@@ -1,11 +1,11 @@
 import { randomUUID } from "crypto";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IPasswordHasher } from "../../../../shared/domain/interfaces/services/IPasswordHasher.service";
-import type { IOtpGenerator } from "../../../../shared/domain/interfaces/services/IOtpGenerator.service";
-import type { IEmailSender } from "../../../../shared/domain/interfaces/services/IEmailSender.service";
-import type { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
-import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IPasswordHasher } from "../../../../shared/application/interfaces/services/IPasswordHasher.service";
+import type { IOtpGenerator } from "../../../../shared/application/interfaces/services/IOtpGenerator.service";
+import type { IEmailSender } from "../../../../shared/application/interfaces/services/IEmailSender.service";
+import type { IPendingRegistrationStore } from "../../../../shared/application/interfaces/IPendingRegistration-store";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 
 export class SendBecomeProviderOtpUseCase implements IUseCase<string,{ registrationId: string; expiresIn: number }>{
     constructor(

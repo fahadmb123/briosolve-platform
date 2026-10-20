@@ -1,7 +1,7 @@
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/services/IPasswordHasher.service";
-import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store";
-import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase";
+import { IPasswordHasher } from "../../../../../shared/application/interfaces/services/IPasswordHasher.service";
+import { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store";
+import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { ResetPasswordDto } from "../../dto/request/reset-password.dto";
 

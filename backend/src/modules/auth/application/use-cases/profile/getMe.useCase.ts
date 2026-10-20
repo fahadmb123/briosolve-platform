@@ -1,8 +1,8 @@
 import { IJwtService } from "../../../../../shared/application/Dto/services/jwtDto.service"
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
-import { IUserTokenPayload } from "../../../../../shared/domain/interfaces/IToken"
+import { IUserTokenPayload } from "../../../../../shared/application/interfaces/IToken"
 import { User } from "../../../domain/entities/user.entity"
-import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase"
+import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase"
 import { IUserRepository } from "../../../domain/repositories/user.repository"
 
 
