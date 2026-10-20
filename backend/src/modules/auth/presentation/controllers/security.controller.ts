@@ -1,11 +1,13 @@
 import { NextFunction,Response,Request } from "express";
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { SendSmsOtpUseCaseInputDto, SendSmsOtpUseCaseOutputDto } from "../../application/dto/authDto";
-import { ResetPasswordDto } from "../../application/dto/resetPasswordDtos";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
-import { UpdatePasswordInputDto } from "../../application/dto/customerDto";
+import { ResetPasswordDto } from "../../application/dto/request/reset-password.dto";
+import { SendSmsOtpUseCaseOutputDto } from "../../application/dto/response/send-sms-otp.dto";
+import { UpdatePasswordInputDto } from "../../application/dto/request/update-password.dto";
+import { SendSmsOtpUseCaseInputDto } from "../../application/dto/request/send-sms-otp.dto";
+
 
 
 

@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto"
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase"
+import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase"
 import { UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto } from "../../dto/customerDto"
 import { IUserRepository } from "../../../domain/repositories/user.repository"
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service"
-import { IOtpGenerator } from "../../../../../shared/domain/interfaces/IOtpGenerator.service"
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/services/IPasswordHasher.service"
+import { IOtpGenerator } from "../../../../../shared/domain/interfaces/services/IOtpGenerator.service"
 import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store"
-import { IEmailSender } from "../../../../../shared/domain/interfaces/IEmailSender.service"
+import { IEmailSender } from "../../../../../shared/domain/interfaces/services/IEmailSender.service"
 
 
 

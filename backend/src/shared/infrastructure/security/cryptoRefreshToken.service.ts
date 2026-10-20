@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { IRefreshTokenService } from "../../domain/interfaces/IRefreshToken.service";
+import { IRefreshTokenService } from "../../domain/interfaces/services/IRefreshToken.service";
 
 export class CryptoRefreshTokenService implements IRefreshTokenService {
     generateToken(): string {

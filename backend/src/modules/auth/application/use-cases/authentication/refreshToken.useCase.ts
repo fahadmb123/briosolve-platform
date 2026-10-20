@@ -2,12 +2,14 @@ import crypto from "crypto";
 import { IJwtService } from "../../../../../shared/application/Dto/services/jwtDto.service";
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
 import { envConfig } from "../../../../../shared/infrastructure/config/env.config";
-import { IRefreshTokenService } from "../../../../../shared/domain/interfaces/IRefreshToken.service";
+import { IRefreshTokenService } from "../../../../../shared/domain/interfaces/services/IRefreshToken.service";
 import { RefreshSession } from "../../../domain/entities/refreshSession.entity";
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { IRefreshSessionRepository } from "../../../domain/repositories/refreshSession.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
-import { RefreshTokenInputDto, RefreshTokenOutputDto } from "../../dto/authDto";
+import { RefreshTokenOutputDto } from "../../dto/response/refresh-token.dto";
+import { RefreshTokenInputDto } from "../../dto/request/refresh-token.dto";
+
 
 export default class RefreshTokenUseCase implements IUseCase<RefreshTokenInputDto, RefreshTokenOutputDto> {
     constructor(

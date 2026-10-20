@@ -2,7 +2,7 @@ import { IJwtService } from "../../../../../shared/application/Dto/services/jwtD
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
 import { IUserTokenPayload } from "../../../../../shared/domain/interfaces/IToken"
 import { User } from "../../../domain/entities/user.entity"
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase"
+import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase"
 import { IUserRepository } from "../../../domain/repositories/user.repository"
 
 

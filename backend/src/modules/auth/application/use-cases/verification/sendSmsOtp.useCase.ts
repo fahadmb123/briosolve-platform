@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IOtpGenerator } from "../../../../../shared/domain/interfaces/IOtpGenerator.service";
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service";
-import { ISmsService } from "../../../../../shared/domain/interfaces/ISms.service";
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase";
+import { IOtpGenerator } from "../../../../../shared/domain/interfaces/services/IOtpGenerator.service";
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/services/IPasswordHasher.service";
+import { ISmsService } from "../../../../../shared/domain/interfaces/services/ISms.service";
+import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { SendSmsOtpUseCaseInputDto, SendSmsOtpUseCaseOutputDto } from "../../dto/authDto";
 import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store";
 import { IUserRepository } from "../../../domain/repositories/user.repository";

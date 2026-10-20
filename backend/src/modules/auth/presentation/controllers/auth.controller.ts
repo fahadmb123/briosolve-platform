@@ -1,14 +1,21 @@
 import { NextFunction, Response, Request } from "express";
-import { LoginInputDto, LoginOutputDto, RefreshTokenInputDto, RefreshTokenOutputDto, LogoutInputDto } from "../../application/dto/authDto";
 import { User } from "../../domain/entities/user.entity";
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import { IUserTokenPayload } from "../../../../shared/domain/interfaces/IToken";
-import { EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto, UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto } from "../../application/dto/customerDto";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { accessTokenCookie, refreshTokenCookie, clearAccessTokenCookieOptions, clearRefreshTokenCookieOptions, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { LoginOutputDto } from "../../application/dto/response/login.dto";
+import { LoginInputDto } from "../../application/dto/request/login.dto";
+import { EmailVerificationUseCaseInputDto } from "../../application/dto/request/email-verification.dto";
+import { EmailVerificationUseCaseOutputDto } from "../../application/dto/response/email-verification.dto";
+import { UpdateEmailUseCaseOutputDto } from "../../application/dto/response/update-email.dto";
+import { UpdateEmailUseCaseInputDto } from "../../application/dto/request/update-email.dto";
+import { RefreshTokenInputDto } from "../../application/dto/request/refresh-token.dto";
+import { RefreshTokenOutputDto } from "../../application/dto/response/refresh-token.dto";
+import { LogoutInputDto } from "../../application/dto/request/logout.dto";
 
 export class AuthController extends BaseController {
     constructor(

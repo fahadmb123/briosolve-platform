@@ -1,5 +1,5 @@
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";
 import { Category } from "../../domain/entities/category.entity";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";

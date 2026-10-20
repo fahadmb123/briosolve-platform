@@ -2,7 +2,7 @@ import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 import { VerificationDocument } from "../../domain/entities/verificationDocument.entity";
 import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { UploadVerificationInputDto } from "../Dto/verificationDto";
 

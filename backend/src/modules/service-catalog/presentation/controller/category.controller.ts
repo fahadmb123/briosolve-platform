@@ -2,7 +2,7 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import type { NextFunction,Request,Response } from "express";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";
 import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/Dto/category";
 import { Category } from "../../domain/entities/category.entity";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";

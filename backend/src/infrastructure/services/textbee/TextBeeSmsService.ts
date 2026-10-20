@@ -1,5 +1,5 @@
 import { Textbee } from "@textbee/sdk";
-import { ISmsService } from "../../../shared/domain/interfaces/ISms.service";
+import { ISmsService } from "../../../shared/domain/interfaces/services/ISms.service";
 import { ApplicationError } from "../../../shared/application/errors/applicationError";
 
 

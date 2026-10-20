@@ -6,7 +6,7 @@ import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 import { IGetProvidersUseCase } from "../../domain/interfaces/use-cases/IGetProvidersUseCase";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";
 import type {
     EmailVerificationUseCaseOutputDto,
     RegisterProviderInput,

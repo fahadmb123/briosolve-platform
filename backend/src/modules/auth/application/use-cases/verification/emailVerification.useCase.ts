@@ -1,13 +1,13 @@
 
 import { randomUUID } from "crypto"
 import { IUserRepository } from "../../../domain/repositories/user.repository"
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service"
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/services/IPasswordHasher.service"
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
-import { IOtpGenerator } from "../../../../../shared/domain/interfaces/IOtpGenerator.service"
+import { IOtpGenerator } from "../../../../../shared/domain/interfaces/services/IOtpGenerator.service"
 import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store"
-import { IEmailSender } from "../../../../../shared/domain/interfaces/IEmailSender.service"
+import { IEmailSender } from "../../../../../shared/domain/interfaces/services/IEmailSender.service"
 import { EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto } from "../../dto/customerDto"
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase"
+import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase"
 
 
 

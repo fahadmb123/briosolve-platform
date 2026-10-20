@@ -1,9 +1,9 @@
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
 import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store";
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service";
-import type { IOtpGenerator } from "../../../../../shared/domain/interfaces/IOtpGenerator.service";
-import type { IEmailSender } from "../../../../../shared/domain/interfaces/IEmailSender.service";
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase";
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/services/IPasswordHasher.service";
+import type { IOtpGenerator } from "../../../../../shared/domain/interfaces/services/IOtpGenerator.service";
+import type { IEmailSender } from "../../../../../shared/domain/interfaces/services/IEmailSender.service";
+import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase";
 
 export type ResendOtpOutput = {
     expiresIn: number;

@@ -1,6 +1,6 @@
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
-import { IPasswordHasher } from "../../../../../shared/domain/interfaces/IPasswordHasher.service"
-import { IUseCase } from "../../../domain/interfaces/use-cases/IUseCase"
+import { IPasswordHasher } from "../../../../../shared/domain/interfaces/services/IPasswordHasher.service"
+import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase"
 import { IUserRepository } from "../../../domain/repositories/user.repository"
 import { UpdatePasswordInputDto } from "../../dto/customerDto"
 

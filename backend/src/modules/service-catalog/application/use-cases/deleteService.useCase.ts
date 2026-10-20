@@ -1,7 +1,7 @@
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
+import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";
 
 export class DeleteServiceUseCase implements IUseCase<string, boolean> {
     constructor(

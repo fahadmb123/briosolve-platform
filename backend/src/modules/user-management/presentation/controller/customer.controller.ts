@@ -8,7 +8,7 @@ import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase"
 import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto"
 import { UserMapper } from "../../infrastructure/mappers/user.mapper"
-import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service"
+import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service"
 import { ApplicationError } from "../../../../shared/application/errors/applicationError"
 import { SendBecomeProviderOtpUseCase } from "../../application/use-cases/sendBecomeProviderOtp.useCase"
 import { BecomeProviderInput, BecomeProviderUseCase } from "../../application/use-cases/becomeProvider.useCase"

@@ -1,9 +1,9 @@
 import { randomUUID } from "crypto";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IPasswordHasher } from "../../../../shared/domain/interfaces/IPasswordHasher.service";
-import type { IOtpGenerator } from "../../../../shared/domain/interfaces/IOtpGenerator.service";
-import type { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service";
+import { IPasswordHasher } from "../../../../shared/domain/interfaces/services/IPasswordHasher.service";
+import type { IOtpGenerator } from "../../../../shared/domain/interfaces/services/IOtpGenerator.service";
+import type { IEmailSender } from "../../../../shared/domain/interfaces/services/IEmailSender.service";
 import type { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 

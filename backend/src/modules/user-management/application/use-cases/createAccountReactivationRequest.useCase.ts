@@ -3,7 +3,7 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IUserAccountBlockRepository } from "../../domain/repositories/IUserAccountBlockRepository";
 import { IAccountReactivationRequestRepository } from "../../domain/repositories/IAccountReactivationRequestRepository";
 import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity";
-import { IEmailSender } from "../../../../shared/domain/interfaces/IEmailSender.service";
+import { IEmailSender } from "../../../../shared/domain/interfaces/services/IEmailSender.service";
 import type { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
 
 export type RequestReactivationDto = {
