@@ -1,3 +1,4 @@
+import { Temporal } from "@js-temporal/polyfill";
 import type { Prisma } from "@prisma/client";
 import { VerificationFile } from "../../domain/entities/verificationFile.entity";
 
@@ -16,5 +17,13 @@ export class VerificationFileMapper {
                 ? new Date(Number(createdAtRaw.epochMilliseconds))
                 : new Date(createdAtRaw)
         );
+    }
+
+    static toPersistence(documentId: string, fileUrl: string) {
+        return {
+            document_id: documentId as never,
+            file_url: fileUrl as never,
+            created_at: Temporal.Now.instant()
+        };
     }
 }

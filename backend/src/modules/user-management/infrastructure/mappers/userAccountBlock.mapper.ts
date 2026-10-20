@@ -1,5 +1,7 @@
+import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import type { Prisma } from "@prisma/client";
 import { UserAccountBlock } from "../../domain/entities/userAccountBlock.entity";
+import { CreateUserAccountBlockInput } from "../../domain/repositories/IUserAccountBlockRepository";
 
 export type UserAccountBlockRecord = Prisma.UserAccountBlockGetPayload<{}>;
 
@@ -20,5 +22,13 @@ export class UserAccountBlockMapper {
             createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
             updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw)
         );
+    }
+
+    static toPersistence(data: CreateUserAccountBlockInput) {
+        return {
+            user_id: data.user_id,
+            blocked_by: data.blocked_by,
+            reason: data.reason as Varchar<1000>
+        };
     }
 }

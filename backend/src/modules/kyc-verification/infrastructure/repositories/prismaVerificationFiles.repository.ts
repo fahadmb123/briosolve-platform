@@ -7,24 +7,20 @@ import { VerificationFileRaw } from "../../application/Dto/verificationDto";
 
 export class VerificationFileRepository implements IVerificationFileRepository {
     async create(documentId: string, fileUrl: string): Promise<VerificationFile> {
-        const record = await db.orm.public.provider_verification_files.create({
-            document_id: documentId as never,
-            file_url: fileUrl as never,
-            created_at: Temporal.Now.instant()
-        } as never)
+        const record = await db.orm.public.provider_verification_files.create(
+            VerificationFileMapper.toPersistence(documentId, fileUrl) as never
+        );
 
-        return VerificationFileMapper.toDomain(record as unknown as VerificationFileRaw)
+        return VerificationFileMapper.toDomain(record as unknown as VerificationFileRaw);
     }
 
     async createMany(documentId: string, fileUrls: string[]): Promise<VerificationFile[]> {
         return await db.transaction(async (tx) => {
             const results: VerificationFile[] = [];
             for (const fileUrl of fileUrls) {
-                const record = await tx.orm.public.provider_verification_files.create({
-                    document_id: documentId as never,
-                    file_url: fileUrl as never,
-                    created_at: Temporal.Now.instant()
-                } as never);
+                const record = await tx.orm.public.provider_verification_files.create(
+                    VerificationFileMapper.toPersistence(documentId, fileUrl) as never
+                );
                 results.push(VerificationFileMapper.toDomain(record as unknown as VerificationFileRaw));
             }
             return results;

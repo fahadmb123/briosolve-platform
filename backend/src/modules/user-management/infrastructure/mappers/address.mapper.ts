@@ -26,4 +26,21 @@ export class AddressMapper {
             updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw)
         );
     }
+
+    static toPersistence(userId: string, data: Omit<Address, "id" | "created_at" | "updated_at">) {
+        return {
+            user_id: userId,
+            house_no: data.house_no,
+            area: data.area,
+            city: data.city,
+            district: data.district,
+            state: data.state,
+            country: data.country,
+            pincode: data.pincode,
+            landmark: data.landmark,
+            type: data.type,
+            latitude: data.latitude,
+            longitude: data.longitude,
+        };
+    }
 }

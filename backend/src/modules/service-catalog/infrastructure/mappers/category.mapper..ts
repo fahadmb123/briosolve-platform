@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { Category } from "../../domain/entities/category.entity";
+import { AddCategoryUseCaseInputDto } from "../../application/Dto/category";
 import { ServiceMapper } from "./service.mapper";
 
 export type CategoryRecord = Prisma.CategoryGetPayload<{}>;
@@ -19,5 +20,14 @@ export class CategoryMapper {
             updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw),
             record.services ? record.services.map((s: any) => ServiceMapper.toDomain(s)) : undefined
         );
+    }
+
+    static toPersistence(input: AddCategoryUseCaseInputDto) {
+        return {
+            name: input.name.toLowerCase(),
+            description: input.description,
+            status: input.status,
+            image: input.image
+        };
     }
 }

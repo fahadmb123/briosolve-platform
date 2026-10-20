@@ -55,13 +55,7 @@ export class ServiceRepository implements IServiceRepository{
 
     async add(input:AddServiceUseCaseInputDto):Promise<Service | null> {
         const service = await db.orm.public.services
-            .create({
-                name: input.name.toLowerCase(),
-                category_id: input.category_id,
-                description: input.description,
-                status: input.status,
-                image: input.image
-            } as never)
+            .create(ServiceMapper.toPersistence(input) as never)
         if (!service) return null
         return ServiceMapper.toDomain(service)
     }

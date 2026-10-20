@@ -10,12 +10,9 @@ import { AccountReactivationRequestMapper } from "../mappers/accountReactivation
 
 export class AccountReactivationRequestRepository implements IAccountReactivationRequestRepository {
     async create(data: CreateReactivationRequestInput): Promise<AccountReactivationRequest> {
-        const created = await db.orm.public.account_reactivation_requests.create({
-            user_id: data.user_id,
-            block_id: data.block_id,
-            reason: data.reason as Varchar<1000>,
-            status: "PENDING"
-        } as never);
+        const created = await db.orm.public.account_reactivation_requests.create(
+            AccountReactivationRequestMapper.toPersistence(data) as never
+        );
 
         return AccountReactivationRequestMapper.toDomain(created);
     }

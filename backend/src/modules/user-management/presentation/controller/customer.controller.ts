@@ -7,7 +7,7 @@ import { registrationCookie } from "../../../../shared/presentation/http/cookies
 import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../application/Dto/customerDto"
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase"
 import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto"
-import { UserResponseMapper } from "../mappers/userResponse.mapper"
+import { UserMapper } from "../../infrastructure/mappers/user.mapper"
 import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service"
 import { ApplicationError } from "../../../../shared/application/errors/applicationError"
 import { SendBecomeProviderOtpUseCase } from "../../application/use-cases/sendBecomeProviderOtp.useCase"
@@ -53,7 +53,7 @@ export class CustomerController extends BaseController{
             })
 
             return sendSuccess(res,"",{
-                users: response.users.map(u => UserResponseMapper.toDto(u)),
+                users: response.users.map(u => UserMapper.toDto(u)),
                 total: response.total,
                 totalPages: response.totalPages
             })

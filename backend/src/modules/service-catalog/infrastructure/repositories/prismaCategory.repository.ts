@@ -56,12 +56,7 @@ export class CategoryRepository implements ICategoryRepository{
 
     async add(input:AddCategoryUseCaseInputDto):Promise<Category | null> {
         const category = await db.orm.public.categories
-            .create({
-                name: input.name.toLowerCase(),
-                description: input.description,
-                status: input.status,
-                image: input.image
-            } as never)
+            .create(CategoryMapper.toPersistence(input) as never)
         if (!category) return null
         return CategoryMapper.toDomain(category as Category)
     }

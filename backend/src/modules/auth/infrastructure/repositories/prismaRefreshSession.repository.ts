@@ -6,18 +6,9 @@ import { RefreshSessionMapper, RefreshSessionRaw } from "../mappers/refreshSessi
 
 export class PrismaRefreshSessionRepository implements IRefreshSessionRepository {
     async create(session: RefreshSession): Promise<RefreshSession> {
-        const raw = await db.orm.public.refresh_sessions.create({
-            id: session.id as never,
-            user_id: session.userId as never,
-            token_hash: session.tokenHash as never,
-            family_id: session.familyId as never,
-            expires_at: Temporal.Instant.from(session.expiresAt.toISOString()),
-            revoked_at: session.revokedAt ? Temporal.Instant.from(session.revokedAt.toISOString()) : (null as never),
-            user_agent: session.userAgent as never,
-            ip_address: session.ipAddress as never,
-            created_at: Temporal.Instant.from(session.createdAt.toISOString()),
-            updated_at: Temporal.Instant.from(session.updatedAt.toISOString())
-        } as never);
+        const raw = await db.orm.public.refresh_sessions.create(
+            RefreshSessionMapper.toPersistence(session) as never
+        );
 
         return RefreshSessionMapper.toDomain(raw as RefreshSessionRaw);
     }
@@ -78,18 +69,9 @@ export class PrismaRefreshSessionRepository implements IRefreshSessionRepository
                     updated_at: Temporal.Now.instant()
                 } as never);
 
-            const raw = await tx.orm.public.refresh_sessions.create({
-                id: newSession.id as never,
-                user_id: newSession.userId as never,
-                token_hash: newSession.tokenHash as never,
-                family_id: newSession.familyId as never,
-                expires_at: Temporal.Instant.from(newSession.expiresAt.toISOString()),
-                revoked_at: null as never,
-                user_agent: newSession.userAgent as never,
-                ip_address: newSession.ipAddress as never,
-                created_at: Temporal.Instant.from(newSession.createdAt.toISOString()),
-                updated_at: Temporal.Instant.from(newSession.updatedAt.toISOString())
-            } as never);
+            const raw = await tx.orm.public.refresh_sessions.create(
+                RefreshSessionMapper.toPersistence(newSession) as never
+            );
 
             return RefreshSessionMapper.toDomain(raw as RefreshSessionRaw);
         });

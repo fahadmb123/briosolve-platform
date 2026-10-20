@@ -1,4 +1,4 @@
-import { Varchar } from "@prisma/orm-postgres/target/codec-types";
+import { Temporal } from "@js-temporal/polyfill";
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
 import { UserAccountBlock } from "../../domain/entities/userAccountBlock.entity";
 import { IUserAccountBlockRepository, CreateUserAccountBlockInput } from "../../domain/repositories/IUserAccountBlockRepository";
@@ -6,11 +6,9 @@ import { UserAccountBlockMapper } from "../mappers/userAccountBlock.mapper";
 
 export class UserAccountBlockRepository implements IUserAccountBlockRepository {
     async create(data: CreateUserAccountBlockInput): Promise<UserAccountBlock> {
-        const created = await db.orm.public.user_account_blocks.create({
-            user_id: data.user_id,
-            blocked_by: data.blocked_by,
-            reason: data.reason as Varchar<1000>
-        } as never);
+        const created = await db.orm.public.user_account_blocks.create(
+            UserAccountBlockMapper.toPersistence(data) as never
+        );
 
         return UserAccountBlockMapper.toDomain(created);
     }
@@ -27,7 +25,7 @@ export class UserAccountBlockRepository implements IUserAccountBlockRepository {
 
     async updateUnblockedAt(userId: string, unblockedAt: Date): Promise<void> {
         await db.orm.public.user_account_blocks.where({ user_id: userId }).update({
-            unblocked_at: Temporal.Now.instant()
+            unblocked_at: Temporal.Instant.from(unblockedAt.toISOString())
         } as never);
     }
 }

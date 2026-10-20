@@ -10,6 +10,7 @@ import {
     AdminKycStats
 } from "../../domain/repositories/IVerificationDocumentRepository";
 import { VerificationDocumentMapper } from "../mappers/verificationDocument.mapper";
+import { VerificationFileMapper } from "../mappers/verificationFile.mapper";
 import { VerificationProfile } from "../../domain/entities/verificationProfile.entity";
 import { VerificationProfileMapper } from "../mappers/verificationProfile.mapper";
 import { CreateVerificationDocumentInputDto, UpdateVerificationDocumentRepositoryDto, VerificationDocumentRaw } from "../../application/Dto/verificationDto";
@@ -88,10 +89,9 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
             }
 
             for (const fileUrl of input.file_urls) {
-                await tx.orm.public.provider_verification_files.create({
-                    document_id: documentId as never,
-                    file_url: fileUrl as never
-                } as never);
+                await tx.orm.public.provider_verification_files.create(
+                    VerificationFileMapper.toPersistence(documentId, fileUrl) as never
+                );
             }
 
             const profile = await tx.orm.public.provider_profiles
@@ -148,10 +148,9 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
 
             if (input.new_file_urls && input.new_file_urls.length > 0) {
                 for (const fileUrl of input.new_file_urls) {
-                    await tx.orm.public.provider_verification_files.create({
-                        document_id: id as never,
-                        file_url: fileUrl as never
-                    } as never);
+                    await tx.orm.public.provider_verification_files.create(
+                        VerificationFileMapper.toPersistence(id, fileUrl) as never
+                    );
                 }
             }
 

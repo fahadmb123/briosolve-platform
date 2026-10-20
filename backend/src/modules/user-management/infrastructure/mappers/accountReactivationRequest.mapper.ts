@@ -1,5 +1,7 @@
+import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import type { Prisma } from "@prisma/client";
 import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity";
+import { CreateReactivationRequestInput } from "../../domain/repositories/IAccountReactivationRequestRepository";
 import { UserMapper, UserRecord } from "./user.mapper";
 import { UserAccountBlockMapper, UserAccountBlockRecord } from "./userAccountBlock.mapper";
 
@@ -25,5 +27,14 @@ export class AccountReactivationRequestMapper {
             record.block ? UserAccountBlockMapper.toDomain(record.block as UserAccountBlockRecord) : undefined,
             record.reviewer ? UserMapper.toDomain(record.reviewer as UserRecord) : null
         );
+    }
+
+    static toPersistence(data: CreateReactivationRequestInput) {
+        return {
+            user_id: data.user_id,
+            block_id: data.block_id,
+            reason: data.reason as Varchar<1000>,
+            status: "PENDING" as const
+        };
     }
 }

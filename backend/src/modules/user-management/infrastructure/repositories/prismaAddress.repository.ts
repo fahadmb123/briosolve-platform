@@ -18,20 +18,9 @@ export class AddressRepository implements IAddressRepository{
     }
 
     async addAddress(id:string,data: Omit<Address, 'id' | 'created_at' | 'updated_at'>): Promise<Address> {
-        const address = await db.orm.public.addresses.create({
-            user_id:id,
-            house_no: data.house_no,
-            area: data.area,
-            city: data.city,
-            district: data.district,
-            state: data.state,
-            country: data.country,
-            pincode: data.pincode,
-            landmark: data.landmark,
-            type: data.type,
-            latitude: data.latitude,
-            longitude: data.longitude,
-        } as never);
+        const address = await db.orm.public.addresses.create(
+            AddressMapper.toPersistence(id, data) as never
+        );
 
         return AddressMapper.toDomain(address);
     }

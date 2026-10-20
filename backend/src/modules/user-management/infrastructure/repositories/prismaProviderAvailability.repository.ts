@@ -29,14 +29,9 @@ export class ProviderAvailabilityRepository implements IProviderAvailabilityRepo
 
             const created: ProviderAvailability[] = [];
             for (const slot of slots) {
-                const raw = await tx.orm.public.provider_availability.create({
-                    provider_id: providerId as never,
-                    day_of_week: slot.day_of_week as never,
-                    start_time: slot.start_time as never,
-                    end_time: slot.end_time as never,
-                    created_at: Temporal.Now.instant(),
-                    updated_at: Temporal.Now.instant()
-                } as never);
+                const raw = await tx.orm.public.provider_availability.create(
+                    ProviderAvailabilityMapper.toPersistence(providerId, slot) as never
+                );
                 created.push(ProviderAvailabilityMapper.toDomain(raw as ProviderAvailabilityRaw));
             }
 
@@ -55,16 +50,9 @@ export class ProviderAvailabilityRepository implements IProviderAvailabilityRepo
     }
 
     async createOverride(providerId: string, data: CreateAvailabilityOverrideInput): Promise<ProviderAvailabilityOverride> {
-        const raw = await db.orm.public.provider_availability_overrides.create({
-            provider_id: providerId as never,
-            override_date: Temporal.Instant.from(data.override_date.toISOString()),
-            type: data.type as never,
-            start_time: (data.start_time || null) as never,
-            end_time: (data.end_time || null) as never,
-            reason: (data.reason || null) as never,
-            created_at: Temporal.Now.instant(),
-            updated_at: Temporal.Now.instant()
-        } as never);
+        const raw = await db.orm.public.provider_availability_overrides.create(
+            ProviderAvailabilityOverrideMapper.toPersistence(providerId, data) as never
+        );
 
         return ProviderAvailabilityOverrideMapper.toDomain(raw as ProviderAvailabilityOverrideRaw);
     }

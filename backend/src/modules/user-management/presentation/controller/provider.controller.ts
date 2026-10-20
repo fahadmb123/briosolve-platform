@@ -4,7 +4,7 @@ import { sendSuccess } from "../../../../shared/presentation/http/response/respo
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 import { IGetProvidersUseCase } from "../../domain/interfaces/use-cases/IGetProvidersUseCase";
-import { UserResponseMapper } from "../mappers/userResponse.mapper";
+import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/domain/interfaces/IImageUpload.service";
 import type {
@@ -48,7 +48,7 @@ export class ProviderController extends BaseController {
             });
 
             return sendSuccess(res, "", {
-                users: response.users.map(u => UserResponseMapper.toDto(u)),
+                users: response.users.map(u => UserMapper.toDto(u)),
                 total: response.total,
                 totalPages: response.totalPages
             });
@@ -88,7 +88,7 @@ export class ProviderController extends BaseController {
 
             res.clearCookie("registration_id");
 
-            return sendSuccess(res, "Provider account created successfully", user);
+            return sendSuccess(res, "Provider account created successfully", UserMapper.toDto(user));
         } catch (err) {
             next(err);
         }

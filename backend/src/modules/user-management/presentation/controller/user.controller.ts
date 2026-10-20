@@ -3,7 +3,7 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import { IUpdateUserStatusUseCase } from "../../domain/interfaces/use-cases/IUpdateUserUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto } from "../../application/Dto/userDto";
-import { UserResponseMapper } from "../mappers/userResponse.mapper";
+import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 
 export class UserController extends BaseController{
@@ -18,7 +18,7 @@ export class UserController extends BaseController{
             const response = await this.getProfileUseCase.execute({id:req.user?.userId!,role:req.user?.role!})
 
             return sendSuccess(res,"",{
-                user: UserResponseMapper.toDto(response.user),
+                user: UserMapper.toDto(response.user),
                 profile: response.profile ? response.profile : null
             }) 
         } catch (err) {

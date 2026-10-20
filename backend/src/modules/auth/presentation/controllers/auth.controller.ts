@@ -7,7 +7,7 @@ import { EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto, Up
 import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { accessTokenCookie, refreshTokenCookie, clearAccessTokenCookieOptions, clearRefreshTokenCookieOptions, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
-import { UserResponseMapper } from "../mappers/userResponse.mapper";
+import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 
 export class AuthController extends BaseController {
@@ -36,7 +36,7 @@ export class AuthController extends BaseController {
 
             return sendSuccess(res, "LoggedIn Successfully", {
                 accessToken: response.accessToken,
-                user: UserResponseMapper.toDto(response.isExist)
+                user: UserMapper.toDto(response.isExist)
             });
         } catch (err) {
             next(err);
@@ -90,7 +90,7 @@ export class AuthController extends BaseController {
             const user = this.getCurrentUser(req);
             const response = await this.getMeUseCase.execute(user);
 
-            return sendSuccess(res, "", UserResponseMapper.toDto(response));
+            return sendSuccess(res, "", UserMapper.toDto(response));
         } catch (err) {
             next(err);
         }
