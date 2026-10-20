@@ -1,4 +1,4 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 

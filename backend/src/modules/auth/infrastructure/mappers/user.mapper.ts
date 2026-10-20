@@ -1,8 +1,8 @@
 import type { Prisma } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
-import { UserResponseDto } from "../../application/dto/authDto";
 import { CustomerProfileMapper, CustomerProfileRecord } from "./customerProfile.mapper";
 import { ProviderProfileMapper, ProviderProfileRecord } from "./providerProfile.mapper";
+import { UserResponseDto } from "../../../user-management/application/Dto/userDto";
 
 export type UserRecord = Prisma.UserGetPayload<{}>;
 
@@ -29,7 +29,7 @@ export class UserMapper {
         );
     }
 
-    static toDto(user: User): UserResponseDto {
+    static toDto(user: User): UserResponseDto{
         return {
             id: user.id,
             name: user.name,

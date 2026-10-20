@@ -1,6 +1,6 @@
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import type { NextFunction,Request,Response } from "express";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";
 import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/Dto/service";

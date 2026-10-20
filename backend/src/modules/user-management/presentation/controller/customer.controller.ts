@@ -2,17 +2,16 @@ import { NextFunction,Request,Response } from "express"
 import { accessTokenCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response"
-import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCustomersUseCase"
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
 import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../application/Dto/customerDto"
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase"
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto"
 import { UserMapper } from "../../infrastructure/mappers/user.mapper"
 import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service"
 import { ApplicationError } from "../../../../shared/application/errors/applicationError"
-import { SendBecomeProviderOtpUseCase } from "../../application/use-cases/sendBecomeProviderOtp.useCase"
-import { BecomeProviderInput, BecomeProviderUseCase } from "../../application/use-cases/becomeProvider.useCase"
+import { BecomeProviderInput } from "../../application/use-cases/becomeProvider.useCase"
 import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.service"
+import { IGetCustomersUseCase } from "../../application/interfaces/use-cases/customers/get-customers.interface"
 
 
 

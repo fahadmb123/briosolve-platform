@@ -1,4 +1,4 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";

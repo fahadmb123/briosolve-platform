@@ -1,7 +1,7 @@
-import { User } from "../../domain/entities/user.entity"
-import { IGetCustomersUseCase } from "../../domain/interfaces/use-cases/IGetCustomersUseCase"
+import { User } from "../../domain/entities/user.entity";
 import { IUserRepository } from "../../domain/repositories/IUserRepository"
 import { getCustomersDto } from "../Dto/getCustomersDto"
+import { IGetCustomersUseCase } from "../interfaces/use-cases/customers/get-customers.interface";
 
 
 

@@ -1,6 +1,5 @@
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { User } from "../../domain/entities/user.entity";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository";
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";

@@ -1,4 +1,4 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/domain/interfaces/services/IImageUpload.service";

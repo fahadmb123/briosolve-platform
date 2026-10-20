@@ -4,9 +4,10 @@ import { IOtpGenerator } from "../../../../../shared/domain/interfaces/services/
 import { IPasswordHasher } from "../../../../../shared/domain/interfaces/services/IPasswordHasher.service";
 import { ISmsService } from "../../../../../shared/domain/interfaces/services/ISms.service";
 import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase";
-import { SendSmsOtpUseCaseInputDto, SendSmsOtpUseCaseOutputDto } from "../../dto/authDto";
 import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { SendSmsOtpUseCaseOutputDto } from "../../dto/response/send-sms-otp.dto";
+import { SendSmsOtpUseCaseInputDto } from "../../dto/request/send-sms-otp.dto";
 
 
 

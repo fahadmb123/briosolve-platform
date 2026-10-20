@@ -1,4 +1,4 @@
-import { IUpdateUserStatusUseCase } from "../../domain/interfaces/use-cases/IUpdateUserUseCase";
+import { IUpdateUserStatusUseCase } from "../interfaces/use-cases/users/update-user.interface";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IUserAccountBlockRepository } from "../../domain/repositories/IUserAccountBlockRepository";
 import { UpdateUserStatusDto } from "../Dto/userDto";

@@ -1,4 +1,4 @@
-import { UpdateUserStatusDto } from "../../../application/Dto/userDto";
+import { UpdateUserStatusDto } from "../../../Dto/userDto";
 
 export interface IUpdateUserStatusUseCase {
     execute(input:UpdateUserStatusDto):Promise<void>

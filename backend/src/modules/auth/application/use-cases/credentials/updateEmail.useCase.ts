@@ -1,12 +1,14 @@
 import { randomUUID } from "node:crypto"
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError"
 import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase"
-import { UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto } from "../../dto/customerDto"
+
 import { IUserRepository } from "../../../domain/repositories/user.repository"
 import { IPasswordHasher } from "../../../../../shared/domain/interfaces/services/IPasswordHasher.service"
 import { IOtpGenerator } from "../../../../../shared/domain/interfaces/services/IOtpGenerator.service"
 import { IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store"
 import { IEmailSender } from "../../../../../shared/domain/interfaces/services/IEmailSender.service"
+import { UpdateEmailUseCaseOutputDto } from "../../dto/response/update-email.dto"
+import { UpdateEmailUseCaseInputDto } from "../../dto/request/update-email.dto"
 
 
 

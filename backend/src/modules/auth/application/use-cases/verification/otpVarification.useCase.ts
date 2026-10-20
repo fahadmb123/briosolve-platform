@@ -1,11 +1,11 @@
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store";
-import { OtpVarificationInput } from "../../dto/otpDto";
+import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../../shared/domain/interfaces/IPendingRegistration-store"
 import { IPasswordHasher } from "../../../../../shared/domain/interfaces/services/IPasswordHasher.service";
 import { ICustomerRepository } from "../../../domain/repositories/customer.respository";
 import { User } from "../../../domain/entities/user.entity";
 import { IUseCase } from "../../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { OtpVarificationInput } from "../../dto/request/otp-verification.dto";
 
 
 

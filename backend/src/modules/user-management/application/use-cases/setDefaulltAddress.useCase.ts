@@ -1,5 +1,4 @@
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
-import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { SetDefaultAddressInputUseCaseDto } from "../Dto/addressDto";
 

@@ -2,7 +2,7 @@ import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { IPasswordHasher } from "../../../../shared/domain/interfaces/services/IPasswordHasher.service";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { randomUUID } from "crypto";
 
 import type { EmailVerificationUseCaseOutputDto,RegisterCustomerInput } from "../Dto/customerDto";

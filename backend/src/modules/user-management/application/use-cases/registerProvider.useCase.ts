@@ -1,6 +1,6 @@
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
 import { User } from "../../domain/entities/user.entity";
 import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";

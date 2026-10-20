@@ -5,7 +5,7 @@ import { IPasswordHasher } from "../../../../shared/domain/interfaces/services/I
 import type { IOtpGenerator } from "../../../../shared/domain/interfaces/services/IOtpGenerator.service";
 import type { IEmailSender } from "../../../../shared/domain/interfaces/services/IEmailSender.service";
 import type { IPendingRegistrationStore } from "../../../../shared/domain/interfaces/IPendingRegistration-store";
-import { IUseCase } from "../../domain/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/domain/interfaces/use-cases/IUseCase";
 
 export class SendBecomeProviderOtpUseCase implements IUseCase<string,{ registrationId: string; expiresIn: number }>{
     constructor(
