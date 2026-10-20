@@ -8,8 +8,8 @@ import { RefreshSession } from "../../../domain/entities/refreshSession.entity";
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IRefreshSessionRepository } from "../../../domain/repositories/refreshSession.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
-import { LoginOutputDto } from "../../dto/response/login.dto";
-import { LoginInputDto } from "../../dto/request/login.dto";
+import { LoginOutputDto } from "../../dtos/response/login.dto";
+import { LoginInputDto } from "../../dtos/request/login.dto";
 
 
 export default class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {

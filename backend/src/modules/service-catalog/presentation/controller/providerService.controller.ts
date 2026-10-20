@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
-import { AddProviderServicesInputDto, DeleteProviderServiceInputDto, DeleteProviderCategoryInputDto } from "../../application/Dto/providerService";
+import { AddProviderServicesInputDto, DeleteProviderServiceInputDto, DeleteProviderCategoryInputDto } from "../../application/dtos/providerService";
 
 export class ProviderServiceController extends BaseController {
     constructor(

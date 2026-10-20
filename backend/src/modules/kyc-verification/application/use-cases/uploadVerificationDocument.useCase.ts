@@ -4,7 +4,9 @@ import { IVerificationDocumentRepository } from "../../domain/repositories/IVeri
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { UploadVerificationInputDto } from "../Dto/verificationDto";
+import { UploadVerificationInputDto } from "../dtos/request/upload-verification.dto";
+
+
 
 export class UploadVerificationDocumentUseCase implements IUseCase<UploadVerificationInputDto, VerificationDocument> {
     constructor(

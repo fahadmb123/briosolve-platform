@@ -3,7 +3,7 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
 import { Category } from "../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
 import { CategoryMapper } from "../mappers/category.mapper.";
-import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/Dto/category";
+import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/dtos/category";
 
 
 

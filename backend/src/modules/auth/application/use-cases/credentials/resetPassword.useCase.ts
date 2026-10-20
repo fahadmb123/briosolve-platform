@@ -3,7 +3,7 @@ import { IPasswordHasher } from "../../../../../shared/application/interfaces/se
 import { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store";
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
-import { ResetPasswordDto } from "../../dto/request/reset-password.dto";
+import { ResetPasswordDto } from "../../dtos/request/reset-password.dto";
 
 
 

@@ -7,8 +7,8 @@ import { RefreshSession } from "../../../domain/entities/refreshSession.entity";
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IRefreshSessionRepository } from "../../../domain/repositories/refreshSession.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
-import { RefreshTokenOutputDto } from "../../dto/response/refresh-token.dto";
-import { RefreshTokenInputDto } from "../../dto/request/refresh-token.dto";
+import { RefreshTokenOutputDto } from "../../dtos/response/refresh-token.dto";
+import { RefreshTokenInputDto } from "../../dtos/request/refresh-token.dto";
 
 
 export default class RefreshTokenUseCase implements IUseCase<RefreshTokenInputDto, RefreshTokenOutputDto> {

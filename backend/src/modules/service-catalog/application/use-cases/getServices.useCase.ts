@@ -1,5 +1,5 @@
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { GetServicesDto } from "../Dto/service";
+import { GetServicesDto } from "../dtos/service";
 import { Service } from "../../domain/entities/service.entity";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
 

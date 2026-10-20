@@ -5,7 +5,7 @@ import { ICustomerRepository } from "../../../domain/repositories/customer.respo
 import { User } from "../../../domain/entities/user.entity";
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
-import { OtpVarificationInput } from "../../dto/request/otp-verification.dto";
+import { OtpVarificationInput } from "../../dtos/request/otp-verification.dto";
 
 
 

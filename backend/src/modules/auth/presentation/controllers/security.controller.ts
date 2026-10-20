@@ -3,10 +3,10 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
-import { ResetPasswordDto } from "../../application/dto/request/reset-password.dto";
-import { SendSmsOtpUseCaseOutputDto } from "../../application/dto/response/send-sms-otp.dto";
-import { UpdatePasswordInputDto } from "../../application/dto/request/update-password.dto";
-import { SendSmsOtpUseCaseInputDto } from "../../application/dto/request/send-sms-otp.dto";
+import { ResetPasswordDto } from "../../application/dtos/request/reset-password.dto";
+import { SendSmsOtpUseCaseOutputDto } from "../../application/dtos/response/send-sms-otp.dto";
+import { UpdatePasswordInputDto } from "../../application/dtos/request/update-password.dto";
+import { SendSmsOtpUseCaseInputDto } from "../../application/dtos/request/send-sms-otp.dto";
 
 
 

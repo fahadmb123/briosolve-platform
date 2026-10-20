@@ -1,6 +1,6 @@
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { Category } from "../../domain/entities/category.entity";
-import { GetCategoriesDto } from "../Dto/category";
+import { GetCategoriesDto } from "../dtos/category";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
 

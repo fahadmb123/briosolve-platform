@@ -2,7 +2,7 @@ import { ApplicationError } from "../../../../../shared/application/errors/appli
 import { IPasswordHasher } from "../../../../../shared/application/interfaces/services/IPasswordHasher.service"
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase"
 import { IUserRepository } from "../../../domain/repositories/user.repository"
-import { UpdatePasswordInputDto } from "../../dto/request/update-password.dto"
+import { UpdatePasswordInputDto } from "../../dtos/request/update-password.dto"
 
 
 

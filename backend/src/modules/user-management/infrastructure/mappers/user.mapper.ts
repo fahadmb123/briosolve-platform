@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
-import { UserResponseDto } from "../../application/Dto/userDto";
+import { UserResponseDto } from "../../application/dtos/userDto";
 import { CustomerProfileMapper, CustomerProfileRecord } from "./customerProfile.mapper";
 import { ProviderProfileMapper, ProviderProfileRecord } from "./providerProfile.mapper";
 

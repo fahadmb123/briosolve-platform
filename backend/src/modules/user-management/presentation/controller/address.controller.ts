@@ -1,7 +1,7 @@
 import { NextFunction,Request,Response } from "express"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import { Address } from "../../domain/entities/address.entity";
-import { AddAddressInputUseCaseDto, EditAddressInputUseCaseDto, GetAddressesInputDto, GetAddressesOutputDto, SetDefaultAddressInputUseCaseDto } from "../../application/Dto/addressDto";
+import { AddAddressInputUseCaseDto, EditAddressInputUseCaseDto, GetAddressesInputDto, GetAddressesOutputDto, SetDefaultAddressInputUseCaseDto } from "../../application/dtos/addressDto";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 

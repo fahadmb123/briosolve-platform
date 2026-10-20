@@ -5,7 +5,7 @@ import { ResendOtpOutput } from "../../application/use-cases/verification/resend
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response"
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
-import { OtpVarificationInput } from "../../application/dto/request/otp-verification.dto"
+import { OtpVarificationInput } from "../../application/dtos/request/otp-verification.dto"
 
 class OtpVarificationController {
     constructor(

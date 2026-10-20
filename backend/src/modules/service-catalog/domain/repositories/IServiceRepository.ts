@@ -1,5 +1,5 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
-import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/Dto/service";
+import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/dtos/service";
 import { Service } from "../entities/service.entity";
 
 export interface IServiceRepository extends BaseRepository<Service | null>{

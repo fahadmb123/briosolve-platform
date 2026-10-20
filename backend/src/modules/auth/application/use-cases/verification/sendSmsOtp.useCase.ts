@@ -6,8 +6,8 @@ import { ISmsService } from "../../../../../shared/application/interfaces/servic
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
-import { SendSmsOtpUseCaseOutputDto } from "../../dto/response/send-sms-otp.dto";
-import { SendSmsOtpUseCaseInputDto } from "../../dto/request/send-sms-otp.dto";
+import { SendSmsOtpUseCaseOutputDto } from "../../dtos/response/send-sms-otp.dto";
+import { SendSmsOtpUseCaseInputDto } from "../../dtos/request/send-sms-otp.dto";
 
 
 

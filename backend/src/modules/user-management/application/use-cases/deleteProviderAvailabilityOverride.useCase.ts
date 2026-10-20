@@ -2,7 +2,7 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
 import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
-import { DeleteAvailabilityOverrideInputDto } from "../Dto/providerDto";
+import { DeleteAvailabilityOverrideInputDto } from "../dtos/providerDto";
 
 export default class DeleteProviderAvailabilityOverrideUseCase implements IUseCase<DeleteAvailabilityOverrideInputDto, void> {
     constructor(

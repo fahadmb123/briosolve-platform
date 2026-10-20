@@ -6,8 +6,8 @@ import { IOtpGenerator } from "../../../../../shared/application/interfaces/serv
 import { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store"
 import { IEmailSender } from "../../../../../shared/application/interfaces/services/IEmailSender.service"
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase"
-import { EmailVerificationUseCaseOutputDto } from "../../dto/response/email-verification.dto"
-import { EmailVerificationUseCaseInputDto } from "../../dto/request/email-verification.dto"
+import { EmailVerificationUseCaseOutputDto } from "../../dtos/response/email-verification.dto"
+import { EmailVerificationUseCaseInputDto } from "../../dtos/request/email-verification.dto"
 
 
 

@@ -2,11 +2,12 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { VerificationDocument } from "../../domain/entities/verificationDocument.entity";
-import { UploadVerificationInputDto, UpdateVerificationInputDto } from "../../application/Dto/verificationDto";
 import { GetAdminKycRequestsInput, GetAdminKycResponse } from "../../domain/repositories/IVerificationDocumentRepository";
 import { UpdateKycStatusInput } from "../../application/use-cases/updateKycStatus.useCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { UploadVerificationInputDto } from "../../application/dtos/request/upload-verification.dto";
+import { UpdateVerificationInputDto } from "../../application/dtos/request/update-verification.dto";
 
 export class VerificationController extends BaseController {
     constructor(

@@ -3,7 +3,7 @@ import type { NextFunction,Request,Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
-import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/Dto/service";
+import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/dtos/service";
 import { Service } from "../../domain/entities/service.entity";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 

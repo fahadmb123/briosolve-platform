@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { User } from "../../domain/entities/user.entity";
 import { CustomerProfileMapper, CustomerProfileRecord } from "./customerProfile.mapper";
 import { ProviderProfileMapper, ProviderProfileRecord } from "./providerProfile.mapper";
-import { UserResponseDto } from "../../../user-management/application/Dto/userDto";
+import { UserResponseDto } from "../../../user-management/application/dtos/userDto";
 
 export type UserRecord = Prisma.UserGetPayload<{}>;
 

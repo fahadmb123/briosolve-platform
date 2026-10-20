@@ -3,7 +3,7 @@ import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IU
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
 import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
 import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity";
-import { CreateAvailabilityOverrideInputDto } from "../Dto/providerDto";
+import { CreateAvailabilityOverrideInputDto } from "../dtos/providerDto";
 
 export default class CreateProviderAvailabilityOverrideUseCase implements IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverride> {
     constructor(

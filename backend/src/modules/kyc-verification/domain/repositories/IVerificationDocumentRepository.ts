@@ -1,7 +1,10 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { CreateVerificationDocumentInputDto } from "../../application/dtos/request/create-verification-document.dto";
+import { UpdateVerificationDocumentRepositoryDto } from "../../application/dtos/request/update-veridication-document-repository.dto";
 import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../entities/verificationDocument.entity";
 import { VerificationProfile } from "../entities/verificationProfile.entity";
-import { CreateVerificationDocumentInputDto, UpdateVerificationDocumentRepositoryDto } from "../../application/Dto/verificationDto";
+
+
 
 export interface GetAdminKycRequestsInput {
     page?: number;

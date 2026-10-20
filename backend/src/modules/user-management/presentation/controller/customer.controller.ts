@@ -3,9 +3,9 @@ import { accessTokenCookie } from "../../../../shared/presentation/http/cookies/
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response"
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
-import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../application/Dto/customerDto"
+import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../application/dtos/customerDto"
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { UpdateCustomerProfileInputDto } from "../../application/Dto/userDto"
+import { UpdateCustomerProfileInputDto } from "../../application/dtos/userDto"
 import { UserMapper } from "../../infrastructure/mappers/user.mapper"
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service"
 import { ApplicationError } from "../../../../shared/application/errors/applicationError"

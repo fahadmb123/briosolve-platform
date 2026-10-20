@@ -6,14 +6,16 @@ import {
     GetAdminKycRequestsInput,
     GetAdminKycResponse,
     UpdateDocumentStatusInput,
-    AdminKycDossier,
     AdminKycStats
 } from "../../domain/repositories/IVerificationDocumentRepository";
 import { VerificationDocumentMapper } from "../mappers/verificationDocument.mapper";
 import { VerificationFileMapper } from "../mappers/verificationFile.mapper";
 import { VerificationProfile } from "../../domain/entities/verificationProfile.entity";
 import { VerificationProfileMapper } from "../mappers/verificationProfile.mapper";
-import { CreateVerificationDocumentInputDto, UpdateVerificationDocumentRepositoryDto, VerificationDocumentRaw } from "../../application/Dto/verificationDto";
+import { CreateVerificationDocumentInputDto } from "../../application/dtos/request/create-verification-document.dto";
+import { UpdateVerificationDocumentRepositoryDto } from "../../application/dtos/request/update-veridication-document-repository.dto";
+
+
 
 export class VerificationDocumentRepository implements IVerificationDocumentRepository {
     async findById(id: string): Promise<VerificationDocument | null> {
@@ -23,7 +25,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
             .first();
 
         if (!record) return null;
-        return VerificationDocumentMapper.toDomain(record as VerificationDocumentRaw);
+        return VerificationDocumentMapper.toDomain(record);
     }
 
     async findByProviderId(providerId: string): Promise<VerificationDocument[]> {
@@ -34,7 +36,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
             .all();
 
         return records.map((record) =>
-            VerificationDocumentMapper.toDomain(record as VerificationDocumentRaw)
+            VerificationDocumentMapper.toDomain(record)
         );
     }
 
@@ -45,7 +47,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
             .first();
 
         if (!record) return null;
-        return VerificationDocumentMapper.toDomain(record as VerificationDocumentRaw);
+        return VerificationDocumentMapper.toDomain(record);
     }
 
     async createOrUpdate(input: CreateVerificationDocumentInputDto): Promise<VerificationDocument> {
@@ -112,7 +114,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
                 .include("files")
                 .first();
 
-            return VerificationDocumentMapper.toDomain(record as VerificationDocumentRaw);
+            return VerificationDocumentMapper.toDomain(record)
         });
     }
 
@@ -173,7 +175,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
                         } as never);
                 }
 
-                return VerificationDocumentMapper.toDomain(docRecord as VerificationDocumentRaw);
+                return VerificationDocumentMapper.toDomain(docRecord);
             }
 
             return null;
@@ -220,7 +222,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
                 .all();
 
             const remainingDocs = remainingDocsRecords.map((r) =>
-                VerificationDocumentMapper.toDomain(r as VerificationDocumentRaw)
+                VerificationDocumentMapper.toDomain(r)
             );
 
             if (remainingDocs.length === 0) {

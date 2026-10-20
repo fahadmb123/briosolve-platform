@@ -1,5 +1,5 @@
 import { User } from "../../../../domain/entities/user.entity";
-import { getCustomersDto } from "../../../Dto/getCustomersDto";
+import { getCustomersDto } from "../../../dtos/getCustomersDto";
 
 
 export interface IGetCustomersUseCase {

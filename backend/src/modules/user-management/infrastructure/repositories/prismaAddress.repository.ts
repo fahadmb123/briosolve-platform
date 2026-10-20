@@ -3,7 +3,7 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
 import { Address } from "../../domain/entities/address.entity";
 import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
 import { AddressMapper } from "../mappers/address.mapper";
-import { GetAddressesInputDto, GetAddressesOutputDto } from "../../application/Dto/addressDto";
+import { GetAddressesInputDto, GetAddressesOutputDto } from "../../application/dtos/addressDto";
 
 
 

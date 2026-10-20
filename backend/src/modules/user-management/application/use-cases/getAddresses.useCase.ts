@@ -2,7 +2,7 @@ import { Address } from "../../domain/entities/address.entity";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IAddressRepository } from "../../domain/repositories/IAddressRepository"
 import { ApplicationError } from "../../../../shared/application/errors/applicationError"
-import { GetAddressesInputDto, GetAddressesOutputDto } from "../Dto/addressDto";
+import { GetAddressesInputDto, GetAddressesOutputDto } from "../dtos/addressDto";
 
 
 export class GetAddressesUseCase implements IUseCase<GetAddressesInputDto,GetAddressesOutputDto>{

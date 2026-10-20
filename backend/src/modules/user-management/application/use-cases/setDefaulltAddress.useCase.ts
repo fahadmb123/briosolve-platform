@@ -1,6 +1,6 @@
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { SetDefaultAddressInputUseCaseDto } from "../Dto/addressDto";
+import { SetDefaultAddressInputUseCaseDto } from "../dtos/addressDto";
 
 
 export class SetDefaultAddressUseCase implements IUseCase<SetDefaultAddressInputUseCaseDto,void>{

@@ -1,7 +1,7 @@
 import { IRefreshTokenService } from "../../../../../shared/application/interfaces/services/IRefreshToken.service";
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IRefreshSessionRepository } from "../../../domain/repositories/refreshSession.repository";
-import { LogoutInputDto } from "../../dto/request/logout.dto";
+import { LogoutInputDto } from "../../dtos/request/logout.dto";
 
 
 export default class LogoutUseCase implements IUseCase<LogoutInputDto, void> {

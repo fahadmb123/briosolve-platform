@@ -3,7 +3,7 @@ import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IU
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
-import { UpdateProviderProfileInputDto } from "../Dto/providerDto";
+import { UpdateProviderProfileInputDto } from "../dtos/providerDto";
 
 export default class UpdateProviderProfileUseCase implements IUseCase<UpdateProviderProfileInputDto, void> {
     constructor(

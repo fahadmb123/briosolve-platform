@@ -16,7 +16,7 @@ import type {
     CreateAvailabilityOverrideInputDto,
     GetAvailabilityOverridesInputDto,
     DeleteAvailabilityOverrideInputDto
-} from "../../application/Dto/providerDto";
+} from "../../application/dtos/providerDto";
 import type { CompleteProviderRegistrationInput } from "../../application/use-cases/registerProvider.useCase";
 import type { User } from "../../domain/entities/user.entity";
 import type { ProviderAvailability } from "../../domain/entities/providerAvailability.entity";

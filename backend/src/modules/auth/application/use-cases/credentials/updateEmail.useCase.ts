@@ -7,8 +7,8 @@ import { IPasswordHasher } from "../../../../../shared/application/interfaces/se
 import { IOtpGenerator } from "../../../../../shared/application/interfaces/services/IOtpGenerator.service"
 import { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store"
 import { IEmailSender } from "../../../../../shared/application/interfaces/services/IEmailSender.service"
-import { UpdateEmailUseCaseOutputDto } from "../../dto/response/update-email.dto"
-import { UpdateEmailUseCaseInputDto } from "../../dto/request/update-email.dto"
+import { UpdateEmailUseCaseOutputDto } from "../../dtos/response/update-email.dto"
+import { UpdateEmailUseCaseInputDto } from "../../dtos/request/update-email.dto"
 
 
 

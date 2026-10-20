@@ -1,5 +1,5 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
-import { UpdateUserStatusDto, UpdateUserRepositoryInput } from "../../application/Dto/userDto";
+import { UpdateUserStatusDto, UpdateUserRepositoryInput } from "../../application/dtos/userDto";
 import { User } from "../entities/user.entity";
 
 export type GetUsersWithRoleInput = {

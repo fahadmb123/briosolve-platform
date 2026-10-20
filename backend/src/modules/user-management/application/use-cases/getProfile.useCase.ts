@@ -3,7 +3,7 @@ import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IU
 import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository";
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { GetProfileUseCaseOutputDto, GetProfileUseCaseInputDto } from "../Dto/userDto";
+import { GetProfileUseCaseOutputDto, GetProfileUseCaseInputDto } from "../dtos/userDto";
 
 export default class GetProfileUseCase implements IUseCase<GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto> {
     constructor(

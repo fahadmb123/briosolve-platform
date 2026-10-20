@@ -6,7 +6,7 @@ import { User } from "../../domain/entities/user.entity";
 import { ProviderProfile } from "../../domain/entities/providerProfile.entity";
 import { UserMapper } from "../mappers/user.mapper";
 import { ProviderProfileMapper, ProviderProfileRaw } from "../mappers/providerProfile.mapper";
-import { UpdateProviderProfileInputDto } from "../../application/Dto/providerDto";
+import { UpdateProviderProfileInputDto } from "../../application/dtos/providerDto";
 
 export class ProviderRepository implements IProviderRepository {
     async createProvider(data: CreateProviderInput): Promise<User> {

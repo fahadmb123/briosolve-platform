@@ -3,7 +3,7 @@ import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IU
 import { Address } from "../../domain/entities/address.entity";
 import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { AddAddressInputUseCaseDto } from "../Dto/addressDto";
+import { AddAddressInputUseCaseDto } from "../dtos/addressDto";
 
 
 export class AddAddressUseCase implements IUseCase<AddAddressInputUseCaseDto,Address>{

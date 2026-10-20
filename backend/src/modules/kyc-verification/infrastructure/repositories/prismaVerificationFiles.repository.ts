@@ -3,7 +3,7 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
 import { VerificationFile } from "../../domain/entities/verificationFile.entity";
 import { IVerificationFileRepository } from "../../domain/repositories/IVerificationFileRepository";
 import { VerificationFileMapper } from "../mappers/verificationFile.mapper";
-import { VerificationFileRaw } from "../../application/Dto/verificationDto";
+
 
 export class VerificationFileRepository implements IVerificationFileRepository {
     async create(documentId: string, fileUrl: string): Promise<VerificationFile> {
@@ -11,7 +11,7 @@ export class VerificationFileRepository implements IVerificationFileRepository {
             VerificationFileMapper.toPersistence(documentId, fileUrl) as never
         );
 
-        return VerificationFileMapper.toDomain(record as unknown as VerificationFileRaw);
+        return VerificationFileMapper.toDomain(record);
     }
 
     async createMany(documentId: string, fileUrls: string[]): Promise<VerificationFile[]> {
@@ -21,7 +21,7 @@ export class VerificationFileRepository implements IVerificationFileRepository {
                 const record = await tx.orm.public.provider_verification_files.create(
                     VerificationFileMapper.toPersistence(documentId, fileUrl) as never
                 );
-                results.push(VerificationFileMapper.toDomain(record as unknown as VerificationFileRaw));
+                results.push(VerificationFileMapper.toDomain(record));
             }
             return results;
         });
@@ -33,7 +33,7 @@ export class VerificationFileRepository implements IVerificationFileRepository {
             .all();
 
         return records.map((record) =>
-            VerificationFileMapper.toDomain(record as VerificationFileRaw)
+            VerificationFileMapper.toDomain(record)
         )
     }
 

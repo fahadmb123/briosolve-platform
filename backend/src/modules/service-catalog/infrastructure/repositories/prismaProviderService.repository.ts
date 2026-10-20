@@ -2,7 +2,7 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
 import { ProviderServiceMapper } from "../mappers/providerService.mapper";
-import { ProviderServiceRaw } from "../../application/Dto/providerService";
+import { ProviderServiceRaw } from "../../application/dtos/providerService";
 
 export class ProviderServiceRepository implements IProviderServiceRepository {
     async getProviderServices(providerId: string): Promise<ProviderService[]> {

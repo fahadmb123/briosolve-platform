@@ -3,7 +3,7 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
 import { User } from "../../domain/entities/user.entity";
 import { IUserRepository, GetUsersWithRoleInput } from "../../domain/repositories/IUserRepository";
 import { UserMapper } from "../mappers/user.mapper";
-import { UpdateUserRepositoryInput } from "../../application/Dto/userDto";
+import { UpdateUserRepositoryInput } from "../../application/dtos/userDto";
 
 type UserStatus = "ACTIVE" | "INACTIVE" | "BLOCKED";
 export class UserRepository implements IUserRepository{

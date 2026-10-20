@@ -7,15 +7,15 @@ import { sendSuccess } from "../../../../shared/presentation/http/response/respo
 import { accessTokenCookie, refreshTokenCookie, clearAccessTokenCookieOptions, clearRefreshTokenCookieOptions, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { LoginOutputDto } from "../../application/dto/response/login.dto";
-import { LoginInputDto } from "../../application/dto/request/login.dto";
-import { EmailVerificationUseCaseInputDto } from "../../application/dto/request/email-verification.dto";
-import { EmailVerificationUseCaseOutputDto } from "../../application/dto/response/email-verification.dto";
-import { UpdateEmailUseCaseOutputDto } from "../../application/dto/response/update-email.dto";
-import { UpdateEmailUseCaseInputDto } from "../../application/dto/request/update-email.dto";
-import { RefreshTokenInputDto } from "../../application/dto/request/refresh-token.dto";
-import { RefreshTokenOutputDto } from "../../application/dto/response/refresh-token.dto";
-import { LogoutInputDto } from "../../application/dto/request/logout.dto";
+import { LoginOutputDto } from "../../application/dtos/response/login.dto";
+import { LoginInputDto } from "../../application/dtos/request/login.dto";
+import { EmailVerificationUseCaseInputDto } from "../../application/dtos/request/email-verification.dto";
+import { EmailVerificationUseCaseOutputDto } from "../../application/dtos/response/email-verification.dto";
+import { UpdateEmailUseCaseOutputDto } from "../../application/dtos/response/update-email.dto";
+import { UpdateEmailUseCaseInputDto } from "../../application/dtos/request/update-email.dto";
+import { RefreshTokenInputDto } from "../../application/dtos/request/refresh-token.dto";
+import { RefreshTokenOutputDto } from "../../application/dtos/response/refresh-token.dto";
+import { LogoutInputDto } from "../../application/dtos/request/logout.dto";
 
 export class AuthController extends BaseController {
     constructor(
