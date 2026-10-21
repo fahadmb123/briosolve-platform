@@ -3,9 +3,11 @@ import type { NextFunction,Request,Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
-import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/dtos/service";
 import { Service } from "../../domain/entities/service.entity";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
+import { AddServiceUseCaseInputDto } from "../../application/dtos/service/request/add-service.dto";
+import { UpdateServiceUseCaseDto } from "../../application/dtos/service/request/update-service.dto";
+import { GetServicesDto } from "../../application/dtos/category/response/get-service.dto";
 
 
 export class ServiceController extends BaseController {

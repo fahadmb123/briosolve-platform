@@ -2,7 +2,7 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { Category } from "../../domain/entities/category.entity";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
-import { AddCategoryUseCaseInputDto } from "../dtos/request/add-category.dto";
+import { AddCategoryUseCaseInputDto } from "../dtos/category/request/add-category.dto";
 
 
 

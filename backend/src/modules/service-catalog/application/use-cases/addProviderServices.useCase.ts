@@ -3,7 +3,7 @@ import { ProviderService } from "../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { AddProviderServicesInputDto } from "../dtos/request/add-provider-service.dto";
+import { AddProviderServicesInputDto } from "../dtos/provider/request/add-provider-service.dto";
 
 export class AddProviderServicesUseCase implements IUseCase<AddProviderServicesInputDto, ProviderService[]> {
     constructor(

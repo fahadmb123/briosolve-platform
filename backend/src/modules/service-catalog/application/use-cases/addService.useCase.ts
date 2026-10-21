@@ -1,8 +1,8 @@
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { AddServiceUseCaseInputDto } from "../dtos/service";
 import { Service } from "../../domain/entities/service.entity";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { AddServiceUseCaseInputDto } from "../dtos/service/request/add-service.dto";
 
 export class AddServiceUseCase implements IUseCase<AddServiceUseCaseInputDto, Service> {
     constructor(

@@ -1,7 +1,7 @@
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { GetServicesDto } from "../dtos/service";
 import { Service } from "../../domain/entities/service.entity";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
+import { GetServicesDto } from "../dtos/category/response/get-service.dto";
 
 export class GetServicesUseCase implements IUseCase<GetServicesDto, { services: Service[], total: number }> {
     constructor(

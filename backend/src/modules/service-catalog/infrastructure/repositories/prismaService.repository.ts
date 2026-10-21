@@ -3,7 +3,9 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
 import { Service } from "../../domain/entities/service.entity";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
 import { ServiceMapper } from "../mappers/service.mapper";
-import { AddServiceUseCaseInputDto, UpdateServiceUseCaseDto, GetServicesDto } from "../../application/dtos/service";
+import { AddServiceUseCaseInputDto } from "../../application/dtos/service/request/add-service.dto";
+import { UpdateServiceUseCaseDto } from "../../application/dtos/service/request/update-service.dto";
+import { GetServicesDto } from "../../application/dtos/category/response/get-service.dto";
 
 
 export class ServiceRepository implements IServiceRepository{

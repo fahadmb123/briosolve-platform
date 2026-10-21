@@ -5,9 +5,10 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
 import { Category } from "../../domain/entities/category.entity";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
-import { AddCategoryUseCaseInputDto } from "../../application/dtos/request/add-category.dto";
-import { GetCategoriesDto } from "../../application/dtos/response/get-categories.dto";
-import { UpdateCategoryUseCaseDto } from "../../application/dtos/request/update-category.dto";
+import { AddCategoryUseCaseInputDto } from "../../application/dtos/category/request/add-category.dto";
+import { GetCategoriesDto } from "../../application/dtos/category/response/get-categories.dto";
+import { UpdateCategoryUseCaseDto } from "../../application/dtos/category/request/update-category.dto";
+
 
 
 

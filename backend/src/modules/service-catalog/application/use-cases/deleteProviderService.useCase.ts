@@ -3,7 +3,7 @@ import { ProviderService } from "../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { DeleteProviderServiceInputDto } from "../dtos/request/delete-provider-service.dto";
+import { DeleteProviderServiceInputDto } from "../dtos/provider/request/delete-provider-service.dto";
 
 export class DeleteProviderServiceUseCase implements IUseCase<DeleteProviderServiceInputDto, ProviderService[]> {
     constructor(
