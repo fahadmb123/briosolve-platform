@@ -1,19 +1,20 @@
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { VerificationDocument } from "../../domain/entities/verificationDocument.entity";
-import { GetAdminKycRequestsInput, GetAdminKycResponse } from "../../domain/repositories/IVerificationDocumentRepository";
 import { UpdateKycStatusInput } from "../../application/use-cases/updateKycStatus.useCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { UpdateVerificationInputDto } from "../../application/dtos/verification/request/update-verification.dto";
 import { UploadVerificationInputDto } from "../../application/dtos/verification/request/upload-verification.dto";
+import { UploadVerificationDocumentResponseDto } from "../../application/dtos/verification/response/upload-verification-document.dto";
+import { GetAdminKycRequestsInput } from "../../application/dtos/admin/request/get-admin-kyc.dto";
+import { GetAdminKycResponse } from "../../application/dtos/admin/response/get-admin-kyc.dto";
 
 export class VerificationController extends BaseController {
     constructor(
-        private readonly uploadVerificationDocumentUseCase: IUseCase<UploadVerificationInputDto, VerificationDocument>,
-        private readonly getProviderVerificationsUseCase: IUseCase<string, VerificationDocument[]>,
-        private readonly updateVerificationDocumentUseCase: IUseCase<UpdateVerificationInputDto, VerificationDocument>,
+        private readonly uploadVerificationDocumentUseCase: IUseCase<UploadVerificationInputDto, UploadVerificationDocumentResponseDto>,
+        private readonly getProviderVerificationsUseCase: IUseCase<string, UploadVerificationDocumentResponseDto[]>,
+        private readonly updateVerificationDocumentUseCase: IUseCase<UpdateVerificationInputDto, UploadVerificationDocumentResponseDto>,
         private readonly deleteVerificationDocumentUseCase: IUseCase<{ id: string; userId: string }, boolean>,
         private readonly getAdminVerificationsUseCase: IUseCase<GetAdminKycRequestsInput, GetAdminKycResponse>,
         private readonly updateKycStatusUseCase: IUseCase<UpdateKycStatusInput, void>

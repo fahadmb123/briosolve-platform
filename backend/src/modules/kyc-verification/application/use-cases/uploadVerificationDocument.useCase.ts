@@ -1,21 +1,21 @@
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { VerificationDocument } from "../../domain/entities/verificationDocument.entity";
 import { IVerificationDocumentRepository } from "../../domain/repositories/IVerificationDocumentRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { UploadVerificationInputDto } from "../dtos/verification/request/upload-verification.dto";
+import { UploadVerificationDocumentResponseDto } from "../dtos/verification/response/upload-verification-document.dto";
 
 
 
-export class UploadVerificationDocumentUseCase implements IUseCase<UploadVerificationInputDto, VerificationDocument> {
+export class UploadVerificationDocumentUseCase implements IUseCase<UploadVerificationInputDto, UploadVerificationDocumentResponseDto> {
     constructor(
         private readonly verificationDocumentRepository: IVerificationDocumentRepository,
         private readonly providerRepository: IProviderRepository,
         private readonly imageUploadService: ImageUploadService
     ){}
 
-    async execute(input: UploadVerificationInputDto): Promise<VerificationDocument> {
+    async execute(input: UploadVerificationInputDto): Promise<UploadVerificationDocumentResponseDto> {
         const provider = await this.providerRepository.findById(input.userId);
         if (!provider) {
             throw new ApplicationError("NOT_FOUND", "Provider profile not found", "NOT_FOUND");

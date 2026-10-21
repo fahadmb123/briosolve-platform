@@ -5,16 +5,17 @@ import { IProviderRepository } from "../../../user-management/domain/repositorie
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { UpdateVerificationInputDto } from "../dtos/verification/request/update-verification.dto";
+import { UploadVerificationDocumentResponseDto } from "../dtos/verification/response/upload-verification-document.dto";
 
 
-export class UpdateVerificationDocumentUseCase implements IUseCase<UpdateVerificationInputDto, VerificationDocument> {
+export class UpdateVerificationDocumentUseCase implements IUseCase<UpdateVerificationInputDto, UploadVerificationDocumentResponseDto> {
     constructor(
         private readonly verificationDocumentRepository: IVerificationDocumentRepository,
         private readonly providerRepository: IProviderRepository,
         private readonly imageUploadService: ImageUploadService
     ){}
 
-    async execute(input: UpdateVerificationInputDto): Promise<VerificationDocument> {
+    async execute(input: UpdateVerificationInputDto): Promise<UploadVerificationDocumentResponseDto> {
         const provider = await this.providerRepository.findById(input.userId);
         if (!provider) {
             throw new ApplicationError("NOT_FOUND", "Provider profile not found", "NOT_FOUND");

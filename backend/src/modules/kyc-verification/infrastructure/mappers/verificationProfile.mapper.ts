@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { VerificationProfile } from "../../domain/entities/verificationProfile.entity";
-import { AdminKycDossier } from "../../domain/repositories/IVerificationDocumentRepository";
 import { VerificationDocumentMapper, VerificationDocumentRecord } from "./verificationDocument.mapper";
+import { AdminKycDossier } from "../../application/dtos/admin/response/get-admin-kyc.dto";
 
 export type VerificationProfileRecord = Prisma.ProviderProfileGetPayload<{}>;
 

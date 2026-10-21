@@ -1,11 +1,10 @@
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import {
-    IVerificationDocumentRepository,
-    GetAdminKycRequestsInput,
-    GetAdminKycResponse,
-    AdminKycStats
+    IVerificationDocumentRepository
 } from "../../domain/repositories/IVerificationDocumentRepository";
 import { VerificationProfileMapper } from "../../infrastructure/mappers/verificationProfile.mapper";
+import { GetAdminKycRequestsInput } from "../dtos/admin/request/get-admin-kyc.dto";
+import { AdminKycStats, GetAdminKycResponse } from "../dtos/admin/response/get-admin-kyc.dto";
 
 export class GetAdminVerificationsUseCase implements IUseCase<GetAdminKycRequestsInput, GetAdminKycResponse> {
     constructor(

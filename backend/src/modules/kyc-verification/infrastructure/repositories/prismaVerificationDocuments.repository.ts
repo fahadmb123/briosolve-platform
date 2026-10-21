@@ -3,10 +3,7 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
 import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../../domain/entities/verificationDocument.entity";
 import {
     IVerificationDocumentRepository,
-    GetAdminKycRequestsInput,
-    GetAdminKycResponse,
-    UpdateDocumentStatusInput,
-    AdminKycStats
+    UpdateDocumentStatusInput
 } from "../../domain/repositories/IVerificationDocumentRepository";
 import { VerificationDocumentMapper } from "../mappers/verificationDocument.mapper";
 import { VerificationFileMapper } from "../mappers/verificationFile.mapper";
@@ -14,6 +11,8 @@ import { VerificationProfile } from "../../domain/entities/verificationProfile.e
 import { VerificationProfileMapper } from "../mappers/verificationProfile.mapper";
 import { UpdateVerificationDocumentRepositoryDto } from "../../application/dtos/verification-document/request/update-veridication-document-repository.dto";
 import { CreateVerificationDocumentInputDto } from "../../application/dtos/verification-document/request/create-verification-document.dto";
+import { GetAdminKycRequestsInput } from "../../application/dtos/admin/request/get-admin-kyc.dto";
+import { AdminKycStats, GetAdminKycResponse } from "../../application/dtos/admin/response/get-admin-kyc.dto";
 
 
 
