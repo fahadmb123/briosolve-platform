@@ -2,8 +2,8 @@ import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IU
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
-import { DeleteProviderCategoryInputDto } from "../dtos/providerService";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { DeleteProviderCategoryInputDto } from "../dtos/request/delete-provider-category.dto";
 
 export class DeleteProviderCategoryUseCase implements IUseCase<DeleteProviderCategoryInputDto, ProviderService[]> {
     constructor(

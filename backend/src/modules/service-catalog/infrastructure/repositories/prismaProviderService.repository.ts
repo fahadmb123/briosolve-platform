@@ -2,7 +2,7 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
 import { ProviderServiceMapper } from "../mappers/providerService.mapper";
-import { ProviderServiceRaw } from "../../application/dtos/providerService";
+
 
 export class ProviderServiceRepository implements IProviderServiceRepository {
     async getProviderServices(providerId: string): Promise<ProviderService[]> {
@@ -16,7 +16,7 @@ export class ProviderServiceRepository implements IProviderServiceRepository {
             .all();
 
         return records.map((record) =>
-            ProviderServiceMapper.toDomain(record as unknown as ProviderServiceRaw)
+            ProviderServiceMapper.toDomain(record)
         );
     }
 
@@ -41,7 +41,7 @@ export class ProviderServiceRepository implements IProviderServiceRepository {
                 .all();
 
             return records.map((record) =>
-                ProviderServiceMapper.toDomain(record as unknown as ProviderServiceRaw)
+                ProviderServiceMapper.toDomain(record)
             );
         });
     }
@@ -92,7 +92,7 @@ export class ProviderServiceRepository implements IProviderServiceRepository {
                 .all();
 
             return remaining.map((record) =>
-                ProviderServiceMapper.toDomain(record as unknown as ProviderServiceRaw)
+                ProviderServiceMapper.toDomain(record)
             );
         });
     }
