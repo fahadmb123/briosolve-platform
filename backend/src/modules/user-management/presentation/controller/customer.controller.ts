@@ -1,7 +1,6 @@
 import { NextFunction,Request,Response } from "express"
 import { accessTokenCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController"
-import { sendSuccess } from "../../../../shared/presentation/http/response/response"
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper"
@@ -38,7 +37,7 @@ export class CustomerController extends BaseController{
 
             res.cookie("registration_id",response.registrationId,registrationCookie)
 
-            return sendSuccess(res,"OTP sent successfully",{expiresIn: response.expiresIn})
+            return this.sendSuccess(res,"OTP sent successfully",{expiresIn: response.expiresIn})
         } catch (err) {
             next(err)
         }
@@ -46,8 +45,6 @@ export class CustomerController extends BaseController{
 
     getCustomers = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
-    
             const response = await this.getCustomersUseCase.execute({
                 page:Number(req.query.page) || 1,
                 limit:Number(req.query.limit) || 10,
@@ -55,7 +52,7 @@ export class CustomerController extends BaseController{
                 search:req.query.search as string | undefined
             })
 
-            return sendSuccess(res,"",{
+            return this.sendSuccess(res,"",{
                 users: response.users.map(u => UserMapper.toDto(u)),
                 total: response.total,
                 totalPages: response.totalPages
@@ -67,10 +64,9 @@ export class CustomerController extends BaseController{
 
     updateProfile = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             await this.updateCustomerProfileUseCase.execute({id:req.user?.userId!,data:req.body})
 
-            return sendSuccess(res,"Updated!")
+            return this.sendSuccess(res,"Updated!")
         } catch (err) {
             next(err)
         }
@@ -78,7 +74,6 @@ export class CustomerController extends BaseController{
     
     uploadProfileImage = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             if (!req.file) throw new ApplicationError("NO_DATA","No image uploaded","NOT_FOUND")
             const imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'profiles')
             
@@ -87,7 +82,7 @@ export class CustomerController extends BaseController{
                 data: { profile_image: imageUrl }
             })
 
-            return sendSuccess(res,"Updated!", { profile_image: imageUrl })
+            return this.sendSuccess(res,"Updated!", { profile_image: imageUrl })
         } catch (err) {
             next(err)
         }
@@ -95,7 +90,6 @@ export class CustomerController extends BaseController{
     
     deleteProfileImage = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             const { imageUrl } = req.body;
 
             if (imageUrl) await this.imageUploadService.deleteImageByUrl(imageUrl)
@@ -105,7 +99,7 @@ export class CustomerController extends BaseController{
                 data: { profile_image: "" }
             })
 
-            return sendSuccess(res,"Deleted!", { profile_image: null })
+            return this.sendSuccess(res,"Deleted!", { profile_image: null })
         } catch (err) {
             next(err)
         }
@@ -113,10 +107,10 @@ export class CustomerController extends BaseController{
 
     sendBecomeProviderOtp = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const { userId } = this.getCurrentUser(req)
+            const userId = req.user!.userId
             const response = await this.sendBecomeProviderOtpUseCase.execute(userId)
             res.cookie("registration_id", response.registrationId, registrationCookie)
-            return sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn })
+            return this.sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn })
         } catch (err) {
             next(err)
         }
@@ -124,8 +118,7 @@ export class CustomerController extends BaseController{
 
     becomeProvider = async (req:Request,res:Response,next:NextFunction) => {
         try {
-         
-            const user = this.getCurrentUser(req)
+            const user = req.user!
             const registrationId = req.cookies.registration_id
             const { businessName, experience, bio, services } = req.body
             await this.becomeProviderUseCase.execute({ registrationId, businessName, experience, bio, services })
@@ -133,7 +126,7 @@ export class CustomerController extends BaseController{
             const newToken = await this.jwtService.generate({ userId: user.userId, role: "PROVIDER" })
             res.cookie("access_token", newToken, accessTokenCookie)
             if (registrationId) res.clearCookie("registration_id")
-            return sendSuccess(res, "Switched to Provider!")
+            return this.sendSuccess(res, "Switched to Provider!")
         } catch (err) {
             console.error("becomeProvider error:", err)
             next(err)
@@ -142,7 +135,7 @@ export class CustomerController extends BaseController{
 
     getNearbyProviders = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = this.getCurrentUser(req);
+            const user = req.user!;
             const response = await this.getNearbyProvidersUseCase.execute({
                 userId: user.userId,
                 page: Number(req.query.page) || 1,
@@ -151,7 +144,7 @@ export class CustomerController extends BaseController{
                 radius: req.query.radius ? Number(req.query.radius) : undefined
             });
 
-            return sendSuccess(res, "Nearby providers fetched successfully", response);
+            return this.sendSuccess(res, "Nearby providers fetched successfully", response);
         } catch (err) {
             next(err);
         }

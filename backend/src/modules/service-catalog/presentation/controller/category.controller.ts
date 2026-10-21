@@ -3,14 +3,10 @@ import type { NextFunction,Request,Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { AddCategoryUseCaseInputDto } from "../../application/dtos/category/request/add-category.dto";
 import { GetCategoriesDto } from "../../application/dtos/category/response/get-categories.dto";
 import { UpdateCategoryUseCaseDto } from "../../application/dtos/category/request/update-category.dto";
 import { CategoryResponseDto } from "../../application/dtos/category/response/category.dto";
-
-
-
 
 export class CategoryController extends BaseController{
     constructor(
@@ -23,14 +19,13 @@ export class CategoryController extends BaseController{
     
     addCategory = async (req:Request, res:Response, next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             if (!req.file) throw new ApplicationError("NOT_FOUND","Category image is required","NOT_FOUND")
 
             const imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'categories')
 
             const response = await this.addCategoryUseCase.execute({...req.body,image:imageUrl})
 
-            return sendSuccess(res,"Added",response)
+            return this.sendSuccess(res,"Added",response)
         } catch (error) {
             next(error);
         }
@@ -38,7 +33,6 @@ export class CategoryController extends BaseController{
 
     updateCategory = async (req:Request, res:Response, next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             let imageUrl: string | undefined = undefined;
             if (req.file) imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'categories')
             
@@ -53,7 +47,7 @@ export class CategoryController extends BaseController{
                 }
             })
 
-            return sendSuccess(res,"Updated!",response)
+            return this.sendSuccess(res,"Updated!",response)
         } catch (error) {
             next(error);
         }
@@ -68,7 +62,7 @@ export class CategoryController extends BaseController{
                 search: req.query.search as string | undefined
             })
 
-            return sendSuccess(res,"", {
+            return this.sendSuccess(res,"", {
                 categories: response.categories,
                 total: response.total,
                 totalPages: response.totalPages
@@ -80,12 +74,11 @@ export class CategoryController extends BaseController{
 
     deleteCategory = async (req:Request, res:Response, next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             const id = req.params.id;
             if (!id) throw new ApplicationError("BAD_REQUEST", "Category ID is required", "UNSUPPORTED");
 
             const response = await this.deleteCategoryUseCase.execute(id as string);
-            return sendSuccess(res, "Category deleted successfully", response);
+            return this.sendSuccess(res, "Category deleted successfully", response);
         } catch (error) {
             next(error);
         }

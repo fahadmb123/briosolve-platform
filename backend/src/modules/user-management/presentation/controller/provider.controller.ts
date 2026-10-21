@@ -1,6 +1,5 @@
- import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { accessTokenCookie, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IGetProvidersUseCase } from "../../application/interfaces/use-cases/providers/get-providers.interface";
@@ -43,8 +42,8 @@ export class ProviderController extends BaseController {
 
     getProviders = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const currentUser = this.getCurrentUser(req);
-            const isCustomer = currentUser.role === "CUSTOMER";
+            const currentUser = req.user;
+            const isCustomer = currentUser?.role === "CUSTOMER";
 
             const response = await this.getProvidersUseCase.execute({
                 page: Number(req.query.page) || 1,
@@ -53,7 +52,7 @@ export class ProviderController extends BaseController {
                 search: req.query.search as string | undefined
             });
 
-            return sendSuccess(res, "", {
+            return this.sendSuccess(res, "", {
                 users: response.users.map(u => UserMapper.toDto(u)),
                 total: response.total,
                 totalPages: response.totalPages
@@ -69,7 +68,7 @@ export class ProviderController extends BaseController {
 
             res.cookie("registration_id", response.registrationId, registrationCookie);
 
-            return sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn });
+            return this.sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn });
         } catch (err) {
             next(err);
         }
@@ -94,7 +93,7 @@ export class ProviderController extends BaseController {
 
             res.clearCookie("registration_id");
 
-            return sendSuccess(res, "Provider account created successfully", UserMapper.toDto(user));
+            return this.sendSuccess(res, "Provider account created successfully", UserMapper.toDto(user));
         } catch (err) {
             next(err);
         }
@@ -102,9 +101,8 @@ export class ProviderController extends BaseController {
 
     updateProfile = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.getCurrentUser(req);
             await this.updateProviderProfileUseCase.execute({ id: req.user?.userId!, data: req.body });
-            return sendSuccess(res, "Updated!");
+            return this.sendSuccess(res, "Updated!");
         } catch (err) {
             next(err);
         }
@@ -112,9 +110,8 @@ export class ProviderController extends BaseController {
 
     getAvailability = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.getCurrentUser(req);
             const data = await this.getProviderAvailabilityUseCase!.execute({ userId: req.user?.userId! });
-            return sendSuccess(res, "Provider availability fetched successfully", data);
+            return this.sendSuccess(res, "Provider availability fetched successfully", data);
         } catch (err) {
             next(err);
         }
@@ -122,12 +119,11 @@ export class ProviderController extends BaseController {
 
     setAvailability = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.getCurrentUser(req);
             const data = await this.setProviderAvailabilityUseCase!.execute({
                 userId: req.user?.userId!,
                 slots: req.body.slots
             });
-            return sendSuccess(res, "Updated!", data);
+            return this.sendSuccess(res, "Updated!", data);
         } catch (err) {
             next(err);
         }
@@ -135,9 +131,8 @@ export class ProviderController extends BaseController {
 
     getAvailabilityOverrides = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.getCurrentUser(req);
             const data = await this.getProviderAvailabilityOverridesUseCase!.execute({ userId: req.user?.userId! });
-            return sendSuccess(res, "Overrides fetched successfully", data);
+            return this.sendSuccess(res, "Overrides fetched successfully", data);
         } catch (err) {
             next(err);
         }
@@ -145,7 +140,6 @@ export class ProviderController extends BaseController {
 
     createAvailabilityOverride = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.getCurrentUser(req);
             const data = await this.createProviderAvailabilityOverrideUseCase!.execute({
                 userId: req.user?.userId!,
                 override_date: req.body.override_date,
@@ -154,7 +148,7 @@ export class ProviderController extends BaseController {
                 end_time: req.body.end_time,
                 reason: req.body.reason
             });
-            return sendSuccess(res, "Override created successfully", data);
+            return this.sendSuccess(res, "Override created successfully", data);
         } catch (err) {
             next(err);
         }
@@ -162,12 +156,11 @@ export class ProviderController extends BaseController {
 
     deleteAvailabilityOverride = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.getCurrentUser(req);
             await this.deleteProviderAvailabilityOverrideUseCase!.execute({
                 userId: req.user?.userId!,
                 overrideId: req.params.id as string
             });
-            return sendSuccess(res, "Deleted!");
+            return this.sendSuccess(res, "Deleted!");
         } catch (err) {
             next(err);
         }
@@ -175,7 +168,6 @@ export class ProviderController extends BaseController {
 
     uploadProfileImage = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.getCurrentUser(req)
             if (!req.file) throw new ApplicationError("NO_DATA", "No image uploaded", "NOT_FOUND")
     
             const imageUrl = await this.imageUploadService!.uploadImage(req.file.buffer, 'profiles')
@@ -185,7 +177,7 @@ export class ProviderController extends BaseController {
                 data: { profile_image: imageUrl }
             });
 
-            return sendSuccess(res, "Updated!", { profile_image: imageUrl });
+            return this.sendSuccess(res, "Updated!", { profile_image: imageUrl });
         } catch (err) {
             next(err);
         }
@@ -193,38 +185,38 @@ export class ProviderController extends BaseController {
 
     deleteProfileImage = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.getCurrentUser(req);
-
             await this.updateProviderProfileUseCase.execute({
                 id: req.user?.userId!,
                 data: { profile_image: "" }
             });
 
-            return sendSuccess(res, "Deleted!", { profile_image: null });
+            return this.sendSuccess(res, "Deleted!", { profile_image: null });
         } catch (err) {
             next(err);
         }
     }
+
     sendBecomeCustomerOtp = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const { userId } = this.getCurrentUser(req)
+            const userId = req.user!.userId
             const response = await this.sendBecomeCustomerOtpUseCase.execute(userId)
             res.cookie("registration_id", response.registrationId, registrationCookie)
-            return sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn })
+            return this.sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn })
         } catch (err) {
             next(err)
         }
     }
+
     becomeCustomer = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const user = this.getCurrentUser(req)
+            const user = req.user!
             const registrationId = req.cookies.registration_id
             await this.becomeCustomerUseCase.execute({registrationId})
             
             const newToken = await this.jwtService.generate({ userId: user.userId, role: "CUSTOMER" })
             res.cookie("access_token", newToken, accessTokenCookie)
             if (registrationId) res.clearCookie("registration_id")
-            return sendSuccess(res, "Switched to CUSTOMER!")
+            return this.sendSuccess(res, "Switched to CUSTOMER!")
         } catch (err) {
             console.error("becomeProvider error:", err)
             next(err)

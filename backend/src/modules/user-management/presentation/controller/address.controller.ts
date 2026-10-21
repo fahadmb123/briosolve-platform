@@ -1,7 +1,6 @@
 import { NextFunction,Request,Response } from "express"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { AddAddressInputUseCaseDto } from "../../application/dtos/request/address/add-address.dto";
 import { GetAddressesInputDto } from "../../application/dtos/request/address/get-addresses.dto";
 import { GetAddressesOutputDto } from "../../application/dtos/response/address/get-addresses.dto";
@@ -21,11 +20,11 @@ export class AddressController extends BaseController{
 
     addAddress = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const user = this.getCurrentUser(req)
+            const user = req.user!
 
             const response = await this.addAddressUseCase.execute({id:user.userId,input:req.body})
             
-            return sendSuccess(res,"Added!",response)
+            return this.sendSuccess(res,"Added!",response)
         } catch (err) {
             next(err)
         }
@@ -33,12 +32,11 @@ export class AddressController extends BaseController{
 
     editAddress = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const user = this.getCurrentUser(req)
             const id = req.params.id
 
             const response = await this.editAddressUseCase.execute({id:id as string,input:req.body})
             
-            return sendSuccess(res,"Updated!",response)
+            return this.sendSuccess(res,"Updated!",response)
         } catch (err) {
             next(err)
         }
@@ -46,7 +44,7 @@ export class AddressController extends BaseController{
 
     getAddresses = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const user = this.getCurrentUser(req)
+            const user = req.user!
 
             const response = await this.getAddressesUseCase.execute({
                 id:user.userId,
@@ -55,31 +53,30 @@ export class AddressController extends BaseController{
                 search:req.query.search as string | undefined
             })
             
-            return sendSuccess(res,"",response)
+            return this.sendSuccess(res,"",response)
         } catch (err) {
             next(err)
         }
     }
     delete = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const user = this.getCurrentUser(req)
             const id = req.params.id
 
             await this.deleteAddressUseCase.execute(id as string)
 
-            return sendSuccess(res,"Deleted!")
+            return this.sendSuccess(res,"Deleted!")
         } catch (err) {
             next(err)
         }
     }
     setDefault = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const user = this.getCurrentUser(req)
+            const user = req.user!
             const addressId = req.params.id
 
             await this.setDefaultAddressUseCase.execute({userId:user.userId,addressId:addressId as string})
 
-            return sendSuccess(res,"Updated!")
+            return this.sendSuccess(res,"Updated!")
         } catch (err) {
             next(err)
         }

@@ -2,7 +2,6 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { UpdateKycStatusInput } from "../../application/use-cases/updateKycStatus.useCase";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { UpdateVerificationInputDto } from "../../application/dtos/verification/request/update-verification.dto";
 import { UploadVerificationInputDto } from "../../application/dtos/verification/request/upload-verification.dto";
@@ -24,7 +23,7 @@ export class VerificationController extends BaseController {
 
     uploadVerification = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = this.getCurrentUser(req);
+            const user = req.user!;
 
             const uploadedFiles: Express.Multer.File[] = [];
             if (Array.isArray(req.files)) {
@@ -49,7 +48,7 @@ export class VerificationController extends BaseController {
             };
 
             const result = await this.uploadVerificationDocumentUseCase.execute(input);
-            return sendSuccess(res, "Submitted!", result);
+            return this.sendSuccess(res, "Submitted!", result);
         } catch (error) {
             next(error);
         }
@@ -57,7 +56,7 @@ export class VerificationController extends BaseController {
 
     updateVerification = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = this.getCurrentUser(req);
+            const user = req.user!;
             const id = req.params.id;
             if (!id) {
                 throw new ApplicationError("BAD_REQUEST", "Document ID is required", "VALIDATION");
@@ -96,7 +95,7 @@ export class VerificationController extends BaseController {
             };
 
             const result = await this.updateVerificationDocumentUseCase.execute(input);
-            return sendSuccess(res, "Updated!", result);
+            return this.sendSuccess(res, "Updated!", result);
         } catch (error) {
             next(error);
         }
@@ -104,7 +103,7 @@ export class VerificationController extends BaseController {
 
     deleteVerification = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = this.getCurrentUser(req);
+            const user = req.user!;
             const id = req.params.id;
             if (!id) {
                 throw new ApplicationError("BAD_REQUEST", "Document ID is required", "VALIDATION");
@@ -114,7 +113,7 @@ export class VerificationController extends BaseController {
                 id: id as string,
                 userId: user.userId
             });
-            return sendSuccess(res, "Deleted!", null);
+            return this.sendSuccess(res, "Deleted!", null);
         } catch (error) {
             next(error);
         }
@@ -122,9 +121,9 @@ export class VerificationController extends BaseController {
 
     getProviderVerifications = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = this.getCurrentUser(req);
+            const user = req.user!;
             const documents = await this.getProviderVerificationsUseCase.execute(user.userId);
-            return sendSuccess(res, "Verification documents retrieved successfully", documents);
+            return this.sendSuccess(res, "Verification documents retrieved successfully", documents);
         } catch (error) {
             next(error);
         }
@@ -145,7 +144,7 @@ export class VerificationController extends BaseController {
                 status,
                 sort
             });
-            return sendSuccess(res, "Admin verification requests retrieved successfully", result);
+            return this.sendSuccess(res, "Admin verification requests retrieved successfully", result);
         } catch (error) {
             next(error);
         }
@@ -164,7 +163,7 @@ export class VerificationController extends BaseController {
                 rejectionReason,
                 documentId
             });
-            return sendSuccess(res, `KYC status updated to ${status}!`, null);
+            return this.sendSuccess(res, `KYC status updated to ${status}!`, null);
         } catch (error) {
             next(error);
         }

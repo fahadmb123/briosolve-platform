@@ -1,7 +1,6 @@
 import { NextFunction ,Response,Request} from "express"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import { IUpdateUserStatusUseCase } from "../../application/interfaces/use-cases/users/update-user.interface";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { GetProfileUseCaseOutputDto } from "../../application/dtos/response/user/get-profile.dto";
@@ -15,10 +14,9 @@ export class UserController extends BaseController{
 
     getProfile = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             const response = await this.getProfileUseCase.execute({id:req.user?.userId!,role:req.user?.role!})
 
-            return sendSuccess(res,"",{
+            return this.sendSuccess(res,"",{
                 user: UserMapper.toDto(response.user),
                 profile: response.profile ? response.profile : null
             }) 
@@ -29,7 +27,6 @@ export class UserController extends BaseController{
     
     updateUserStatus = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             await this.updateUserUseCase.execute({
                 id: req.params.id as string,
                 status: req.body.status,
@@ -37,7 +34,7 @@ export class UserController extends BaseController{
                 adminId: req.user?.userId
             })
 
-            return sendSuccess(res,"Updated!")
+            return this.sendSuccess(res,"Updated!")
         } catch (err) {
             next(err)
         }

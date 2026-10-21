@@ -3,13 +3,10 @@ import type { NextFunction,Request,Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { AddServiceUseCaseInputDto } from "../../application/dtos/service/request/add-service.dto";
 import { UpdateServiceUseCaseDto } from "../../application/dtos/service/request/update-service.dto";
 import { GetServicesDto } from "../../application/dtos/category/response/get-service.dto";
 import { ServiceResponseDto } from "../../application/dtos/service/response/service.dto";
-
-
 
 export class ServiceController extends BaseController {
     constructor(
@@ -22,14 +19,13 @@ export class ServiceController extends BaseController {
     
     addService = async (req:Request, res:Response, next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             if (!req.file) throw new ApplicationError("NOT_FOUND","Service image is required","NOT_FOUND")
 
             const imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'services')
 
             const response = await this.addServiceUseCase.execute({...req.body, image:imageUrl})
 
-            return sendSuccess(res,"Added",response)
+            return this.sendSuccess(res,"Added",response)
         } catch (error) {
             next(error);
         }
@@ -37,7 +33,6 @@ export class ServiceController extends BaseController {
 
     updateService = async (req:Request, res:Response, next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             let imageUrl: string | undefined = undefined;
             if (req.file) imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'services')
             
@@ -52,7 +47,7 @@ export class ServiceController extends BaseController {
                 }
             })
 
-            return sendSuccess(res,"Updated!",response)
+            return this.sendSuccess(res,"Updated!",response)
         } catch (error) {
             next(error);
         }
@@ -60,7 +55,6 @@ export class ServiceController extends BaseController {
 
     getServices = async (req:Request, res:Response, next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             const limit = Number(req.query.limit) || 10;
             const response = await this.getServicesUseCase.execute({
                 page: Number(req.query.page) || 1,
@@ -69,7 +63,7 @@ export class ServiceController extends BaseController {
                 search: req.query.search as string | undefined
             })
 
-            return sendSuccess(res,"", {
+            return this.sendSuccess(res,"", {
                 services: response.services,
                 total: response.total,
                 totalPages: Math.ceil(response.total / limit)
@@ -81,12 +75,11 @@ export class ServiceController extends BaseController {
 
     deleteService = async (req:Request, res:Response, next:NextFunction) => {
         try {
-            this.getCurrentUser(req)
             const id = req.params.id;
             if (!id) throw new ApplicationError("BAD_REQUEST", "Service ID is required", "UNSUPPORTED");
 
             const response = await this.deleteServiceUseCase.execute(id as string);
-            return sendSuccess(res, "Service deleted successfully", response);
+            return this.sendSuccess(res, "Service deleted successfully", response);
         } catch (error) {
             next(error);
         }

@@ -94,10 +94,10 @@ export class AuthController extends BaseController {
 
     getMe = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = this.getCurrentUser(req);
+            const user = req.user!;
             const response = await this.getMeUseCase.execute(user);
 
-            return sendSuccess(res, "", response)
+            return this.sendSuccess(res, "", response)
         } catch (err) {
             next(err);
         }
@@ -109,7 +109,7 @@ export class AuthController extends BaseController {
             let response = null;
 
             if (work === "UPDATE") {
-                const user = this.getCurrentUser(req);
+                const user = req.user!;
                 response = await this.updateEmailUseCase.execute({ email: req.body.email, userId: user.userId });
             } else {
                 response = await this.emailVerification.execute({ email: req.body.email });
@@ -117,7 +117,7 @@ export class AuthController extends BaseController {
 
             res.cookie("registration_id", response.registrationId, registrationCookie);
 
-            return sendSuccess(res, "OTP Sent Successfully", { expiresIn: response.expiresIn });
+            return this.sendSuccess(res, "OTP Sent Successfully", { expiresIn: response.expiresIn });
         } catch (err) {
             next(err);
         }
