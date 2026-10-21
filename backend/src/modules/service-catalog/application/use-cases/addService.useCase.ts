@@ -3,13 +3,14 @@ import { Service } from "../../domain/entities/service.entity";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { AddServiceUseCaseInputDto } from "../dtos/service/request/add-service.dto";
+import { ServiceResponseDto } from "../dtos/service/response/service.dto";
 
-export class AddServiceUseCase implements IUseCase<AddServiceUseCaseInputDto, Service> {
+export class AddServiceUseCase implements IUseCase<AddServiceUseCaseInputDto, ServiceResponseDto> {
     constructor(
         private serviceRepository: IServiceRepository
     ){}
 
-    async execute(input: AddServiceUseCaseInputDto): Promise<Service> {
+    async execute(input: AddServiceUseCaseInputDto): Promise<ServiceResponseDto> {
         const existingService = await this.serviceRepository.findByName(input.name);
         if (existingService) {
             throw new ApplicationError("CONFLICT", "Service with this name already exists", "CONFLICT");

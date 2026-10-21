@@ -4,18 +4,19 @@ import { Category } from "../../domain/entities/category.entity";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
 import { UpdateCategoryUseCaseDto } from "../dtos/category/request/update-category.dto";
+import { CategoryResponseDto } from "../dtos/category/response/category.dto";
 
 
 
 
 
 
-export class UpdateCategoryUseCase implements IUseCase<UpdateCategoryUseCaseDto,Category>{
+export class UpdateCategoryUseCase implements IUseCase<UpdateCategoryUseCaseDto,CategoryResponseDto>{
     constructor(
         private readonly categoryRepository : ICategoryRepository,
         private readonly imageUploadService: ImageUploadService,
     ){}
-    async execute(data: UpdateCategoryUseCaseDto): Promise<Category> {
+    async execute(data: UpdateCategoryUseCaseDto): Promise<CategoryResponseDto> {
 
         if (data.input.name){
             data.input.name = data.input.name.toLocaleLowerCase()

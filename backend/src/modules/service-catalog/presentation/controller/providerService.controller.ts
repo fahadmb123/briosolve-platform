@@ -1,19 +1,19 @@
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { ProviderService } from "../../domain/entities/providerService.entity";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { AddProviderServicesInputDto } from "../../application/dtos/provider/request/add-provider-service.dto";
 import { DeleteProviderServiceInputDto } from "../../application/dtos/provider/request/delete-provider-service.dto";
 import { DeleteProviderCategoryInputDto } from "../../application/dtos/provider/request/delete-provider-category.dto";
+import { ProviderServiceResponseDto } from "../../application/dtos/provider/response/provider-service.dto";
 
 
 export class ProviderServiceController extends BaseController {
     constructor(
-        private readonly getProviderServicesUseCase: IUseCase<string, ProviderService[]>,
-        private readonly addProviderServicesUseCase: IUseCase<AddProviderServicesInputDto, ProviderService[]>,
-        private readonly deleteProviderServiceUseCase: IUseCase<DeleteProviderServiceInputDto, ProviderService[]>,
-        private readonly deleteProviderCategoryUseCase: IUseCase<DeleteProviderCategoryInputDto, ProviderService[]>
+        private readonly getProviderServicesUseCase: IUseCase<string, ProviderServiceResponseDto[]>,
+        private readonly addProviderServicesUseCase: IUseCase<AddProviderServicesInputDto, ProviderServiceResponseDto[]>,
+        private readonly deleteProviderServiceUseCase: IUseCase<DeleteProviderServiceInputDto, ProviderServiceResponseDto[]>,
+        private readonly deleteProviderCategoryUseCase: IUseCase<DeleteProviderCategoryInputDto, ProviderServiceResponseDto[]>
     ) {
         super();
     }

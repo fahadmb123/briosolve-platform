@@ -4,14 +4,15 @@ import { IProviderServiceRepository } from "../../domain/repositories/IProviderS
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { AddProviderServicesInputDto } from "../dtos/provider/request/add-provider-service.dto";
+import { ProviderServiceResponseDto } from "../dtos/provider/response/provider-service.dto";
 
-export class AddProviderServicesUseCase implements IUseCase<AddProviderServicesInputDto, ProviderService[]> {
+export class AddProviderServicesUseCase implements IUseCase<AddProviderServicesInputDto, ProviderServiceResponseDto[]> {
     constructor(
         private readonly providerServiceRepository: IProviderServiceRepository,
         private readonly providerRepository: IProviderRepository
     ){}
 
-    async execute(input: AddProviderServicesInputDto): Promise<ProviderService[]> {
+    async execute(input: AddProviderServicesInputDto): Promise<ProviderServiceResponseDto[]> {
         const profile = await this.providerRepository.findById(input.userId);
         if (!profile) {
             throw new ApplicationError("NOT_FOUND", "Provider profile not found", "NOT_FOUND");

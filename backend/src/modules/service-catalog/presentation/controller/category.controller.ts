@@ -3,21 +3,21 @@ import type { NextFunction,Request,Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
-import { Category } from "../../domain/entities/category.entity";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { AddCategoryUseCaseInputDto } from "../../application/dtos/category/request/add-category.dto";
 import { GetCategoriesDto } from "../../application/dtos/category/response/get-categories.dto";
 import { UpdateCategoryUseCaseDto } from "../../application/dtos/category/request/update-category.dto";
+import { CategoryResponseDto } from "../../application/dtos/category/response/category.dto";
 
 
 
 
 export class CategoryController extends BaseController{
     constructor(
-        private readonly addCategoryUseCase : IUseCase<AddCategoryUseCaseInputDto,Category>,
+        private readonly addCategoryUseCase : IUseCase<AddCategoryUseCaseInputDto,CategoryResponseDto>,
         private readonly imageUploadService: ImageUploadService,
-        private readonly updateCategoryUseCase: IUseCase<UpdateCategoryUseCaseDto,Category>,
-        private readonly getCategoriesUseCase: IUseCase<GetCategoriesDto,{categories:Category[], total: number, totalPages: number}>,
+        private readonly updateCategoryUseCase: IUseCase<UpdateCategoryUseCaseDto,CategoryResponseDto>,
+        private readonly getCategoriesUseCase: IUseCase<GetCategoriesDto,{categories:CategoryResponseDto[], total: number, totalPages: number}>,
         private readonly deleteCategoryUseCase: IUseCase<string, boolean>
     ){super()}
     

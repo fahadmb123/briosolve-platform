@@ -3,14 +3,15 @@ import { ProviderService } from "../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ProviderServiceResponseDto } from "../dtos/provider/response/provider-service.dto";
 
-export class GetProviderServicesUseCase implements IUseCase<string, ProviderService[]> {
+export class GetProviderServicesUseCase implements IUseCase<string, ProviderServiceResponseDto[]> {
     constructor(
         private readonly providerServiceRepository: IProviderServiceRepository,
         private readonly providerRepository: IProviderRepository
     ){}
 
-    async execute(userId: string): Promise<ProviderService[]> {
+    async execute(userId: string): Promise<ProviderServiceResponseDto[]> {
         const profile = await this.providerRepository.findById(userId);
         if (!profile) {
             throw new ApplicationError("NOT_FOUND", "Provider profile not found", "NOT_FOUND");
