@@ -34,7 +34,7 @@ export function BecomeProvider() {
 
     const sendOtpMut = useSendBecomeProviderOtp();
     const becomeProviderMut = useBecomeProvider();
-    const getCategories = useGetCategoriesService();
+    const getCategories = useGetCategoriesService();   
 
     useEffect(() => {
         getCategories.mutate({ page: 1, limit: 100, filter: 'ACTIVE' }, {

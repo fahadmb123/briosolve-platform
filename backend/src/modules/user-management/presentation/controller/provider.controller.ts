@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+ import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
-import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
+import { accessTokenCookie, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IGetProvidersUseCase } from "../../application/interfaces/use-cases/providers/get-providers.interface";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
@@ -19,6 +19,8 @@ import { DeleteAvailabilityOverrideInputDto } from "../../application/dtos/reque
 import { ProviderAvailabilityResponseDto } from "../../application/dtos/response/provider/provider-availability.dto";
 import { ProviderAvailabilityOverrideResponseDto } from "../../application/dtos/response/provider/provider-availability-override.dto";
 import { CompleteProviderRegistrationInput } from "../../application/dtos/request/provider/complete-provider-registration.dto";
+import { BecomeCustomerInputDto } from "../../application/dtos/request/onboading/become-customer.dto";
+import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.service";
 
 
 
@@ -32,8 +34,11 @@ export class ProviderController extends BaseController {
         private readonly getProviderAvailabilityOverridesUseCase: IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverrideResponseDto[]>,
         private readonly createProviderAvailabilityOverrideUseCase: IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverrideResponseDto>,
         private readonly deleteProviderAvailabilityOverrideUseCase: IUseCase<DeleteAvailabilityOverrideInputDto, void>,
+        private readonly sendBecomeCustomerOtpUseCase:IUseCase<string,{ registrationId: string; expiresIn: number }>,
         private readonly imageUploadService: ImageUploadService,
-        private readonly getProvidersUseCase: IGetProvidersUseCase
+        private readonly getProvidersUseCase: IGetProvidersUseCase,
+        private readonly becomeCustomerUseCase: IUseCase<BecomeCustomerInputDto,void>,
+        private readonly jwtService : IJwtService
     ) { super(); }
 
     getProviders = async (req: Request, res: Response, next: NextFunction) => {
@@ -197,6 +202,31 @@ export class ProviderController extends BaseController {
             return sendSuccess(res, "Deleted!", { profile_image: null });
         } catch (err) {
             next(err);
+        }
+    }
+    sendBecomeCustomerOtp = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const { userId } = this.getCurrentUser(req)
+            const response = await this.sendBecomeCustomerOtpUseCase.execute(userId)
+            res.cookie("registration_id", response.registrationId, registrationCookie)
+            return sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn })
+        } catch (err) {
+            next(err)
+        }
+    }
+    becomeCustomer = async (req:Request,res:Response,next:NextFunction) => {
+        try {
+            const user = this.getCurrentUser(req)
+            const registrationId = req.cookies.registration_id
+            await this.becomeCustomerUseCase.execute({registrationId})
+            
+            const newToken = await this.jwtService.generate({ userId: user.userId, role: "CUSTOMER" })
+            res.cookie("access_token", newToken, accessTokenCookie)
+            if (registrationId) res.clearCookie("registration_id")
+            return sendSuccess(res, "Switched to CUSTOMER!")
+        } catch (err) {
+            console.error("becomeProvider error:", err)
+            next(err)
         }
     }
 }

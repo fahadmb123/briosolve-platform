@@ -14,6 +14,7 @@ router.post("/register",validate(customerRegistrationSchema),customerController.
 router.post("/profile/image", authMiddleware, requireRole(["CUSTOMER"]), upload.single("image"), validateFile(imageFileSchema),customerController.uploadProfileImage)
 router.post("/become-provider/send-otp", authMiddleware, requireRole(["CUSTOMER"]), customerController.sendBecomeProviderOtp)
 router.post("/become-provider", authMiddleware, requireRole(["CUSTOMER"]), customerController.becomeProvider)
+
 router.patch("/profile",validate(profileSchema),authMiddleware,requireRole(["CUSTOMER"]),customerController.updateProfile)
 router.delete("/profile/image", authMiddleware, requireRole(["CUSTOMER"]), customerController.deleteProfileImage)
 

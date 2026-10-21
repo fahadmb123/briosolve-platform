@@ -9,6 +9,31 @@ import { UpdateCustomerProfileInputDto } from "../../application/dtos/request/cu
 
 
 export class CustomerRepository implements ICustomerRepository {
+    async createCustomerProfile(userId:string): Promise<void> {
+        const existing = await db.orm.public.customer_profiles
+            .where({ user_id: userId as Varchar<255> })
+            .first();
+
+        if (existing) {
+            await db.orm.public.customer_profiles
+                .where({ user_id: userId as Varchar<255> })
+                .update({
+                    about: existing.about || "",
+                    service_radius_km: existing.service_radius_km ?? 20,
+                    updated_at: Temporal.Now.instant()
+                } as never);
+            return;
+        }
+
+        await db.orm.public.customer_profiles.create({
+            user_id: userId, 
+            about: "",
+            service_radius_km: 20,
+            created_at: Temporal.Now.instant(),
+            updated_at: Temporal.Now.instant()
+        } as never);
+    }
+
     async updateProfile(input:UpdateCustomerProfileInputDto): Promise<void> {
         return await db.transaction(async (tx) => {
             if (input.data.name !== undefined) {

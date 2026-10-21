@@ -40,7 +40,7 @@ export class VerificationFileRepository implements IVerificationFileRepository {
     async deleteByDocumentId(documentId: string): Promise<boolean> {
         await db.orm.public.provider_verification_files
             .where({ document_id: documentId as never })
-            .delete();
+            .deleteAll();
 
         return true
     }

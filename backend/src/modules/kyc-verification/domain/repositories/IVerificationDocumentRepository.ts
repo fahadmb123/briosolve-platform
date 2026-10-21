@@ -30,4 +30,5 @@ export interface IVerificationDocumentRepository extends BaseRepository<Verifica
     resolveProviderProfileId(providerId: string): Promise<string>;
     updateDocumentStatus(input: UpdateDocumentStatusInput): Promise<void>;
     updateProviderKycStatus(profileId: string, kycStatus: string): Promise<void>;
+    deleteByProviderId(providerId: string): Promise<void> 
 }

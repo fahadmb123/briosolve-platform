@@ -21,4 +21,6 @@ export interface IProviderAvailabilityRepository {
     findOverridesByProviderId(providerId: string): Promise<ProviderAvailabilityOverride[]>;
     createOverride(providerId: string, data: CreateAvailabilityOverrideInput): Promise<ProviderAvailabilityOverride>;
     deleteOverride(providerId: string, overrideId: string): Promise<void>;
+    deleteOverrideByProviderId(providerId: string): Promise<void>;
+    deleteByProviderId(providerId: string): Promise<void>;
 }

@@ -29,7 +29,7 @@ export const useOtpVarify = (isInline?: boolean) => {
                     }
                 }
 
-                if (currentUser) {
+                if (currentUser && !response.data.for?.includes("BECOME")) {
                     useAuthStore.getState().setUser({
                         ...currentUser,
                         ...(response.data.email ? { email: response.data.email, email_verified: true } : {}),

@@ -5,14 +5,9 @@ import { IProviderRepository } from "../../../domain/repositories/IProviderRepos
 import { IProviderAvailabilityRepository } from "../../../domain/repositories/IProviderAvailabilityRepository";
 import type { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store";
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { BecomeProviderInput } from "../../dtos/request/onboading/become-provider.dto";
 
-export type BecomeProviderInput = {
-    registrationId: string;
-    businessName: string;
-    experience: string;
-    bio: string;
-    services: string[];
-};
+
 
 export class BecomeProviderUseCase implements IUseCase<BecomeProviderInput,void>{
     constructor(

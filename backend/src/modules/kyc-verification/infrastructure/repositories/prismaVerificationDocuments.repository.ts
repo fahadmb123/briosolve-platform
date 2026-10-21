@@ -341,4 +341,9 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
                 updated_at: Temporal.Now.instant(),
             } as never);
     }
+    async deleteByProviderId(providerId: string): Promise<void> {
+        await db.orm.public.provider_verification_documents
+            .where({ provider_id: providerId})
+            .deleteAll()
+    }
 }

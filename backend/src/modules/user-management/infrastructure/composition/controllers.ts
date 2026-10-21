@@ -28,7 +28,9 @@ import {
     getReactivationRequestsUseCase,
     sendReactivationOtpUseCase,
     sendBecomeProviderOtpUseCase,
-    becomeProviderUseCase
+    becomeProviderUseCase,
+    sendBecomeCustomerOtpUseCase,
+    becomeCustomerUseCase
 } from "./useCases";
 import { imageUploadService } from "./services";
 import { jwtService } from "../../../auth/infrastructure/composition/services";
@@ -61,6 +63,7 @@ export const addressController = new AddressController(
     setDefaultAddressUseCase
 )
 
+
 export const providerController = new ProviderController(
     preRegisterProviderUseCase,
     registerProviderUseCase,
@@ -70,6 +73,9 @@ export const providerController = new ProviderController(
     getProviderAvailabilityOverridesUseCase,
     createProviderAvailabilityOverrideUseCase,
     deleteProviderAvailabilityOverrideUseCase,
+    sendBecomeCustomerOtpUseCase,
     imageUploadService,
-    getProvidersUseCase
+    getProvidersUseCase,
+    becomeCustomerUseCase,
+    jwtService
 );

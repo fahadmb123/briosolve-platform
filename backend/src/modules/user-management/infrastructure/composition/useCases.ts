@@ -31,6 +31,10 @@ import {
     pendingRegistrationStore,
     imageUploadService
 } from "./services";
+import { SendBecomeCustomerOtpUseCase } from "../../application/use-cases/onboarding/sendBecomeCustomerOtp.useCase";
+import { BecomeCustomerUseCase } from "../../application/use-cases/onboarding/becomeCustomer.useCase";
+import { providerServiceRepository } from "../../../service-catalog/infrastructure/composition/respositories";
+import { verificationDocumentRepository, verificationFileRepository } from "../../../kyc-verification/infrastructure/composition/repositories";
 
 
 export const registerCustomerUseCase = new RegisterCustomerUseCase(
@@ -140,10 +144,27 @@ export const sendBecomeProviderOtpUseCase = new SendBecomeProviderOtpUseCase(
     emailSender,
     pendingRegistrationStore
 );
+export const sendBecomeCustomerOtpUseCase = new SendBecomeCustomerOtpUseCase(
+    userRepository,
+    passwordHasher,
+    otpGenerate,
+    emailSender,
+    pendingRegistrationStore
+);
 export const becomeProviderUseCase = new BecomeProviderUseCase(
     userRepository,
     customerRepository,
     providerRepository,
     providerAvailabilityRepository,
     pendingRegistrationStore
+);
+export const becomeCustomerUseCase = new BecomeCustomerUseCase(
+    userRepository,
+    customerRepository,
+    providerRepository,
+    providerAvailabilityRepository,
+    pendingRegistrationStore,
+    providerServiceRepository,
+    verificationDocumentRepository,
+    verificationFileRepository
 );

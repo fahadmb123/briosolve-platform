@@ -121,4 +121,10 @@ export class ProviderRepository implements IProviderRepository {
     async findProfileByUserId(userId: string): Promise<ProviderProfile | null> {
         return this.findById(userId);
     }
+
+    async deleteByUserId(userId: string): Promise<void> {
+        await db.orm.public.provider_profiles
+            .where({ user_id: userId as Varchar<255> })
+            .delete();
+    }
 }

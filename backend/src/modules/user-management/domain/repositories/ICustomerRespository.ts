@@ -8,4 +8,5 @@ import { CustomerProfile } from "../entities/customerProfile.entity";
 export interface ICustomerRepository extends BaseRepository<CustomerProfile | null>{
     updateProfile(data: UpdateCustomerProfileInputDto): Promise<void>;
     deleteByUserId(userId: string): Promise<void>;
+    createCustomerProfile(userId:string): Promise<void>;
 }

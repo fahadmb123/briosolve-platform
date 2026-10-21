@@ -96,5 +96,9 @@ export class ProviderServiceRepository implements IProviderServiceRepository {
             );
         });
     }
+    async deleteByProviderId(providerId: string): Promise<void> {
+        await db.orm.public.provider_services.where({provider_id:providerId}).deleteAll()
+        return 
+    }
 }
 

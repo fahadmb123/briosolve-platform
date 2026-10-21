@@ -10,6 +10,7 @@ import { AvailabilitySettings } from '../../components/AvailabilitySettings';
 import { useGetProviderServices } from '../../hooks/mutations/useTradeService';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
+import { BecomeCustomer } from '../../components/BecomeCustomer';
 const Addresses = lazy(() => import('../../../../customer/settings/pages/Settings/views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
 
 export default function Settings() {
@@ -68,6 +69,7 @@ export default function Settings() {
   const handleSelectNotifications = useCallback(() => setActiveSection('notifications'), []);
   const handleSelectAddresses = useCallback(() => setActiveSection('addresses'), []);
   const handleBackToGrid = useCallback(() => setActiveSection('grid'), []);
+  const handleBecomeCustomer = useCallback(() => setActiveSection('become-customer'), []);
 
   const handleServicesChange = useCallback((info: { total: number; active: number }) => {
     setTradeServicesInfo(info);
@@ -75,7 +77,7 @@ export default function Settings() {
 
   return (
     <>
-<div className="app-content">
+            <div className="app-content">
                 
                 <div className="flex justify-between items-end flex-wrap gap-4 mb-5">
                     <div>
@@ -128,6 +130,12 @@ export default function Settings() {
                             description="Save your business addresses for accurate local search matching."
                             onClick={handleSelectAddresses}
                             badge={addressBadge}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-store"
+                            title="Become a Customer"
+                            description="Switch your account and start requesting for the services on the marketplace."
+                            onClick={handleBecomeCustomer}
                         />
                     </div>
                 </div>
@@ -244,6 +252,12 @@ export default function Settings() {
                                 <Addresses />
                             </Suspense>
                         )}
+                        {activeSection === 'become-customer' && (
+                            <Suspense fallback={<SpinnerOverlay isLoading={true} />}>
+                                <BecomeCustomer />
+                            </Suspense>
+                        )}
+                        
                 </div>
                 )}
             </div>

@@ -20,6 +20,8 @@ router.post("/register", validate(completeProviderRegistrationSchema), providerC
 router.post("/profile/image", authMiddleware, requireRole(["PROVIDER"]), upload.single("image"), validateFile(imageFileSchema), providerController.uploadProfileImage)
 router.post("/availability", validate(setProviderAvailabilitySchema), authMiddleware, requireRole(["PROVIDER"]), providerController.setAvailability)
 router.post("/availability/overrides", validate(createAvailabilityOverrideSchema), authMiddleware, requireRole(["PROVIDER"]), providerController.createAvailabilityOverride)
+router.post("/become-customer/send-otp", authMiddleware, requireRole(["PROVIDER"]), providerController.sendBecomeCustomerOtp)
+router.post("/become-customer", authMiddleware, requireRole(["PROVIDER"]), providerController.becomeCustomer)
 
 router.put("/availability", validate(setProviderAvailabilitySchema), authMiddleware, requireRole(["PROVIDER"]), providerController.setAvailability)
 router.patch("/profile", validate(providerProfileSchema), authMiddleware, requireRole(["PROVIDER"]), providerController.updateProfile)

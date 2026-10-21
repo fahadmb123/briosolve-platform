@@ -68,4 +68,16 @@ export class ProviderAvailabilityRepository implements IProviderAvailabilityRepo
                 .delete();
         }
     }
+    async deleteOverrideByProviderId(providerId: string): Promise<void> {
+        await db.orm.public.provider_availability_overrides
+            .where({provider_id: providerId as never })
+            .deleteAll()
+
+    }
+    async deleteByProviderId(providerId: string): Promise<void> {
+        
+        await db.orm.public.provider_availability
+            .where({ provider_id:providerId})
+            .deleteAll()
+    }
 }

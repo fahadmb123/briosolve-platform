@@ -6,4 +6,5 @@ export interface IProviderServiceRepository {
     addProviderServices(providerId: string, serviceIds: string[]): Promise<ProviderService[]>;
     deleteProviderService(providerId: string, serviceId: string): Promise<ProviderService[]>;
     deleteProviderCategory(providerId: string, categoryId: string): Promise<ProviderService[]>;
+    deleteByProviderId(providerId: string): Promise<void>;
 }
