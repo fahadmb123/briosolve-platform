@@ -3,7 +3,7 @@ import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IU
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
 import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
 import { ProviderAvailability } from "../../domain/entities/providerAvailability.entity";
-import { GetProviderAvailabilityInputDto } from "../dtos/providerDto";
+import { GetProviderAvailabilityInputDto } from "../dtos/request/provider/get-provider-availability.dto";
 
 export default class GetProviderAvailabilityUseCase implements IUseCase<GetProviderAvailabilityInputDto, ProviderAvailability[]> {
     constructor(

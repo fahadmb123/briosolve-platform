@@ -1,5 +1,6 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
-import { GetAddressesInputDto, GetAddressesOutputDto } from "../../application/dtos/addressDto";
+import { GetAddressesInputDto } from "../../application/dtos/request/address/get-addresses.dto";
+import { GetAddressesOutputDto } from "../../application/dtos/response/address/get-addresses.dto";
 import { Address } from "../entities/address.entity";
 
 

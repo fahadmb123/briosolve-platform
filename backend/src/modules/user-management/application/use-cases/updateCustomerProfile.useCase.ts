@@ -2,7 +2,7 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository";
-import { UpdateCustomerProfileInputDto } from "../dtos/userDto";
+import { UpdateCustomerProfileInputDto } from "../dtos/request/customer/update-customer-profile.dto";
 
 
 

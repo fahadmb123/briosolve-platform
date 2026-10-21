@@ -1,10 +1,10 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types"
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
-import { UpdateCustomerProfileInputDto } from "../../application/dtos/userDto"
 import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository"
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity"
 import { CustomerProfileMapper } from "../mappers/customerProfile.mapper"
+import { UpdateCustomerProfileInputDto } from "../../application/dtos/request/customer/update-customer-profile.dto";
 
 
 

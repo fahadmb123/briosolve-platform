@@ -4,10 +4,10 @@ import { IPasswordHasher } from "../../../../shared/application/interfaces/servi
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { randomUUID } from "crypto";
-
-import type { EmailVerificationUseCaseOutputDto,RegisterCustomerInput } from "../dtos/customerDto";
 import type { IOtpGenerator } from "../../../../shared/application/interfaces/services/IOtpGenerator.service";
 import type { IEmailSender } from "../../../../shared/application/interfaces/services/IEmailSender.service";
+import { RegisterCustomerInput } from "../dtos/request/customer/register-customer.dto";
+import { EmailVerificationUseCaseOutputDto } from "../dtos/response/user/email-verification.dto";
 
 
 

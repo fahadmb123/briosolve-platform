@@ -1,10 +1,10 @@
 import { IUpdateUserStatusUseCase } from "../interfaces/use-cases/users/update-user.interface";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IUserAccountBlockRepository } from "../../domain/repositories/IUserAccountBlockRepository";
-import { UpdateUserStatusDto } from "../dtos/userDto";
 import { IEmailSender } from "../../../../shared/application/interfaces/services/IEmailSender.service";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { IAccountReactivationRequestRepository } from "../../domain/repositories/IAccountReactivationRequestRepository";
+import { UpdateUserStatusDto } from "../dtos/request/user/update-user-status.dto";
 
 export default class UpdateUserStatusUseCase implements IUpdateUserStatusUseCase {
     constructor(

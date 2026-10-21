@@ -2,7 +2,8 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { Address } from "../../domain/entities/address.entity";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
-import { EditAddressInputUseCaseDto } from "../dtos/addressDto";
+import { EditAddressInputUseCaseDto } from "../dtos/request/address/edit-address.dto";
+
 
 
 export class EditAddressUseCase implements IUseCase<EditAddressInputUseCaseDto,Address>{

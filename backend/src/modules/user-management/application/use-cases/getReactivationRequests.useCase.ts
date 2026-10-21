@@ -1,6 +1,7 @@
 import { IAccountReactivationRequestRepository } from "../../domain/repositories/IAccountReactivationRequestRepository";
 import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity";
-import { GetReactivationsDto } from "../dtos/getReactivationsDto";
+import { GetReactivationsDto } from "../dtos/request/suspend/get-reactivations.dto";
+
 
 export class GetReactivationRequestsUseCase {
     constructor(

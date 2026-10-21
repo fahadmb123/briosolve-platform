@@ -2,9 +2,10 @@ import { NextFunction ,Response,Request} from "express"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import { IUpdateUserStatusUseCase } from "../../application/interfaces/use-cases/users/update-user.interface";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
-import { GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto } from "../../application/dtos/userDto";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { GetProfileUseCaseOutputDto } from "../../application/dtos/response/user/get-profile.dto";
+import { GetProfileUseCaseInputDto } from "../../application/dtos/request/user/get-profile.dto";
 
 export class UserController extends BaseController{
     constructor (

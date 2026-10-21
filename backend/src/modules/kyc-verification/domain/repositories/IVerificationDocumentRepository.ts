@@ -1,5 +1,5 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
-import { CreateVerificationDocumentInputDto } from "../../application/dtos/request/create-verification-document.dto";
+import { CreateVerificationDocumentInputDto } from "../../application/dtos/verification-document/request/create-verification-document.dto";
 import { UpdateVerificationDocumentRepositoryDto } from "../../application/dtos/verification-document/request/update-veridication-document-repository.dto";
 import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../entities/verificationDocument.entity";
 import { VerificationProfile } from "../entities/verificationProfile.entity";

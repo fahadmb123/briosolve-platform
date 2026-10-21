@@ -3,15 +3,16 @@ import { accessTokenCookie } from "../../../../shared/presentation/http/cookies/
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response"
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
-import { EmailVerificationUseCaseOutputDto, RegisterCustomerInput } from "../../application/dtos/customerDto"
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { UpdateCustomerProfileInputDto } from "../../application/dtos/userDto"
 import { UserMapper } from "../../infrastructure/mappers/user.mapper"
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service"
 import { ApplicationError } from "../../../../shared/application/errors/applicationError"
 import { BecomeProviderInput } from "../../application/use-cases/becomeProvider.useCase"
 import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.service"
 import { IGetCustomersUseCase } from "../../application/interfaces/use-cases/customers/get-customers.interface"
+import { EmailVerificationUseCaseOutputDto } from "../../application/dtos/response/user/email-verification.dto"
+import { RegisterCustomerInput } from "../../../auth/domain/repositories/user.repository"
+import { UpdateCustomerProfileInputDto } from "../../application/dtos/request/customer/update-customer-profile.dto"
 
 
 

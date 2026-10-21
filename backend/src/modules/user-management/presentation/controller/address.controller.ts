@@ -1,9 +1,13 @@
 import { NextFunction,Request,Response } from "express"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import { Address } from "../../domain/entities/address.entity";
-import { AddAddressInputUseCaseDto, EditAddressInputUseCaseDto, GetAddressesInputDto, GetAddressesOutputDto, SetDefaultAddressInputUseCaseDto } from "../../application/dtos/addressDto";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
+import { AddAddressInputUseCaseDto } from "../../application/dtos/request/address/add-address.dto";
+import { GetAddressesInputDto } from "../../application/dtos/request/address/get-addresses.dto";
+import { GetAddressesOutputDto } from "../../application/dtos/response/address/get-addresses.dto";
+import { EditAddressInputUseCaseDto } from "../../application/dtos/request/address/edit-address.dto";
+import { SetDefaultAddressInputUseCaseDto } from "../../application/dtos/request/address/set-default-address.dto";
 
 
 export class AddressController extends BaseController{

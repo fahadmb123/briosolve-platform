@@ -1,7 +1,8 @@
 import { User } from "../../domain/entities/user.entity";
 import { IGetProvidersUseCase } from "../interfaces/use-cases/providers/get-providers.interface";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { getProvidersDto } from "../dtos/getProvidersDto";
+import { getProvidersDto } from "../dtos/request/provider/get-providers.dto";
+
 
 export default class GetProvidersUseCase implements IGetProvidersUseCase {
     constructor(
