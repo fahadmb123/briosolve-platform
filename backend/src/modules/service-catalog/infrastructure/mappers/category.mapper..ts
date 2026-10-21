@@ -1,7 +1,8 @@
 import type { Prisma } from "@prisma/client";
 import { Category } from "../../domain/entities/category.entity";
-import { AddCategoryUseCaseInputDto } from "../../application/dtos/category";
 import { ServiceMapper } from "./service.mapper";
+import { AddCategoryUseCaseInputDto } from "../../application/dtos/request/add-category.dto";
+
 
 export type CategoryRecord = Prisma.CategoryGetPayload<{}>;
 

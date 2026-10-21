@@ -3,9 +3,11 @@ import type { NextFunction,Request,Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
-import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/dtos/category";
 import { Category } from "../../domain/entities/category.entity";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
+import { AddCategoryUseCaseInputDto } from "../../application/dtos/request/add-category.dto";
+import { GetCategoriesDto } from "../../application/dtos/response/get-categories.dto";
+import { UpdateCategoryUseCaseDto } from "../../application/dtos/request/update-category.dto";
 
 
 

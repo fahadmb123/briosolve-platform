@@ -3,7 +3,8 @@ import { ImageUploadService } from "../../../../shared/application/interfaces/se
 import { Category } from "../../domain/entities/category.entity";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
-import { UpdateCategoryUseCaseDto, UpdateCategoryDto } from "../dtos/category";
+import { UpdateCategoryUseCaseDto } from "../dtos/request/update-category.dto";
+
 
 
 

@@ -1,5 +1,7 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
-import { AddCategoryUseCaseInputDto, UpdateCategoryUseCaseDto, GetCategoriesDto } from "../../application/dtos/category";
+import { AddCategoryUseCaseInputDto } from "../../application/dtos/request/add-category.dto";
+import { UpdateCategoryUseCaseDto } from "../../application/dtos/request/update-category.dto";
+import { GetCategoriesDto } from "../../application/dtos/response/get-categories.dto";
 import { Category } from "../entities/category.entity";
 
 export interface ICategoryRepository extends BaseRepository<Category | null>{
