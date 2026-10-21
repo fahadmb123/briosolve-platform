@@ -1,4 +1,5 @@
 import type { Temporal } from "@js-temporal/polyfill";
+import type { Address } from "../Dtos/address";
 
 export type response<T> = {
     success: boolean,
@@ -15,10 +16,12 @@ export type User = {
     status: "ACTIVE" | "INACTIVE" | "BLOCKED";
     email_verified: boolean;
     phone_verified: boolean;
+    current_address_id?: string | Address | null;
     created_at: Temporal.Instant | string | Date;
     updated_at: Temporal.Instant | string | Date;
     customer_profile?: CustomerProfile | null;
     provider_profile?: ProviderProfile | null;
+    distance?: number;
 }
 
 

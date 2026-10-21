@@ -168,3 +168,8 @@ export const becomeCustomerUseCase = new BecomeCustomerUseCase(
     verificationDocumentRepository,
     verificationFileRepository
 );
+import { GetNearbyProvidersUseCase } from "../../application/use-cases/customers/getNearbyProviders.useCase";
+export const getNearbyProvidersUseCase = new GetNearbyProvidersUseCase(
+    userRepository,
+    customerRepository
+);

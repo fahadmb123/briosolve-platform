@@ -30,7 +30,8 @@ import {
     sendBecomeProviderOtpUseCase,
     becomeProviderUseCase,
     sendBecomeCustomerOtpUseCase,
-    becomeCustomerUseCase
+    becomeCustomerUseCase,
+    getNearbyProvidersUseCase
 } from "./useCases";
 import { imageUploadService } from "./services";
 import { jwtService } from "../../../auth/infrastructure/composition/services";
@@ -53,7 +54,8 @@ export const customerController = new CustomerController(
     imageUploadService,
     sendBecomeProviderOtpUseCase,
     becomeProviderUseCase,
-    jwtService
+    jwtService,
+    getNearbyProvidersUseCase
 );
 export const addressController = new AddressController(
     addAddressUseCase,

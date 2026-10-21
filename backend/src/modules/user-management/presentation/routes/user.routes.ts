@@ -8,7 +8,7 @@ import { addressSchema } from "../validators/address";
 const router = Router();
 
 router.get("/customers",authMiddleware,requireRole(["ADMIN"]),customerController.getCustomers)
-router.get("/providers",authMiddleware,requireRole(["ADMIN"]),providerController.getProviders)
+router.get("/providers",authMiddleware,requireRole(["ADMIN", "CUSTOMER"]),providerController.getProviders)
 router.get("/profile",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),userController.getProfile)
 router.get("/address",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),addressController.getAddresses)
 router.post("/address",authMiddleware,requireRole(["CUSTOMER","PROVIDER"]),validate(addressSchema),addressController.addAddress)

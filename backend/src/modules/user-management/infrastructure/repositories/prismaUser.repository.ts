@@ -15,9 +15,9 @@ export class UserRepository implements IUserRepository{
         let query = db.orm.public.users.where({ role });
 
         if (role === "PROVIDER") {
-            query = query.include("provider_profile");
+            query = query.include("provider_profile").include("current_address");
         } else if (role === "CUSTOMER") {
-            query = query.include("customer_profile");
+            query = query.include("customer_profile").include("current_address");
         }
 
         if (search) {
@@ -61,5 +61,17 @@ export class UserRepository implements IUserRepository{
         const updatedUser = await this.findById(id)
         if (!updatedUser) throw new Error("User not found after update")
         return updatedUser
+    }
+
+    async getActiveProviders(): Promise<User[]> {
+        const users = await db.orm.public.users
+            .where({ role: "PROVIDER", status: "ACTIVE" })
+            .include("provider_profile")
+            .include("current_address")
+            .all();
+
+        return users
+            .filter(user => user.provider_profile?.kyc_status === "APPROVED")
+            .map(user => UserMapper.toDomain(user));
     }
 }

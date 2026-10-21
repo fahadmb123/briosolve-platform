@@ -13,6 +13,8 @@ import { EmailVerificationUseCaseOutputDto } from "../../application/dtos/respon
 import { UpdateCustomerProfileInputDto } from "../../application/dtos/request/customer/update-customer-profile.dto"
 import { RegisterCustomerInput } from "../../application/dtos/request/customer/register-customer.dto"
 import { BecomeProviderInput } from "../../application/dtos/request/onboading/become-provider.dto"
+import { GetNearbyProvidersDto } from "../../application/dtos/request/customer/get-nearby-providers.dto";
+import { GetNearbyProvidersOutputDto } from "../../application/dtos/response/customer/get-nearby-providers-output.dto";
 
 
 
@@ -26,7 +28,8 @@ export class CustomerController extends BaseController{
         private readonly imageUploadService: ImageUploadService,
         private readonly sendBecomeProviderOtpUseCase: IUseCase<string,{ registrationId: string; expiresIn: number }>,
         private readonly becomeProviderUseCase: IUseCase<BecomeProviderInput,void>,
-        private readonly jwtService : IJwtService
+        private readonly jwtService : IJwtService,
+        private readonly getNearbyProvidersUseCase: IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto>
     ) {super()}
 
     register = async (req:Request,res:Response,next:NextFunction) => {
@@ -134,6 +137,23 @@ export class CustomerController extends BaseController{
         } catch (err) {
             console.error("becomeProvider error:", err)
             next(err)
+        }
+    }
+
+    getNearbyProviders = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const user = this.getCurrentUser(req);
+            const response = await this.getNearbyProvidersUseCase.execute({
+                userId: user.userId,
+                page: Number(req.query.page) || 1,
+                limit: Number(req.query.limit) || 12,
+                search: req.query.search as string | undefined,
+                radius: req.query.radius ? Number(req.query.radius) : undefined
+            });
+
+            return sendSuccess(res, "Nearby providers fetched successfully", response);
+        } catch (err) {
+            next(err);
         }
     }
 }

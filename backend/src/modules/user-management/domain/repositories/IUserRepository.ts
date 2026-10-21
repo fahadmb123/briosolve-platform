@@ -15,4 +15,5 @@ export interface IUserRepository extends BaseRepository<User | null>{
   updateStatus(id:string,status:string):Promise<void>;
   findByEmail(email: string): Promise<User | null>;
   update(id: string, data: UpdateUserRepositoryInput): Promise<User>;
+  getActiveProviders(): Promise<User[]>;
 }

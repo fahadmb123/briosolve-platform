@@ -6,3 +6,4 @@ export const CustomerDashboard = React.lazy(() => import('../../../features/cust
 export const CustomerProfile = React.lazy(() => import('../../../features/customer/profile/pages/Profile/Profile'));
 export const CustomerSettings = React.lazy(() => import('../../../features/customer/settings/pages/Settings/Settings'));
 export const CustomerNotifications = React.lazy(() => import('../../../features/customer/notifications/pages/Notifications/Notifications'));
+export const CustomerNearbyProviders = React.lazy(() => import('../../../features/customer/nearbyProviders/pages/NearbyProviders/NearbyProviders'));

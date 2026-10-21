@@ -57,11 +57,10 @@ export default function CustomerLayout() {
                         </NavLink>
                     </li>
                     <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink to="/nearby-providers" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-map-marked-alt"></i>
                             <span>Nearby Providers</span>
-                            <span className="badge badge-primary ml-auto">12+</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">
@@ -158,7 +157,7 @@ export default function CustomerLayout() {
                 </div>
 
                 <div className="navbar-center hide-mobile">
-                    <Link to="/admin/providers" className="nav-item-link">Nearby Providers</Link>
+                    <Link to="/nearby-providers" className="nav-item-link">Nearby Providers</Link>
                     <Link to="#" className="nav-item-link">How It Works</Link>
                     <Link to={getDashboardRoute()} className="nav-item-link font-semibold text-primary">Dashboard</Link>
                 </div>

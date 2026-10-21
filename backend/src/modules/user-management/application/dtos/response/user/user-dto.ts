@@ -16,4 +16,5 @@ export type UserResponseDto = {
     updated_at: Date;
     customer_profile?: CustomerProfile | null;
     provider_profile?: ProviderProfile | null;
+    distance?: number;
 }

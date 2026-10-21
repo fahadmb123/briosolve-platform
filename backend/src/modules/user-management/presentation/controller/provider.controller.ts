@@ -43,12 +43,13 @@ export class ProviderController extends BaseController {
 
     getProviders = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            this.getCurrentUser(req);
+            const currentUser = this.getCurrentUser(req);
+            const isCustomer = currentUser.role === "CUSTOMER";
 
             const response = await this.getProvidersUseCase.execute({
                 page: Number(req.query.page) || 1,
-                limit: Number(req.query.limit) || 10,
-                filter: req.query.filter as string | undefined,
+                limit: Number(req.query.limit) || (isCustomer ? 12 : 10),
+                filter: isCustomer ? "ACTIVE" : (req.query.filter as string | undefined),
                 search: req.query.search as string | undefined
             });
 

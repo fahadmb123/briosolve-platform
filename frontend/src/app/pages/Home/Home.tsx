@@ -59,10 +59,9 @@ export default function Home() {
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/admin/providers" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+                        <NavLink to="/nearby-providers" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-map-marked-alt"></i>
                             <span>Nearby Providers</span>
-                            <span className="badge badge-primary ml-auto">12+</span>
                         </NavLink>
                     </li>
                     <li>
@@ -163,7 +162,7 @@ export default function Home() {
                 </div>
 
                 <div className="navbar-center hide-mobile">
-                    <Link to="/admin/providers" className="nav-item-link">Nearby Providers</Link>
+                    <Link to="/nearby-providers" className="nav-item-link">Nearby Providers</Link>
                     <Link to="#" className="nav-item-link">How It Works</Link>
                     <Link to={getDashboardRoute()} className="nav-item-link font-semibold text-primary">Dashboard</Link>
                 </div>
@@ -427,7 +426,7 @@ export default function Home() {
                                 <Link to="#" className="btn btn-outline">
                                     <span>View All Categories</span>
                                 </Link>
-                                <Link to="/admin/providers" className="btn btn-secondary">
+                                <Link to="/nearby-providers" className="btn btn-secondary">
                                     <span>Find Nearby Providers</span>
                                     <i className="fas fa-arrow-right ml-1"></i>
                                 </Link>
