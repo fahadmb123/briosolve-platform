@@ -2,17 +2,17 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
 import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
-import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity";
 import { CreateAvailabilityOverrideInputDto } from "../dtos/request/provider/create-availability-override.dto";
+import { ProviderAvailabilityOverrideResponseDto } from "../dtos/response/provider/provider-availability-override.dto";
 
 
-export default class CreateProviderAvailabilityOverrideUseCase implements IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverride> {
+export default class CreateProviderAvailabilityOverrideUseCase implements IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverrideResponseDto> {
     constructor(
         private readonly providerRepository: IProviderRepository,
         private readonly availabilityRepository: IProviderAvailabilityRepository
     ) {}
 
-    async execute(input: CreateAvailabilityOverrideInputDto): Promise<ProviderAvailabilityOverride> {
+    async execute(input: CreateAvailabilityOverrideInputDto): Promise<ProviderAvailabilityOverrideResponseDto> {
         const profile = await this.providerRepository.findById(input.userId);
         if (!profile) {
             throw new ApplicationError("PROVIDER_NOT_FOUND", "Provider profile not found", "NOT_FOUND");

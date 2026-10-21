@@ -7,10 +7,7 @@ import { IGetProvidersUseCase } from "../../application/interfaces/use-cases/pro
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
-import type { CompleteProviderRegistrationInput } from "../../application/use-cases/registerProvider.useCase";
-import type { User } from "../../domain/entities/user.entity";
-import type { ProviderAvailability } from "../../domain/entities/providerAvailability.entity";
-import type { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity";
+import { UserResponseDto } from "../../application/dtos/response/user/user-dto";
 import { RegisterProviderInput } from "../../application/dtos/request/provider/register-provider.dto";
 import { EmailVerificationUseCaseOutputDto } from "../../application/dtos/response/user/email-verification.dto";
 import { UpdateProviderProfileInputDto } from "../../application/dtos/request/provider/update-provider-profile.dto";
@@ -19,16 +16,21 @@ import { GetProviderAvailabilityInputDto } from "../../application/dtos/request/
 import { GetAvailabilityOverridesInputDto } from "../../application/dtos/request/provider/get-availability-override.dto";
 import { CreateAvailabilityOverrideInputDto } from "../../application/dtos/request/provider/create-availability-override.dto";
 import { DeleteAvailabilityOverrideInputDto } from "../../application/dtos/request/provider/delete-availability-override.dto";
+import { ProviderAvailabilityResponseDto } from "../../application/dtos/response/provider/provider-availability.dto";
+import { ProviderAvailabilityOverrideResponseDto } from "../../application/dtos/response/provider/provider-availability-override.dto";
+import { CompleteProviderRegistrationInput } from "../../application/dtos/request/provider/complete-provider-registration.dto";
+
+
 
 export class ProviderController extends BaseController {
     constructor(
         private readonly preRegisterProviderUseCase: IUseCase<RegisterProviderInput, EmailVerificationUseCaseOutputDto>,
-        private readonly registerProviderUseCase: IUseCase<CompleteProviderRegistrationInput, User>,
+        private readonly registerProviderUseCase: IUseCase<CompleteProviderRegistrationInput, UserResponseDto>,
         private readonly updateProviderProfileUseCase: IUseCase<UpdateProviderProfileInputDto, void>,
-        private readonly setProviderAvailabilityUseCase: IUseCase<SetProviderAvailabilityInputDto, ProviderAvailability[]>,
-        private readonly getProviderAvailabilityUseCase: IUseCase<GetProviderAvailabilityInputDto, ProviderAvailability[]>,
-        private readonly getProviderAvailabilityOverridesUseCase: IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverride[]>,
-        private readonly createProviderAvailabilityOverrideUseCase: IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverride>,
+        private readonly setProviderAvailabilityUseCase: IUseCase<SetProviderAvailabilityInputDto, ProviderAvailabilityResponseDto[]>,
+        private readonly getProviderAvailabilityUseCase: IUseCase<GetProviderAvailabilityInputDto, ProviderAvailabilityResponseDto[]>,
+        private readonly getProviderAvailabilityOverridesUseCase: IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverrideResponseDto[]>,
+        private readonly createProviderAvailabilityOverrideUseCase: IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverrideResponseDto>,
         private readonly deleteProviderAvailabilityOverrideUseCase: IUseCase<DeleteAvailabilityOverrideInputDto, void>,
         private readonly imageUploadService: ImageUploadService,
         private readonly getProvidersUseCase: IGetProvidersUseCase

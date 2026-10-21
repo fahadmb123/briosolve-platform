@@ -2,24 +2,19 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { IPendingRegistrationStore } from "../../../../shared/application/interfaces/IPendingRegistration-store";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
-import { User } from "../../domain/entities/user.entity";
 import { IProviderAvailabilityRepository } from "../../domain/repositories/IProviderAvailabilityRepository";
+import { UserMapper } from "../../infrastructure/mappers/user.mapper";
+import { UserResponseDto } from "../dtos/response/user/user-dto";
+import { CompleteProviderRegistrationInput } from "../dtos/request/provider/complete-provider-registration.dto";
 
-export type CompleteProviderRegistrationInput = {
-    registrationId: string;
-    services: string[];
-    experience: string;
-    bio: string;
-};
-
-export default class RegisterProviderUseCase implements IUseCase<CompleteProviderRegistrationInput, User> {
+export default class RegisterProviderUseCase implements IUseCase<CompleteProviderRegistrationInput, UserResponseDto> {
     constructor(
         private readonly providerRepository: IProviderRepository,
         private readonly pendingRegistrationStore: IPendingRegistrationStore,
         private readonly providerAvailabilityRepository: IProviderAvailabilityRepository
     ) {}
 
-    async execute(input: CompleteProviderRegistrationInput): Promise<User> {
+    async execute(input: CompleteProviderRegistrationInput): Promise<UserResponseDto> {
         const pendingData = await this.pendingRegistrationStore.get(input.registrationId);
         
         if (!pendingData)  throw new ApplicationError("REGISTRATION_EXPIRED", "Registration session expired", "AUTHENTICATION")
@@ -51,6 +46,6 @@ export default class RegisterProviderUseCase implements IUseCase<CompleteProvide
 
         await this.pendingRegistrationStore.delete(input.registrationId);
 
-        return user;
+        return UserMapper.toDto(user)
     }
 }

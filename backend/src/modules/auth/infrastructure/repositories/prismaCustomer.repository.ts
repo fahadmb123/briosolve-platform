@@ -3,9 +3,9 @@ import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity"
 import { ICustomerRepository } from "../../domain/repositories/customer.respository";
 import { User } from "../../domain/entities/user.entity";
-import { RegisterCustomerInput } from "../../domain/repositories/user.repository";
 import { UserMapper } from "../mappers/user.mapper";
 import { CustomerProfileMapper } from "../mappers/customerProfile.mapper";
+import { RegisterCustomerInput } from "../../application/dtos/request/register-customer.dto";
 
 
 

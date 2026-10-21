@@ -11,8 +11,8 @@ import { BecomeProviderInput } from "../../application/use-cases/becomeProvider.
 import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.service"
 import { IGetCustomersUseCase } from "../../application/interfaces/use-cases/customers/get-customers.interface"
 import { EmailVerificationUseCaseOutputDto } from "../../application/dtos/response/user/email-verification.dto"
-import { RegisterCustomerInput } from "../../../auth/domain/repositories/user.repository"
 import { UpdateCustomerProfileInputDto } from "../../application/dtos/request/customer/update-customer-profile.dto"
+import { RegisterCustomerInput } from "../../application/dtos/request/customer/register-customer.dto"
 
 
 

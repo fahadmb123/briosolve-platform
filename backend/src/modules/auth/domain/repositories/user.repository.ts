@@ -1,18 +1,7 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository"
 import { User } from "../entities/user.entity"
 
-
-
-
-
-export type RegisterCustomerInput = {
-  name:string,
-  email : string,
-  password:string
-}
 type userPartial = Partial<User>
-
-
 
 
 export interface IUserRepository extends BaseRepository<User | null>{
