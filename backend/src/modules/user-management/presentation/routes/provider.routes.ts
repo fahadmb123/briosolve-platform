@@ -24,7 +24,6 @@ router.post("/availability/overrides", validate(createAvailabilityOverrideSchema
 router.put("/availability", validate(setProviderAvailabilitySchema), authMiddleware, requireRole(["PROVIDER"]), providerController.setAvailability)
 router.patch("/profile", validate(providerProfileSchema), authMiddleware, requireRole(["PROVIDER"]), providerController.updateProfile)
 router.delete("/profile/image", authMiddleware, requireRole(["PROVIDER"]), providerController.deleteProfileImage)
-
 router.delete("/availability/overrides/:id", authMiddleware, requireRole(["PROVIDER"]), providerController.deleteAvailabilityOverride)
 
 export default router;
