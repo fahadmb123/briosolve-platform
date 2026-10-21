@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from "express"
-import { User } from "../../domain/entities/user.entity"
 import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/application/interfaces/IPendingRegistration-store"
 import { ResendOtpOutput } from "../../application/use-cases/verification/resendOtp.useCase"
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase"
 import { sendSuccess } from "../../../../shared/presentation/http/response/response"
 import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
 import { OtpVarificationInput } from "../../application/dtos/request/otp-verification.dto"
+import { UserResponseDto } from "../../application/dtos/response/user.dto"
 
 class OtpVarificationController {
     constructor(
-        private readonly otpVarificationUseCase: IUseCase<OtpVarificationInput, { response: User | IPendingCustomerRegistration, for: string, email: string, path?: string }>,
+        private readonly otpVarificationUseCase: IUseCase<OtpVarificationInput, { response: UserResponseDto | IPendingCustomerRegistration, for: string, email: string, path?: string }>,
         private readonly pendingRegistrationStore: IPendingRegistrationStore,
         private readonly resendOtpUseCase: IUseCase<string, ResendOtpOutput>
     ) { }

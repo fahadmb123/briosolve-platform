@@ -2,14 +2,15 @@ import { ApplicationError } from "../../../../../shared/application/errors/appli
 import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store"
 import { IPasswordHasher } from "../../../../../shared/application/interfaces/services/IPasswordHasher.service";
 import { ICustomerRepository } from "../../../domain/repositories/customer.respository";
-import { User } from "../../../domain/entities/user.entity";
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { OtpVarificationInput } from "../../dtos/request/otp-verification.dto";
+import { UserResponseDto } from "../../dtos/response/user.dto";
+import { UserMapper } from "../../../infrastructure/mappers/user.mapper";
 
 
 
-export default class OtpVarificationUseCase implements IUseCase<OtpVarificationInput,{response:User | IPendingCustomerRegistration,for:string, email:string, path?:string}>{
+export default class OtpVarificationUseCase implements IUseCase<OtpVarificationInput,{response:UserResponseDto | IPendingCustomerRegistration,for:string, email:string, path?:string}>{
     constructor(
         private readonly PendingRegistrationStore:IPendingRegistrationStore,
         private readonly PasswordHasher:IPasswordHasher,
@@ -17,7 +18,7 @@ export default class OtpVarificationUseCase implements IUseCase<OtpVarificationI
         private readonly UserRepository : IUserRepository
     ){}
 
-    async execute ({registrationId,otp}:OtpVarificationInput):Promise<{response:User | IPendingCustomerRegistration,for:string,email:string,path?:string}>{
+    async execute ({registrationId,otp}:OtpVarificationInput):Promise<{response:UserResponseDto | IPendingCustomerRegistration,for:string,email:string,path?:string}>{
         const data = await this.PendingRegistrationStore.get(registrationId)
 
         if (!registrationId || !data) throw new ApplicationError("REGISTRATION_EXPIRED","Registration session expired","AUTHENTICATION")
@@ -32,11 +33,11 @@ export default class OtpVarificationUseCase implements IUseCase<OtpVarificationI
 
         switch (data?.for) {
             case "CREATE_CUSTOMER":
-                response = await this.CustomerRepository.createCustomer({
+                response = UserMapper.toDto(await this.CustomerRepository.createCustomer({
                     name: data.name,
                     email: data.email,
                     password: data.passwordHash!
-                })
+                })) as UserResponseDto
                 await this.PendingRegistrationStore.delete(registrationId)
                 break;
             case "FORGOT_PASSWORD":
@@ -57,17 +58,17 @@ export default class OtpVarificationUseCase implements IUseCase<OtpVarificationI
                 await this.PendingRegistrationStore.delete(registrationId)
                 break;
             case "CREATE_PROVIDER":
-    response = data;
-    await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
-    break;
-case "BECOME_PROVIDER":
-    response = data;
-    await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
-    break;
-case "REACTIVATE_ACCOUNT":
-    response = data;
-    await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
-    break;
+                response = data;
+                await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+                break;
+            case "BECOME_PROVIDER":
+                response = data;
+                await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+                break;
+            case "REACTIVATE_ACCOUNT":
+                response = data;
+                await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+                break;
         }
 
         return { response: response!, for: data?.for, email: data.email, path: data?.path }
