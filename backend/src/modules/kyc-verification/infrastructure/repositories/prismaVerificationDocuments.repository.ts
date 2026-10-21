@@ -13,7 +13,7 @@ import { VerificationFileMapper } from "../mappers/verificationFile.mapper";
 import { VerificationProfile } from "../../domain/entities/verificationProfile.entity";
 import { VerificationProfileMapper } from "../mappers/verificationProfile.mapper";
 import { CreateVerificationDocumentInputDto } from "../../application/dtos/request/create-verification-document.dto";
-import { UpdateVerificationDocumentRepositoryDto } from "../../application/dtos/request/update-veridication-document-repository.dto";
+import { UpdateVerificationDocumentRepositoryDto } from "../../application/dtos/verification-document/request/update-veridication-document-repository.dto";
 
 
 

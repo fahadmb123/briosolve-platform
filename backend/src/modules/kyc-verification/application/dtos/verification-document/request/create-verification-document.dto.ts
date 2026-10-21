@@ -1,4 +1,4 @@
-import { VerificationDocumentType } from "../../../domain/entities/verificationDocument.entity";
+import { VerificationDocumentType } from "../../../../domain/entities/verificationDocument.entity";
 
 export interface CreateVerificationDocumentInputDto {
     provider_id: string;

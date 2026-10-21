@@ -6,8 +6,8 @@ import { GetAdminKycRequestsInput, GetAdminKycResponse } from "../../domain/repo
 import { UpdateKycStatusInput } from "../../application/use-cases/updateKycStatus.useCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { UploadVerificationInputDto } from "../../application/dtos/request/upload-verification.dto";
-import { UpdateVerificationInputDto } from "../../application/dtos/request/update-verification.dto";
+import { UpdateVerificationInputDto } from "../../application/dtos/verification/request/update-verification.dto";
+import { UploadVerificationInputDto } from "../../application/dtos/verification/request/upload-verification.dto";
 
 export class VerificationController extends BaseController {
     constructor(
