@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { updateBusinessProfile, updateServiceRadius } from "../../services/settings.service";
 import type { ApiError } from "../../../../../shared/api/ApiError";
 import { toast } from "react-toastify";
+import { updateBusinessProfile } from "../../services/auth.service";
+import { updateServiceRadius } from "../../services/service-catelog.service";
 
 export const useUpdateBusinessProfile = () => {
     return useMutation({

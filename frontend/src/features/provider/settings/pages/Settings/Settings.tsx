@@ -10,7 +10,6 @@ import { AvailabilitySettings } from '../../components/AvailabilitySettings';
 import { useGetProviderServices } from '../../hooks/mutations/useTradeService';
 import { SpinnerOverlay } from '../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../../../store/auth/auth.store';
-
 const Addresses = lazy(() => import('../../../../customer/settings/pages/Settings/views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
 
 export default function Settings() {
@@ -44,10 +43,12 @@ export default function Settings() {
   }, [tradeServicesInfo]);
 
   useEffect(() => {
-    if ((location.state as { activeSection?: string })?.activeSection) {
-      setActiveSection((location.state as { activeSection?: string }).activeSection!);
-    }
-  }, [location.state]);
+    (()=>{
+        if ((location.state as { activeSection?: string })?.activeSection) {
+            setActiveSection((location.state as { activeSection?: string }).activeSection!);
+        }
+    })()
+  }, [location.state])
 
   const isContactVerified = Boolean(user?.email_verified && user?.phone_verified);
   const isAddressVerified = Boolean(user?.current_address_id);

@@ -30,7 +30,7 @@ export class SendBecomeProviderOtpUseCase implements IUseCase<string,{ registrat
         const otpExpiresIn = 60;
         const otpExpiresAt = Date.now() + otpExpiresIn * 1000;
         const registrationTtl = 10 * 60;
-console.log("OTP : ",otp)
+        console.log("OTP : ",otp)
         await this.pendingRegistrationStore.save(registrationId, {
             name: user.name,
             email: user.email,

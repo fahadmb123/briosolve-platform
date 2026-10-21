@@ -2,17 +2,23 @@ import { useMutation } from "@tanstack/react-query";
 import * as SettingsService from "../../services/settings.service";
 import type { ApiError } from "../../../../../shared/api/ApiError";
 import { toast } from "react-toastify";
+import { createProviderAvailabilityOverride,
+     deleteProviderAvailabilityOverride,
+      getProviderAvailability, 
+      getProviderAvailabilityOverrides,
+       setProviderAvailability 
+} from "../../services/availability.service";
 
 export const useGetProviderAvailability = () => {
     return useMutation({
-        mutationFn: SettingsService.getProviderAvailability,
+        mutationFn: getProviderAvailability,
         onError: (error: ApiError) => toast.error(error.message)
     });
 };
 
 export const useSetProviderAvailability = () => {
     return useMutation({
-        mutationFn: SettingsService.setProviderAvailability,
+        mutationFn: setProviderAvailability,
         onError: (error: ApiError) => toast.error(error.message)
     });
 };
@@ -33,21 +39,21 @@ export const useUpdateAcceptingLeads = () => {
 
 export const useGetProviderAvailabilityOverrides = () => {
     return useMutation({
-        mutationFn: SettingsService.getProviderAvailabilityOverrides,
+        mutationFn: getProviderAvailabilityOverrides,
         onError: (error: ApiError) => toast.error(error.message)
     });
 };
 
 export const useCreateProviderAvailabilityOverride = () => {
     return useMutation({
-        mutationFn: SettingsService.createProviderAvailabilityOverride,
+        mutationFn: createProviderAvailabilityOverride,
         onError: (error: ApiError) => toast.error(error.message)
     });
 };
 
 export const useDeleteProviderAvailabilityOverride = () => {
     return useMutation({
-        mutationFn: SettingsService.deleteProviderAvailabilityOverride,
+        mutationFn:deleteProviderAvailabilityOverride,
         onError: (error: ApiError) => toast.error(error.message)
     });
 };

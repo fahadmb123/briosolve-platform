@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { updatePassword } from "../../services/settings.service";
 import type { ApiError } from "../../../../../shared/api/ApiError";
 import { toast } from "react-toastify";
+import { updatePassword } from "../../services/auth.service";
 
 export const useUpdatePassword = () => {
     return useMutation({
