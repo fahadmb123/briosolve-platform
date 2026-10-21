@@ -1,5 +1,4 @@
 import { NextFunction, Response, Request } from "express";
-import { User } from "../../domain/entities/user.entity";
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
 import { IUserTokenPayload } from "../../../../shared/application/interfaces/IToken";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
@@ -16,11 +15,12 @@ import { UpdateEmailUseCaseInputDto } from "../../application/dtos/request/updat
 import { RefreshTokenInputDto } from "../../application/dtos/request/refresh-token.dto";
 import { RefreshTokenOutputDto } from "../../application/dtos/response/refresh-token.dto";
 import { LogoutInputDto } from "../../application/dtos/request/logout.dto";
+import { UserResponseDto } from "../../application/dtos/response/user.dto";
 
 export class AuthController extends BaseController {
     constructor(
         private readonly loginUseCase: IUseCase<LoginInputDto, LoginOutputDto>,
-        private readonly getMeUseCase: IUseCase<IUserTokenPayload, User>,
+        private readonly getMeUseCase: IUseCase<IUserTokenPayload, UserResponseDto>,
         private readonly emailVerification: IUseCase<EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto>,
         private readonly updateEmailUseCase: IUseCase<UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto>,
         private readonly refreshTokenUseCase: IUseCase<RefreshTokenInputDto, RefreshTokenOutputDto>,
@@ -97,7 +97,7 @@ export class AuthController extends BaseController {
             const user = this.getCurrentUser(req);
             const response = await this.getMeUseCase.execute(user);
 
-            return sendSuccess(res, "", UserMapper.toDto(response));
+            return sendSuccess(res, "", response)
         } catch (err) {
             next(err);
         }
