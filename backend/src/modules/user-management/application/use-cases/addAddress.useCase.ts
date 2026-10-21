@@ -4,14 +4,15 @@ import { Address } from "../../domain/entities/address.entity";
 import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { AddAddressInputUseCaseDto } from "../dtos/request/address/add-address.dto";
+import { AddressResponseDto } from "../dtos/response/address/address.dto";
 
 
-export class AddAddressUseCase implements IUseCase<AddAddressInputUseCaseDto,Address>{
+export class AddAddressUseCase implements IUseCase<AddAddressInputUseCaseDto,AddressResponseDto>{
     constructor(
         private readonly addressRepository:IAddressRepository,
         private readonly userRepository:IUserRepository
     ){}
-    async execute(data: AddAddressInputUseCaseDto): Promise<Address> {
+    async execute(data: AddAddressInputUseCaseDto): Promise<AddressResponseDto> {
         const user = await this.userRepository.findById(data.id)
 
         if (!user) throw new ApplicationError("USER_NOT_FOUND","User not found","NOT_FOUND")

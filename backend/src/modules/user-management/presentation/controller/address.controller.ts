@@ -1,6 +1,5 @@
 import { NextFunction,Request,Response } from "express"
 import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { Address } from "../../domain/entities/address.entity";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { sendSuccess } from "../../../../shared/presentation/http/response/response";
 import { AddAddressInputUseCaseDto } from "../../application/dtos/request/address/add-address.dto";
@@ -8,13 +7,14 @@ import { GetAddressesInputDto } from "../../application/dtos/request/address/get
 import { GetAddressesOutputDto } from "../../application/dtos/response/address/get-addresses.dto";
 import { EditAddressInputUseCaseDto } from "../../application/dtos/request/address/edit-address.dto";
 import { SetDefaultAddressInputUseCaseDto } from "../../application/dtos/request/address/set-default-address.dto";
+import { AddressResponseDto } from "../../application/dtos/response/address/address.dto";
 
 
 export class AddressController extends BaseController{
     constructor(
-        private readonly addAddressUseCase: IUseCase<AddAddressInputUseCaseDto,Address>,
+        private readonly addAddressUseCase: IUseCase<AddAddressInputUseCaseDto,AddressResponseDto>,
         private readonly getAddressesUseCase: IUseCase<GetAddressesInputDto,GetAddressesOutputDto>,
-        private readonly editAddressUseCase: IUseCase<EditAddressInputUseCaseDto,Address>,
+        private readonly editAddressUseCase: IUseCase<EditAddressInputUseCaseDto,AddressResponseDto>,
         private readonly deleteAddressUseCase: IUseCase<string,void>,
         private readonly setDefaultAddressUseCase: IUseCase<SetDefaultAddressInputUseCaseDto,void>
     ){super()}

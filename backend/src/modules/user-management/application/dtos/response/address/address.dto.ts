@@ -1,0 +1,17 @@
+export interface AddressResponseDto {
+    id: string,
+    user_id: string,
+    house_no: string | null,
+    area: string,
+    city: string,
+    district: string,
+    state: string,
+    country: string,
+    pincode: string,
+    landmark: string | null,
+    type: string,
+    latitude: number | null,
+    longitude: number | null,
+    created_at: Date,
+    updated_at: Date,
+}
