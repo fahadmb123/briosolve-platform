@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react';
 import type { VerificationDocument } from '../types/kyc.types';
-import { useAuthStore } from '../../auth';
+import { useAuthStore } from '../../auth/stores/auth.store';
 import type { ProviderProfile } from '../../../shared/types/Dtos';
 
 interface KycStatusBannerProps {

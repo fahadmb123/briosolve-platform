@@ -8,7 +8,7 @@ import { BusinessProfileForm } from '../../components/provider/BusinessProfileFo
 import { TradeServices, useGetProviderServices } from '../../../service-catalog';
 import { AvailabilitySettings } from '../../../availability';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
-import { useAuthStore } from '../../../auth';
+import { useAuthStore } from '../../../auth/stores/auth.store';
 import { BecomeCustomer } from '../../components/provider/BecomeCustomer';
 const Addresses = lazy(() => import('../CustomerSettings/views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
 

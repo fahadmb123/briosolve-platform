@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useAuthStore } from '../../../auth';
+import { useAuthStore } from '../../../auth/stores/auth.store';
 import { ImageCropModal } from '../../../../shared/components/ui/ImageCropModal/ImageCropModal';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useUpdateProfileImage } from '../../hooks/provider/useUpdateProfileImage';

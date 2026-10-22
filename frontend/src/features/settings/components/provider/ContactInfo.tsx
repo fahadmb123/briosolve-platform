@@ -5,7 +5,8 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { emailSchema, phoneSchema, type EmailInputType, type PhoneInputType } from '../../schemas/providerSettings.schema';
 import { useUpdateEmail, useUpdatePhone, useDeletePhone } from '../../hooks/customer/contact';
-import { useResetFlowStore, useAuthStore } from '../../../auth';
+import { useAuthStore } from '../../../auth/stores/auth.store';
+import { useResetFlowStore } from '../../../auth/stores/reset-flow.store';
 import { ConfirmModal } from '../../../../shared/components/ui/ConfirmModal/ConfirmModal';
 
 export const ContactInfo: React.FC = () => {

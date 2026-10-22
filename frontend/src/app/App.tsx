@@ -8,7 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '../features/auth';
+import { useAuthStore } from '../features/auth/stores/auth.store';
 import { LoadingScreen } from '../shared/components/ui/LoadingScreen/LoadingScreen';
 
 function App() {

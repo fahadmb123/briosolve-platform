@@ -1,7 +1,8 @@
 import { Outlet, Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
-import { useAuthStore, useLogout } from '../features/auth';
+import { useAuthStore } from '../features/auth/stores/auth.store';
+import { useLogout } from '../features/auth/hooks/use-otp-varify';
 import type { ProviderProfile } from '../shared/types/Dtos';
 import '../shared/styles/pro-badge.css';
 

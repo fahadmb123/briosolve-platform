@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import { useUpdateProfile } from '../../hooks/customer/useUpdateProfile';
 import { useGetProfile } from '../../hooks/customer/useGetProfile';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
-import { useAuthStore } from '../../../auth';
+import { useAuthStore } from '../../../auth/stores/auth.store';
 import { ImageCropModal } from '../../../../shared/components/ui/ImageCropModal/ImageCropModal';
 import { useUpdateProfileImage } from '../../hooks/customer/useUpdateProfileImage';
 import { useDeleteProfileImage } from '../../hooks/customer/useDeleteProfileImage';

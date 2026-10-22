@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { toast } from 'react-toastify';
-import { useAuthStore } from '../../auth';
+import { useAuthStore } from '../../auth/stores/auth.store';
 import {
     useGetProviderAvailability,
     useSetProviderAvailability,

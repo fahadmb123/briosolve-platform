@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getMe } from "../common/services/auth.service";
+import { getMe } from "../services/auth.service";
 import type { Address } from "../../addresses";
 import type { CustomerProfile, ProviderProfile } from "../../profiles";
 

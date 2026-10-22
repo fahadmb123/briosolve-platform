@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { useAuthStore } from '../../../auth';
+import { useAuthStore } from '../../../auth/stores/auth.store';
 import { useUpdateServiceRadius } from '../../hooks/customer/useUpdateServiceRadius';
 import type { Address } from '../../../addresses';
 import type { CustomerProfile } from '../../../profiles';

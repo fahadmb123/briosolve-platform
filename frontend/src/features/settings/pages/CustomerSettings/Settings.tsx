@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import './Settings.css';
 import { SettingsMenuCard } from '../../components/common/SettingsMenuCard';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
-import { useAuthStore } from '../../../auth';
+import { useAuthStore } from '../../../auth/stores/auth.store';
 
 const Appearance = lazy(() => import('./views/Appearance/Appearance').then(m => ({ default: m.Appearance })));
 const Contact = lazy(() => import('./views/Contact/Contact').then(m => ({ default: m.Contact })));

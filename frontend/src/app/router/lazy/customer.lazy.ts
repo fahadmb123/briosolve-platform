@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-export const CustomerRegister = React.lazy(() => import('../../../features/auth/customer/pages/CustomerRegister/CustomerRegister'));
+export const CustomerRegister = React.lazy(() => import('../../../features/auth/pages/CustomerRegister/CustomerRegister'));
 export const CustomerDashboard = React.lazy(() => import('../../../features/dashboard/pages/CustomerDashboard/Dashboard'));
 export const CustomerProfile = React.lazy(() => import('../../../features/profiles/pages/CustomerProfile/Profile'));
 export const CustomerSettings = React.lazy(() => import('../../../features/settings/pages/CustomerSettings/Settings'));

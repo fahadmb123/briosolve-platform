@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import { businessProfileSchema, type BusinessProfileInputType } from '../../schemas/providerSettings.schema';
 import { useUpdateBusinessProfile } from '../../hooks/provider/useUpdateBusinessProfile';
-import { useAuthStore } from '../../../auth';
+import { useAuthStore } from '../../../auth/stores/auth.store';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import type { ProviderProfile } from '../../../profiles';
 

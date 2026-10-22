@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import type { ApiError } from "../../../../shared/api/ApiError";
 import { updateEmail, updatePassword, updatePhone, deletePhone } from "../../services/accountSecurity.service";
 import { toast } from "react-toastify";
-import { useAuthStore } from "../../../auth";
+import { useAuthStore } from "../../../auth/stores/auth.store";
 
 export const useUpdateEmail = () => {
     return useMutation({

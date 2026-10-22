@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAuthStore, OtpModal } from '../../../auth';
+import { useAuthStore } from '../../../auth/stores/auth.store';
+import { OtpModal } from '../../../auth/components/OtpModal';
 import { useBecomeCustomer, useSendBecomeCustomerOtp } from '../../hooks/provider/useBecomeCustomer';
 import type { ApiError } from '../../../../shared/api/ApiError';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';

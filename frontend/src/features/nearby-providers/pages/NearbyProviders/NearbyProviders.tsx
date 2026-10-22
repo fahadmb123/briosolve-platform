@@ -6,7 +6,7 @@ import { ProviderCard } from '../../components/ProviderCard';
 import { ProviderDetailsModal } from '../../components/ProviderDetailsModal';
 import { AdminPagination } from '../../../admin/components/AdminPagination';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
-import { useAuthStore } from '../../../auth';
+import { useAuthStore } from '../../../auth/stores/auth.store';
 import type { User, response } from '../../../../shared/types/Dtos';
 import type { Address } from '../../../addresses';
 import type { NearbyProvidersResponseData } from '../../services/nearbyProviders.service';

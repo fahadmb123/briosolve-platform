@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuthStore } from "../../../features/auth";
+import { useAuthStore } from "../../../features/auth/stores/auth.store";
 import NotFound from "../../pages/NotFound/NotFound";
 
 interface RoleRouteProps {

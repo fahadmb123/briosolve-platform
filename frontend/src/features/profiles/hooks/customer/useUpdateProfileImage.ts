@@ -17,7 +17,7 @@ export const useUpdateProfileImage = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["profile"] });
-            import("../../../auth").then(m => m.useAuthStore.getState().fetchUser());
+            import("../../../auth/stores/auth.store").then(m => m.useAuthStore.getState().fetchUser());
         },
     });
 };
