@@ -10,16 +10,7 @@ import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/Conf
 import { useCategoryFormData } from "../../hooks/useCategoryFormData";
 
 
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  status: 'ACTIVE' | 'INACTIVE';
-  image?: string | null;
-  updated_at:string,
-  created_at:string,
-  services: any[];
-}
+import type { Category } from "../../services/category.service";
 
 export default function Categories() {
   const [page, setPage] = useState(1);

@@ -1,15 +1,23 @@
 import { apiClient } from "../../../shared/api/Client"
 import type { response } from "../../../shared/types/Dtos";
 
-interface Category {
+export interface CategoryService {
+  id: string;
+  name: string;
+  description?: string | null;
+  status?: 'ACTIVE' | 'INACTIVE' | string;
+  image?: string | null;
+}
+
+export interface Category {
   id: string;
   name: string;
   description: string;
   status: 'ACTIVE' | 'INACTIVE';
   image?: string | null;
-  updated_at:string,
-  created_at:string,
-  services: any[];
+  updated_at: string;
+  created_at: string;
+  services: CategoryService[];
 }
 
 

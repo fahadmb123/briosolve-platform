@@ -6,7 +6,17 @@ export type ReactivationRequestInput = {
     reason: string;
 };
 
-export const submitReactivationRequest = async (data: ReactivationRequestInput): Promise<response<any>> => {
+export type ReactivationRequestResponse = {
+    id: string;
+    user_id: string;
+    block_id: string;
+    reason: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    created_at?: string;
+    updated_at?: string;
+};
+
+export const submitReactivationRequest = async (data: ReactivationRequestInput): Promise<response<ReactivationRequestResponse>> => {
     const res = await apiClient.post("/api/reactivation/request", data);
     return res.data;
 };

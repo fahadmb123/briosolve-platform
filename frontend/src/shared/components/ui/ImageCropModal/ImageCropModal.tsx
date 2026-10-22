@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import Cropper from 'react-easy-crop';
+import Cropper, { type Area } from 'react-easy-crop';
 import { getCroppedImg } from '../../../utils/cropImage';
 import { toast } from 'react-toastify';
 
@@ -31,7 +31,7 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
     const [imageFile, setImageFile] = useState<File | null>(initialFile);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -69,7 +69,7 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
         e.target.value = '';
     };
 
-    const onCropComplete = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
+    const onCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
         setCroppedAreaPixels(croppedAreaPixels);
     }, []);
 

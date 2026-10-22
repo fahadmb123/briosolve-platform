@@ -9,10 +9,15 @@ interface ServicesStepProps {
     onBack: () => void;
 }
 
+interface ServiceItem {
+  id: string;
+  name: string;
+}
+
 interface Category {
   id: string;
   name: string;
-  services: any[];
+  services: ServiceItem[];
 }
 
 export function ServicesStep({ isActive, onNext, onBack }: ServicesStepProps) {
@@ -75,7 +80,7 @@ export function ServicesStep({ isActive, onNext, onBack }: ServicesStepProps) {
                                     </div>
                                     <div className="p-5">
                                         <div className="modern-chips-wrapper" style={{ justifyContent: 'flex-start' }}>
-                                            {category.services.map((service: any) => (
+                                            {category.services.map((service) => (
                                                 <label key={service.id} className="modern-service-chip">
                                                     <input 
                                                         type="checkbox" 
