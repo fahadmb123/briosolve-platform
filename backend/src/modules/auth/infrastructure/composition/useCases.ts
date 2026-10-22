@@ -11,15 +11,14 @@ import UpdatePasswordUseCase from "../../application/use-cases/credentials/updat
 import { SendSmsOtpUseCase } from "../../application/use-cases/verification/sendSmsOtp.useCase";
 import { DeletePhoneUseCase } from "../../application/use-cases/credentials/deletePhone.useCase";
 
-import { userRepository, customerRepository, refreshSessionRepository } from "./repositories";
+import { userRepository, customerRepository } from "./repositories";
 import {
   pendingRegistrationStore,
   passwordHasher,
   otpGenerator,
   emailSender,
   jwtService,
-  smsService,
-  refreshTokenService
+  smsService
 } from "./services";
 
 export const otpVarificationUseCase = new OtpVarificationUseCase(
@@ -39,22 +38,15 @@ export const resendOtpUseCase = new ResendOtpUseCase(
 export const loginUseCase = new LoginUseCase(
   userRepository,
   passwordHasher,
-  jwtService,
-  refreshSessionRepository,
-  refreshTokenService
+  jwtService
 );
 
 export const refreshTokenUseCase = new RefreshTokenUseCase(
-  refreshSessionRepository,
   userRepository,
-  jwtService,
-  refreshTokenService
+  jwtService
 );
 
-export const logoutUseCase = new LogoutUseCase(
-  refreshSessionRepository,
-  refreshTokenService
-);
+export const logoutUseCase = new LogoutUseCase();
 
 export const getMeUseCase = new GetMeUseCase(userRepository);
 

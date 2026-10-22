@@ -44,10 +44,6 @@
       "model": "provider_verification_files",
       "namespace": "public"
     },
-    "refresh_sessions": {
-      "model": "refresh_sessions",
-      "namespace": "public"
-    },
     "services": {
       "model": "services",
       "namespace": "public"
@@ -1619,143 +1615,6 @@
               "table": "provider_verification_files"
             }
           },
-          "refresh_sessions": {
-            "fields": {
-              "created_at": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "kind": "scalar"
-                }
-              },
-              "expires_at": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "kind": "scalar"
-                }
-              },
-              "family_id": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/uuid@1",
-                  "kind": "scalar"
-                }
-              },
-              "id": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/uuid@1",
-                  "kind": "scalar"
-                }
-              },
-              "ip_address": {
-                "nullable": true,
-                "type": {
-                  "codecId": "sql/varchar@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "length": 100
-                  }
-                }
-              },
-              "revoked_at": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "kind": "scalar"
-                }
-              },
-              "token_hash": {
-                "nullable": false,
-                "type": {
-                  "codecId": "sql/varchar@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "length": 255
-                  }
-                }
-              },
-              "updated_at": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "kind": "scalar"
-                }
-              },
-              "user_agent": {
-                "nullable": true,
-                "type": {
-                  "codecId": "sql/varchar@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "length": 500
-                  }
-                }
-              },
-              "user_id": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/uuid@1",
-                  "kind": "scalar"
-                }
-              }
-            },
-            "relations": {
-              "user": {
-                "cardinality": "N:1",
-                "nullable": false,
-                "on": {
-                  "localFields": [
-                    "user_id"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
-                },
-                "to": {
-                  "model": "users",
-                  "namespace": "public"
-                }
-              }
-            },
-            "storage": {
-              "fields": {
-                "created_at": {
-                  "column": "created_at"
-                },
-                "expires_at": {
-                  "column": "expires_at"
-                },
-                "family_id": {
-                  "column": "family_id"
-                },
-                "id": {
-                  "column": "id"
-                },
-                "ip_address": {
-                  "column": "ip_address"
-                },
-                "revoked_at": {
-                  "column": "revoked_at"
-                },
-                "token_hash": {
-                  "column": "token_hash"
-                },
-                "updated_at": {
-                  "column": "updated_at"
-                },
-                "user_agent": {
-                  "column": "user_agent"
-                },
-                "user_id": {
-                  "column": "user_id"
-                }
-              },
-              "namespaceId": "public",
-              "table": "refresh_sessions"
-            }
-          },
           "services": {
             "fields": {
               "category_id": {
@@ -2238,21 +2097,6 @@
                 },
                 "to": {
                   "model": "account_reactivation_requests",
-                  "namespace": "public"
-                }
-              },
-              "refresh_sessions": {
-                "cardinality": "1:N",
-                "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "user_id"
-                  ]
-                },
-                "to": {
-                  "model": "refresh_sessions",
                   "namespace": "public"
                 }
               },
@@ -3434,113 +3278,6 @@
               },
               "uniques": []
             },
-            "refresh_sessions": {
-              "columns": {
-                "created_at": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "default": {
-                    "expression": "now()",
-                    "kind": "function"
-                  },
-                  "nativeType": "timestamptz",
-                  "nullable": false
-                },
-                "expires_at": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "nativeType": "timestamptz",
-                  "nullable": false
-                },
-                "family_id": {
-                  "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
-                  "nullable": false
-                },
-                "id": {
-                  "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
-                  "nullable": false
-                },
-                "ip_address": {
-                  "codecId": "sql/varchar@1",
-                  "nativeType": "character varying",
-                  "nullable": true,
-                  "typeParams": {
-                    "length": 100
-                  }
-                },
-                "revoked_at": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "nativeType": "timestamptz",
-                  "nullable": true
-                },
-                "token_hash": {
-                  "codecId": "sql/varchar@1",
-                  "nativeType": "character varying",
-                  "nullable": false,
-                  "typeParams": {
-                    "length": 255
-                  }
-                },
-                "updated_at": {
-                  "codecId": "pg/timestamptz-temporal@1",
-                  "nativeType": "timestamptz",
-                  "nullable": false
-                },
-                "user_agent": {
-                  "codecId": "sql/varchar@1",
-                  "nativeType": "character varying",
-                  "nullable": true,
-                  "typeParams": {
-                    "length": 500
-                  }
-                },
-                "user_id": {
-                  "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
-                  "nullable": false
-                }
-              },
-              "foreignKeys": [
-                {
-                  "source": {
-                    "columns": [
-                      "user_id"
-                    ],
-                    "namespaceId": "public",
-                    "tableName": "refresh_sessions"
-                  },
-                  "target": {
-                    "columns": [
-                      "id"
-                    ],
-                    "namespaceId": "public",
-                    "tableName": "users"
-                  }
-                }
-              ],
-              "indexes": [
-                {
-                  "columns": [
-                    "user_id"
-                  ],
-                  "name": "refresh_sessions_user_id_idx_6c952402",
-                  "prefix": "refresh_sessions_user_id_idx",
-                  "unique": false
-                }
-              ],
-              "primaryKey": {
-                "columns": [
-                  "id"
-                ]
-              },
-              "uniques": [
-                {
-                  "columns": [
-                    "token_hash"
-                  ]
-                }
-              ]
-            },
             "services": {
               "checks": [
                 {
@@ -3992,10 +3729,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "a2691c57f344df3ce16540f5cdd56f561ba5d3a9e71140508ef1757e5bae7088"
+    "storageHash": "28d81cd74560b55ce83c61c7f9120e2d0fc061ce6708d71ad2c82f42e4bf1bb9"
   },
   "execution": {
-    "executionHash": "cd9279aebf1c784c6bc09862f6c30a8e07264e0cba8854417ef576380d7b373f",
+    "executionHash": "562d774e1c1196ee81f93c0f6dcb0299fc9243709fe9fdd6e5715de11fdc9747",
     "mutations": {
       "defaults": [
         {
@@ -4226,43 +3963,6 @@
             "column": "id",
             "namespace": "public",
             "table": "provider_verification_files"
-          }
-        },
-        {
-          "onCreate": {
-            "id": "uuidv4",
-            "kind": "generator"
-          },
-          "ref": {
-            "column": "family_id",
-            "namespace": "public",
-            "table": "refresh_sessions"
-          }
-        },
-        {
-          "onCreate": {
-            "id": "uuidv4",
-            "kind": "generator"
-          },
-          "ref": {
-            "column": "id",
-            "namespace": "public",
-            "table": "refresh_sessions"
-          }
-        },
-        {
-          "onCreate": {
-            "id": "instantNow",
-            "kind": "generator"
-          },
-          "onUpdate": {
-            "id": "instantNow",
-            "kind": "generator"
-          },
-          "ref": {
-            "column": "updated_at",
-            "namespace": "public",
-            "table": "refresh_sessions"
           }
         },
         {

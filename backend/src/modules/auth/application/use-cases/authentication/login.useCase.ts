@@ -1,24 +1,16 @@
-import crypto from "crypto";
 import { IJwtService } from "../../../../../shared/application/Dto/services/jwtDto.service";
 import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { envConfig } from "../../../../../shared/infrastructure/config/env.config";
 import { IPasswordHasher } from "../../../../../shared/application/interfaces/services/IPasswordHasher.service";
-import { IRefreshTokenService } from "../../../../../shared/application/interfaces/services/IRefreshToken.service";
-import { RefreshSession } from "../../../domain/entities/refreshSession.entity";
 import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
-import { IRefreshSessionRepository } from "../../../domain/repositories/refreshSession.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { LoginOutputDto } from "../../dtos/response/login.dto";
 import { LoginInputDto } from "../../dtos/request/login.dto";
-
 
 export default class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly passwordHasher: IPasswordHasher,
-        private readonly jwtService: IJwtService,
-        private readonly refreshSessionRepository: IRefreshSessionRepository,
-        private readonly refreshTokenService: IRefreshTokenService
+        private readonly jwtService: IJwtService
     ) {}
 
     async execute(input: LoginInputDto): Promise<LoginOutputDto> {
@@ -44,30 +36,14 @@ export default class LoginUseCase implements IUseCase<LoginInputDto, LoginOutput
             role: user.role
         });
 
-        const rawRefreshToken = this.refreshTokenService.generateToken();
-        const tokenHash = this.refreshTokenService.hashToken(rawRefreshToken);
-        const familyId = crypto.randomUUID();
-        const expiresAt = new Date(Date.now() + envConfig.REFRESH_TOKEN_COOKIE_MAX_AGE_MS);
-        const now = new Date();
-
-        const session = new RefreshSession(
-            crypto.randomUUID(),
-            user.id,
-            tokenHash,
-            familyId,
-            expiresAt,
-            null,
-            input.userAgent ?? null,
-            input.ipAddress ?? null,
-            now,
-            now
-        );
-
-        await this.refreshSessionRepository.create(session);
+        const refreshToken = this.jwtService.generateRefreshToken({
+            userId: user.id,
+            role: user.role
+        });
 
         return {
             accessToken,
-            refreshToken: rawRefreshToken,
+            refreshToken,
             isExist: user
         };
     }

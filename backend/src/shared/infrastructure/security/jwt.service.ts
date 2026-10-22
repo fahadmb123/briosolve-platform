@@ -14,4 +14,16 @@ export class JwtService implements IJwtService {
     verify(token: string): JwtPayload {
         return jwt.verify(token, envConfig.JWT_ACCESS_SECRET) as JwtPayload;
     }
+
+    generateRefreshToken(payload: JwtPayload, expiresIn?: string): string {
+        const options: SignOptions = {
+            expiresIn: (expiresIn || envConfig.REFRESH_TOKEN_EXPIRATION) as SignOptions["expiresIn"]
+        };
+
+        return jwt.sign(payload, envConfig.JWT_REFRESH_SECRET, options);
+    }
+
+    verifyRefreshToken(token: string): JwtPayload {
+        return jwt.verify(token, envConfig.JWT_REFRESH_SECRET) as JwtPayload;
+    }
 }

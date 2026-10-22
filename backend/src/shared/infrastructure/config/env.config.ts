@@ -16,7 +16,7 @@ const envSchema = z.object({
     REFRESH_TOKEN_EXPIRATION: z.string().default("7d"),
     ACCESS_TOKEN_COOKIE_MAX_AGE_MS: z.coerce.number().default(15 * 60 * 1000),
     REFRESH_TOKEN_COOKIE_MAX_AGE_MS: z.coerce.number().default(7 * 24 * 60 * 60 * 1000),
-    REFRESH_TOKEN_ROTATION_GRACE_PERIOD_MS: z.coerce.number().default(10000),
+    REGISTRATION_COOKIE_MAX_AGE_MS: z.coerce.number().default(10 * 60 * 1000),
     CORS_ORIGIN: z.string().default("http://localhost:5173")
 });
 

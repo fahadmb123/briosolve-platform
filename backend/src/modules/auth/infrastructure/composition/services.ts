@@ -4,7 +4,6 @@ import { NodemailerEmailSender } from "../../../../shared/infrastructure/email/n
 import { RedisPendingRegistrationStore } from "../../../../shared/infrastructure/cache/redis/redisPendingRegistration.store";
 import { JwtService } from "../../../../shared/infrastructure/security/jwt.service";
 import { TextBeeSmsService } from "../../../../infrastructure/services/textbee/TextBeeSmsService";
-import { CryptoRefreshTokenService } from "../../../../shared/infrastructure/security/cryptoRefreshToken.service";
 
 export const pendingRegistrationStore = new RedisPendingRegistrationStore();
 export const emailSender = new NodemailerEmailSender();
@@ -12,4 +11,3 @@ export const otpGenerator = new SecureOtpGeneratorService();
 export const passwordHasher = new BcryptPasswordHasherService();
 export const jwtService = new JwtService();
 export const smsService = new TextBeeSmsService();
-export const refreshTokenService = new CryptoRefreshTokenService();

@@ -35,6 +35,6 @@ export const registrationCookie: CookieOptions = {
     httpOnly: true,
     secure: envConfig.isProduction,
     sameSite: "lax",
-    maxAge: 10 * 60 * 1000,
+    maxAge: envConfig.REGISTRATION_COOKIE_MAX_AGE_MS,
     path: "/"
 };

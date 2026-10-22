@@ -5,7 +5,6 @@ type DefaultModelRow<Table extends keyof Contract["storage"]["namespaces"]["publ
 
 declare module "@prisma/client" {
     export namespace Prisma {
-        export type RefreshSessionGetPayload<T = {}> = DefaultModelRow<"refresh_sessions"> & Partial<Models.public_refresh_sessions>;
         export type UserGetPayload<T = {}> = DefaultModelRow<"users"> & Partial<Models.public_users>;
         export type usersGetPayload<T = {}> = UserGetPayload<T>;
         export type CustomerProfileGetPayload<T = {}> = DefaultModelRow<"customer_profiles"> & Partial<Models.public_customer_profiles>;
