@@ -8,13 +8,13 @@ const AdminLayout = React.lazy(() => import('../../layouts/AdminLayout'));
 const ProviderLayout = React.lazy(() => import('../../layouts/ProviderLayout'));
 const CustomerLayout = React.lazy(() => import('../../layouts/CustomerLayout'));
 
-import { adminRoutes } from './admin/adminRoutes';
-import { providerRoutes } from './provider/providerRoutes';
-import { customerRoutes } from './customer/customerRoutes';
-import { publicRoutes, verificationRoutes } from './public/publicRoutes';
-import PublicRoute from '../../shared/middlewares/PublicRoute';
-import RoleRoute from '../../shared/middlewares/RoleRoute';
-import { ProviderRegister } from './provider/provider.lazy';
+import { adminRoutes } from './routes/adminRoutes';
+import { providerRoutes } from './routes/providerRoutes';
+import { customerRoutes } from './routes/customerRoutes';
+import { publicRoutes, verificationRoutes } from './routes/publicRoutes';
+import PublicRoute from './guards/PublicRoute';
+import RoleRoute from './guards/RoleRoute';
+import { ProviderRegister } from './lazy/provider.lazy';
 
 
 

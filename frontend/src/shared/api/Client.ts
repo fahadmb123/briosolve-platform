@@ -1,6 +1,6 @@
 import axios, { isAxiosError, type InternalAxiosRequestConfig } from "axios";
 import { normalizeApiError } from "./ApiError";
-import { useAuthStore } from "../../store/auth/auth.store";
+import { useAuthStore } from "../../features/auth/stores/auth.store";
 
 interface RetriableRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;

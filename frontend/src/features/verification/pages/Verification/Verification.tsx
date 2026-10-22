@@ -16,7 +16,7 @@ import {
 import { toast } from 'react-toastify';
 import '../../components/kyc.css';
 import { ConfirmModal } from '../../../../shared/components/ui/ConfirmModal/ConfirmModal';
-import { useAuthStore } from '../../../../store/auth/auth.store';
+import { useAuthStore } from '../../../auth';
 
 
 

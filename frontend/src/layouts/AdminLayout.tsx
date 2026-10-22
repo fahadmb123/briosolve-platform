@@ -1,8 +1,7 @@
 import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
-import { useLogout } from '../features/auth/hooks/mutations/use-otp-varify';
-import { useAuthStore } from '../store/auth/auth.store';
+import { useLogout, useAuthStore } from '../features/auth';
 
 export default function AdminLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();

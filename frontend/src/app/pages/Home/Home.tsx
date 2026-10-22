@@ -4,8 +4,7 @@ import './Home.css';
 
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import { useAuthStore } from '../../../store/auth/auth.store';
-import { useLogout } from '../../../features/auth/hooks/mutations/use-otp-varify';
+import { useAuthStore, useLogout } from '../../../features/auth';
 
 export default function Home() {
   const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
@@ -138,7 +137,6 @@ export default function Home() {
         <main className="app-main">
             
             <header className="app-header">
-                {/* Navbar helper */}
                 {(() => {
                     const getDashboardRoute = () => {
                         if (!user) return '/login';
@@ -162,9 +160,24 @@ export default function Home() {
                 </div>
 
                 <div className="navbar-center hide-mobile">
-                    <Link to="/nearby-providers" className="nav-item-link">Nearby Providers</Link>
-                    <Link to="#" className="nav-item-link">How It Works</Link>
-                    <Link to={getDashboardRoute()} className="nav-item-link font-semibold text-primary">Dashboard</Link>
+                    {user && (
+                        <>
+                            {user.role === "CUSTOMER" ? (
+                                <>
+                                    <Link to="/nearby-providers" className="nav-item-link">Nearby Providers</Link>
+                                    <Link to="#" className="nav-item-link">How It Works</Link>
+                                </>
+                            ):null}
+                            <Link to={getDashboardRoute()} className="nav-item-link font-semibold text-primary">Dashboard</Link>
+                        </>
+                    )}
+                    {/*{!user && (
+                        <>
+                        <Link to="/register" className="nav-item-link font-semibold text-primary"></Link>
+                        <Link to="/register" className="nav-item-link font-semibold text-primary"></Link>
+                            <Link to="/register" className="nav-item-link font-semibold text-primary">Sign Up</Link>
+                        </>
+                    )}*/}
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -201,14 +214,16 @@ export default function Home() {
             </header>
 
             {/* Floating Top-Right Action Box */}
-            <div className="navbar-action-box always-visible">
-                <Link to="/register" className="btn btn-outline btn-sm">
+            {user && (
+                <div className="navbar-action-box always-visible">
+                <Link to="/settings" className="btn btn-outline btn-sm">
                     Become a Provider
                 </Link>
                 <Link to="#" className="btn btn-primary btn-sm">
                     <i className="fas fa-plus mr-1"></i> Post Request
                 </Link>
             </div>
+            )}
 
             <div className="app-content-home">
 
