@@ -17,7 +17,8 @@ const envSchema = z.object({
     ACCESS_TOKEN_COOKIE_MAX_AGE_MS: z.coerce.number().default(15 * 60 * 1000),
     REFRESH_TOKEN_COOKIE_MAX_AGE_MS: z.coerce.number().default(7 * 24 * 60 * 60 * 1000),
     REGISTRATION_COOKIE_MAX_AGE_MS: z.coerce.number().default(10 * 60 * 1000),
-    CORS_ORIGIN: z.string().default("http://localhost:5173")
+    CORS_ORIGIN: z.string().default("http://localhost:5173"),
+    LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -33,6 +34,7 @@ export const envConfig = {
     ...rawConfig,
     JWT_ACCESS_SECRET: rawConfig.JWT_ACCESS_SECRET || rawConfig.JWT_SECRET,
     JWT_REFRESH_SECRET: rawConfig.JWT_REFRESH_SECRET || rawConfig.JWT_SECRET,
+    LOG_LEVEL: rawConfig.LOG_LEVEL || (rawConfig.NODE_ENV === "production" ? "info" : "debug"),
     isProduction: rawConfig.NODE_ENV === "production"
 };
 

@@ -40,7 +40,6 @@ export default class RegisterCustomerUseCase implements IUseCase<RegisterCustome
         const otpExpiresIn = 60
         const otpExpiresAt = Date.now() + otpExpiresIn * 1000
         const path = "login"
-        console.log("OTP : ",otp)
         await this.PendingRegistrationStore.save(registrationId,{
             name:input.name,
             email:input.email,
