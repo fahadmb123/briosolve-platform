@@ -6,16 +6,16 @@ import { UploadVerificationDocumentResponseDto } from "../dtos/verification/resp
 
 export class GetProviderVerificationsUseCase implements IUseCase<string, UploadVerificationDocumentResponseDto[]> {
     constructor(
-        private readonly verificationDocumentRepository: IVerificationDocumentRepository,
-        private readonly providerRepository: IProviderRepository
+        private readonly _verificationDocumentRepository: IVerificationDocumentRepository,
+        private readonly _providerRepository: IProviderRepository
     ){}
 
     async execute(userId: string): Promise<UploadVerificationDocumentResponseDto[]> {
-        const provider = await this.providerRepository.findById(userId);
+        const provider = await this._providerRepository.findById(userId);
         if (!provider) {
             return [];
         }
 
-        return await this.verificationDocumentRepository.findByProviderId(provider.id);
+        return await this._verificationDocumentRepository.findByProviderId(provider.id);
     }
 }

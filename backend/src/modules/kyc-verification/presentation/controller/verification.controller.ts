@@ -11,12 +11,12 @@ import { GetAdminKycResponse } from "../../application/dtos/admin/response/get-a
 
 export class VerificationController extends BaseController {
     constructor(
-        private readonly uploadVerificationDocumentUseCase: IUseCase<UploadVerificationInputDto, UploadVerificationDocumentResponseDto>,
-        private readonly getProviderVerificationsUseCase: IUseCase<string, UploadVerificationDocumentResponseDto[]>,
-        private readonly updateVerificationDocumentUseCase: IUseCase<UpdateVerificationInputDto, UploadVerificationDocumentResponseDto>,
-        private readonly deleteVerificationDocumentUseCase: IUseCase<{ id: string; userId: string }, boolean>,
-        private readonly getAdminVerificationsUseCase: IUseCase<GetAdminKycRequestsInput, GetAdminKycResponse>,
-        private readonly updateKycStatusUseCase: IUseCase<UpdateKycStatusInput, void>
+        private readonly _uploadVerificationDocumentUseCase: IUseCase<UploadVerificationInputDto, UploadVerificationDocumentResponseDto>,
+        private readonly _getProviderVerificationsUseCase: IUseCase<string, UploadVerificationDocumentResponseDto[]>,
+        private readonly _updateVerificationDocumentUseCase: IUseCase<UpdateVerificationInputDto, UploadVerificationDocumentResponseDto>,
+        private readonly _deleteVerificationDocumentUseCase: IUseCase<{ id: string; userId: string }, boolean>,
+        private readonly _getAdminVerificationsUseCase: IUseCase<GetAdminKycRequestsInput, GetAdminKycResponse>,
+        private readonly _updateKycStatusUseCase: IUseCase<UpdateKycStatusInput, void>
     ) {
         super();
     }
@@ -47,7 +47,7 @@ export class VerificationController extends BaseController {
                 }))
             };
 
-            const result = await this.uploadVerificationDocumentUseCase.execute(input);
+            const result = await this._uploadVerificationDocumentUseCase.execute(input);
             return this.sendSuccess(res, "Submitted!", result);
         } catch (error) {
             next(error);
@@ -94,7 +94,7 @@ export class VerificationController extends BaseController {
                 }))
             };
 
-            const result = await this.updateVerificationDocumentUseCase.execute(input);
+            const result = await this._updateVerificationDocumentUseCase.execute(input);
             return this.sendSuccess(res, "Updated!", result);
         } catch (error) {
             next(error);
@@ -109,7 +109,7 @@ export class VerificationController extends BaseController {
                 throw new ApplicationError("BAD_REQUEST", "Document ID is required", "VALIDATION");
             }
 
-            await this.deleteVerificationDocumentUseCase.execute({
+            await this._deleteVerificationDocumentUseCase.execute({
                 id: id as string,
                 userId: user.userId
             });
@@ -122,7 +122,7 @@ export class VerificationController extends BaseController {
     getProviderVerifications = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const user = req.user!;
-            const documents = await this.getProviderVerificationsUseCase.execute(user.userId);
+            const documents = await this._getProviderVerificationsUseCase.execute(user.userId);
             return this.sendSuccess(res, "Verification documents retrieved successfully", documents);
         } catch (error) {
             next(error);
@@ -137,7 +137,7 @@ export class VerificationController extends BaseController {
             const status = req.query.status as string | undefined;
             const sort = req.query.sort as "asc" | "desc" | undefined;
 
-            const result = await this.getAdminVerificationsUseCase.execute({
+            const result = await this._getAdminVerificationsUseCase.execute({
                 page,
                 limit,
                 search,
@@ -157,7 +157,7 @@ export class VerificationController extends BaseController {
             const rejectionReason = req.body.rejectionReason || req.body.rejection_reason;
             const documentId = req.body.documentId;
 
-            await this.updateKycStatusUseCase.execute({
+            await this._updateKycStatusUseCase.execute({
                 providerId,
                 status,
                 rejectionReason,

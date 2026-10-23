@@ -8,7 +8,7 @@ import { AdminKycStats, GetAdminKycResponse } from "../dtos/admin/response/get-a
 
 export class GetAdminVerificationsUseCase implements IUseCase<GetAdminKycRequestsInput, GetAdminKycResponse> {
     constructor(
-        private readonly verificationDocumentRepository: IVerificationDocumentRepository,
+        private readonly _verificationDocumentRepository: IVerificationDocumentRepository,
 
     ) {}
 
@@ -17,7 +17,7 @@ export class GetAdminVerificationsUseCase implements IUseCase<GetAdminKycRequest
         const limit = input.limit || 10;
         const skip = (page - 1) * limit;
 
-        const allProfiles = await this.verificationDocumentRepository.getAllProfilesWithVerifications();
+        const allProfiles = await this._verificationDocumentRepository.getAllProfilesWithVerifications();
         const submittedProfiles = allProfiles.filter((p) => p.hasUploadedDocuments());
 
         const stats: AdminKycStats = {

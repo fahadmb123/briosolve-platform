@@ -10,13 +10,13 @@ import { UploadVerificationDocumentResponseDto } from "../dtos/verification/resp
 
 export class UploadVerificationDocumentUseCase implements IUseCase<UploadVerificationInputDto, UploadVerificationDocumentResponseDto> {
     constructor(
-        private readonly verificationDocumentRepository: IVerificationDocumentRepository,
-        private readonly providerRepository: IProviderRepository,
-        private readonly imageUploadService: ImageUploadService
+        private readonly _verificationDocumentRepository: IVerificationDocumentRepository,
+        private readonly _providerRepository: IProviderRepository,
+        private readonly _imageUploadService: ImageUploadService
     ){}
 
     async execute(input: UploadVerificationInputDto): Promise<UploadVerificationDocumentResponseDto> {
-        const provider = await this.providerRepository.findById(input.userId);
+        const provider = await this._providerRepository.findById(input.userId);
         if (!provider) {
             throw new ApplicationError("NOT_FOUND", "Provider profile not found", "NOT_FOUND");
         }
@@ -25,22 +25,22 @@ export class UploadVerificationDocumentUseCase implements IUseCase<UploadVerific
             throw new ApplicationError("BAD_REQUEST", "At least one verification document file is required", "VALIDATION");
         }
 
-        const existingDoc = await this.verificationDocumentRepository.findByProviderAndType(
+        const existingDoc = await this._verificationDocumentRepository.findByProviderAndType(
             provider.id,
             input.document_type
         );
 
         const fileUrls = await Promise.all(
-            input.files.map((file) => this.imageUploadService.uploadImage(file.buffer, "verifications"))
+            input.files.map((file) => this._imageUploadService.uploadImage(file.buffer, "verifications"))
         );
 
         if (existingDoc && existingDoc.files && existingDoc.files.length > 0) {
             await Promise.all(
-                existingDoc.files.map((file) => this.imageUploadService.deleteImageByUrl(file.file_url).catch(() => {}))
+                existingDoc.files.map((file) => this._imageUploadService.deleteImageByUrl(file.file_url).catch(() => {}))
             );
         }
 
-        return await this.verificationDocumentRepository.createOrUpdate({
+        return await this._verificationDocumentRepository.createOrUpdate({
             provider_id: provider.id,
             document_type: input.document_type,
             document_name: input.document_name,

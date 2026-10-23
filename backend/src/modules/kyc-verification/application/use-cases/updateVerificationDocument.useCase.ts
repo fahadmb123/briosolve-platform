@@ -10,18 +10,18 @@ import { UploadVerificationDocumentResponseDto } from "../dtos/verification/resp
 
 export class UpdateVerificationDocumentUseCase implements IUseCase<UpdateVerificationInputDto, UploadVerificationDocumentResponseDto> {
     constructor(
-        private readonly verificationDocumentRepository: IVerificationDocumentRepository,
-        private readonly providerRepository: IProviderRepository,
-        private readonly imageUploadService: ImageUploadService
+        private readonly _verificationDocumentRepository: IVerificationDocumentRepository,
+        private readonly _providerRepository: IProviderRepository,
+        private readonly _imageUploadService: ImageUploadService
     ){}
 
     async execute(input: UpdateVerificationInputDto): Promise<UploadVerificationDocumentResponseDto> {
-        const provider = await this.providerRepository.findById(input.userId);
+        const provider = await this._providerRepository.findById(input.userId);
         if (!provider) {
             throw new ApplicationError("NOT_FOUND", "Provider profile not found", "NOT_FOUND");
         }
 
-        const existingDoc = await this.verificationDocumentRepository.findById(input.id);
+        const existingDoc = await this._verificationDocumentRepository.findById(input.id);
         if (!existingDoc) {
             throw new ApplicationError("NOT_FOUND", "Verification document not found", "NOT_FOUND");
         }
@@ -33,7 +33,7 @@ export class UpdateVerificationDocumentUseCase implements IUseCase<UpdateVerific
         let newFileUrls: string[] = [];
         if (input.new_files && input.new_files.length > 0) {
             newFileUrls = await Promise.all(
-                input.new_files.map((file) => this.imageUploadService.uploadImage(file.buffer, "verifications"))
+                input.new_files.map((file) => this._imageUploadService.uploadImage(file.buffer, "verifications"))
             );
         }
 
@@ -52,12 +52,12 @@ export class UpdateVerificationDocumentUseCase implements IUseCase<UpdateVerific
 
             if (filesToDelete.length > 0) {
                 await Promise.all(
-                    filesToDelete.map((f) => this.imageUploadService.deleteImageByUrl(f.file_url).catch(() => {}))
+                    filesToDelete.map((f) => this._imageUploadService.deleteImageByUrl(f.file_url).catch(() => {}))
                 );
             }
         }
 
-        const updated = await this.verificationDocumentRepository.updateDocument(input.id, {
+        const updated = await this._verificationDocumentRepository.updateDocument(input.id, {
             document_name: input.document_name,
             kept_file_ids: keptFileIds,
             new_file_urls: newFileUrls

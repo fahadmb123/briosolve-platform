@@ -11,7 +11,7 @@ export interface UpdateKycStatusInput {
 
 export class UpdateKycStatusUseCase implements IUseCase<UpdateKycStatusInput, void> {
     constructor(
-        private readonly verificationDocumentRepository: IVerificationDocumentRepository
+        private readonly _verificationDocumentRepository: IVerificationDocumentRepository
     ) {}
 
     async execute(input: UpdateKycStatusInput): Promise<void> {
@@ -21,15 +21,15 @@ export class UpdateKycStatusUseCase implements IUseCase<UpdateKycStatusInput, vo
 
         if (input.status === "REJECTED" && !input.rejectionReason?.trim()) throw new ApplicationError("BAD_REQUEST", "Rejection reason is required when rejecting a document", "VALIDATION");
 
-        const profileId = await this.verificationDocumentRepository.resolveProviderProfileId(input.providerId);
+        const profileId = await this._verificationDocumentRepository.resolveProviderProfileId(input.providerId);
 
-        await this.verificationDocumentRepository.updateDocumentStatus({
+        await this._verificationDocumentRepository.updateDocumentStatus({
             documentId: input.documentId,
             status: input.status,
             rejectionReason: input.status === "REJECTED" ? input.rejectionReason || "Verification rejected" : null,
         });
 
-        const allDocs = await this.verificationDocumentRepository.findByProviderId(profileId);
+        const allDocs = await this._verificationDocumentRepository.findByProviderId(profileId);
 
         const hasIdentityApproved = allDocs.some((d) => d.document_type === "IDENTITY" && d.status === "APPROVED");
         const hasCertificateApproved = allDocs.some((d) => d.document_type === "CERTIFICATE" && d.status === "APPROVED");
@@ -44,6 +44,6 @@ export class UpdateKycStatusUseCase implements IUseCase<UpdateKycStatusInput, vo
             ? "PENDING"
             : "NOT_SUBMITTED";
 
-        await this.verificationDocumentRepository.updateProviderKycStatus(profileId, newKycStatus);
+        await this._verificationDocumentRepository.updateProviderKycStatus(profileId, newKycStatus);
     }
 }
