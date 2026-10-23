@@ -35,7 +35,6 @@ export class CloudinaryService implements ImageUploadService {
         try {
             await cloudinary.uploader.destroy(publicId);
         } catch (error) {
-            // Using ApplicationError or just logging in the infrastructure layer
             console.error('Cloudinary delete error:', error);
             throw new ApplicationError("IMAGE_DELETION_FAILED", "Image deletion failed", "INTERNAL");
         }
@@ -56,7 +55,6 @@ export class CloudinaryService implements ImageUploadService {
                 }
             }
         } catch (error) {
-            // Safe fallback, we log inside the infra layer rather than bubbling up to controller
             console.error('Failed to parse and delete Cloudinary URL:', error);
         }
     }
