@@ -8,11 +8,11 @@ import { IGetCustomersUseCase } from "../../interfaces/use-cases/customers/get-c
 
 export default class GetCustomersUseCase implements IGetCustomersUseCase{
     constructor(
-        private readonly userRepository:IUserRepository
+        private readonly _userRepository: IUserRepository
     ){}
 
     async execute (input:getCustomersDto):Promise<{users:User[],total:number,totalPages:number}>{
-        const response = await this.userRepository.getUsersWithRole({
+        const response = await this._userRepository.getUsersWithRole({
             role: "CUSTOMER",
             ...input
         });

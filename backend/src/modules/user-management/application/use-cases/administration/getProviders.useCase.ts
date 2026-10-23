@@ -6,11 +6,11 @@ import { getProvidersDto } from "../../dtos/request/provider/get-providers.dto";
 
 export default class GetProvidersUseCase implements IGetProvidersUseCase {
     constructor(
-        private readonly userRepository: IUserRepository
+        private readonly _userRepository: IUserRepository
     ) {}
 
     async execute(input: getProvidersDto): Promise<{ users: User[]; total: number; totalPages: number }> {
-        const response = await this.userRepository.getUsersWithRole({
+        const response = await this._userRepository.getUsersWithRole({
             role: "PROVIDER",
             ...input
         });

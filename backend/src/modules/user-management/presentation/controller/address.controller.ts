@@ -11,18 +11,18 @@ import { AddressResponseDto } from "../../application/dtos/response/address/addr
 
 export class AddressController extends BaseController{
     constructor(
-        private readonly addAddressUseCase: IUseCase<AddAddressInputUseCaseDto,AddressResponseDto>,
-        private readonly getAddressesUseCase: IUseCase<GetAddressesInputDto,GetAddressesOutputDto>,
-        private readonly editAddressUseCase: IUseCase<EditAddressInputUseCaseDto,AddressResponseDto>,
-        private readonly deleteAddressUseCase: IUseCase<string,void>,
-        private readonly setDefaultAddressUseCase: IUseCase<SetDefaultAddressInputUseCaseDto,void>
+        private readonly _addAddressUseCase: IUseCase<AddAddressInputUseCaseDto,AddressResponseDto>,
+        private readonly _getAddressesUseCase: IUseCase<GetAddressesInputDto,GetAddressesOutputDto>,
+        private readonly _editAddressUseCase: IUseCase<EditAddressInputUseCaseDto,AddressResponseDto>,
+        private readonly _deleteAddressUseCase: IUseCase<string,void>,
+        private readonly _setDefaultAddressUseCase: IUseCase<SetDefaultAddressInputUseCaseDto,void>
     ){super()}
 
     addAddress = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const user = req.user!
 
-            const response = await this.addAddressUseCase.execute({id:user.userId,input:req.body})
+            const response = await this._addAddressUseCase.execute({id:user.userId,input:req.body})
             
             return this.sendSuccess(res,"Added!",response)
         } catch (err) {
@@ -34,7 +34,7 @@ export class AddressController extends BaseController{
         try {
             const id = req.params.id
 
-            const response = await this.editAddressUseCase.execute({id:id as string,input:req.body})
+            const response = await this._editAddressUseCase.execute({id:id as string,input:req.body})
             
             return this.sendSuccess(res,"Updated!",response)
         } catch (err) {
@@ -46,7 +46,7 @@ export class AddressController extends BaseController{
         try {
             const user = req.user!
 
-            const response = await this.getAddressesUseCase.execute({
+            const response = await this._getAddressesUseCase.execute({
                 id:user.userId,
                 page:Number(req.query.page) || 1,
                 limit:Number(req.query.limit) || 10,
@@ -62,7 +62,7 @@ export class AddressController extends BaseController{
         try {
             const id = req.params.id
 
-            await this.deleteAddressUseCase.execute(id as string)
+            await this._deleteAddressUseCase.execute(id as string)
 
             return this.sendSuccess(res,"Deleted!")
         } catch (err) {
@@ -74,7 +74,7 @@ export class AddressController extends BaseController{
             const user = req.user!
             const addressId = req.params.id
 
-            await this.setDefaultAddressUseCase.execute({userId:user.userId,addressId:addressId as string})
+            await this._setDefaultAddressUseCase.execute({userId:user.userId,addressId:addressId as string})
 
             return this.sendSuccess(res,"Updated!")
         } catch (err) {

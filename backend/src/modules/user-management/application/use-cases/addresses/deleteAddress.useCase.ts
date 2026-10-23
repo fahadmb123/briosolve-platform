@@ -4,10 +4,10 @@ import { IAddressRepository } from "../../../domain/repositories/IAddressReposit
 
 export class DeleteAddressUseCase implements IUseCase<string,void>{
     constructor(
-        private readonly addressRepository:IAddressRepository
+        private readonly _addressRepository: IAddressRepository
     ){}
     async execute(id:string): Promise<void> {
-        await this.addressRepository.delete(id)
+        await this._addressRepository.delete(id)
         return
     }
 }

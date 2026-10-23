@@ -23,17 +23,17 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 
 export class GetNearbyProvidersUseCase implements IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto> {
     constructor(
-        private readonly userRepository: IUserRepository,
-        private readonly customerRepository: ICustomerRepository
+        private readonly _userRepository: IUserRepository,
+        private readonly _customerRepository: ICustomerRepository
     ) {}
 
     async execute(input: GetNearbyProvidersDto): Promise<GetNearbyProvidersOutputDto> {
-        const customer = await this.userRepository.findById(input.userId);
+        const customer = await this._userRepository.findById(input.userId);
         if (!customer) {
             throw new ApplicationError("NOT_FOUND", "Customer not found", "NOT_FOUND");
         }
 
-        const customerProfile = await this.customerRepository.findById(input.userId);
+        const customerProfile = await this._customerRepository.findById(input.userId);
         const customerRadius = input.radius ?? customerProfile?.service_radius_km ?? 20;
 
         const customerAddress = customer.current_address_id as Address | null;
@@ -50,7 +50,7 @@ export class GetNearbyProvidersUseCase implements IUseCase<GetNearbyProvidersDto
         const customerLat = Number(customerAddress.latitude);
         const customerLng = Number(customerAddress.longitude);
 
-        const providers = await this.userRepository.getActiveProviders();
+        const providers = await this._userRepository.getActiveProviders();
 
         const searchLower = input.search?.trim().toLowerCase();
 

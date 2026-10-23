@@ -6,10 +6,10 @@ import { SetDefaultAddressInputUseCaseDto } from "../../dtos/request/address/set
 
 export class SetDefaultAddressUseCase implements IUseCase<SetDefaultAddressInputUseCaseDto,void>{
     constructor(
-        private readonly userRespository:IUserRepository
+        private readonly _userRepository: IUserRepository
     ){}
     async execute(input:SetDefaultAddressInputUseCaseDto): Promise<void> {
-        await this.userRespository.update(input.userId,{current_address_id:input.addressId})
+        await this._userRepository.update(input.userId,{current_address_id:input.addressId})
         return
     }
 }

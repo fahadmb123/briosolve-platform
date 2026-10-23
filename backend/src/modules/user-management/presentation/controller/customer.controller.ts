@@ -21,19 +21,19 @@ import { GetNearbyProvidersOutputDto } from "../../application/dtos/response/cus
 
 export class CustomerController extends BaseController{
     constructor (
-        private readonly getCustomersUseCase:IGetCustomersUseCase,
-        private readonly registerCustomerUseCase:IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto>,
-        private readonly updateCustomerProfileUseCase : IUseCase<UpdateCustomerProfileInputDto,void>,
-        private readonly imageUploadService: ImageUploadService,
-        private readonly sendBecomeProviderOtpUseCase: IUseCase<string,{ registrationId: string; expiresIn: number }>,
-        private readonly becomeProviderUseCase: IUseCase<BecomeProviderInput,void>,
-        private readonly jwtService : IJwtService,
-        private readonly getNearbyProvidersUseCase: IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto>
+        private readonly _getCustomersUseCase: IGetCustomersUseCase,
+        private readonly _registerCustomerUseCase: IUseCase<RegisterCustomerInput, EmailVerificationUseCaseOutputDto>,
+        private readonly _updateCustomerProfileUseCase: IUseCase<UpdateCustomerProfileInputDto, void>,
+        private readonly _imageUploadService: ImageUploadService,
+        private readonly _sendBecomeProviderOtpUseCase: IUseCase<string, { registrationId: string; expiresIn: number }>,
+        private readonly _becomeProviderUseCase: IUseCase<BecomeProviderInput, void>,
+        private readonly _jwtService: IJwtService,
+        private readonly _getNearbyProvidersUseCase: IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto>
     ) {super()}
 
     register = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const response = await this.registerCustomerUseCase.execute(req.body)
+            const response = await this._registerCustomerUseCase.execute(req.body)
 
             res.cookie("registration_id",response.registrationId,registrationCookie)
 
@@ -45,7 +45,7 @@ export class CustomerController extends BaseController{
 
     getCustomers = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const response = await this.getCustomersUseCase.execute({
+            const response = await this._getCustomersUseCase.execute({
                 page:Number(req.query.page) || 1,
                 limit:Number(req.query.limit) || 10,
                 filter:req.query.filter as string | undefined,
@@ -64,7 +64,7 @@ export class CustomerController extends BaseController{
 
     updateProfile = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            await this.updateCustomerProfileUseCase.execute({id:req.user?.userId!,data:req.body})
+            await this._updateCustomerProfileUseCase.execute({id:req.user?.userId!,data:req.body})
 
             return this.sendSuccess(res,"Updated!")
         } catch (err) {
@@ -75,9 +75,9 @@ export class CustomerController extends BaseController{
     uploadProfileImage = async (req:Request,res:Response,next:NextFunction) => {
         try {
             if (!req.file) throw new ApplicationError("NO_DATA","No image uploaded","NOT_FOUND")
-            const imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'profiles')
+            const imageUrl = await this._imageUploadService.uploadImage(req.file.buffer, 'profiles')
             
-            await this.updateCustomerProfileUseCase.execute({
+            await this._updateCustomerProfileUseCase.execute({
                 id: req.user?.userId!, 
                 data: { profile_image: imageUrl }
             })
@@ -92,9 +92,9 @@ export class CustomerController extends BaseController{
         try {
             const { imageUrl } = req.body;
 
-            if (imageUrl) await this.imageUploadService.deleteImageByUrl(imageUrl)
+            if (imageUrl) await this._imageUploadService.deleteImageByUrl(imageUrl)
 
-            await this.updateCustomerProfileUseCase.execute({
+            await this._updateCustomerProfileUseCase.execute({
                 id: req.user?.userId!, 
                 data: { profile_image: "" }
             })
@@ -108,7 +108,7 @@ export class CustomerController extends BaseController{
     sendBecomeProviderOtp = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const userId = req.user!.userId
-            const response = await this.sendBecomeProviderOtpUseCase.execute(userId)
+            const response = await this._sendBecomeProviderOtpUseCase.execute(userId)
             res.cookie("registration_id", response.registrationId, registrationCookie)
             return this.sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn })
         } catch (err) {
@@ -121,9 +121,9 @@ export class CustomerController extends BaseController{
             const user = req.user!
             const registrationId = req.cookies.registration_id
             const { businessName, experience, bio, services } = req.body
-            await this.becomeProviderUseCase.execute({ registrationId, businessName, experience, bio, services })
+            await this._becomeProviderUseCase.execute({ registrationId, businessName, experience, bio, services })
             
-            const newToken = await this.jwtService.generate({ userId: user.userId, role: "PROVIDER" })
+            const newToken = await this._jwtService.generate({ userId: user.userId, role: "PROVIDER" })
             res.cookie("access_token", newToken, accessTokenCookie)
             if (registrationId) res.clearCookie("registration_id")
             return this.sendSuccess(res, "Switched to Provider!")
@@ -136,7 +136,7 @@ export class CustomerController extends BaseController{
     getNearbyProviders = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const user = req.user!;
-            const response = await this.getNearbyProvidersUseCase.execute({
+            const response = await this._getNearbyProvidersUseCase.execute({
                 userId: user.userId,
                 page: Number(req.query.page) || 1,
                 limit: Number(req.query.limit) || 12,

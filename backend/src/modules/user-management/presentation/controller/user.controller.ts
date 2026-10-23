@@ -8,13 +8,13 @@ import { GetProfileUseCaseInputDto } from "../../application/dtos/request/user/g
 
 export class UserController extends BaseController{
     constructor (
-        private readonly updateUserUseCase:IUpdateUserStatusUseCase,
-        private readonly getProfileUseCase : IUseCase<GetProfileUseCaseInputDto,GetProfileUseCaseOutputDto>
+        private readonly _updateUserUseCase: IUpdateUserStatusUseCase,
+        private readonly _getProfileUseCase: IUseCase<GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto>
     ) {super()}
 
     getProfile = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            const response = await this.getProfileUseCase.execute({id:req.user?.userId!,role:req.user?.role!})
+            const response = await this._getProfileUseCase.execute({id:req.user?.userId!,role:req.user?.role!})
 
             return this.sendSuccess(res,"",{
                 user: UserMapper.toDto(response.user),
@@ -27,7 +27,7 @@ export class UserController extends BaseController{
     
     updateUserStatus = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            await this.updateUserUseCase.execute({
+            await this._updateUserUseCase.execute({
                 id: req.params.id as string,
                 status: req.body.status,
                 reason: req.body.reason,

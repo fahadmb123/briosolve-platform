@@ -14,11 +14,11 @@ export type RequestReactivationDto = {
 
 export class CreateAccountReactivationRequestUseCase {
     constructor(
-        private readonly userRepository: IUserRepository,
-        private readonly userAccountBlockRepository: IUserAccountBlockRepository,
-        private readonly reactivationRequestRepository: IAccountReactivationRequestRepository,
-        private readonly emailSender: IEmailSender,
-        private readonly pendingRegistrationStore: IPendingRegistrationStore
+        private readonly _userRepository: IUserRepository,
+        private readonly _userAccountBlockRepository: IUserAccountBlockRepository,
+        private readonly _reactivationRequestRepository: IAccountReactivationRequestRepository,
+        private readonly _emailSender: IEmailSender,
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore
     ) {}
 
     async execute(input: RequestReactivationDto): Promise<AccountReactivationRequest> {
@@ -32,7 +32,7 @@ export class CreateAccountReactivationRequestUseCase {
             throw new ApplicationError("UNAUTHORIZED", "Verification session expired. Please verify your email again.", "AUTHENTICATION");
         }
 
-        const session = await this.pendingRegistrationStore.get(input.registrationId);
+        const session = await this._pendingRegistrationStore.get(input.registrationId);
         if (!session || session.for !== "REACTIVATE_ACCOUNT" || !(session as any).isVerified) {
             throw new ApplicationError("UNAUTHORIZED", "Please verify your email before submitting the request", "AUTHENTICATION");
         }
@@ -41,27 +41,27 @@ export class CreateAccountReactivationRequestUseCase {
             throw new ApplicationError("BAD_REQUEST", "Submitted email does not match verified email", "VALIDATION");
         }
 
-        const user = await this.userRepository.findByEmail(email);
+        const user = await this._userRepository.findByEmail(email);
         if (!user) throw new ApplicationError("NOT_FOUND", "No account found with this email address", "NOT_FOUND");
 
         if (user.status !== "BLOCKED") {
             throw new ApplicationError("BAD_REQUEST", "This account is currently active and not suspended", "CONFLICT");
         }
 
-        const block = await this.userAccountBlockRepository.findByUserId(user.id);
+        const block = await this._userAccountBlockRepository.findByUserId(user.id);
         if (!block) {
             throw new ApplicationError("NOT_FOUND", "No active suspension record found for this account", "NOT_FOUND");
         }
 
-        const pending = await this.reactivationRequestRepository.findPendingByUserId(user.id);
+        const pending = await this._reactivationRequestRepository.findPendingByUserId(user.id);
         if (pending) {
             throw new ApplicationError("CONFLICT", "A reactivation request is already under review for this account", "CONFLICT");
         }
 
-        await this.pendingRegistrationStore.delete(input.registrationId);
-        await this.emailSender.sendSubmitRequest(user.email);
+        await this._pendingRegistrationStore.delete(input.registrationId);
+        await this._emailSender.sendSubmitRequest(user.email);
 
-        return await this.reactivationRequestRepository.create({
+        return await this._reactivationRequestRepository.create({
             user_id: user.id,
             block_id: block.id,
             reason

@@ -9,10 +9,10 @@ import { AddressResponseDto } from "../../dtos/response/address/address.dto";
 
 export class EditAddressUseCase implements IUseCase<EditAddressInputUseCaseDto,AddressResponseDto>{
     constructor(
-        private readonly addressRepository:IAddressRepository
+        private readonly _addressRepository: IAddressRepository
     ){}
     async execute(data: EditAddressInputUseCaseDto): Promise<AddressResponseDto> {
-        const address = await this.addressRepository.update(data.id,data.input)
+        const address = await this._addressRepository.update(data.id, data.input)
 
         if (!address) throw new ApplicationError("FAILED","Failed to update","INTERNAL")
 

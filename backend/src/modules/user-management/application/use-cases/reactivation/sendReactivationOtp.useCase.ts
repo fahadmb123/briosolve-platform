@@ -14,13 +14,13 @@ export type SendReactivationOtpDto = {
 
 export class SendReactivationOtpUseCase {
     constructor(
-        private readonly userRepository: IUserRepository,
-        private readonly userAccountBlockRepository: IUserAccountBlockRepository,
-        private readonly reactivationRequestRepository: IAccountReactivationRequestRepository,
-        private readonly passwordHasher: IPasswordHasher,
-        private readonly otpGenerate: IOtpGenerator,
-        private readonly emailSender: IEmailSender,
-        private readonly pendingRegistrationStore: IPendingRegistrationStore
+        private readonly _userRepository: IUserRepository,
+        private readonly _userAccountBlockRepository: IUserAccountBlockRepository,
+        private readonly _reactivationRequestRepository: IAccountReactivationRequestRepository,
+        private readonly _passwordHasher: IPasswordHasher,
+        private readonly _otpGenerate: IOtpGenerator,
+        private readonly _emailSender: IEmailSender,
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore
     ) {}
 
     async execute(input: SendReactivationOtpDto): Promise<{ registrationId: string; expiresIn: number }> {
@@ -28,31 +28,31 @@ export class SendReactivationOtpUseCase {
 
         if (!email) throw new ApplicationError("BAD_REQUEST", "Email address is required", "VALIDATION");
 
-        const user = await this.userRepository.findByEmail(email);
+        const user = await this._userRepository.findByEmail(email);
         if (!user) throw new ApplicationError("NOT_FOUND", "No account found with this email address", "NOT_FOUND");
 
         if (user.status !== "BLOCKED") {
             throw new ApplicationError("BAD_REQUEST", "This account is currently active and not suspended", "CONFLICT");
         }
 
-        const block = await this.userAccountBlockRepository.findByUserId(user.id);
+        const block = await this._userAccountBlockRepository.findByUserId(user.id);
         if (!block) {
             throw new ApplicationError("NOT_FOUND", "No active suspension record found for this account", "NOT_FOUND");
         }
 
-        const pending = await this.reactivationRequestRepository.findPendingByUserId(user.id);
+        const pending = await this._reactivationRequestRepository.findPendingByUserId(user.id);
         if (pending) {
             throw new ApplicationError("CONFLICT", "A reactivation request is already under review for this account", "CONFLICT");
         }
 
-        const otp = this.otpGenerate.generate();
-        const otpHash = await this.passwordHasher.hash(otp);
+        const otp = this._otpGenerate.generate();
+        const otpHash = await this._passwordHasher.hash(otp);
         const registrationId = randomUUID();
         const otpExpiresIn = 60;
         const otpExpiresAt = Date.now() + otpExpiresIn * 1000;
         const registrationTtl = 10 * 60;
 
-        await this.pendingRegistrationStore.save(registrationId, {
+        await this._pendingRegistrationStore.save(registrationId, {
             name: user.name,
             email: user.email,
             otpHash,
@@ -63,7 +63,7 @@ export class SendReactivationOtpUseCase {
             userId: user.id
         }, registrationTtl);
 
-        await this.emailSender.sendOtp(user.email, otp);
+        await this._emailSender.sendOtp(user.email, otp);
 
         return { registrationId, expiresIn: otpExpiresIn };
     }

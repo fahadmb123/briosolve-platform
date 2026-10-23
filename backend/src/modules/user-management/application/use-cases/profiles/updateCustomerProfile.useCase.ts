@@ -9,16 +9,16 @@ import { UpdateCustomerProfileInputDto } from "../../dtos/request/customer/updat
 
 export default class UpdateCustomerProfileUseCase implements IUseCase<UpdateCustomerProfileInputDto,void>{
     constructor(
-        private readonly UserRepository:IUserRepository,
-        private readonly customerRepository:ICustomerRepository
+        private readonly _userRepository: IUserRepository,
+        private readonly _customerRepository: ICustomerRepository
     ){}
     async execute(input:UpdateCustomerProfileInputDto):Promise<void>{
         
-        const user = await this.UserRepository.findById(input.id)
+        const user = await this._userRepository.findById(input.id)
         
         if (!user) throw new ApplicationError("USER_NOT_FOUND","User not found","NOT_FOUND")
         
-        await this.customerRepository.updateProfile({id:input.id,data:input.data})
+        await this._customerRepository.updateProfile({id:input.id,data:input.data})
         
         return
     }

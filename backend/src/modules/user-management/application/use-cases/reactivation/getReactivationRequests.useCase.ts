@@ -5,14 +5,14 @@ import { GetReactivationsDto } from "../../dtos/request/suspend/get-reactivation
 
 export class GetReactivationRequestsUseCase {
     constructor(
-        private readonly reactivationRepository: IAccountReactivationRequestRepository
+        private readonly _reactivationRepository: IAccountReactivationRequestRepository
     ) {}
 
     async execute(input: GetReactivationsDto): Promise<{ requests: AccountReactivationRequest[]; total: number; totalPages: number }> {
         const limit = input.limit || 10;
         const page = input.page || 1;
 
-        const response = await this.reactivationRepository.getRequests({
+        const response = await this._reactivationRepository.getRequests({
             page,
             limit,
             search: input.search,

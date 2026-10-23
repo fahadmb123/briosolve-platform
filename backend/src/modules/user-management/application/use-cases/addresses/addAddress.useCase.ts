@@ -8,19 +8,19 @@ import { AddressResponseDto } from "../../dtos/response/address/address.dto";
 
 export class AddAddressUseCase implements IUseCase<AddAddressInputUseCaseDto,AddressResponseDto>{
     constructor(
-        private readonly addressRepository:IAddressRepository,
-        private readonly userRepository:IUserRepository
+        private readonly _addressRepository: IAddressRepository,
+        private readonly _userRepository: IUserRepository
     ){}
     async execute(data: AddAddressInputUseCaseDto): Promise<AddressResponseDto> {
-        const user = await this.userRepository.findById(data.id)
+        const user = await this._userRepository.findById(data.id)
 
         if (!user) throw new ApplicationError("USER_NOT_FOUND","User not found","NOT_FOUND")
        
-        const address = await this.addressRepository.addAddress(data.id,data.input)
+        const address = await this._addressRepository.addAddress(data.id,data.input)
 
         if (!address) throw new ApplicationError("FAILED","Failed to add address","INTERNAL")
 
-        if (!user.current_address_id) await this.userRepository.update(data.id, { current_address_id: address.id })
+        if (!user.current_address_id) await this._userRepository.update(data.id, { current_address_id: address.id })
 
         return address
     }

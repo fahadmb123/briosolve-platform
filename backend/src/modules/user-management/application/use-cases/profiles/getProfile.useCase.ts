@@ -9,22 +9,22 @@ import { GetProfileUseCaseOutputDto } from "../../dtos/response/user/get-profile
 
 export default class GetProfileUseCase implements IUseCase<GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto> {
     constructor(
-        private readonly userRepository: IUserRepository,
-        private readonly customerRepository: ICustomerRepository,
-        private readonly providerRepository: IProviderRepository
+        private readonly _userRepository: IUserRepository,
+        private readonly _customerRepository: ICustomerRepository,
+        private readonly _providerRepository: IProviderRepository
     ) {}
 
     async execute(input: GetProfileUseCaseInputDto): Promise<GetProfileUseCaseOutputDto> {
-        const user = await this.userRepository.findById(input.id);
+        const user = await this._userRepository.findById(input.id);
 
         if (!user) throw new ApplicationError("USER_NOT_FOUND", "User not found", "NOT_FOUND");
 
         let profile = null;
 
         if (input.role === "CUSTOMER") {
-            profile = await this.customerRepository.findById(user.id);
+            profile = await this._customerRepository.findById(user.id);
         } else if (input.role === "PROVIDER") {
-            profile = await this.providerRepository.findById(user.id);
+            profile = await this._providerRepository.findById(user.id);
         }
 
         return { user, profile };

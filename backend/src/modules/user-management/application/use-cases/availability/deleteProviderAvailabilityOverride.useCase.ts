@@ -8,16 +8,16 @@ import { DeleteAvailabilityOverrideInputDto } from "../../dtos/request/provider/
 
 export default class DeleteProviderAvailabilityOverrideUseCase implements IUseCase<DeleteAvailabilityOverrideInputDto, void> {
     constructor(
-        private readonly providerRepository: IProviderRepository,
-        private readonly availabilityRepository: IProviderAvailabilityRepository
+        private readonly _providerRepository: IProviderRepository,
+        private readonly _availabilityRepository: IProviderAvailabilityRepository
     ) {}
 
     async execute(input: DeleteAvailabilityOverrideInputDto): Promise<void> {
-        const profile = await this.providerRepository.findById(input.userId);
+        const profile = await this._providerRepository.findById(input.userId);
         if (!profile) {
             throw new ApplicationError("PROVIDER_NOT_FOUND", "Provider profile not found", "NOT_FOUND");
         }
 
-        await this.availabilityRepository.deleteOverride(profile.id, input.overrideId);
+        await this._availabilityRepository.deleteOverride(profile.id, input.overrideId);
     }
 }

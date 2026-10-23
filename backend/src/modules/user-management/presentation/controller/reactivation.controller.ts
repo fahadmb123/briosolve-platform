@@ -7,9 +7,9 @@ import { SendReactivationOtpUseCase } from "../../application/use-cases/reactiva
 
 export class ReactivationController extends BaseController {
     constructor(
-        private readonly createAccountReactivationRequestUseCase: CreateAccountReactivationRequestUseCase,
-        private readonly getReactivationRequestsUseCase: GetReactivationRequestsUseCase,
-        private readonly sendReactivationOtpUseCase: SendReactivationOtpUseCase
+        private readonly _createAccountReactivationRequestUseCase: CreateAccountReactivationRequestUseCase,
+        private readonly _getReactivationRequestsUseCase: GetReactivationRequestsUseCase,
+        private readonly _sendReactivationOtpUseCase: SendReactivationOtpUseCase
     ) {
         super();
     }
@@ -17,7 +17,7 @@ export class ReactivationController extends BaseController {
     sendOtp = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { email } = req.body;
-            const response = await this.sendReactivationOtpUseCase.execute({ email });
+            const response = await this._sendReactivationOtpUseCase.execute({ email });
             res.cookie("registration_id", response.registrationId, registrationCookie);
             return this.sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn });
         } catch (err) {
@@ -29,7 +29,7 @@ export class ReactivationController extends BaseController {
         try {
             const { email, reason } = req.body;
             const registrationId = req.cookies.registration_id;
-            const result = await this.createAccountReactivationRequestUseCase.execute({
+            const result = await this._createAccountReactivationRequestUseCase.execute({
                 email,
                 reason,
                 registrationId
@@ -52,7 +52,7 @@ export class ReactivationController extends BaseController {
             const role = req.query.role as string | undefined;
             const sort = (req.query.sort as "asc" | "desc") || "desc";
 
-            const result = await this.getReactivationRequestsUseCase.execute({
+            const result = await this._getReactivationRequestsUseCase.execute({
                 page,
                 limit,
                 search,

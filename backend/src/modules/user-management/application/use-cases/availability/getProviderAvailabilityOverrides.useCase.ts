@@ -8,16 +8,16 @@ import { ProviderAvailabilityOverrideResponseDto } from "../../dtos/response/pro
 
 export default class GetProviderAvailabilityOverridesUseCase implements IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverrideResponseDto[]> {
     constructor(
-        private readonly providerRepository: IProviderRepository,
-        private readonly availabilityRepository: IProviderAvailabilityRepository
+        private readonly _providerRepository: IProviderRepository,
+        private readonly _availabilityRepository: IProviderAvailabilityRepository
     ) {}
 
     async execute(input: GetAvailabilityOverridesInputDto): Promise<ProviderAvailabilityOverrideResponseDto[]> {
-        const profile = await this.providerRepository.findById(input.userId);
+        const profile = await this._providerRepository.findById(input.userId);
         if (!profile) {
             throw new ApplicationError("PROVIDER_NOT_FOUND", "Provider profile not found", "NOT_FOUND");
         }
 
-        return await this.availabilityRepository.findOverridesByProviderId(profile.id);
+        return await this._availabilityRepository.findOverridesByProviderId(profile.id);
     }
 }

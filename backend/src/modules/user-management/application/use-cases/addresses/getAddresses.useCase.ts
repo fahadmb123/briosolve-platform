@@ -8,10 +8,10 @@ import { GetAddressesInputDto } from "../../dtos/request/address/get-addresses.d
 
 export class GetAddressesUseCase implements IUseCase<GetAddressesInputDto,GetAddressesOutputDto>{
     constructor(
-        private readonly addressRepository:IAddressRepository,
+        private readonly _addressRepository: IAddressRepository,
     ){}
     async execute(data:GetAddressesInputDto): Promise<GetAddressesOutputDto> {
-        const response = await this.addressRepository.getAddresses(data)
+        const response = await this._addressRepository.getAddresses(data)
 
         if (!response) throw new ApplicationError("FAILED","Failed to get addresses","INTERNAL")
 

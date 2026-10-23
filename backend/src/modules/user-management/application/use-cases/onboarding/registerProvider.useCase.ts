@@ -9,19 +9,19 @@ import { CompleteProviderRegistrationInput } from "../../dtos/request/provider/c
 
 export default class RegisterProviderUseCase implements IUseCase<CompleteProviderRegistrationInput, UserResponseDto> {
     constructor(
-        private readonly providerRepository: IProviderRepository,
-        private readonly pendingRegistrationStore: IPendingRegistrationStore,
-        private readonly providerAvailabilityRepository: IProviderAvailabilityRepository
+        private readonly _providerRepository: IProviderRepository,
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore,
+        private readonly _providerAvailabilityRepository: IProviderAvailabilityRepository
     ) {}
 
     async execute(input: CompleteProviderRegistrationInput): Promise<UserResponseDto> {
-        const pendingData = await this.pendingRegistrationStore.get(input.registrationId);
+        const pendingData = await this._pendingRegistrationStore.get(input.registrationId);
         
         if (!pendingData)  throw new ApplicationError("REGISTRATION_EXPIRED", "Registration session expired", "AUTHENTICATION")
 
         if (pendingData.for !== "CREATE_PROVIDER") throw new ApplicationError("INVALID_REGISTRATION", "Invalid registration type", "AUTHENTICATION")
 
-        const user = await this.providerRepository.createProvider({
+        const user = await this._providerRepository.createProvider({
             name: pendingData.name,
             email: pendingData.email,
             password: pendingData.passwordHash!,
@@ -40,11 +40,11 @@ export default class RegisterProviderUseCase implements IUseCase<CompleteProvide
             { day_of_week: 'SATURDAY' as const, start_time: '09:00', end_time: '17:00' }
         ];
 
-        const profile = await this.providerRepository.findById(user.id)
+        const profile = await this._providerRepository.findById(user.id)
         
-        if (profile) await this.providerAvailabilityRepository.setAvailability(profile.id, availabilitySlots)
+        if (profile) await this._providerAvailabilityRepository.setAvailability(profile.id, availabilitySlots)
 
-        await this.pendingRegistrationStore.delete(input.registrationId);
+        await this._pendingRegistrationStore.delete(input.registrationId);
 
         return UserMapper.toDto(user)
     }

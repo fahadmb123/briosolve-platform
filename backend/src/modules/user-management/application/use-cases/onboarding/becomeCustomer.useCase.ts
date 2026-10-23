@@ -14,26 +14,26 @@ import { IVerificationFileRepository } from "../../../../kyc-verification/domain
 
 export class BecomeCustomerUseCase implements IUseCase<BecomeCustomerInputDto,void>{
     constructor(
-        private readonly userRepository: IUserRepository,
-        private readonly customerRepository: ICustomerRepository,
-        private readonly providerRepository: IProviderRepository,
-        private readonly providerAvailabilityRepository: IProviderAvailabilityRepository,
-        private readonly pendingRegistrationStore: IPendingRegistrationStore,
-        private readonly providerServiceRepository: IProviderServiceRepository,
-        private readonly providerVerificationDocumentsRepository: IVerificationDocumentRepository,
-        private readonly providerVerificationFilesRepository: IVerificationFileRepository
+        private readonly _userRepository: IUserRepository,
+        private readonly _customerRepository: ICustomerRepository,
+        private readonly _providerRepository: IProviderRepository,
+        private readonly _providerAvailabilityRepository: IProviderAvailabilityRepository,
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore,
+        private readonly _providerServiceRepository: IProviderServiceRepository,
+        private readonly _providerVerificationDocumentsRepository: IVerificationDocumentRepository,
+        private readonly _providerVerificationFilesRepository: IVerificationFileRepository
     ) {}
 
     async execute(input: BecomeCustomerInputDto): Promise<void> {
-        const session = await this.pendingRegistrationStore.get(input.registrationId);
+        const session = await this._pendingRegistrationStore.get(input.registrationId);
 
         if (!session || session.for !== "BECOME_CUSTOMER" || !(session as any).isVerified) throw new ApplicationError("UNAUTHORIZED", "Please verify your email before proceeding", "AUTHENTICATION")
 
         const userId = (session as any).userId;
 
-        const user = await this.userRepository.findById(userId);
+        const user = await this._userRepository.findById(userId);
         
-        const providerProfile = await this.providerRepository.findProfileByUserId(userId)
+        const providerProfile = await this._providerRepository.findProfileByUserId(userId)
 
         if (!user) throw new ApplicationError("NOT_FOUND", "User not found", "NOT_FOUND");
 
@@ -41,28 +41,28 @@ export class BecomeCustomerUseCase implements IUseCase<BecomeCustomerInputDto,vo
 
         if (user.role !== "PROVIDER") throw new ApplicationError("BAD_REQUEST", "Only providers can become customers", "CONFLICT")
 
-        const documents = await this.providerVerificationDocumentsRepository.findByProviderId(providerProfile.id);
+        const documents = await this._providerVerificationDocumentsRepository.findByProviderId(providerProfile.id);
 
         if (documents.length !== 0) {
             for (let doc of documents) {
-                await this.providerVerificationFilesRepository.deleteByDocumentId(doc.id);
+                await this._providerVerificationFilesRepository.deleteByDocumentId(doc.id);
             }
         }
 
-        await this.providerVerificationDocumentsRepository.deleteByProviderId(providerProfile.id);
+        await this._providerVerificationDocumentsRepository.deleteByProviderId(providerProfile.id);
 
-        await this.providerAvailabilityRepository.deleteOverrideByProviderId(providerProfile.id);
+        await this._providerAvailabilityRepository.deleteOverrideByProviderId(providerProfile.id);
 
-        await this.providerAvailabilityRepository.deleteByProviderId(providerProfile.id);
+        await this._providerAvailabilityRepository.deleteByProviderId(providerProfile.id);
 
-        await this.providerServiceRepository.deleteByProviderId(providerProfile.id);
+        await this._providerServiceRepository.deleteByProviderId(providerProfile.id);
 
-        await this.providerRepository.deleteByUserId(userId);
+        await this._providerRepository.deleteByUserId(userId);
 
-        await this.userRepository.update(userId, { role: "CUSTOMER" });
+        await this._userRepository.update(userId, { role: "CUSTOMER" });
 
-        await this.customerRepository.createCustomerProfile(userId);
+        await this._customerRepository.createCustomerProfile(userId);
         
-        await this.pendingRegistrationStore.delete(input.registrationId);
+        await this._pendingRegistrationStore.delete(input.registrationId);
     }
 }

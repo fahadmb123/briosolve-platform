@@ -19,28 +19,29 @@ import { EmailVerificationUseCaseOutputDto } from "../../dtos/response/user/emai
 
 
 export default class RegisterCustomerUseCase implements IUseCase<RegisterCustomerInput,EmailVerificationUseCaseOutputDto> {
-    constructor(private readonly userRepository : IUserRepository,
-        readonly passwordHasher:IPasswordHasher,
-        readonly otpGenerate:IOtpGenerator,
-        readonly EmailSender:IEmailSender,
-        readonly PendingRegistrationStore:IPendingRegistrationStore
+    constructor(
+        private readonly _userRepository: IUserRepository,
+        private readonly _passwordHasher: IPasswordHasher,
+        private readonly _otpGenerate: IOtpGenerator,
+        private readonly _emailSender: IEmailSender,
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore
     ){}
 
     async execute (input:RegisterCustomerInput):Promise<EmailVerificationUseCaseOutputDto>{
-        const isEmailExist = await this.userRepository.findByEmail(input.email)
+        const isEmailExist = await this._userRepository.findByEmail(input.email)
         if (isEmailExist) throw new ApplicationError("USER_EMAIL_ALREADY_EXIST","User with email already exist","CONFLICT")
 
-        const otp = this.otpGenerate.generate()
+        const otp = this._otpGenerate.generate()
 
-        const passwordHash = await this.passwordHasher.hash(input.password)
-        const otpHash = await this.passwordHasher.hash(otp)
+        const passwordHash = await this._passwordHasher.hash(input.password)
+        const otpHash = await this._passwordHasher.hash(otp)
         const registrationId  = randomUUID()
         
         const registrationTtl = 10 * 60
         const otpExpiresIn = 60
         const otpExpiresAt = Date.now() + otpExpiresIn * 1000
         const path = "login"
-        await this.PendingRegistrationStore.save(registrationId,{
+        await this._pendingRegistrationStore.save(registrationId,{
             name:input.name,
             email:input.email,
             passwordHash,
@@ -55,7 +56,7 @@ export default class RegisterCustomerUseCase implements IUseCase<RegisterCustome
         )
         
         
-        await this.EmailSender.sendOtp(input.email,otp)
+        await this._emailSender.sendOtp(input.email,otp)
     
         return {registrationId,expiresIn: otpExpiresIn}
     }

@@ -25,19 +25,19 @@ import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.
 
 export class ProviderController extends BaseController {
     constructor(
-        private readonly preRegisterProviderUseCase: IUseCase<RegisterProviderInput, EmailVerificationUseCaseOutputDto>,
-        private readonly registerProviderUseCase: IUseCase<CompleteProviderRegistrationInput, UserResponseDto>,
-        private readonly updateProviderProfileUseCase: IUseCase<UpdateProviderProfileInputDto, void>,
-        private readonly setProviderAvailabilityUseCase: IUseCase<SetProviderAvailabilityInputDto, ProviderAvailabilityResponseDto[]>,
-        private readonly getProviderAvailabilityUseCase: IUseCase<GetProviderAvailabilityInputDto, ProviderAvailabilityResponseDto[]>,
-        private readonly getProviderAvailabilityOverridesUseCase: IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverrideResponseDto[]>,
-        private readonly createProviderAvailabilityOverrideUseCase: IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverrideResponseDto>,
-        private readonly deleteProviderAvailabilityOverrideUseCase: IUseCase<DeleteAvailabilityOverrideInputDto, void>,
-        private readonly sendBecomeCustomerOtpUseCase:IUseCase<string,{ registrationId: string; expiresIn: number }>,
-        private readonly imageUploadService: ImageUploadService,
-        private readonly getProvidersUseCase: IGetProvidersUseCase,
-        private readonly becomeCustomerUseCase: IUseCase<BecomeCustomerInputDto,void>,
-        private readonly jwtService : IJwtService
+        private readonly _preRegisterProviderUseCase: IUseCase<RegisterProviderInput, EmailVerificationUseCaseOutputDto>,
+        private readonly _registerProviderUseCase: IUseCase<CompleteProviderRegistrationInput, UserResponseDto>,
+        private readonly _updateProviderProfileUseCase: IUseCase<UpdateProviderProfileInputDto, void>,
+        private readonly _setProviderAvailabilityUseCase: IUseCase<SetProviderAvailabilityInputDto, ProviderAvailabilityResponseDto[]>,
+        private readonly _getProviderAvailabilityUseCase: IUseCase<GetProviderAvailabilityInputDto, ProviderAvailabilityResponseDto[]>,
+        private readonly _getProviderAvailabilityOverridesUseCase: IUseCase<GetAvailabilityOverridesInputDto, ProviderAvailabilityOverrideResponseDto[]>,
+        private readonly _createProviderAvailabilityOverrideUseCase: IUseCase<CreateAvailabilityOverrideInputDto, ProviderAvailabilityOverrideResponseDto>,
+        private readonly _deleteProviderAvailabilityOverrideUseCase: IUseCase<DeleteAvailabilityOverrideInputDto, void>,
+        private readonly _sendBecomeCustomerOtpUseCase: IUseCase<string, { registrationId: string; expiresIn: number }>,
+        private readonly _imageUploadService: ImageUploadService,
+        private readonly _getProvidersUseCase: IGetProvidersUseCase,
+        private readonly _becomeCustomerUseCase: IUseCase<BecomeCustomerInputDto, void>,
+        private readonly _jwtService: IJwtService
     ) { super(); }
 
     getProviders = async (req: Request, res: Response, next: NextFunction) => {
@@ -45,7 +45,7 @@ export class ProviderController extends BaseController {
             const currentUser = req.user;
             const isCustomer = currentUser?.role === "CUSTOMER";
 
-            const response = await this.getProvidersUseCase.execute({
+            const response = await this._getProvidersUseCase.execute({
                 page: Number(req.query.page) || 1,
                 limit: Number(req.query.limit) || (isCustomer ? 12 : 10),
                 filter: isCustomer ? "ACTIVE" : (req.query.filter as string | undefined),
@@ -64,7 +64,7 @@ export class ProviderController extends BaseController {
 
     preRegister = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const response = await this.preRegisterProviderUseCase.execute(req.body);
+            const response = await this._preRegisterProviderUseCase.execute(req.body);
 
             res.cookie("registration_id", response.registrationId, registrationCookie);
 
@@ -89,7 +89,7 @@ export class ProviderController extends BaseController {
                 bio: req.body.bio
             };
 
-            const user = await this.registerProviderUseCase.execute(payload);
+            const user = await this._registerProviderUseCase.execute(payload);
 
             res.clearCookie("registration_id");
 
@@ -101,7 +101,7 @@ export class ProviderController extends BaseController {
 
     updateProfile = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await this.updateProviderProfileUseCase.execute({ id: req.user?.userId!, data: req.body });
+            await this._updateProviderProfileUseCase.execute({ id: req.user?.userId!, data: req.body });
             return this.sendSuccess(res, "Updated!");
         } catch (err) {
             next(err);
@@ -110,7 +110,7 @@ export class ProviderController extends BaseController {
 
     getAvailability = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const data = await this.getProviderAvailabilityUseCase!.execute({ userId: req.user?.userId! });
+            const data = await this._getProviderAvailabilityUseCase!.execute({ userId: req.user?.userId! });
             return this.sendSuccess(res, "Provider availability fetched successfully", data);
         } catch (err) {
             next(err);
@@ -119,7 +119,7 @@ export class ProviderController extends BaseController {
 
     setAvailability = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const data = await this.setProviderAvailabilityUseCase!.execute({
+            const data = await this._setProviderAvailabilityUseCase!.execute({
                 userId: req.user?.userId!,
                 slots: req.body.slots
             });
@@ -131,7 +131,7 @@ export class ProviderController extends BaseController {
 
     getAvailabilityOverrides = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const data = await this.getProviderAvailabilityOverridesUseCase!.execute({ userId: req.user?.userId! });
+            const data = await this._getProviderAvailabilityOverridesUseCase!.execute({ userId: req.user?.userId! });
             return this.sendSuccess(res, "Overrides fetched successfully", data);
         } catch (err) {
             next(err);
@@ -140,7 +140,7 @@ export class ProviderController extends BaseController {
 
     createAvailabilityOverride = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const data = await this.createProviderAvailabilityOverrideUseCase!.execute({
+            const data = await this._createProviderAvailabilityOverrideUseCase!.execute({
                 userId: req.user?.userId!,
                 override_date: req.body.override_date,
                 type: req.body.type,
@@ -156,7 +156,7 @@ export class ProviderController extends BaseController {
 
     deleteAvailabilityOverride = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await this.deleteProviderAvailabilityOverrideUseCase!.execute({
+            await this._deleteProviderAvailabilityOverrideUseCase!.execute({
                 userId: req.user?.userId!,
                 overrideId: req.params.id as string
             });
@@ -170,9 +170,9 @@ export class ProviderController extends BaseController {
         try {
             if (!req.file) throw new ApplicationError("NO_DATA", "No image uploaded", "NOT_FOUND")
     
-            const imageUrl = await this.imageUploadService!.uploadImage(req.file.buffer, 'profiles')
+            const imageUrl = await this._imageUploadService!.uploadImage(req.file.buffer, 'profiles')
 
-            await this.updateProviderProfileUseCase.execute({
+            await this._updateProviderProfileUseCase.execute({
                 id: req.user?.userId!,
                 data: { profile_image: imageUrl }
             });
@@ -185,7 +185,7 @@ export class ProviderController extends BaseController {
 
     deleteProfileImage = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await this.updateProviderProfileUseCase.execute({
+            await this._updateProviderProfileUseCase.execute({
                 id: req.user?.userId!,
                 data: { profile_image: "" }
             });
@@ -199,7 +199,7 @@ export class ProviderController extends BaseController {
     sendBecomeCustomerOtp = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const userId = req.user!.userId
-            const response = await this.sendBecomeCustomerOtpUseCase.execute(userId)
+            const response = await this._sendBecomeCustomerOtpUseCase.execute(userId)
             res.cookie("registration_id", response.registrationId, registrationCookie)
             return this.sendSuccess(res, "OTP sent successfully", { expiresIn: response.expiresIn })
         } catch (err) {
@@ -211,9 +211,9 @@ export class ProviderController extends BaseController {
         try {
             const user = req.user!
             const registrationId = req.cookies.registration_id
-            await this.becomeCustomerUseCase.execute({registrationId})
+            await this._becomeCustomerUseCase.execute({registrationId})
             
-            const newToken = await this.jwtService.generate({ userId: user.userId, role: "CUSTOMER" })
+            const newToken = await this._jwtService.generate({ userId: user.userId, role: "CUSTOMER" })
             res.cookie("access_token", newToken, accessTokenCookie)
             if (registrationId) res.clearCookie("registration_id")
             return this.sendSuccess(res, "Switched to CUSTOMER!")
