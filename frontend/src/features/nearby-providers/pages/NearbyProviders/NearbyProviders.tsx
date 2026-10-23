@@ -5,7 +5,6 @@ import { useGetNearbyProviders } from '../../hooks/mutations/useNearbyProviders'
 import { ProviderCard } from '../../components/ProviderCard';
 import { ProviderDetailsModal } from '../../components/ProviderDetailsModal';
 import { AdminPagination } from '../../../admin/components/AdminPagination';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import type { User, response } from '../../../../shared/types/Dtos';
 import type { Address } from '../../../addresses';
@@ -92,7 +91,7 @@ export default function NearbyProviders() {
 
     return (
         <div className="app-content nearby-providers-container">
-            {getProvidersMut.isPending && <SpinnerOverlay isLoading={true} />}
+            
 
             <div className="nearby-header-section">
                 <div>
@@ -190,7 +189,14 @@ export default function NearbyProviders() {
                         </span>
                     </div>
 
-                    {displayedProviders.length > 0 ? (
+                    {getProvidersMut.isPending ? (
+                        <div className="empty-providers-state">
+                            <h3 className="h5 mb-2">Searching for providerss .....</h3>
+                            <p className="text-secondary text-sm max-w-md mx-auto mb-4">
+                                while we searching..Please waite we are searching the providers whos nearest with ({activeRadiusKm} km) . Try expanding your search radius.
+                            </p>
+                        </div>
+                    ) : displayedProviders.length > 0 ? (
                         <>
                             <div className="providers-grid">
                                 {displayedProviders.map((provider) => (
