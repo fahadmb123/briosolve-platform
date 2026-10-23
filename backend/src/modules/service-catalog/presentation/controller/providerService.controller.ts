@@ -8,10 +8,10 @@ import { ProviderServiceResponseDto } from "../../application/dtos/provider/resp
 
 export class ProviderServiceController extends BaseController {
     constructor(
-        private readonly getProviderServicesUseCase: IUseCase<string, ProviderServiceResponseDto[]>,
-        private readonly addProviderServicesUseCase: IUseCase<AddProviderServicesInputDto, ProviderServiceResponseDto[]>,
-        private readonly deleteProviderServiceUseCase: IUseCase<DeleteProviderServiceInputDto, ProviderServiceResponseDto[]>,
-        private readonly deleteProviderCategoryUseCase: IUseCase<DeleteProviderCategoryInputDto, ProviderServiceResponseDto[]>
+        private readonly _getProviderServicesUseCase: IUseCase<string, ProviderServiceResponseDto[]>,
+        private readonly _addProviderServicesUseCase: IUseCase<AddProviderServicesInputDto, ProviderServiceResponseDto[]>,
+        private readonly _deleteProviderServiceUseCase: IUseCase<DeleteProviderServiceInputDto, ProviderServiceResponseDto[]>,
+        private readonly _deleteProviderCategoryUseCase: IUseCase<DeleteProviderCategoryInputDto, ProviderServiceResponseDto[]>
     ) {
         super();
     }
@@ -19,7 +19,7 @@ export class ProviderServiceController extends BaseController {
     getProviderServices = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const user = req.user!;
-            const services = await this.getProviderServicesUseCase.execute(user.userId);
+            const services = await this._getProviderServicesUseCase.execute(user.userId);
             return this.sendSuccess(res, "Provider services fetched successfully", services);
         } catch (error) {
             next(error);
@@ -30,7 +30,7 @@ export class ProviderServiceController extends BaseController {
         try {
             const user = req.user!;
             const { serviceIds } = req.body as { serviceIds: string[] };
-            const services = await this.addProviderServicesUseCase.execute({
+            const services = await this._addProviderServicesUseCase.execute({
                 userId: user.userId,
                 serviceIds: Array.isArray(serviceIds) ? serviceIds : []
             });
@@ -44,7 +44,7 @@ export class ProviderServiceController extends BaseController {
         try {
             const user = req.user!;
             const id = req.params.id as string;
-            const services = await this.deleteProviderServiceUseCase.execute({
+            const services = await this._deleteProviderServiceUseCase.execute({
                 userId: user.userId,
                 serviceId: id
             });
@@ -58,7 +58,7 @@ export class ProviderServiceController extends BaseController {
         try {
             const user = req.user!;
             const id = req.params.id as string;
-            const services = await this.deleteProviderCategoryUseCase.execute({
+            const services = await this._deleteProviderCategoryUseCase.execute({
                 userId: user.userId,
                 categoryId: id
             });

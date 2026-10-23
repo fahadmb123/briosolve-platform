@@ -13,26 +13,26 @@ import { CategoryResponseDto } from "../dtos/category/response/category.dto";
 
 export class UpdateCategoryUseCase implements IUseCase<UpdateCategoryUseCaseDto,CategoryResponseDto>{
     constructor(
-        private readonly categoryRepository : ICategoryRepository,
-        private readonly imageUploadService: ImageUploadService,
+        private readonly _categoryRepository: ICategoryRepository,
+        private readonly _imageUploadService: ImageUploadService,
     ){}
     async execute(data: UpdateCategoryUseCaseDto): Promise<CategoryResponseDto> {
 
         if (data.input.name){
             data.input.name = data.input.name.toLocaleLowerCase()
-            const isExist = await this.categoryRepository.findByName(data.input.name)
+            const isExist = await this._categoryRepository.findByName(data.input.name)
             if(isExist && String(isExist.id) !== String(data.id)) throw new ApplicationError("NAME_ALREADY_EXIST","name already exist","CONFLICT")
         }
         
         if (data.input.image){
-            const isExist = await this.categoryRepository.findById(data.id)
+            const isExist = await this._categoryRepository.findById(data.id)
 
             if (!isExist) throw new ApplicationError("NOT_FUND","Category not exist","NOT_FOUND")
 
-            if (isExist.image) await this.imageUploadService.deleteImageByUrl(isExist.image)
+            if (isExist.image) await this._imageUploadService.deleteImageByUrl(isExist.image)
         }
     
-        const category = await this.categoryRepository.update(data)
+        const category = await this._categoryRepository.update(data)
 
         if (!category) throw new ApplicationError("FAILED","failed","INTERNAL")
             

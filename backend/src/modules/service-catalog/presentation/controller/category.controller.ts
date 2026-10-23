@@ -10,20 +10,20 @@ import { CategoryResponseDto } from "../../application/dtos/category/response/ca
 
 export class CategoryController extends BaseController{
     constructor(
-        private readonly addCategoryUseCase : IUseCase<AddCategoryUseCaseInputDto,CategoryResponseDto>,
-        private readonly imageUploadService: ImageUploadService,
-        private readonly updateCategoryUseCase: IUseCase<UpdateCategoryUseCaseDto,CategoryResponseDto>,
-        private readonly getCategoriesUseCase: IUseCase<GetCategoriesDto,{categories:CategoryResponseDto[], total: number, totalPages: number}>,
-        private readonly deleteCategoryUseCase: IUseCase<string, boolean>
+        private readonly _addCategoryUseCase: IUseCase<AddCategoryUseCaseInputDto, CategoryResponseDto>,
+        private readonly _imageUploadService: ImageUploadService,
+        private readonly _updateCategoryUseCase: IUseCase<UpdateCategoryUseCaseDto, CategoryResponseDto>,
+        private readonly _getCategoriesUseCase: IUseCase<GetCategoriesDto, { categories: CategoryResponseDto[], total: number, totalPages: number }>,
+        private readonly _deleteCategoryUseCase: IUseCase<string, boolean>
     ){super()}
     
     addCategory = async (req:Request, res:Response, next:NextFunction) => {
         try {
             if (!req.file) throw new ApplicationError("NOT_FOUND","Category image is required","NOT_FOUND")
 
-            const imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'categories')
+            const imageUrl = await this._imageUploadService.uploadImage(req.file.buffer, 'categories')
 
-            const response = await this.addCategoryUseCase.execute({...req.body,image:imageUrl})
+            const response = await this._addCategoryUseCase.execute({...req.body,image:imageUrl})
 
             return this.sendSuccess(res,"Added",response)
         } catch (error) {
@@ -34,12 +34,12 @@ export class CategoryController extends BaseController{
     updateCategory = async (req:Request, res:Response, next:NextFunction) => {
         try {
             let imageUrl: string | undefined = undefined;
-            if (req.file) imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'categories')
+            if (req.file) imageUrl = await this._imageUploadService.uploadImage(req.file.buffer, 'categories')
             
             const id = req.params.id
             if (!id) throw new ApplicationError("BAD_REQUEST", "Category ID is required","UNSUPPORTED");
 
-            const response = await this.updateCategoryUseCase.execute({
+            const response = await this._updateCategoryUseCase.execute({
                 id: id as string,
                 input: {
                     ...req.body,
@@ -55,7 +55,7 @@ export class CategoryController extends BaseController{
 
     getCategories = async (req:Request, res:Response, next:NextFunction) => {
         try {
-            const response = await this.getCategoriesUseCase.execute({
+            const response = await this._getCategoriesUseCase.execute({
                 page: Number(req.query.page) || 1,
                 limit: Number(req.query.limit) || 10,
                 filter: req.query.filter as string | undefined,
@@ -77,7 +77,7 @@ export class CategoryController extends BaseController{
             const id = req.params.id;
             if (!id) throw new ApplicationError("BAD_REQUEST", "Category ID is required", "UNSUPPORTED");
 
-            const response = await this.deleteCategoryUseCase.execute(id as string);
+            const response = await this._deleteCategoryUseCase.execute(id as string);
             return this.sendSuccess(res, "Category deleted successfully", response);
         } catch (error) {
             next(error);

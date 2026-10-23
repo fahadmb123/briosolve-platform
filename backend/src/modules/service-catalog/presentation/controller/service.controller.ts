@@ -10,20 +10,20 @@ import { ServiceResponseDto } from "../../application/dtos/service/response/serv
 
 export class ServiceController extends BaseController {
     constructor(
-        private readonly addServiceUseCase : IUseCase<AddServiceUseCaseInputDto,ServiceResponseDto>,
-        private readonly imageUploadService: ImageUploadService,
-        private readonly updateServiceUseCase: IUseCase<UpdateServiceUseCaseDto,ServiceResponseDto>,
-        private readonly getServicesUseCase: IUseCase<GetServicesDto,{services:ServiceResponseDto[], total: number}>,
-        private readonly deleteServiceUseCase: IUseCase<string, boolean>
+        private readonly _addServiceUseCase: IUseCase<AddServiceUseCaseInputDto, ServiceResponseDto>,
+        private readonly _imageUploadService: ImageUploadService,
+        private readonly _updateServiceUseCase: IUseCase<UpdateServiceUseCaseDto, ServiceResponseDto>,
+        private readonly _getServicesUseCase: IUseCase<GetServicesDto, { services: ServiceResponseDto[], total: number }>,
+        private readonly _deleteServiceUseCase: IUseCase<string, boolean>
     ){super()}
     
     addService = async (req:Request, res:Response, next:NextFunction) => {
         try {
             if (!req.file) throw new ApplicationError("NOT_FOUND","Service image is required","NOT_FOUND")
 
-            const imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'services')
+            const imageUrl = await this._imageUploadService.uploadImage(req.file.buffer, 'services')
 
-            const response = await this.addServiceUseCase.execute({...req.body, image:imageUrl})
+            const response = await this._addServiceUseCase.execute({...req.body, image:imageUrl})
 
             return this.sendSuccess(res,"Added",response)
         } catch (error) {
@@ -34,12 +34,12 @@ export class ServiceController extends BaseController {
     updateService = async (req:Request, res:Response, next:NextFunction) => {
         try {
             let imageUrl: string | undefined = undefined;
-            if (req.file) imageUrl = await this.imageUploadService.uploadImage(req.file.buffer, 'services')
+            if (req.file) imageUrl = await this._imageUploadService.uploadImage(req.file.buffer, 'services')
             
             const id = req.params.id
             if (!id) throw new ApplicationError("BAD_REQUEST", "Service ID is required","UNSUPPORTED");
 
-            const response = await this.updateServiceUseCase.execute({
+            const response = await this._updateServiceUseCase.execute({
                 id: id as string,
                 input: {
                     ...req.body,
@@ -56,7 +56,7 @@ export class ServiceController extends BaseController {
     getServices = async (req:Request, res:Response, next:NextFunction) => {
         try {
             const limit = Number(req.query.limit) || 10;
-            const response = await this.getServicesUseCase.execute({
+            const response = await this._getServicesUseCase.execute({
                 page: Number(req.query.page) || 1,
                 limit,
                 filter: req.query.filter as string | undefined,
@@ -78,7 +78,7 @@ export class ServiceController extends BaseController {
             const id = req.params.id;
             if (!id) throw new ApplicationError("BAD_REQUEST", "Service ID is required", "UNSUPPORTED");
 
-            const response = await this.deleteServiceUseCase.execute(id as string);
+            const response = await this._deleteServiceUseCase.execute(id as string);
             return this.sendSuccess(res, "Service deleted successfully", response);
         } catch (error) {
             next(error);

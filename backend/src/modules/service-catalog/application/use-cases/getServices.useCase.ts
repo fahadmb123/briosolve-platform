@@ -6,10 +6,10 @@ import { ServiceResponseDto } from "../dtos/service/response/service.dto";
 
 export class GetServicesUseCase implements IUseCase<GetServicesDto, { services: ServiceResponseDto[], total: number }> {
     constructor(
-        private serviceRepository: IServiceRepository
+        private readonly _serviceRepository: IServiceRepository
     ){}
 
     async execute(input: GetServicesDto): Promise<{ services: ServiceResponseDto[], total: number }> {
-        return await this.serviceRepository.get(input);
+        return await this._serviceRepository.get(input);
     }
 }

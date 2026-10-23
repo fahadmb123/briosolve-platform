@@ -5,19 +5,19 @@ import { ImageUploadService } from "../../../../shared/application/interfaces/se
 
 export class DeleteCategoryUseCase implements IUseCase<string, boolean> {
     constructor(
-        private readonly categoryRepository: ICategoryRepository,
-        private readonly imageUploadService: ImageUploadService
+        private readonly _categoryRepository: ICategoryRepository,
+        private readonly _imageUploadService: ImageUploadService
     ) {}
 
     async execute(id: string): Promise<boolean> {
-        const category = await this.categoryRepository.findById(id);
+        const category = await this._categoryRepository.findById(id);
         if (!category) {
             throw new ApplicationError("NOT_FOUND", "Category not found", "NOT_FOUND");
         }
         if (category.image) {
-            await this.imageUploadService.deleteImageByUrl(category.image);
+            await this._imageUploadService.deleteImageByUrl(category.image);
         }
 
-        return await this.categoryRepository.delete(id);
+        return await this._categoryRepository.delete(id);
     }
 }

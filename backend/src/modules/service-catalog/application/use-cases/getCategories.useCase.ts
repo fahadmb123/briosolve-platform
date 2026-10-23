@@ -10,10 +10,10 @@ import { CategoryResponseDto } from "../dtos/category/response/category.dto";
 
 export class GetCategoriesUseCase implements IUseCase<GetCategoriesDto,{categories:CategoryResponseDto[], total: number, totalPages: number}>{
     constructor(
-        private readonly categoryRepository : ICategoryRepository
+        private readonly _categoryRepository : ICategoryRepository
     ){}
     async execute(input: GetCategoriesDto): Promise<{categories:CategoryResponseDto[], total: number, totalPages: number}> {
-        const response = await this.categoryRepository.get(input)
+        const response = await this._categoryRepository.get(input)
 
         if (!response.categories) throw new ApplicationError("FAILED","failed","INTERNAL")
             

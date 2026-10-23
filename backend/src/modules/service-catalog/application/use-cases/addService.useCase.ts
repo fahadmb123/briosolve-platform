@@ -7,16 +7,16 @@ import { ServiceResponseDto } from "../dtos/service/response/service.dto";
 
 export class AddServiceUseCase implements IUseCase<AddServiceUseCaseInputDto, ServiceResponseDto> {
     constructor(
-        private serviceRepository: IServiceRepository
+        private readonly _serviceRepository: IServiceRepository
     ){}
 
     async execute(input: AddServiceUseCaseInputDto): Promise<ServiceResponseDto> {
-        const existingService = await this.serviceRepository.findByName(input.name);
+        const existingService = await this._serviceRepository.findByName(input.name);
         if (existingService) {
             throw new ApplicationError("CONFLICT", "Service with this name already exists", "CONFLICT");
         }
         
-        const service = await this.serviceRepository.add(input);
+        const service = await this._serviceRepository.add(input);
         if (!service) {
             throw new ApplicationError("INTERNAL_SERVER_ERROR", "Failed to add service", "INTERNAL");
         }

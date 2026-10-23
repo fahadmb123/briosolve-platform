@@ -8,15 +8,15 @@ import { ProviderServiceResponseDto } from "../dtos/provider/response/provider-s
 
 export class DeleteProviderServiceUseCase implements IUseCase<DeleteProviderServiceInputDto, ProviderServiceResponseDto[]> {
     constructor(
-        private readonly providerServiceRepository: IProviderServiceRepository,
-        private readonly providerRepository: IProviderRepository
+        private readonly _providerServiceRepository: IProviderServiceRepository,
+        private readonly _providerRepository: IProviderRepository
     ){}
 
     async execute(input: DeleteProviderServiceInputDto): Promise<ProviderServiceResponseDto[]> {
-        const profile = await this.providerRepository.findById(input.userId);
+        const profile = await this._providerRepository.findById(input.userId);
         if (!profile) {
             throw new ApplicationError("NOT_FOUND", "Provider profile not found", "NOT_FOUND");
         }
-        return await this.providerServiceRepository.deleteProviderService(profile.id, input.serviceId);
+        return await this._providerServiceRepository.deleteProviderService(profile.id, input.serviceId);
     }
 }

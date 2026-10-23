@@ -7,15 +7,15 @@ import { ProviderServiceResponseDto } from "../dtos/provider/response/provider-s
 
 export class GetProviderServicesUseCase implements IUseCase<string, ProviderServiceResponseDto[]> {
     constructor(
-        private readonly providerServiceRepository: IProviderServiceRepository,
-        private readonly providerRepository: IProviderRepository
+        private readonly _providerServiceRepository: IProviderServiceRepository,
+        private readonly _providerRepository: IProviderRepository
     ){}
 
     async execute(userId: string): Promise<ProviderServiceResponseDto[]> {
-        const profile = await this.providerRepository.findById(userId);
+        const profile = await this._providerRepository.findById(userId);
         if (!profile) {
             throw new ApplicationError("NOT_FOUND", "Provider profile not found", "NOT_FOUND");
         }
-        return await this.providerServiceRepository.getProviderServices(profile.id);
+        return await this._providerServiceRepository.getProviderServices(profile.id);
     }
 }
