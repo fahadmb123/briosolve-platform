@@ -1,4 +1,4 @@
-import { apiClient, refreshClient, clearAuthCoordinationState } from "../../../shared/api/Client";
+import { apiClient, refreshClient } from "../../../shared/api/Client";
 import type { LoginInputType, EmailInputType } from "../schemas/validation";
 import type { response } from '../../../shared/types/Dtos';
 import type { IAuthUser } from "../stores/auth.store";
@@ -53,7 +53,6 @@ export const resendOtp = async (): Promise<response<{expiresIn: number}>> => {
 }
 
 export const login = async (data:LoginInputType): Promise<response<{accessToken: string; user: IAuthUser & { customer_profile?: CustomerProfile | null; provider_profile?: ProviderProfile | null }}>> => {
-    clearAuthCoordinationState(false);
     const response = await apiClient.post("/api/auth/login",data)
     return response.data;
 }
@@ -62,7 +61,6 @@ export const getMe = async (): Promise<response<IAuthUser & { customer_profile?:
     return response.data;
 }
 export const logout = async (): Promise<response<null>> => {
-    clearAuthCoordinationState(false);
     const response = await apiClient.post("/api/auth/logout")
     return response.data;
 }
