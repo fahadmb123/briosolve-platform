@@ -8,7 +8,8 @@ import { AdminKycStats, GetAdminKycResponse } from "../dtos/admin/response/get-a
 
 export class GetAdminVerificationsUseCase implements IUseCase<GetAdminKycRequestsInput, GetAdminKycResponse> {
     constructor(
-        private readonly verificationDocumentRepository: IVerificationDocumentRepository
+        private readonly verificationDocumentRepository: IVerificationDocumentRepository,
+
     ) {}
 
     async execute(input: GetAdminKycRequestsInput): Promise<GetAdminKycResponse> {
@@ -47,6 +48,11 @@ export class GetAdminVerificationsUseCase implements IUseCase<GetAdminKycRequest
         } else {
             filtered.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
         }
+       /* filtered = filtered.filter((verification)=>{
+            if (verification.kyc_status === "APROVED"){
+                return verification
+            }
+        })*/
 
         const total = filtered.length;
         const totalPages = Math.ceil(total / limit) || 1;

@@ -194,7 +194,9 @@ export default function Home() {
                     <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
                         <span>{isAuthenticated ? "Logout" : "Login"}</span>
                     </button>
-                    <Link to="/profile" className="avatar avatar-sm ml-2" title="Profile">
+                    {user && (
+                        <>
+                            <Link to="/profile" className="avatar avatar-sm ml-2" title="Profile">
                         {profile?.profile_image ? (
                             <img 
                                 src={`${profile.profile_image.startsWith('http') ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000')}${profile.profile_image}`} 
@@ -208,6 +210,8 @@ export default function Home() {
                             <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366F1&color=fff&rounded=true`} alt="User avatar" />
                         )}
                     </Link>
+                        </>
+                    )}
                 </div>
                 </>
                 );

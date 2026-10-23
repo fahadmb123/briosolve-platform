@@ -18,6 +18,8 @@ import { AdminKycStats, GetAdminKycResponse } from "../../application/dtos/admin
 
 export class VerificationDocumentRepository implements IVerificationDocumentRepository {
     async findById(id: string): Promise<VerificationDocument | null> {
+
+        
         const record = await db.orm.public.provider_verification_documents
             .where({ id: id as never })
             .include("files")
@@ -28,6 +30,8 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
     }
 
     async findByProviderId(providerId: string): Promise<VerificationDocument[]> {
+
+        
         const records = await db.orm.public.provider_verification_documents
             .where({ provider_id: providerId as never })
             .include("files")
