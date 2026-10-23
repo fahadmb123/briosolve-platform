@@ -7,8 +7,8 @@ import { RefreshTokenInputDto } from "../../dtos/request/refresh-token.dto";
 
 export default class RefreshTokenUseCase implements IUseCase<RefreshTokenInputDto, RefreshTokenOutputDto> {
     constructor(
-        private readonly userRepository: IUserRepository,
-        private readonly jwtService: IJwtService
+        private readonly _userRepository: IUserRepository,
+        private readonly _jwtService: IJwtService
     ) {}
 
     async execute(input: RefreshTokenInputDto): Promise<RefreshTokenOutputDto> {
@@ -18,12 +18,12 @@ export default class RefreshTokenUseCase implements IUseCase<RefreshTokenInputDt
 
         let payload;
         try {
-            payload = this.jwtService.verifyRefreshToken(input.refreshToken);
+            payload = this._jwtService.verifyRefreshToken(input.refreshToken);
         } catch {
             throw new ApplicationError("INVALID_TOKEN", "Invalid or expired refresh token", "AUTHENTICATION");
         }
 
-        const user = await this.userRepository.findById(payload.userId);
+        const user = await this._userRepository.findById(payload.userId);
         if (!user) {
             throw new ApplicationError("USER_NOT_FOUND", "User not found", "NOT_FOUND");
         }
@@ -35,12 +35,12 @@ export default class RefreshTokenUseCase implements IUseCase<RefreshTokenInputDt
             throw new ApplicationError("BLOCKED_ACCOUNT", "Your account has been blocked", "AUTHORIZATION");
         }
 
-        const accessToken = this.jwtService.generate({
+        const accessToken = this._jwtService.generate({
             userId: user.id,
             role: user.role
         });
 
-        const newRefreshToken = this.jwtService.generateRefreshToken({
+        const newRefreshToken = this._jwtService.generateRefreshToken({
             userId: user.id,
             role: user.role
         });

@@ -15,26 +15,26 @@ import { SendSmsOtpUseCaseInputDto } from "../../dtos/request/send-sms-otp.dto";
 
 export class SendSmsOtpUseCase implements IUseCase<SendSmsOtpUseCaseInputDto,SendSmsOtpUseCaseOutputDto>{
     constructor (
-        private readonly smsService:ISmsService,
-        private readonly otpGenerate : IOtpGenerator,
-        private readonly passwordHasher : IPasswordHasher,
-        private readonly pendingRegistrationStore : IPendingRegistrationStore,
-        private readonly userRepository : IUserRepository
+        private readonly _smsService: ISmsService,
+        private readonly _otpGenerate: IOtpGenerator,
+        private readonly _passwordHasher: IPasswordHasher,
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore,
+        private readonly _userRepository: IUserRepository
     ){}
     async execute(input:SendSmsOtpUseCaseInputDto):Promise<SendSmsOtpUseCaseOutputDto>{
-        const user = await this.userRepository.findById(input.id)
+        const user = await this._userRepository.findById(input.id)
 
         if (!user) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
 
         if(user.phone === input.phone) throw new ApplicationError("ALREADY_VERIFIED","Already verified","CONFLICT")
 
-        const isPhoneExist = await this.userRepository.findByPhone(input.phone)
+        const isPhoneExist = await this._userRepository.findByPhone(input.phone)
                 
         if (isPhoneExist) throw new ApplicationError("USER_ALREADY_EXIST", "User with mobile already exist", "CONFLICT")
 
-        const otp = this.otpGenerate.generate()
+        const otp = this._otpGenerate.generate()
 
-        const otpHash = await this.passwordHasher.hash(otp)
+        const otpHash = await this._passwordHasher.hash(otp)
         const registrationId  = randomUUID()
         
         const registrationTtl = 10 * 60
@@ -43,7 +43,7 @@ export class SendSmsOtpUseCase implements IUseCase<SendSmsOtpUseCaseInputDto,Sen
 
         const forPath =  "UPDATE_PHONE"
 
-        await this.pendingRegistrationStore.save(registrationId,{
+        await this._pendingRegistrationStore.save(registrationId,{
             name:user.name,
             email:user.email,
             phone:input.phone,
@@ -58,7 +58,7 @@ export class SendSmsOtpUseCase implements IUseCase<SendSmsOtpUseCaseInputDto,Sen
         )
 
         
-        await this.smsService.sendOtp(input.phone,otp)
+        await this._smsService.sendOtp(input.phone,otp)
     
         return {registrationId,expiresIn: otpExpiresIn}
     }

@@ -18,27 +18,27 @@ import { UpdateEmailUseCaseInputDto } from "../../dtos/request/update-email.dto"
 
 export default class UpdateEmailUseCase implements IUseCase<UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto> {
     constructor(
-        private readonly userRepository: IUserRepository,
-        private readonly passwordHasher: IPasswordHasher,
-        private readonly otpGenerate: IOtpGenerator,
-        private readonly PendingRegistrationStore: IPendingRegistrationStore,
-        private readonly EmailSender: IEmailSender
+        private readonly _userRepository: IUserRepository,
+        private readonly _passwordHasher: IPasswordHasher,
+        private readonly _otpGenerate: IOtpGenerator,
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore,
+        private readonly _emailSender: IEmailSender
     ) { }
 
     async execute(input: UpdateEmailUseCaseInputDto): Promise<UpdateEmailUseCaseOutputDto> {
 
-        const user = await this.userRepository.findById(input.userId)
+        const user = await this._userRepository.findById(input.userId)
 
         if (!user) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
 
         if (user?.email === input.email) throw new ApplicationError("ALREADY_VERIFIED", "Already verified", "CONFLICT")
 
-        const isEmailExist = await this.userRepository.findByEmail(input.email)
+        const isEmailExist = await this._userRepository.findByEmail(input.email)
         
         if (isEmailExist) throw new ApplicationError("USER_ALREADY_EXIST", "User with email already exist", "CONFLICT")
         
-        const otp = this.otpGenerate.generate()
-        const otpHash = await this.passwordHasher.hash(otp)
+        const otp = this._otpGenerate.generate()
+        const otpHash = await this._passwordHasher.hash(otp)
 
         const registrationId = randomUUID()
 
@@ -50,7 +50,7 @@ export default class UpdateEmailUseCase implements IUseCase<UpdateEmailUseCaseIn
 
         const forPath = "UPDATE"
 
-        await this.PendingRegistrationStore.save(registrationId, {
+        await this._pendingRegistrationStore.save(registrationId, {
             name: "",
             email: input.email,
             otpHash,
@@ -64,7 +64,7 @@ export default class UpdateEmailUseCase implements IUseCase<UpdateEmailUseCaseIn
         )
 
 
-        await this.EmailSender.sendOtp(input.email, otp)
+        await this._emailSender.sendOtp(input.email, otp)
 
         return { registrationId, expiresIn: otpExpiresIn }
     }

@@ -12,11 +12,11 @@ import { UserMapper } from "../../../infrastructure/mappers/user.mapper"
 
 export default class GetMeUseCase implements IUseCase<IUserTokenPayload,UserResponseDto>{
     constructor(
-        private readonly userRepository:IUserRepository
+        private readonly _userRepository: IUserRepository
     ){}
 
     async execute (user:IUserTokenPayload):Promise<UserResponseDto>{
-        const foundUser = await this.userRepository.findById(user.userId)
+        const foundUser = await this._userRepository.findById(user.userId)
 
         if (!foundUser) throw new ApplicationError("USER_NOT_FOUND","User not found","NOT_FOUND")
 

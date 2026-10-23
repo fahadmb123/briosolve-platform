@@ -14,24 +14,24 @@ import { EmailVerificationUseCaseInputDto } from "../../dtos/request/email-verif
 
 export default class EmailVerificationUseCase implements IUseCase<EmailVerificationUseCaseInputDto,EmailVerificationUseCaseOutputDto>{
     constructor(
-        private readonly customerRepository:IUserRepository,
-        private readonly passwordHasher:IPasswordHasher,
-        private readonly otpGenerate : IOtpGenerator,
-        private readonly PendingRegistrationStore:IPendingRegistrationStore,
-        private readonly EmailSender : IEmailSender
+        private readonly _customerRepository: IUserRepository,
+        private readonly _passwordHasher: IPasswordHasher,
+        private readonly _otpGenerate: IOtpGenerator,
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore,
+        private readonly _emailSender: IEmailSender
     ){}
 
     async execute (input:EmailVerificationUseCaseInputDto):Promise<EmailVerificationUseCaseOutputDto>{
-        const user = await this.customerRepository.findByEmail(input.email)
+        const user = await this._customerRepository.findByEmail(input.email)
         if (!user) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
 
-        const customer = await this.customerRepository.findById(user.id)
+        const customer = await this._customerRepository.findById(user.id)
         if (!customer) throw new ApplicationError("USER_NOT_FOUND","User not Found","NOT_FOUND")
 
         if (customer.status === "BLOCKED") throw new ApplicationError("BLOCKED_ACCOUNT","User is Blocked","AUTHORIZATION")
-        const otp = this.otpGenerate.generate()
+        const otp = this._otpGenerate.generate()
 
-        const otpHash = await this.passwordHasher.hash(otp)
+        const otpHash = await this._passwordHasher.hash(otp)
         const registrationId  = randomUUID()
         
         const registrationTtl = 10 * 60
@@ -42,7 +42,7 @@ export default class EmailVerificationUseCase implements IUseCase<EmailVerificat
 
         const forPath =  "FORGOT_PASSWORD"
 
-        await this.PendingRegistrationStore.save(registrationId,{
+        await this._pendingRegistrationStore.save(registrationId,{
             name:user.name,
             email:input.email,
             otpHash,
@@ -55,7 +55,7 @@ export default class EmailVerificationUseCase implements IUseCase<EmailVerificat
         )
 
         
-        await this.EmailSender.sendOtp(input.email,otp)
+        await this._emailSender.sendOtp(input.email,otp)
     
         return {registrationId,expiresIn: otpExpiresIn}
     }

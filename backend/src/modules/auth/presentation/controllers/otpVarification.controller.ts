@@ -9,9 +9,9 @@ import { UserResponseDto } from "../../application/dtos/response/user.dto"
 
 class OtpVarificationController {
     constructor(
-        private readonly otpVarificationUseCase: IUseCase<OtpVarificationInput, { response: UserResponseDto | IPendingCustomerRegistration, for: string, email: string, path?: string }>,
-        private readonly pendingRegistrationStore: IPendingRegistrationStore,
-        private readonly resendOtpUseCase: IUseCase<string, ResendOtpOutput>
+        private readonly _otpVarificationUseCase: IUseCase<OtpVarificationInput, { response: UserResponseDto | IPendingCustomerRegistration, for: string, email: string, path?: string }>,
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore,
+        private readonly _resendOtpUseCase: IUseCase<string, ResendOtpOutput>
     ) { }
 
     validate = async (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +19,7 @@ class OtpVarificationController {
             const registrationId = req.cookies.registration_id
             const otp = req.body.otp
             
-            const response = await this.otpVarificationUseCase.execute({ registrationId, otp })
+            const response = await this._otpVarificationUseCase.execute({ registrationId, otp })
 
             response.for === "FORGOT_PASSWORD" ? res.cookie("reset_password", registrationId, registrationCookie) : null
 
@@ -47,7 +47,7 @@ const base = response.response || {};
         try {
             const registrationId = req.cookies.registration_id
 
-            const response = await this.resendOtpUseCase.execute(registrationId)
+            const response = await this._resendOtpUseCase.execute(registrationId)
 
             return sendSuccess(res, "OTP resent successfully", { expiresIn: response.expiresIn })
         } catch (err) {
@@ -61,7 +61,7 @@ const base = response.response || {};
 
             if (!registrationId) return res.status(200).json({ success: true, data: { attempts: 0, expiresIn: 0 } })
 
-            const response = await this.pendingRegistrationStore.get(registrationId)
+            const response = await this._pendingRegistrationStore.get(registrationId)
 
             let expiresIn = 0
 

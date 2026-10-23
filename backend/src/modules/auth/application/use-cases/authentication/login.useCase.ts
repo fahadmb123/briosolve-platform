@@ -8,18 +8,18 @@ import { LoginInputDto } from "../../dtos/request/login.dto";
 
 export default class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
     constructor(
-        private readonly userRepository: IUserRepository,
-        private readonly passwordHasher: IPasswordHasher,
-        private readonly jwtService: IJwtService
+        private readonly _userRepository: IUserRepository,
+        private readonly _passwordHasher: IPasswordHasher,
+        private readonly _jwtService: IJwtService
     ) {}
 
     async execute(input: LoginInputDto): Promise<LoginOutputDto> {
-        const user = await this.userRepository.findByEmail(input.email);
+        const user = await this._userRepository.findByEmail(input.email);
         if (!user) {
             throw new ApplicationError("USER_NOT_FOUND", "User not found", "NOT_FOUND");
         }
 
-        const isPasswordValid = await this.passwordHasher.compare(input.password, user.passwordHash);
+        const isPasswordValid = await this._passwordHasher.compare(input.password, user.passwordHash);
         if (!isPasswordValid) {
             throw new ApplicationError("INVALID_PASSWORD", "Invalid Password", "AUTHORIZATION");
         }
@@ -31,12 +31,12 @@ export default class LoginUseCase implements IUseCase<LoginInputDto, LoginOutput
             throw new ApplicationError("BLOCKED_ACCOUNT", "Your account has been blocked", "AUTHORIZATION");
         }
 
-        const accessToken = this.jwtService.generate({
+        const accessToken = this._jwtService.generate({
             userId: user.id,
             role: user.role
         });
 
-        const refreshToken = this.jwtService.generateRefreshToken({
+        const refreshToken = this._jwtService.generateRefreshToken({
             userId: user.id,
             role: user.role
         });

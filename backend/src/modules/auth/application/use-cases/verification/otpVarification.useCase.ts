@@ -12,20 +12,20 @@ import { UserMapper } from "../../../infrastructure/mappers/user.mapper";
 
 export default class OtpVarificationUseCase implements IUseCase<OtpVarificationInput,{response:UserResponseDto | IPendingCustomerRegistration,for:string, email:string, path?:string}>{
     constructor(
-        private readonly PendingRegistrationStore:IPendingRegistrationStore,
-        private readonly PasswordHasher:IPasswordHasher,
-        private readonly CustomerRepository : ICustomerRepository,
-        private readonly UserRepository : IUserRepository
+        private readonly _pendingRegistrationStore: IPendingRegistrationStore,
+        private readonly _passwordHasher: IPasswordHasher,
+        private readonly _customerRepository: ICustomerRepository,
+        private readonly _userRepository: IUserRepository
     ){}
 
     async execute ({registrationId,otp}:OtpVarificationInput):Promise<{response:UserResponseDto | IPendingCustomerRegistration,for:string,email:string,path?:string}>{
-        const data = await this.PendingRegistrationStore.get(registrationId)
+        const data = await this._pendingRegistrationStore.get(registrationId)
 
         if (!registrationId || !data) throw new ApplicationError("REGISTRATION_EXPIRED","Registration session expired","AUTHENTICATION")
 
         if (data.otpExpiresAt && Date.now() > data.otpExpiresAt) throw new ApplicationError("OTP_EXPIRED","OTP Expired","AUTHENTICATION")
 
-        const isMatch = await this.PasswordHasher.compare(otp,data?.otpHash!)
+        const isMatch = await this._passwordHasher.compare(otp,data?.otpHash!)
 
         if (!isMatch) throw new ApplicationError("INVALID_OTP","Invalid OTP","AUTHENTICATION")
 
@@ -33,12 +33,12 @@ export default class OtpVarificationUseCase implements IUseCase<OtpVarificationI
 
         switch (data?.for) {
             case "CREATE_CUSTOMER":
-                response = UserMapper.toDto(await this.CustomerRepository.createCustomer({
+                response = UserMapper.toDto(await this._customerRepository.createCustomer({
                     name: data.name,
                     email: data.email,
                     password: data.passwordHash!
                 })) as UserResponseDto
-                await this.PendingRegistrationStore.delete(registrationId)
+                await this._pendingRegistrationStore.delete(registrationId)
                 break;
             case "FORGOT_PASSWORD":
                 response = data
@@ -46,32 +46,32 @@ export default class OtpVarificationUseCase implements IUseCase<OtpVarificationI
             case "UPDATE":
                 response = data
                 if (data.userId) {
-                    await this.UserRepository.update(data.userId, { email: data.email })
+                    await this._userRepository.update(data.userId, { email: data.email })
                 }
-                await this.PendingRegistrationStore.delete(registrationId)
+                await this._pendingRegistrationStore.delete(registrationId)
                 break;
             case "UPDATE_PHONE":
                 response = data
                 if (data.userId) {
-                    await this.UserRepository.update(data.userId, { phone: data.phone })
+                    await this._userRepository.update(data.userId, { phone: data.phone })
                 }
-                await this.PendingRegistrationStore.delete(registrationId)
+                await this._pendingRegistrationStore.delete(registrationId)
                 break;
             case "CREATE_PROVIDER":
                 response = data;
-                await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+                await this._pendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
                 break;
             case "BECOME_PROVIDER":
                 response = data;
-                await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+                await this._pendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
                 break;
             case "BECOME_CUSTOMER":
                 response = data;
-                await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+                await this._pendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
                 break;
             case "REACTIVATE_ACCOUNT":
                 response = data;
-                await this.PendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
+                await this._pendingRegistrationStore.save(registrationId, { ...data, isVerified: true } as any, 15 * 60);
                 break;
         }
 

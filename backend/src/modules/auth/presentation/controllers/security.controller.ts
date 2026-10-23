@@ -9,17 +9,17 @@ import { SendSmsOtpUseCaseInputDto } from "../../application/dtos/request/send-s
 
 export class SecurityController extends BaseController {
     constructor (
-        private readonly resetPasswordUseCase:IUseCase<ResetPasswordDto,void>,
-        private readonly sendSmsOtpUseCase:IUseCase<SendSmsOtpUseCaseInputDto,SendSmsOtpUseCaseOutputDto>,
-        private readonly updatePasswordUseCase :IUseCase<UpdatePasswordInputDto,void>,
-        private readonly deletePhoneUseCase : IUseCase<string,void>
+        private readonly _resetPasswordUseCase: IUseCase<ResetPasswordDto, void>,
+        private readonly _sendSmsOtpUseCase: IUseCase<SendSmsOtpUseCaseInputDto, SendSmsOtpUseCaseOutputDto>,
+        private readonly _updatePasswordUseCase: IUseCase<UpdatePasswordInputDto, void>,
+        private readonly _deletePhoneUseCase: IUseCase<string, void>
     ) {super()}
 
     resetPassword = async (req:Request,res:Response,next:NextFunction) => {
         try {
             const registrationId = req.cookies.reset_password
 
-            await this.resetPasswordUseCase.execute({registrationId,password:req.body.password})
+            await this._resetPasswordUseCase.execute({registrationId,password:req.body.password})
 
             return this.sendSuccess(res,"Password Updated")
         } catch (err) {
@@ -33,7 +33,7 @@ export class SecurityController extends BaseController {
             const user = req.user!
             const path = req.query.path as string
             
-            const response = await this.sendSmsOtpUseCase.execute({phone:req.body.phone,path,id:user.userId})
+            const response = await this._sendSmsOtpUseCase.execute({phone:req.body.phone,path,id:user.userId})
         
             res.cookie("registration_id",response.registrationId,registrationCookie)
             
@@ -45,7 +45,7 @@ export class SecurityController extends BaseController {
 
     updatePassword = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            await this.updatePasswordUseCase.execute({id:req.user?.userId as string,data:req.body})
+            await this._updatePasswordUseCase.execute({id:req.user?.userId as string,data:req.body})
 
             return this.sendSuccess(res,"Updated")
         } catch (err) {
@@ -55,7 +55,7 @@ export class SecurityController extends BaseController {
 
     deletePhone = async (req:Request,res:Response,next:NextFunction) => {
         try {
-            await this.deletePhoneUseCase.execute(req.user?.userId as string)
+            await this._deletePhoneUseCase.execute(req.user?.userId as string)
 
             return this.sendSuccess(res,"Updated")
         } catch (err) {

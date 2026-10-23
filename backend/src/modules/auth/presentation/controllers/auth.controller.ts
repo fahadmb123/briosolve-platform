@@ -19,19 +19,19 @@ import { UserResponseDto } from "../../application/dtos/response/user.dto";
 
 export class AuthController extends BaseController {
     constructor(
-        private readonly loginUseCase: IUseCase<LoginInputDto, LoginOutputDto>,
-        private readonly getMeUseCase: IUseCase<IUserTokenPayload, UserResponseDto>,
-        private readonly emailVerification: IUseCase<EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto>,
-        private readonly updateEmailUseCase: IUseCase<UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto>,
-        private readonly refreshTokenUseCase: IUseCase<RefreshTokenInputDto, RefreshTokenOutputDto>,
-        private readonly logoutUseCase: IUseCase<LogoutInputDto, void>
+        private readonly _loginUseCase: IUseCase<LoginInputDto, LoginOutputDto>,
+        private readonly _getMeUseCase: IUseCase<IUserTokenPayload, UserResponseDto>,
+        private readonly _emailVerification: IUseCase<EmailVerificationUseCaseInputDto, EmailVerificationUseCaseOutputDto>,
+        private readonly _updateEmailUseCase: IUseCase<UpdateEmailUseCaseInputDto, UpdateEmailUseCaseOutputDto>,
+        private readonly _refreshTokenUseCase: IUseCase<RefreshTokenInputDto, RefreshTokenOutputDto>,
+        private readonly _logoutUseCase: IUseCase<LogoutInputDto, void>
     ) {
         super();
     }
 
     login = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const response = await this.loginUseCase.execute({
+            const response = await this._loginUseCase.execute({
                 email: req.body.email,
                 password: req.body.password,
                 userAgent: req.headers["user-agent"] || null,
@@ -58,7 +58,7 @@ export class AuthController extends BaseController {
                 throw new ApplicationError("TOKEN_REQUIRED", "Refresh token is required", "AUTHENTICATION");
             }
 
-            const response = await this.refreshTokenUseCase.execute({
+            const response = await this._refreshTokenUseCase.execute({
                 refreshToken,
                 userAgent: req.headers["user-agent"] || null,
                 ipAddress: req.ip || null
@@ -78,7 +78,7 @@ export class AuthController extends BaseController {
             const refreshToken = req.cookies.refresh_token;
 
             if (refreshToken) {
-                await this.logoutUseCase.execute({ refreshToken });
+                await this._logoutUseCase.execute({ refreshToken });
             }
 
             res.clearCookie("access_token", clearAccessTokenCookieOptions);
@@ -95,7 +95,7 @@ export class AuthController extends BaseController {
     getMe = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const user = req.user!;
-            const response = await this.getMeUseCase.execute(user);
+            const response = await this._getMeUseCase.execute(user);
 
             return this.sendSuccess(res, "", response)
         } catch (err) {
@@ -110,9 +110,9 @@ export class AuthController extends BaseController {
 
             if (work === "UPDATE") {
                 const user = req.user!;
-                response = await this.updateEmailUseCase.execute({ email: req.body.email, userId: user.userId });
+                response = await this._updateEmailUseCase.execute({ email: req.body.email, userId: user.userId });
             } else {
-                response = await this.emailVerification.execute({ email: req.body.email });
+                response = await this._emailVerification.execute({ email: req.body.email });
             }
 
             res.cookie("registration_id", response.registrationId, registrationCookie);
