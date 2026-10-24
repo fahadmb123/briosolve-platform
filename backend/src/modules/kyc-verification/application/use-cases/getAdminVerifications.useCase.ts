@@ -48,11 +48,12 @@ export class GetAdminVerificationsUseCase implements IUseCase<GetAdminKycRequest
         } else {
             filtered.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
         }
-       filtered = filtered.filter((verification)=>{
+       /*filtered = filtered.filter((verification)=>{
             if (verification.kyc_status === "APROVED"){
                 return verification
             }
-        })
+        })*/
+       //console.log(filtered)
 
         const total = filtered.length;
         const totalPages = Math.ceil(total / limit) || 1;

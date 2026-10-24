@@ -4,7 +4,7 @@ import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { otpSchema, type OtpInputType } from '../../schemas/validation';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../hooks/use-otp-varify';
 import { useResetFlowStore } from '../../stores/reset-flow.store';

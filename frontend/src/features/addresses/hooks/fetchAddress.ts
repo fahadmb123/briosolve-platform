@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import { fetchAddressWithCoordinates } from "../services/geocoding.service";
 
 export const fetchAddressFromCoordinates = async (lat: number, lng: number) => {

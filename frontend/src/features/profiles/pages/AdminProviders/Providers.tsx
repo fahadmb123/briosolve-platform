@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useGetProviders, useUpdateProviderStatus as useUpdateStatus } from '../../hooks/admin/useAdminProviders';
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import type { User, response } from '../../types/profile.types';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";

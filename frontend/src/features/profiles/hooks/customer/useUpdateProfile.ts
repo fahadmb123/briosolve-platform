@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { updateProfile } from "../../services/customerProfile.service";
 import type { ApiError } from "../../../../shared/api/ApiError";
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 
 export const useUpdateProfile = () => {
     return useMutation({

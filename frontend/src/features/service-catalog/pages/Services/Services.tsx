@@ -6,7 +6,7 @@ import { AddServiceModal } from "../../components/AddServiceModal";
 import { useGetCategoriesService } from "../../hooks/useCategory";
 import { useGetServices, useAddServiceMut, useUpdateServiceMut, useDeleteServiceMut } from "../../hooks/useService";
 import { useServiceFormData } from "../../hooks/useServiceFormData";
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 

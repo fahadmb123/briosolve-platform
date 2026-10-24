@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useSendBecomeProviderOtp, useBecomeProvider } from '../../../../hooks/customer/useBecomeProvider';
 import { useAuthStore } from '../../../../../auth/stores/auth.store';
 import { OtpModal } from '../../../../../auth/components/OtpModal';

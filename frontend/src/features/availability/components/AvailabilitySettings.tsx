@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useAuthStore } from '../../auth/stores/auth.store';
 import {
     useGetProviderAvailability,
@@ -135,7 +135,7 @@ const AvailabilitySettingsComponent: React.FC = () => {
                 return { ...item, isEnabled: true, startTime: '09:00', endTime: '17:00' };
             })
         );
-        toast.info('Applied 9:00 AM - 5:00 PM for weekdays');
+        toast.success('Applied 9:00 AM - 5:00 PM for weekdays');
     }, []);
 
     const handleCloseOverrideModal = useCallback(() => {

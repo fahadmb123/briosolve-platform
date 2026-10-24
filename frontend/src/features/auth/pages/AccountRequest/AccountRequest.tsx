@@ -10,7 +10,7 @@ import {
 } from '../../schemas/validation';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { OtpModal } from '../../components/OtpModal';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import './AccountRequest.css';
 import type { ApiError } from '../../../../shared/api/ApiError';
 

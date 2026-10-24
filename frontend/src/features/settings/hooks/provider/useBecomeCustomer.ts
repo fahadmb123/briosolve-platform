@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import type { ApiError } from "../../../../shared/api/ApiError";
 import { becomeCustomer, sendBecomeCustomerOtp } from "../../services/becomeCustomer.service";
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { useUpdateServiceRadius } from '../../hooks/provider/useUpdateBusinessProfile';
 import type { Address } from '../../../addresses';

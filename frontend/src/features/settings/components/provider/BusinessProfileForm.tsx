@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { businessProfileSchema, type BusinessProfileInputType } from '../../schemas/providerSettings.schema';
 import { useUpdateBusinessProfile } from '../../hooks/provider/useUpdateBusinessProfile';
 import { useAuthStore } from '../../../auth/stores/auth.store';

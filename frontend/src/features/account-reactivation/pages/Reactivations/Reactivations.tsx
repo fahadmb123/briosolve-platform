@@ -9,7 +9,7 @@ import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/
 import { ConfirmModal } from '../../../../shared/components/ui/ConfirmModal/ConfirmModal';
 import { BlockReasonModal } from '../../../admin/components/BlockReasonModal';
 import type { ReactivationRequestItem } from '../../types/reactivation.types';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 
 export default function Reactivations() {
   const [requests, setRequests] = useState<ReactivationRequestItem[]>([]);

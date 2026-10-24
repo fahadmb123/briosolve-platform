@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { updatePasswordSchema, type UpdatePasswordInputType } from '../../schemas/providerSettings.schema';
 import { useUpdatePassword } from '../../hooks/provider/useUpdatePassword';
 

@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { addAddress, deleteAddress, editAddress, getAddresses, setDefaultAddress } from "../services/address.service";
 import type { ApiError } from "../../../shared/api/ApiError";
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 
 export const useDeleteAddress = () => {
     return useMutation({

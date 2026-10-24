@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AddAddressModal, type AddressPayload, useAddAddress, useDeleteAddress, useEditAddress, useGetAddresses, useSetDefaultAddress } from '../../../../../addresses';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useAuthStore } from '../../../../../auth/stores/auth.store';
 import { SpinnerOverlay } from '../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from '../../../../../../shared/components/ui/ConfirmModal/ConfirmModal';

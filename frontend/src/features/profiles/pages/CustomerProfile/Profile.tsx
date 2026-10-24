@@ -4,7 +4,7 @@ import '../../../../shared/styles/location-picker.css';
 import { nameSchema, type NameInputType } from '../../schemas/customerProfile.schema';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useUpdateProfile } from '../../hooks/customer/useUpdateProfile';
 import { useGetProfile } from '../../hooks/customer/useGetProfile';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';

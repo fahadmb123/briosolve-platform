@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { getCroppedImg } from '../../../shared/utils/cropImage';
 import { serviceSchema, type ServiceFormData } from '../schemas/service.schema';
 

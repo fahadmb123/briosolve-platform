@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { updatePasswordSchema, type UpdatePasswordInputType } from '../../../../schemas/customerSettings.schema';
 import { useUpdatePassword } from '../../../../hooks/customer/contact';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { SpinnerOverlay } from '../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 
 export const Security = () => {

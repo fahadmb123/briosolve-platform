@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { registerProvider } from "../../services/provider/providerRegistration.service";
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import type { ApiError } from "../../../../shared/api/ApiError";
 import { useNavigate } from "react-router-dom";
 

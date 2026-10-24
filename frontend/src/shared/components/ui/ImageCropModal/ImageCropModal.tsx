@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Cropper, { type Area } from 'react-easy-crop';
 import { getCroppedImg } from '../../../utils/cropImage';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 
 interface ImageCropModalProps {
     isOpen: boolean;

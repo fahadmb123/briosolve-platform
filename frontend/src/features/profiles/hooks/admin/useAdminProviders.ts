@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { getProviders, updateProviderStatus } from "../../services/adminProviders.service";
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import type { ApiError } from "../../../../shared/api/ApiError";
 import type { response, User } from "../../types/profile.types";
 

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { emailSchema, phoneSchema, type EmailInputType, type PhoneInputType } from '../../../../schemas/customerSettings.schema';
 import { useUpdateEmail, useUpdatePhone, useDeletePhone } from '../../../../hooks/customer/contact';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../../../auth/stores/auth.store';
 import { useResetFlowStore } from '../../../../../auth/stores/reset-flow.store';

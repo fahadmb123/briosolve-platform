@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useGetCustomers, useUpdateCustomerStatus as useUpdateStatus } from '../../hooks/admin/useAdminCustomers';
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import type { User, response } from '../../types/profile.types';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useGetCategoriesService } from '../hooks/useCategory';
 import {
     useGetProviderServices,
@@ -161,7 +161,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
 
     const handleConfirmAddCategories = useCallback(() => {
         if (selectedServiceIds.length === 0) {
-            toast.warning('Please select at least one service');
+            toast.error('Please select at least one service');
             return;
         }
 
@@ -201,7 +201,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
     const handleConfirmAddServices = useCallback(() => {
         if (!serviceModalCategory) return;
         if (selectedServiceIdsToAdd.length === 0) {
-            toast.warning('Please select at least one service');
+            toast.error('Please select at least one service');
             return;
         }
 

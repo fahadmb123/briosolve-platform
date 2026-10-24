@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 import * as CategoryService from "../services/category.service"
 import type { ApiError } from "../../../shared/api/ApiError"
-import { toast } from "react-toastify"
+import { toast } from 'react-hot-toast'
 
 
 

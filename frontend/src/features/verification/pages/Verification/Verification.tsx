@@ -13,7 +13,7 @@ import {
   useDeleteVerificationDocument,
 } from '../../hooks/mutations/useVerification';
 
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import '../../components/kyc.css';
 import { ConfirmModal } from '../../../../shared/components/ui/ConfirmModal/ConfirmModal';
 import { useAuthStore } from '../../../auth/stores/auth.store';

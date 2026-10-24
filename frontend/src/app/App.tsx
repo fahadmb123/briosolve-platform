@@ -4,8 +4,7 @@ import '../shared/styles/global.css';
 import '../shared/styles/user-theme.css';
 import '../shared/styles/provider-theme.css';
 import '../shared/styles/admin-theme.css';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../features/auth/stores/auth.store';
@@ -25,7 +24,7 @@ function App() {
       <div className="app">
         {isInitializing ? (<LoadingScreen isLoading={true}/>) : (
           <>
-            <ToastContainer position="top-center" autoClose={1000} hideProgressBar={true} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover toastClassName="custom-premium-toast" closeButton={false} stacked />
+            <Toaster position="top-center" />
             <AppRouter />
           </>
         )}

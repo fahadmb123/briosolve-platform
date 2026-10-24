@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { emailSchema, phoneSchema, type EmailInputType, type PhoneInputType } from '../../schemas/providerSettings.schema';
 import { useUpdateEmail, useUpdatePhone, useDeletePhone } from '../../hooks/customer/contact';

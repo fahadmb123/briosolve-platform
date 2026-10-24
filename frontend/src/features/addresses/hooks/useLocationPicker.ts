@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import { fetchAddressFromCoordinates } from "./fetchAddress";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

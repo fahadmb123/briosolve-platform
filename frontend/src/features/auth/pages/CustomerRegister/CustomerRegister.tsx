@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, type RegisterInputType } from '../../schemas/customer/customerRegistration.schema';
-import {toast} from "react-toastify"
+import {toast} from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom';
 import { useRegisterCustomer } from '../../hooks/customer/useRegisterCustomer';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';

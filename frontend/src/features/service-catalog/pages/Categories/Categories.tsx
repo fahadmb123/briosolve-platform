@@ -4,7 +4,7 @@ import { AdminTable, type TableColumn } from "../../../admin/components/AdminTab
 import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { AddCategoryModal } from "../../components/AddCategoryModal";
 import { useAddCategoryService, useGetCategoriesService, useUpdateCategoryService, useDeleteCategoryService } from "../../hooks/useCategory";
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { useCategoryFormData } from "../../hooks/useCategoryFormData";

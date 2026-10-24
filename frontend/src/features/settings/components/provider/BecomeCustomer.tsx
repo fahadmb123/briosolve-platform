@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { OtpModal } from '../../../auth/components/OtpModal';
 import { useBecomeCustomer, useSendBecomeCustomerOtp } from '../../hooks/provider/useBecomeCustomer';
