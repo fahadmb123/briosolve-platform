@@ -41,7 +41,7 @@ export class AuthController extends BaseController {
             res.cookie("access_token", response.accessToken, accessTokenCookie);
             res.cookie("refresh_token", response.refreshToken, refreshTokenCookie);
 
-            return sendSuccess(res, "LoggedIn Successfully", {
+            return sendSuccess(res, "Authenticated", {
                 accessToken: response.accessToken,
                 user: UserMapper.toDto(response.isExist)
             });
