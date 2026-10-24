@@ -11,19 +11,21 @@ export const KycStatusBanner = memo(({ documents }: KycStatusBannerProps) => {
   const profile = useAuthStore((state) => state.profile) as ProviderProfile | null;
 
   const { hasRejected, allApproved, hasPending } = useMemo(() => {
+    const kycStatus = profile?.kyc_status;
+    const docCount = documents.length;
+
     const hasIdentityApproved = documents.some((doc) => doc.document_type === 'IDENTITY' && doc.status === 'APPROVED');
     const hasCertApproved = documents.some((doc) => doc.document_type === 'CERTIFICATE' && doc.status === 'APPROVED');
     const docBothApproved = hasIdentityApproved && hasCertApproved;
 
-    const docAllRejected = documents.length > 0 && documents.every((doc) => doc.status === 'REJECTED');
-    const docHasPending = documents.some((doc) => doc.status === 'PENDING') || (documents.length > 0 && !docBothApproved && !docAllRejected);
+    const docAllRejected = docCount > 0 && documents.every((doc) => doc.status === 'REJECTED');
 
-    const kycStatus = profile?.kyc_status;
+    const docAllPending = docCount >= 2 && documents.every((doc) => doc.status === 'PENDING');
 
     return {
-      hasRejected: docAllRejected || (documents.length === 0 && kycStatus === 'REJECTED'),
-      hasPending: docHasPending || (documents.length === 0 && (kycStatus === 'PENDING' || !kycStatus)),
-      allApproved: documents.length > 0 ? docBothApproved : kycStatus === 'APPROVED',
+      hasRejected: docAllRejected || (docCount === 0 && kycStatus === 'REJECTED'),
+      hasPending: docAllPending,
+      allApproved: docCount > 0 ? docBothApproved : kycStatus === 'APPROVED',
     };
   }, [documents, profile?.kyc_status]);
 
@@ -99,7 +101,7 @@ export const KycStatusBanner = memo(({ documents }: KycStatusBannerProps) => {
         <div>
           <h2 className="kyc-banner-title">Complete Your Provider KYC</h2>
           <p className="kyc-banner-desc">
-            Submit your Government Identity and Additional Certificates to earn the Verified Provider badge and build trust with clients.
+            Submit your Government Identity and Additional Certificates to earn the Verified Provider badge and build trust with clients. You must submit both documents then only will be verify.
           </p>
         </div>
       </div>

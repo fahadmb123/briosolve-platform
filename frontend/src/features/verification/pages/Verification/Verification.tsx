@@ -45,6 +45,10 @@ export default function Verification() {
     });
   }, []);
 
+  const docAllPending = useMemo(()=>{
+    return documents.length >= 2 && documents.every((doc) => doc.status === 'PENDING');
+  },[documents])
+
   const identityDoc = useMemo(
     () => documents.find((d) => d.document_type === 'IDENTITY'),
     [documents]
@@ -225,6 +229,7 @@ export default function Verification() {
               description="Official government photo ID (Aadhaar Card, Passport, or Driving License) to verify your individual legal identity."
               icon="fa-id-card"
               document={identityDoc}
+              docAllPending={docAllPending}
               onRequestVerification={handleOpenRequest}
               onViewRequest={handleOpenDetails}
               onEditVerification={handleOpenEdit}
@@ -237,6 +242,7 @@ export default function Verification() {
               description="Vocational diplomas, trade licenses, safety badges, or brand certifications demonstrating your professional skills."
               icon="fa-certificate"
               document={certificatesDoc}
+              docAllPending={docAllPending}
               onRequestVerification={handleOpenRequest}
               onViewRequest={handleOpenDetails}
               onEditVerification={handleOpenEdit}

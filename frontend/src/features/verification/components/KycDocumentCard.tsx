@@ -7,6 +7,7 @@ interface KycDocumentCardProps {
   description: string;
   icon: string;
   document?: VerificationDocument;
+  docAllPending?:boolean;
   onRequestVerification: (type: VerificationDocumentType) => void;
   onViewRequest: (document: VerificationDocument) => void;
   onEditVerification?: (document: VerificationDocument) => void;
@@ -19,6 +20,7 @@ export const KycDocumentCard = memo(({
   description,
   icon,
   document,
+  docAllPending,
   onRequestVerification,
   onViewRequest,
   onEditVerification,
@@ -94,7 +96,13 @@ export const KycDocumentCard = memo(({
           <div className="kyc-card-icon-wrapper">
             <i className={`fas ${icon}`}></i>
           </div>
-          {statusPill}
+          {docAllPending === false ? (
+            <>
+              <span className="kyc-status-pill pending">
+                <i className="fas fa-clock"></i>Submit All Doc
+              </span>
+            </>
+          ):statusPill}
         </div>
 
         <h3 className="kyc-card-title">{title}</h3>
