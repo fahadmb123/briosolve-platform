@@ -1,5 +1,29 @@
 import pino from "pino";
+import path from "path"
 import { envConfig } from "../config/env.config";
+
+
+const transport = pino.transport({
+    targets: [
+        {
+            target: "pino-roll",
+            options: {
+                file: path.join(process.cwd(), "logs", "app"),
+                frequency: "daily",
+                mkdir: true,
+                extension: ".log"
+            },
+            level: envConfig.LOG_LEVEL
+        },
+        {
+            target: "pino/file",
+            options: {
+                destination: 1
+            },
+            level: envConfig.LOG_LEVEL
+        }
+    ]
+})
 
 export const logger = pino({
     level: envConfig.LOG_LEVEL,
@@ -36,6 +60,7 @@ export const logger = pino({
         ],
         censor: "[REDACTED]"
     }
-});
+    
+},transport)
 
 export type Logger = typeof logger;

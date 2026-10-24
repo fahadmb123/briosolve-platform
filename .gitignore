@@ -51,3 +51,10 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+
+# Application logs
+logs
+
+# Build output
+dist/
