@@ -20,7 +20,6 @@ export const KycDocumentCard = memo(({
   description,
   icon,
   document,
-  docAllPending,
   onRequestVerification,
   onViewRequest,
   onEditVerification,
@@ -31,6 +30,7 @@ export const KycDocumentCard = memo(({
   const isPending = status === 'PENDING';
   const isApproved = status === 'APPROVED';
   const isNotSubmitted = status === 'NOT_SUBMITTED';
+  
 
   const handleRequestClick = useCallback(() => {
     onRequestVerification(documentType);
@@ -96,13 +96,7 @@ export const KycDocumentCard = memo(({
           <div className="kyc-card-icon-wrapper">
             <i className={`fas ${icon}`}></i>
           </div>
-          {docAllPending === false ? (
-            <>
-              <span className="kyc-status-pill pending">
-                <i className="fas fa-clock"></i>Submit All Doc
-              </span>
-            </>
-          ):statusPill}
+          {statusPill}
         </div>
 
         <h3 className="kyc-card-title">{title}</h3>
