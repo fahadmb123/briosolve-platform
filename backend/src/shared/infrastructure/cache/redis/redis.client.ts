@@ -2,7 +2,7 @@ import { createClient } from "redis";
 import { logger } from "../../logger/logger";
 
 let lastErrorLogTime = 0;
-const ERROR_LOG_INTERVAL_MS = 30000; // Throttle error logs to at most once every 30 seconds
+const ERROR_LOG_INTERVAL_MS = 30000
 let isConnected = false;
 
 export const redisClient = createClient({
@@ -55,4 +55,4 @@ export const connectRedis = async (timeoutMs = 5000): Promise<void> => {
         );
         await Promise.race([redisClient.connect(), timeoutPromise]);
     }
-};
+};

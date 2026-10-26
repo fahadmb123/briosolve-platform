@@ -1,7 +1,8 @@
 import type { Socket } from "socket.io";
 import * as cookie from "cookie";
-import type { IJwtService } from "../../application/Dto/services/jwtDto.service";
-import { SocketData } from "./types/socket-data.types";
+import { IJwtService } from "../../../application/Dto/services/jwtDto.service";
+import { SocketData } from "../types/socket-data.types";
+
 
 
 type SocketAuthCallback = (error?: Error) => void;
