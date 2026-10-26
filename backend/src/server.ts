@@ -3,25 +3,39 @@ dotenv.config();
 import app from "./app/app";
 import { connectRedis } from "./shared/infrastructure/cache/redis/redis.client";
 import { logger } from "./shared/infrastructure/logger/logger";
+import { createServer } from "node:http";
+import { createSocketServer } from "./shared/infrastructure/realtime/server/socket-server";
+import { jwtService } from "./modules/auth/infrastructure/composition/services";
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
     await connectRedis();
-    logger.info("Redis connected");
+    logger.info("Redis connected")
 
-    const server = app.listen(PORT, () => {
-      logger.info({ port: PORT }, "Server started");
-    });
+    const httpServer = createServer(app)
 
-    server.on("error", (error) => {
+    createSocketServer(httpServer,jwtService)
+
+    httpServer.on("error", (error) => {
       logger.error({ err: error }, "Server failed to start");
-    });
+    })
+
+    httpServer.listen(PORT, () => {
+        logger.info({ port: PORT }, "HTTP and WebSocket server started");
+    })
+    
   } catch (error) {
     logger.error({ err: error }, "Failed to start application");
     process.exit(1);
   }
 };
 
-startServer();
+startServer();
+
+
+
+
+
+

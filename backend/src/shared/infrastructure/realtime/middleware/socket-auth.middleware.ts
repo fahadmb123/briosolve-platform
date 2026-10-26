@@ -1,14 +1,18 @@
 import type { Socket } from "socket.io";
-import * as cookie from "cookie";
-import { IJwtService } from "../../../application/Dto/services/jwtDto.service";
+import * as cookie from "cookie"
+import type { IJwtService } from "../../../application/Dto/services/jwtDto.service";
 import { SocketData } from "../types/socket-data.types";
-
 
 
 type SocketAuthCallback = (error?: Error) => void;
 
-export function createSocketAuthMiddleware(jwtService: IJwtService) {
-    return (socket: Socket<never, never, never, SocketData>,next: SocketAuthCallback,): void => {
+export function createSocketAuthMiddleware(
+    jwtService: IJwtService,
+) {
+    return (
+        socket: Socket<never, never, never, SocketData>,
+        next: SocketAuthCallback,
+    ): void => {
         try {
             const cookieHeader = socket.handshake.headers.cookie;
 
