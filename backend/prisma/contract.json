@@ -20,6 +20,10 @@
       "model": "customer_profiles",
       "namespace": "public"
     },
+    "notifications": {
+      "model": "notifications",
+      "namespace": "public"
+    },
     "provider_availability": {
       "model": "provider_availability",
       "namespace": "public"
@@ -825,6 +829,133 @@
               },
               "namespaceId": "public",
               "table": "customer_profiles"
+            }
+          },
+          "notifications": {
+            "fields": {
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "data": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "is_read": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "message": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 1000
+                  }
+                }
+              },
+              "read_at": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "recipient_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "title": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 150
+                  }
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              }
+            },
+            "relations": {
+              "recipient": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "recipient_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "users",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "created_at": {
+                  "column": "created_at"
+                },
+                "data": {
+                  "column": "data"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "is_read": {
+                  "column": "is_read"
+                },
+                "message": {
+                  "column": "message"
+                },
+                "read_at": {
+                  "column": "read_at"
+                },
+                "recipient_id": {
+                  "column": "recipient_id"
+                },
+                "title": {
+                  "column": "title"
+                },
+                "type": {
+                  "column": "type"
+                }
+              },
+              "namespaceId": "public",
+              "table": "notifications"
             }
           },
           "provider_availability": {
@@ -2069,6 +2200,21 @@
                   "namespace": "public"
                 }
               },
+              "notifications": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "recipient_id"
+                  ]
+                },
+                "to": {
+                  "model": "notifications",
+                  "namespace": "public"
+                }
+              },
               "provider_profile": {
                 "cardinality": "1:1",
                 "nullable": true,
@@ -2641,6 +2787,117 @@
                   ]
                 }
               ]
+            },
+            "notifications": {
+              "columns": {
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "data": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "is_read": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "message": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 1000
+                  }
+                },
+                "read_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "recipient_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "title": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 150
+                  }
+                },
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "recipient_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "notifications"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "recipient_id"
+                  ],
+                  "name": "notifications_recipient_id_idx_1e4ca6fd",
+                  "prefix": "notifications_recipient_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "recipient_id",
+                    "is_read",
+                    "created_at"
+                  ],
+                  "name": "notifications_recipient_id_is_read_created_at_idx_681b2a09",
+                  "prefix": "notifications_recipient_id_is_read_created_at_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
             },
             "provider_availability": {
               "checks": [
@@ -3729,10 +3986,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "28d81cd74560b55ce83c61c7f9120e2d0fc061ce6708d71ad2c82f42e4bf1bb9"
+    "storageHash": "7df988ae37058d5d102c6a0d84747fb50b1b46e192180f5085a9e85db3e397e9"
   },
   "execution": {
-    "executionHash": "562d774e1c1196ee81f93c0f6dcb0299fc9243709fe9fdd6e5715de11fdc9747",
+    "executionHash": "f042583b7e2cd6aaeb0df6d2ca7587b02c7f268b0c8ac020844b084677aedd34",
     "mutations": {
       "defaults": [
         {
@@ -3837,6 +4094,17 @@
             "column": "updated_at",
             "namespace": "public",
             "table": "customer_profiles"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "notifications"
           }
         },
         {

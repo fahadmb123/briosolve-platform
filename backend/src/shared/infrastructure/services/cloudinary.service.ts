@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import { v2 as cloudinary } from 'cloudinary';
 import { ImageUploadService } from '../../application/interfaces/services/IImageUpload.service';
 import { ApplicationError } from "../../application/errors/applicationError";

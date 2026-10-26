@@ -1,3 +1,5 @@
+import { Buffer } from "node:buffer";
+
 export interface ImageUploadService {
     uploadImage(fileBuffer: Buffer, folder?: string): Promise<string>;
     deleteImage(publicId: string): Promise<void>;
