@@ -10,6 +10,7 @@ const transport = pino.transport({
             options: {
                 file: path.join(process.cwd(), "logs", "app"),
                 frequency: "daily",
+                dateFormat: "yyyy-MM-dd",
                 mkdir: true,
                 extension: ".log"
             },
