@@ -1,8 +1,9 @@
 import { NotificationController } from "../../presentation/controller/notification.controller";
-import { createNotificationUsecase, getNotificationsUseCase, updateNotificationUseCase } from "./useCases";
+import { createNotificationUsecase, getNotificationsUseCase, markAllAsReadUseCase, updateNotificationUseCase } from "./useCases";
 
 export const notificationController = new NotificationController(
     createNotificationUsecase,
     getNotificationsUseCase,
-    updateNotificationUseCase
+    updateNotificationUseCase,
+    markAllAsReadUseCase
 )

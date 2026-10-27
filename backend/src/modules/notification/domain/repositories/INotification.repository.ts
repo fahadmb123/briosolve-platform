@@ -21,11 +21,8 @@ export interface UpdateNotificationData {
 }
 
 export interface INotificationRepository extends BaseRepository<Notification | null> {
-  
   create(data: CreateNotificationData): Promise<Notification>;
-
   findByRecipientId(id: string): Promise<Notification[]>;
-
-  update(id: string,data:UpdateNotificationData): Promise<Notification | null>
-
+  update(id: string,data:UpdateNotificationData): Promise<Notification | null>;
+  markAllAsRead(recipientId: string): Promise<Notification[] | null>;
 }

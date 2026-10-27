@@ -1,5 +1,6 @@
 import { CreateNotificationUseCase } from "../../application/use-cases/createNotification.usecase";
 import { GetNotificationsUseCase } from "../../application/use-cases/getNotifications.useCase";
+import { MarkAllAsReadUseCase } from "../../application/use-cases/markAllAsRead.useCase";
 import { UpdateNotificationUseCase } from "../../application/use-cases/updateNotification.useCase";
 import { notificastionRepository, userRepository } from "./repositories";
 
@@ -12,6 +13,10 @@ export const getNotificationsUseCase = new GetNotificationsUseCase(
     userRepository
 )
 export const updateNotificationUseCase = new UpdateNotificationUseCase(
+    notificastionRepository,
+    userRepository
+)
+export const markAllAsReadUseCase = new MarkAllAsReadUseCase(
     notificastionRepository,
     userRepository
 )

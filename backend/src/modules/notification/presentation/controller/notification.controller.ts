@@ -7,11 +7,13 @@ import { GetNotificationRequestDto } from "../../application/dtos/request/get-no
 import { UpdateNotificationRequestDto } from "../../application/dtos/request/update-notificsation.dto";
 
 
+
 export class NotificationController extends BaseController{
     constructor(
         private readonly _createNotificationUseCase: IUseCase<CreateNotificationRequestDto,NotificationResponseDto>,
         private readonly _getNotificationsUseCase: IUseCase<GetNotificationRequestDto,NotificationResponseDto[]>,
-        private readonly _updateNotificationUseCase: IUseCase<UpdateNotificationRequestDto,void>,
+        private readonly _updateNotificationUseCase: IUseCase<UpdateNotificationRequestDto,NotificationResponseDto>,
+        private readonly _markAllAsRead:IUseCase<string,NotificationResponseDto[]>,
     ) {super()}
 
     async create(req: Request,res: Response,next: NextFunction,): Promise<void> {
@@ -53,6 +55,19 @@ export class NotificationController extends BaseController{
                 id:id as string,
                 input:req.body
             })
+
+            this.sendSuccess(
+                res,
+                "Updated!"
+            )
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async markAllAsRead(req: Request,res: Response,next: NextFunction,): Promise<void> {
+        try {
+            await this._markAllAsRead.execute(req.user?.userId as string)
 
             this.sendSuccess(
                 res,

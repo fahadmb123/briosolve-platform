@@ -8,6 +8,7 @@ const router = Router()
 
 router.get("/",authMiddleware,notificationController.getNotifications)
 router.post("/",authMiddleware,validate(createNotificationSchema),notificationController.create)
+router.patch("/",authMiddleware,validate(updateNotificationSchema),notificationController.markAllAsRead)
 router.patch("/:id",authMiddleware,validate(updateNotificationSchema),notificationController.update)
 
 export default router

@@ -50,4 +50,19 @@ export class PrismaNotificationRepository implements INotificationRepository {
 
         return NotificationMapper.toDomain(record)
     }
+
+    async markAllAsRead(recipientId: string): Promise<Notification[] | null> {
+        const record = await db.orm.public.notifications
+            .where({recipient_id:recipientId})
+            .updateAll({
+                is_read:true,
+                read_at:new Date()
+            })
+        
+        if (!record) return null
+
+        return record.map((rec)=>{
+            return NotificationMapper.toDomain(rec)
+        })
+    }
 }

@@ -3,15 +3,17 @@ import { ApplicationError } from "../../../../shared/application/errors/applicat
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../auth/public";
 import { UpdateNotificationRequestDto } from "../dtos/request/update-notificsation.dto";
+import { NotificationMapper } from "../../infrastructure/mappers/notification.mapper";
+import { NotificationResponseDto } from "../dtos/response/notification-response.dto";
 
 
-export class UpdateNotificationUseCase implements IUseCase<UpdateNotificationRequestDto,void>{
+export class UpdateNotificationUseCase implements IUseCase<UpdateNotificationRequestDto,NotificationResponseDto>{
     constructor(
         private readonly _notificationRepository: INotificationRepository,
         private readonly _userRepository: IUserRepository,
     ) {}
 
-    async execute(data:UpdateNotificationRequestDto): Promise<void> {
+    async execute(data:UpdateNotificationRequestDto): Promise<NotificationResponseDto> {
         const user = await this._userRepository.findById(data.recipientId)
 
         if (!user){
@@ -32,9 +34,19 @@ export class UpdateNotificationUseCase implements IUseCase<UpdateNotificationReq
             )
         }
 
-        await this._notificationRepository.update(
+        const resposne = await this._notificationRepository.update(
             data.id,
             data.input
         )
+
+        if (!resposne) {
+            throw new ApplicationError(
+                "FAILED_TO_UPDATE",
+                "Failed To Update",
+                "INTERNAL"
+            )
+        }
+
+        return NotificationMapper.toDto(resposne)
     }
 }
