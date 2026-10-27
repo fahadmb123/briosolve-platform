@@ -8,6 +8,7 @@ import providerRoute from "../modules/user-management/presentation/routes/provid
 import providerServiceRoute from "../modules/service-catalog/presentation/routes/providerService.routes"
 import verificationRoutes from "../modules/kyc-verification/presentation/routes/verification.routes"
 import reactivationRoutes from "../modules/user-management/presentation/routes/reactivation.routes"
+import notificationRoutes from "../modules/notification/presentation/routes/notification.routes"
 
 const router = Router();
 
@@ -21,5 +22,6 @@ router.use("/verification",verificationRoutes)
 router.use("/service",serviceRouter)
 router.use("/category",categoryRouter)
 router.use("/reactivation",reactivationRoutes)
+router.use("/notification",notificationRoutes)
 
 export default router;
