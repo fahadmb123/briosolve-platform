@@ -65,4 +65,15 @@ export class PrismaNotificationRepository implements INotificationRepository {
             return NotificationMapper.toDomain(rec)
         })
     }
+
+    async getUnreadCount(recipientId: string): Promise<number> {
+        const count = await db.orm.public.notifications
+            .where({
+                recipient_id:recipientId,
+                is_read:false
+            })
+            .count()
+
+        return Number(count)
+    }
 }

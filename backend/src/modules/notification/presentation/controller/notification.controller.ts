@@ -14,6 +14,7 @@ export class NotificationController extends BaseController{
         private readonly _getNotificationsUseCase: IUseCase<GetNotificationRequestDto,NotificationResponseDto[]>,
         private readonly _updateNotificationUseCase: IUseCase<UpdateNotificationRequestDto,NotificationResponseDto>,
         private readonly _markAllAsRead:IUseCase<string,NotificationResponseDto[]>,
+         private readonly _getUnreadCountUseCase : IUseCase<string,number>
     ) {super()}
 
     async create(req: Request,res: Response,next: NextFunction,): Promise<void> {
@@ -72,6 +73,19 @@ export class NotificationController extends BaseController{
             this.sendSuccess(
                 res,
                 "Updated!"
+            )
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async getUnreadCount(req: Request,res: Response,next: NextFunction,): Promise<void> {
+        try {
+            await this._getUnreadCountUseCase.execute(req.user?.userId as string)
+
+            this.sendSuccess(
+                res,
+                "Counted!"
             )
         } catch (error) {
             next(error)

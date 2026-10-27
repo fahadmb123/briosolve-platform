@@ -25,4 +25,5 @@ export interface INotificationRepository extends BaseRepository<Notification | n
   findByRecipientId(id: string): Promise<Notification[]>;
   update(id: string,data:UpdateNotificationData): Promise<Notification | null>;
   markAllAsRead(recipientId: string): Promise<Notification[] | null>;
+  getUnreadCount(recipientId: string): Promise<number>
 }
