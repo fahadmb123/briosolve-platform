@@ -1,20 +1,30 @@
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
 import { Notification } from "../../domain/entities/notification.entity";
-import {CreateNotificationData,INotificationRepository} from "../../domain/repositories/INotification.repository";
 import { NotificationMapper } from "../mappers/notification.mapper";
+import {CreateNotificationData
+    ,INotificationRepository
+    , UpdateNotificationData
+} from "../../domain/repositories/INotification.repository";
+
+
 
 export class PrismaNotificationRepository implements INotificationRepository {
 
-    async findById(id:string): Promise<Notification> {
+    async findById(id:string): Promise<Notification | null> {
         const record = await db.orm.public.notifications
-            .where({id:id}).first()
+            .where({id:id})
+            .first()
+
+        if (!record) return null
 
         return NotificationMapper.toDomain(record!)
     }
 
     async create(data: CreateNotificationData): Promise<Notification> {
         const record = await db.orm.public.notifications
-            .create(NotificationMapper.toPersistence(data))
+            .create(
+                NotificationMapper.toPersistence(data)
+            )
 
         return NotificationMapper.toDomain(record)
     }
@@ -27,5 +37,17 @@ export class PrismaNotificationRepository implements INotificationRepository {
         return record.map((rec)=>{
             return NotificationMapper.toDomain(rec)
         })
+    }
+
+    async update(id: string,data:UpdateNotificationData): Promise<Notification | null> {
+        const record = await db.orm.public.notifications
+            .where({id:id})
+            .update(
+                NotificationMapper.toPersistenceUpdate(data)
+            )
+        
+        if (!record) return null
+
+        return NotificationMapper.toDomain(record)
     }
 }
