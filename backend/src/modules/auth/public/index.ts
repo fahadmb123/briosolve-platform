@@ -1,0 +1,1 @@
+export { IUserRepository } from "../domain/repositories/user.repository";
