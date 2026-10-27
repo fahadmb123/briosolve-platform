@@ -3,15 +3,16 @@ import { CreateNotificationRequestDto } from "../dtos/request/create-notificasti
 import { NotificationResponseDto } from "../dtos/response/notification-response.dto";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { NotificationMapper } from "../../infrastructure/mappers/notification.mapper";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 
 
-export class CreateNotificationUseCase {
+export class CreateNotificationUseCase implements IUseCase<CreateNotificationRequestDto,NotificationResponseDto>{
     constructor(
-        private readonly notificationRepository: INotificationRepository,
+        private readonly _notificationRepository: INotificationRepository,
     ) {}
 
     async execute(data: CreateNotificationRequestDto): Promise<NotificationResponseDto> {
-        const notification = await this.notificationRepository.create(data)
+        const notification = await this._notificationRepository.create(data)
 
         if (!notification) {
             throw new ApplicationError(
