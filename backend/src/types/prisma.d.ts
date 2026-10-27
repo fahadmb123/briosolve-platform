@@ -31,5 +31,9 @@ declare module "@prisma/client" {
         export type user_account_blocksGetPayload<T = {}> = UserAccountBlockGetPayload<T>;
         export type AccountReactivationRequestGetPayload<T = {}> = DefaultModelRow<"account_reactivation_requests"> & Partial<Models.public_account_reactivation_requests>;
         export type account_reactivation_requestsGetPayload<T = {}> = AccountReactivationRequestGetPayload<T>;
+        export type NotificationGetPayload<T = {}> = DefaultModelRow<"notifications"> & Partial<Models.public_notifications>;
+        export type notificationsGetPayload<T = {}> = NotificationGetPayload<T>;
+        export type NotificationCreateInput = import("@prisma/orm-postgres/orm-client").CreateInput<Contract, "notifications", "public">;
+        export type notificationsCreateInput = NotificationCreateInput;
     }
 }
