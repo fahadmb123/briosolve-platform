@@ -2,7 +2,7 @@ import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
 import { Category } from "../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
-import { CategoryMapper } from "../mappers/category.mapper.";
+import { CategoryMapper, CategoryRecord } from "../mappers/category.mapper.";
 import { GetCategoriesDto } from "../../application/dtos/category/response/get-categories.dto";
 import { AddCategoryUseCaseInputDto } from "../../application/dtos/category/request/add-category.dto";
 import { UpdateCategoryUseCaseDto } from "../../application/dtos/category/request/update-category.dto";
@@ -17,7 +17,7 @@ export class CategoryRepository implements ICategoryRepository{
             .where({ id })
             .first()
         if (!category) return null
-        return CategoryMapper.toDomain(category as Category)
+        return CategoryMapper.toDomain(category as CategoryRecord)
     }
 
     async findByName(name:string):Promise<Category | null> {
@@ -26,7 +26,7 @@ export class CategoryRepository implements ICategoryRepository{
             .where({ name: name.toLowerCase() as Varchar<100> })
             .first()
         if (!category) return null
-        return CategoryMapper.toDomain(category as Category)
+        return CategoryMapper.toDomain(category as CategoryRecord)
     }
 
     async get(input: GetCategoriesDto):Promise<{categories:Category[], total: number}> {
@@ -52,7 +52,7 @@ export class CategoryRepository implements ICategoryRepository{
         const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
 
         return {
-            categories: categories.map(category => CategoryMapper.toDomain(category as Category)),
+            categories: categories.map(category => CategoryMapper.toDomain(category as CategoryRecord)),
             total: totalResult.total
         }
     }
@@ -61,7 +61,7 @@ export class CategoryRepository implements ICategoryRepository{
         const category = await db.orm.public.categories
             .create(CategoryMapper.toPersistence(input) as never)
         if (!category) return null
-        return CategoryMapper.toDomain(category as Category)
+        return CategoryMapper.toDomain(category as CategoryRecord)
     }
 
     async update(data:UpdateCategoryUseCaseDto):Promise<Category | null> {

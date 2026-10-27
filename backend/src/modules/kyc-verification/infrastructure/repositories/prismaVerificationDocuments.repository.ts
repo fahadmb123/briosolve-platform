@@ -117,7 +117,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
                 .include("files")
                 .first();
 
-            return VerificationDocumentMapper.toDomain(record)
+            return VerificationDocumentMapper.toDomain(record!);
         });
     }
 

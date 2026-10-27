@@ -6,7 +6,7 @@ export class Category {
         public readonly name: string,
         public readonly description: string | null,
         public readonly status: "ACTIVE" | "INACTIVE",
-        public readonly image: string,
+        public readonly image: string | null,
         public readonly created_at: Date,
         public readonly updated_at: Date,
         public readonly services?: Service[]
