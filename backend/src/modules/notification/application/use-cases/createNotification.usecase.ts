@@ -11,10 +11,16 @@ export class CreateNotificationUseCase {
     ) {}
 
     async execute(data: CreateNotificationRequestDto): Promise<NotificationResponseDto> {
-        const response = await this.notificationRepository.create(data)
+        const notification = await this.notificationRepository.create(data)
 
-        if (!response) throw new ApplicationError("CREATION_FAILED","Creation Failed","INTERNAL")
+        if (!notification) {
+            throw new ApplicationError(
+                "CREATION_FAILED",
+                "Creation Failed",
+                "INTERNAL",
+            );
+        }
 
-        return NotificationMapper.toDto(response)
+        return NotificationMapper.toDto(notification)
     }
 }
