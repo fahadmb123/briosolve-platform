@@ -4,11 +4,13 @@ import { NotificationResponseDto } from "../dtos/response/notification-response.
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { NotificationMapper } from "../../infrastructure/mappers/notification.mapper";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { INotificationDelivery } from "../interfaces/INotificationDelivery";
 
 
 export class CreateNotificationUseCase implements IUseCase<CreateNotificationRequestDto,NotificationResponseDto>{
     constructor(
         private readonly _notificationRepository: INotificationRepository,
+        private readonly _notificationDelivery: INotificationDelivery,
     ) {}
 
     async execute(data: CreateNotificationRequestDto): Promise<NotificationResponseDto> {
@@ -22,6 +24,10 @@ export class CreateNotificationUseCase implements IUseCase<CreateNotificationReq
             );
         }
 
-        return NotificationMapper.toDto(notification)
+        const response = NotificationMapper.toDto(notification)
+
+        this._notificationDelivery.deliver(response)
+
+        return response
     }
 }
