@@ -13,7 +13,13 @@ export function createSocketServer(httpServer: HttpServer,jwtService: IJwtServic
         },
     });
 
-    io.use(createSocketAuthMiddleware(jwtService));
+    io.use(createSocketAuthMiddleware(jwtService))
+
+    io.on("connection", (socket) => {
+        const { userId } = socket.data.user;
+
+        socket.join(`user:${userId}`);
+    })
 
     return io
 }
