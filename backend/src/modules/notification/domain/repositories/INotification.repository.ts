@@ -1,3 +1,4 @@
+import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
 import { Notification } from "../entities/notification.entity";
 
 export interface CreateNotificationData {
@@ -6,12 +7,11 @@ export interface CreateNotificationData {
   type: string;
   title: string;
   message: string;
-  data?: Record<string, unknown> | null;
   isRead?: boolean;
   readAt?: Date | null;
   createdAt?: Date;
 }
 
-export interface INotificationRepository {
+export interface INotificationRepository extends BaseRepository<Notification> {
   create(data: CreateNotificationData): Promise<Notification>;
 }
