@@ -4,6 +4,11 @@ import { logger } from "../../../infrastructure/logger/logger";
 
 export const requestLogger = pinoHttp({
     logger,
+    autoLogging: {
+        ignore: (req) => {
+            return req.url ? req.url.startsWith("/uploads") : false;
+        }
+    },
     genReqId: (req, res) => {
         const existingId = req.headers["x-request-id"];
         if (existingId && typeof existingId === "string") {

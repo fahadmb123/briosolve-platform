@@ -3,7 +3,9 @@ import { SecureOtpGeneratorService } from "../../../../shared/infrastructure/sec
 import { NodemailerEmailSender } from "../../../../shared/infrastructure/email/nodemailer/nodemailerEmail-sender";
 import { RedisPendingRegistrationStore } from "../../../../shared/infrastructure/cache/redis/redisPendingRegistration.store";
 import { JwtService } from "../../../../shared/infrastructure/security/jwt.service";
-import { TextBeeSmsService } from "../../../../infrastructure/services/textbee/TextBeeSmsService";
+import { TextBeeSmsService } from "../../../../shared/infrastructure/services/textBeeSmsService";
+
+
 
 export const pendingRegistrationStore = new RedisPendingRegistrationStore();
 export const emailSender = new NodemailerEmailSender();

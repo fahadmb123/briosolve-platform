@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import { VerificationDocumentType } from "../../../../domain/entities/verificationDocument.entity";
 
 

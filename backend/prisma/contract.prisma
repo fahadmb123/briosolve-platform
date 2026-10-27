@@ -51,6 +51,8 @@ model users {
 
   reactivation_requests          account_reactivation_requests[] @relation("UserReactivationRequests")
   reviewed_reactivation_requests account_reactivation_requests[] @relation("ReviewedReactivationRequests")
+
+  notifications                  notifications[]
 }
 
 enum weekday {
@@ -285,4 +287,20 @@ model account_reactivation_requests {
   user        users                       @relation("UserReactivationRequests", fields:[user_id], references:[id])
   block       user_account_blocks         @relation(fields:[block_id], references:[id])
   reviewer    users?                      @relation("ReviewedReactivationRequests", fields:[reviewed_by], references:[id])
+}
+
+model notifications {
+  id           Uuid          @id @default(uuid())
+  recipient_id Uuid
+  type         VarChar(100)
+  title        VarChar(150)
+  message      VarChar(1000)
+  data         Json?
+  is_read      Boolean       @default(false)
+  read_at      DateTime?
+  created_at   DateTime      @default(now())
+
+  recipient    users         @relation(fields:[recipient_id], references:[id], onDelete: Cascade)
+
+  @@index([recipient_id, is_read, created_at])
 }

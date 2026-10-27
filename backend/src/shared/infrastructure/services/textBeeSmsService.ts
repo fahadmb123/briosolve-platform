@@ -1,6 +1,6 @@
 import { Textbee } from "@textbee/sdk";
-import { ISmsService } from "../../../shared/application/interfaces/services/ISms.service";
-import { ApplicationError } from "../../../shared/application/errors/applicationError";
+import { ISmsService } from "../../application/interfaces/services/ISms.service";
+import { ApplicationError } from "../../application/errors/applicationError";
 
 
 export class TextBeeSmsService implements ISmsService {

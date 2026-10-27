@@ -58,3 +58,9 @@ logs
 
 # Build output
 dist/
+
+# AI Agent Skills (Prisma skills sync)
+.agents/
+.claude/
+.cursor/
+.devin/

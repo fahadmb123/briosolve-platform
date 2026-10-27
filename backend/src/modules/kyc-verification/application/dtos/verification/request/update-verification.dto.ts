@@ -1,3 +1,5 @@
+import { Buffer } from "node:buffer";
+
 export interface UpdateVerificationInputDto {
     id: string;
     userId: string;
