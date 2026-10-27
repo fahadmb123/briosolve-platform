@@ -6,14 +6,26 @@ import { NotificationMapper } from "../mappers/notification.mapper";
 export class PrismaNotificationRepository implements INotificationRepository {
 
     async findById(id:string): Promise<Notification> {
-        const record = await db.orm.public.notifications.where({id:id}).first()
+        const record = await db.orm.public.notifications
+            .where({id:id}).first()
 
         return NotificationMapper.toDomain(record!)
     }
 
     async create(data: CreateNotificationData): Promise<Notification> {
-        const record = await db.orm.public.notifications.create(NotificationMapper.toPersistence(data))
+        const record = await db.orm.public.notifications
+            .create(NotificationMapper.toPersistence(data))
 
         return NotificationMapper.toDomain(record)
+    }
+
+    async findByRecipientId(id: string): Promise<Notification[]> {
+        const record = await db.orm.public.notifications
+            .where({recipient_id:id})
+            .all()
+
+        return record.map((rec)=>{
+            return NotificationMapper.toDomain(rec)
+        })
     }
 }

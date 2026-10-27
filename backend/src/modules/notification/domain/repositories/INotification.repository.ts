@@ -13,5 +13,9 @@ export interface CreateNotificationData {
 }
 
 export interface INotificationRepository extends BaseRepository<Notification> {
+  
   create(data: CreateNotificationData): Promise<Notification>;
+
+  findByRecipientId(id: string): Promise<Notification[]>;
+
 }

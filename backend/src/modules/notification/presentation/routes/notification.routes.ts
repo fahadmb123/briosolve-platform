@@ -6,6 +6,7 @@ import validate from "../../../../shared/presentation/http/middlewares/validate-
 
 const router = Router()
 
+router.get("/",authMiddleware,notificationController.getNotifications)
 router.post("/",authMiddleware,validate(createNotificationSchema),notificationController.create)
 
 export default router
