@@ -2,7 +2,9 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import './NearbyProviders.css';
 import { useGetNearbyProviders } from '../../hooks/mutations/useNearbyProviders';
+import Skeleton from 'react-loading-skeleton';
 import { ProviderCard } from '../../components/ProviderCard';
+import { ProviderCardSkeletonGrid } from '../../components/ProviderCardSkeleton';
 import { ProviderDetailsModal } from '../../components/ProviderDetailsModal';
 import { AdminPagination } from '../../../admin/components/AdminPagination';
 import { useAuthStore } from '../../../auth/stores/auth.store';
@@ -91,7 +93,7 @@ export default function NearbyProviders() {
 
     return (
         <div className="app-content nearby-providers-container">
-            
+
 
             <div className="nearby-header-section">
                 <div>
@@ -185,17 +187,16 @@ export default function NearbyProviders() {
 
                     <div className="flex justify-between items-center mb-4">
                         <span className="text-xs text-secondary font-medium">
-                            Showing {displayedProviders.length} of {total} mutual-coverage providers
+                            {getProvidersMut.isPending ? (
+                                <Skeleton width={180} height={14} />
+                            ) : (
+                                `Showing ${displayedProviders.length} of ${total} mutual-coverage providers`
+                            )}
                         </span>
                     </div>
 
                     {getProvidersMut.isPending ? (
-                        <div className="empty-providers-state">
-                            <h3 className="h5 mb-2">Searching for providerss .....</h3>
-                            <p className="text-secondary text-sm max-w-md mx-auto mb-4">
-                                while we searching..Please waite we are searching the providers whos nearest with ({activeRadiusKm} km) . Try expanding your search radius.
-                            </p>
-                        </div>
+                        <ProviderCardSkeletonGrid count={4} />
                     ) : displayedProviders.length > 0 ? (
                         <>
                             <div className="providers-grid">

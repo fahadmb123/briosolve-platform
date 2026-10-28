@@ -422,3 +422,36 @@
     border: 1px dashed var(--border);
 }
 
+/* ==========================================================================
+   react-loading-skeleton Theme Integration & Styles
+   ========================================================================== */
+.react-loading-skeleton {
+    --base-color: var(--surface-elevated, #1e293b);
+    --highlight-color: var(--surface-hover, #334155);
+}
+
+[data-theme="light"] .react-loading-skeleton {
+    --base-color: #e2e8f0;
+    --highlight-color: #f1f5f9;
+}
+
+.provider-card-skeleton {
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.9;
+}
+
+.provider-avatar-skeleton {
+    border: 4px solid var(--surface) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    display: block !important;
+}
+
+.skeleton-stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 1;
+}
+
