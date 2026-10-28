@@ -1,5 +1,6 @@
-export { default as CustomerNotifications } from './pages/CustomerNotifications/Notifications';
-export { default as ProviderNotifications } from './pages/ProviderNotifications/Notifications';
-export { default as AdminNotifications } from './pages/AdminNotifications/Notifications';
+export { default as NotificationsCenter } from './components/NotificationsCenter';
+export { default as CustomerNotifications } from './components/NotificationsCenter';
+export { default as ProviderNotifications } from './components/NotificationsCenter';
+export { default as AdminNotifications } from './components/NotificationsCenter';
 export { NotificationDropdown } from './components/NotificationDropdown';
-
+export * from './types/notification.types';
