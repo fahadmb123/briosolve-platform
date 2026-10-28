@@ -3,7 +3,8 @@ import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
 import { useAuthStore } from '../features/auth/stores/auth.store';
 import { useLogout } from '../features/auth/hooks/use-otp-varify';
-import { NotificationDropdown } from '../features/notifications';
+import NotificationDropdown from '../features/notifications/components/NotificationDropdown';
+
 
 export default function CustomerLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
