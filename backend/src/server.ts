@@ -40,16 +40,16 @@ const startServer = async (): Promise<void> => {
         const notificationRoutes = createNotificationRouter(notificationController)
 
         const rootRouter = createRootRouter({
-            notificationRoutes,
             authRoutes,
-            verificationRoutes,
-            categoryRoutes,
-            serviceRoutes,
-            providerServiceRoutes,
             userRoutes,
             customerRoutes,
+            providerServiceRoutes,
+            verificationRoutes,
             providerRoutes,
-            reactivationRoutes
+            serviceRoutes,
+            categoryRoutes,
+            reactivationRoutes,
+            notificationRoutes
         })
 
         app.use("/api", rootRouter);
