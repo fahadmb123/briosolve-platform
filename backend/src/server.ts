@@ -11,6 +11,7 @@ import { createNotificationRouter } from "./modules/notification/presentation/ro
 import { createNotificationController } from "./modules/notification/infrastructure/composition/constrollers";
 import { errorHandler } from "./shared/presentation/http/middlewares/error-handler";
 import { authRoutes } from "./modules/auth/infrastructure/composition";
+import { verificationRoutes } from "./modules/kyc-verification/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -29,7 +30,8 @@ const startServer = async (): Promise<void> => {
 
         const rootRouter = createRootRouter({
             notificationRoutes,
-            authRoutes
+            authRoutes,
+            verificationRoutes
         })
 
         app.use("/api", rootRouter);

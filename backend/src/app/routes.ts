@@ -5,7 +5,6 @@ import categoryRouter from "../modules/service-catalog/presentation/routes/categ
 import serviceRouter from "../modules/service-catalog/presentation/routes/service.routes";
 import providerRoute from "../modules/user-management/presentation/routes/provider.routes";
 import providerServiceRoute from "../modules/service-catalog/presentation/routes/providerService.routes";
-import verificationRoutes from "../modules/kyc-verification/presentation/routes/verification.routes";
 import reactivationRoutes from "../modules/user-management/presentation/routes/reactivation.routes";
 import { RootRouterDependencies } from "./types/root-router-dependencies";
 
@@ -17,9 +16,9 @@ export function createRootRouter(root:RootRouterDependencies) {
     router.use("/user", userRoutes);
     router.use("/customer", customerRoute);
     router.use("/provider/service", providerServiceRoute);
-    router.use("/provider/verification", verificationRoutes);
+    router.use("/provider/verification", root.verificationRoutes);
     router.use("/provider", providerRoute);
-    router.use("/verification", verificationRoutes);
+    router.use("/verification", root.verificationRoutes);
     router.use("/service", serviceRouter);
     router.use("/category", categoryRouter);
     router.use("/reactivation", reactivationRoutes);

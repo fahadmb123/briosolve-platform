@@ -7,8 +7,8 @@ export interface RootRouterDependencies {
     categoryRoutes: ExpressRouter;
     serviceRoutes: ExpressRouter;
     providerRoutes: ExpressRouter;
-    providerServiceRoutes: ExpressRouter;
+    providerServiceRoutes: ExpressRouter;*/
     verificationRoutes: ExpressRouter;
-    reactivationRoutes: ExpressRouter;*/
+    /*reactivationRoutes: ExpressRouter;*/
     notificationRoutes: ExpressRouter;
 }
