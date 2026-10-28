@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AddAddressModal, type AddressPayload, useAddAddress, useDeleteAddress, useEditAddress, useGetAddresses, useSetDefaultAddress } from '../../../../../addresses';
+import { AddAddressModal, AddressCardSkeletonGrid, type AddressPayload, useAddAddress, useDeleteAddress, useEditAddress, useGetAddresses, useSetDefaultAddress } from '../../../../../addresses';
+import Skeleton from 'react-loading-skeleton';
 import { toast } from 'react-hot-toast';
 import { useAuthStore } from '../../../../../auth/stores/auth.store';
 import { SpinnerOverlay } from '../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
@@ -125,8 +126,12 @@ export const Addresses = () => {
             <p className="font-body-md text-body-md text-on-surface-variant mt-0.5 mb-0 text-left">Manage your shipping and billing locations for timely deliveries and dispatches.</p>
           </div>
           <div className="flex items-center shrink-0 ml-4">
-            <span className="px-3 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm border border-surface-variant whitespace-nowrap">
-              {addresses.length} Saved Location{total !== 1 && 's'}
+            <span className="px-3 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm border border-surface-variant whitespace-nowrap min-w-[120px] text-center">
+              {getAddresses.isPending ? (
+                <Skeleton width={90} height={14} inline />
+              ) : (
+                `${addresses.length} Saved Location${total !== 1 ? 's' : ''}`
+              )}
             </span>
           </div>
         </div>
@@ -162,9 +167,7 @@ export const Addresses = () => {
         <div className="flex flex-col gap-4">
           
           {getAddresses.isPending ? (
-            <div className="flex flex-col items-center justify-center py-12 text-on-surface-variant gap-3 border-2 border-dashed border-surface-variant rounded-xl">
-              <p className="font-body-md m-0">Searching for address...</p>
-            </div>
+            <AddressCardSkeletonGrid count={3} />
           ) : (
             <>
               {addresses.map((address) => {

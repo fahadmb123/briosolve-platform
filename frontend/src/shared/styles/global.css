@@ -1325,6 +1325,19 @@ input::-ms-clear {
 }
 
 /* ==========================================================================
+   react-loading-skeleton Global Theme Integration
+   ========================================================================== */
+.react-loading-skeleton {
+    --base-color: var(--surface-elevated, #1e293b);
+    --highlight-color: var(--surface-hover, #334155);
+}
+
+[data-theme="light"] .react-loading-skeleton {
+    --base-color: #e2e8f0;
+    --highlight-color: #f1f5f9;
+}
+
+/* ==========================================================================
    React Toastify Premium Styles
    ========================================================================== */
 .custom-premium-toast {
