@@ -1316,12 +1316,14 @@ input::-ms-clear {
     }
 }
 
-/* Hide navbar cleanly when opening the sidebar drawer/modal (Customer / Home) */
-.app-container.sidebar-modal-layout.sidebar-open .app-header {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transform: translateY(-100%) !important;
+/* Hide navbar cleanly on mobile when opening the sidebar drawer/modal (Customer / Home) */
+@media (max-width: 991px) {
+    .app-container.sidebar-modal-layout.sidebar-open .app-header {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transform: translateY(-100%) !important;
+    }
 }
 
 /* ==========================================================================
@@ -1460,9 +1462,9 @@ input::-ms-clear {
    Desktop Mini-Sidebar Behavior for ALL Portals
    ========================================================================== */
 @media (min-width: 993px) {
-    /* Hide the navbar toggle button completely on desktop */
+    /* Navbar toggle button is visible so users can toggle sidebar anytime */
     .app-header #sidebar-toggle {
-        display: none !important;
+        display: inline-flex !important;
     }
 
     /* Hide the dark modal overlay on desktop ONLY when closed */
@@ -1470,18 +1472,19 @@ input::-ms-clear {
         display: none !important;
     }
 
-    /* OPEN STATE: Modal Overlay */
+    /* OPEN STATE: Full Desktop Sidebar */
     .app-container.sidebar-modal-layout.sidebar-open .app-sidebar {
-        transform: translateX(0);
-        width: 260px;
+        transform: translateX(0) !important;
+        width: 260px !important;
         z-index: 50;
+        box-shadow: none;
     }
     
-    /* Main content always stays at 80px margin on desktop */
+    /* Main content shifts smoothly to fit 260px sidebar on desktop */
     .app-container.sidebar-modal-layout.sidebar-open .app-main {
-        margin-left: 80px !important;
-        width: calc(100% - 80px) !important;
-        max-width: calc(100vw - 80px) !important;
+        margin-left: 260px !important;
+        width: calc(100% - 260px) !important;
+        max-width: calc(100vw - 260px) !important;
     }
 
     /* CLOSED STATE: Mini Sidebar */
@@ -1549,4 +1552,5 @@ input::-ms-clear {
         display: flex;
         margin: 0 auto;
     }
+
 }
