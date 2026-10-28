@@ -1,12 +1,14 @@
 import { Router } from "express";
 import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
 import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
-import { reactivationController } from "../../infrastructure/composition/index";
+import { ReactivationRouteDependencies } from "../types/reactivation.route.dependencies";
 
-const router = Router();
+export function buildReactivationRoute(controller: ReactivationRouteDependencies): Router {
+    const router = Router();
 
-router.get("/", authMiddleware, requireRole(["ADMIN"]), reactivationController.getReactivations)
-router.post("/send-otp", reactivationController.sendOtp)
-router.post("/request", reactivationController.requestReactivation)
+    router.get("/", authMiddleware, requireRole(["ADMIN"]), controller.reactivation.getReactivations);
+    router.post("/send-otp", controller.reactivation.sendOtp);
+    router.post("/request", controller.reactivation.requestReactivation);
 
-export default router;
+    return router;
+}

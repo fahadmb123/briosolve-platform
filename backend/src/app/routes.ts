@@ -1,25 +1,20 @@
-import { Router} from "express";
-import userRoutes from "../modules/user-management/presentation/routes/user.routes";
-import customerRoute from "../modules/user-management/presentation/routes/customer.routes";
-import providerRoute from "../modules/user-management/presentation/routes/provider.routes";
-import reactivationRoutes from "../modules/user-management/presentation/routes/reactivation.routes";
+import { Router } from "express";
 import { RootRouterDependencies } from "./types/root-router-dependencies";
 
-export function createRootRouter(root:RootRouterDependencies) {
-    
-    const router = Router()
+export function createRootRouter(route: RootRouterDependencies) {
+    const router = Router();
 
-    router.use("/auth", root.authRoutes);
-    router.use("/user", userRoutes);
-    router.use("/customer", customerRoute);
-    router.use("/provider/service", root.providerServiceRoutes);
-    router.use("/provider/verification", root.verificationRoutes);
-    router.use("/provider", providerRoute);
-    router.use("/verification", root.verificationRoutes);
-    router.use("/service", root.serviceRoutes);
-    router.use("/category", root.categoryRoutes);
-    router.use("/reactivation", reactivationRoutes);
-    router.use("/notification", root.notificationRoutes);
+    router.use("/auth", route.authRoutes);
+    router.use("/user", route.userRoutes);
+    router.use("/customer", route.customerRoutes);
+    router.use("/provider/service", route.providerServiceRoutes);
+    router.use("/provider/verification", route.verificationRoutes);
+    router.use("/provider", route.providerRoutes);
+    router.use("/verification", route.verificationRoutes);
+    router.use("/service", route.serviceRoutes);
+    router.use("/category", route.categoryRoutes);
+    router.use("/reactivation", route.reactivationRoutes);
+    router.use("/notification", route.notificationRoutes);
 
     return router;
 }

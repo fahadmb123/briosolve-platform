@@ -16,7 +16,13 @@ import {
     categoryRoutes,
     serviceRoutes,
     providerServiceRoutes
- } from "./modules/service-catalog/infrastructure/composition"
+} from "./modules/service-catalog/infrastructure/composition";
+import {
+    userRoutes,
+    customerRoutes,
+    providerRoutes,
+    reactivationRoutes
+} from "./modules/user-management/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -39,7 +45,11 @@ const startServer = async (): Promise<void> => {
             verificationRoutes,
             categoryRoutes,
             serviceRoutes,
-            providerServiceRoutes
+            providerServiceRoutes,
+            userRoutes,
+            customerRoutes,
+            providerRoutes,
+            reactivationRoutes
         })
 
         app.use("/api", rootRouter);
