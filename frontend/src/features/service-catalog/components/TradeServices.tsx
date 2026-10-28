@@ -8,6 +8,8 @@ import {
     useDeleteProviderCategory
 } from '../hooks/useTradeService';
 import type { PopulatedProviderService } from '../../settings';
+import { TradeServicesSkeleton } from './TradeServicesSkeleton';
+import Skeleton from 'react-loading-skeleton';
 
 interface CatalogService {
     id: string;
@@ -269,11 +271,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                 </div>
 
                 {getProviderServices.isPending ? (
-                    <div className="text-center py-14 my-4 border border-dashed rounded-xl" style={{ borderColor: 'var(--border)' }}>
-                        <i className="fas fa-spinner fa-spin text-2xl text-primary mb-2.5 block"></i>
-                        <p className="font-semibold text-text text-sm mb-1">Loading Trade &amp; Services</p>
-                        <p className="text-xs text-secondary mb-0">Fetching your assigned trade categories and services...</p>
-                    </div>
+                    <TradeServicesSkeleton count={2} />
                 ) : groupedCategories.length === 0 ? (
                     <div className="text-center py-12 border border-dashed rounded-xl my-4" style={{ borderColor: 'var(--border)' }}>
                         <i className="fas fa-tools text-2xl text-secondary mb-2 opacity-50 block"></i>
@@ -420,9 +418,20 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
 
                         <div className="overflow-y-auto flex-1 pr-1 flex flex-col gap-4 mb-3" style={{ maxHeight: '55vh' }}>
                             {getCategories.isPending ? (
-                                <div className="text-center py-8 text-secondary text-sm">
-                                    <i className="fas fa-spinner fa-spin mr-2 text-primary text-xl mb-2"></i>
-                                    <p>Loading services...</p>
+                                <div className="flex flex-col gap-3 py-2">
+                                    {Array.from({ length: 3 }).map((_, i) => (
+                                        <div key={`modal-skel-${i}`} className="border rounded-xl p-3.5 flex flex-col gap-2.5" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface)' }}>
+                                            <div className="flex justify-between items-center">
+                                                <Skeleton width={140} height={18} borderRadius={4} />
+                                                <Skeleton width={75} height={16} borderRadius={4} />
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 pt-1">
+                                                <Skeleton width={105} height={26} borderRadius={8} />
+                                                <Skeleton width={125} height={26} borderRadius={8} />
+                                                <Skeleton width={95} height={26} borderRadius={8} />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             ) : availableCategoriesForAdd.length === 0 ? (
                                 <div className="text-center py-8 text-xs text-secondary">

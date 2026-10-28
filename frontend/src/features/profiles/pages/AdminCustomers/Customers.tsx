@@ -6,6 +6,7 @@ import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { BlockReasonModal } from "../../../admin/components/BlockReasonModal";
 import CustomerRow from "../../components/admin/CustomerRow";
+import Skeleton from "react-loading-skeleton";
 
 
 
@@ -172,13 +173,26 @@ export default function Customers() {
                         </thead>
                         <tbody>
                             {getCustomers.isPending ? (
-                                <tr>
-                                    <td colSpan={6} className="text-center py-10 text-secondary">
-                                        <div className="flex flex-col items-center justify-center gap-3">
-                                            <span className="font-medium">Searching for results...</span>
-                                        </div>
-                                    </td>
-                                </tr>
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <tr key={`customer-skel-${i}`} className="border-b border-border">
+                                        <td>
+                                            <div className="flex items-center gap-2">
+                                                <Skeleton circle width={36} height={36} />
+                                                <Skeleton width={110} height={15} />
+                                            </div>
+                                        </td>
+                                        <td><Skeleton width="85%" height={15} /></td>
+                                        <td><Skeleton width="70%" height={15} /></td>
+                                        <td><Skeleton width={80} height={15} /></td>
+                                        <td><Skeleton width={65} height={22} borderRadius={12} /></td>
+                                        <td className="text-right">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Skeleton width={45} height={26} borderRadius={6} />
+                                                <Skeleton width={65} height={26} borderRadius={6} />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
                             ) : customers.length > 0 ? (
                                 customers.map((customer) => (
                                     <CustomerRow

@@ -1,4 +1,5 @@
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 
 export interface TableColumn<T> {
   key: string;
@@ -15,6 +16,7 @@ interface AdminTableProps<T> {
   loadingMessage?: string;
   keyExtractor: (item: T) => string;
   rowStyle?: (item: T) => React.CSSProperties;
+  skeletonRowCount?: number;
 }
 
 function AdminTableComponent<T>({ 
@@ -22,9 +24,9 @@ function AdminTableComponent<T>({
   data, 
   isLoading, 
   emptyMessage = "No records found.", 
-  loadingMessage = "Loading results...",
   keyExtractor,
-  rowStyle 
+  rowStyle,
+  skeletonRowCount = 5
 }: AdminTableProps<T>) {
   return (
     <div className="admin-table-card relative">
@@ -57,13 +59,19 @@ function AdminTableComponent<T>({
                 </td>
               </tr>
             ) : (
-              <tr>
-                <td colSpan={columns.length} className="text-center py-10 text-secondary">
-                  <div className="flex flex-col items-center justify-center gap-3">
-                    <span className="font-medium">{loadingMessage}</span>
-                  </div>
-                </td>
-              </tr>
+              Array.from({ length: skeletonRowCount }).map((_, rowIndex) => (
+                <tr key={`skeleton-row-${rowIndex}`} className="border-b border-border">
+                  {columns.map((col, colIndex) => (
+                    <td key={`skeleton-cell-${rowIndex}-${col.key || colIndex}`} className="p-4 align-middle">
+                      <Skeleton
+                        height={18}
+                        width={colIndex === 0 ? '75%' : colIndex === columns.length - 1 ? '45%' : '85%'}
+                        borderRadius={6}
+                      />
+                    </td>
+                  ))}
+                </tr>
+              ))
             )}
           </tbody>
         </table>

@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import type {VerificationDocument,VerificationDocumentType,KycSubmissionPayload,KycEditSubmissionPayload,} from '../../types/kyc.types';
 import { KycStatusBanner } from '../../components/KycStatusBanner';
 import { KycDocumentCard } from '../../components/KycDocumentCard';
+import { DocumentCardSkeleton } from '../../components/DocumentCardSkeleton';
 import { KycRequestModal } from '../../components/KycRequestModal';
 import { KycEditModal } from '../../components/KycEditModal';
 import { KycDetailsModal } from '../../components/KycDetailsModal';
@@ -218,8 +219,8 @@ export default function Verification() {
         <KycStatusBanner documents={documents} />
 
         {getVerificationsMut.isPending && documents.length === 0 ? (
-          <div className="flex justify-center items-center py-12">
-            <i className="fas fa-spinner fa-spin text-3xl text-primary"></i>
+          <div className="kyc-categories-grid">
+            <DocumentCardSkeleton count={2} />
           </div>
         ) : (
           <div className="kyc-categories-grid">

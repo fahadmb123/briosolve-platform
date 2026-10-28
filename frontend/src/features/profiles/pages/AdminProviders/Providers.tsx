@@ -7,6 +7,7 @@ import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { BlockReasonModal } from "../../../admin/components/BlockReasonModal";
 import ProviderRow from "../../components/admin/ProviderRow";
+import Skeleton from "react-loading-skeleton";
 
 export default function Providers() {
     const [providers, setProviders] = useState<User[]>([]);
@@ -179,14 +180,27 @@ export default function Providers() {
                             </thead>
                             <tbody>
                                 {getProviders.isPending ? (
-                                    <tr>
-                                        <td colSpan={7} className="text-center py-10 text-secondary">
-                                            <div className="flex flex-col items-center justify-center gap-3">
-                                                <i className="fas fa-spinner fa-spin text-xl text-primary"></i>
-                                                <span className="font-medium">Searching for results...</span>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <tr key={`provider-skel-${i}`} className="border-b border-border">
+                                            <td>
+                                                <div className="flex items-center gap-2">
+                                                    <Skeleton circle width={36} height={36} />
+                                                    <div className="flex-1">
+                                                        <Skeleton width={110} height={15} />
+                                                        <Skeleton width={80} height={12} style={{ marginTop: 4 }} />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><Skeleton width="85%" height={15} /></td>
+                                            <td><Skeleton width="70%" height={15} /></td>
+                                            <td><Skeleton width={50} height={15} /></td>
+                                            <td><Skeleton width={80} height={22} borderRadius={12} /></td>
+                                            <td><Skeleton width={65} height={22} borderRadius={12} /></td>
+                                            <td className="text-right">
+                                                <Skeleton width={50} height={28} borderRadius={6} />
+                                            </td>
+                                        </tr>
+                                    ))
                                 ) : providers.length > 0 ? (
                                     providers.map((provider) => (
                                         <ProviderRow
