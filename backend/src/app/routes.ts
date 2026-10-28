@@ -1,5 +1,4 @@
 import { Router, type Router as ExpressRouter } from "express";
-import authRoutes from "../modules/auth/presentation/routes/auth.routes";
 import userRoutes from "../modules/user-management/presentation/routes/user.routes";
 import customerRoute from "../modules/user-management/presentation/routes/customer.routes";
 import categoryRouter from "../modules/service-catalog/presentation/routes/category.routes";
@@ -8,11 +7,13 @@ import providerRoute from "../modules/user-management/presentation/routes/provid
 import providerServiceRoute from "../modules/service-catalog/presentation/routes/providerService.routes";
 import verificationRoutes from "../modules/kyc-verification/presentation/routes/verification.routes";
 import reactivationRoutes from "../modules/user-management/presentation/routes/reactivation.routes";
+import { RootRouterDependencies } from "./types/root-router-dependencies";
 
-export function createRootRouter(notificationRoutes: ExpressRouter) {
-    const router = Router();
+export function createRootRouter(root:RootRouterDependencies) {
+    
+    const router = Router()
 
-    router.use("/auth", authRoutes);
+    router.use("/auth", root.authRoutes);
     router.use("/user", userRoutes);
     router.use("/customer", customerRoute);
     router.use("/provider/service", providerServiceRoute);
@@ -22,7 +23,7 @@ export function createRootRouter(notificationRoutes: ExpressRouter) {
     router.use("/service", serviceRouter);
     router.use("/category", categoryRouter);
     router.use("/reactivation", reactivationRoutes);
-    router.use("/notification", notificationRoutes);
+    router.use("/notification", root.notificationRoutes);
 
     return router;
 }

@@ -10,6 +10,7 @@ import { createRootRouter } from "./app/routes";
 import { createNotificationRouter } from "./modules/notification/presentation/routes/notification.routes";
 import { createNotificationController } from "./modules/notification/infrastructure/composition/constrollers";
 import { errorHandler } from "./shared/presentation/http/middlewares/error-handler";
+import { authRoutes } from "./modules/auth/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -23,9 +24,13 @@ const startServer = async (): Promise<void> => {
 
         const io = createSocketServer(httpServer, jwtService);
 
-        const notificationController = createNotificationController(io);
-        const notificationRoutes = createNotificationRouter(notificationController);
-        const rootRouter = createRootRouter(notificationRoutes);
+        const notificationController = createNotificationController(io)
+        const notificationRoutes = createNotificationRouter(notificationController)
+
+        const rootRouter = createRootRouter({
+            notificationRoutes,
+            authRoutes
+        })
 
         app.use("/api", rootRouter);
         app.use(errorHandler);
