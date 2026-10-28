@@ -521,6 +521,13 @@ body.theme-admin .app-header.admin-app-header {
         max-width: calc(100vw - 260px) !important;
     }
 
+    body.theme-admin .app-container.sidebar-modal-layout.sidebar-open .app-header.admin-app-header {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        transform: none !important;
+    }
+
     /* CLOSED STATE: Mini Sidebar */
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .app-sidebar {
         transform: translateX(0) !important;
