@@ -312,146 +312,149 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       {/* Notification Dropdown Modal */}
       {isOpen && (
         <div className="notif-dropdown-modal show" role="dialog" aria-label="Notifications dropdown">
-        {/* Header */}
-        <div className="notif-dropdown-header">
-          <div className="flex items-center gap-2">
-            <h3 className="notif-header-title">
-              <i className="fas fa-bell text-primary text-sm"></i>
-              Notifications
-            </h3>
-            {unreadCount > 0 ? (
-              <span className="notif-unread-pill">{unreadCount} New</span>
-            ) : (
-              <span className="text-xs text-secondary flex items-center gap-1 font-medium">
-                <i className="fas fa-check text-success text-xs"></i> All caught up
-              </span>
+          {/* Header */}
+          <div className="notif-dropdown-header">
+            <div className="flex items-center gap-2.5">
+              <h3 className="notif-header-title">Notifications</h3>
+              {unreadCount > 0 ? (
+                <span className="notif-unread-pill">{unreadCount} new</span>
+              ) : (
+                <span className="notif-caught-up-pill">
+                  <i className="fas fa-check"></i> Caught up
+                </span>
+              )}
+            </div>
+
+            {unreadCount > 0 && (
+              <button
+                type="button"
+                className="btn-mark-all-read"
+                onClick={handleMarkAllRead}
+                title="Mark all notifications as read"
+              >
+                <i className="fas fa-check-double text-xs"></i>
+                <span>Mark all read</span>
+              </button>
             )}
           </div>
 
-          {unreadCount > 0 && (
-            <button
-              type="button"
-              className="btn-mark-all-read"
-              onClick={handleMarkAllRead}
-              title="Mark all notifications as read"
-            >
-              <i className="fas fa-check-double"></i>
-              Mark all read
-            </button>
-          )}
-        </div>
-
-        {/* Filter Tabs */}
-        <div className="notif-dropdown-tabs">
-          <button
-            type="button"
-            className={`notif-tab-btn ${activeTab === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveTab('all')}
-          >
-            All <span className="text-xs opacity-70">({notifications.length})</span>
-          </button>
-          <button
-            type="button"
-            className={`notif-tab-btn ${activeTab === 'unread' ? 'active' : ''}`}
-            onClick={() => setActiveTab('unread')}
-          >
-            Unread{' '}
-            {unreadCount > 0 && (
-              <span className="notif-unread-pill" style={{ padding: '0.1rem 0.4rem' }}>
-                {unreadCount}
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Body Items List */}
-        <div className="notif-dropdown-body">
-          {displayedNotifications.length === 0 ? (
-            <div className="notif-empty-state">
-              <div className="notif-empty-icon">
-                <i className="fas fa-bell-slash"></i>
-              </div>
-              <p className="font-semibold text-text text-sm mb-1">
-                {activeTab === 'unread' ? 'No unread notifications' : 'No notifications yet'}
-              </p>
-              <p className="text-xs text-secondary mb-0">
-                {activeTab === 'unread'
-                  ? 'Great job! You have read all your latest updates.'
-                  : 'New activity, quotes, and messages will appear here.'}
-              </p>
-            </div>
-          ) : (
-            displayedNotifications.map((item) => (
-              <div
-                key={item.id}
-                className={`notif-dropdown-item ${item.unread ? 'unread' : ''}`}
-                onClick={() => handleItemClick(item)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleItemClick(item);
-                  }
-                }}
+          {/* Segmented Control Filter Tabs */}
+          <div className="notif-tabs-container">
+            <div className="notif-segmented-control">
+              <button
+                type="button"
+                className={`notif-segment-btn ${activeTab === 'all' ? 'active' : ''}`}
+                onClick={() => setActiveTab('all')}
               >
-                {/* Category Icon */}
-                <div
-                  className="notif-item-icon-box"
-                  style={{ backgroundColor: item.iconBg }}
-                >
-                  <i
-                    className={`fas ${item.icon}`}
-                    style={{ color: item.iconColor }}
-                  ></i>
-                </div>
+                <span>Today</span>
+                <span className="notif-segment-count">{notifications.length}</span>
+              </button>
+              <button
+                type="button"
+                className={`notif-segment-btn ${activeTab === 'unread' ? 'active' : ''}`}
+                onClick={() => setActiveTab('unread')}
+              >
+                <span>Unread</span>
+                {unreadCount > 0 && (
+                  <span className="notif-segment-count unread-badge">{unreadCount}</span>
+                )}
+              </button>
+            </div>
+          </div>
 
-                {/* Content */}
-                <div className="notif-item-content">
-                  <div className="notif-item-title">
-                    <span>{item.title}</span>
-                    {item.unread && <span className="unread-dot" title="Unread"></span>}
+          {/* Body Items List */}
+          <div className="notif-dropdown-body">
+            {displayedNotifications.length === 0 ? (
+              <div className="notif-empty-state">
+                <div className="notif-empty-icon">
+                  <i className="fas fa-bell-slash"></i>
+                </div>
+                <p className="font-semibold text-text text-sm mb-1">
+                  {activeTab === 'unread' ? 'No unread notifications' : 'No notifications yet'}
+                </p>
+                <p className="text-xs text-secondary mb-0">
+                  {activeTab === 'unread'
+                    ? 'Great job! You have read all your latest updates.'
+                    : 'New activity, quotes, and messages will appear here.'}
+                </p>
+              </div>
+            ) : (
+              displayedNotifications.map((item) => (
+                <div
+                  key={item.id}
+                  className={`notif-dropdown-item ${item.unread ? 'unread' : 'read'}`}
+                  onClick={() => handleItemClick(item)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleItemClick(item);
+                    }
+                  }}
+                >
+                  {/* Category Icon */}
+                  <div
+                    className="notif-item-icon-box"
+                    style={{ backgroundColor: item.iconBg }}
+                  >
+                    <i
+                      className={`fas ${item.icon}`}
+                      style={{ color: item.iconColor }}
+                    ></i>
                   </div>
-                  <p className="notif-item-text">{item.message}</p>
-                  <div className="notif-item-footer">
-                    <span className="notif-item-time">
-                      <i className="far fa-clock mr-1 text-xs"></i>
-                      {item.time}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        className="btn-read-toggle"
-                        onClick={(e) => handleToggleRead(item.id, e)}
-                        title={item.unread ? 'Mark as read' : 'Mark as unread'}
-                      >
-                        <i
-                          className={`fas ${item.unread ? 'fa-check' : 'fa-envelope'}`}
-                        ></i>
-                        {item.unread ? 'Read' : 'Unread'}
-                      </button>
-                      <span className="text-xs text-primary font-semibold flex items-center gap-1">
-                        View <i className="fas fa-arrow-right text-[10px]"></i>
+
+                  {/* Content */}
+                  <div className="notif-item-content">
+                    <div className="notif-item-header-row">
+                      <span className="notif-item-title">{item.title}</span>
+                      {item.unread && <span className="notif-pulse-dot" title="Unread"></span>}
+                    </div>
+                    <p className="notif-item-text">{item.message}</p>
+                    <div className="notif-item-footer">
+                      <span className="notif-item-time">
+                        <i className="far fa-clock text-[10px]"></i>
+                        <span>{item.time}</span>
                       </span>
+                      <div className="notif-item-actions" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          className="btn-read-toggle"
+                          onClick={(e) => handleToggleRead(item.id, e)}
+                          title={item.unread ? 'Mark as read' : 'Mark as unread'}
+                        >
+                          <i
+                            className={`fas ${item.unread ? 'fa-check' : 'fa-envelope-open'}`}
+                          ></i>
+                          <span>{item.unread ? 'Mark read' : 'Unread'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="notif-quick-view-link"
+                          onClick={() => handleItemClick(item)}
+                        >
+                          <span>View</span>
+                          <i className="fas fa-arrow-right text-[10px]"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
+              ))
+            )}
+          </div>
 
-        {/* Footer */}
-        <div className="notif-dropdown-footer">
-          <Link
-            to={targetViewAll}
-            className="notif-view-all-link"
-            onClick={() => setIsOpen(false)}
-          >
-            <span>View all notifications</span>
-            <i className="fas fa-arrow-right text-xs"></i>
-          </Link>
+          {/* Footer */}
+          <div className="notif-dropdown-footer">
+            <Link
+              to={targetViewAll}
+              className="notif-view-all-link"
+              onClick={() => setIsOpen(false)}
+            >
+              <span>View all activity alerts</span>
+              <i className="fas fa-arrow-right text-xs notif-arrow-icon"></i>
+            </Link>
+          </div>
         </div>
-      </div>
       )}
     </div>
   );
