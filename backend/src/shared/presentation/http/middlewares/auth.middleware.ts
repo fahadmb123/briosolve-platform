@@ -1,29 +1,58 @@
 import { Request, Response, NextFunction } from "express";
 import { JwtService } from "../../../infrastructure/security/jwt.service";
+import { checkAccountStatus } from "../utils/check-account-status";
+import { HttpStatus, AuthErrorCode, AuthErrorMessage, AuthCookieNames } from "../constants/auth.constants";
+import { clearAccessTokenCookieOptions, clearRefreshTokenCookieOptions } from "../cookies/cookieConfig";
 
 const jwtService = new JwtService();
 
-export const authMiddleware = (req: Request,res: Response,next: NextFunction) => {
+export const authMiddleware = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void | Response> => {
     try {
-        const token = req.cookies.access_token;
+        const token = req.cookies?.[AuthCookieNames.ACCESS_TOKEN];
 
         if (!token) {
-            return res.status(401).json({
+            return res.status(HttpStatus.UNAUTHORIZED).json({
                 success: false,
-                message: "Authentication required"
+                code: AuthErrorCode.AUTHENTICATION_REQUIRED,
+                message: AuthErrorMessage.AUTHENTICATION_REQUIRED,
             });
         }
 
-        const payload = jwtService.verify(token);
+        let payload;
+        try {
+            payload = jwtService.verify(token);
+        } catch {
+            return res.status(HttpStatus.UNAUTHORIZED).json({
+                success: false,
+                code: AuthErrorCode.INVALID_TOKEN,
+                message: AuthErrorMessage.INVALID_OR_EXPIRED_TOKEN,
+            });
+        }
 
-        req.user = {userId: payload.userId, role: payload.role}
+        const statusCheck = await checkAccountStatus(payload.userId);
 
-        next()
+        if (!statusCheck.isAllowed || !statusCheck.user) {
+            res.clearCookie(AuthCookieNames.ACCESS_TOKEN, clearAccessTokenCookieOptions);
+            res.clearCookie(AuthCookieNames.REFRESH_TOKEN, clearRefreshTokenCookieOptions);
 
+            return res.status(statusCheck.statusCode ?? HttpStatus.FORBIDDEN).json({
+                success: false,
+                code: statusCheck.code,
+                message: statusCheck.message,
+            });
+        }
+
+        req.user = {
+            userId: statusCheck.user.id,
+            role: statusCheck.user.role,
+        };
+
+        return next();
     } catch (error) {
-        return res.status(401).json({
-            success: false,
-            message: "Invalid or expired token"
-        });
+        return next(error);
     }
 };

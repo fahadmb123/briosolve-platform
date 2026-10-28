@@ -23,7 +23,7 @@ export function buildAuthRoute(controller:AuthRouteDependencies):Router{
     router.post("/resend-otp", controller.otpVarification.resend);
 
     router.patch("/email", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), validate(emailSchema), controller.auth.emailVerify);
-    router.patch("/password", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), validate(updatePasswordSchema), authMiddleware, controller.security.updatePassword)
+    router.patch("/password", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), validate(updatePasswordSchema), controller.security.updatePassword)
     router.patch("/phone", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), validate(phoneSchema), controller.security.updatePhone);
 
     router.delete("/phone", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), controller.security.deletePhone)

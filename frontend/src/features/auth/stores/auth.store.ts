@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { getMe } from "../services/auth.service";
 import type { Address } from "../../addresses";
 import type { CustomerProfile, ProviderProfile } from "../../profiles";
+import { UserStatus } from "../../../shared/constants/auth.constants";
 
 export type UserRole =
     | "CUSTOMER"
@@ -14,7 +15,7 @@ export interface IAuthUser {
     email: string;
     role: UserRole;
     current_address_id: Address | null;
-    status: 'ACTIVE' | 'BLOCKED' | 'PENDING';
+    status: UserStatus;
     phone?: string | null;
     email_verified: boolean;
     phone_verified: boolean;

@@ -1,6 +1,7 @@
 import axios, { isAxiosError, type InternalAxiosRequestConfig } from "axios";
 import { normalizeApiError } from "./ApiError";
 import { useAuthStore } from "../../features/auth/stores/auth.store";
+import { HttpStatus, AuthErrorCode } from "../constants/auth.constants";
 
 interface RetriableRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
@@ -53,7 +54,22 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
     (response) => response,
     async (error: unknown) => {
-        if (!isAxiosError(error) || !error.config || error.response?.status !== 401) {
+        if (isAxiosError(error)) {
+            const status = error.response?.status;
+            const data = error.response?.data as { code?: string; message?: string } | undefined;
+
+            if (status === HttpStatus.FORBIDDEN && (data?.code === AuthErrorCode.BLOCKED_ACCOUNT || data?.code === AuthErrorCode.INACTIVE_ACCOUNT)) {
+                useAuthStore.getState().clearAuth();
+
+                if (window.location.pathname !== "/login") {
+                    window.location.replace("/login");
+                }
+
+                return Promise.reject(normalizeApiError(error));
+            }
+        }
+
+        if (!isAxiosError(error) || !error.config || error.response?.status !== HttpStatus.UNAUTHORIZED) {
             return Promise.reject(normalizeApiError(error));
         }
 
