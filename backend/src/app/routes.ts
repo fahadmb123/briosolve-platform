@@ -1,10 +1,7 @@
-import { Router, type Router as ExpressRouter } from "express";
+import { Router} from "express";
 import userRoutes from "../modules/user-management/presentation/routes/user.routes";
 import customerRoute from "../modules/user-management/presentation/routes/customer.routes";
-import categoryRouter from "../modules/service-catalog/presentation/routes/category.routes";
-import serviceRouter from "../modules/service-catalog/presentation/routes/service.routes";
 import providerRoute from "../modules/user-management/presentation/routes/provider.routes";
-import providerServiceRoute from "../modules/service-catalog/presentation/routes/providerService.routes";
 import reactivationRoutes from "../modules/user-management/presentation/routes/reactivation.routes";
 import { RootRouterDependencies } from "./types/root-router-dependencies";
 
@@ -15,12 +12,12 @@ export function createRootRouter(root:RootRouterDependencies) {
     router.use("/auth", root.authRoutes);
     router.use("/user", userRoutes);
     router.use("/customer", customerRoute);
-    router.use("/provider/service", providerServiceRoute);
+    router.use("/provider/service", root.providerServiceRoutes);
     router.use("/provider/verification", root.verificationRoutes);
     router.use("/provider", providerRoute);
     router.use("/verification", root.verificationRoutes);
-    router.use("/service", serviceRouter);
-    router.use("/category", categoryRouter);
+    router.use("/service", root.serviceRoutes);
+    router.use("/category", root.categoryRoutes);
     router.use("/reactivation", reactivationRoutes);
     router.use("/notification", root.notificationRoutes);
 

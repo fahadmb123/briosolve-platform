@@ -4,13 +4,15 @@ import { requireRole } from "../../../../shared/presentation/http/middlewares/ro
 import { upload } from "../../../../shared/infrastructure/utils/multer";
 import validate from "../../../../shared/presentation/http/middlewares/validate-request";
 import { createCategorySchema } from "../schemas/create-category.schema";
-import { categoryController } from "../../infrastructure/composition/controller";
+import { CategoryRouteDependencies } from "../types/category.route.dependencies";
 
-const router = Router()
+export function buildCategoryRoute(controller:CategoryRouteDependencies):Router{
+    const router = Router()
 
-router.get("/",categoryController.getCategories)
-router.post("/",authMiddleware,requireRole(["ADMIN"]),upload.single("image"),validate(createCategorySchema),categoryController.addCategory)
-router.patch("/:id",authMiddleware,requireRole(["ADMIN"]),upload.single("image"),validate(createCategorySchema),categoryController.updateCategory)
-router.delete("/:id",authMiddleware,requireRole(["ADMIN"]),categoryController.deleteCategory)
+    router.get("/",controller.category.getCategories)
+    router.post("/",authMiddleware,requireRole(["ADMIN"]),upload.single("image"),validate(createCategorySchema),controller.category.addCategory)
+    router.patch("/:id",authMiddleware,requireRole(["ADMIN"]),upload.single("image"),validate(createCategorySchema),controller.category.updateCategory)
+    router.delete("/:id",authMiddleware,requireRole(["ADMIN"]),controller.category.deleteCategory)
 
-export default router;
+    return router
+}

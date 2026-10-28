@@ -1,13 +1,15 @@
 import { Router } from "express";
 import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
 import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
-import { providerServiceController } from "../../infrastructure/composition/controller";
+import { ProviderServiceDependencies } from "../types/providerService.route.dependencies";
 
-const route = Router();
+export function buildProviderServiceRoute(controller:ProviderServiceDependencies):Router{
+    const router = Router()
 
-route.get("/", authMiddleware, requireRole(["PROVIDER"]), providerServiceController.getProviderServices);
-route.post("/", authMiddleware, requireRole(["PROVIDER"]), providerServiceController.addProviderServices);
-route.delete("/category/:id", authMiddleware, requireRole(["PROVIDER"]), providerServiceController.deleteProviderCategory);
-route.delete("/:id", authMiddleware, requireRole(["PROVIDER"]), providerServiceController.deleteProviderService);
+    router.get("/", authMiddleware, requireRole(["PROVIDER"]), controller.providerService.getProviderServices);
+    router.post("/", authMiddleware, requireRole(["PROVIDER"]), controller.providerService.addProviderServices);
+    router.delete("/:id", authMiddleware, requireRole(["PROVIDER"]), controller.providerService.deleteProviderService);
+    router.delete("/category/:id", authMiddleware, requireRole(["PROVIDER"]), controller.providerService.deleteProviderCategory);
 
-export default route;
+    return router
+}
