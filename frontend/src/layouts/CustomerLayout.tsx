@@ -3,6 +3,7 @@ import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
 import { useAuthStore } from '../features/auth/stores/auth.store';
 import { useLogout } from '../features/auth/hooks/use-otp-varify';
+import { NotificationDropdown } from '../features/notifications';
 
 export default function CustomerLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
@@ -166,12 +167,7 @@ export default function CustomerLayout() {
                     <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
                         <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
-                    <div className="notif-dropdown-wrapper">
-                        <button id="notif-toggle" className="btn-icon notif-bell-btn" aria-label="Notifications" title="Notifications">
-                            <i className="fas fa-bell"></i>
-                            <span className="notif-badge-count" id="notif-badge">3</span>
-                        </button>
-                    </div>
+                    <NotificationDropdown role="CUSTOMER" viewAllLink="/notifications" />
                     <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
                         <span>{isAuthenticated ? "Logout" : "Login"}</span>
                     </button>

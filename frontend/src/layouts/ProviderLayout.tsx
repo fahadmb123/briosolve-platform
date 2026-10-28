@@ -4,6 +4,7 @@ import { useTheme } from '../shared/hooks/useTheme';
 import { useAuthStore } from '../features/auth/stores/auth.store';
 import { useLogout } from '../features/auth/hooks/use-otp-varify';
 import type { ProviderProfile } from '../shared/types/Dtos';
+import { NotificationDropdown } from '../features/notifications';
 import '../shared/styles/pro-badge.css';
 
 export default function ProviderLayout() {
@@ -144,12 +145,7 @@ export default function ProviderLayout() {
                     <button id="theme-toggle" className="btn-icon" aria-label="Toggle Theme" onClick={toggleTheme}>
                         <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
-                    <div className="notif-dropdown-wrapper">
-                        <button id="notif-toggle" className="btn-icon notif-bell-btn" aria-label="Notifications" title="Notifications">
-                            <i className="fas fa-bell"></i>
-                            <span className="notif-badge-count" id="notif-badge">3</span>
-                        </button>
-                    </div>
+                    <NotificationDropdown role="PROVIDER" viewAllLink="/provider/notifications" />
                     <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
                        
                         <span>{isAuthenticated ? "Logout" : "Login"}</span>
