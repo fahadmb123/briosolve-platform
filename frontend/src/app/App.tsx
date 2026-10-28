@@ -9,11 +9,14 @@ import { ThemeProvider } from './providers/ThemeProvider';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../features/auth/stores/auth.store';
 import { LoadingScreen } from '../shared/components/ui/LoadingScreen/LoadingScreen';
+import { useNotificationSocket } from '../features/notifications/hooks/useNotificationSocket';
 
 function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
   const [isInitializing, setIsInitializing] = useState(true);
 
+  useNotificationSocket()
+  
   useEffect(() => {
     fetchUser().finally(() => {
       setIsInitializing(false);

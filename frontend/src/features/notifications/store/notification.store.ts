@@ -7,6 +7,10 @@ interface NotificationState {
     setNotifications: (notifications: NotificationResponseDto[]) => void;
     addNotification: (notification: NotificationResponseDto) => void;
     clearNotifications: () => void;
+    updateNotification: (
+        id: string,
+        changes: Partial<Pick<NotificationResponseDto, "is_read" | "read_at">>,
+    ) => void;
 }
 
 export const useNotificationStore = create<NotificationState>()((set) => ({
@@ -26,4 +30,13 @@ export const useNotificationStore = create<NotificationState>()((set) => ({
         }),
 
     clearNotifications: () => set({ notifications: [] }),
+
+    updateNotification: (id, changes) =>
+    set((state) => ({
+        notifications: state.notifications.map((notification) =>
+            notification.id === id
+                ? { ...notification, ...changes }
+                : notification,
+        ),
+    })),
 }));
