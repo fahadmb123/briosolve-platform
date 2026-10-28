@@ -3,10 +3,8 @@ import { CustomerController } from "../../presentation/controller/customer.contr
 import { UserController } from "../../presentation/controller/user.controller";
 import { ProviderController } from "../../presentation/controller/provider.controller";
 import { ReactivationController } from "../../presentation/controller/reactivation.controller";
-
 import {
     getCustomerUseCase,
-    updateUserStatusUseCase,
     registerCustomerUseCase,
     getProfileUseCase,
     updateCustomerProfileUseCase,
@@ -31,15 +29,30 @@ import {
     becomeProviderUseCase,
     sendBecomeCustomerOtpUseCase,
     becomeCustomerUseCase,
-    getNearbyProvidersUseCase
+    getNearbyProvidersUseCase,
+    createUpdateUserStatusUseCase
 } from "./useCases";
 import { imageUploadService } from "./services";
 import { jwtService } from "../../../auth/infrastructure/composition/services";
+import type { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import type { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
+import type { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 
-export const userController = new UserController(
-    updateUserStatusUseCase,
-    getProfileUseCase
-);
+export function createUserController(
+    createNotificationUseCase: IUseCase<
+        CreateNotificationRequestDto,
+        NotificationResponseDto
+    >,
+): UserController {
+    const updateUserStatusUseCase = createUpdateUserStatusUseCase(
+        createNotificationUseCase,
+    );
+
+    return new UserController(
+        updateUserStatusUseCase,
+        getProfileUseCase,
+    );
+}
 
 export const reactivationController = new ReactivationController(
     createAccountReactivationRequestUseCase,

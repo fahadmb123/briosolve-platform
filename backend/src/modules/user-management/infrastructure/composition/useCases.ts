@@ -62,12 +62,20 @@ export const getCustomerUseCase = new GetCustomersUseCase(
 export const getProvidersUseCase = new GetProvidersUseCase(
     userRepository
 )
-export const updateUserStatusUseCase = new UpdateUserStatusUseCase(
-    userRepository,
-    userAccountBlockRepository,
-    emailSender,
-    accountReactivationRequestRepository
-)
+
+
+export function createUpdateUserStatusUseCase(
+    createNotificationUseCase: IUseCase<CreateNotificationRequestDto,NotificationResponseDto>,
+): UpdateUserStatusUseCase {
+    return new UpdateUserStatusUseCase(
+        userRepository,
+        userAccountBlockRepository,
+        emailSender,
+        accountReactivationRequestRepository,
+        createNotificationUseCase,
+    );
+}
+
 export const createAccountReactivationRequestUseCase = new CreateAccountReactivationRequestUseCase(
     userRepository,
     userAccountBlockRepository,
@@ -169,6 +177,9 @@ export const becomeCustomerUseCase = new BecomeCustomerUseCase(
     verificationFileRepository
 );
 import { GetNearbyProvidersUseCase } from "../../application/use-cases/customers/getNearbyProviders.useCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
+import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 export const getNearbyProvidersUseCase = new GetNearbyProvidersUseCase(
     userRepository,
     customerRepository

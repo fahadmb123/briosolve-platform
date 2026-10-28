@@ -1,23 +1,21 @@
 import type { Server } from "socket.io";
 import { NotificationController } from "../../presentation/controller/notification.controller";
-import { CreateNotificationUseCase } from "../../application/use-cases/createNotification.usecase";
-import { SocketIoNotificationDeliveryAdapter } from "../adapters/socket-io-notification-delivery.adapter";
-import { notificastionRepository } from "./repositories";
 import {
+    createNotificationUseCase,
     getNotificationsUseCase,
     getUnreadCountUseCase,
     markAllAsReadUseCase,
     updateNotificationUseCase,
 } from "./useCases";
+import { CreateNotificationUseCase } from "../../application/use-cases/createNotification.usecase";
 
 
-export function createNotificationController(io: Server): NotificationController {
-    const notificationDelivery = new SocketIoNotificationDeliveryAdapter(io);
-
-    const createNotificationUsecase = new CreateNotificationUseCase(
-        notificastionRepository,
-        notificationDelivery,
-    );
+export function createNotificationController(
+    io: Server,
+    createNotificationUseCaseInstance?: CreateNotificationUseCase,
+): NotificationController {
+    const createNotificationUsecase =
+        createNotificationUseCaseInstance ?? createNotificationUseCase(io);
 
     return new NotificationController(
         createNotificationUsecase,

@@ -3,19 +3,31 @@ import { buildCustomerRoute } from "../../presentation/routes/customer.routes";
 import { buildProviderRoute } from "../../presentation/routes/provider.routes";
 import { buildReactivationRoute } from "../../presentation/routes/reactivation.routes";
 import {
-    userController,
     customerController,
     addressController,
     providerController,
-    reactivationController
+    reactivationController,
+    createUserController
 } from "./controllers";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
+import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 
-export const userRoutes = buildUserRoute({
-    user: userController,
-    customer: customerController,
-    provider: providerController,
-    address: addressController
-});
+export function createUserRoutes(
+    createNotificationUseCase: IUseCase<
+        CreateNotificationRequestDto,
+        NotificationResponseDto
+    >,
+) {
+    const userController = createUserController(createNotificationUseCase);
+
+    return buildUserRoute({
+        user: userController,
+        customer: customerController,
+        provider: providerController,
+        address: addressController
+    });
+}
 
 export const customerRoutes = buildCustomerRoute({
     customer: customerController

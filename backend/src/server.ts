@@ -18,11 +18,12 @@ import {
     providerServiceRoutes
 } from "./modules/service-catalog/infrastructure/composition";
 import {
-    userRoutes,
+    createUserRoutes,
     customerRoutes,
     providerRoutes,
     reactivationRoutes
 } from "./modules/user-management/infrastructure/composition";
+import { createNotificationUseCase } from "./modules/notification/infrastructure/composition/useCases";
 
 const PORT = process.env.PORT || 5000;
 
@@ -36,8 +37,10 @@ const startServer = async (): Promise<void> => {
 
         const io = createSocketServer(httpServer, jwtService);
 
-        const notificationController = createNotificationController(io)
+        const notificationUseCase = createNotificationUseCase(io)
+        const notificationController = createNotificationController(io, notificationUseCase)
         const notificationRoutes = createNotificationRouter(notificationController)
+        const userRoutes = createUserRoutes(notificationUseCase)
 
         const rootRouter = createRootRouter({
             authRoutes,
