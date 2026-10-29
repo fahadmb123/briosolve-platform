@@ -192,9 +192,9 @@
 }
 
 [data-theme="light"] .home-services-section {
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-  border-bottom: 1px solid #e9ecef;
+  background: #edf0f4;
+  border-top: 1px solid #dce0e6;
+  border-bottom: 1px solid #dce0e6;
 }
 
 .home-how-it-works-section {
@@ -208,9 +208,9 @@
 }
 
 [data-theme="light"] .home-benefits-section {
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-  border-bottom: 1px solid #e9ecef;
+  background: #edf0f4;
+  border-top: 1px solid #dce0e6;
+  border-bottom: 1px solid #dce0e6;
 }
 
 .home-cta-section {
@@ -540,8 +540,8 @@
 }
 
 [data-theme="light"] .home-footer {
-  background: #f1f3f5;
-  border-top: 1px solid #e2e8f0;
+  background: #e5e8ed;
+  border-top: 1px solid #d5dae2;
 }
 
 .home-footer-container {
