@@ -57,7 +57,38 @@ export const TopNav: React.FC = () => {
     setOpenDropdown((prev) => (prev === name ? null : name));
   }, []);
 
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMouseEnter = useCallback((name: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setOpenDropdown(name);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 150);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const closeAllMenus = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     setOpenDropdown(null);
     setMobileMenuOpen(false);
   }, []);
@@ -128,7 +159,11 @@ export const TopNav: React.FC = () => {
               </NavLink>
             )}
 
-            <div className="topnav-dropdown-wrapper">
+            <div
+              className="topnav-dropdown-wrapper"
+              onMouseEnter={() => handleMouseEnter("more")}
+              onMouseLeave={handleMouseLeave}
+            >
               <button
                 type="button"
                 className={`topnav-link topnav-dropdown-trigger ${

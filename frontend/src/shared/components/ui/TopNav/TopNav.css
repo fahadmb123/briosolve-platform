@@ -188,6 +188,15 @@
   animation: topnavDropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.topnav-dropdown-menu::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+
 [data-theme="light"] .topnav-dropdown-menu {
   background: #ffffff;
   color: #000000;
@@ -196,8 +205,9 @@
 }
 
 .topnav-dropdown-menu-right {
-  left: auto;
-  right: 0;
+  left: auto !important;
+  right: 0 !important;
+  transform: none !important;
   min-width: 260px;
 }
 

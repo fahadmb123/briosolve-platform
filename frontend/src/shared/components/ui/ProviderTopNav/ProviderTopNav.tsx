@@ -34,11 +34,42 @@ export const ProviderTopNav: React.FC = () => {
     navigate("/login");
   };
 
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMouseEnter = useCallback((panelName: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setActivePanel(panelName);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setActivePanel(null);
+    }, 150);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const togglePanel = useCallback((panelName: string) => {
     setActivePanel((prev) => (prev === panelName ? null : panelName));
   }, []);
 
   const closeAll = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     setActivePanel(null);
     setMobileMenuOpen(false);
   }, []);
@@ -85,7 +116,11 @@ export const ProviderTopNav: React.FC = () => {
         </div>
 
         <nav className="prov-topnav-center" aria-label="Provider Categories">
-          <div className="prov-category-wrapper">
+          <div
+            className="prov-category-wrapper"
+            onMouseEnter={() => handleMouseEnter("workspace")}
+            onMouseLeave={handleMouseLeave}
+          >
             <button
               type="button"
               className={`prov-category-btn ${
@@ -166,7 +201,11 @@ export const ProviderTopNav: React.FC = () => {
             )}
           </div>
 
-          <div className="prov-category-wrapper">
+          <div
+            className="prov-category-wrapper"
+            onMouseEnter={() => handleMouseEnter("finances")}
+            onMouseLeave={handleMouseLeave}
+          >
             <button
               type="button"
               className={`prov-category-btn ${
@@ -239,7 +278,11 @@ export const ProviderTopNav: React.FC = () => {
             )}
           </div>
 
-          <div className="prov-category-wrapper">
+          <div
+            className="prov-category-wrapper"
+            onMouseEnter={() => handleMouseEnter("performance")}
+            onMouseLeave={handleMouseLeave}
+          >
             <button
               type="button"
               className={`prov-category-btn ${
@@ -314,7 +357,11 @@ export const ProviderTopNav: React.FC = () => {
             )}
           </div>
 
-          <div className="prov-category-wrapper">
+          <div
+            className="prov-category-wrapper"
+            onMouseEnter={() => handleMouseEnter("settings")}
+            onMouseLeave={handleMouseLeave}
+          >
             <button
               type="button"
               className={`prov-category-btn ${
@@ -432,7 +479,7 @@ export const ProviderTopNav: React.FC = () => {
             viewAllLink="/provider/notifications"
           />
 
-          <div className="prov-category-wrapper">
+          <div className="prov-user-wrapper">
             <button
               type="button"
               className={`prov-user-btn ${
