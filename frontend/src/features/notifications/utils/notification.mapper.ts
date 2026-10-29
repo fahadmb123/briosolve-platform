@@ -1,72 +1,52 @@
-import type { HeaderNotification } from "../components/NotificationDropdown";
-import type { NotificationResponseDto } from "../types/notificastion-response.types";
+import {
+    NOTIFICATION_ICON_THEMES,
+    NOTIFICATION_ROUTES,
+    TIME_THRESHOLDS,
+} from "../constants/notification.constants";
 import type {
     UserRole,
+    NotificationResponseDto,
+    HeaderNotification,
     UnifiedNotificationItem,
     NotificationTimeGroup,
     NotificationAction,
 } from "../types/notification.types";
 
-export function mapNotificationToHeader(
-    notification: NotificationResponseDto,
-    role: "CUSTOMER" | "PROVIDER" | "ADMIN",
-): HeaderNotification {
-    const createdAt = new Date(notification.created_at);
+export function formatRelativeTime(date: Date): string {
     const elapsedSeconds = Math.max(
         0,
-        Math.floor((Date.now() - createdAt.getTime()) / 1000),
+        Math.floor((Date.now() - date.getTime()) / 1000),
     );
 
-    let time: string;
-
-    if (elapsedSeconds < 60) {
-        time = "Just now";
-    } else if (elapsedSeconds < 3600) {
-        time = `${Math.floor(elapsedSeconds / 60)}m ago`;
-    } else if (elapsedSeconds < 86400) {
-        time = `${Math.floor(elapsedSeconds / 3600)}h ago`;
-    } else {
-        time = `${Math.floor(elapsedSeconds / 86400)}d ago`;
+    if (elapsedSeconds < TIME_THRESHOLDS.MINUTE_SECONDS) {
+        return "Just now";
     }
+    if (elapsedSeconds < TIME_THRESHOLDS.HOUR_SECONDS) {
+        return `${Math.floor(elapsedSeconds / TIME_THRESHOLDS.MINUTE_SECONDS)}m ago`;
+    }
+    if (elapsedSeconds < TIME_THRESHOLDS.DAY_SECONDS) {
+        return `${Math.floor(elapsedSeconds / TIME_THRESHOLDS.HOUR_SECONDS)}h ago`;
+    }
+    return `${Math.floor(elapsedSeconds / TIME_THRESHOLDS.DAY_SECONDS)}d ago`;
+}
 
-    const iconByType = {
-        INFO: {
-            icon: "fa-info-circle",
-            iconColor: "#3b82f6",
-            iconBg: "rgba(59, 130, 246, 0.12)",
-        },
-        SUCCESS: {
-            icon: "fa-check-circle",
-            iconColor: "#10b981",
-            iconBg: "rgba(16, 185, 129, 0.12)",
-        },
-        WARNING: {
-            icon: "fa-exclamation-triangle",
-            iconColor: "#d97706",
-            iconBg: "rgba(245, 158, 11, 0.12)",
-        },
-        ERROR: {
-            icon: "fa-times-circle",
-            iconColor: "#ef4444",
-            iconBg: "rgba(239, 68, 68, 0.12)",
-        },
-    } as const;
-
-    const icon = iconByType[notification.type];
+export function mapNotificationToHeader(
+    notification: NotificationResponseDto,
+    role: UserRole,
+): HeaderNotification {
+    const createdAt = new Date(notification.created_at);
+    const theme = NOTIFICATION_ICON_THEMES[notification.type];
 
     return {
         id: notification.id,
         title: notification.title,
         message: notification.message,
-        time,
+        time: formatRelativeTime(createdAt),
         unread: !notification.is_read,
-        ...icon,
-        link:
-            role === "PROVIDER"
-                ? "/provider/notifications"
-                : role === "ADMIN"
-                ? "/admin/notifications"
-                : "/notifications",
+        icon: theme.icon,
+        iconColor: theme.iconColor,
+        iconBg: theme.iconBg,
+        link: NOTIFICATION_ROUTES[role] || NOTIFICATION_ROUTES.CUSTOMER,
     };
 }
 
@@ -78,8 +58,13 @@ export function mapNotificationToUnified(
     const now = new Date();
 
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfYesterday = new Date(startOfToday.getTime() - 24 * 60 * 60 * 1000);
-    const startOfWeek = new Date(startOfToday.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const startOfYesterday = new Date(
+        startOfToday.getTime() - TIME_THRESHOLDS.MILLISECONDS_PER_DAY,
+    );
+    const startOfWeek = new Date(
+        startOfToday.getTime() -
+            TIME_THRESHOLDS.WEEK_DAYS * TIME_THRESHOLDS.MILLISECONDS_PER_DAY,
+    );
 
     let group: NotificationTimeGroup;
     if (createdAt >= startOfToday) {
@@ -92,57 +77,17 @@ export function mapNotificationToUnified(
         group = "Earlier this month";
     }
 
-    const elapsedSeconds = Math.max(
-        0,
-        Math.floor((now.getTime() - createdAt.getTime()) / 1000),
-    );
-
-    let time: string;
-    if (elapsedSeconds < 60) {
-        time = "Just now";
-    } else if (elapsedSeconds < 3600) {
-        time = `${Math.floor(elapsedSeconds / 60)}m ago`;
-    } else if (elapsedSeconds < 86400) {
-        time = `${Math.floor(elapsedSeconds / 3600)}h ago`;
-    } else {
-        time = `${Math.floor(elapsedSeconds / 86400)}d ago`;
-    }
-
-    const iconByType = {
-        INFO: {
-            icon: "fa-info-circle",
-            iconColor: "#3b82f6",
-            iconBg: "rgba(59, 130, 246, 0.12)",
-            badgeType: "info" as const,
-        },
-        SUCCESS: {
-            icon: "fa-check-circle",
-            iconColor: "#10b981",
-            iconBg: "rgba(16, 185, 129, 0.12)",
-            badgeType: "success" as const,
-        },
-        WARNING: {
-            icon: "fa-exclamation-triangle",
-            iconColor: "#d97706",
-            iconBg: "rgba(245, 158, 11, 0.12)",
-            badgeType: "warning" as const,
-        },
-        ERROR: {
-            icon: "fa-times-circle",
-            iconColor: "#ef4444",
-            iconBg: "rgba(239, 68, 68, 0.12)",
-            badgeType: "danger" as const,
-        },
-    } as const;
-
-    const iconConfig = iconByType[notification.type];
-
+    const theme = NOTIFICATION_ICON_THEMES[notification.type];
     const content = `${notification.title} ${notification.message}`.toLowerCase();
     let category = "system";
     let primaryAction: NotificationAction | undefined;
 
     if (role === "CUSTOMER") {
-        if (content.includes("quote") || content.includes("bid") || content.includes("estimate")) {
+        if (
+            content.includes("quote") ||
+            content.includes("bid") ||
+            content.includes("estimate")
+        ) {
             category = "quote";
             primaryAction = {
                 label: "View Quotes",
@@ -169,7 +114,11 @@ export function mapNotificationToUnified(
             category = "system";
         }
     } else if (role === "PROVIDER") {
-        if (content.includes("lead") || content.includes("request") || content.includes("nearby")) {
+        if (
+            content.includes("lead") ||
+            content.includes("request") ||
+            content.includes("nearby")
+        ) {
             category = "lead";
             primaryAction = {
                 label: "View Leads",
@@ -177,7 +126,11 @@ export function mapNotificationToUnified(
                 icon: "fa-bolt",
                 variant: "primary",
             };
-        } else if (content.includes("accepted") || content.includes("quote") || content.includes("awarded")) {
+        } else if (
+            content.includes("accepted") ||
+            content.includes("quote") ||
+            content.includes("awarded")
+        ) {
             category = "accepted";
             primaryAction = {
                 label: "View Quotes",
@@ -185,7 +138,11 @@ export function mapNotificationToUnified(
                 icon: "fa-check-double",
                 variant: "primary",
             };
-        } else if (content.includes("booking") || content.includes("job") || content.includes("appointment")) {
+        } else if (
+            content.includes("booking") ||
+            content.includes("job") ||
+            content.includes("appointment")
+        ) {
             category = "booking";
             primaryAction = {
                 label: "View Schedule",
@@ -200,13 +157,21 @@ export function mapNotificationToUnified(
             content.includes("wallet")
         ) {
             category = "finance";
-        } else if (content.includes("review") || content.includes("rating") || content.includes("feedback")) {
+        } else if (
+            content.includes("review") ||
+            content.includes("rating") ||
+            content.includes("feedback")
+        ) {
             category = "review";
         } else {
             category = "lead";
         }
     } else if (role === "ADMIN") {
-        if (content.includes("kyc") || content.includes("verification") || content.includes("document")) {
+        if (
+            content.includes("kyc") ||
+            content.includes("verification") ||
+            content.includes("document")
+        ) {
             category = "kyc";
             primaryAction = {
                 label: "Review KYC",
@@ -229,9 +194,17 @@ export function mapNotificationToUnified(
                 icon: "fa-users",
                 variant: "primary",
             };
-        } else if (content.includes("dispute") || content.includes("conflict") || content.includes("complaint")) {
+        } else if (
+            content.includes("dispute") ||
+            content.includes("conflict") ||
+            content.includes("complaint")
+        ) {
             category = "dispute";
-        } else if (content.includes("catalog") || content.includes("proposal") || content.includes("category")) {
+        } else if (
+            content.includes("catalog") ||
+            content.includes("proposal") ||
+            content.includes("category")
+        ) {
             category = "catalog";
             primaryAction = {
                 label: "View Catalog",
@@ -244,7 +217,8 @@ export function mapNotificationToUnified(
         }
     }
 
-    const badgeLabel = notification.type.charAt(0) + notification.type.slice(1).toLowerCase();
+    const badgeLabel =
+        notification.type.charAt(0) + notification.type.slice(1).toLowerCase();
 
     return {
         id: notification.id,
@@ -252,14 +226,14 @@ export function mapNotificationToUnified(
         category,
         title: notification.title,
         subtitle: notification.message,
-        time,
+        time: formatRelativeTime(createdAt),
         group,
         unread: !notification.is_read,
-        icon: iconConfig.icon,
-        iconColor: iconConfig.iconColor,
-        iconBg: iconConfig.iconBg,
+        icon: theme.icon,
+        iconColor: theme.iconColor,
+        iconBg: theme.iconBg,
         badgeLabel,
-        badgeType: iconConfig.badgeType,
+        badgeType: theme.badgeType,
         primaryAction,
     };
 }

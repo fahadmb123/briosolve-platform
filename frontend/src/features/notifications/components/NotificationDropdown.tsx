@@ -1,37 +1,28 @@
-
 import React, {
   useState,
   useRef,
   useEffect,
   useCallback,
   useMemo,
-} from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../auth/stores/auth.store';
-import './NotificationDropdown.css';
-import { useNotificationStore } from '../store/notification.store';
-import { mapNotificationToHeader } from '../utils/notification.mapper';
+} from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../auth/stores/auth.store";
+import "./NotificationDropdown.css";
+import { useNotifications } from "../hooks/useNotifications";
+import { mapNotificationToHeader } from "../utils/notification.mapper";
 import {
-  markAllNotificationsAsRead,
-  updateNotificationStatus,
-} from '../services/notification.service';
+  MAX_DROPDOWN_BADGE_COUNT,
+  NOTIFICATION_ROUTES,
+} from "../constants/notification.constants";
+import { NotificationDropdownItem } from "./NotificationDropdownItem";
+import { NotificationDropdownEmpty } from "./NotificationDropdownEmpty";
+import type {
+  HeaderNotification,
+  NotificationDropdownProps,
+  UserRole,
+} from "../types/notification.types";
 
-export interface HeaderNotification {
-  id: string;
-  title: string;
-  message: string;
-  time: string;
-  unread: boolean;
-  icon: string;
-  iconColor: string;
-  iconBg: string;
-  link: string;
-}
- 
-interface NotificationDropdownProps {
-  role?: 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
-  viewAllLink?: string;
-}
+export type { HeaderNotification, NotificationDropdownProps };
 
 export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   role,
@@ -42,49 +33,41 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
+  const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
 
-  const updateNotification = useNotificationStore(
-    (state) => state.updateNotification,
-  );
+  const { notifications, markAllAsRead, toggleReadStatus } = useNotifications();
 
-  const notificationsFromStore = useNotificationStore(
-    (state) => state.notifications,
-  );
-
-  const resolvedRole = useMemo(() => {
+  const resolvedRole = useMemo<UserRole>(() => {
     if (role) return role;
-    if (user?.role === 'PROVIDER') return 'PROVIDER';
-    if (user?.role === 'ADMIN') return 'ADMIN';
-    return 'CUSTOMER';
+    if (user?.role === "PROVIDER") return "PROVIDER";
+    if (user?.role === "ADMIN") return "ADMIN";
+    return "CUSTOMER";
   }, [role, user?.role]);
 
-  const notifications = useMemo(
+  const headerNotifications = useMemo(
     () =>
-      notificationsFromStore.map((notification) =>
+      notifications.map((notification) =>
         mapNotificationToHeader(notification, resolvedRole),
       ),
-    [notificationsFromStore, resolvedRole],
+    [notifications, resolvedRole],
   );
 
   const unreadCount = useMemo(
-    () => notifications.filter((notification) => notification.unread).length,
-    [notifications],
+    () => headerNotifications.filter((n) => n.unread).length,
+    [headerNotifications],
   );
 
   const displayedNotifications = useMemo(
     () =>
-      activeTab === 'unread'
-        ? notifications.filter((notification) => notification.unread)
-        : notifications,
-    [notifications, activeTab],
+      activeTab === "unread"
+        ? headerNotifications.filter((n) => n.unread)
+        : headerNotifications,
+    [headerNotifications, activeTab],
   );
 
   const targetViewAll = useMemo(() => {
     if (viewAllLink) return viewAllLink;
-    if (resolvedRole === 'PROVIDER') return '/provider/notifications';
-    if (resolvedRole === 'ADMIN') return '/admin/notifications';
-    return '/notifications';
+    return NOTIFICATION_ROUTES[resolvedRole] || NOTIFICATION_ROUTES.CUSTOMER;
   }, [viewAllLink, resolvedRole]);
 
   const handleToggle = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -97,70 +80,31 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-
-      const readAt = new Date();
-
-      notificationsFromStore.forEach((notification) => {
-        if (!notification.is_read) {
-          updateNotification(notification.id, {
-            is_read: true,
-            read_at: readAt,
-          });
-        }
-      });
-
-      markAllNotificationsAsRead().catch(() => {});
+      markAllAsRead();
     },
-    [notificationsFromStore, updateNotification],
+    [markAllAsRead],
   );
 
   const handleToggleRead = useCallback(
     (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-
-      const notification = notificationsFromStore.find(
-        (item) => item.id === id,
-      );
-
-      if (!notification) return;
-
-      const isRead = !notification.is_read;
-      const readAt = isRead ? new Date() : null;
-
-      updateNotification(id, {
-        is_read: isRead,
-        read_at: readAt,
-      });
-
-      updateNotificationStatus(id, {
-        isRead,
-        readAt,
-      }).catch(() => {});
+      toggleReadStatus(id);
     },
-    [notificationsFromStore, updateNotification],
+    [toggleReadStatus],
   );
 
   const handleItemClick = useCallback(
     (item: HeaderNotification) => {
-      const notification = notificationsFromStore.find(
-        (entry) => entry.id === item.id,
-      );
-
-      if (notification && !notification.is_read) {
-        updateNotification(item.id, {
-          is_read: true,
-          read_at: new Date(),
-        });
+      if (item.unread) {
+        toggleReadStatus(item.id);
       }
-
       setIsOpen(false);
-
       if (item.link) {
         navigate(item.link);
       }
     },
-    [notificationsFromStore, updateNotification, navigate],
+    [toggleReadStatus, navigate],
   );
 
   useEffect(() => {
@@ -174,25 +118,25 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
+      if (event.key === "Escape" && isOpen) {
         setIsOpen(false);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
 
@@ -201,7 +145,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       <button
         type="button"
         id="notif-toggle"
-        className={`btn-icon notif-bell-btn ${isOpen ? 'active' : ''}`}
+        className={`btn-icon notif-bell-btn ${isOpen ? "active" : ""}`}
         aria-label="Notifications"
         aria-expanded={isOpen}
         title="Notifications"
@@ -211,7 +155,9 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
         {unreadCount > 0 && (
           <span className="notif-badge-count" id="notif-badge">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {unreadCount > MAX_DROPDOWN_BADGE_COUNT
+              ? `${MAX_DROPDOWN_BADGE_COUNT}+`
+              : unreadCount}
           </span>
         )}
       </button>
@@ -225,13 +171,8 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           <div className="notif-dropdown-header">
             <div className="flex items-center gap-2.5">
               <h3 className="notif-header-title">Notifications</h3>
-
-              {unreadCount > 0 ? (
-                <span className="notif-unread-pill">
-                  {unreadCount} new
-                </span>
-              ) : (
-                <></>
+              {unreadCount > 0 && (
+                <span className="notif-unread-pill">{unreadCount} new</span>
               )}
             </div>
 
@@ -253,25 +194,24 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
               <button
                 type="button"
                 className={`notif-segment-btn ${
-                  activeTab === 'all' ? 'active' : ''
+                  activeTab === "all" ? "active" : ""
                 }`}
-                onClick={() => setActiveTab('all')}
+                onClick={() => setActiveTab("all")}
               >
                 <span>Today</span>
                 <span className="notif-segment-count">
-                  {notifications.length}
+                  {headerNotifications.length}
                 </span>
               </button>
 
               <button
                 type="button"
                 className={`notif-segment-btn ${
-                  activeTab === 'unread' ? 'active' : ''
+                  activeTab === "unread" ? "active" : ""
                 }`}
-                onClick={() => setActiveTab('unread')}
+                onClick={() => setActiveTab("unread")}
               >
                 <span>Unread</span>
-
                 {unreadCount > 0 && (
                   <span className="notif-segment-count unread-badge">
                     {unreadCount}
@@ -283,111 +223,15 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
           <div className="notif-dropdown-body">
             {displayedNotifications.length === 0 ? (
-              <div className="notif-empty-state">
-                <div className="notif-empty-icon">
-                  <i className="fas fa-bell-slash"></i>
-                </div>
-
-                <p className="font-semibold text-text text-sm mb-1">
-                  {activeTab === 'unread'
-                    ? 'No unread notifications'
-                    : 'No notifications yet'}
-                </p>
-
-                <p className="text-xs text-secondary mb-0">
-                  {activeTab === 'unread'
-                    ? 'Great job! You have read all your latest updates.'
-                    : 'New activity, quotes, and messages will appear here.'}
-                </p>
-              </div>
+              <NotificationDropdownEmpty activeTab={activeTab} />
             ) : (
               displayedNotifications.map((item) => (
-                <div
+                <NotificationDropdownItem
                   key={item.id}
-                  className={`notif-dropdown-item ${
-                    item.unread ? 'unread' : 'read'
-                  }`}
-                  onClick={() => handleItemClick(item)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleItemClick(item);
-                    }
-                  }}
-                >
-                  <div
-                    className="notif-item-icon-box"
-                    style={{ backgroundColor: item.iconBg }}
-                  >
-                    <i
-                      className={`fas ${item.icon}`}
-                      style={{ color: item.iconColor }}
-                    ></i>
-                  </div>
-
-                  <div className="notif-item-content">
-                    <div className="notif-item-header-row">
-                      <span className="notif-item-title">
-                        {item.title}
-                      </span>
-
-                      {item.unread && (
-                        <span
-                          className="notif-pulse-dot"
-                          title="Unread"
-                        ></span>
-                      )}
-                    </div>
-
-                    <p className="notif-item-text">{item.message}</p>
-
-                    <div className="notif-item-footer">
-                      <span className="notif-item-time">
-                        <i className="far fa-clock text-[10px]"></i>
-                        <span>{item.time}</span>
-                      </span>
-
-                      <div
-                        className="notif-item-actions"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button
-                          type="button"
-                          className="btn-read-toggle"
-                          onClick={(e) => handleToggleRead(item.id, e)}
-                          title={
-                            item.unread
-                              ? 'Mark as read'
-                              : 'Mark as unread'
-                          }
-                        >
-                          <i
-                            className={`fas ${
-                              item.unread
-                                ? 'fa-check'
-                                : 'fa-envelope-open'
-                            }`}
-                          ></i>
-
-                          <span>
-                            {item.unread ? 'Mark read' : 'Unread'}
-                          </span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="notif-quick-view-link"
-                          onClick={() => handleItemClick(item)}
-                        >
-                          <span>View</span>
-                          <i className="fas fa-arrow-right text-[10px]"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  item={item}
+                  onItemClick={handleItemClick}
+                  onToggleRead={handleToggleRead}
+                />
               ))
             )}
           </div>

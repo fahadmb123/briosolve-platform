@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { NotificationResponseDto } from "../types/notificastion-response.types";
+import type { NotificationResponseDto } from "../types/notification.types";
 
 interface NotificationState {
     notifications: NotificationResponseDto[];
@@ -47,3 +47,4 @@ export const useNotificationStore = create<NotificationState>()((set) => ({
             ),
         })),
 }));
+

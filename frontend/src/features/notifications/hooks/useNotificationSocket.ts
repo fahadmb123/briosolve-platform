@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { socket } from "../../../shared/api/socket-client";
 import { useAuthStore } from "../../auth/stores/auth.store";
-import { useNotificationStore } from "../store/notification.store";
+import { useNotificationStore } from "../stores/notification.store";
 import { getNotifications } from "../services/notification.service";
 import { playNotificationSound } from "../utils/sound.utils";
-import type { NotificationResponseDto } from "../types/notificastion-response.types";
+import type { NotificationResponseDto } from "../types/notification.types";
 
 export function useNotificationSocket(): void {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
