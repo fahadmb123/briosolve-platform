@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import "./NotificationsCenter.css";
@@ -62,18 +62,20 @@ export default function NotificationsCenter({
   );
 
   const getNotificationsMutation = useGetNotifications();
+  const fetchRef = useRef(getNotificationsMutation.mutate);
+  fetchRef.current = getNotificationsMutation.mutate;
   const markAllMutation = useMarkAllNotificationsRead();
   const updateStatusMutation = useUpdateNotificationStatus();
 
   useEffect(() => {
-    getNotificationsMutation.mutate(undefined, {
+    fetchRef.current(undefined, {
       onSuccess: (res) => {
         if (res?.data) {
           setNotifications(res.data);
         }
       },
     });
-  }, [setNotifications, getNotificationsMutation]);
+  }, [setNotifications]);
 
   const unifiedNotifications: UnifiedNotificationItem[] = useMemo(() => {
     return notifications.map((n) => mapNotificationToUnified(n, activeRole));

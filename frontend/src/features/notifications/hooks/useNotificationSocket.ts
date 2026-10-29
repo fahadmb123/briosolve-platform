@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { socket } from "../../../shared/api/socket-client";
 import { useAuthStore } from "../../auth/stores/auth.store";
 import { useNotificationStore } from "../stores/notification.store";
@@ -15,6 +15,8 @@ export function useNotificationSocket(): void {
         (state) => state.setNotifications,
     );
     const getNotificationsMutation = useGetNotifications();
+    const fetchRef = useRef(getNotificationsMutation.mutate);
+    fetchRef.current = getNotificationsMutation.mutate;
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -22,7 +24,7 @@ export function useNotificationSocket(): void {
             return;
         }
 
-        getNotificationsMutation.mutate(undefined, {
+        fetchRef.current(undefined, {
             onSuccess: (res) => {
                 if (res?.data) {
                     setNotifications(res.data);
@@ -42,5 +44,5 @@ export function useNotificationSocket(): void {
             socket.off("notification:new", handleNewNotification);
             socket.disconnect();
         };
-    }, [isAuthenticated, addNotification, setNotifications, getNotificationsMutation]);
+    }, [isAuthenticated, addNotification, setNotifications]);
 }
