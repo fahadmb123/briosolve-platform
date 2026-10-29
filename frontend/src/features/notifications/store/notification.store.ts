@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import type { NotificationResponseDto } from "../types/notificastion-response.types";
 
-
 interface NotificationState {
     notifications: NotificationResponseDto[];
     setNotifications: (notifications: NotificationResponseDto[]) => void;
@@ -11,6 +10,7 @@ interface NotificationState {
         id: string,
         changes: Partial<Pick<NotificationResponseDto, "is_read" | "read_at">>,
     ) => void;
+    removeNotification: (id: string) => void;
 }
 
 export const useNotificationStore = create<NotificationState>()((set) => ({
@@ -32,11 +32,18 @@ export const useNotificationStore = create<NotificationState>()((set) => ({
     clearNotifications: () => set({ notifications: [] }),
 
     updateNotification: (id, changes) =>
-    set((state) => ({
-        notifications: state.notifications.map((notification) =>
-            notification.id === id
-                ? { ...notification, ...changes }
-                : notification,
-        ),
-    })),
+        set((state) => ({
+            notifications: state.notifications.map((notification) =>
+                notification.id === id
+                    ? { ...notification, ...changes }
+                    : notification,
+            ),
+        })),
+
+    removeNotification: (id) =>
+        set((state) => ({
+            notifications: state.notifications.filter(
+                (notification) => notification.id !== id,
+            ),
+        })),
 }));
