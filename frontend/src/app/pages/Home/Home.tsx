@@ -174,7 +174,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="services" className="home-section">
+      <section id="services" className="home-section home-services-section">
         <div className="home-section-container">
           <div className="home-section-header">
             <span className="home-section-label">Service Directory</span>
@@ -207,7 +207,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="how-it-works" className="home-section">
+      <section id="how-it-works" className="home-section home-how-it-works-section">
         <div className="home-section-container">
           <div className="home-section-header">
             <span className="home-section-label">How It Works</span>
@@ -230,7 +230,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="home-section">
+      <section className="home-section home-benefits-section">
         <div className="home-section-container">
           <div className="home-section-header">
             <span className="home-section-label">Why ReverseMarket</span>
@@ -255,7 +255,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="home-section">
+      <section className="home-section home-cta-section">
         <div className="home-section-container">
           <div className="home-cta-card">
             <h2 className="home-cta-title">Ready to hire or offer services?</h2>

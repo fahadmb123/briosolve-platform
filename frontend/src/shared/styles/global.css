@@ -4,29 +4,29 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-:root {
-    /* DARK THEME (DEFAULT) - Sleek Dark Blue/Slate */
-    --bg: #0B1121;
-    --surface: #111827;
-    --surface-elevated: #1F2937;
-    --surface-hover: #374151;
+:root,
+[data-theme="dark"] {
+    --bg: #09090c;
+    --surface: #141418;
+    --surface-elevated: #1e1e24;
+    --surface-hover: #292932;
+    --surface-highlight: #333340;
     
-    --navbar-bg: rgba(255, 255, 255, 0.08); /* Premium Apple-style dark frosted glass */
-    --sidebar-bg: #111827; /* Match surface for solid dark sidebar */
+    --navbar-bg: rgba(14, 14, 18, 0.88);
+    --sidebar-bg: #141418;
 
-    --text: #F6F0E4;
-    --text-secondary: #A0A0A0;
-    --text-muted: #666666;
+    --text: #FFFFFF;
+    --text-secondary: #A1A1AA;
+    --text-muted: #71717A;
 
-    --border: #374151; /* Slate 700 */
-    --border-light: #4B5563; /* Slate 600 */
+    --border: #282832;
+    --border-light: #383846;
 
-    /* Classic Editorial Accents */
-    --primary: #D4AC77;
-    --primary-content: #101C23;
-    --primary-hover: #C39962;
-    --primary-active: #B28851;
-    --primary-light: rgba(212, 172, 119, 0.15);
+    --primary: #FFFFFF;
+    --primary-content: #09090c;
+    --primary-hover: #E4E4E7;
+    --primary-active: #D4D4D8;
+    --primary-light: rgba(255, 255, 255, 0.12);
 
     /* Status Colors */
     --success: #22C55E;
@@ -910,7 +910,7 @@ h6, .h6 { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
     font-size: 0.875rem;
     font-family: var(--font-family);
     color: var(--text);
-    background-color: var(--bg);
+    background-color: var(--surface-elevated);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
@@ -918,8 +918,18 @@ h6, .h6 { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
 
 .form-control:focus {
     outline: none;
-    border-color: var(--primary);
+    background-color: var(--surface-hover);
+    border-color: var(--border-light);
     box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+[data-theme="light"] .form-control {
+    background-color: #FFFFFF;
+}
+
+[data-theme="light"] .form-control:focus {
+    background-color: #FFFFFF;
+    border-color: var(--primary);
 }
 
 .form-control::placeholder {
@@ -994,6 +1004,7 @@ input::-ms-clear {
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .card-header {
@@ -1002,6 +1013,11 @@ input::-ms-clear {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background-color: var(--surface-elevated);
+}
+
+[data-theme="light"] .card-header {
+    background-color: #FFFFFF;
 }
 
 .card-body {
@@ -1012,6 +1028,10 @@ input::-ms-clear {
     padding: 1.25rem 1.5rem;
     border-top: 1px solid var(--border);
     background-color: var(--surface-elevated);
+}
+
+[data-theme="light"] .card-footer {
+    background-color: #FAFAFA;
 }
 
 /* ==========================================================================
@@ -1058,6 +1078,10 @@ input::-ms-clear {
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    background-color: var(--surface-elevated);
+}
+
+[data-theme="light"] .table th {
     background-color: var(--bg);
 }
 
@@ -1329,8 +1353,8 @@ input::-ms-clear {
    react-loading-skeleton Global Theme Integration
    ========================================================================== */
 .react-loading-skeleton {
-    --base-color: var(--surface-elevated, #1e293b);
-    --highlight-color: var(--surface-hover, #334155);
+    --base-color: var(--surface-elevated, #141414);
+    --highlight-color: var(--surface-hover, #222222);
 }
 
 [data-theme="light"] .react-loading-skeleton {

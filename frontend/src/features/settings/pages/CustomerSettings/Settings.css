@@ -94,11 +94,12 @@
 }
 
 .dark-preview {
-    background-color: #0B0F14;
+    background-color: #09090c;
+    border-color: #282832;
 }
 
 .light-preview {
-    background-color: #F8FAFC;
+    background-color: #FFFFFF;
 }
 
 /* Toggle Switch Component */
@@ -147,7 +148,7 @@
 
 .toggle-switch input:checked + .toggle-slider:before {
     transform: translateX(20px);
-    background-color: #ffffff;
+    background-color: var(--primary-content);
 }
 
 .form-row-2 {

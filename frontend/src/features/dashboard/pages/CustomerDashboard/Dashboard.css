@@ -108,17 +108,19 @@
 .header-search-input {
     width: 100%;
     padding: 0.5rem 0.875rem 0.5rem 2.25rem;
-    background-color: var(--bg);
+    background-color: var(--surface-elevated);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     font-size: 0.8125rem;
     color: var(--text);
     outline: none;
     font-family: inherit;
+    transition: all var(--transition-fast);
 }
 
 .header-search-input:focus {
-    border-color: var(--primary);
+    background-color: var(--surface-hover);
+    border-color: var(--border-light);
 }
 
 .relative-badge {
@@ -159,6 +161,13 @@
     align-items: center;
     gap: 1.25rem;
     padding: 1.35rem 1.5rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-widget:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-light);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 .stat-icon-wrapper {
