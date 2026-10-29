@@ -1,8 +1,13 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import "./NotificationsCenter.css";
-import { useNotifications } from "../../hooks/useNotifications";
+import { useNotificationStore } from "../../stores/notification.store";
+import {
+  useGetNotifications,
+  useMarkAllNotificationsRead,
+  useUpdateNotificationStatus,
+} from "../../hooks/useNotifications";
 import { mapNotificationToUnified } from "../../utils/notification.mapper";
 import {
   TIME_GROUPS,
@@ -45,12 +50,30 @@ export default function NotificationsCenter({
   const [showUnreadOnly, setShowUnreadOnly] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const {
-    notifications,
-    markAllAsRead,
-    toggleReadStatus,
-    removeNotification,
-  } = useNotifications();
+  const notifications = useNotificationStore((state) => state.notifications);
+  const setNotifications = useNotificationStore(
+    (state) => state.setNotifications,
+  );
+  const updateNotification = useNotificationStore(
+    (state) => state.updateNotification,
+  );
+  const removeNotification = useNotificationStore(
+    (state) => state.removeNotification,
+  );
+
+  const getNotificationsMutation = useGetNotifications();
+  const markAllMutation = useMarkAllNotificationsRead();
+  const updateStatusMutation = useUpdateNotificationStatus();
+
+  useEffect(() => {
+    getNotificationsMutation.mutate(undefined, {
+      onSuccess: (res) => {
+        if (res?.data) {
+          setNotifications(res.data);
+        }
+      },
+    });
+  }, [setNotifications, getNotificationsMutation]);
 
   const unifiedNotifications: UnifiedNotificationItem[] = useMemo(() => {
     return notifications.map((n) => mapNotificationToUnified(n, activeRole));
@@ -70,9 +93,44 @@ export default function NotificationsCenter({
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      markAllAsRead();
+
+      const readAt = new Date();
+      notifications.forEach((notification) => {
+        if (!notification.is_read) {
+          updateNotification(notification.id, {
+            is_read: true,
+            read_at: readAt,
+          });
+        }
+      });
+
+      markAllMutation.mutate();
     },
-    [markAllAsRead],
+    [notifications, updateNotification, markAllMutation],
+  );
+
+  const toggleReadStatus = useCallback(
+    (id: string) => {
+      const target = notifications.find((n) => n.id === id);
+      if (!target) return;
+
+      const nextRead = !target.is_read;
+      const readAt = nextRead ? new Date() : null;
+
+      updateNotification(id, {
+        is_read: nextRead,
+        read_at: readAt,
+      });
+
+      updateStatusMutation.mutate({
+        id,
+        data: {
+          isRead: nextRead,
+          readAt,
+        },
+      });
+    },
+    [notifications, updateNotification, updateStatusMutation],
   );
 
   const filteredNotifications = useMemo(() => {

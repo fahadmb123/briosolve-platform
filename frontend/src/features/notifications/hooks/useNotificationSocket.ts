@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { socket } from "../../../shared/api/socket-client";
 import { useAuthStore } from "../../auth/stores/auth.store";
 import { useNotificationStore } from "../stores/notification.store";
-import { getNotifications } from "../services/notification.service";
+import { useGetNotifications } from "./useNotifications";
 import { playNotificationSound } from "../utils/sound.utils";
 import type { NotificationResponseDto } from "../types/notification.types";
 
@@ -14,6 +14,7 @@ export function useNotificationSocket(): void {
     const setNotifications = useNotificationStore(
         (state) => state.setNotifications,
     );
+    const getNotificationsMutation = useGetNotifications();
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -21,13 +22,13 @@ export function useNotificationSocket(): void {
             return;
         }
 
-        getNotifications()
-            .then((res) => {
-                if (res.data) {
+        getNotificationsMutation.mutate(undefined, {
+            onSuccess: (res) => {
+                if (res?.data) {
                     setNotifications(res.data);
                 }
-            })
-            .catch(() => {});
+            },
+        });
 
         const handleNewNotification = (notification: NotificationResponseDto) => {
             addNotification(notification);
@@ -41,5 +42,5 @@ export function useNotificationSocket(): void {
             socket.off("notification:new", handleNewNotification);
             socket.disconnect();
         };
-    }, [isAuthenticated, addNotification, setNotifications]);
+    }, [isAuthenticated, addNotification, setNotifications, getNotificationsMutation]);
 }

@@ -8,7 +8,11 @@ import React, {
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../auth/stores/auth.store";
 import "./NotificationDropdown.css";
-import { useNotifications } from "../hooks/useNotifications";
+import { useNotificationStore } from "../stores/notification.store";
+import {
+  useMarkAllNotificationsRead,
+  useUpdateNotificationStatus,
+} from "../hooks/useNotifications";
 import { mapNotificationToHeader } from "../utils/notification.mapper";
 import {
   MAX_DROPDOWN_BADGE_COUNT,
@@ -35,7 +39,13 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
 
-  const { notifications, markAllAsRead, toggleReadStatus } = useNotifications();
+  const notifications = useNotificationStore((state) => state.notifications);
+  const updateNotification = useNotificationStore(
+    (state) => state.updateNotification,
+  );
+
+  const markAllMutation = useMarkAllNotificationsRead();
+  const updateStatusMutation = useUpdateNotificationStatus();
 
   const resolvedRole = useMemo<UserRole>(() => {
     if (role) return role;
@@ -80,31 +90,70 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      markAllAsRead();
+
+      const readAt = new Date();
+      notifications.forEach((notification) => {
+        if (!notification.is_read) {
+          updateNotification(notification.id, {
+            is_read: true,
+            read_at: readAt,
+          });
+        }
+      });
+
+      markAllMutation.mutate();
     },
-    [markAllAsRead],
+    [notifications, updateNotification, markAllMutation],
   );
 
   const handleToggleRead = useCallback(
     (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      toggleReadStatus(id);
+
+      const notification = notifications.find((item) => item.id === id);
+      if (!notification) return;
+
+      const isRead = !notification.is_read;
+      const readAt = isRead ? new Date() : null;
+
+      updateNotification(id, {
+        is_read: isRead,
+        read_at: readAt,
+      });
+
+      updateStatusMutation.mutate({
+        id,
+        data: {
+          isRead,
+          readAt,
+        },
+      });
     },
-    [toggleReadStatus],
+    [notifications, updateNotification, updateStatusMutation],
   );
 
   const handleItemClick = useCallback(
     (item: HeaderNotification) => {
       if (item.unread) {
-        toggleReadStatus(item.id);
+        updateNotification(item.id, {
+          is_read: true,
+          read_at: new Date(),
+        });
+        updateStatusMutation.mutate({
+          id: item.id,
+          data: {
+            isRead: true,
+            readAt: new Date(),
+          },
+        });
       }
       setIsOpen(false);
       if (item.link) {
         navigate(item.link);
       }
     },
-    [toggleReadStatus, navigate],
+    [updateNotification, updateStatusMutation, navigate],
   );
 
   useEffect(() => {
