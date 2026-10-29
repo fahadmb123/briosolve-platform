@@ -22,6 +22,10 @@ export const TopNav: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const navRef = useRef<HTMLDivElement>(null);
 
+  const isCustomer = isAuthenticated && user?.role === "CUSTOMER";
+  const isProvider = isAuthenticated && user?.role === "PROVIDER";
+  const isAdmin = isAuthenticated && user?.role === "ADMIN";
+
   const resolvedRole = useMemo<UserRole>(() => {
     if (user?.role === "ADMIN") return "ADMIN";
     if (user?.role === "PROVIDER") return "PROVIDER";
@@ -34,6 +38,18 @@ export const TopNav: React.FC = () => {
     if (user.role === "PROVIDER") return "/provider/dashboard";
     return "/dashboard";
   }, [user]);
+
+  const profileRoute = useMemo(() => {
+    if (isProvider) return "/provider/profile";
+    if (isAdmin) return "/admin/dashboard";
+    return "/profile";
+  }, [isProvider, isAdmin]);
+
+  const settingsRoute = useMemo(() => {
+    if (isProvider) return "/provider/settings";
+    if (isAdmin) return "/admin/settings";
+    return "/settings";
+  }, [isProvider, isAdmin]);
 
   const notificationRoute = useMemo(() => {
     if (user?.role === "ADMIN") return "/admin/notifications";
@@ -139,14 +155,16 @@ export const TopNav: React.FC = () => {
               Home
             </NavLink>
 
-            <NavLink
-              to="/nearby-providers"
-              className={({ isActive }) =>
-                `topnav-link ${isActive ? "active" : ""}`
-              }
-            >
-              Services
-            </NavLink>
+            {isCustomer && (
+              <NavLink
+                to="/nearby-providers"
+                className={({ isActive }) =>
+                  `topnav-link ${isActive ? "active" : ""}`
+                }
+              >
+                Providers
+              </NavLink>
+            )}
 
             {isAuthenticated && (
               <NavLink
@@ -159,99 +177,101 @@ export const TopNav: React.FC = () => {
               </NavLink>
             )}
 
-            <div
-              className="topnav-dropdown-wrapper"
-              onMouseEnter={() => handleMouseEnter("more")}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button
-                type="button"
-                className={`topnav-link topnav-dropdown-trigger ${
-                  openDropdown === "more" ? "active" : ""
-                }`}
-                onClick={() => toggleDropdown("more")}
-                aria-expanded={openDropdown === "more"}
+            {isCustomer && (
+              <div
+                className="topnav-dropdown-wrapper"
+                onMouseEnter={() => handleMouseEnter("more")}
+                onMouseLeave={handleMouseLeave}
               >
-                <span>More</span>
-                <i
-                  className={`fas fa-chevron-down topnav-caret ${
-                    openDropdown === "more" ? "rotate" : ""
+                <button
+                  type="button"
+                  className={`topnav-link topnav-dropdown-trigger ${
+                    openDropdown === "more" ? "active" : ""
                   }`}
-                ></i>
-              </button>
+                  onClick={() => toggleDropdown("more")}
+                  aria-expanded={openDropdown === "more"}
+                >
+                  <span>More</span>
+                  <i
+                    className={`fas fa-chevron-down topnav-caret ${
+                      openDropdown === "more" ? "rotate" : ""
+                    }`}
+                  ></i>
+                </button>
 
-              {openDropdown === "more" && (
-                <div className="topnav-dropdown-menu" role="menu">
-                  <div className="topnav-dropdown-section-title">Activity</div>
-                  <Link
-                    to="/dashboard"
-                    className="topnav-dropdown-item"
-                    role="menuitem"
-                    onClick={closeAllMenus}
-                  >
-                    <span>My Requests</span>
-                    <i className="fas fa-file-alt"></i>
-                  </Link>
-                  <Link
-                    to="/dashboard"
-                    className="topnav-dropdown-item"
-                    role="menuitem"
-                    onClick={closeAllMenus}
-                  >
-                    <span>Bookings</span>
-                    <i className="fas fa-calendar-check"></i>
-                  </Link>
-                  <Link
-                    to="/dashboard"
-                    className="topnav-dropdown-item"
-                    role="menuitem"
-                    onClick={closeAllMenus}
-                  >
-                    <span>Messages</span>
-                    <i className="fas fa-comments"></i>
-                  </Link>
-                  <Link
-                    to="/dashboard"
-                    className="topnav-dropdown-item"
-                    role="menuitem"
-                    onClick={closeAllMenus}
-                  >
-                    <span>Reviews</span>
-                    <i className="fas fa-star"></i>
-                  </Link>
+                {openDropdown === "more" && (
+                  <div className="topnav-dropdown-menu" role="menu">
+                    <div className="topnav-dropdown-section-title">Activity</div>
+                    <Link
+                      to="/dashboard"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={closeAllMenus}
+                    >
+                      <span>My Requests</span>
+                      <i className="fas fa-file-alt"></i>
+                    </Link>
+                    <Link
+                      to="/dashboard"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={closeAllMenus}
+                    >
+                      <span>Bookings</span>
+                      <i className="fas fa-calendar-check"></i>
+                    </Link>
+                    <Link
+                      to="/dashboard"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={closeAllMenus}
+                    >
+                      <span>Messages</span>
+                      <i className="fas fa-comments"></i>
+                    </Link>
+                    <Link
+                      to="/dashboard"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={closeAllMenus}
+                    >
+                      <span>Reviews</span>
+                      <i className="fas fa-star"></i>
+                    </Link>
 
-                  <div className="topnav-dropdown-divider"></div>
-                  <div className="topnav-dropdown-section-title">Features</div>
-                  <Link
-                    to="/dashboard"
-                    className="topnav-dropdown-item"
-                    role="menuitem"
-                    onClick={closeAllMenus}
-                  >
-                    <span>AI Assistant</span>
-                    <span className="topnav-mono-badge">AI</span>
-                  </Link>
-                  <Link
-                    to="/dashboard"
-                    className="topnav-dropdown-item"
-                    role="menuitem"
-                    onClick={closeAllMenus}
-                  >
-                    <span>Products</span>
-                    <span className="topnav-mono-badge">NEW</span>
-                  </Link>
-                  <Link
-                    to="/#how-it-works"
-                    className="topnav-dropdown-item"
-                    role="menuitem"
-                    onClick={closeAllMenus}
-                  >
-                    <span>How It Works</span>
-                    <i className="fas fa-info-circle"></i>
-                  </Link>
-                </div>
-              )}
-            </div>
+                    <div className="topnav-dropdown-divider"></div>
+                    <div className="topnav-dropdown-section-title">Features</div>
+                    <Link
+                      to="/dashboard"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={closeAllMenus}
+                    >
+                      <span>AI Assistant</span>
+                      <span className="topnav-mono-badge">AI</span>
+                    </Link>
+                    <Link
+                      to="/dashboard"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={closeAllMenus}
+                    >
+                      <span>Products</span>
+                      <span className="topnav-mono-badge">NEW</span>
+                    </Link>
+                    <Link
+                      to="/#how-it-works"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={closeAllMenus}
+                    >
+                      <span>How It Works</span>
+                      <i className="fas fa-info-circle"></i>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
         </div>
 
@@ -320,9 +340,14 @@ export const TopNav: React.FC = () => {
                     <div className="topnav-dropdown-header">
                       <div className="topnav-header-title">{user?.name}</div>
                       <div className="topnav-header-sub">{user?.email}</div>
+                      {isProvider && (
+                        <div style={{ marginTop: "0.35rem" }}>
+                          <span className="topnav-mono-badge">Verified Pro</span>
+                        </div>
+                      )}
                     </div>
                     <Link
-                      to="/profile"
+                      to={profileRoute}
                       className="topnav-dropdown-item"
                       role="menuitem"
                       onClick={closeAllMenus}
@@ -330,6 +355,17 @@ export const TopNav: React.FC = () => {
                       <span>Profile</span>
                       <i className="fas fa-user"></i>
                     </Link>
+                    {isProvider && (
+                      <Link
+                        to="/provider/kyc"
+                        className="topnav-dropdown-item"
+                        role="menuitem"
+                        onClick={closeAllMenus}
+                      >
+                        <span>KYC Verification</span>
+                        <i className="fas fa-shield-alt"></i>
+                      </Link>
+                    )}
                     <NavLink
                       to={notificationRoute}
                       className="topnav-dropdown-item"
@@ -340,7 +376,7 @@ export const TopNav: React.FC = () => {
                       <i className="fas fa-bell"></i>
                     </NavLink>
                     <Link
-                      to="/settings"
+                      to={settingsRoute}
                       className="topnav-dropdown-item"
                       role="menuitem"
                       onClick={closeAllMenus}
@@ -348,15 +384,17 @@ export const TopNav: React.FC = () => {
                       <span>Settings</span>
                       <i className="fas fa-cog"></i>
                     </Link>
-                    <Link
-                      to="/provider/register"
-                      className="topnav-dropdown-item"
-                      role="menuitem"
-                      onClick={closeAllMenus}
-                    >
-                      <span>Become a Provider</span>
-                      <i className="fas fa-briefcase"></i>
-                    </Link>
+                    {isCustomer && (
+                      <Link
+                        to="/provider/register"
+                        className="topnav-dropdown-item"
+                        role="menuitem"
+                        onClick={closeAllMenus}
+                      >
+                        <span>Become a Provider</span>
+                        <i className="fas fa-briefcase"></i>
+                      </Link>
+                    )}
                     <div className="topnav-dropdown-divider"></div>
                     <button
                       type="button"
@@ -371,10 +409,12 @@ export const TopNav: React.FC = () => {
                 )}
               </div>
 
-              <Link to="/dashboard" className="topnav-cta-btn hide-mobile">
-                <i className="fas fa-plus"></i>
-                <span>Post Request</span>
-              </Link>
+              {isCustomer && (
+                <Link to="/dashboard" className="topnav-cta-btn hide-mobile">
+                  <i className="fas fa-plus"></i>
+                  <span>Post Request</span>
+                </Link>
+              )}
             </>
           ) : (
             <>
@@ -410,13 +450,15 @@ export const TopNav: React.FC = () => {
             >
               Home
             </NavLink>
-            <NavLink
-              to="/nearby-providers"
-              className="topnav-mobile-item"
-              onClick={closeAllMenus}
-            >
-              Services
-            </NavLink>
+            {isCustomer && (
+              <NavLink
+                to="/nearby-providers"
+                className="topnav-mobile-item"
+                onClick={closeAllMenus}
+              >
+                Providers
+              </NavLink>
+            )}
             {isAuthenticated && (
               <NavLink
                 to={dashboardRoute}
@@ -428,74 +470,87 @@ export const TopNav: React.FC = () => {
             )}
           </div>
 
-          <div className="topnav-mobile-section">
-            <div className="topnav-mobile-label">Activity</div>
-            <Link
-              to="/dashboard"
-              className="topnav-mobile-item"
-              onClick={closeAllMenus}
-            >
-              My Requests
-            </Link>
-            <Link
-              to="/dashboard"
-              className="topnav-mobile-item"
-              onClick={closeAllMenus}
-            >
-              Bookings
-            </Link>
-            <Link
-              to="/dashboard"
-              className="topnav-mobile-item"
-              onClick={closeAllMenus}
-            >
-              Messages
-            </Link>
-            <Link
-              to="/dashboard"
-              className="topnav-mobile-item"
-              onClick={closeAllMenus}
-            >
-              Reviews
-            </Link>
-          </div>
+          {isCustomer && (
+            <>
+              <div className="topnav-mobile-section">
+                <div className="topnav-mobile-label">Activity</div>
+                <Link
+                  to="/dashboard"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  My Requests
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  Bookings
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  Messages
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  Reviews
+                </Link>
+              </div>
 
-          <div className="topnav-mobile-section">
-            <div className="topnav-mobile-label">Features</div>
-            <Link
-              to="/dashboard"
-              className="topnav-mobile-item"
-              onClick={closeAllMenus}
-            >
-              AI Assistant
-            </Link>
-            <Link
-              to="/dashboard"
-              className="topnav-mobile-item"
-              onClick={closeAllMenus}
-            >
-              Products
-            </Link>
-            <Link
-              to="/#how-it-works"
-              className="topnav-mobile-item"
-              onClick={closeAllMenus}
-            >
-              How It Works
-            </Link>
-          </div>
+              <div className="topnav-mobile-section">
+                <div className="topnav-mobile-label">Features</div>
+                <Link
+                  to="/dashboard"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  AI Assistant
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  Products
+                </Link>
+                <Link
+                  to="/#how-it-works"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  How It Works
+                </Link>
+              </div>
+            </>
+          )}
 
           <div className="topnav-mobile-section">
             <div className="topnav-mobile-label">Account</div>
             {isAuthenticated ? (
               <>
                 <Link
-                  to="/profile"
+                  to={profileRoute}
                   className="topnav-mobile-item"
                   onClick={closeAllMenus}
                 >
                   Profile
                 </Link>
+                {isProvider && (
+                  <Link
+                    to="/provider/kyc"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    KYC Verification
+                  </Link>
+                )}
                 <Link
                   to={notificationRoute}
                   className="topnav-mobile-item"
@@ -504,19 +559,21 @@ export const TopNav: React.FC = () => {
                   Notifications
                 </Link>
                 <Link
-                  to="/settings"
+                  to={settingsRoute}
                   className="topnav-mobile-item"
                   onClick={closeAllMenus}
                 >
                   Settings
                 </Link>
-                <Link
-                  to="/provider/register"
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  Become a Provider
-                </Link>
+                {isCustomer && (
+                  <Link
+                    to="/provider/register"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    Become a Provider
+                  </Link>
+                )}
                 <button
                   type="button"
                   className="topnav-mobile-item topnav-mobile-logout"
