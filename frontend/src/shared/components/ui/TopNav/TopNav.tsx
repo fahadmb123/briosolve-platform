@@ -91,8 +91,10 @@ export const TopNav: React.FC = () => {
       <div className="topnav-container">
         <div className="topnav-left">
           <Link to="/" className="topnav-brand" onClick={closeAllMenus}>
-            <i className="fas fa-layer-group"></i>
-            <span>ReverseMarket</span>
+            <span className="topnav-brand-icon">
+              <i className="fas fa-layer-group"></i>
+            </span>
+            <span className="topnav-brand-name">ReverseMarket</span>
           </Link>
 
           <nav className="topnav-links" aria-label="Primary Navigation">
