@@ -16,23 +16,22 @@ export default class UpdateUserStatusUseCase implements IUpdateUserStatusUseCase
         private readonly _userAccountBlockRepository: IUserAccountBlockRepository,
         private readonly _emailSender: IEmailSender,
         private readonly _acountReactivationRequestRepository: IAccountReactivationRequestRepository,
-        private readonly _createNotificationUseCase: IUseCase<CreateNotificationRequestDto,NotificationResponseDto>
+        private readonly _createNotificationUseCase: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
 
     async execute(input: UpdateUserStatusDto): Promise<void> {
-        const user = await this._userRepository.findById(input.id)
+        const user = await this._userRepository.findById(input.id);
 
-        if (!user) throw new ApplicationError("USER_NOT_FOUND","user not found","AUTHORIZATION")
+        if (!user) throw new ApplicationError("USER_NOT_FOUND", "user not found", "AUTHORIZATION");
 
-        const existReactivationRequest = await this._acountReactivationRequestRepository.findPendingByUserId(input.id)
+        const existReactivationRequest = await this._acountReactivationRequestRepository.findPendingByUserId(input.id);
 
-        if (existReactivationRequest) await this._acountReactivationRequestRepository.deleteByUserId(input.id)
+        if (existReactivationRequest) await this._acountReactivationRequestRepository.deleteByUserId(input.id);
 
         if (input.status === "BLOCKED") {
+            const existingBlock = await this._userAccountBlockRepository.findByUserId(input.id);
 
-            const existingBlock = await this._userAccountBlockRepository.findByUserId(input.id)
-
-            if (existingBlock) await this._userAccountBlockRepository.deleteByUserId(input.id)
+            if (existingBlock) await this._userAccountBlockRepository.deleteByUserId(input.id);
 
             const reason = input.reason || "Administrative block";
 
@@ -40,31 +39,25 @@ export default class UpdateUserStatusUseCase implements IUpdateUserStatusUseCase
                 user_id: input.id,
                 blocked_by: input.adminId || input.id,
                 reason
-            })
+            });
 
             if (existReactivationRequest) {
-
-                await this._emailSender.sendRequestDeniedEmail(user.email,reason)
-
-            }else {
-
-                await this._emailSender.sendBlockEmail(user.email, reason)
-
+                await this._emailSender.sendRequestDeniedEmail(user.email, reason);
+            } else {
+                await this._emailSender.sendBlockEmail(user.email, reason);
             }
         } else if (input.status === "ACTIVE") {
+            const existingBlock = await this._userAccountBlockRepository.findByUserId(input.id);
 
-            const existingBlock = await this._userAccountBlockRepository.findByUserId(input.id)
+            if (existingBlock) await this._userAccountBlockRepository.deleteByUserId(input.id);
 
-            if (existingBlock) await this._userAccountBlockRepository.deleteByUserId(input.id)
-
-            await this._emailSender.sendActivationEmail(user.email)
+            await this._emailSender.sendActivationEmail(user.email);
         }
 
-        await this._userRepository.updateStatus(input.id, input.status)
+        await this._userRepository.updateStatus(input.id, input.status);
 
         if (input.status === "BLOCKED" || input.status === "ACTIVE") {
-            
-            const isBlocked = input.status === "BLOCKED"
+            const isBlocked = input.status === "BLOCKED";
 
             const notification = {
                 recipientId: input.id,
@@ -76,14 +69,23 @@ export default class UpdateUserStatusUseCase implements IUpdateUserStatusUseCase
             } as const;
 
             try {
+                await this._createNotificationUseCase.execute(notification);
 
-                await this._createNotificationUseCase.execute(notification)
-
+                if (input.adminId && input.adminId !== input.id) {
+                    await this._createNotificationUseCase.execute({
+                        recipientId: input.adminId,
+                        type: isBlocked ? "WARNING" : "SUCCESS",
+                        title: isBlocked ? "User Suspended" : "User Activated",
+                        message: isBlocked
+                            ? `You suspended the account for ${user.email}.`
+                            : `You activated the account for ${user.email}.`,
+                    });
+                }
             } catch (error) {
                 logger.error(
                     { err: error, userId: input.id },
                     "Failed to create account status notification",
-                )
+                );
             }
         }
     }

@@ -11,6 +11,10 @@ import { useAuthStore } from '../../auth/stores/auth.store';
 import './NotificationDropdown.css';
 import { useNotificationStore } from '../store/notification.store';
 import { mapNotificationToHeader } from '../utils/notification.mapper';
+import {
+  markAllNotificationsAsRead,
+  updateNotificationStatus,
+} from '../services/notification.service';
 
 export interface HeaderNotification {
   id: string;
@@ -104,6 +108,8 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           });
         }
       });
+
+      markAllNotificationsAsRead().catch(() => {});
     },
     [notificationsFromStore, updateNotification],
   );
@@ -120,11 +126,17 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       if (!notification) return;
 
       const isRead = !notification.is_read;
+      const readAt = isRead ? new Date() : null;
 
       updateNotification(id, {
         is_read: isRead,
-        read_at: isRead ? new Date() : null,
+        read_at: readAt,
       });
+
+      updateNotificationStatus(id, {
+        isRead,
+        readAt,
+      }).catch(() => {});
     },
     [notificationsFromStore, updateNotification],
   );
