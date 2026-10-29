@@ -10,7 +10,6 @@ import {
 export const useGetNotifications = () => {
   return useMutation({
     mutationFn: getNotifications,
-    onError: (error: ApiError) => toast.error(error.message),
   });
 };
 
