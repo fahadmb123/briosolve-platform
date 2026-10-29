@@ -76,7 +76,9 @@ export const ProviderTopNav: React.FC = () => {
             className="prov-topnav-brand"
             onClick={closeAll}
           >
-            <i className="fas fa-tools"></i>
+            <span className="prov-brand-icon">
+              <i className="fas fa-tools"></i>
+            </span>
             <span className="prov-brand-text">ReverseMarket</span>
             <span className="prov-pro-badge">PRO</span>
           </Link>
