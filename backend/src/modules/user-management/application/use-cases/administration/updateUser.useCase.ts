@@ -70,17 +70,6 @@ export default class UpdateUserStatusUseCase implements IUpdateUserStatusUseCase
 
             try {
                 await this._createNotificationUseCase.execute(notification);
-
-                if (input.adminId && input.adminId !== input.id) {
-                    await this._createNotificationUseCase.execute({
-                        recipientId: input.adminId,
-                        type: isBlocked ? "WARNING" : "SUCCESS",
-                        title: isBlocked ? "User Suspended" : "User Activated",
-                        message: isBlocked
-                            ? `You suspended the account for ${user.email}.`
-                            : `You activated the account for ${user.email}.`,
-                    });
-                }
             } catch (error) {
                 logger.error(
                     { err: error, userId: input.id },
