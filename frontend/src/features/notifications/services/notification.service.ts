@@ -14,10 +14,7 @@ export const markAllNotificationsAsRead = async (): Promise<response<Notificatio
     return res.data;
 };
 
-export const updateNotificationStatus = async (
-    id: string,
-    data: { isRead?: boolean; readAt?: Date | null },
-): Promise<response<NotificationResponseDto>> => {
+export const updateNotificationStatus = async (id: string,data: { isRead?: boolean; readAt?: Date | null }): Promise<response<NotificationResponseDto>> => {
     const res = await apiClient.patch<response<NotificationResponseDto>>(`/api/notification/${id}`, data);
     return res.data;
 };
