@@ -72,15 +72,19 @@
   filter: none;
 }
 
-.prov-brand-text {
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  color: #ffffff;
+.prov-brand-text-logo {
+  height: 32px;
+  width: auto;
+  max-width: 175px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+  filter: invert(1);
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-[data-theme="light"] .prov-brand-text {
-  color: #000000;
+[data-theme="light"] .prov-brand-text-logo {
+  filter: none;
 }
 
 .prov-pro-badge {

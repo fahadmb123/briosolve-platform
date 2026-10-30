@@ -139,7 +139,7 @@ export const TopNav: React.FC = () => {
         <div className="topnav-left">
           <Link to="/" className="topnav-brand" onClick={closeAllMenus}>
             <img src="/briosolve-logo.svg" alt="Briosolve" className="topnav-brand-logo" />
-            <span className="topnav-brand-name">ReverseMarket</span>
+            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="topnav-brand-text-logo" />
           </Link>
 
           <nav className="topnav-links" aria-label="Primary Navigation">

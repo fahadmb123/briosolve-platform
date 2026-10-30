@@ -59,8 +59,8 @@
 }
 
 .topnav-brand-logo {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 60px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
@@ -72,15 +72,19 @@
   filter: none;
 }
 
-.topnav-brand-name {
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  color: #ffffff;
+.topnav-brand-text-logo {
+  height: 37px;
+  width: auto;
+  max-width: 190px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+  filter: invert(1);
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-[data-theme="light"] .topnav-brand-name {
-  color: #000000;
+[data-theme="light"] .topnav-brand-text-logo {
+  filter: none;
 }
 
 .topnav-links {
@@ -626,6 +630,7 @@
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
