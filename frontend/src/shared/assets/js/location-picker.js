@@ -1,5 +1,5 @@
 /**
- * Reverse Service Marketplace - Location Picker Controller
+ * Briosolve - Location Picker Controller
  * Supports Leaflet / OpenStreetMap, Search Autocomplete, Geolocation States, and Provider Radius
  */
 

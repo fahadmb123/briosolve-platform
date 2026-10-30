@@ -38,9 +38,9 @@ export default function Login() {
                 <div className="auth-card">
                     
                     <div className="auth-form-header">
-                        <Link to="/" className="auth-brand-logo">
-                            <i className="fas fa-layer-group"></i>
-                            <span>ReverseMarket</span>
+                        <Link to="/" className="brand-logo-container justify-center mb-4" aria-label="Briosolve Home">
+                            <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
+                            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
                         </Link>
                         <h2>Sign In</h2>
                         <p>Enter your email and password to securely access your account.</p>

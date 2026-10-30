@@ -66,3 +66,28 @@
 .dark .loading-subtitle {
   color: #94a3b8;
 }
+
+
+.loading-emblem {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  margin-bottom: 20px;
+  filter: brightness(0) invert(1);
+}
+
+[data-theme="light"] .loading-emblem {
+  filter: brightness(0);
+}
+
+.loading-text-logo {
+  height: 44px;
+  width: auto;
+  max-width: 250px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+[data-theme="light"] .loading-text-logo {
+  filter: none;
+}

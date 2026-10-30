@@ -87,15 +87,23 @@
   filter: none;
 }
 
+.prov-brand-text-group {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+
 .prov-pro-badge {
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: 2px 7px;
+  letter-spacing: 0.08em;
+  padding: 1.5px 6px;
   border-radius: 9999px;
   background: #ffffff;
   color: #000000;
   line-height: 1.1;
+  align-self: flex-start;
+  margin-top: 1px;
 }
 
 [data-theme="light"] .prov-pro-badge {

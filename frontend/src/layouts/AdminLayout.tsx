@@ -23,9 +23,9 @@ export default function AdminLayout() {
             <div id="sidebar-overlay" className={`sidebar-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
             <aside className={`app-sidebar ${isSidebarOpen ? 'show' : ''}`} id="app-sidebar">
             <div className="sidebar-brand flex items-center justify-between">
-                <NavLink to="/admin/dashboard" className="logo flex items-center gap-2">
-                    <i className="fas fa-layer-group text-primary"></i>
-                    <span>ReverseMarket</span>
+                <NavLink to="/admin/dashboard" className="brand-logo-container flex items-center gap-2">
+                    <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" style={{ width: '28px', height: '28px' }} />
+                    <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" style={{ height: '22px' }} />
                 </NavLink>
                 <button className="btn-icon ml-auto sidebar-inner-toggle" aria-label="Toggle Sidebar" onClick={handleSidebarToggle}>
                     <i className="fas fa-bars"></i>
@@ -169,7 +169,7 @@ export default function AdminLayout() {
                         <i className="fas fa-bars"></i>
                     </button>
                     <div className="flex items-center gap-3">
-                        <i className="fas fa-layer-group text-primary text-2xl"></i>
+                        <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" style={{ width: '28px', height: '28px' }} />
                         <div className="breadcrumbs-trail tracking-widest text-text" style={{ fontSize: '1.5rem', fontWeight: 800 }}>
                             ADMIN
                         </div>

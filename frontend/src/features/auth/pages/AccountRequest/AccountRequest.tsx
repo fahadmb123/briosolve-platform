@@ -71,10 +71,10 @@ export default function AccountRequest() {
             {(reactivationMut.isPending || sendOtpMut.isPending) && <SpinnerOverlay isLoading={true} />}
 
             <header className="account-request-topbar">
-                <Link to="/" className="account-request-brand">
-                    <i className="fas fa-layer-group text-primary"></i>
-                    <span>ReverseMarket</span>
-                </Link>
+                <Link to="/" className="brand-logo-container justify-center mb-4" aria-label="Briosolve Home">
+                            <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
+                            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
+                        </Link>
 
                 <div className="account-request-topbar-actions">
                     <button

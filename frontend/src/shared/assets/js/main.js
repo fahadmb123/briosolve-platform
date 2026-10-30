@@ -1,5 +1,5 @@
 /**
- * Reverse Service Marketplace
+ * Briosolve
  * Main JavaScript File
  */
 

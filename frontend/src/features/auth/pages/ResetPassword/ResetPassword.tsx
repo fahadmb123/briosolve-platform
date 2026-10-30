@@ -35,9 +35,9 @@ export default function ResetPassword() {
             <div className="auth-card-container">
                 <div className="auth-card card">
                     <div className="text-center mb-6">
-                        <Link to="/" className="logo justify-center mb-4">
-                            <i className="fas fa-layer-group text-primary"></i>
-                            <span>ReverseMarket</span>
+                        <Link to="/" className="brand-logo-container justify-center mb-4" aria-label="Briosolve Home">
+                            <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
+                            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
                         </Link>
                         
                         <h1 className="h3 mb-2">Create New Password</h1>

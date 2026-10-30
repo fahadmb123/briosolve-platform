@@ -238,7 +238,7 @@ export default function Home() {
       <section className="home-section home-benefits-section">
         <div className="home-section-container">
           <div className="home-section-header">
-            <span className="home-section-label">Why ReverseMarket</span>
+            <span className="home-section-label">Why Briosolve</span>
             <h2 className="home-section-title">A marketplace designed for trust</h2>
             <p className="home-section-desc">
               Built to eliminate aggressive sales calls, hidden fees, and
@@ -288,12 +288,12 @@ export default function Home() {
         <div className="home-footer-container">
           <div className="home-footer-top">
             <div className="home-footer-brand">
-              <Link to="/" className="home-logo">
-                <i className="fas fa-layer-group"></i>
-                <span>ReverseMarket</span>
+              <Link to="/" className="brand-logo-container mb-3" aria-label="Briosolve Home">
+                <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
+                <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
               </Link>
               <p>
-                A modern reverse service marketplace connecting homeowners and
+                A modern service marketplace connecting homeowners and
                 businesses with verified local specialists.
               </p>
             </div>
@@ -358,7 +358,7 @@ export default function Home() {
           </div>
 
           <div className="home-footer-bottom">
-            <span>&copy; {new Date().getFullYear()} ReverseMarket. All rights reserved.</span>
+            <span>&copy; {new Date().getFullYear()} Briosolve. All rights reserved.</span>
             <div className="home-footer-legal-links">
               <Link to="/settings" className="home-footer-link">
                 Privacy

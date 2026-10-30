@@ -50,13 +50,13 @@ export class NotificationController extends BaseController {
     update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const id = req.params.id;
-console.log("Heyyyyyyyyyyyyyyyyyyyy")
+
             await this._updateNotificationUseCase.execute({
                 recipientId: req.user?.userId as string,
                 id: id as string,
                 input: req.body,
             });
-console.log("0000000000000000000000")
+
             this.sendSuccess(
                 res,
                 "Updated!"

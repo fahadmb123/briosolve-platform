@@ -1585,3 +1585,47 @@ input::-ms-clear {
     display: flex;
     flex-direction: column;
 }
+
+
+.brand-logo-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  user-select: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.brand-logo-container:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.brand-emblem-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+[data-theme="light"] .brand-emblem-logo {
+  filter: brightness(0);
+}
+
+.brand-text-logo {
+  height: 28px;
+  width: auto;
+  max-width: 170px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+  filter: invert(1);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+[data-theme="light"] .brand-text-logo {
+  filter: none;
+}

@@ -95,7 +95,9 @@ export const ProviderTopNav: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    closeAll();
+    (()=>{
+      closeAll();
+    })()
   }, [location.pathname, closeAll]);
 
   return (
@@ -108,8 +110,10 @@ export const ProviderTopNav: React.FC = () => {
             onClick={closeAll}
           >
             <img src="/briosolve-logo.svg" alt="Briosolve" className="prov-brand-logo" />
-            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="prov-brand-text-logo" />
-            <span className="prov-pro-badge">PROVIDER</span>
+            <div className="prov-brand-text-group">
+              <img src="/briosolve-text-logo.svg" alt="Briosolve" className="prov-brand-text-logo" />
+              <span className="prov-pro-badge">PROVIDER</span>
+            </div>
           </Link>
         </div>
 
@@ -534,7 +538,15 @@ export const ProviderTopNav: React.FC = () => {
                   </div>
                   <div className="prov-header-email">{user?.email}</div>
                   <div className="prov-header-meta">
-                    <span className="prov-mono-badge">Verified Pro</span>
+                    {profile?.kyc_status === "APPROVED" ? (
+                      <>
+                        <span className="prov-mono-badge">Verified Provider</span>
+                      </>
+                    ):(
+                      <>
+                        <span className="prov-mono-badge">Not Verified</span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="prov-dropdown-divider"></div>
