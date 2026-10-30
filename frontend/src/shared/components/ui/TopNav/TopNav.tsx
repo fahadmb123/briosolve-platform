@@ -138,9 +138,7 @@ export const TopNav: React.FC = () => {
       <div className="topnav-container">
         <div className="topnav-left">
           <Link to="/" className="topnav-brand" onClick={closeAllMenus}>
-            <span className="topnav-brand-icon">
-              <i className="fas fa-layer-group"></i>
-            </span>
+            <img src="/briosolve-logo.svg" alt="Briosolve" className="topnav-brand-logo" />
             <span className="topnav-brand-name">ReverseMarket</span>
           </Link>
 

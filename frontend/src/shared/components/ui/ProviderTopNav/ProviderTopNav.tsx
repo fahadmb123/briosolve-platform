@@ -107,9 +107,7 @@ export const ProviderTopNav: React.FC = () => {
             className="prov-topnav-brand"
             onClick={closeAll}
           >
-            <span className="prov-brand-icon">
-              <i className="fas fa-tools"></i>
-            </span>
+            <img src="/briosolve-logo.svg" alt="Briosolve" className="prov-brand-logo" />
             <span className="prov-brand-text">ReverseMarket</span>
             <span className="prov-pro-badge">PRO</span>
           </Link>
