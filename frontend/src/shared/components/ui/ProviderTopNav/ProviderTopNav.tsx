@@ -114,6 +114,16 @@ export const ProviderTopNav: React.FC = () => {
         </div>
 
         <nav className="prov-topnav-center" aria-label="Provider Categories">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `prov-category-btn ${isActive ? "active" : ""}`
+            }
+            onClick={closeAll}
+          >
+            <span>Home</span>
+          </NavLink>
           <div
             className="prov-category-wrapper"
             onMouseEnter={() => handleMouseEnter("workspace")}
@@ -598,6 +608,14 @@ export const ProviderTopNav: React.FC = () => {
         <div className="prov-mobile-menu">
           <div className="prov-mobile-section">
             <div className="prov-col-title">WORKSPACE</div>
+            <NavLink
+              to="/"
+              end
+              className="prov-mobile-item"
+              onClick={closeAll}
+            >
+              <span>Home</span>
+            </NavLink>
             <NavLink
               to="/provider/dashboard"
               end
