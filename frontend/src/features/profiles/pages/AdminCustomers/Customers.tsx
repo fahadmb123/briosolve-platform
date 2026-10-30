@@ -153,9 +153,19 @@ export default function Customers() {
             </div>
 
         
-            <div className="admin-table-card">
+            <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
+                {getCustomers.isPending && <div className="skeleton-progress-bar" />}
                 <div className="admin-table-header">
-                    <div className="text-sm font-semibold text-text"></div>
+                    <div className="text-sm font-semibold text-text">
+                        {getCustomers.isPending && (
+                            <span className="skeleton-loading-label">
+                                <span className="skeleton-dot" />
+                                <span className="skeleton-dot" />
+                                <span className="skeleton-dot" />
+                                Fetching records
+                            </span>
+                        )}
+                    </div>
                     <div className="text-xs text-muted"><i className="fas fa-shield-alt mr-1 text-primary"></i>Admin Action Logging Active</div>
                 </div>
 
@@ -173,22 +183,22 @@ export default function Customers() {
                         </thead>
                         <tbody>
                             {getCustomers.isPending ? (
-                                Array.from({ length: 5 }).map((_, i) => (
-                                    <tr key={`customer-skel-${i}`} className="border-b border-border">
-                                        <td>
-                                            <div className="flex items-center gap-2">
-                                                <Skeleton circle width={36} height={36} />
-                                                <Skeleton width={110} height={15} />
+                                Array.from({ length: 8 }).map((_, i) => (
+                                    <tr key={`customer-skel-${i}`} className="skeleton-row" style={{ opacity: 1 - i * 0.08 }}>
+                                        <td className="skeleton-shimmer-cell">
+                                            <div className="flex items-center gap-3">
+                                                <Skeleton circle width={38} height={38} />
+                                                <Skeleton width={120} height={14} borderRadius={6} />
                                             </div>
                                         </td>
-                                        <td><Skeleton width="85%" height={15} /></td>
-                                        <td><Skeleton width="70%" height={15} /></td>
-                                        <td><Skeleton width={80} height={15} /></td>
-                                        <td><Skeleton width={65} height={22} borderRadius={12} /></td>
-                                        <td className="text-right">
+                                        <td className="skeleton-shimmer-cell"><Skeleton width="80%" height={14} borderRadius={6} /></td>
+                                        <td className="skeleton-shimmer-cell"><Skeleton width="65%" height={14} borderRadius={6} /></td>
+                                        <td className="skeleton-shimmer-cell"><Skeleton width={90} height={14} borderRadius={6} /></td>
+                                        <td className="skeleton-shimmer-cell"><Skeleton width={70} height={24} borderRadius={20} /></td>
+                                        <td className="skeleton-shimmer-cell text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <Skeleton width={45} height={26} borderRadius={6} />
-                                                <Skeleton width={65} height={26} borderRadius={6} />
+                                                <Skeleton width={48} height={28} borderRadius={6} />
+                                                <Skeleton width={72} height={28} borderRadius={6} />
                                             </div>
                                         </td>
                                     </tr>

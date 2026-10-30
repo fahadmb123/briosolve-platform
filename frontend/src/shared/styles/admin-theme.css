@@ -218,6 +218,70 @@ html[data-theme="light"] body.theme-admin {
     border-bottom: none;
 }
 
+@keyframes admin-skeleton-shimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+
+body.theme-admin .react-loading-skeleton {
+    --base-color: #2e2e3e;
+    --highlight-color: #484862;
+    border-radius: 6px !important;
+    line-height: unset !important;
+}
+
+body.theme-admin .skeleton-shimmer-cell .react-loading-skeleton {
+    background: linear-gradient(
+        90deg,
+        #2e2e3e 25%,
+        #484862 50%,
+        #2e2e3e 75%
+    ) !important;
+    background-size: 800px 100% !important;
+    animation: admin-skeleton-shimmer 1.6s ease-in-out infinite !important;
+    border-radius: 6px !important;
+}
+
+html[data-theme="light"] body.theme-admin .react-loading-skeleton {
+    --base-color: #C8D0DC;
+    --highlight-color: #E4EAF3;
+}
+
+html[data-theme="light"] body.theme-admin .skeleton-shimmer-cell .react-loading-skeleton {
+    background: linear-gradient(
+        90deg,
+        #C8D0DC 25%,
+        #E4EAF3 50%,
+        #C8D0DC 75%
+    ) !important;
+    background-size: 800px 100% !important;
+    animation: admin-skeleton-shimmer 1.6s ease-in-out infinite !important;
+    border-radius: 6px !important;
+}
+
+.admin-table tbody tr.skeleton-row {
+    background-color: transparent;
+}
+
+.admin-table tbody tr.skeleton-row:hover {
+    background-color: transparent !important;
+}
+
+.admin-table tbody tr.skeleton-row td {
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.admin-table tbody tr.skeleton-row:last-child td {
+    border-bottom: none;
+}
+
+.skeleton-shimmer-cell {
+    position: relative;
+    overflow: hidden;
+}
+
 /* Table Pagination Footer */
 .admin-pagination {
     padding: 1rem 1.5rem;
@@ -483,30 +547,35 @@ body.theme-admin .app-header.admin-app-header {
     top: 0 !important;
 }
 
-/* Smooth transitions for the layout shift */
 .app-main, .app-sidebar {
-    transition: margin-left var(--transition-normal), width var(--transition-normal), max-width var(--transition-normal), transform var(--transition-normal);
+    transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.theme-admin .app-header.admin-app-header {
-    transition: none; /* Prevent laggy double-transition against app-main */
+    transition: none !important;
 }
 
-/* Sidebar behavior for Admin on Desktop */
-/* Removed overriding admin desktop sidebar rules so it inherits the global modal/mini sidebar logic */
-/* Sidebar behavior for Admin on Desktop - RESTORED */
 @media (min-width: 993px) {
-    /* Hide the navbar toggle button completely on desktop */
     body.theme-admin .admin-app-header #sidebar-toggle {
         display: none !important;
     }
 
-    /* Hide the dark modal overlay on desktop */
     body.theme-admin .app-container.sidebar-modal-layout .sidebar-overlay {
         display: none !important;
     }
 
-    /* OPEN STATE: Push content smoothly instead of modal floating */
+    body.theme-admin .app-container.sidebar-modal-layout .app-sidebar {
+        transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        will-change: width;
+        overflow-x: hidden !important;
+        white-space: nowrap !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .app-main {
+        transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        will-change: margin-left, width;
+    }
+
     body.theme-admin .app-container.sidebar-modal-layout.sidebar-open .app-sidebar {
         transform: translateX(0) !important;
         width: 260px !important;
@@ -526,7 +595,6 @@ body.theme-admin .app-header.admin-app-header {
         transform: none !important;
     }
 
-    /* CLOSED STATE: Mini Sidebar */
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .app-sidebar {
         transform: translateX(0) !important;
         width: 80px !important;
@@ -539,11 +607,150 @@ body.theme-admin .app-header.admin-app-header {
         max-width: calc(100vw - 80px) !important;
     }
 
-    /* Mini Sidebar inner styling */
-    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand span,
-    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item span:not(.badge),
+    body.theme-admin .app-container.sidebar-modal-layout .sidebar-brand {
+        transition: padding 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout.sidebar-open .sidebar-brand {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 1.25rem !important;
+        width: 260px !important;
+        box-sizing: border-box !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 0.625rem !important;
+        width: 80px !important;
+        box-sizing: border-box !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .sidebar-brand .brand-logo-container {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .sidebar-brand .brand-emblem-logo {
+        display: block !important;
+        width: 26px !important;
+        height: 26px !important;
+        flex-shrink: 0 !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .sidebar-brand .brand-text-logo {
+        display: inline-block !important;
+        vertical-align: middle !important;
+        transition: opacity 0.22s ease, max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        max-width: 140px !important;
+        opacity: 1 !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand .brand-text-logo,
+    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand .logo {
+        max-width: 0 !important;
+        opacity: 0 !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
+        margin: 0 !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .sidebar-inner-toggle {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 30px !important;
+        height: 30px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        margin-left: auto !important;
+        flex-shrink: 0 !important;
+        border-radius: var(--radius-md, 6px) !important;
+        color: var(--text-secondary) !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .sidebar-menu-wrapper {
+        overflow-x: hidden !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .sidebar-item {
+        transition: padding 0.28s cubic-bezier(0.4, 0, 0.2, 1), margin 0.28s cubic-bezier(0.4, 0, 0.2, 1), gap 0.28s cubic-bezier(0.4, 0, 0.2, 1), background-color var(--transition-fast), color var(--transition-fast) !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout.sidebar-open .sidebar-item {
+        justify-content: flex-start !important;
+        padding: 0.75rem 1rem !important;
+        margin: 0 0.5rem !important;
+        gap: 0.75rem !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item {
+        position: relative !important;
+        justify-content: center !important;
+        padding: 0.75rem 0 !important;
+        margin: 0 0.5rem !important;
+        gap: 0 !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .sidebar-item i {
+        margin: 0 !important;
+        font-size: 1.25rem !important;
+        width: 24px !important;
+        text-align: center !important;
+        flex-shrink: 0 !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .sidebar-item span:not(.badge) {
+        display: inline-block !important;
+        vertical-align: middle !important;
+        transition: opacity 0.22s ease, max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item span:not(.badge) {
+        opacity: 0 !important;
+        max-width: 0 !important;
+        pointer-events: none !important;
+        transform: translateX(-10px) !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout.sidebar-open .sidebar-item span:not(.badge) {
+        opacity: 1 !important;
+        max-width: 180px !important;
+        transform: translateX(0) !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout .menu-label {
+        transition: opacity 0.22s ease, max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1), margin 0.28s cubic-bezier(0.4, 0, 0.2, 1), padding 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+    }
+
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .menu-label {
-        display: none !important;
+        opacity: 0 !important;
+        max-height: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        pointer-events: none !important;
+    }
+
+    body.theme-admin .app-container.sidebar-modal-layout.sidebar-open .menu-label {
+        opacity: 1 !important;
+        max-height: 30px !important;
     }
 
     body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item .badge {
@@ -553,31 +760,61 @@ body.theme-admin .app-header.admin-app-header {
         padding: 2px 4px;
         font-size: 0.6rem;
     }
-    
-    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item {
-        position: relative;
-        justify-content: center;
-        padding: 0.75rem;
-        margin: 0 0.5rem;
-    }
-
-    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item i {
-        margin: 0;
-        font-size: 1.25rem;
-    }
-    
-    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand {
-        justify-content: center;
-        padding: 0;
-    }
-    
-    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand .logo {
-        display: none;
-    }
-    
-    body.theme-admin .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-inner-toggle {
-        display: flex;
-        margin: 0 auto;
-    }
 }
 
+
+@keyframes skeleton-progress-slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+}
+
+@keyframes skeleton-dot-bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-4px); opacity: 1; }
+}
+
+.skeleton-progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--surface-elevated, #1a1a24);
+    overflow: hidden;
+    z-index: 10;
+}
+
+.skeleton-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 45%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--primary, #6366f1), #818cf8, var(--primary, #6366f1), transparent);
+    animation: skeleton-progress-slide 1.4s ease-in-out infinite;
+    border-radius: 2px;
+}
+
+.skeleton-loading-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted, #6b7280);
+    letter-spacing: 0.02em;
+}
+
+.skeleton-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--primary, #6366f1);
+    animation: skeleton-dot-bounce 1.2s ease-in-out infinite;
+}
+
+.skeleton-dot:nth-child(1) { animation-delay: 0s; }
+.skeleton-dot:nth-child(2) { animation-delay: 0.2s; }
+.skeleton-dot:nth-child(3) { animation-delay: 0.4s; }

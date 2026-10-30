@@ -168,11 +168,8 @@ export default function AdminLayout() {
                     <button id="sidebar-toggle" className="btn-icon mobile-menu-toggle" aria-label="Toggle Sidebar" onClick={handleSidebarToggle}>
                         <i className="fas fa-bars"></i>
                     </button>
-                    <div className="flex items-center gap-3">
-                        <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" style={{ width: '28px', height: '28px' }} />
-                        <div className="breadcrumbs-trail tracking-widest text-text" style={{ fontSize: '1.5rem', fontWeight: 800 }}>
-                            ADMIN
-                        </div>
+                    <div className="breadcrumbs-trail tracking-widest text-text" style={{ fontSize: '1.5rem', fontWeight: 800 }}>
+                        ADMIN
                     </div>
                 </div>
 

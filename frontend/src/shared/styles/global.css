@@ -1474,17 +1474,26 @@ input::-ms-clear {
    Desktop Mini-Sidebar Behavior for ALL Portals
    ========================================================================== */
 @media (min-width: 993px) {
-    /* Navbar toggle button is visible so users can toggle sidebar anytime */
     .app-header #sidebar-toggle {
         display: inline-flex !important;
     }
 
-    /* Hide the dark modal overlay on desktop ONLY when closed */
     .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-overlay {
         display: none !important;
     }
 
-    /* OPEN STATE: Full Desktop Sidebar */
+    .app-container.sidebar-modal-layout .app-sidebar {
+        transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        will-change: width;
+        overflow-x: hidden !important;
+        white-space: nowrap !important;
+    }
+
+    .app-container.sidebar-modal-layout .app-main {
+        transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        will-change: margin-left, width;
+    }
+
     .app-container.sidebar-modal-layout.sidebar-open .app-sidebar {
         transform: translateX(0) !important;
         width: 260px !important;
@@ -1492,17 +1501,15 @@ input::-ms-clear {
         box-shadow: none;
     }
     
-    /* Main content shifts smoothly to fit 260px sidebar on desktop */
     .app-container.sidebar-modal-layout.sidebar-open .app-main {
         margin-left: 260px !important;
         width: calc(100% - 260px) !important;
         max-width: calc(100vw - 260px) !important;
     }
 
-    /* CLOSED STATE: Mini Sidebar */
     .app-container.sidebar-modal-layout:not(.sidebar-open) .app-sidebar {
         transform: translateX(0) !important;
-        width: 80px;
+        width: 80px !important;
         box-shadow: none;
         z-index: 40;
     }
@@ -1513,11 +1520,65 @@ input::-ms-clear {
         max-width: calc(100vw - 80px) !important;
     }
 
-    /* Mini Sidebar inner styling */
-    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand span,
-    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item span:not(.badge),
+    .app-container.sidebar-modal-layout .sidebar-brand .brand-text-logo {
+        display: inline-block !important;
+        vertical-align: middle !important;
+        transition: opacity 0.22s ease, max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        max-width: 140px !important;
+        opacity: 1 !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+    }
+
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand .brand-text-logo,
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand .logo {
+        max-width: 0 !important;
+        opacity: 0 !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
+        margin: 0 !important;
+    }
+
+    .app-container.sidebar-modal-layout .sidebar-item span:not(.badge) {
+        display: inline-block !important;
+        vertical-align: middle !important;
+        transition: opacity 0.22s ease, max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+    }
+
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item span:not(.badge) {
+        opacity: 0 !important;
+        max-width: 0 !important;
+        pointer-events: none !important;
+        transform: translateX(-10px) !important;
+    }
+
+    .app-container.sidebar-modal-layout.sidebar-open .sidebar-item span:not(.badge) {
+        opacity: 1 !important;
+        max-width: 180px !important;
+        transform: translateX(0) !important;
+    }
+
+    .app-container.sidebar-modal-layout .menu-label {
+        transition: opacity 0.22s ease, max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1), margin 0.28s cubic-bezier(0.4, 0, 0.2, 1), padding 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+    }
+
     .app-container.sidebar-modal-layout:not(.sidebar-open) .menu-label {
-        display: none;
+        opacity: 0 !important;
+        max-height: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        pointer-events: none !important;
+    }
+
+    .app-container.sidebar-modal-layout.sidebar-open .menu-label {
+        opacity: 1 !important;
+        max-height: 30px !important;
     }
 
     .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item .badge {
@@ -1542,8 +1603,9 @@ input::-ms-clear {
     .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item {
         position: relative;
         justify-content: center;
-        padding: 0.75rem;
+        padding: 0.75rem 0;
         margin: 0 0.5rem;
+        gap: 0 !important;
     }
 
     .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-item i {
@@ -1552,19 +1614,42 @@ input::-ms-clear {
     }
     
     .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand {
-        justify-content: center;
-        padding: 0;
-    }
-    
-    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand .logo {
-        display: none;
-    }
-    
-    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-inner-toggle {
-        display: flex;
-        margin: 0 auto;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 0.625rem !important;
+        width: 80px !important;
+        box-sizing: border-box !important;
     }
 
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand .brand-logo-container {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0 !important;
+        flex-shrink: 0 !important;
+    }
+
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-brand .brand-emblem-logo {
+        display: block !important;
+        width: 26px !important;
+        height: 26px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .app-container.sidebar-modal-layout:not(.sidebar-open) .sidebar-inner-toggle {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 30px !important;
+        height: 30px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        margin-left: auto !important;
+        flex-shrink: 0 !important;
+        border-radius: var(--radius-md, 6px) !important;
+        color: var(--text-secondary) !important;
+    }
 }
 
 .top-nav-layout,
@@ -1584,6 +1669,11 @@ input::-ms-clear {
     padding-top: 64px;
     display: flex;
     flex-direction: column;
+}
+
+.top-nav-layout.has-subnav .top-nav-content,
+.provider-top-layout.has-subnav .provider-main-content {
+    padding-top: 112px;
 }
 
 
