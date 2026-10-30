@@ -59,23 +59,23 @@
 }
 
 .prov-brand-logo {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  filter: invert(1);
+  filter: brightness(0) invert(1);
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 [data-theme="light"] .prov-brand-logo {
-  filter: none;
+  filter: brightness(0);
 }
 
 .prov-brand-text-logo {
-  height: 32px;
+  height: 36px;
   width: auto;
-  max-width: 175px;
+  max-width: 200px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;

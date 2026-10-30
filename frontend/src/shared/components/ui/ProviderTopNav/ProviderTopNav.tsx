@@ -109,7 +109,7 @@ export const ProviderTopNav: React.FC = () => {
           >
             <img src="/briosolve-logo.svg" alt="Briosolve" className="prov-brand-logo" />
             <img src="/briosolve-text-logo.svg" alt="Briosolve" className="prov-brand-text-logo" />
-            <span className="prov-pro-badge">PRO</span>
+            <span className="prov-pro-badge">PROVIDER</span>
           </Link>
         </div>
 
