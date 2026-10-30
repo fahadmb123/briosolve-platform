@@ -426,8 +426,8 @@
    react-loading-skeleton Theme Integration & Styles
    ========================================================================== */
 .react-loading-skeleton {
-    --base-color: var(--surface-elevated, #1e293b);
-    --highlight-color: var(--surface-hover, #334155);
+    --base-color: var(--surface-elevated, #1c1c22);
+    --highlight-color: var(--surface-hover, #2b2b36);
 }
 
 [data-theme="light"] .react-loading-skeleton {

@@ -237,8 +237,8 @@
 
 .error-details-box {
   margin-top: 0.85rem;
-  background: #0f172a;
-  border: 1px solid #1e293b;
+  background: #121216;
+  border: 1px solid #23232c;
   border-radius: var(--radius-md, 10px);
   padding: 1rem;
   overflow: hidden;
@@ -262,7 +262,7 @@
   align-items: center;
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #282834;
 }
 
 .error-details-title {
@@ -275,8 +275,8 @@
 }
 
 .error-copy-btn {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: #1e1e26;
+  border: 1px solid #2e2e3c;
   color: #cbd5e1;
   font-size: 0.725rem;
   font-weight: 600;
@@ -290,7 +290,7 @@
 }
 
 .error-copy-btn:hover {
-  background: #334155;
+  background: #2a2a38;
   color: #ffffff;
 }
 
@@ -306,7 +306,7 @@
   overflow-y: auto;
   line-height: 1.5;
   scrollbar-width: thin;
-  scrollbar-color: #334155 transparent;
+  scrollbar-color: #2e2e3c transparent;
 }
 
 .error-code-block::-webkit-scrollbar {
@@ -314,14 +314,14 @@
 }
 
 .error-code-block::-webkit-scrollbar-thumb {
-  background-color: #334155;
+  background-color: #2e2e3c;
   border-radius: 3px;
 }
 
 .error-stack-trace {
   margin-top: 0.65rem;
   padding-top: 0.65rem;
-  border-top: 1px dashed #334155;
+  border-top: 1px dashed #2e2e3c;
   color: #94a3b8;
   font-size: 0.7rem;
 }

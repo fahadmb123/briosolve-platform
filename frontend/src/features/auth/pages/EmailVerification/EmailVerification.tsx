@@ -14,10 +14,10 @@ export default function EmailVerification() {
 
         <div className="auth-card-container">
             <div className="auth-card card text-center">
-                <Link to="/" className="logo justify-center mb-5">
-                    <i className="fas fa-layer-group text-primary"></i>
-                    <span>ReverseMarket</span>
-                </Link>
+                <Link to="/" className="brand-logo-container justify-center mb-4" aria-label="Briosolve Home">
+                            <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
+                            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
+                        </Link>
 
                 <div className="verify-icon-wrapper mb-4">
                     <div className="verify-icon-pulse"></div>

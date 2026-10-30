@@ -71,6 +71,7 @@ input:focus + .slider-round {
 
 input:checked + .slider-round:before {
     transform: translateX(20px);
+    background-color: var(--primary-content);
 }
 
 .session-device-row {

@@ -59,7 +59,7 @@ export function ReviewStep({ isActive, isPending, onBack, onSubmit }: ReviewStep
             <div className="register-actions-footer bg-transparent p-0 border-0">
                 <label className="flex items-center gap-2 cursor-pointer text-xs text-secondary w-full justify-center mb-4">
                     <input type="checkbox" id="accept-terms" required defaultChecked className="w-4 h-4 accent-primary" />
-                    <span>I accept the ReverseMarket <Link to="#" className="underline text-primary">Provider Service Terms</Link></span>
+                    <span>I accept the Briosolve <Link to="#" className="underline text-primary">Provider Service Terms</Link></span>
                 </label>
 
                 <div className="flex gap-3 w-full max-w-md mx-auto">

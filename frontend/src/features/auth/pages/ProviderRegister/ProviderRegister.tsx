@@ -43,8 +43,10 @@ export default function ProviderRegister() {
     <div className="register-pro-wrapper">
         
         <header className="register-pro-header" style={{ position: 'relative' }}>
-            <Link to="/" className="logo text-3xl font-black tracking-wide text-text" style={{ fontWeight: 900 }}>
-                Provider Registration
+            <Link to="/" className="brand-logo-container" aria-label="Briosolve Home">
+                <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" style={{ width: '34px', height: '34px' }} />
+                <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" style={{ height: '26px' }} />
+                <span className="text-secondary text-sm font-semibold ml-2 border-l pl-3 border-border">Provider Onboarding</span>
             </Link>
             
             <div className="navbar-center hide-mobile" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '2rem' }}>

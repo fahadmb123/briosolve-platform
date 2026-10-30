@@ -120,14 +120,14 @@
     margin-left: -1.5rem;
     margin-top: -1.5rem;
     height: 200px;
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: linear-gradient(135deg, #27272a 0%, #18181b 100%);
     border-radius: 0 0 1.5rem 1.5rem;
     position: relative;
     z-index: 1;
 }
 
 [data-theme='dark'] .profile-banner {
-    background: linear-gradient(135deg, #1c1f26 0%, #0a0c10 100%);
+    background: linear-gradient(135deg, #18181b 0%, #0a0a0a 100%);
     border-bottom: 1px solid var(--border);
 }
 
@@ -164,7 +164,8 @@
 
 [data-theme='dark'] .profile-card-modern {
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    background: rgba(30, 41, 59, 0.85);
+    background: var(--surface);
+    border-color: var(--border);
 }
 
 .floating-avatar {

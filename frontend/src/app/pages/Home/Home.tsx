@@ -1,24 +1,13 @@
-import { useState, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useSidebar } from "../../../shared/hooks/useSidebar";
-import { useTheme } from "../../../shared/hooks/useTheme";
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "../../../features/auth/stores/auth.store";
-import { useLogout } from "../../../features/auth/hooks/use-otp-varify";
-import NotificationDropdown from "../../../features/notifications/components/NotificationDropdown";
-import { CustomerSidebar } from "../../../shared/components/ui/CustomerSidebar/CustomerSidebar";
+import { TopNav } from "../../../shared/components/ui/TopNav/TopNav";
+import { ProviderTopNav } from "../../../shared/components/ui/ProviderTopNav/ProviderTopNav";
 import "./Home.css";
 
 export default function Home() {
-  const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
-  const { theme, toggleTheme } = useTheme();
-  const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
-  const profile = useAuthStore((state) => state.profile);
-  const clearAuth = useAuthStore((state) => state.clearAuth);
-  const logout = useLogout();
 
   const dashboardRoute = useMemo(() => {
     if (!user) return "/login";
@@ -26,16 +15,6 @@ export default function Home() {
     if (user.role === "PROVIDER") return "/provider/dashboard";
     return "/dashboard";
   }, [user]);
-
-  const handleLogout = async () => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-    await logout.mutateAsync();
-    clearAuth();
-    navigate("/login");
-  };
 
   const services = [
     {
@@ -124,210 +103,14 @@ export default function Home() {
   ];
 
   return (
-    <div
-      className={`app-container sidebar-modal-layout ${
-        isSidebarOpen ? "sidebar-open" : ""
-      }`}
-    >
-      <div
-        id="sidebar-overlay"
-        className={`sidebar-overlay ${isSidebarOpen ? "show" : ""}`}
-        onClick={() => setIsSidebarOpen(false)}
-      ></div>
-      <CustomerSidebar
-        isOpen={isSidebarOpen}
-        onToggle={handleSidebarToggle}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-      <main className="app-main home-wrapper">
-        <nav className="home-navbar">
-          <div className="home-navbar-container">
-            <div className="home-logo-group">
-              <button
-                id="sidebar-toggle"
-                className="btn-icon mobile-menu-toggle"
-                aria-label="Toggle Sidebar"
-                title="Open Menu"
-                onClick={handleSidebarToggle}
-              >
-                <i className="fas fa-bars"></i>
-              </button>
-              <Link to="/" className="home-logo">
-                <i className="fas fa-layer-group"></i>
-                <span>ReverseMarket</span>
-              </Link>
-            </div>
-
-          <div className="home-nav-links">
-            <Link to="/nearby-providers" className="home-nav-link">
-              Nearby Providers
-            </Link>
-            <a href="#services" className="home-nav-link">
-              Services
-            </a>
-            <a href="#how-it-works" className="home-nav-link">
-              How It Works
-            </a>
-            {isAuthenticated && (
-              <Link to={dashboardRoute} className="home-nav-link">
-                Dashboard
-              </Link>
-            )}
-          </div>
-
-          <div className="home-nav-actions">
-            <button
-              type="button"
-              className="btn-icon"
-              onClick={toggleTheme}
-              aria-label="Toggle Theme"
-              title="Toggle Theme"
-            >
-              <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
-            </button>
-
-            {isAuthenticated ? (
-              <>
-                <NotificationDropdown />
-                <Link to={dashboardRoute} className="btn btn-primary btn-sm">
-                  Dashboard
-                </Link>
-                <Link to="/profile" className="avatar avatar-sm ml-1" title="Profile">
-                  {profile?.profile_image ? (
-                    <img
-                      src={`${
-                        profile.profile_image.startsWith("http")
-                          ? ""
-                          : import.meta.env.VITE_API_URL || "http://localhost:5000"
-                      }${profile.profile_image}`}
-                      alt={user?.name || "User"}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          user?.name || "User",
-                        )}&background=6366F1&color=fff&rounded=true`;
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        user?.name || "User",
-                      )}&background=6366F1&color=fff&rounded=true`}
-                      alt="User avatar"
-                    />
-                  )}
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="btn btn-outline btn-sm hide-mobile ml-1"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/provider/register"
-                  className="home-nav-link hide-mobile"
-                >
-                  Become a Provider
-                </Link>
-                <Link to="/login" className="btn btn-outline btn-sm">
-                  Sign In
-                </Link>
-                <Link to="/register" className="btn btn-primary btn-sm hide-mobile">
-                  Get Started
-                </Link>
-              </>
-            )}
-
-            <button
-              type="button"
-              className="home-mobile-toggle"
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              aria-label="Toggle Menu"
-            >
-              <i className={mobileMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
-            </button>
-          </div>
-        </div>
-
-        <div className={`home-mobile-drawer ${mobileMenuOpen ? "open" : ""}`}>
-          <Link
-            to="/nearby-providers"
-            className="home-nav-link"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Nearby Providers
-          </Link>
-          <a
-            href="#services"
-            className="home-nav-link"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Services
-          </a>
-          <a
-            href="#how-it-works"
-            className="home-nav-link"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            How It Works
-          </a>
-          {isAuthenticated ? (
-            <>
-              <Link
-                to={dashboardRoute}
-                className="home-nav-link"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/profile"
-                className="home-nav-link"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Profile
-              </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="btn btn-outline btn-sm text-left"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/provider/register"
-                className="home-nav-link"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Become a Provider
-              </Link>
-              <Link
-                to="/login"
-                className="btn btn-outline btn-sm"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/register"
-                className="btn btn-primary btn-sm"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Get Started
-              </Link>
-            </>
-          )}
-        </div>
-      </nav>
-
-      <section className="home-hero-section">
+    <div className="home-top-layout">
+      {isAuthenticated && user?.role === "PROVIDER" ? (
+        <ProviderTopNav />
+      ) : (
+        <TopNav />
+      )}
+      <main className="home-wrapper">
+        <section className="home-hero-section">
         <div className="home-hero-container">
           <div className="home-badge-pill">
             <i className="fas fa-check-circle"></i>
@@ -396,7 +179,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="services" className="home-section">
+      <section id="services" className="home-section home-services-section">
         <div className="home-section-container">
           <div className="home-section-header">
             <span className="home-section-label">Service Directory</span>
@@ -429,7 +212,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="how-it-works" className="home-section">
+      <section id="how-it-works" className="home-section home-how-it-works-section">
         <div className="home-section-container">
           <div className="home-section-header">
             <span className="home-section-label">How It Works</span>
@@ -452,10 +235,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="home-section">
+      <section className="home-section home-benefits-section">
         <div className="home-section-container">
           <div className="home-section-header">
-            <span className="home-section-label">Why ReverseMarket</span>
+            <span className="home-section-label">Why Briosolve</span>
             <h2 className="home-section-title">A marketplace designed for trust</h2>
             <p className="home-section-desc">
               Built to eliminate aggressive sales calls, hidden fees, and
@@ -477,7 +260,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="home-section">
+      <section className="home-section home-cta-section">
         <div className="home-section-container">
           <div className="home-cta-card">
             <h2 className="home-cta-title">Ready to hire or offer services?</h2>
@@ -505,12 +288,12 @@ export default function Home() {
         <div className="home-footer-container">
           <div className="home-footer-top">
             <div className="home-footer-brand">
-              <Link to="/" className="home-logo">
-                <i className="fas fa-layer-group"></i>
-                <span>ReverseMarket</span>
+              <Link to="/" className="brand-logo-container mb-3" aria-label="Briosolve Home">
+                <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
+                <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
               </Link>
               <p>
-                A modern reverse service marketplace connecting homeowners and
+                A modern service marketplace connecting homeowners and
                 businesses with verified local specialists.
               </p>
             </div>
@@ -575,7 +358,7 @@ export default function Home() {
           </div>
 
           <div className="home-footer-bottom">
-            <span>&copy; {new Date().getFullYear()} ReverseMarket. All rights reserved.</span>
+            <span>&copy; {new Date().getFullYear()} Briosolve. All rights reserved.</span>
             <div className="home-footer-legal-links">
               <Link to="/settings" className="home-footer-link">
                 Privacy
