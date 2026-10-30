@@ -11,8 +11,21 @@ export default function ProviderLayout() {
     return <Outlet />;
   }
 
+  const isSettingsSection =
+    location.pathname.startsWith("/provider/settings") ||
+    location.pathname.startsWith("/provider/profile") ||
+    location.pathname.startsWith("/provider/kyc") ||
+    location.pathname.startsWith("/provider/notifications") ||
+    location.pathname.startsWith("/provider/verification");
+
+  const isWorkspaceSection =
+    location.pathname === "/provider/dashboard" ||
+    location.pathname.startsWith("/provider/dashboard");
+
+  const hasSubnav = isSettingsSection || isWorkspaceSection;
+
   return (
-    <div className="provider-top-layout">
+    <div className={`provider-top-layout ${hasSubnav ? "has-subnav" : ""}`}>
       <ProviderTopNav />
       <main className="provider-main-content">
         <Outlet />

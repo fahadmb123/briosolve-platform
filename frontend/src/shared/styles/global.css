@@ -1586,6 +1586,11 @@ input::-ms-clear {
     flex-direction: column;
 }
 
+.top-nav-layout.has-subnav .top-nav-content,
+.provider-top-layout.has-subnav .provider-main-content {
+    padding-top: 112px;
+}
+
 
 .brand-logo-container {
   display: inline-flex;

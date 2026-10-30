@@ -7,6 +7,48 @@ import NotificationDropdown from "../../../../features/notifications/components/
 import type { UserRole } from "../../../../features/notifications/types/notification.types";
 import "./TopNav.css";
 
+interface SubnavItem {
+  label: string;
+  to: string;
+  icon: string;
+}
+
+const CUSTOMER_WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
+  {
+    label: "Dashboard",
+    to: "/dashboard",
+    icon: "fas fa-chart-pie",
+  },
+  {
+    label: "Find Providers",
+    to: "/nearby-providers",
+    icon: "fas fa-search-location",
+  },
+  {
+    label: "Notifications",
+    to: "/notifications",
+    icon: "fas fa-bell",
+  },
+];
+
+const CUSTOMER_SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
+  {
+    label: "Profile",
+    to: "/profile",
+    icon: "fas fa-user",
+  },
+  {
+    label: "Account Settings",
+    to: "/settings",
+    icon: "fas fa-cog",
+  },
+  {
+    label: "Notifications",
+    to: "/notifications",
+    icon: "fas fa-bell",
+  },
+];
+
 export const TopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -25,6 +67,36 @@ export const TopNav: React.FC = () => {
   const isCustomer = isAuthenticated && user?.role === "CUSTOMER";
   const isProvider = isAuthenticated && user?.role === "PROVIDER";
   const isAdmin = isAuthenticated && user?.role === "ADMIN";
+
+  const isCustomerSettings =
+    isAuthenticated &&
+    !isProvider &&
+    (location.pathname.startsWith("/settings") ||
+      location.pathname.startsWith("/profile") ||
+      location.pathname.startsWith("/notifications"));
+
+  const isCustomerWorkspace =
+    isAuthenticated &&
+    !isProvider &&
+    (location.pathname === "/dashboard" ||
+      location.pathname.startsWith("/dashboard") ||
+      location.pathname.startsWith("/nearby-providers"));
+
+  const activeSubnavItems = isCustomerSettings
+    ? CUSTOMER_SETTINGS_SUBNAV_ITEMS
+    : isCustomerWorkspace
+    ? CUSTOMER_WORKSPACE_SUBNAV_ITEMS
+    : null;
+
+  const activeSubnavTitle = isCustomerSettings
+    ? "Settings"
+    : isCustomerWorkspace
+    ? "Workspace"
+    : "";
+
+  const activeSubnavIcon = isCustomerSettings
+    ? "fas fa-sliders-h"
+    : "fas fa-th-large";
 
   const resolvedRole = useMemo<UserRole>(() => {
     if (user?.role === "ADMIN") return "ADMIN";
@@ -134,7 +206,7 @@ export const TopNav: React.FC = () => {
   }, [location.pathname, closeAllMenus]);
 
   return (
-    <header className="topnav-header" ref={navRef}>
+    <header className={`topnav-header ${activeSubnavItems ? "has-subnav" : ""}`} ref={navRef}>
       <div className="topnav-container">
         <div className="topnav-left">
           <Link to="/" className="topnav-brand" onClick={closeAllMenus}>
@@ -435,6 +507,40 @@ export const TopNav: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {activeSubnavItems && (
+        <nav className="topnav-subnav-bar" aria-label="Secondary navigation">
+          <div className="topnav-subnav-container">
+            <div className="topnav-subnav-left">
+              <span className="topnav-subnav-title">
+                <i className={activeSubnavIcon}></i>
+                <span>{activeSubnavTitle}</span>
+              </span>
+              <span className="topnav-subnav-separator" aria-hidden="true">/</span>
+              {activeSubnavItems.map((item) => {
+                const [toPath, toHash] = item.to.split("#");
+                const isActive = toHash
+                  ? location.pathname === toPath && location.hash === `#${toHash}`
+                  : toPath.endsWith("/dashboard")
+                  ? location.pathname === toPath && (!location.hash || location.hash === "")
+                  : location.pathname === toPath;
+
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`topnav-subnav-item ${isActive ? "active" : ""}`}
+                    onClick={closeAllMenus}
+                  >
+                    <i className={item.icon}></i>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </nav>
+      )}
 
       {mobileMenuOpen && (
         <div className="topnav-mobile-menu">

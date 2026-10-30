@@ -11,8 +11,16 @@ export default function CustomerLayout() {
     return <Outlet />;
   }
 
+  const hasSubnav =
+    location.pathname === "/dashboard" ||
+    location.pathname.startsWith("/dashboard") ||
+    location.pathname.startsWith("/nearby-providers") ||
+    location.pathname.startsWith("/profile") ||
+    location.pathname.startsWith("/settings") ||
+    location.pathname.startsWith("/notifications");
+
   return (
-    <div className="top-nav-layout">
+    <div className={`top-nav-layout ${hasSubnav ? "has-subnav" : ""}`}>
       <TopNav />
       <main className="top-nav-content">
         <Outlet />
