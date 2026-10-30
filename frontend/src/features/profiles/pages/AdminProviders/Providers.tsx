@@ -159,9 +159,19 @@ export default function Providers() {
                     </div>
                 </div>
 
-                <div className="admin-table-card">
+                <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
+                    {getProviders.isPending && <div className="skeleton-progress-bar" />}
                     <div className="admin-table-header">
-                        <div className="text-sm font-semibold text-text">{total} Providers Listed</div>
+                        <div className="text-sm font-semibold text-text">
+                            {getProviders.isPending ? (
+                                <span className="skeleton-loading-label">
+                                    <span className="skeleton-dot" />
+                                    <span className="skeleton-dot" />
+                                    <span className="skeleton-dot" />
+                                    Fetching records
+                                </span>
+                            ) : `${total} Providers Listed`}
+                        </div>
                         <div className="text-xs text-muted"><i className="fas fa-shield-alt mr-1 text-primary"></i>Admin Action Logging Active</div>
                     </div>
 
@@ -180,24 +190,24 @@ export default function Providers() {
                             </thead>
                             <tbody>
                                 {getProviders.isPending ? (
-                                    Array.from({ length: 5 }).map((_, i) => (
-                                        <tr key={`provider-skel-${i}`} className="border-b border-border">
-                                            <td>
-                                                <div className="flex items-center gap-2">
-                                                    <Skeleton circle width={36} height={36} />
-                                                    <div className="flex-1">
-                                                        <Skeleton width={110} height={15} />
-                                                        <Skeleton width={80} height={12} style={{ marginTop: 4 }} />
+                                    Array.from({ length: 8 }).map((_, i) => (
+                                        <tr key={`provider-skel-${i}`} className="skeleton-row" style={{ opacity: 1 - i * 0.08 }}>
+                                            <td className="skeleton-shimmer-cell">
+                                                <div className="flex items-center gap-3">
+                                                    <Skeleton circle width={38} height={38} />
+                                                    <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                                                        <Skeleton width={120} height={14} borderRadius={6} />
+                                                        <Skeleton width={85} height={12} borderRadius={6} />
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td><Skeleton width="85%" height={15} /></td>
-                                            <td><Skeleton width="70%" height={15} /></td>
-                                            <td><Skeleton width={50} height={15} /></td>
-                                            <td><Skeleton width={80} height={22} borderRadius={12} /></td>
-                                            <td><Skeleton width={65} height={22} borderRadius={12} /></td>
-                                            <td className="text-right">
-                                                <Skeleton width={50} height={28} borderRadius={6} />
+                                            <td className="skeleton-shimmer-cell"><Skeleton width="80%" height={14} borderRadius={6} /></td>
+                                            <td className="skeleton-shimmer-cell"><Skeleton width="65%" height={14} borderRadius={6} /></td>
+                                            <td className="skeleton-shimmer-cell"><Skeleton width={55} height={14} borderRadius={6} /></td>
+                                            <td className="skeleton-shimmer-cell"><Skeleton width={88} height={24} borderRadius={20} /></td>
+                                            <td className="skeleton-shimmer-cell"><Skeleton width={70} height={24} borderRadius={20} /></td>
+                                            <td className="skeleton-shimmer-cell text-right">
+                                                <Skeleton width={54} height={28} borderRadius={6} />
                                             </td>
                                         </tr>
                                     ))
