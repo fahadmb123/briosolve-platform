@@ -1,4 +1,0 @@
-model Test {
-  id Uuid @id @default(uuid())
-  updated_at DateTime temporal.updatedAt()
-}
