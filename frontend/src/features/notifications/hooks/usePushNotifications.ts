@@ -39,6 +39,7 @@ export const useSubscribePush = () => {
         mutationFn: (vapidKey?: string) => subscribePush(vapidKey),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["push-subscription-status"] });
+            toast.success("Push notifications enabled!");
         },
         onError: (error: ApiError | Error) => {
             toast.error(error.message || "Failed to subscribe to push notifications");
@@ -53,10 +54,10 @@ export const useUnsubscribePush = () => {
         mutationFn: () => unsubscribePush(),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["push-subscription-status"] });
+            toast.success("Push notifications disabled!");
         },
         onError: (error: ApiError | Error) => {
             toast.error(error.message || "Failed to unsubscribe from push notifications");
         },
     });
 };
-

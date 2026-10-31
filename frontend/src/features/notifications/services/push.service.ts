@@ -10,7 +10,6 @@ export const isPushNotificationSupported = (): boolean => {
     return (
         typeof window !== "undefined" &&
         "serviceWorker" in navigator &&
-        "PushManager" in window &&
         "Notification" in window
     );
 };
@@ -24,8 +23,13 @@ export const getPushPermissionState = (): NotificationPermission => {
 
 export const getExistingPushSubscription = async (): Promise<PushSubscription | null> => {
     if (!isPushNotificationSupported()) return null;
-    const registration = await navigator.serviceWorker.ready;
-    return registration.pushManager.getSubscription();
+    try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (!registration) return null;
+        return await registration.pushManager.getSubscription();
+    } catch {
+        return null;
+    }
 };
 
 export const registerAndSubscribePush = async (
@@ -70,12 +74,17 @@ export const registerAndSubscribePush = async (
 
 export const unsubscribeBrowserPush = async (): Promise<string | null> => {
     if (!isPushNotificationSupported()) return null;
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.getSubscription();
-    if (!subscription) return null;
-    const endpoint = subscription.endpoint;
-    await subscription.unsubscribe();
-    return endpoint;
+    try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (!registration) return null;
+        const subscription = await registration.pushManager.getSubscription();
+        if (!subscription) return null;
+        const endpoint = subscription.endpoint;
+        await subscription.unsubscribe();
+        return endpoint;
+    } catch {
+        return null;
+    }
 };
 
 export const subscribePush = async (
