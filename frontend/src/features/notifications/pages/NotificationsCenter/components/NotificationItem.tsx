@@ -10,8 +10,7 @@ interface NotificationItemProps {
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({
   item,
-  onToggleRead,
-  onRemove,
+  onToggleRead
 }) => {
   return (
     <div className={`notif-item ${item.unread ? "unread" : ""}`}>
@@ -29,15 +28,6 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         <div className="notif-headline">
           <div className="notif-title-row">
             <span className="notif-title">{item.title}</span>
-            {item.badgeLabel && (
-              <span
-                className={`notif-badge-tag badge-${
-                  item.badgeType || "primary"
-                }`}
-              >
-                {item.badgeLabel}
-              </span>
-            )}
           </div>
           <span className="notif-time">{item.time}</span>
         </div>
@@ -134,14 +124,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
               }`}
             ></i>
           </button>
-          <button
-            type="button"
-            className="btn-icon-subtle text-danger"
-            title="Dismiss"
-            onClick={() => onRemove(item.id)}
-          >
-            <i className="fas fa-times"></i>
-          </button>
+          
         </div>
       </div>
     </div>

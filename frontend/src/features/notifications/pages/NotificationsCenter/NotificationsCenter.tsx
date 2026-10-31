@@ -10,7 +10,7 @@ import {
 } from "../../hooks/useNotifications";
 import { mapNotificationToUnified } from "../../utils/notification.mapper";
 import { NotificationHeaderBanner } from "./components/NotificationHeaderBanner";
-import { NotificationStatStrip } from "./components/NotificationStatStrip";
+
 import {
   NotificationToolbar,
   type NotificationFilterTab,
@@ -76,7 +76,11 @@ export default function NotificationsCenter({
   }, [setNotifications]);
 
   const unifiedNotifications: UnifiedNotificationItem[] = useMemo(() => {
-    return notifications.map((n) => mapNotificationToUnified(n, activeRole));
+    const now = Date.now();
+    const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+    return notifications
+      .filter((n) => now - new Date(n.created_at).getTime() <= oneWeekMs)
+      .map((n) => mapNotificationToUnified(n, activeRole));
   }, [notifications, activeRole]);
 
   const unreadCount = useMemo(
@@ -142,8 +146,6 @@ export default function NotificationsCenter({
         const query = searchQuery.toLowerCase();
         const matchesTitle = item.title.toLowerCase().includes(query);
         const matchesSubtitle = item.subtitle.toLowerCase().includes(query);
-        const matchesBadge =
-          item.badgeLabel?.toLowerCase().includes(query) ?? false;
         const matchesMeta =
           item.metaTags?.some(
             (tag) =>
@@ -151,7 +153,7 @@ export default function NotificationsCenter({
               tag.label?.toLowerCase().includes(query),
           ) ?? false;
 
-        if (!matchesTitle && !matchesSubtitle && !matchesBadge && !matchesMeta) {
+        if (!matchesTitle && !matchesSubtitle && !matchesMeta) {
           return false;
         }
       }
@@ -192,8 +194,6 @@ export default function NotificationsCenter({
         unreadCount={unreadCount}
         onMarkAllAsRead={handleMarkAllRead}
       />
-
-      <NotificationStatStrip stats={stats} />
 
       <NotificationToolbar
         activeTab={activeTab}

@@ -248,9 +248,6 @@ export function mapNotificationToUnified(
         }
     }
 
-    const badgeLabel =
-        notification.type.charAt(0) + notification.type.slice(1).toLowerCase();
-
     return {
         id: notification.id,
         role,
@@ -263,7 +260,6 @@ export function mapNotificationToUnified(
         icon: theme.icon,
         iconColor: theme.iconColor,
         iconBg: theme.iconBg,
-        badgeLabel,
         badgeType: theme.badgeType,
         primaryAction,
     };
