@@ -6,12 +6,6 @@ import { UpdateVerificationDocumentRepositoryDto } from "../../application/dtos/
 import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../entities/verificationDocument.entity";
 import { VerificationProfile } from "../entities/verificationProfile.entity";
 
-
-
-
-
-
-
 export interface UpdateDocumentStatusInput {
     documentId: string;
     status: "APPROVED" | "REJECTED";
@@ -28,7 +22,8 @@ export interface IVerificationDocumentRepository extends BaseRepository<Verifica
     getAdminKycRequests(input: GetAdminKycRequestsInput): Promise<GetAdminKycResponse>;
     getAllProfilesWithVerifications(): Promise<VerificationProfile[]>;
     resolveProviderProfileId(providerId: string): Promise<string>;
+    resolveProviderUserId(providerId: string): Promise<string>;
     updateDocumentStatus(input: UpdateDocumentStatusInput): Promise<void>;
     updateProviderKycStatus(profileId: string, kycStatus: string): Promise<void>;
-    deleteByProviderId(providerId: string): Promise<void> 
+    deleteByProviderId(providerId: string): Promise<void>;
 }

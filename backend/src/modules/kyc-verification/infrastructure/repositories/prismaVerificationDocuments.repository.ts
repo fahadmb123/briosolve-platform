@@ -327,6 +327,24 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
         return (profile as any).id as string;
     }
 
+    async resolveProviderUserId(providerId: string): Promise<string> {
+        let profile = await db.orm.public.provider_profiles
+            .where({ id: providerId as never })
+            .first();
+
+        if (!profile) {
+            profile = await db.orm.public.provider_profiles
+                .where({ user_id: providerId as never })
+                .first();
+        }
+
+        if (!profile) {
+            throw new Error("Provider profile not found");
+        }
+
+        return (profile as any).user_id as string;
+    }
+
     async updateDocumentStatus(input: UpdateDocumentStatusInput): Promise<void> {
         await db.orm.public.provider_verification_documents
             .where({ id: input.documentId as never })
@@ -351,3 +369,4 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
             .deleteAll()
     }
 }
+

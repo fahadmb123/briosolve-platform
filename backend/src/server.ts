@@ -11,7 +11,7 @@ import { createNotificationRouter } from "./modules/notification/presentation/ro
 import { createNotificationController } from "./modules/notification/infrastructure/composition/constrollers";
 import { errorHandler } from "./shared/presentation/http/middlewares/error-handler";
 import { authRoutes } from "./modules/auth/infrastructure/composition";
-import { verificationRoutes } from "./modules/kyc-verification/infrastructure/composition";
+import { createVerificationRoutes } from "./modules/kyc-verification/infrastructure/composition";
 import { 
     categoryRoutes,
     serviceRoutes,
@@ -41,6 +41,7 @@ const startServer = async (): Promise<void> => {
         const notificationController = createNotificationController(io, notificationUseCase)
         const notificationRoutes = createNotificationRouter(notificationController)
         const userRoutes = createUserRoutes(notificationUseCase)
+        const verificationRoutes = createVerificationRoutes(notificationUseCase)
 
         const rootRouter = createRootRouter({
             authRoutes,
