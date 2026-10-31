@@ -5,15 +5,22 @@ import type { IPushSubscriptionRepository } from "../../domain/repositories/IPus
 import { logger } from "../../../../shared/infrastructure/logger/logger";
 
 export class WebPushNotificationDeliveryAdapter implements INotificationDelivery {
+    private _vapidConfigured = false;
+
     constructor(
         private readonly _pushSubscriptionRepository: IPushSubscriptionRepository,
     ) {
-        if (process.env.VAPID_SUBJECT && process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-            webpush.setVapidDetails(
-                process.env.VAPID_SUBJECT,
-                process.env.VAPID_PUBLIC_KEY,
-                process.env.VAPID_PRIVATE_KEY,
-            );
+        this.initVapid();
+    }
+
+    private initVapid(): void {
+        const subject = process.env.VAPID_SUBJECT?.replace(/^["']|["']$/g, "");
+        const publicKey = process.env.VAPID_PUBLIC_KEY?.replace(/^["']|["']$/g, "");
+        const privateKey = process.env.VAPID_PRIVATE_KEY?.replace(/^["']|["']$/g, "");
+
+        if (subject && publicKey && privateKey) {
+            webpush.setVapidDetails(subject, publicKey, privateKey);
+            this._vapidConfigured = true;
         }
     }
 
@@ -24,6 +31,15 @@ export class WebPushNotificationDeliveryAdapter implements INotificationDelivery
     }
 
     private async send(notification: NotificationResponseDto): Promise<void> {
+        if (!this._vapidConfigured) {
+            this.initVapid();
+        }
+
+        if (!this._vapidConfigured) {
+            logger.warn("Web push VAPID details not configured, skipping delivery");
+            return;
+        }
+
         const subscriptions = await this._pushSubscriptionRepository.findByUserId(
             notification.recipient_id,
         );
@@ -67,4 +83,3 @@ export class WebPushNotificationDeliveryAdapter implements INotificationDelivery
         );
     }
 }
-

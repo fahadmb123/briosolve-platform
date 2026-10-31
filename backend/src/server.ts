@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 import { createServer } from "node:http";
 import { connectRedis } from "./shared/infrastructure/cache/redis/redis.client";
 import { logger } from "./shared/infrastructure/logger/logger";
