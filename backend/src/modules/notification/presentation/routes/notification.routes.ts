@@ -17,6 +17,7 @@ export function createNotificationRouter(notificationController: NotificationCon
     router.post("/", authMiddleware, validate(createNotificationSchema), notificationController.create);
     router.patch("/", authMiddleware, validate(updateNotificationSchema), notificationController.markAllAsRead);
     router.patch("/:id", authMiddleware, validate(updateNotificationSchema), notificationController.update);
+    
     router.post("/push/subscribe", authMiddleware, validate(savePushSubscriptionSchema), notificationController.subscribePush);
     router.post("/push/unsubscribe", authMiddleware, validate(deletePushSubscriptionSchema), notificationController.unsubscribePush);
 
