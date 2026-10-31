@@ -177,7 +177,7 @@
 .modern-service-chip .hidden-checkbox:checked + .chip-content .check-box-icon {
     background-color: var(--primary);
     border-color: var(--primary);
-    color: white;
+    color: var(--primary-content);
 }
 
 .days-chips-row {
@@ -205,7 +205,7 @@
 .day-pill-check:has(input:checked) {
     background-color: var(--primary);
     border-color: var(--primary);
-    color: #fff;
+    color: var(--primary-content);
 }
 
 .radius-slider-display {
@@ -293,3 +293,4 @@
     padding-left: 2.75rem;
     width: 100%;
 }
+

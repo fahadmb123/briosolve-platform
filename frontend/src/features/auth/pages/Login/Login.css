@@ -154,7 +154,7 @@
 }
 
 .checkmark-box i {
-    color: white;
+    color: var(--primary-content);
     font-size: 0.6rem;
     opacity: 0;
     transform: scale(0);
@@ -182,7 +182,7 @@
     width: 100%;
     padding: 0.875rem;
     background: var(--primary);
-    color: white;
+    color: var(--primary-content);
     border: none;
     border-radius: var(--radius-md);
     font-size: 1rem;

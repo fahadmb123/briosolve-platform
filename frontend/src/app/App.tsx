@@ -25,7 +25,11 @@ function App() {
     });
   }, [fetchUser]);
 
-  if (suspended) {
+  const isVisitingAllowedPage =
+    window.location.pathname === '/account/request' ||
+    window.location.pathname === '/login';
+
+  if (suspended && !isVisitingAllowedPage) {
     return <AccountSuspended />;
   }
 

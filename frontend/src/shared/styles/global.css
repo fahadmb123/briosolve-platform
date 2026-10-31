@@ -1299,7 +1299,7 @@ input::-ms-clear {
 .stepper-item.active .stepper-circle {
     background-color: var(--primary);
     border-color: var(--primary);
-    color: #fff;
+    color: var(--primary-content);
 }
 
 .stepper-item.active .stepper-label {
@@ -1311,7 +1311,7 @@ input::-ms-clear {
 .stepper-item.completed .stepper-circle {
     background-color: var(--success);
     border-color: var(--success);
-    color: #fff;
+    color: var(--primary-content);
 }
 
 .stepper-item.completed::after {
@@ -1719,3 +1719,4 @@ input::-ms-clear {
 [data-theme="light"] .brand-text-logo {
   filter: none;
 }
+

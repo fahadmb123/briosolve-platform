@@ -570,7 +570,7 @@
 
 .notif-action-btn.primary {
   background: var(--primary);
-  color: #ffffff;
+  color: var(--primary-content);
 }
 
 .notif-action-btn.primary:hover {

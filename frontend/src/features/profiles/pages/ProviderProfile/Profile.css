@@ -75,7 +75,7 @@
     height: 28px;
     border-radius: var(--radius-full);
     background-color: var(--primary);
-    color: #ffffff;
+    color: var(--primary-content);
     border: 2px solid var(--surface);
     display: flex;
     align-items: center;
@@ -194,7 +194,7 @@
     width: 36px;
     height: 36px;
     background: var(--primary);
-    color: white;
+    color: var(--primary-content);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -310,3 +310,4 @@
     transform: translateY(-2px);
     border-color: var(--primary-light);
 }
+
