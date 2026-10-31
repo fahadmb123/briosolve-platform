@@ -1,6 +1,11 @@
 import { Router } from "express";
 import type { NotificationController } from "../../presentation/controller/notification.controller";
-import { createNotificationSchema, updateNotificationSchema } from "../validators/notification.validator";
+import {
+    createNotificationSchema,
+    updateNotificationSchema,
+    savePushSubscriptionSchema,
+    deletePushSubscriptionSchema,
+} from "../validators/notification.validator";
 import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
 import validate from "../../../../shared/presentation/http/middlewares/validate-request";
 
@@ -12,6 +17,8 @@ export function createNotificationRouter(notificationController: NotificationCon
     router.post("/", authMiddleware, validate(createNotificationSchema), notificationController.create);
     router.patch("/", authMiddleware, validate(updateNotificationSchema), notificationController.markAllAsRead);
     router.patch("/:id", authMiddleware, validate(updateNotificationSchema), notificationController.update);
+    router.post("/push/subscribe", authMiddleware, validate(savePushSubscriptionSchema), notificationController.subscribePush);
+    router.post("/push/unsubscribe", authMiddleware, validate(deletePushSubscriptionSchema), notificationController.unsubscribePush);
 
     return router;
 }

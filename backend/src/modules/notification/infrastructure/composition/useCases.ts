@@ -2,10 +2,12 @@ import { GetNotificationsUseCase } from "../../application/use-cases/getNotifica
 import { GetUnreadCountUseCase } from "../../application/use-cases/getUnreadCount.useCase";
 import { MarkAllAsReadUseCase } from "../../application/use-cases/markAllAsRead.useCase";
 import { UpdateNotificationUseCase } from "../../application/use-cases/updateNotification.useCase";
-import { notificastionRepository, userRepository } from "./repositories";
+import { notificastionRepository, pushSubscriptionRepository, userRepository } from "./repositories";
 import type { Server } from "socket.io";
 import { CreateNotificationUseCase } from "../../application/use-cases/createNotification.usecase";
 import { SocketIoNotificationDeliveryAdapter } from "../adapters/socket-io-notification-delivery.adapter";
+import { SavePushSubscriptionUseCase } from "../../application/use-cases/savePushSubscription.useCase";
+import { DeletePushSubscriptionUseCase } from "../../application/use-cases/deletePushSubscription.useCase";
 
 export const getNotificationsUseCase = new GetNotificationsUseCase(
     notificastionRepository,
@@ -25,7 +27,16 @@ export const markAllAsReadUseCase = new MarkAllAsReadUseCase(
 export const getUnreadCountUseCase = new GetUnreadCountUseCase(
     notificastionRepository,
     userRepository,
-)
+);
+
+export const savePushSubscriptionUseCase = new SavePushSubscriptionUseCase(
+    pushSubscriptionRepository,
+    userRepository,
+);
+
+export const deletePushSubscriptionUseCase = new DeletePushSubscriptionUseCase(
+    pushSubscriptionRepository,
+);
 
 export function createNotificationUseCase(
     io: Server,
