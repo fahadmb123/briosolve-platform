@@ -17,13 +17,15 @@ export interface UpdateNotificationData {
   title?: string;
   message?: string;
   is_read?: boolean;
+  isRead?: boolean;
   read_at?: Date | null;
+  readAt?: Date | null;
 }
 
 export interface INotificationRepository extends BaseRepository<Notification | null> {
   create(data: CreateNotificationData): Promise<Notification>;
   findByRecipientId(id: string): Promise<Notification[]>;
-  update(id: string,data:UpdateNotificationData): Promise<Notification | null>;
+  update(id: string, data: UpdateNotificationData): Promise<Notification | null>;
   markAllAsRead(recipientId: string): Promise<Notification[] | null>;
-  getUnreadCount(recipientId: string): Promise<number>
+  getUnreadCount(recipientId: string): Promise<number>;
 }
