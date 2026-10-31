@@ -6,9 +6,10 @@ import {
     getUnreadCountUseCase,
     markAllAsReadUseCase,
     updateNotificationUseCase,
+    savePushSubscriptionUseCase,
+    deletePushSubscriptionUseCase,
 } from "./useCases";
 import { CreateNotificationUseCase } from "../../application/use-cases/createNotification.usecase";
-
 
 export function createNotificationController(
     io: Server,
@@ -23,5 +24,7 @@ export function createNotificationController(
         updateNotificationUseCase,
         markAllAsReadUseCase,
         getUnreadCountUseCase,
+        savePushSubscriptionUseCase,
+        deletePushSubscriptionUseCase,
     );
 }

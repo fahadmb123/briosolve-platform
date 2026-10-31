@@ -240,3 +240,13 @@ export const ROLE_CONFIGS: Record<UserRole, RoleNotificationConfig> = {
         ],
     },
 };
+
+export interface PushSubscriptionPayload {
+    endpoint: string;
+    p256dh: string;
+    auth: string;
+}
+
+export interface UnsubscribePushPayload {
+    endpoint: string;
+}

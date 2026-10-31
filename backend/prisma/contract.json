@@ -48,6 +48,10 @@
       "model": "provider_verification_files",
       "namespace": "public"
     },
+    "push_subscriptions": {
+      "model": "push_subscriptions",
+      "namespace": "public"
+    },
     "services": {
       "model": "services",
       "namespace": "public"
@@ -1759,6 +1763,103 @@
               "table": "provider_verification_files"
             }
           },
+          "push_subscriptions": {
+            "fields": {
+              "auth": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 255
+                  }
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "endpoint": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 1000
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "p256dh": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 255
+                  }
+                }
+              },
+              "user_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "user": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "user_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "users",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "auth": {
+                  "column": "auth"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "endpoint": {
+                  "column": "endpoint"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "p256dh": {
+                  "column": "p256dh"
+                },
+                "user_id": {
+                  "column": "user_id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "push_subscriptions"
+            }
+          },
           "services": {
             "fields": {
               "category_id": {
@@ -2241,6 +2342,21 @@
                 },
                 "to": {
                   "model": "provider_profiles",
+                  "namespace": "public"
+                }
+              },
+              "push_subscriptions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "user_id"
+                  ]
+                },
+                "to": {
+                  "model": "push_subscriptions",
                   "namespace": "public"
                 }
               },
@@ -3556,6 +3672,94 @@
               },
               "uniques": []
             },
+            "push_subscriptions": {
+              "columns": {
+                "auth": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 255
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "endpoint": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 1000
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "p256dh": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 255
+                  }
+                },
+                "user_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "user_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "push_subscriptions"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "user_id"
+                  ],
+                  "name": "push_subscriptions_user_id_idx_6c952402",
+                  "prefix": "push_subscriptions_user_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "endpoint"
+                  ]
+                }
+              ]
+            },
             "services": {
               "checks": [
                 {
@@ -4007,10 +4211,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "6247420855ac4a380fb2fdedff6c1e69ad8dcefca90bc1132d5b4160e5f073d3"
+    "storageHash": "1d17f557e4e3e391fe5a7594fd9dd954a0926df3d668d46e9ceb6cc8e77d14bf"
   },
   "execution": {
-    "executionHash": "f042583b7e2cd6aaeb0df6d2ca7587b02c7f268b0c8ac020844b084677aedd34",
+    "executionHash": "0c91cf47b4b0284166c37286e961234147769649211d5226c99d1509a52854f9",
     "mutations": {
       "defaults": [
         {
@@ -4252,6 +4456,17 @@
             "column": "id",
             "namespace": "public",
             "table": "provider_verification_files"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "push_subscriptions"
           }
         },
         {

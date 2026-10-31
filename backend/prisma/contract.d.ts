@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'6247420855ac4a380fb2fdedff6c1e69ad8dcefca90bc1132d5b4160e5f073d3'>;
+  StorageHashBase<'1d17f557e4e3e391fe5a7594fd9dd954a0926df3d668d46e9ceb6cc8e77d14bf'>;
 export type ExecutionHash =
-  ExecutionHashBase<'f042583b7e2cd6aaeb0df6d2ca7587b02c7f268b0c8ac020844b084677aedd34'>;
+  ExecutionHashBase<'0c91cf47b4b0284166c37286e961234147769649211d5226c99d1509a52854f9'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -359,6 +359,14 @@ export type FieldOutputTypes = {
       readonly file_url: Varchar<1000>;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
+    readonly push_subscriptions: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly user_id: CodecTypes['pg/uuid@1']['output'];
+      readonly endpoint: Varchar<1000>;
+      readonly p256dh: Varchar<255>;
+      readonly auth: Varchar<255>;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
     readonly services: {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly category_id: CodecTypes['pg/uuid@1']['output'];
@@ -512,6 +520,14 @@ export type FieldInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly document_id: CodecTypes['pg/uuid@1']['input'];
       readonly file_url: CodecTypes['sql/varchar@1']['input'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly push_subscriptions: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly user_id: CodecTypes['pg/uuid@1']['input'];
+      readonly endpoint: CodecTypes['sql/varchar@1']['input'];
+      readonly p256dh: CodecTypes['sql/varchar@1']['input'];
+      readonly auth: CodecTypes['sql/varchar@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly services: {
@@ -669,6 +685,14 @@ export type StorageColumnTypes = {
       readonly file_url: Varchar<1000>;
       readonly id: CodecTypes['pg/uuid@1']['output'];
     };
+    readonly push_subscriptions: {
+      readonly auth: Varchar<255>;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly endpoint: Varchar<1000>;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly p256dh: Varchar<255>;
+      readonly user_id: CodecTypes['pg/uuid@1']['output'];
+    };
     readonly services: {
       readonly category_id: CodecTypes['pg/uuid@1']['output'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -824,6 +848,14 @@ export type StorageColumnInputTypes = {
       readonly file_url: CodecTypes['sql/varchar@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
     };
+    readonly push_subscriptions: {
+      readonly auth: CodecTypes['sql/varchar@1']['input'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly endpoint: CodecTypes['sql/varchar@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly p256dh: CodecTypes['sql/varchar@1']['input'];
+      readonly user_id: CodecTypes['pg/uuid@1']['input'];
+    };
     readonly services: {
       readonly category_id: CodecTypes['pg/uuid@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -882,6 +914,7 @@ export namespace Models {
     customer_profile: public_customer_profiles | null;
     notifications: public_notifications[];
     provider_profile: public_provider_profiles | null;
+    push_subscriptions: public_push_subscriptions[];
     reactivation_requests: public_account_reactivation_requests[];
     reviewed_reactivation_requests: public_account_reactivation_requests[];
     readonly [RelationKeys]?:
@@ -892,6 +925,7 @@ export namespace Models {
       | 'customer_profile'
       | 'notifications'
       | 'provider_profile'
+      | 'push_subscriptions'
       | 'reactivation_requests'
       | 'reviewed_reactivation_requests';
   };
@@ -1069,6 +1103,16 @@ export namespace Models {
     recipient: public_users;
     readonly [RelationKeys]?: 'recipient';
   };
+  export type public_push_subscriptions = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    user_id: CodecTypes['pg/uuid@1']['output'];
+    endpoint: Varchar<1000>;
+    p256dh: Varchar<255>;
+    auth: Varchar<255>;
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    user: public_users;
+    readonly [RelationKeys]?: 'user';
+  };
 }
 
 export declare const models: {
@@ -1087,6 +1131,7 @@ export declare const models: {
     user_account_blocks: Models.public_user_account_blocks;
     account_reactivation_requests: Models.public_account_reactivation_requests;
     notifications: Models.public_notifications;
+    push_subscriptions: Models.public_push_subscriptions;
   };
 };
 
@@ -1997,6 +2042,68 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly push_subscriptions: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly user_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly endpoint: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 1000 };
+                };
+                readonly p256dh: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 255 };
+                };
+                readonly auth: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 255 };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['endpoint'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'push_subscriptions_user_id_idx_6c952402';
+                  readonly prefix: 'push_subscriptions_user_id_idx';
+                  readonly columns: readonly ['user_id'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'push_subscriptions';
+                    readonly columns: readonly ['user_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'users';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly services: {
               columns: {
                 readonly id: {
@@ -2362,6 +2469,10 @@ type ContractBase = Omit<
     readonly notifications: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'notifications';
+    };
+    readonly push_subscriptions: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'push_subscriptions';
     };
   };
   readonly domain: {
@@ -3405,6 +3516,75 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly push_subscriptions: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly user_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly endpoint: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 1000 };
+                };
+              };
+              readonly p256dh: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 255 };
+                };
+              };
+              readonly auth: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 255 };
+                };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly user: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'users';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['user_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'push_subscriptions';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly user_id: { readonly column: 'user_id' };
+                readonly endpoint: { readonly column: 'endpoint' };
+                readonly p256dh: { readonly column: 'p256dh' };
+                readonly auth: { readonly column: 'auth' };
+                readonly created_at: { readonly column: 'created_at' };
+              };
+            };
+          };
           readonly services: {
             readonly fields: {
               readonly id: {
@@ -3744,6 +3924,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['user_id'];
                 };
               };
+              readonly push_subscriptions: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'push_subscriptions';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['user_id'];
+                };
+              };
               readonly reactivation_requests: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -4045,6 +4236,14 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'provider_verification_files';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'push_subscriptions';
             readonly column: 'id';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
