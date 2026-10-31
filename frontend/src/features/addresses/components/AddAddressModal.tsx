@@ -46,16 +46,16 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6">
-        {/* Backdrop */}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+
         <div
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity cursor-pointer"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity cursor-pointer"
           onClick={onClose}
         ></div>
 
-        {/* Modal Container */}
-        <div className="relative bg-surface rounded-t-2xl sm:rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 max-h-[95vh] sm:max-h-[90vh] mt-16 sm:mt-0">
-          {/* Header */}
+
+        <div className="relative bg-surface rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] my-auto">
+
           <div className="flex items-center justify-between px-6 py-5 border-b border-surface-variant">
             <div className="flex items-center gap-3">
               {step === 2 && (
@@ -89,11 +89,11 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
             </button>
           </div>
 
-          {/* Body */}
+
           <div className="flex-1 overflow-y-auto flex flex-col">
             {step === 1 && (
               <div className="flex flex-col gap-4 p-5 sm:p-6 pb-0 flex-1">
-                {/* Search Bar */}
+
                 <div className="relative z-20">
                   <span
                     className={`material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-[20px] ${isSearching ? "animate-spin" : ""}`}
@@ -111,7 +111,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                     placeholder="Search area, street, landmark..."
                   />
 
-                  {/* Autocomplete Dropdown */}
+
                   {showDropdown &&
                     (searchResults.length > 0 ||
                       (searchQuery.trim().length > 2 && !isSearching)) && (
@@ -150,7 +150,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                     )}
                 </div>
 
-                {/* Current Location Button */}
+
                 <button
                   onClick={handleCurrentLocation}
                   disabled={isLocating}
@@ -185,7 +185,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                   </div>
                 )}
 
-                {/* Map Area */}
+
                 <div className="relative w-full h-[300px] bg-slate-200 dark:bg-slate-800 border border-surface-variant rounded-xl overflow-hidden">
                   {coordinates.lat && coordinates.lng ? (
                     <LeafletMap
@@ -202,7 +202,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                     </div>
                   )}
 
-                  {/* Fixed Center Pin Overlay */}
+
                   {coordinates.lat && coordinates.lng && (
                     <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center pb-8 z-[500]">
                       <span
@@ -216,7 +216,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                   )}
                 </div>
 
-                {/* Display Reverse Geocoded Address */}
+
                 <div className="min-h-[60px] flex items-center bg-surface-container-lowest p-3 rounded-xl border border-surface-variant mt-2 mb-4">
                   <span className="material-symbols-outlined text-primary mr-3">
                     location_city
@@ -245,7 +245,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
             {step === 2 && (
               <div className="flex flex-col gap-5 p-5 sm:p-6 pt-5">
                 
-                {/* Location Map Preview / Edit Button */}
+
                 <div className="flex items-center justify-between p-3.5 bg-surface-container-lowest border border-primary/20 rounded-xl">
                   <div className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-primary text-2xl">location_on</span>
@@ -372,7 +372,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                   {errors.landmark && <span className="text-error text-xs">{errors.landmark.message}</span>}
                 </div>
 
-                {/* Section 3: Address Tags & Save */}
+
                 <div className="pt-2">
                   <label className="block font-label-md text-label-md font-medium text-on-surface mb-3">
                     Save As
@@ -426,7 +426,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
             )}
           </div>
 
-          {/* Footer */}
+
           <div className="p-6 border-t border-surface-variant bg-surface sticky bottom-0 z-10 w-full rounded-b-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
             {step === 1 ? (
               <button
