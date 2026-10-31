@@ -14,16 +14,14 @@ import {
   useUpdateNotificationStatus,
 } from "../hooks/useNotifications";
 import { mapNotificationToHeader } from "../utils/notification.mapper";
+import { NotificationDropdownItem } from "./NotificationDropdownItem";
+import { NotificationDropdownEmpty } from "./NotificationDropdownEmpty";
 import {
   MAX_DROPDOWN_BADGE_COUNT,
   NOTIFICATION_ROUTES,
-} from "../constants/notification.constants";
-import { NotificationDropdownItem } from "./NotificationDropdownItem";
-import { NotificationDropdownEmpty } from "./NotificationDropdownEmpty";
-import type {
-  HeaderNotification,
-  NotificationDropdownProps,
-  UserRole,
+  type HeaderNotification,
+  type NotificationDropdownProps,
+  type UserRole,
 } from "../types/notification.types";
 
 export type { HeaderNotification, NotificationDropdownProps };

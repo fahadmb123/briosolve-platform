@@ -1,50 +1,44 @@
 import React from "react";
-import type {
-  NotificationCategoryTab,
-  UnifiedNotificationItem,
-} from "../../../types/notification.types";
+
+export type NotificationFilterTab = "all" | "unread";
 
 interface NotificationToolbarProps {
-  categories: NotificationCategoryTab[];
-  activeTab: string;
-  onSelectTab: (tabId: string) => void;
+  activeTab: NotificationFilterTab;
+  onSelectTab: (tab: NotificationFilterTab) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  showUnreadOnly: boolean;
-  onToggleUnreadOnly: () => void;
-  unifiedNotifications: UnifiedNotificationItem[];
+  totalCount: number;
+  unreadCount: number;
 }
 
 export const NotificationToolbar: React.FC<NotificationToolbarProps> = ({
-  categories,
   activeTab,
   onSelectTab,
   searchQuery,
   onSearchChange,
-  showUnreadOnly,
-  onToggleUnreadOnly,
-  unifiedNotifications,
+  totalCount,
+  unreadCount,
 }) => {
   return (
     <div className="notif-toolbar-card">
       <div className="notif-tab-group">
-        {categories.map((cat) => {
-          const count =
-            cat.id === "all"
-              ? unifiedNotifications.length
-              : unifiedNotifications.filter((n) => n.category === cat.id).length;
+        <button
+          type="button"
+          className={`notif-tab-btn ${activeTab === "all" ? "active" : ""}`}
+          onClick={() => onSelectTab("all")}
+        >
+          <span>All</span>
+          <span className="notif-tab-badge">{totalCount}</span>
+        </button>
 
-          return (
-            <button
-              key={cat.id}
-              className={`notif-tab-btn ${activeTab === cat.id ? "active" : ""}`}
-              onClick={() => onSelectTab(cat.id)}
-            >
-              <span>{cat.label}</span>
-              <span className="notif-tab-badge">{count}</span>
-            </button>
-          );
-        })}
+        <button
+          type="button"
+          className={`notif-tab-btn ${activeTab === "unread" ? "active" : ""}`}
+          onClick={() => onSelectTab("unread")}
+        >
+          <span>Unread</span>
+          <span className="notif-tab-badge">{unreadCount}</span>
+        </button>
       </div>
 
       <div className="notif-controls">
@@ -68,19 +62,7 @@ export const NotificationToolbar: React.FC<NotificationToolbarProps> = ({
             </button>
           )}
         </div>
-
-        <button
-          type="button"
-          className={`notif-unread-switch ${showUnreadOnly ? "active" : ""}`}
-          onClick={onToggleUnreadOnly}
-        >
-          <i
-            className={`fas ${showUnreadOnly ? "fa-dot-circle" : "fa-circle"}`}
-          ></i>
-          <span>Unread Only</span>
-        </button>
       </div>
     </div>
   );
 };
-

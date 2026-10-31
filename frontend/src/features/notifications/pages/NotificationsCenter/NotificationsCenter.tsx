@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import "./NotificationsCenter.css";
@@ -9,18 +9,19 @@ import {
   useUpdateNotificationStatus,
 } from "../../hooks/useNotifications";
 import { mapNotificationToUnified } from "../../utils/notification.mapper";
+import { NotificationHeaderBanner } from "./components/NotificationHeaderBanner";
+import { NotificationStatStrip } from "./components/NotificationStatStrip";
+import {
+  NotificationToolbar,
+  type NotificationFilterTab,
+} from "./components/NotificationToolbar";
+import { NotificationEmptyState } from "./components/NotificationEmptyState";
+import { NotificationItem } from "./components/NotificationItem";
 import {
   TIME_GROUPS,
   ROLE_CONFIGS,
-} from "../../constants/notification.constants";
-import { NotificationHeaderBanner } from "./components/NotificationHeaderBanner";
-import { NotificationStatStrip } from "./components/NotificationStatStrip";
-import { NotificationToolbar } from "./components/NotificationToolbar";
-import { NotificationEmptyState } from "./components/NotificationEmptyState";
-import { NotificationItem } from "./components/NotificationItem";
-import type {
-  UserRole,
-  UnifiedNotificationItem,
+  type UserRole,
+  type UnifiedNotificationItem,
 } from "../../types/notification.types";
 
 export interface NotificationsCenterProps {
@@ -46,8 +47,7 @@ export default function NotificationsCenter({
 
   const config = ROLE_CONFIGS[activeRole] || ROLE_CONFIGS.CUSTOMER;
 
-  const [activeTab, setActiveTab] = useState<string>("all");
-  const [showUnreadOnly, setShowUnreadOnly] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<NotificationFilterTab>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const notifications = useNotificationStore((state) => state.notifications);
@@ -62,13 +62,11 @@ export default function NotificationsCenter({
   );
 
   const getNotificationsMutation = useGetNotifications();
-  const fetchRef = useRef(getNotificationsMutation.mutate);
-  fetchRef.current = getNotificationsMutation.mutate;
   const markAllMutation = useMarkAllNotificationsRead();
   const updateStatusMutation = useUpdateNotificationStatus();
 
   useEffect(() => {
-    fetchRef.current(undefined, {
+    getNotificationsMutation.mutate(undefined, {
       onSuccess: (res) => {
         if (res?.data) {
           setNotifications(res.data);
@@ -137,10 +135,7 @@ export default function NotificationsCenter({
 
   const filteredNotifications = useMemo(() => {
     return unifiedNotifications.filter((item) => {
-      if (activeTab !== "all" && item.category !== activeTab) {
-        return false;
-      }
-      if (showUnreadOnly && !item.unread) {
+      if (activeTab === "unread" && !item.unread) {
         return false;
       }
       if (searchQuery.trim()) {
@@ -162,7 +157,7 @@ export default function NotificationsCenter({
       }
       return true;
     });
-  }, [unifiedNotifications, activeTab, showUnreadOnly, searchQuery]);
+  }, [unifiedNotifications, activeTab, searchQuery]);
 
   const groups = useMemo(() => {
     const result = TIME_GROUPS.map((groupName) => ({
@@ -185,11 +180,10 @@ export default function NotificationsCenter({
 
   const resetFilters = useCallback(() => {
     setActiveTab("all");
-    setShowUnreadOnly(false);
     setSearchQuery("");
   }, []);
 
-  const isFiltered = Boolean(showUnreadOnly || searchQuery || activeTab !== "all");
+  const isFiltered = Boolean(activeTab !== "all" || searchQuery);
 
   return (
     <div className="app-content notif-center-container">
@@ -202,14 +196,12 @@ export default function NotificationsCenter({
       <NotificationStatStrip stats={stats} />
 
       <NotificationToolbar
-        categories={config.categories}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        showUnreadOnly={showUnreadOnly}
-        onToggleUnreadOnly={() => setShowUnreadOnly((prev) => !prev)}
-        unifiedNotifications={unifiedNotifications}
+        totalCount={unifiedNotifications.length}
+        unreadCount={unreadCount}
       />
 
       {groups.length === 0 ? (

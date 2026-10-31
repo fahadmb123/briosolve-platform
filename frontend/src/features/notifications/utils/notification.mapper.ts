@@ -1,16 +1,47 @@
 import {
-    NOTIFICATION_ICON_THEMES,
     NOTIFICATION_ROUTES,
-    TIME_THRESHOLDS,
-} from "../constants/notification.constants";
-import type {
-    UserRole,
-    NotificationResponseDto,
-    HeaderNotification,
-    UnifiedNotificationItem,
-    NotificationTimeGroup,
-    NotificationAction,
+    type UserRole,
+    type NotificationResponseDto,
+    type HeaderNotification,
+    type UnifiedNotificationItem,
+    type NotificationTimeGroup,
+    type NotificationAction,
 } from "../types/notification.types";
+
+const TIME_THRESHOLDS = {
+    MINUTE_SECONDS: 60,
+    HOUR_SECONDS: 3600,
+    DAY_SECONDS: 86400,
+    MILLISECONDS_PER_DAY: 86400000,
+    WEEK_DAYS: 7,
+} as const;
+
+const NOTIFICATION_ICON_THEMES = {
+    INFO: {
+        icon: "fa-info-circle",
+        iconColor: "#3b82f6",
+        iconBg: "rgba(59, 130, 246, 0.12)",
+        badgeType: "info" as const,
+    },
+    SUCCESS: {
+        icon: "fa-check-circle",
+        iconColor: "#10b981",
+        iconBg: "rgba(16, 185, 129, 0.12)",
+        badgeType: "success" as const,
+    },
+    WARNING: {
+        icon: "fa-exclamation-triangle",
+        iconColor: "#d97706",
+        iconBg: "rgba(245, 158, 11, 0.12)",
+        badgeType: "warning" as const,
+    },
+    ERROR: {
+        icon: "fa-times-circle",
+        iconColor: "#ef4444",
+        iconBg: "rgba(239, 68, 68, 0.12)",
+        badgeType: "danger" as const,
+    },
+} as const;
 
 export function formatRelativeTime(date: Date): string {
     const elapsedSeconds = Math.max(

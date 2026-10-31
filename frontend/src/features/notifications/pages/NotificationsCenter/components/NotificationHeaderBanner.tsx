@@ -21,9 +21,6 @@ export const NotificationHeaderBanner: React.FC<NotificationHeaderBannerProps> =
             <i className={`fas ${config.headerIcon}`}></i>
           </span>
           <span>{config.headerTitle}</span>
-          {config.badgePillText && (
-            <span className="notif-role-pill">{config.badgePillText}</span>
-          )}
           {unreadCount > 0 && (
             <span className="notif-unread-count-pill">
               <span className="notif-pulse-dot"></span>
