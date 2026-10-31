@@ -92,110 +92,130 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       }
 
       return (
-        <div className="error-boundary-wrapper" role="alert">
-          <div className="error-boundary-bg-watermark">ERROR</div>
+        <div className="error-boundary-page-wrapper" role="alert">
+          <header className="error-boundary-topbar">
+            <a href="/" className="brand-logo-container" aria-label="Briosolve Home">
+              <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
+              <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
+            </a>
 
-          <div className="error-boundary-card">
-            {/* Glowing Icon */}
-            <div className="error-icon-container">
-              <span className="error-icon-pulse"></span>
-              <i className="fas fa-exclamation-triangle"></i>
-            </div>
-
-            {/* Badge & Title */}
-            <div>
-              <span className="error-badge">
-                <i className="fas fa-shield-alt"></i> Application Error
-              </span>
-            </div>
-
-            <h1 className="error-title">Something Went Wrong</h1>
-            <p className="error-subtitle">
-              An unexpected client-side error occurred while rendering this view.
-              You can reload the page or return to the homepage to continue.
-            </p>
-
-            {/* Primary Action Buttons */}
-            <div className="error-actions">
-              <button
-                type="button"
-                className="error-btn error-btn-primary"
-                onClick={this.handleReload}
-              >
-                <i className="fas fa-redo-alt"></i>
-                <span>Reload Page</span>
-              </button>
-
-              <button
-                type="button"
-                className="error-btn error-btn-secondary"
-                onClick={this.handleHome}
-              >
+            <div className="error-boundary-topbar-actions">
+              <button type="button" onClick={this.handleHome} className="error-boundary-home-btn">
                 <i className="fas fa-home"></i>
-                <span>Go to Homepage</span>
-              </button>
-
-              <button
-                type="button"
-                className="error-btn error-btn-subtle"
-                onClick={this.handleReset}
-                title="Attempt to recover without full reload"
-              >
-                <i className="fas fa-sync"></i>
-                <span>Try Recovering</span>
+                <span>Homepage</span>
               </button>
             </div>
+          </header>
 
-            {/* Diagnostic Details Accordion */}
-            <div className="error-diagnostic-section">
+          <main className="error-boundary-main">
+            <nav className="error-boundary-breadcrumb" aria-label="Breadcrumb">
+              <a href="/">Home</a>
+              <i className="fas fa-chevron-right"></i>
+              <span>Support</span>
+              <i className="fas fa-chevron-right"></i>
+              <span>System Diagnostics</span>
+            </nav>
+
+            <div className="error-boundary-page-header">
+              <div className="error-boundary-badge-row">
+                <span className="error-boundary-status-badge">
+                  <i className="fas fa-exclamation-triangle"></i>
+                  <span>Application Error</span>
+                </span>
+              </div>
+              <h1 className="error-boundary-page-title">An Unexpected Error Occurred</h1>
+              <p className="error-boundary-page-desc">
+                The application encountered an unhandled exception while rendering this view. You can reload the application, attempt to recover the current state, or return to the homepage.
+              </p>
+            </div>
+
+            <div className="error-boundary-section">
+              <h2 className="error-boundary-section-title">1. Recommended Actions</h2>
+              <p className="error-boundary-section-hint">
+                Choose an action below to restore application state or navigate safely away.
+              </p>
+
+              <div className="error-boundary-actions-bar">
+                <button
+                  type="button"
+                  className="error-boundary-submit-btn"
+                  onClick={this.handleReload}
+                >
+                  <i className="fas fa-redo-alt"></i>
+                  <span>Reload Application</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="error-boundary-secondary-btn"
+                  onClick={this.handleReset}
+                >
+                  <i className="fas fa-sync"></i>
+                  <span>Try Recovering View</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="error-boundary-cancel-btn"
+                  onClick={this.handleHome}
+                >
+                  Return to Homepage
+                </button>
+              </div>
+            </div>
+
+            <div className="error-boundary-section">
+              <h2 className="error-boundary-section-title">2. Technical Diagnostics & Trace</h2>
+              <p className="error-boundary-section-hint">
+                Inspect the recorded runtime error stack or copy the diagnostic report for developer support.
+              </p>
+
               <button
                 type="button"
-                className="error-diagnostic-toggle"
+                className="error-boundary-diagnostic-toggle"
                 onClick={this.handleToggleDetails}
                 aria-expanded={showDetails}
               >
-                <span className="error-diagnostic-toggle-left">
+                <span className="error-boundary-diagnostic-toggle-left">
                   <i className="fas fa-terminal"></i>
-                  <span>Technical Diagnostics & Stack</span>
+                  <span>Diagnostic Stack & Hierarchy</span>
                 </span>
-                <i
-                  className={`fas ${
-                    showDetails ? "fa-chevron-up" : "fa-chevron-down"
-                  }`}
-                ></i>
+                <i className={`fas ${showDetails ? "fa-chevron-up" : "fa-chevron-down"}`}></i>
               </button>
 
               {showDetails && (
-                <div className="error-details-box">
-                  <div className="error-details-header">
-                    <span className="error-details-title">Error Details</span>
+                <div className="error-boundary-details-box">
+                  <div className="error-boundary-details-header">
+                    <span className="error-boundary-details-title">Error Details</span>
                     <button
                       type="button"
-                      className="error-copy-btn"
+                      className="error-boundary-copy-btn"
                       onClick={this.handleCopyReport}
-                      title="Copy diagnostic report to clipboard"
                     >
-                      <i
-                        className={`fas ${copied ? "fa-check" : "fa-copy"}`}
-                      ></i>
+                      <i className={`fas ${copied ? "fa-check" : "fa-copy"}`}></i>
                       <span>{copied ? "Copied!" : "Copy Report"}</span>
                     </button>
                   </div>
 
-                  <pre className="error-code-block">
+                  <pre className="error-boundary-code-block">
                     {error?.name}: {error?.message || "Unknown error"}
                     {error?.stack && `\n\n${error.stack}`}
-                    {errorInfo?.componentStack && (
-                      <div className="error-stack-trace">
-                        Component Stack:
-                        {errorInfo.componentStack}
-                      </div>
-                    )}
+                    {errorInfo?.componentStack && `\n\nComponent Stack:${errorInfo.componentStack}`}
                   </pre>
                 </div>
               )}
             </div>
-          </div>
+
+            <div className="error-boundary-footer-help">
+              <span>
+                If this issue persists across multiple reloads, please contact technical support at{" "}
+                <a href="mailto:support@briosolve.com" className="error-boundary-footer-link">
+                  support@briosolve.com
+                </a>
+                .
+              </span>
+            </div>
+          </main>
         </div>
       );
     }

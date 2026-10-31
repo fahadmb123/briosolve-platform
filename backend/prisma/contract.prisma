@@ -294,6 +294,7 @@ model notifications {
   recipient_id Uuid
   type         VarChar(100)
   title        VarChar(150)
+  title_code   VarChar(150)
   message      VarChar(1000)
   data         Json?
   is_read      Boolean       @default(false)

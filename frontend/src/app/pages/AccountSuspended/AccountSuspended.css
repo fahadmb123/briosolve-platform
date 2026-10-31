@@ -1,0 +1,303 @@
+.account-suspended-page-wrapper {
+    min-height: 100vh;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+}
+
+.account-suspended-topbar {
+    width: 100%;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.account-suspended-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.account-suspended-signin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.15rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+    background-color: var(--surface-hover);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.account-suspended-signin-btn:hover {
+    background-color: var(--surface);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.account-suspended-main {
+    flex: 1;
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem 2rem;
+}
+
+.account-suspended-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--secondary);
+    margin-bottom: 1rem;
+}
+
+.account-suspended-breadcrumb a {
+    color: var(--secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.account-suspended-breadcrumb a:hover {
+    color: var(--primary);
+}
+
+.account-suspended-breadcrumb i {
+    font-size: 0.7rem;
+    opacity: 0.6;
+}
+
+.account-suspended-page-header {
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.account-suspended-badge-row {
+    margin-bottom: 0.85rem;
+}
+
+.account-suspended-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 50px;
+    background-color: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #ef4444;
+    font-size: 0.825rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.account-suspended-status-badge i {
+    font-size: 0.8rem;
+}
+
+.account-suspended-page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+}
+
+.account-suspended-page-desc {
+    font-size: 0.95rem;
+    color: var(--secondary);
+    margin: 0;
+    line-height: 1.6;
+    max-width: 720px;
+}
+
+.account-suspended-section {
+    padding-bottom: 2.25rem;
+    margin-bottom: 2.25rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.account-suspended-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 1.5rem;
+}
+
+.account-suspended-section-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.35rem 0;
+}
+
+.account-suspended-section-hint {
+    font-size: 0.875rem;
+    color: var(--secondary);
+    margin: 0 0 1.25rem 0;
+    line-height: 1.5;
+}
+
+.account-suspended-details-panel {
+    border-radius: 8px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1.25rem;
+}
+
+.account-suspended-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 0;
+    font-size: 0.9rem;
+    gap: 1.5rem;
+}
+
+.account-suspended-detail-row:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.account-suspended-detail-label {
+    color: var(--secondary);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.account-suspended-detail-value {
+    color: var(--text);
+    font-weight: 500;
+    text-align: right;
+}
+
+.account-suspended-detail-value.danger {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.account-suspended-detail-value.code {
+    font-family: monospace;
+    font-size: 0.85rem;
+    background-color: var(--surface-hover);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+}
+
+.account-suspended-notice-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.15rem 1.35rem;
+    border-radius: 8px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--text);
+}
+
+.account-suspended-notice-box i {
+    color: var(--primary);
+    font-size: 1.15rem;
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+}
+
+.account-suspended-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-top: 0.5rem;
+}
+
+.account-suspended-submit-btn {
+    padding: 0.85rem 2rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.account-suspended-submit-btn:hover {
+    filter: brightness(0.92);
+}
+
+.account-suspended-cancel-btn {
+    background: none;
+    border: none;
+    color: var(--secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0.5rem 0.75rem;
+}
+
+.account-suspended-cancel-btn:hover {
+    color: var(--text);
+}
+
+.account-suspended-footer-help {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--secondary);
+}
+
+.account-suspended-footer-link {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.account-suspended-footer-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .account-suspended-topbar {
+        padding: 1rem 1.25rem;
+    }
+
+    .account-suspended-main {
+        padding: 2rem 1.25rem 4rem 1.25rem;
+    }
+
+    .account-suspended-page-title {
+        font-size: 1.6rem;
+    }
+
+    .account-suspended-detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+    }
+
+    .account-suspended-detail-value {
+        text-align: left;
+    }
+
+    .account-suspended-actions-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .account-suspended-submit-btn {
+        justify-content: center;
+    }
+}

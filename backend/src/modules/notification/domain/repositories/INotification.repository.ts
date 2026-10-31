@@ -6,6 +6,7 @@ export interface CreateNotificationData {
     recipientId: string;
     type: string;
     title: string;
+    title_code:string;
     message: string;
     isRead?: boolean;
     readAt?: Date | null;

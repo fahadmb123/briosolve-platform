@@ -10,22 +10,31 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '../features/auth/stores/auth.store';
 import { LoadingScreen } from '../shared/components/ui/LoadingScreen/LoadingScreen';
 import { useNotificationSocket } from '../features/notifications/hooks/useNotificationSocket';
+import AccountSuspended from './pages/AccountSuspended/AccountSuspended';
 
 function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
   const [isInitializing, setIsInitializing] = useState(true);
+  const suspended = useAuthStore((state) => state.isSuspended);
 
-  useNotificationSocket()
-  
+  useNotificationSocket();
+
   useEffect(() => {
     fetchUser().finally(() => {
       setIsInitializing(false);
     });
   }, [fetchUser]);
+
+  if (suspended) {
+    return <AccountSuspended />;
+  }
+
   return (
     <ThemeProvider>
       <div className="app">
-        {isInitializing ? (<LoadingScreen isLoading={true}/>) : (
+        {isInitializing ? (
+          <LoadingScreen isLoading={true} />
+        ) : (
           <>
             <Toaster position="top-center" />
             <AppRouter />

@@ -26,10 +26,12 @@ export interface IAuthUser {
 }
 
 interface IAuthState {
+    isSuspended:boolean
     user: IAuthUser | null;
     profile: CustomerProfile | ProviderProfile | null;
     isAuthenticated: boolean;
 
+    setSuspended: (suspended: boolean) => void;
     setUser: (user: IAuthUser) => void;
     setProfile: (profile: CustomerProfile | ProviderProfile | null) => void;
     clearAuth: () => void;
@@ -37,10 +39,15 @@ interface IAuthState {
 }
 
 export const useAuthStore = create<IAuthState>()((set) => ({
+    isSuspended:false,
     user: null,
     profile: null,
     isAuthenticated: false,
 
+    setSuspended: (suspended: boolean) =>
+        set({
+            isSuspended:suspended
+        }),
     setUser: (user: IAuthUser) =>
         set({
             user,
@@ -62,17 +69,23 @@ export const useAuthStore = create<IAuthState>()((set) => ({
         try {
             const response = await getMe();
             const userData = response.data;
-            
+            const isBlocked = userData?.status === UserStatus.BLOCKED;
+
             set({
                 user: userData,
                 profile: userData.customer_profile || userData.provider_profile || null,
-                isAuthenticated: true,
+                isAuthenticated: !isBlocked,
+                isSuspended: isBlocked,
             });
-        } catch {
+        } catch (err: any) {
+            const isBlocked =
+                err?.response?.data?.code === "BLOCKED_ACCOUNT" ||
+                err?.response?.status === 403;
             set({
                 user: null,
                 profile: null,
                 isAuthenticated: false,
+                isSuspended: isBlocked,
             });
         }
     },

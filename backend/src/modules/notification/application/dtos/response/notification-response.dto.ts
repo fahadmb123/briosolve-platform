@@ -5,6 +5,7 @@ export interface NotificationResponseDto {
   recipient_id: string;
   type: NotificationType;
   title: string;
+  title_code?: string;
   message: string;
   is_read: boolean;
   read_at: Date | null;

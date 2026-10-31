@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'7df988ae37058d5d102c6a0d84747fb50b1b46e192180f5085a9e85db3e397e9'>;
+  StorageHashBase<'6247420855ac4a380fb2fdedff6c1e69ad8dcefca90bc1132d5b4160e5f073d3'>;
 export type ExecutionHash =
   ExecutionHashBase<'f042583b7e2cd6aaeb0df6d2ca7587b02c7f268b0c8ac020844b084677aedd34'>;
 export type ProfileHash =
@@ -293,6 +293,7 @@ export type FieldOutputTypes = {
       readonly recipient_id: CodecTypes['pg/uuid@1']['output'];
       readonly type: Varchar<100>;
       readonly title: Varchar<150>;
+      readonly title_code: Varchar<150>;
       readonly message: Varchar<1000>;
       readonly data: CodecTypes['pg/json@1']['output'] | null;
       readonly is_read: CodecTypes['pg/bool@1']['output'];
@@ -447,6 +448,7 @@ export type FieldInputTypes = {
       readonly recipient_id: CodecTypes['pg/uuid@1']['input'];
       readonly type: CodecTypes['sql/varchar@1']['input'];
       readonly title: CodecTypes['sql/varchar@1']['input'];
+      readonly title_code: CodecTypes['sql/varchar@1']['input'];
       readonly message: CodecTypes['sql/varchar@1']['input'];
       readonly data: CodecTypes['pg/json@1']['input'] | null;
       readonly is_read: CodecTypes['pg/bool@1']['input'];
@@ -605,6 +607,7 @@ export type StorageColumnTypes = {
       readonly read_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly recipient_id: CodecTypes['pg/uuid@1']['output'];
       readonly title: Varchar<150>;
+      readonly title_code: Varchar<150>;
       readonly type: Varchar<100>;
     };
     readonly provider_availability: {
@@ -759,6 +762,7 @@ export type StorageColumnInputTypes = {
       readonly read_at: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly recipient_id: CodecTypes['pg/uuid@1']['input'];
       readonly title: CodecTypes['sql/varchar@1']['input'];
+      readonly title_code: CodecTypes['sql/varchar@1']['input'];
       readonly type: CodecTypes['sql/varchar@1']['input'];
     };
     readonly provider_availability: {
@@ -1056,6 +1060,7 @@ export namespace Models {
     recipient_id: CodecTypes['pg/uuid@1']['output'];
     type: Varchar<100>;
     title: Varchar<150>;
+    title_code: Varchar<150>;
     message: Varchar<1000>;
     data: CodecTypes['pg/json@1']['output'] | null;
     is_read: CodecTypes['pg/bool@1']['output'];
@@ -1466,6 +1471,12 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly length: 100 };
                 };
                 readonly title: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 150 };
+                };
+                readonly title_code: {
                   readonly nativeType: 'character varying';
                   readonly codecId: 'sql/varchar@1';
                   readonly nullable: false;
@@ -2798,6 +2809,14 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly length: 150 };
                 };
               };
+              readonly title_code: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 150 };
+                };
+              };
               readonly message: {
                 readonly nullable: false;
                 readonly type: {
@@ -2851,6 +2870,7 @@ type ContractBase = Omit<
                 readonly recipient_id: { readonly column: 'recipient_id' };
                 readonly type: { readonly column: 'type' };
                 readonly title: { readonly column: 'title' };
+                readonly title_code: { readonly column: 'title_code' };
                 readonly message: { readonly column: 'message' };
                 readonly data: { readonly column: 'data' };
                 readonly is_read: { readonly column: 'is_read' };

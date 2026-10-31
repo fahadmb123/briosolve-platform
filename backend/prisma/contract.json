@@ -895,6 +895,16 @@
                   }
                 }
               },
+              "title_code": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 150
+                  }
+                }
+              },
               "type": {
                 "nullable": false,
                 "type": {
@@ -949,6 +959,9 @@
                 },
                 "title": {
                   "column": "title"
+                },
+                "title_code": {
+                  "column": "title_code"
                 },
                 "type": {
                   "column": "type"
@@ -2844,6 +2857,14 @@
                     "length": 150
                   }
                 },
+                "title_code": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 150
+                  }
+                },
                 "type": {
                   "codecId": "sql/varchar@1",
                   "nativeType": "character varying",
@@ -3986,7 +4007,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7df988ae37058d5d102c6a0d84747fb50b1b46e192180f5085a9e85db3e397e9"
+    "storageHash": "6247420855ac4a380fb2fdedff6c1e69ad8dcefca90bc1132d5b4160e5f073d3"
   },
   "execution": {
     "executionHash": "f042583b7e2cd6aaeb0df6d2ca7587b02c7f268b0c8ac020844b084677aedd34",

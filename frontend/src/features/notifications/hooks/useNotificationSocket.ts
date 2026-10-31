@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { socket } from "../../../shared/api/socket-client";
 import { useAuthStore } from "../../auth/stores/auth.store";
 import { useNotificationStore } from "../stores/notification.store";
@@ -15,8 +15,7 @@ export function useNotificationSocket(): void {
         (state) => state.setNotifications,
     );
     const getNotificationsMutation = useGetNotifications();
-    const fetchRef = useRef(getNotificationsMutation.mutate);
-    fetchRef.current = getNotificationsMutation.mutate;
+    
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -24,7 +23,7 @@ export function useNotificationSocket(): void {
             return;
         }
 
-        fetchRef.current(undefined, {
+        getNotificationsMutation.mutate(undefined, {
             onSuccess: (res) => {
                 if (res?.data) {
                     setNotifications(res.data);
@@ -33,14 +32,35 @@ export function useNotificationSocket(): void {
         });
 
         const handleNewNotification = (notification: NotificationResponseDto) => {
+            if (
+                notification.title_code === "ACCOUNT_SUSPENDED" ||
+                notification.title === "ACCOUNT_SUSPENDED" ||
+                notification.title === "Account Suspended"
+            ) {
+                useAuthStore.getState().clearAuth();
+                useAuthStore.getState().setSuspended(true);
+                return;
+            }
             addNotification(notification);
             playNotificationSound();
         };
 
+        const handleConnect = () => {
+            console.log("Notification socket connected successfully");
+        };
+
+        const handleConnectError = (error: Error) => {
+            console.error("Notification socket connection error:", error.message);
+        };
+
+        socket.on("connect", handleConnect);
+        socket.on("connect_error", handleConnectError);
         socket.on("notification:new", handleNewNotification);
         socket.connect();
 
         return () => {
+            socket.off("connect", handleConnect);
+            socket.off("connect_error", handleConnectError);
             socket.off("notification:new", handleNewNotification);
             socket.disconnect();
         };

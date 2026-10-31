@@ -88,11 +88,6 @@ export default function NotificationsCenter({
     [unifiedNotifications],
   );
 
-  const stats = useMemo(
-    () => config.getStats(unifiedNotifications, unreadCount),
-    [config, unifiedNotifications, unreadCount],
-  );
-
   const handleMarkAllRead = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();

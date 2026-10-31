@@ -9,6 +9,7 @@ export class Notification {
     public readonly id: string,
     public readonly recipient_id: string,
     public readonly title: string,
+    public readonly title_code:string,
     public readonly message: string,
     public readonly type: NotificationType,
     public readonly is_read: boolean,

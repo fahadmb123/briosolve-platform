@@ -28,7 +28,7 @@ export default class LoginUseCase implements IUseCase<LoginInputDto, LoginOutput
             throw new ApplicationError("INACTIVE_ACCOUNT", "Inactive Account", "AUTHORIZATION");
         }
         if (user.status === "BLOCKED") {
-            throw new ApplicationError("BLOCKED_ACCOUNT", "Your account has been blocked", "AUTHORIZATION");
+            throw new ApplicationError("BLOCKED_ACCOUNT", "Suspended Account. Please check your email.", "AUTHORIZATION");
         }
 
         const accessToken = this._jwtService.generate({

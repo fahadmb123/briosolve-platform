@@ -62,6 +62,7 @@ export default class UpdateUserStatusUseCase implements IUpdateUserStatusUseCase
             const notification = {
                 recipientId: input.id,
                 type: isBlocked ? "ERROR" : "SUCCESS",
+                title_code:isBlocked ? "ACCOUNT_SUSPENDED" : "ACCOUNT_ACTIVATED",
                 title: isBlocked ? "Account Suspended" : "Account Activated",
                 message: isBlocked
                     ? input.reason || "Your account has been suspended."
