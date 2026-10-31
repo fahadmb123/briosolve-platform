@@ -127,7 +127,12 @@ export default function Home() {
           </p>
 
           <div className="home-hero-cta-group">
-            <Link to="/nearby-providers" className="home-btn-primary">
+            <Link to="/request-service" className="home-btn-primary">
+              <i className="fas fa-plus-circle"></i>
+              <span>Post a Service Request</span>
+            </Link>
+
+            <Link to="/nearby-providers" className="home-btn-secondary">
               <i className="fas fa-search-location"></i>
               <span>Find Nearby Providers</span>
             </Link>
@@ -269,7 +274,12 @@ export default function Home() {
               as an independent service provider to expand your business.
             </p>
             <div className="home-cta-actions">
-              <Link to="/nearby-providers" className="home-btn-primary">
+              <Link to="/request-service" className="home-btn-primary">
+              <i className="fas fa-plus-circle"></i>
+              <span>Post a Service Request</span>
+            </Link>
+
+            <Link to="/nearby-providers" className="home-btn-secondary">
                 <i className="fas fa-map-marker-alt"></i>
                 <span>Find Providers</span>
               </Link>

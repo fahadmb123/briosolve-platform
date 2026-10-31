@@ -14,7 +14,7 @@ export default function Dashboard() {
                             You have <span className="text-primary font-semibold">7 new quotations</span> waiting for your review across 2 active requests.
                         </p>
                     </div>
-                    <Link to="#" className="btn btn-primary btn-lg cta-pulse-btn">
+                    <Link to="/request-service" className="btn btn-primary btn-lg cta-pulse-btn">
                         <i className="fas fa-plus-circle"></i>
                         <span>Post a Service Request</span>
                     </Link>
