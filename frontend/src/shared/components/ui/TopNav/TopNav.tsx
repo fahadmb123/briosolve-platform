@@ -25,6 +25,11 @@ const CUSTOMER_WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-search-location",
   },
   {
+    label: "Request Service",
+    to: "/request-service",
+    icon: "fas fa-plus-circle",
+  },
+  {
     label: "Notifications",
     to: "/notifications",
     icon: "fas fa-bell",
@@ -80,7 +85,8 @@ export const TopNav: React.FC = () => {
     !isProvider &&
     (location.pathname === "/dashboard" ||
       location.pathname.startsWith("/dashboard") ||
-      location.pathname.startsWith("/nearby-providers"));
+      location.pathname.startsWith("/nearby-providers") ||
+      location.pathname.startsWith("/request-service"));
 
   const activeSubnavItems = isCustomerSettings
     ? CUSTOMER_SETTINGS_SUBNAV_ITEMS
@@ -225,6 +231,15 @@ export const TopNav: React.FC = () => {
               Home
             </NavLink>
 
+            <NavLink
+              to="/request-service"
+              className={({ isActive }) =>
+                `topnav-link ${isActive ? "active" : ""}`
+              }
+            >
+              Request Service
+            </NavLink>
+
             {isCustomer && (
               <NavLink
                 to="/nearby-providers"
@@ -272,6 +287,15 @@ export const TopNav: React.FC = () => {
                 {openDropdown === "more" && (
                   <div className="topnav-dropdown-menu" role="menu">
                     <div className="topnav-dropdown-section-title">Activity</div>
+                    <Link
+                      to="/request-service"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={closeAllMenus}
+                    >
+                      <span>Request Service</span>
+                      <i className="fas fa-plus-circle"></i>
+                    </Link>
                     <Link
                       to="/dashboard"
                       className="topnav-dropdown-item"
@@ -554,6 +578,15 @@ export const TopNav: React.FC = () => {
             >
               Home
             </NavLink>
+
+            <NavLink
+              to="/request-service"
+              className={({ isActive }) =>
+                `topnav-link ${isActive ? "active" : ""}`
+              }
+            >
+              Request Service
+            </NavLink>
             {isCustomer && (
               <NavLink
                 to="/nearby-providers"
@@ -578,6 +611,13 @@ export const TopNav: React.FC = () => {
             <>
               <div className="topnav-mobile-section">
                 <div className="topnav-mobile-label">Activity</div>
+                <Link
+                  to="/request-service"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  Request Service
+                </Link>
                 <Link
                   to="/dashboard"
                   className="topnav-mobile-item"

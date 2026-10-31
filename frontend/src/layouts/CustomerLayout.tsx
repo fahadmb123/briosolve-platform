@@ -17,7 +17,8 @@ export default function CustomerLayout() {
     location.pathname.startsWith("/nearby-providers") ||
     location.pathname.startsWith("/profile") ||
     location.pathname.startsWith("/settings") ||
-    location.pathname.startsWith("/notifications");
+    location.pathname.startsWith("/notifications") ||
+    location.pathname.startsWith("/request-service");
 
   return (
     <div className={`top-nav-layout ${hasSubnav ? "has-subnav" : ""}`}>
