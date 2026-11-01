@@ -1,0 +1,123 @@
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import "./CustomerSubnavSidebar.css";
+
+interface SubnavItem {
+  label: string;
+  to: string;
+  icon: string;
+}
+
+const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
+  {
+    label: "Dashboard",
+    to: "/dashboard",
+    icon: "fas fa-chart-pie",
+  },
+  {
+    label: "Find Providers",
+    to: "/nearby-providers",
+    icon: "fas fa-search-location",
+  },
+  {
+    label: "Request Service",
+    to: "/request-service",
+    icon: "fas fa-plus-circle",
+  },
+  {
+    label: "Notifications",
+    to: "/notifications",
+    icon: "fas fa-bell",
+  },
+];
+
+const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
+  {
+    label: "Profile",
+    to: "/profile",
+    icon: "fas fa-user",
+  },
+  {
+    label: "Account Settings",
+    to: "/settings",
+    icon: "fas fa-cog",
+  },
+  {
+    label: "Notifications",
+    to: "/notifications",
+    icon: "fas fa-bell",
+  },
+];
+
+export const CustomerSubnavSidebar: React.FC = () => {
+  const location = useLocation();
+
+  const isSettingsSection =
+    location.pathname.startsWith("/settings") ||
+    location.pathname.startsWith("/profile");
+
+  const isWorkspaceSection =
+    location.pathname === "/dashboard" ||
+    location.pathname.startsWith("/dashboard") ||
+    location.pathname.startsWith("/nearby-providers") ||
+    location.pathname.startsWith("/request-service");
+
+  const isNotifications = location.pathname.startsWith("/notifications");
+
+  const activeSubnavItems = isSettingsSection
+    ? SETTINGS_SUBNAV_ITEMS
+    : isWorkspaceSection
+    ? WORKSPACE_SUBNAV_ITEMS
+    : isNotifications
+    ? SETTINGS_SUBNAV_ITEMS
+    : null;
+
+  const activeSubnavTitle = isSettingsSection || isNotifications
+    ? "Settings"
+    : isWorkspaceSection
+    ? "Workspace"
+    : "";
+
+  const activeSubnavIcon = isSettingsSection || isNotifications
+    ? "fas fa-sliders-h"
+    : "fas fa-th-large";
+
+  if (!activeSubnavItems) return null;
+
+  return (
+    <aside className="cust-subnav-sidebar" aria-label="Secondary navigation">
+      <div className="cust-subnav-sidebar-header">
+        <div className="cust-subnav-sidebar-badge">
+          <i className={activeSubnavIcon}></i>
+          <span>{activeSubnavTitle}</span>
+        </div>
+      </div>
+
+      <nav className="cust-subnav-sidebar-nav">
+        {activeSubnavItems.map((item) => {
+          const [toPath, toHash] = item.to.split("#");
+          const isActive = toHash
+            ? location.pathname === toPath && location.hash === `#${toHash}`
+            : toPath.endsWith("/dashboard")
+            ? location.pathname === toPath && (!location.hash || location.hash === "")
+            : location.pathname === toPath;
+
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`cust-subnav-sidebar-item ${isActive ? "active" : ""}`}
+            >
+              <div className="cust-subnav-sidebar-icon">
+                <i className={item.icon}></i>
+              </div>
+              <span className="cust-subnav-sidebar-label">{item.label}</span>
+              {isActive && <span className="cust-subnav-sidebar-pill" />}
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+};
+
