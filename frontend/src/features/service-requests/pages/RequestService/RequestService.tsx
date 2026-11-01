@@ -2,6 +2,7 @@ import React, { useState, useId } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import type { Address } from "../../../addresses";
+import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
 import "./RequestService.css";
 
 interface ServiceCategoryItem {
@@ -134,9 +135,11 @@ const LEVEL_STEPS = [
 ];
 
 export default function RequestService() {
+  const verifications = useAuthStore(state=>state.verifications)
   const navigate = useNavigate();
   const fileInputId = useId();
   const user = useAuthStore((s) => s.user);
+  const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
 
   const customerAddress =
     typeof user?.current_address_id === "object"
@@ -262,6 +265,18 @@ export default function RequestService() {
     AFTERNOON: "Afternoon (12 PM - 4 PM)",
     EVENING: "Evening (4 PM - 8 PM)",
   }[scheduledSlot];
+
+
+    if (!isVerified) {
+    return (
+      <div className="app-content request-service-container">
+        <VerificationRequiredCard
+          title="Complete Verification to Post a Request"
+          description="To maintain marketplace trust, prevent spam, and ensure providers can reach you, please complete the required verifications before submitting your service request."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="app-content request-service-container">
