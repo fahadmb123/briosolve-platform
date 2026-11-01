@@ -11,6 +11,7 @@ import { AvailabilitySettings } from '../../../availability';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { BecomeCustomer } from '../../components/provider/BecomeCustomer';
+import { BankAccountSettings } from '../../components/provider/BankAccountSettings';
 const Addresses = lazy(() => import('../CustomerSettings/views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
 
 export default function Settings() {
@@ -68,6 +69,7 @@ export default function Settings() {
   const handleSelectAvailability = useCallback(() => setActiveSection('availability'), []);
   const handleSelectNotifications = useCallback(() => setActiveSection('notifications'), []);
   const handleSelectAddresses = useCallback(() => setActiveSection('addresses'), []);
+  const handleSelectBankAccount = useCallback(() => setActiveSection('bank-account'), []);
   const handleBackToGrid = useCallback(() => setActiveSection('grid'), []);
   const handleBecomeCustomer = useCallback(() => setActiveSection('become-customer'), []);
 
@@ -130,6 +132,13 @@ export default function Settings() {
                             description="Save your business addresses for accurate local search matching."
                             onClick={handleSelectAddresses}
                             badge={addressBadge}
+                        />
+                        <SettingsMenuCard
+                            icon="fas fa-university"
+                            title="Bank Account"
+                            description="Configure your payout bank account, IFSC details, and automated settlements."
+                            onClick={handleSelectBankAccount}
+                            badge={{ text: 'Verified', type: 'success' }}
                         />
                         <SettingsMenuCard
                             icon="fas fa-store"
@@ -255,6 +264,11 @@ export default function Settings() {
                             <Suspense fallback={<SpinnerOverlay isLoading={true} />}>
                                 <Addresses />
                             </Suspense>
+                        )}
+                        {activeSection === 'bank-account' && (
+                            <div className="settings-card-panel" id="sec-bank-account">
+                                <BankAccountSettings />
+                            </div>
                         )}
                         {activeSection === 'become-customer' && (
                             <Suspense fallback={<SpinnerOverlay isLoading={true} />}>
