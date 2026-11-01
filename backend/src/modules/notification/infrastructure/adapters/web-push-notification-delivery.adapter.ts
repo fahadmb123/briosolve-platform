@@ -42,11 +42,9 @@ export class WebPushNotificationDeliveryAdapter implements INotificationDelivery
 
         const subscriptions = await this._pushSubscriptionRepository.findByUserId(
             notification.recipient_id,
-        );
+        )
 
-        if (!subscriptions || subscriptions.length === 0) {
-            return;
-        }
+        if (!subscriptions || subscriptions.length === 0) return
 
         const payload = JSON.stringify({
             title: notification.title,
