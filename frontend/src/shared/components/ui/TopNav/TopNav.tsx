@@ -407,7 +407,14 @@ export const TopNav: React.FC = () => {
                       role="menuitem"
                       onClick={closeAllMenus}
                     >
-                      <span>Settings</span>
+                      <span className="flex items-center gap-2">
+                        Settings
+                        {!isVerified && (
+                          <span className="topnav-warning-badge" title="Verification required">
+                            <i className="fas fa-exclamation"></i>
+                          </span>
+                        )}
+                      </span>
                       <i className="fas fa-cog"></i>
                     </Link>
                     {isCustomer && (
@@ -605,10 +612,15 @@ export const TopNav: React.FC = () => {
                 </Link>
                 <Link
                   to={settingsRoute}
-                  className="topnav-mobile-item"
+                  className="topnav-mobile-item flex items-center justify-between"
                   onClick={closeAllMenus}
                 >
-                  Settings
+                  <span>Settings</span>
+                  {!isVerified && (
+                    <span className="topnav-warning-badge" title="Verification required">
+                      <i className="fas fa-exclamation"></i>
+                    </span>
+                  )}
                 </Link>
                 {isCustomer && (
                   <Link

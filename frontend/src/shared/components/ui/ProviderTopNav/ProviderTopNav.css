@@ -353,6 +353,30 @@
   color: #ffffff;
 }
 
+.prov-nav-warning-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  min-width: 17px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #F59E0B !important;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  line-height: 1;
+  flex-shrink: 0;
+  margin-left: 0.35rem;
+}
+
+[data-theme="light"] .prov-nav-warning-badge {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #D97706 !important;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
 .prov-logout-item {
   color: #ffffff;
 }

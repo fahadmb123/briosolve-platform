@@ -412,6 +412,11 @@ export const ProviderTopNav: React.FC = () => {
               aria-expanded={activePanel === "settings"}
             >
               <span>Settings</span>
+              {!isVerified && (
+                <span className="prov-nav-warning-badge" title="Verification required">
+                  <i className="fas fa-exclamation"></i>
+                </span>
+              )}
               <i
                 className={`fas fa-chevron-down prov-caret ${
                   activePanel === "settings" ? "rotate" : ""
@@ -471,6 +476,11 @@ export const ProviderTopNav: React.FC = () => {
                         <i className="fas fa-cog"></i>
                         <span>Account Settings</span>
                       </div>
+                      {!isVerified && (
+                        <span className="prov-nav-warning-badge" title="Verification required">
+                          <i className="fas fa-exclamation"></i>
+                        </span>
+                      )}
                     </NavLink>
                     <NavLink
                       to="/provider/notifications"
@@ -603,6 +613,11 @@ export const ProviderTopNav: React.FC = () => {
                     <i className="fas fa-cog"></i>
                     <span>Settings</span>
                   </div>
+                  {!isVerified && (
+                    <span className="prov-nav-warning-badge" title="Verification required">
+                      <i className="fas fa-exclamation"></i>
+                    </span>
+                  )}
                 </NavLink>
                 <Link
                   to="/provider/verification"
@@ -740,10 +755,15 @@ export const ProviderTopNav: React.FC = () => {
             </NavLink>
             <NavLink
               to="/provider/settings"
-              className="prov-mobile-item"
+              className="prov-mobile-item flex items-center justify-between"
               onClick={closeAll}
             >
               <span>Account Settings</span>
+              {!isVerified && (
+                <span className="prov-nav-warning-badge" title="Verification required">
+                  <i className="fas fa-exclamation"></i>
+                </span>
+              )}
             </NavLink>
             <NavLink
               to="/provider/notifications"

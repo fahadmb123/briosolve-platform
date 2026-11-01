@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuthStore } from "../../../../features/auth/stores/auth.store";
 import "./CustomerSubnavSidebar.css";
 
 interface SubnavItem {
@@ -41,6 +42,9 @@ const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
 
 export const CustomerSubnavSidebar: React.FC = () => {
   const location = useLocation();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const verifications = useAuthStore((state) => state.verifications);
+  const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
 
   const isSettingsSection =
     location.pathname.startsWith("/settings") ||
@@ -56,14 +60,14 @@ export const CustomerSubnavSidebar: React.FC = () => {
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS
     : isWorkspaceSection
-    ? WORKSPACE_SUBNAV_ITEMS
-    : null;
+      ? WORKSPACE_SUBNAV_ITEMS
+      : null;
 
   const activeSubnavTitle = isSettingsSection
     ? "Settings"
     : isWorkspaceSection
-    ? "Workspace"
-    : "";
+      ? "Workspace"
+      : "";
 
   const activeSubnavIcon = isSettingsSection
     ? "fas fa-sliders-h"
@@ -90,8 +94,8 @@ export const CustomerSubnavSidebar: React.FC = () => {
           const isActive = toHash
             ? location.pathname === toPath && location.hash === `#${toHash}`
             : toPath.endsWith("/dashboard")
-            ? location.pathname === toPath && (!location.hash || location.hash === "")
-            : location.pathname === toPath;
+              ? location.pathname === toPath && (!location.hash || location.hash === "")
+              : location.pathname === toPath;
 
           return (
             <Link
@@ -118,6 +122,11 @@ export const CustomerSubnavSidebar: React.FC = () => {
             <i className="fas fa-cog"></i>
           </div>
           <span className="cust-subnav-sidebar-label">Account Settings</span>
+          {!isVerified && (
+            <span className="cust-subnav-warning-badge" title="Verification required">
+              <i className="fas fa-exclamation"></i>
+            </span>
+          )}
           {isAccountSettingsActive && <span className="cust-subnav-sidebar-pill" />}
         </Link>
       </div>

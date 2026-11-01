@@ -90,53 +90,90 @@ export default function Settings() {
 
                 
                 {activeSection === 'grid' && (
-                <div id="settings-grid-view">
-                    <div className="settings-glass-grid mb-6">
-                        <SettingsMenuCard
-                            icon="fas fa-user-shield"
-                            title="Account & Security"
-                            description="Configure your sign-in credentials and two-factor auth."
-                            onClick={handleSelectAccount}
-                            badge={contactBadge}
-                        />
-                        <SettingsMenuCard
-                            icon="fas fa-briefcase"
-                            title="Business Profile"
-                            description="Update your business name, bio, and years of experience."
-                            onClick={handleSelectBusiness}
-                        />
-                        <SettingsMenuCard
-                            icon="fas fa-wrench"
-                            title="Trade Services"
-                            description="Manage the service categories you specialize in."
-                            onClick={handleSelectServices}
-                            badge={tradeServicesBadge}
-                        />
-                        <SettingsMenuCard
-                            icon="fas fa-calendar-alt"
-                            title="Working Availability"
-                            description="Configure your daily business hours and specific days off."
-                            onClick={handleSelectAvailability}
-                        />
-                        <SettingsMenuCard
-                            icon="fas fa-bell"
-                            title="Notification Triggers"
-                            description="Choose which marketplace events send you push alerts."
-                            onClick={handleSelectNotifications}
-                        />
-                        <SettingsMenuCard
-                            icon="fas fa-map-pin"
-                            title="Manage Addresses"
-                            description="Save your business addresses for accurate local search matching."
-                            onClick={handleSelectAddresses}
-                            badge={addressBadge}
-                        />
-                        <SettingsMenuCard
-                            icon="fas fa-store"
-                            title="Become a Customer"
-                            description="Switch your account and start requesting for the services on the marketplace."
-                            onClick={handleBecomeCustomer}
-                        />
+                <div id="settings-grid-view" className="flex flex-col gap-6">
+                    <div className="settings-group-box">
+                        <div className="settings-group-header">
+                            <div className="settings-group-title-area">
+                                <div className="settings-group-icon verification">
+                                    <i className="fas fa-shield-alt"></i>
+                                </div>
+                                <div>
+                                    <h2 className="settings-group-title">Required Verifications</h2>
+                                    <p className="settings-group-desc">Mandatory credentials, service qualification, and location coverage to operate.</p>
+                                </div>
+                            </div>
+                            <div className="settings-group-badge">
+                                <span className={`badge ${isContactVerified && isAddressVerified ? 'badge-success' : 'badge-warning'} text-xs font-semibold px-2.5 py-1`}>
+                                    <i className={`fas ${isContactVerified && isAddressVerified ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-1`}></i>
+                                    {isContactVerified && isAddressVerified ? 'Verified' : 'Action Required'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="settings-glass-grid">
+                            <SettingsMenuCard
+                                icon="fas fa-user-shield"
+                                title="Account & Security"
+                                description="Configure your sign-in credentials and two-factor auth."
+                                onClick={handleSelectAccount}
+                                badge={contactBadge}
+                            />
+                            <SettingsMenuCard
+                                icon="fas fa-map-pin"
+                                title="Manage Addresses"
+                                description="Save your business addresses for accurate local search matching."
+                                onClick={handleSelectAddresses}
+                                badge={addressBadge}
+                            />
+                            <SettingsMenuCard
+                                icon="fas fa-wrench"
+                                title="Trade Services"
+                                description="Manage the service categories you specialize in."
+                                onClick={handleSelectServices}
+                                badge={tradeServicesBadge}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="settings-group-box">
+                        <div className="settings-group-header">
+                            <div className="settings-group-title-area">
+                                <div className="settings-group-icon preferences">
+                                    <i className="fas fa-sliders-h"></i>
+                                </div>
+                                <div>
+                                    <h2 className="settings-group-title">General Preferences & Operations</h2>
+                                    <p className="settings-group-desc">Manage public business identity, working schedule availability, and operational triggers.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="settings-glass-grid">
+                            <SettingsMenuCard
+                                icon="fas fa-briefcase"
+                                title="Business Profile"
+                                description="Update your business name, bio, and years of experience."
+                                onClick={handleSelectBusiness}
+                            />
+                            <SettingsMenuCard
+                                icon="fas fa-calendar-alt"
+                                title="Working Availability"
+                                description="Configure your daily business hours and specific days off."
+                                onClick={handleSelectAvailability}
+                            />
+                            <SettingsMenuCard
+                                icon="fas fa-bell"
+                                title="Notification Triggers"
+                                description="Choose which marketplace events send you push alerts."
+                                onClick={handleSelectNotifications}
+                            />
+                            <SettingsMenuCard
+                                icon="fas fa-store"
+                                title="Become a Customer"
+                                description="Switch your account and start requesting for the services on the marketplace."
+                                onClick={handleBecomeCustomer}
+                            />
+                        </div>
                     </div>
                 </div>
                 )}

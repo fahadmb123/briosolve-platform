@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuthStore } from "../../../../features/auth/stores/auth.store";
 import "./ProviderSubnavSidebar.css";
 
 interface SubnavItem {
@@ -51,6 +52,9 @@ const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
 
 export const ProviderSubnavSidebar: React.FC = () => {
   const location = useLocation();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const verifications = useAuthStore((state) => state.verifications);
+  const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
 
   const isSettingsSection =
     location.pathname.startsWith("/provider/settings") ||
@@ -128,6 +132,11 @@ export const ProviderSubnavSidebar: React.FC = () => {
             <i className="fas fa-cog"></i>
           </div>
           <span className="prov-subnav-sidebar-label">Account Settings</span>
+          {!isVerified && (
+            <span className="prov-subnav-warning-badge" title="Verification required">
+              <i className="fas fa-exclamation"></i>
+            </span>
+          )}
           {isAccountSettingsActive && <span className="prov-subnav-sidebar-pill" />}
         </Link>
       </div>
