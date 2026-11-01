@@ -61,10 +61,12 @@ export const ServiceAreaRadius: React.FC<ServiceAreaRadiusProps> = ({ onManageAd
     }, [profile, fetchUser]);
 
     useEffect(() => {
-        if (customerProfile?.service_radius_km !== undefined && customerProfile.service_radius_km !== null) {
-            setRadius(customerProfile.service_radius_km);
-            setInitialRadius(customerProfile.service_radius_km);
-        }
+        (()=>{
+            if (customerProfile?.service_radius_km !== undefined && customerProfile.service_radius_km !== null) {
+                setRadius(customerProfile.service_radius_km);
+                setInitialRadius(customerProfile.service_radius_km);
+            }
+        })()
     }, [customerProfile?.service_radius_km]);
 
     const currentAddress: Address | null =

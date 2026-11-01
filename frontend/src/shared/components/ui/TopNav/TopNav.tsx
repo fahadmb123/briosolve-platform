@@ -132,7 +132,9 @@ export const TopNav: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    closeAllMenus();
+    (()=>{
+      closeAllMenus();
+    })()
   }, [location.pathname, closeAllMenus]);
 
   return (
@@ -404,7 +406,8 @@ export const TopNav: React.FC = () => {
                     </Link>
                     {isCustomer && (
                       <Link
-                        to="/provider/register"
+                        to="/settings"
+                        state={{activeView :'become-provider'}}
                         className="topnav-dropdown-item"
                         role="menuitem"
                         onClick={closeAllMenus}
@@ -428,7 +431,7 @@ export const TopNav: React.FC = () => {
               </div>
 
               {isCustomer && (
-                <Link to="/dashboard" className="topnav-cta-btn hide-mobile">
+                <Link to="/request-service" className="topnav-cta-btn hide-mobile">
                   <i className="fas fa-plus"></i>
                   <span>Post Request</span>
                 </Link>
