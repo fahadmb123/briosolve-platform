@@ -377,79 +377,113 @@ export default function RequestService() {
 
           <div className="request-form-column">
             {currentLevel === 1 && (
-              <div className="request-section-card">
-                <div className="request-section-header">
-                  <div className="request-step-badge">1</div>
-                  <div className="request-section-title-group">
-                    <h2>Level 1: Select Service Category</h2>
-                    <p>Choose the discipline that matches your requirement</p>
+              <>
+                <div className="request-section-card">
+                  <div className="request-section-header">
+                    <div className="request-step-badge">1</div>
+                    <div className="request-section-title-group">
+                      <h2>Select Service Category</h2>
+                      <p>Choose the discipline that matches your requirement</p>
+                    </div>
+                    {selectedCategory && (
+                      <div className="request-selected-badge active">
+                        <i className={selectedCategory.icon}></i>
+                        <span>{selectedCategory.name}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="request-categories-grid">
+                    {SERVICE_CATEGORIES.map((cat) => {
+                      const isSelected = selectedCategory.id === cat.id;
+                      return (
+                        <div
+                          key={cat.id}
+                          className={`request-category-card ${isSelected ? "selected" : ""}`}
+                          onClick={() => handleCategorySelect(cat)}
+                        >
+                          <div className="request-category-icon">
+                            <i className={cat.icon}></i>
+                          </div>
+                          <div className="request-category-name">{cat.name}</div>
+                          <div className="request-category-subtext">{cat.desc}</div>
+                          {isSelected && (
+                            <div className="request-category-check">
+                              <i className="fas fa-check"></i>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
-                <div className="request-categories-grid">
-                  {SERVICE_CATEGORIES.map((cat) => {
-                    const isSelected = selectedCategory.id === cat.id;
-                    return (
-                      <div
-                        key={cat.id}
-                        className={`request-category-card ${isSelected ? "selected" : ""}`}
-                        onClick={() => handleCategorySelect(cat)}
-                      >
-                        <div className="request-category-icon">
-                          <i className={cat.icon}></i>
-                        </div>
-                        <div className="request-category-name">{cat.name}</div>
-                        <div className="request-category-subtext">{cat.desc}</div>
-                        {isSelected && (
-                          <div className="request-category-check">
+                <div className="request-section-card">
+                  <div className="request-section-header">
+                    <div className="request-step-badge">
+                      <i className="fas fa-tools text-xs"></i>
+                    </div>
+                    <div className="request-section-title-group">
+                      <h2>Select Service in {selectedCategory.name}</h2>
+                      <p>Pick the specific task or service you need assistance with</p>
+                    </div>
+                    {selectedSubservice && (
+                      <div className="request-selected-badge active">
+                        <i className="fas fa-check-circle"></i>
+                        <span>{selectedSubservice}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="request-services-grid">
+                    {selectedCategory.subservices.map((sub) => {
+                      const isSubSelected = selectedSubservice === sub;
+                      return (
+                        <div
+                          key={sub}
+                          className={`request-service-item-card ${isSubSelected ? "selected" : ""}`}
+                          onClick={() => {
+                            setSelectedSubservice(sub);
+                            if (!title) {
+                              setTitle(sub);
+                            }
+                          }}
+                        >
+                          <div className="request-service-item-radio">
+                            {isSubSelected && (
+                              <div className="request-service-item-radio-dot"></div>
+                            )}
+                          </div>
+                          <div className="request-service-item-content">
+                            <div className="request-service-item-title">{sub}</div>
+                            <div className="request-service-item-sub">
+                              {isSubSelected ? "Selected service" : "Click to select"}
+                            </div>
+                          </div>
+                          <div className="request-service-item-check">
                             <i className="fas fa-check"></i>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {selectedCategory && (
-                  <div className="subservice-chips-container">
-                    <div className="subservice-chips-title">
-                      Common Tasks in {selectedCategory.name}
-                    </div>
-                    <div className="subservice-chips-list">
-                      {selectedCategory.subservices.map((sub) => {
-                        const isSubSelected = selectedSubservice === sub;
-                        return (
-                          <button
-                            key={sub}
-                            type="button"
-                            className={`subservice-chip ${isSubSelected ? "selected" : ""}`}
-                            onClick={() => {
-                              setSelectedSubservice(sub);
-                              if (!title) {
-                                setTitle(sub);
-                              }
-                            }}
-                          >
-                            {sub}
-                          </button>
-                        );
-                      })}
-                    </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                )}
 
-                <div className="level-navigation-bar">
-                  <div></div>
-                  <button
-                    type="button"
-                    className="level-nav-next-btn"
-                    onClick={handleNextLevel}
-                  >
-                    <span>Continue to Level 2</span>
-                    <i className="fas fa-arrow-right"></i>
-                  </button>
+                  <div className="level-navigation-bar">
+                    <div className="level-nav-summary">
+                      <span>Selected:</span>
+                      <strong>{selectedCategory.name} &bull; {selectedSubservice}</strong>
+                    </div>
+                    <button
+                      type="button"
+                      className="level-nav-next-btn"
+                      onClick={handleNextLevel}
+                    >
+                      <span>Continue to Level 2</span>
+                      <i className="fas fa-arrow-right"></i>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
 
             {currentLevel === 2 && (
