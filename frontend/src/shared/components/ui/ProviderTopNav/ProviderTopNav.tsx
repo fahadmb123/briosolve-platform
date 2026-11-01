@@ -32,7 +32,8 @@ export const ProviderTopNav: React.FC = () => {
 
   const [activePanel, setActivePanel] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const navRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null)
+  const isVerified = user?.phone_verified && user.email_verified && profile?.kyc_status === "APPROVED" && user.current_address_id
 
   const handleLogout = async () => {
     if (!isAuthenticated) {
@@ -560,7 +561,7 @@ export const ProviderTopNav: React.FC = () => {
                   </div>
                   <div className="prov-header-email">{user?.email}</div>
                   <div className="prov-header-meta">
-                    {profile?.kyc_status === "APPROVED" ? (
+                    {isVerified ? (
                       <>
                         <span className="prov-mono-badge">Verified Provider</span>
                       </>

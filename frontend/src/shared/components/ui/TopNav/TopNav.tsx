@@ -25,7 +25,7 @@ export const TopNav: React.FC = () => {
   const isCustomer = isAuthenticated && user?.role === "CUSTOMER";
   const isProvider = isAuthenticated && user?.role === "PROVIDER";
   const isAdmin = isAuthenticated && user?.role === "ADMIN";
-
+  //const isVerified =  
 
 
   const resolvedRole = useMemo<UserRole>(() => {
