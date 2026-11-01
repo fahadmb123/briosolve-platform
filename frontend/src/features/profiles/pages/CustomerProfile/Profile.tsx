@@ -194,7 +194,7 @@ export default function Profile() {
                   <p className="text-xs text-secondary mb-0">Update your name and household preferences for visiting contractors.</p>
                 </div>
                 <span className="badge badge-primary text-xs uppercase px-2.5 py-1">
-                  <i className="fas fa-user-check mr-1"></i> Client Profile
+                  <i className="fas fa-user-check mr-1"></i>Profile
                 </span>
               </div>
 
