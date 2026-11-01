@@ -9,6 +9,7 @@ import "./TopNav.css";
 
 export const TopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const verifications = useAuthStore(state=>state.verifications)
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -25,7 +26,8 @@ export const TopNav: React.FC = () => {
   const isCustomer = isAuthenticated && user?.role === "CUSTOMER";
   const isProvider = isAuthenticated && user?.role === "PROVIDER";
   const isAdmin = isAuthenticated && user?.role === "ADMIN";
-  //const isVerified =  
+  const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
+
 
 
   const resolvedRole = useMemo<UserRole>(() => {
@@ -360,11 +362,15 @@ export const TopNav: React.FC = () => {
                     <div className="topnav-dropdown-header">
                       <div className="topnav-header-title">{user?.name}</div>
                       <div className="topnav-header-sub">{user?.email}</div>
-                      {isProvider && (
-                        <div style={{ marginTop: "0.35rem" }}>
-                          <span className="topnav-mono-badge">Verified Pro</span>
-                        </div>
-                      )}
+                      <div className="prov-header-meta">
+                        {isVerified ? (
+                          <span className="prov-mono-badge">
+                            {isProvider ? "Verified Provider" : "Verified Customer"}
+                          </span>
+                        ) : (
+                          <span className="prov-mono-badge">Not Verified</span>
+                        )}
+                      </div>
                     </div>
                     <Link
                       to={profileRoute}
