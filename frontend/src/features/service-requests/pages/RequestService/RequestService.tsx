@@ -1,104 +1,25 @@
-import React, { useState, useId } from "react";
+import React, { useState, useId, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import type { Address } from "../../../addresses";
 import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
 import "./RequestService.css";
+import { useGetCategoriesService } from "../../../service-catalog";
+import { ServiceSelectionSkeleton } from "../../components/ServiceSelectionSkeleton";
 
-interface ServiceCategoryItem {
+interface ServiceItem {
   id: string;
   name: string;
-  icon: string;
-  desc: string;
-  subservices: string[];
+  description?: string | null;
 }
 
-const SERVICE_CATEGORIES: ServiceCategoryItem[] = [
-  {
-    id: "plumbing",
-    name: "Plumbing",
-    icon: "fas fa-wrench",
-    desc: "Pipe leaks, tap fixing, drain clearing, sanitary install",
-    subservices: [
-      "Pipe Leakage",
-      "Tap / Faucet Repair",
-      "Drain Blockage",
-      "Water Heater / Geyser",
-      "Toilet / Bathroom Fitting",
-      "Water Tank Repair",
-    ],
-  },
-  {
-    id: "electrical",
-    name: "Electrical",
-    icon: "fas fa-bolt",
-    desc: "Wiring, switchboard, ceiling fan, light installation",
-    subservices: [
-      "Wiring & Tripping Fix",
-      "Switchboard / Socket Repair",
-      "Fan & Light Installation",
-      "MCB & Fuse Box Work",
-      "Inverter / Generator Setup",
-      "Appliance Power Line",
-    ],
-  },
-  {
-    id: "cleaning",
-    name: "Deep Cleaning",
-    icon: "fas fa-broom",
-    desc: "Full home sanitization, kitchen, washroom, upholstery",
-    subservices: [
-      "Full Home Deep Clean",
-      "Kitchen & Chimney Clean",
-      "Bathroom Sanitization",
-      "Sofa & Carpet Shampoo",
-      "Post-Construction Cleaning",
-      "Balcony / Window Wash",
-    ],
-  },
-  {
-    id: "carpentry",
-    name: "Carpentry",
-    icon: "fas fa-hammer",
-    desc: "Furniture repair, locks, doors, custom woodwork",
-    subservices: [
-      "Furniture Repair & Polish",
-      "Door Lock & Latch Fixing",
-      "Cupboard / Cabinet Work",
-      "Bed & Table Assembly",
-      "Wooden Partition",
-      "Window Frame Repair",
-    ],
-  },
-  {
-    id: "ac-repair",
-    name: "AC & Appliances",
-    icon: "fas fa-snowflake",
-    desc: "AC cooling, gas refill, fridge, washing machine",
-    subservices: [
-      "AC Filter & Service",
-      "AC Gas Leakage Refill",
-      "Refrigerator Repair",
-      "Washing Machine Repair",
-      "Microwave / Oven Fix",
-      "RO Water Purifier",
-    ],
-  },
-  {
-    id: "painting",
-    name: "Painting",
-    icon: "fas fa-paint-roller",
-    desc: "Interior, exterior, moisture sealing, texture walls",
-    subservices: [
-      "Interior Wall Painting",
-      "Damp Proofing / Waterproof",
-      "Exterior House Coating",
-      "Wood Polish & Varnish",
-      "Wall Stencil / Texture",
-      "Touch-up & Patchwork",
-    ],
-  },
-];
+interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  image?: string | null;
+  services: ServiceItem[];
+}
 
 interface MockAddressItem {
   id: string;
@@ -140,6 +61,26 @@ export default function RequestService() {
   const fileInputId = useId();
   const user = useAuthStore((s) => s.user);
   const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
+  const getCategories = useGetCategoriesService();
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    getCategories.mutate(
+      { page: 1, limit: 100, filter: "ACTIVE" },
+      {
+        onSuccess: (res) => {
+          const cats = res.data?.categories || [];
+          setCategories(cats);
+          if (cats.length > 0) {
+            setSelectedCategory(cats[0]);
+            if (cats[0].services && cats[0].services.length > 0) {
+              setSelectedSubservice(cats[0].services[0]);
+            }
+          }
+        },
+      }
+    );
+  }, []);
 
   const customerAddress =
     typeof user?.current_address_id === "object"
@@ -166,12 +107,9 @@ export default function RequestService() {
   ];
 
   const [currentLevel, setCurrentLevel] = useState<number>(1);
-  const [selectedCategory, setSelectedCategory] = useState<ServiceCategoryItem>(
-    SERVICE_CATEGORIES[0]
-  );
-  const [selectedSubservice, setSelectedSubservice] = useState<string>(
-    SERVICE_CATEGORIES[0].subservices[0]
-  );
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedSubservice, setSelectedSubservice] = useState<ServiceItem | null>(null);
+
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [urgency, setUrgency] = useState<
@@ -194,9 +132,16 @@ export default function RequestService() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
 
-  const handleCategorySelect = (category: ServiceCategoryItem) => {
+  const handleCategorySelect = (category: Category) => {
     setSelectedCategory(category);
-    setSelectedSubservice(category.subservices[0] || "");
+    if (category.services && category.services.length > 0) {
+      setSelectedSubservice(category.services[0]);
+      if (!title) {
+        setTitle(category.services[0].name);
+      }
+    } else {
+      setSelectedSubservice(null);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -377,113 +322,138 @@ export default function RequestService() {
 
           <div className="request-form-column">
             {currentLevel === 1 && (
-              <>
-                <div className="request-section-card">
-                  <div className="request-section-header">
-                    <div className="request-step-badge">1</div>
-                    <div className="request-section-title-group">
-                      <h2>Select Service Category</h2>
-                      <p>Choose the discipline that matches your requirement</p>
-                    </div>
-                    {selectedCategory && (
-                      <div className="request-selected-badge active">
-                        <i className={selectedCategory.icon}></i>
-                        <span>{selectedCategory.name}</span>
+              getCategories.isPending ? (
+                <ServiceSelectionSkeleton />
+              ) : (
+                <>
+                  <div className="request-section-card">
+                    <div className="request-section-header">
+                      <div className="request-step-badge">1</div>
+                      <div className="request-section-title-group">
+                        <h2>Select Service Category</h2>
+                        <p>Choose the discipline that matches your requirement</p>
                       </div>
-                    )}
-                  </div>
-
-                  <div className="request-categories-grid">
-                    {SERVICE_CATEGORIES.map((cat) => {
-                      const isSelected = selectedCategory.id === cat.id;
-                      return (
-                        <div
-                          key={cat.id}
-                          className={`request-category-card ${isSelected ? "selected" : ""}`}
-                          onClick={() => handleCategorySelect(cat)}
-                        >
-                          <div className="request-category-icon">
-                            <i className={cat.icon}></i>
-                          </div>
-                          <div className="request-category-name">{cat.name}</div>
-                          <div className="request-category-subtext">{cat.desc}</div>
-                          {isSelected && (
-                            <div className="request-category-check">
-                              <i className="fas fa-check"></i>
-                            </div>
-                          )}
+                      {selectedCategory && (
+                        <div className="request-selected-badge active">
+                          <span>{selectedCategory?.name || "N/A"}</span>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="request-section-card">
-                  <div className="request-section-header">
-                    <div className="request-step-badge">
-                      <i className="fas fa-tools text-xs"></i>
+                      )}
                     </div>
-                    <div className="request-section-title-group">
-                      <h2>Select Service in {selectedCategory.name}</h2>
-                      <p>Pick the specific task or service you need assistance with</p>
-                    </div>
-                    {selectedSubservice && (
-                      <div className="request-selected-badge active">
-                        <i className="fas fa-check-circle"></i>
-                        <span>{selectedSubservice}</span>
-                      </div>
-                    )}
-                  </div>
 
-                  <div className="request-services-grid">
-                    {selectedCategory.subservices.map((sub) => {
-                      const isSubSelected = selectedSubservice === sub;
-                      return (
-                        <div
-                          key={sub}
-                          className={`request-service-item-card ${isSubSelected ? "selected" : ""}`}
-                          onClick={() => {
-                            setSelectedSubservice(sub);
-                            if (!title) {
-                              setTitle(sub);
-                            }
-                          }}
-                        >
-                          <div className="request-service-item-radio">
-                            {isSubSelected && (
-                              <div className="request-service-item-radio-dot"></div>
+                    <div className="request-categories-grid">
+                      {categories.map((cat) => {
+                        const isSelected = selectedCategory?.id === cat.id;
+                        return (
+                          <div
+                            key={cat.id}
+                            className={`request-category-card ${isSelected ? "selected" : ""}`}
+                            onClick={() => handleCategorySelect(cat)}
+                          >
+                            <div className="request-category-icon">
+                              {cat.image ? (
+                                <img
+                                  src={cat.image}
+                                  alt={cat.name}
+                                  className="w-full h-full object-cover rounded"
+                                />
+                              ) : (
+                                <i className="fas fa-tools"></i>
+                              )}
+                            </div>
+                            <div className="request-category-name">{cat.name}</div>
+                            {cat.description && (
+                              <div className="request-category-subtext">{cat.description}</div>
+                            )}
+                            {isSelected && (
+                              <div className="request-category-check">
+                                <i className="fas fa-check"></i>
+                              </div>
                             )}
                           </div>
-                          <div className="request-service-item-content">
-                            <div className="request-service-item-title">{sub}</div>
-                            <div className="request-service-item-sub">
-                              {isSubSelected ? "Selected service" : "Click to select"}
-                            </div>
-                          </div>
-                          <div className="request-service-item-check">
-                            <i className="fas fa-check"></i>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  <div className="level-navigation-bar">
-                    <div className="level-nav-summary">
-                      <span>Selected:</span>
-                      <strong>{selectedCategory.name} &bull; {selectedSubservice}</strong>
+                  {selectedCategory && (
+                    <div className="request-section-card">
+                      <div className="request-section-header">
+                        <div className="request-step-badge">
+                          <i className="fas fa-tools text-xs"></i>
+                        </div>
+                        <div className="request-section-title-group">
+                          <h2>Select Service in {selectedCategory.name}</h2>
+                          <p>Pick the specific task or service you need assistance with</p>
+                        </div>
+                        {selectedSubservice && (
+                          <div className="request-selected-badge active">
+                            <i className="fas fa-check-circle"></i>
+                            <span>{selectedSubservice.name}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {selectedCategory.services && selectedCategory.services.length > 0 ? (
+                        <div className="request-services-grid">
+                          {selectedCategory.services.map((sub) => {
+                            const isSubSelected = selectedSubservice?.id === sub.id;
+                            return (
+                              <div
+                                key={sub.id}
+                                className={`request-service-item-card ${isSubSelected ? "selected" : ""}`}
+                                onClick={() => {
+                                  setSelectedSubservice(sub);
+                                  if (!title) {
+                                    setTitle(sub.name);
+                                  }
+                                }}
+                              >
+                                <div className="request-service-item-radio">
+                                  {isSubSelected && (
+                                    <div className="request-service-item-radio-dot"></div>
+                                  )}
+                                </div>
+                                <div className="request-service-item-content">
+                                  <div className="request-service-item-title">{sub.name}</div>
+                                  <div className="request-service-item-sub">
+                                    {sub.description || (isSubSelected ? "Selected service" : "Click to select")}
+                                  </div>
+                                </div>
+                                <div className="request-service-item-check">
+                                  <i className="fas fa-check"></i>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="p-4 text-center text-sm text-secondary">
+                          No services available in this category yet.
+                        </div>
+                      )}
+
+                      <div className="level-navigation-bar">
+                        <div className="level-nav-summary">
+                          <span>Selected:</span>
+                          <strong>
+                            {selectedCategory.name}
+                            {selectedSubservice ? ` • ${selectedSubservice.name}` : ""}
+                          </strong>
+                        </div>
+                        <button
+                          type="button"
+                          className="level-nav-next-btn"
+                          disabled={!selectedCategory || !selectedSubservice}
+                          onClick={handleNextLevel}
+                        >
+                          <span>Continue to Level 2</span>
+                          <i className="fas fa-arrow-right"></i>
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      type="button"
-                      className="level-nav-next-btn"
-                      onClick={handleNextLevel}
-                    >
-                      <span>Continue to Level 2</span>
-                      <i className="fas fa-arrow-right"></i>
-                    </button>
-                  </div>
-                </div>
-              </>
+                  )}
+                </>
+              )
             )}
 
             {currentLevel === 2 && (
@@ -879,7 +849,7 @@ export default function RequestService() {
                     Level 1
                   </span>
                   <span className="summary-item-value">
-                    {selectedCategory.name} • {selectedSubservice || "General"}
+                    {selectedCategory?.name || "None"} • {selectedSubservice?.name || "General"}
                   </span>
                 </div>
 
@@ -1003,11 +973,11 @@ export default function RequestService() {
             <div className="request-success-info-box">
               <div className="request-success-info-row">
                 <span>Category:</span>
-                <span>{selectedCategory.name}</span>
+                <span>{selectedCategory?.name || "N/A"}</span>
               </div>
               <div className="request-success-info-row">
                 <span>Task:</span>
-                <span>{selectedSubservice}</span>
+                <span>{selectedSubservice?.name || "General"}</span>
               </div>
               <div className="request-success-info-row">
                 <span>Schedule:</span>
