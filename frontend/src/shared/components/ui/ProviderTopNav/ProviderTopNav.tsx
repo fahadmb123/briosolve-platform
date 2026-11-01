@@ -7,62 +7,11 @@ import type { ProviderProfile } from "../../../types/Dtos";
 import NotificationDropdown from "../../../../features/notifications/components/NotificationDropdown";
 import "./ProviderTopNav.css";
 
-interface SubnavItem {
-  label: string;
-  to: string;
-  icon: string;
-}
-
-const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
-  {
-    label: "Dashboard",
-    to: "/provider/dashboard",
-    icon: "fas fa-chart-pie",
-  },
-  {
-    label: "Service Requests",
-    to: "/provider/dashboard#requests",
-    icon: "fas fa-search-dollar",
-  },
-  {
-    label: "Bookings",
-    to: "/provider/dashboard#bookings",
-    icon: "fas fa-calendar-check",
-  },
-  {
-    label: "Messages",
-    to: "/provider/dashboard#messages",
-    icon: "fas fa-comments",
-  },
-];
-
-const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
-  {
-    label: "Business Profile",
-    to: "/provider/profile",
-    icon: "fas fa-user-tie",
-  },
-  {
-    label: "KYC Documents",
-    to: "/provider/kyc",
-    icon: "fas fa-id-card",
-  },
-  {
-    label: "Account Settings",
-    to: "/provider/settings",
-    icon: "fas fa-cog",
-  },
-  {
-    label: "Notification Alerts",
-    to: "/provider/notifications",
-    icon: "fas fa-bell",
-  },
-];
-
 export const ProviderTopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+
   const isSettingsSection =
     location.pathname.startsWith("/provider/settings") ||
     location.pathname.startsWith("/provider/profile") ||
@@ -74,21 +23,6 @@ export const ProviderTopNav: React.FC = () => {
     location.pathname === "/provider/dashboard" ||
     location.pathname.startsWith("/provider/dashboard");
 
-  const activeSubnavItems = isSettingsSection
-    ? SETTINGS_SUBNAV_ITEMS
-    : isWorkspaceSection
-    ? WORKSPACE_SUBNAV_ITEMS
-    : null;
-
-  const activeSubnavTitle = isSettingsSection
-    ? "Settings"
-    : isWorkspaceSection
-    ? "Workspace"
-    : "";
-
-  const activeSubnavIcon = isSettingsSection
-    ? "fas fa-sliders-h"
-    : "fas fa-th-large";
 
   const user = useAuthStore((state) => state.user);
   const profile = useAuthStore((state) => state.profile) as ProviderProfile | null;
@@ -179,7 +113,7 @@ export const ProviderTopNav: React.FC = () => {
   }, [location.pathname, closeAll]);
 
   return (
-    <header className={`prov-topnav-header ${activeSubnavItems ? "has-subnav" : ""}`} ref={navRef}>
+    <header className={`prov-topnav-header`} ref={navRef}>
       <div className="prov-topnav-container">
         <div className="prov-topnav-left">
           <Link
@@ -704,39 +638,7 @@ export const ProviderTopNav: React.FC = () => {
         </div>
       </div>
 
-      {activeSubnavItems && (
-        <nav className="prov-subnav-bar" aria-label="Secondary navigation">
-          <div className="prov-subnav-container">
-            <div className="prov-subnav-left">
-              <span className="prov-subnav-title">
-                <i className={activeSubnavIcon}></i>
-                <span>{activeSubnavTitle}</span>
-              </span>
-              <span className="prov-subnav-separator" aria-hidden="true">/</span>
-              {activeSubnavItems.map((item) => {
-                const [toPath, toHash] = item.to.split("#");
-                const isActive = toHash
-                  ? location.pathname === toPath && location.hash === `#${toHash}`
-                  : toPath.endsWith("/dashboard")
-                  ? location.pathname === toPath && (!location.hash || location.hash === "")
-                  : location.pathname === toPath;
-
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={`prov-subnav-item ${isActive ? "active" : ""}`}
-                    onClick={closeAll}
-                  >
-                    <i className={item.icon}></i>
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </nav>
-      )}
+      
 
       {mobileMenuOpen && (
         <div className="prov-mobile-menu">
