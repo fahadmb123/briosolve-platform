@@ -77,17 +77,21 @@ export default function Profile() {
   }, []);
 
   useEffect(() => {
-    if (user?.current_address_id && typeof user.current_address_id === 'object') {
-      setAddress(user.current_address_id as Address);
-    }
+    (()=>{
+      if (user?.current_address_id && typeof user.current_address_id === 'object') {
+        setAddress(user.current_address_id as Address);
+      }
+    })()
   }, [user?.current_address_id]);
 
   useEffect(() => {
-    if (providerProfile?.profile_image) {
-      setProfileImage(providerProfile.profile_image);
-    } else {
-      setProfileImage(null);
-    }
+    (()=>{
+      if (providerProfile?.profile_image) {
+        setProfileImage(providerProfile.profile_image);
+      } else {
+        setProfileImage(null);
+      }
+    })()
   }, [providerProfile?.profile_image]);
 
   const handleCropComplete = (croppedFile: File) => {

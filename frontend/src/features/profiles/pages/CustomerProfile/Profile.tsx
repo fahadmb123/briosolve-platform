@@ -38,11 +38,13 @@ export default function Profile() {
   const getProfile = useGetProfile();
 
   useEffect(() => {
-    if (customerProfile?.profile_image) {
-      setProfileImage(customerProfile.profile_image);
-    } else {
-      setProfileImage(null);
-    }
+    (()=>{
+      if (customerProfile?.profile_image) {
+        setProfileImage(customerProfile.profile_image);
+      } else {
+        setProfileImage(null);
+      }
+    })()
   }, [customerProfile?.profile_image]);
 
   useEffect(() => {
@@ -204,16 +206,6 @@ export default function Profile() {
                     <span className="text-red-500 text-xs mt-1 block">{errors.name.message}</span>
                   )}
                 </div>
-
-                <div className="modern-input-group">
-                  <label>Email Address</label>
-                  <div className="form-control-static">
-                    <span className="truncate">{user?.email || "No email set"}</span>
-                    <span className="badge badge-success text-2xs uppercase px-2 py-0.5 shrink-0">
-                      <i className="fas fa-check-circle mr-1"></i> Verified
-                    </span>
-                  </div>
-                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
@@ -227,11 +219,20 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <div className="modern-input-group">
+                {/*<div className="modern-input-group">
                   <label>Membership Tier</label>
                   <div className="form-control-static">
                     <span className="font-medium">Verified Customer</span>
                     <span className="badge badge-primary text-2xs uppercase px-2 py-0.5 shrink-0">Standard</span>
+                  </div>
+                </div>*/}
+                <div className="modern-input-group">
+                  <label>Email Address</label>
+                  <div className="form-control-static">
+                    <span className="truncate">{user?.email || "No email set"}</span>
+                    <span className="badge badge-success text-2xs uppercase px-2 py-0.5 shrink-0">
+                      <i className="fas fa-check-circle mr-1"></i> Verified
+                    </span>
                   </div>
                 </div>
               </div>
