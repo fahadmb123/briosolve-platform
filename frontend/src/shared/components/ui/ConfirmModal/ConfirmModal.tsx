@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import './ConfirmModal.css';
 
 export interface ConfirmModalProps {
@@ -38,7 +39,7 @@ const ConfirmModalComponent: React.FC<ConfirmModalProps> = ({
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="confirm-modal-overlay" onClick={(e) => e.stopPropagation()}>
             <div className="confirm-modal-content" onClick={(e) => e.stopPropagation()}>
                 <h3 className="h5 mb-2" style={{ fontWeight: 600 }}>{title}</h3>
@@ -68,7 +69,8 @@ const ConfirmModalComponent: React.FC<ConfirmModalProps> = ({
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useLocationPicker } from "../hooks/useLocationPicker";
 import { type AddressPayload } from "../schemas/address.schema";
 import { LeafletMap } from "./LeafletMap";
@@ -43,10 +44,21 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
   const { register, formState: { errors }, watch } = form;
   const { area, city, pincode } = watch();
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
 
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity cursor-pointer"
@@ -54,7 +66,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
         ></div>
 
 
-        <div className="relative bg-surface rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] my-auto">
+        <div className="relative bg-surface rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] my-auto z-10">
 
           <div className="flex items-center justify-between px-6 py-5 border-b border-surface-variant">
             <div className="flex items-center gap-3">
@@ -447,6 +459,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
             )}
           </div>
         </div>
-      </div>
+      </div>,
+    document.body
   );
 };

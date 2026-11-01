@@ -1660,8 +1660,7 @@ input::-ms-clear {
     width: 100%;
 }
 
-.top-nav-content,
-.provider-main-content {
+.top-nav-content {
     flex: 1;
     width: 100%;
     margin-left: 0 !important;
@@ -1671,9 +1670,53 @@ input::-ms-clear {
     flex-direction: column;
 }
 
-.top-nav-layout.has-subnav .top-nav-content,
-.provider-top-layout.has-subnav .provider-main-content {
-    padding-top: 112px;
+.provider-main-content {
+    flex: 1;
+    width: 100%;
+    margin-left: 0 !important;
+    max-width: 100vw !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.customer-body-layout {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    width: 100%;
+    min-height: calc(100vh - 64px);
+    margin-top: 64px;
+}
+
+.customer-body-layout .top-nav-content {
+    padding-top: 0;
+    min-width: 0;
+}
+
+@media (max-width: 1023px) {
+    .customer-body-layout.has-subnav {
+        flex-direction: column;
+    }
+}
+
+.provider-body-layout {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    width: 100%;
+    min-height: calc(100vh - 64px);
+    margin-top: 64px;
+}
+
+.provider-body-layout .provider-main-content {
+    padding-top: 0;
+    min-width: 0;
+}
+
+@media (max-width: 1023px) {
+    .provider-body-layout.has-subnav {
+        flex-direction: column;
+    }
 }
 
 

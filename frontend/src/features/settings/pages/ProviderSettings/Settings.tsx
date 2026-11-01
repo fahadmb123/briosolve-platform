@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense, useMemo, useCallback } from 'react
 import { useLocation } from 'react-router-dom';
 import './Settings.css';
 import { SettingsMenuCard } from '../../components/common/SettingsMenuCard';
+import { BrowserPushNotificationToggle } from '../../components/common/BrowserPushNotificationToggle';
 import { ChangePasswordForm } from '../../components/provider/ChangePasswordForm';
 import { ContactInfo } from '../../components/provider/ContactInfo';
 import { BusinessProfileForm } from '../../components/provider/BusinessProfileForm';
@@ -160,10 +161,10 @@ export default function Settings() {
                                 </span>
                             </div>
 
-                            {/* Email and Mobile in two separate cards/tables */}
+                            
                             <ContactInfo />
 
-                            {/* Password in two separate cards/tables */}
+                            
                             <div className="pt-4 border-top">
                                 <h3 className="h6 mb-4 font-bold">Change Account Password</h3>
                                 <ChangePasswordForm />
@@ -200,48 +201,52 @@ export default function Settings() {
                             <h2 className="h5 mb-2">Notification Preferences</h2>
                             <p className="text-xs text-secondary mb-4">Choose which marketplace events trigger real-time push alerts</p>
 
-                            <div className="toggle-switch-row">
-                                <div>
-                                    <div className="font-bold text-sm text-text">New Matching Request Alerts</div>
-                                    <div className="text-xs text-secondary">Instant alerts when a customer posts a plumbing/AC request within 15 km</div>
-                                </div>
-                                <label className="switch-slider-ctrl">
-                                    <input type="checkbox" checked />
-                                    <span className="slider-round"></span>
-                                </label>
-                            </div>
+                            <BrowserPushNotificationToggle />
 
-                            <div className="toggle-switch-row">
-                                <div>
-                                    <div className="font-bold text-sm text-text">Quotation Acceptance &amp; Updates</div>
-                                    <div className="text-xs text-secondary">Notify immediately when a homeowner accepts or views your quotation</div>
+                            <div className="flex flex-col gap-3 mt-6">
+                                <div className="p-4 rounded-xl border border-border bg-surface-elevated/40 hover:bg-surface-elevated/70 transition-colors flex justify-between items-center flex-wrap gap-4">
+                                    <div>
+                                        <div className="font-semibold text-xs text-text">New Matching Request Alerts</div>
+                                        <div className="text-xs text-secondary mt-0.5">Instant alerts when a customer posts a plumbing/AC request within 15 km</div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" defaultChecked className="sr-only peer" />
+                                        <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
                                 </div>
-                                <label className="switch-slider-ctrl">
-                                    <input type="checkbox" checked />
-                                    <span className="slider-round"></span>
-                                </label>
-                            </div>
 
-                            <div className="toggle-switch-row">
-                                <div>
-                                    <div className="font-bold text-sm text-text">Customer Chat Messages</div>
-                                    <div className="text-xs text-secondary">Notify when a client sends an in-app message</div>
+                                <div className="p-4 rounded-xl border border-border bg-surface-elevated/40 hover:bg-surface-elevated/70 transition-colors flex justify-between items-center flex-wrap gap-4">
+                                    <div>
+                                        <div className="font-semibold text-xs text-text">Quotation Acceptance &amp; Updates</div>
+                                        <div className="text-xs text-secondary mt-0.5">Notify immediately when a homeowner accepts or views your quotation</div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" defaultChecked className="sr-only peer" />
+                                        <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
                                 </div>
-                                <label className="switch-slider-ctrl">
-                                    <input type="checkbox" checked />
-                                    <span className="slider-round"></span>
-                                </label>
-                            </div>
 
-                            <div className="toggle-switch-row">
-                                <div>
-                                    <div className="font-bold text-sm text-text">New Reviews &amp; Ratings</div>
-                                    <div className="text-xs text-secondary">Notify when a client writes a review after job completion</div>
+                                <div className="p-4 rounded-xl border border-border bg-surface-elevated/40 hover:bg-surface-elevated/70 transition-colors flex justify-between items-center flex-wrap gap-4">
+                                    <div>
+                                        <div className="font-semibold text-xs text-text">Customer Chat Messages</div>
+                                        <div className="text-xs text-secondary mt-0.5">Notify when a client sends an in-app message</div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" defaultChecked className="sr-only peer" />
+                                        <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
                                 </div>
-                                <label className="switch-slider-ctrl">
-                                    <input type="checkbox" checked />
-                                    <span className="slider-round"></span>
-                                </label>
+
+                                <div className="p-4 rounded-xl border border-border bg-surface-elevated/40 hover:bg-surface-elevated/70 transition-colors flex justify-between items-center flex-wrap gap-4">
+                                    <div>
+                                        <div className="font-semibold text-xs text-text">New Reviews &amp; Ratings</div>
+                                        <div className="text-xs text-secondary mt-0.5">Notify when a client writes a review after job completion</div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" defaultChecked className="sr-only peer" />
+                                        <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         )}

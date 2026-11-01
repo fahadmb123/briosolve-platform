@@ -53,6 +53,7 @@ model users {
   reviewed_reactivation_requests account_reactivation_requests[] @relation("ReviewedReactivationRequests")
 
   notifications                  notifications[]
+  push_subscriptions             push_subscriptions[]
 }
 
 enum weekday {
@@ -304,4 +305,17 @@ model notifications {
   recipient    users         @relation(fields:[recipient_id], references:[id], onDelete: Cascade)
 
   @@index([recipient_id, is_read, created_at])
+}
+
+model push_subscriptions {
+  id         Uuid          @id @default(uuid())
+  user_id    Uuid
+  endpoint   VarChar(1000) @unique
+  p256dh     VarChar(255)
+  auth       VarChar(255)
+  created_at DateTime      @default(now())
+
+  user       users         @relation(fields:[user_id], references:[id], onDelete: Cascade)
+
+  @@index([user_id])
 }

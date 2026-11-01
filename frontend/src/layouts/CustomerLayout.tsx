@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { TopNav } from "../shared/components/ui/TopNav/TopNav";
+import { CustomerSubnavSidebar } from "../shared/components/ui/CustomerSubnavSidebar/CustomerSubnavSidebar";
 
 export default function CustomerLayout() {
   const location = useLocation();
@@ -21,11 +22,14 @@ export default function CustomerLayout() {
     location.pathname.startsWith("/request-service");
 
   return (
-    <div className={`top-nav-layout ${hasSubnav ? "has-subnav" : ""}`}>
+    <div className="top-nav-layout">
       <TopNav />
-      <main className="top-nav-content">
-        <Outlet />
-      </main>
+      <div className={`customer-body-layout ${hasSubnav ? "has-subnav" : ""}`}>
+        {hasSubnav && <CustomerSubnavSidebar />}
+        <main className={`top-nav-content ${hasSubnav ? "with-sidebar" : ""}`}>
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

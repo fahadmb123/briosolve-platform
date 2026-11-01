@@ -78,9 +78,17 @@ declare module "@prisma/client" {
         export type NotificationGetPayload<T = {}> = DefaultModelRow<"notifications">;
         export type notificationsGetPayload<T = {}> = NotificationGetPayload<T>;
 
+        export type PushSubscriptionGetPayload<T = {}> = DefaultModelRow<"push_subscriptions">;
+        export type PushSubscriptionsGetPayload<T = {}> = DefaultModelRow<"push_subscriptions">;
+        export type push_subscriptionsGetPayload<T = {}> = PushSubscriptionGetPayload<T>;
+
         export type NotificationCreateInput = import("@prisma/orm-postgres/orm-client").CreateInput<Contract, "notifications", "public">;
         export type notificationsCreateInput = NotificationCreateInput;
 
+        export type PushSubscriptionCreateInput = import("@prisma/orm-postgres/orm-client").CreateInput<Contract, "push_subscriptions", "public">;
+        export type PushSubscriptionsCreateInput = PushSubscriptionCreateInput;
+        export type push_subscriptionsCreateInput = PushSubscriptionCreateInput;
+        
         export type CreateInput<Table extends PublicTables> = import("@prisma/orm-postgres/orm-client").CreateInput<Contract, Table, "public">;
     }
 }
