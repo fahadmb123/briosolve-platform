@@ -43,11 +43,6 @@ const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-id-card",
   },
   {
-    label: "Account Settings",
-    to: "/provider/settings",
-    icon: "fas fa-cog",
-  },
-  {
     label: "Notification Alerts",
     to: "/provider/notifications",
     icon: "fas fa-bell",
@@ -84,6 +79,10 @@ export const ProviderSubnavSidebar: React.FC = () => {
     ? "fas fa-sliders-h"
     : "fas fa-th-large";
 
+  const isAccountSettingsActive =
+    location.pathname === "/provider/settings" ||
+    location.pathname.startsWith("/provider/settings");
+
   if (!activeSubnavItems) return null;
 
   return (
@@ -119,7 +118,19 @@ export const ProviderSubnavSidebar: React.FC = () => {
           );
         })}
       </nav>
+
+      <div className="prov-subnav-sidebar-footer">
+        <Link
+          to="/provider/settings"
+          className={`prov-subnav-sidebar-item ${isAccountSettingsActive ? "active" : ""}`}
+        >
+          <div className="prov-subnav-sidebar-icon">
+            <i className="fas fa-cog"></i>
+          </div>
+          <span className="prov-subnav-sidebar-label">Account Settings</span>
+          {isAccountSettingsActive && <span className="prov-subnav-sidebar-pill" />}
+        </Link>
+      </div>
     </aside>
   );
 };
-
