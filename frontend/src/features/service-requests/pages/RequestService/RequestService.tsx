@@ -1,7 +1,7 @@
 import React, { useState, useId, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
-import type { Address } from "../../../addresses";
+import { useGetAddresses, type Address, type AddressPayload } from "../../../addresses";
 import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
 import "./RequestService.css";
 import { useGetCategoriesService } from "../../../service-catalog";
@@ -21,12 +21,6 @@ interface Category {
   services: ServiceItem[];
 }
 
-interface MockAddressItem {
-  id: string;
-  type: string;
-  title: string;
-  details: string;
-}
 
 const LEVEL_STEPS = [
   {
@@ -57,17 +51,17 @@ const LEVEL_STEPS = [
 
 export default function RequestService() {
   const verifications = useAuthStore(state=>state.verifications)
-  const navigate = useNavigate();
   const fileInputId = useId();
   const user = useAuthStore((s) => s.user);
   const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
   const getCategories = useGetCategoriesService();
+  const getAddresses = useGetAddresses()
   const [categories, setCategories] = useState<Category[]>([]);
   const [currentLevel, setCurrentLevel] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubservice, setSelectedSubservice] = useState<ServiceItem | null>(null);
+  const [addresses,setAddresses] = useState<AddressPayload[]>([])
 
-  
   useEffect(() => {
     getCategories.mutate(
       { page: 1, limit: 100, filter: "ACTIVE" },
@@ -86,31 +80,20 @@ export default function RequestService() {
     );
   }, []);
 
+  useEffect(()=>{
+    (()=>{
+      getAddresses.mutate({page:1,search:'',limit:100},{
+        onSuccess:(response)=>{
+          setAddresses(response.data.addresses as []) 
+        }
+      })
+    })()
+  }, [])
+
   const customerAddress =
     typeof user?.current_address_id === "object"
       ? (user.current_address_id as Address | null)
       : null;
-
-  const defaultAddresses: MockAddressItem[] = [
-    {
-      id: customerAddress?.id || "addr-1",
-      type: customerAddress?.type || "Home",
-      title: customerAddress
-        ? `${customerAddress.house_no || ""} ${customerAddress.area}`.trim()
-        : "Apartment 4B, Emerald Heights",
-      details: customerAddress
-        ? `${customerAddress.city}, ${customerAddress.state} - ${customerAddress.pincode}`
-        : "Ponnani-Chavakkad Highway, Thrissur, Kerala - 680665",
-    },
-    {
-      id: "addr-2",
-      type: "Office",
-      title: "Suite 204, Metro Business Hub",
-      details: "MG Road, Kochi, Kerala - 682016",
-    },
-  ];
-
-  
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -124,7 +107,7 @@ export default function RequestService() {
     "MORNING" | "AFTERNOON" | "EVENING"
   >("MORNING");
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
-    defaultAddresses[0].id
+    customerAddress?.id as string
   );
   const [budgetType, setBudgetType] = useState<"OPEN_BID" | "FIXED" | "HOURLY">(
     "OPEN_BID"
@@ -198,7 +181,7 @@ export default function RequestService() {
   };
 
   const selectedAddress =
-    defaultAddresses.find((a) => a.id === selectedAddressId) || defaultAddresses[0];
+    addresses.find((address)=>address.id === customerAddress?.id)
 
   const urgencyLabel = {
     EMERGENCY: "Immediate (2-4 hrs)",
@@ -590,13 +573,13 @@ export default function RequestService() {
                 </div>
 
                 <div className="addresses-selection-list">
-                  {defaultAddresses.map((addr) => {
+                  {addresses.map((addr) => {
                     const isSelected = selectedAddressId === addr.id;
                     return (
                       <div
                         key={addr.id}
                         className={`address-select-card ${isSelected ? "selected" : ""}`}
-                        onClick={() => setSelectedAddressId(addr.id)}
+                        onClick={() => setSelectedAddressId(addr.id!)}
                       >
                         <div className="address-radio-indicator">
                           {isSelected && <div className="address-radio-dot"></div>}
@@ -604,9 +587,9 @@ export default function RequestService() {
                         <div className="address-card-body">
                           <div className="address-card-header">
                             <span className="address-type-tag">{addr.type}</span>
-                            <span className="address-text-main">{addr.title}</span>
+                            <span className="address-text-main">{addr.landmark}</span>
                           </div>
-                          <div className="address-text-sub">{addr.details}</div>
+                         
                         </div>
                       </div>
                     );
@@ -871,7 +854,7 @@ export default function RequestService() {
                     Level 3
                   </span>
                   <span className="summary-item-value">
-                    {selectedAddress.title}
+                    {selectedAddress?.landmark}
                   </span>
                 </div>
 
@@ -942,18 +925,7 @@ export default function RequestService() {
                   )}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => navigate("/dashboard")}
-                  className="summary-draft-btn"
-                >
-                  Save as Draft
-                </button>
-              </div>
 
-              <div className="summary-trust-badge">
-                <i className="fas fa-lock text-success"></i>
-                <span>No upfront booking fee • Free quotes</span>
               </div>
             </div>
           </div>
@@ -989,7 +961,7 @@ export default function RequestService() {
               </div>
               <div className="request-success-info-row">
                 <span>Location:</span>
-                <span>{selectedAddress.title}</span>
+                <span>{selectedAddress?.landmark}</span>
               </div>
             </div>
 
