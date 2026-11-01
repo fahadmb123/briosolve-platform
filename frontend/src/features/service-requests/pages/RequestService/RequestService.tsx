@@ -63,7 +63,11 @@ export default function RequestService() {
   const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
   const getCategories = useGetCategoriesService();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [currentLevel, setCurrentLevel] = useState<number>(1);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedSubservice, setSelectedSubservice] = useState<ServiceItem | null>(null);
 
+  
   useEffect(() => {
     getCategories.mutate(
       { page: 1, limit: 100, filter: "ACTIVE" },
@@ -106,9 +110,7 @@ export default function RequestService() {
     },
   ];
 
-  const [currentLevel, setCurrentLevel] = useState<number>(1);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [selectedSubservice, setSelectedSubservice] = useState<ServiceItem | null>(null);
+  
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
