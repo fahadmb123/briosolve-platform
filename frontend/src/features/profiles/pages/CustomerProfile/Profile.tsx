@@ -1,4 +1,5 @@
 import './Profile.css';
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import '../../../../shared/styles/location-picker.css';
 import { nameSchema, type NameInputType } from '../../schemas/customerProfile.schema';
@@ -183,46 +184,137 @@ export default function Profile() {
           </div>
 
           {/* RIGHT MAIN CONTENT - EDIT FORM */}
-          <div className="profile-main-content">
-            <form onSubmit={handleSubmit(onSubmitForm)} className="form-card-modern flex flex-col h-full">
-              <div className="flex justify-between items-center mb-6 pb-4 border-bottom">
-                <h3 className="h4 mb-0">Personal Information</h3>
-                
+          <div className="profile-main-content flex flex-col gap-6">
+            <form onSubmit={handleSubmit(onSubmitForm)} className="form-card-modern">
+              <div className="flex justify-between items-center mb-6 pb-4 border-bottom border-border">
+                <div>
+                  <h3 className="h5 mb-0.5 text-text font-bold">Personal Information</h3>
+                  <p className="text-xs text-secondary mb-0">Update your name and household preferences for visiting contractors.</p>
+                </div>
+                <span className="badge badge-primary text-xs uppercase px-2.5 py-1">
+                  <i className="fas fa-user-check mr-1"></i> Client Profile
+                </span>
               </div>
 
-              <div className="mb-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
                 <div className="modern-input-group">
                   <label htmlFor="prof-name">Full Name</label>
                   <input type="text" id="prof-name" className="form-control" {...register("name")} />
                   {errors.name && (
-                    <span className="text-red-500 text-xs mt-1">{errors.name.message}</span>
+                    <span className="text-red-500 text-xs mt-1 block">{errors.name.message}</span>
                   )}
+                </div>
+
+                <div className="modern-input-group">
+                  <label>Email Address</label>
+                  <div className="form-control-static">
+                    <span className="truncate">{user?.email || "No email set"}</span>
+                    <span className="badge badge-success text-2xs uppercase px-2 py-0.5 shrink-0">
+                      <i className="fas fa-check-circle mr-1"></i> Verified
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="modern-input-group flex-grow">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                <div className="modern-input-group">
+                  <label>Phone Contact</label>
+                  <div className="form-control-static">
+                    <span>{user?.phone || "No phone added"}</span>
+                    <span className={`badge ${user?.phone_verified ? "badge-success" : "badge-neutral"} text-2xs uppercase px-2 py-0.5 shrink-0`}>
+                      {user?.phone_verified ? "Verified" : "Unverified"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="modern-input-group">
+                  <label>Membership Tier</label>
+                  <div className="form-control-static">
+                    <span className="font-medium">Verified Customer</span>
+                    <span className="badge badge-primary text-2xs uppercase px-2 py-0.5 shrink-0">Standard</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modern-input-group">
                 <label htmlFor="prof-headline">About / Household Notes</label>
                 <textarea 
                   id="prof-headline" 
                   className="form-control modern-textarea" 
-                  placeholder="Brief note about your preferences or pets for visiting providers..."
+                  placeholder="Brief note about your preferences, parking, or pets for visiting providers..."
                   {...register("about")}
                 ></textarea>
                 {errors.about && (
-                  <span className="text-red-500 text-xs mt-1">{errors.about.message}</span>
+                  <span className="text-red-500 text-xs mt-1 block">{errors.about.message}</span>
                 )}
-                <p className="text-xs text-secondary mt-2">
-                  <i className="fas fa-info-circle mr-1"></i> 
-                  This information helps providers understand your household preferences before they arrive.
+                <p className="text-xs text-secondary mt-2 flex items-center gap-1.5 mb-0">
+                  <i className="fas fa-info-circle text-primary"></i> 
+                  <span>This information helps providers understand your household preferences before they arrive.</span>
                 </p>
               </div>
 
-              <div className="flex justify-end items-center gap-3 mt-auto pt-6 border-top">
-                <button type="submit" disabled={isPending} className="btn btn-primary btn-lg px-8 shadow-lg">
+              <div className="flex justify-end items-center gap-3 pt-5 mt-4 border-top border-border">
+                <button type="submit" disabled={isPending} className="btn btn-primary px-8 shadow-sm">
                   <i className="fas fa-check mr-2"></i> {isPending ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
+
+            <div className="form-card-modern">
+              <div className="flex justify-between items-center mb-5 pb-4 border-bottom border-border">
+                <div>
+                  <h3 className="h5 mb-0.5 text-text font-bold">Activity &amp; Quick Shortcuts</h3>
+                  <p className="text-xs text-secondary mb-0">Manage your connected marketplace actions and quick links.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div className="p-4 rounded-xl border border-border bg-surface-hover flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <i className="fas fa-file-invoice text-lg"></i>
+                  </div>
+                  <div>
+                    <div className="text-xs text-secondary uppercase font-semibold">Service Requests</div>
+                    <div className="text-lg font-bold text-text">14 Active/Past</div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-border bg-surface-hover flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+                    <i className="fas fa-calendar-check text-lg"></i>
+                  </div>
+                  <div>
+                    <div className="text-xs text-secondary uppercase font-semibold">Bookings</div>
+                    <div className="text-lg font-bold text-text">12 Completed</div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-border bg-surface-hover flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                    <i className="fas fa-bell text-lg"></i>
+                  </div>
+                  <div>
+                    <div className="text-xs text-secondary uppercase font-semibold">Alerts</div>
+                    <div className="text-lg font-bold text-text">Live Push Ready</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <Link to="/settings" className="btn btn-outline btn-sm flex items-center gap-1.5">
+                  <i className="fas fa-cog text-primary"></i>
+                  <span>Account Settings</span>
+                </Link>
+                <Link to="/notifications" className="btn btn-outline btn-sm flex items-center gap-1.5">
+                  <i className="fas fa-bell text-primary"></i>
+                  <span>Notification Preferences</span>
+                </Link>
+                <button type="button" onClick={() => setIsLocModalOpen(true)} className="btn btn-outline btn-sm flex items-center gap-1.5">
+                  <i className="fas fa-map-marker-alt text-primary"></i>
+                  <span>View Full Address Details</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

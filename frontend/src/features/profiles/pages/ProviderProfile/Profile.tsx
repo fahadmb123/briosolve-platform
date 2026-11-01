@@ -431,8 +431,8 @@ export default function Profile() {
             </div>
           </div>
 
-          <div className="profile-main-content">
-            <div className="bg-surface border border-border rounded-xl p-4 mb-6 flex justify-between items-center flex-wrap gap-3">
+          <div className="profile-main-content flex flex-col gap-6">
+            <div className="bg-surface border border-border rounded-xl p-4 flex justify-between items-center flex-wrap gap-3">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                   <i className="fas fa-user-cog"></i>
@@ -447,7 +447,7 @@ export default function Profile() {
               </Link>
             </div>
 
-            <div className="form-card-modern mb-6">
+            <div className="form-card-modern">
               <div className="flex justify-between items-center mb-4 pb-4 border-bottom">
                 <div>
                   <h3 className="h4 mb-0">About &amp; Trade Background</h3>
@@ -484,7 +484,7 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="form-card-modern mb-6">
+            <div className="form-card-modern">
               <div className="flex justify-between items-center mb-6 pb-4 border-bottom">
                 <h3 className="h4 mb-0">Active Service Categories</h3>
               </div>
