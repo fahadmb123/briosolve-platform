@@ -33,7 +33,8 @@ export const ProviderTopNav: React.FC = () => {
   const [activePanel, setActivePanel] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const navRef = useRef<HTMLDivElement>(null)
-  const isVerified = user?.phone_verified && user.email_verified && profile?.kyc_status === "APPROVED" && user.current_address_id
+  const verifications = useAuthStore(state=>state.verifications)
+  const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
 
   const handleLogout = async () => {
     if (!isAuthenticated) {
