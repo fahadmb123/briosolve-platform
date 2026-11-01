@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense, useMemo, useCallback } from 'react
 import { useLocation } from 'react-router-dom';
 import './Settings.css';
 import { SettingsMenuCard } from '../../components/common/SettingsMenuCard';
+import { BrowserPushNotificationToggle } from '../../components/common/BrowserPushNotificationToggle';
 import { ChangePasswordForm } from '../../components/provider/ChangePasswordForm';
 import { ContactInfo } from '../../components/provider/ContactInfo';
 import { BusinessProfileForm } from '../../components/provider/BusinessProfileForm';
@@ -160,10 +161,10 @@ export default function Settings() {
                                 </span>
                             </div>
 
-                            {/* Email and Mobile in two separate cards/tables */}
+                            
                             <ContactInfo />
 
-                            {/* Password in two separate cards/tables */}
+                            
                             <div className="pt-4 border-top">
                                 <h3 className="h6 mb-4 font-bold">Change Account Password</h3>
                                 <ChangePasswordForm />
@@ -199,6 +200,8 @@ export default function Settings() {
                         <div className="settings-card-panel" id="sec-notifications">
                             <h2 className="h5 mb-2">Notification Preferences</h2>
                             <p className="text-xs text-secondary mb-4">Choose which marketplace events trigger real-time push alerts</p>
+
+                            <BrowserPushNotificationToggle />
 
                             <div className="toggle-switch-row">
                                 <div>
