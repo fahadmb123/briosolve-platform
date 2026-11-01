@@ -24,11 +24,6 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/request-service",
     icon: "fas fa-plus-circle",
   },
-  {
-    label: "Notifications",
-    to: "/notifications",
-    icon: "fas fa-bell",
-  },
 ];
 
 const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
@@ -49,7 +44,8 @@ export const CustomerSubnavSidebar: React.FC = () => {
 
   const isSettingsSection =
     location.pathname.startsWith("/settings") ||
-    location.pathname.startsWith("/profile");
+    location.pathname.startsWith("/profile") ||
+    location.pathname.startsWith("/notifications");
 
   const isWorkspaceSection =
     location.pathname === "/dashboard" ||
@@ -57,23 +53,19 @@ export const CustomerSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/nearby-providers") ||
     location.pathname.startsWith("/request-service");
 
-  const isNotifications = location.pathname.startsWith("/notifications");
-
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS
     : isWorkspaceSection
     ? WORKSPACE_SUBNAV_ITEMS
-    : isNotifications
-    ? SETTINGS_SUBNAV_ITEMS
     : null;
 
-  const activeSubnavTitle = isSettingsSection || isNotifications
+  const activeSubnavTitle = isSettingsSection
     ? "Settings"
     : isWorkspaceSection
     ? "Workspace"
     : "";
 
-  const activeSubnavIcon = isSettingsSection || isNotifications
+  const activeSubnavIcon = isSettingsSection
     ? "fas fa-sliders-h"
     : "fas fa-th-large";
 
