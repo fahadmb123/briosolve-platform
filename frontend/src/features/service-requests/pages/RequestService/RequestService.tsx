@@ -1,4 +1,11 @@
 import React, { useState, useId, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import {
+  level1ServiceRequestSchema,
+  level2ServiceRequestSchema,
+  level3ServiceRequestSchema,
+  level4ServiceRequestSchema
+} from "../../schemas/serviceRequest.schema";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetAddresses, type Address, type AddressPayload } from "../../../addresses";
@@ -111,15 +118,19 @@ export default function RequestService() {
   const [budgetAmount, setBudgetAmount] = useState<string>("1500");
   const [agreedToPolicy, setAgreedToPolicy] = useState<boolean>(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
 
   const handleCategorySelect = (category: Category) => {
     setSelectedCategory(category);
+    clearFieldError("categoryId");
     if (category.services && category.services.length > 0) {
       setSelectedSubservice(category.services[0]);
+      clearFieldError("subserviceId");
       if (!title) {
         setTitle(category.services[0].name);
+        clearFieldError("title");
       }
     } else {
       setSelectedSubservice(null);
@@ -148,9 +159,89 @@ export default function RequestService() {
 
   const handlePresetBudget = (amount: string) => {
     setBudgetAmount(amount);
+    clearFieldError("budgetAmount");
+  };
+
+  const clearFieldError = (field: string) => {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const copy = { ...prev };
+        delete copy[field];
+        return copy;
+      });
+    }
+  };
+
+  const validateCurrentLevel = (level: number): boolean => {
+    if (level === 1) {
+      const result = level1ServiceRequestSchema.safeParse({
+        categoryId: selectedCategory?.id || "",
+        subserviceId: selectedSubservice?.id || ""
+      });
+      if (!result.success) {
+        const newErrors: Record<string, string> = {};
+        result.error.issues.forEach((issue) => {
+          const key = issue.path[0]?.toString() || "categoryId";
+          newErrors[key] = issue.message;
+        });
+        setErrors(newErrors);
+        toast.error(result.error.issues[0]?.message || "Please select a service category");
+        return false;
+      }
+    } else if (level === 2) {
+      const result = level2ServiceRequestSchema.safeParse({
+        title,
+        description,
+        urgency
+      });
+      if (!result.success) {
+        const newErrors: Record<string, string> = {};
+        result.error.issues.forEach((issue) => {
+          const key = issue.path[0]?.toString() || "title";
+          newErrors[key] = issue.message;
+        });
+        setErrors(newErrors);
+        return false;
+      }
+    } else if (level === 3) {
+      const result = level3ServiceRequestSchema.safeParse({
+        selectedAddressId: selectedAddressId || "",
+        availableTimeFrom,
+        availableTimeTo
+      });
+      if (!result.success) {
+        const newErrors: Record<string, string> = {};
+        result.error.issues.forEach((issue) => {
+          const key = issue.path[0]?.toString() || "selectedAddressId";
+          newErrors[key] = issue.message;
+        });
+        setErrors(newErrors);
+        return false;
+      }
+    } else if (level === 4) {
+      const result = level4ServiceRequestSchema.safeParse({
+        budgetType,
+        budgetAmount,
+        agreedToPolicy
+      });
+      if (!result.success) {
+        const newErrors: Record<string, string> = {};
+        result.error.issues.forEach((issue) => {
+          const key = issue.path[0]?.toString() || "budgetAmount";
+          newErrors[key] = issue.message;
+        });
+        setErrors(newErrors);
+        return false;
+      }
+    }
+    setErrors({});
+    return true;
   };
 
   const handleNextLevel = () => {
+    if (!validateCurrentLevel(currentLevel)) {
+      return;
+    }
     if (currentLevel < 4) {
       setCurrentLevel((prev) => prev + 1);
       window.scrollTo({ top: 120, behavior: "smooth" });
@@ -159,6 +250,7 @@ export default function RequestService() {
 
   const handlePrevLevel = () => {
     if (currentLevel > 1) {
+      setErrors({});
       setCurrentLevel((prev) => prev - 1);
       window.scrollTo({ top: 120, behavior: "smooth" });
     }
@@ -170,7 +262,7 @@ export default function RequestService() {
       handleNextLevel();
       return;
     }
-    if (!agreedToPolicy) {
+    if (!validateCurrentLevel(4)) {
       return;
     }
     setIsSubmitting(true);
@@ -358,6 +450,11 @@ export default function RequestService() {
                         );
                       })}
                     </div>
+                    {errors.categoryId && (
+                      <div className="text-danger text-xs mt-3">
+                        {errors.categoryId}
+                      </div>
+                    )}
                   </div>
 
                   {selectedCategory && (
@@ -462,11 +559,19 @@ export default function RequestService() {
                     type="text"
                     required
                     maxLength={100}
-                    className="request-form-input"
+                    className={`request-form-input ${errors.title ? "border-danger" : ""}`}
                     placeholder="e.g. Washbasin pipe leaking heavily under cabinet"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(e) => {
+                      setTitle(e.target.value);
+                      clearFieldError("title");
+                    }}
                   />
+                  {errors.title && (
+                    <span className="text-danger text-xs mt-1 block">
+                      {errors.title}
+                    </span>
+                  )}
                 </div>
 
                 <div className="request-form-group">
@@ -480,11 +585,19 @@ export default function RequestService() {
                     required
                     rows={4}
                     maxLength={1000}
-                    className="request-form-textarea"
+                    className={`request-form-textarea ${errors.description ? "border-danger" : ""}`}
                     placeholder="Describe the issue, work scope, materials available or needed, and any constraints..."
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    onChange={(e) => {
+                      setDescription(e.target.value);
+                      clearFieldError("description");
+                    }}
                   ></textarea>
+                  {errors.description && (
+                    <span className="text-danger text-xs mt-1 block">
+                      {errors.description}
+                    </span>
+                  )}
                 </div>
 
                 <div className="request-form-group">
@@ -497,7 +610,10 @@ export default function RequestService() {
                   <div className="urgency-grid">
                     <div
                       className={`urgency-card ${urgency === "TODAY" ? "selected" : ""}`}
-                      onClick={() => setUrgency("TODAY")}
+                      onClick={() => {
+                        setUrgency("TODAY");
+                        clearFieldError("urgency");
+                      }}
                     >
                       <div className="urgency-icon text-primary">
                         <i className="fas fa-calendar-day"></i>
@@ -508,7 +624,10 @@ export default function RequestService() {
 
                     <div
                       className={`urgency-card ${urgency === "THIS_WEEK" ? "selected" : ""}`}
-                      onClick={() => setUrgency("THIS_WEEK")}
+                      onClick={() => {
+                        setUrgency("THIS_WEEK");
+                        clearFieldError("urgency");
+                      }}
                     >
                       <div className="urgency-icon text-info">
                         <i className="fas fa-calendar-week"></i>
@@ -519,7 +638,10 @@ export default function RequestService() {
 
                     <div
                       className={`urgency-card ${urgency === "FLEXIBLE" ? "selected" : ""}`}
-                      onClick={() => setUrgency("FLEXIBLE")}
+                      onClick={() => {
+                        setUrgency("FLEXIBLE");
+                        clearFieldError("urgency");
+                      }}
                     >
                       <div className="urgency-icon text-secondary">
                         <i className="fas fa-clock"></i>
@@ -528,6 +650,11 @@ export default function RequestService() {
                       <div className="urgency-desc">Anytime soon</div>
                     </div>
                   </div>
+                  {errors.urgency && (
+                    <span className="text-danger text-xs mt-1 block">
+                      {errors.urgency}
+                    </span>
+                  )}
                 </div>
 
                 <div className="level-navigation-bar">
@@ -571,7 +698,10 @@ export default function RequestService() {
                       <div
                         key={addr.id}
                         className={`address-select-card ${isSelected ? "selected" : ""}`}
-                        onClick={() => setSelectedAddressId(addr.id!)}
+                        onClick={() => {
+                          setSelectedAddressId(addr.id!);
+                          clearFieldError("selectedAddressId");
+                        }}
                       >
                         <div className="address-radio-indicator">
                           {isSelected && <div className="address-radio-dot"></div>}
@@ -586,6 +716,11 @@ export default function RequestService() {
                       </div>
                     );
                   })}
+                {errors.selectedAddressId && (
+                  <div className="text-danger text-xs mt-1 mb-3">
+                    {errors.selectedAddressId}
+                  </div>
+                )}
                 </div>
 
                 <Link
@@ -603,19 +738,36 @@ export default function RequestService() {
                       <span className="time-range-label">From</span>
                       <input
                         type="time"
-                        className="request-form-input"
+                        className={`request-form-input ${errors.availableTimeFrom ? "border-danger" : ""}`}
                         value={availableTimeFrom}
-                        onChange={(e) => setAvailableTimeFrom(e.target.value)}
+                        onChange={(e) => {
+                          setAvailableTimeFrom(e.target.value);
+                          clearFieldError("availableTimeFrom");
+                          clearFieldError("availableTimeTo");
+                        }}
                       />
+                      {errors.availableTimeFrom && (
+                        <span className="text-danger text-xs mt-1 block">
+                          {errors.availableTimeFrom}
+                        </span>
+                      )}
                     </div>
                     <div className="time-range-field">
                       <span className="time-range-label">To</span>
                       <input
                         type="time"
-                        className="request-form-input"
+                        className={`request-form-input ${errors.availableTimeTo ? "border-danger" : ""}`}
                         value={availableTimeTo}
-                        onChange={(e) => setAvailableTimeTo(e.target.value)}
+                        onChange={(e) => {
+                          setAvailableTimeTo(e.target.value);
+                          clearFieldError("availableTimeTo");
+                        }}
                       />
+                      {errors.availableTimeTo && (
+                        <span className="text-danger text-xs mt-1 block">
+                          {errors.availableTimeTo}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -681,10 +833,18 @@ export default function RequestService() {
                         min={100}
                         max={100000}
                         step={50}
-                        className="request-form-input"
+                        className={`request-form-input ${errors.budgetAmount ? "border-danger" : ""}`}
                         value={budgetAmount}
-                        onChange={(e) => setBudgetAmount(e.target.value)}
+                        onChange={(e) => {
+                          setBudgetAmount(e.target.value);
+                          clearFieldError("budgetAmount");
+                        }}
                       />
+                      {errors.budgetAmount && (
+                        <span className="text-danger text-xs mt-1 block">
+                          {errors.budgetAmount}
+                        </span>
+                      )}
                     </div>
 
                     <div className="budget-presets-row">
@@ -785,14 +945,21 @@ export default function RequestService() {
                     <input
                       type="checkbox"
                       checked={agreedToPolicy}
-                      onChange={(e) => setAgreedToPolicy(e.target.checked)}
+                      onChange={(e) => {
+                        setAgreedToPolicy(e.target.checked);
+                        clearFieldError("agreedToPolicy");
+                      }}
                       className="request-policy-checkbox"
-                      required
                     />
                     <span>
                       I understand and agree to the request flow, quotation acceptance terms, and the 10% platform fee included in the initial advance payment.
                     </span>
                   </label>
+                  {errors.agreedToPolicy && (
+                    <span className="text-danger text-xs mt-1 block">
+                      {errors.agreedToPolicy}
+                    </span>
+                  )}
                 </div>
 
                 <div className="level-navigation-bar">
@@ -995,6 +1162,7 @@ export default function RequestService() {
                   setAvailableTimeFrom("09:00");
                   setAvailableTimeTo("17:00");
                   setAgreedToPolicy(false);
+                  setErrors({});
                   setUploadedImages([]);
                 }}
               >

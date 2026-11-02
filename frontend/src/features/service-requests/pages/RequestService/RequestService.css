@@ -1493,3 +1493,15 @@
     cursor: pointer;
     flex-shrink: 0;
 }
+
+
+.request-form-input.border-danger,
+.request-form-textarea.border-danger,
+.border-danger {
+    border-color: var(--danger) !important;
+}
+
+.request-form-input.border-danger:focus,
+.request-form-textarea.border-danger:focus {
+    box-shadow: 0 0 0 3px var(--danger-bg) !important;
+}
