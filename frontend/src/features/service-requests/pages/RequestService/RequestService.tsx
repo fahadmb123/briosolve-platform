@@ -1,4 +1,4 @@
-import { useState, useId, useEffect } from "react";
+import { useState, useId, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
@@ -8,6 +8,8 @@ import { useGetAddresses, type Address, type AddressPayload } from "../../../add
 import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
 import "./RequestService.css";
 import { useGetCategoriesService } from "../../../service-catalog";
+import { useCreateServiceRequest } from "../../hooks/useServiceRequestMutations";
+import type { ApiError } from "../../../../shared/api/ApiError";
 import {
   serviceRequestSchema,
   type ServiceRequestInputType
@@ -23,7 +25,8 @@ import {
   Level3ScheduleStep,
   Level4BudgetStep,
   RequestSummary,
-  RequestSuccessModal
+  RequestSuccessModal,
+  RequestErrorBox
 } from "./components";
 
 export default function RequestService() {
@@ -40,7 +43,8 @@ export default function RequestService() {
   const [selectedSubservice, setSelectedSubservice] = useState<ServiceItem | null>(null);
   const [addresses, setAddresses] = useState<AddressPayload[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const createServiceRequestMutation = useCreateServiceRequest();
+  const isSubmitting = createServiceRequestMutation.isPending;
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
 
   const customerAddress =
@@ -85,6 +89,40 @@ export default function RequestService() {
   const budgetType = watch("budgetType");
   const budgetAmount = watch("budgetAmount");
   const agreedToPolicy = watch("agreedToPolicy");
+
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [dismissedErrors, setDismissedErrors] = useState(false);
+
+  const currentLevelErrors: string[] = useMemo(() => {
+    const errorMessages: string[] = [];
+    const levelKeysMap: Record<number, (keyof ServiceRequestInputType)[]> = {
+      1: ["categoryId", "subserviceId"],
+      2: ["title", "description", "urgency", "specificDate"],
+      3: ["selectedAddressId", "availableTimeFrom", "availableTimeTo"],
+      4: ["budgetType", "budgetAmount", "agreedToPolicy"],
+    };
+    const currentKeys = levelKeysMap[currentLevel] || [];
+    currentKeys.forEach((key) => {
+      const fieldError = errors[key];
+      if (fieldError?.message && !errorMessages.includes(fieldError.message)) {
+        errorMessages.push(fieldError.message);
+      }
+    });
+    return errorMessages;
+  }, [errors, currentLevel]);
+
+  const displayedErrors = useMemo(() => {
+    if (dismissedErrors) return [];
+    const list = [...currentLevelErrors];
+    if (submissionError && !list.includes(submissionError)) {
+      list.unshift(submissionError);
+    }
+    return list;
+  }, [dismissedErrors, currentLevelErrors, submissionError]);
+
+  useEffect(() => {
+    setDismissedErrors(false);
+  }, [currentLevel]);
 
   useEffect(() => {
     getCategories.mutate(
@@ -183,6 +221,7 @@ export default function RequestService() {
   };
 
   const handleNextLevel = async () => {
+    setDismissedErrors(false);
     let isValid = false;
     if (currentLevel === 1) {
       isValid = await trigger(["categoryId", "subserviceId"]);
@@ -199,6 +238,8 @@ export default function RequestService() {
 
     if (isValid && currentLevel < 4) {
       setCurrentLevel((prev) => prev + 1);
+      window.scrollTo({ top: 120, behavior: "smooth" });
+    } else if (!isValid) {
       window.scrollTo({ top: 120, behavior: "smooth" });
     }
   };
@@ -232,12 +273,33 @@ export default function RequestService() {
     }
   };
 
-  const onSubmit = () => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setShowSuccessModal(true);
-    }, 700);
+  const onSubmit = (data: ServiceRequestInputType) => {
+    setDismissedErrors(false);
+    setSubmissionError(null);
+    createServiceRequestMutation.mutate(
+      {
+        categoryId: data.categoryId,
+        subserviceId: data.subserviceId,
+        title: data.title,
+        description: data.description,
+        urgency: data.urgency,
+        specificDate: data.specificDate,
+        selectedAddressId: data.selectedAddressId,
+        availableTimeFrom: data.availableTimeFrom,
+        availableTimeTo: data.availableTimeTo,
+        budgetType: data.budgetType,
+        budgetAmount: data.budgetAmount,
+        images: uploadedImages
+      },
+      {
+        onSuccess: () => {
+          setShowSuccessModal(true);
+        },
+        onError: (err: ApiError) => {
+          setSubmissionError(err.message || "Failed to submit service request");
+        }
+      }
+    );
   };
 
   const selectedAddress =
@@ -339,6 +401,14 @@ export default function RequestService() {
           />
 
           <div className="request-form-column">
+            <RequestErrorBox
+              errors={displayedErrors}
+              onDismiss={() => {
+                setDismissedErrors(true);
+                setSubmissionError(null);
+              }}
+            />
+
             {currentLevel === 1 && (
               <Level1ServiceStep
                 categories={categories}
