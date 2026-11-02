@@ -211,21 +211,6 @@ export default function RequestService() {
   return (
     <div className="app-content request-service-container">
       <div className="request-service-header">
-        <div className="request-service-top-row">
-          <div className="request-service-breadcrumb">
-            <Link to="/">Home</Link>
-            <i className="fas fa-chevron-right text-[10px]"></i>
-            <Link to="/dashboard">Dashboard</Link>
-            <i className="fas fa-chevron-right text-[10px]"></i>
-            <span className="current">Request Service</span>
-          </div>
-
-          <div className="request-guarantee-pill">
-            <i className="fas fa-shield-alt"></i>
-            <span>Verified Quality & Price Protection</span>
-          </div>
-        </div>
-
         <div className="request-service-title-row">
           <div className="request-service-title-group">
             <div className="request-step-pill">
@@ -238,17 +223,9 @@ export default function RequestService() {
             </p>
           </div>
 
-          <div className="request-progress-card">
-            <div className="request-progress-header">
-              <span className="request-progress-label">Overall Progress</span>
-              <span className="request-progress-percent">{currentLevel * 25}%</span>
-            </div>
-            <div className="request-progress-track">
-              <div
-                className="request-progress-bar"
-                style={{ width: `${currentLevel * 25}%` }}
-              ></div>
-            </div>
+          <div className="request-guarantee-pill">
+            <i className="fas fa-shield-alt"></i>
+            <span>Verified Quality & Price Protection</span>
           </div>
         </div>
       </div>
