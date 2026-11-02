@@ -211,26 +211,44 @@ export default function RequestService() {
   return (
     <div className="app-content request-service-container">
       <div className="request-service-header">
-        <div className="request-service-breadcrumb">
-          <Link to="/">Home</Link>
-          <i className="fas fa-chevron-right text-[10px]"></i>
-          <Link to="/dashboard">Dashboard</Link>
-          <i className="fas fa-chevron-right text-[10px]"></i>
-          <span className="current">Request Service</span>
-        </div>
-
-        <div className="request-service-title-row">
-          <div className="request-service-title-group">
-            <h1>Post a Service Request</h1>
-            <p>
-              Complete the 4 levels to broadcast your requirement to verified local
-              service providers and receive competitive quotes.
-            </p>
+        <div className="request-service-top-row">
+          <div className="request-service-breadcrumb">
+            <Link to="/">Home</Link>
+            <i className="fas fa-chevron-right text-[10px]"></i>
+            <Link to="/dashboard">Dashboard</Link>
+            <i className="fas fa-chevron-right text-[10px]"></i>
+            <span className="current">Request Service</span>
           </div>
 
           <div className="request-guarantee-pill">
             <i className="fas fa-shield-alt"></i>
-            <span>Briosolve Quality & Price Protection</span>
+            <span>Verified Quality & Price Protection</span>
+          </div>
+        </div>
+
+        <div className="request-service-title-row">
+          <div className="request-service-title-group">
+            <div className="request-step-pill">
+              <span className="request-step-pill-dot"></span>
+              <span>Level {currentLevel} of 4: {LEVEL_STEPS[currentLevel - 1].title}</span>
+            </div>
+            <h1>Post a Service Request</h1>
+            <p>
+              Complete the structured levels below to broadcast your requirement to verified local specialists and receive competitive quotes.
+            </p>
+          </div>
+
+          <div className="request-progress-card">
+            <div className="request-progress-header">
+              <span className="request-progress-label">Overall Progress</span>
+              <span className="request-progress-percent">{currentLevel * 25}%</span>
+            </div>
+            <div className="request-progress-track">
+              <div
+                className="request-progress-bar"
+                style={{ width: `${currentLevel * 25}%` }}
+              ></div>
+            </div>
           </div>
         </div>
       </div>
@@ -262,8 +280,11 @@ export default function RequestService() {
           <div className="levels-stepper-column">
             <div className="levels-stepper-card">
               <div className="levels-sidebar-header">
-                <h3>Levels Progress</h3>
-                <p>Complete steps 1 to 4</p>
+                <div>
+                  <h3>Levels Roadmap</h3>
+                  <p>Step-by-step service posting</p>
+                </div>
+                <span className="levels-count-pill">{currentLevel}/4</span>
               </div>
 
               <div className="levels-list">
@@ -563,6 +584,9 @@ export default function RequestService() {
             )}
 
             {currentLevel === 3 && (
+              getAddresses.isPending ? (
+                <ServiceSelectionSkeleton/>
+              ):( 
               <div className="request-section-card">
                 <div className="request-section-header">
                   <div className="request-step-badge">3</div>
@@ -662,7 +686,7 @@ export default function RequestService() {
                   </button>
                 </div>
               </div>
-            )}
+            ))}
 
             {currentLevel === 4 && (
               <div className="request-section-card">
@@ -822,10 +846,17 @@ export default function RequestService() {
 
           <div className="request-summary-column">
             <div className="request-summary-card">
-              <h3 className="summary-card-title">Request Summary</h3>
-              <p className="summary-card-subtext">
-                Live preview of your requirement across all levels
-              </p>
+              <div className="summary-card-header">
+                <div className="summary-status-pulse">
+                  <span className="summary-pulse-dot"></span>
+                </div>
+                <div>
+                  <h3 className="summary-card-title">Live Scope Summary</h3>
+                  <p className="summary-card-subtext">
+                    Real-time preview across all levels
+                  </p>
+                </div>
+              </div>
 
               <div className="summary-items-list">
                 <div className="summary-item">
