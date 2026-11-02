@@ -100,12 +100,8 @@ export default function RequestService() {
   const [urgency, setUrgency] = useState<
     "TODAY" | "THIS_WEEK" | "FLEXIBLE"
   >("TODAY");
-  const [scheduledDate, setScheduledDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
-  );
-  const [scheduledSlot, setScheduledSlot] = useState<
-    "MORNING" | "AFTERNOON" | "EVENING"
-  >("MORNING");
+  const [availableTimeFrom, setAvailableTimeFrom] = useState<string>("09:00");
+  const [availableTimeTo, setAvailableTimeTo] = useState<string>("17:00");
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
     customerAddress?.id as string
   );
@@ -189,11 +185,14 @@ export default function RequestService() {
     FLEXIBLE: "Flexible Date",
   }[urgency];
 
-  const timeSlotLabel = {
-    MORNING: "Morning (8 AM - 12 PM)",
-    AFTERNOON: "Afternoon (12 PM - 4 PM)",
-    EVENING: "Evening (4 PM - 8 PM)",
-  }[scheduledSlot];
+  const formatTime = (timeStr: string) => {
+    if (!timeStr) return "";
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return timeStr;
+    const period = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+    return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+  };
 
 
     if (!isVerified) {
@@ -593,41 +592,26 @@ export default function RequestService() {
                   <span>Add new location or manage addresses in Settings</span>
                 </Link>
 
-                <div className="schedule-row">
-                  <div className="request-form-group">
-                    <label className="request-form-label">Preferred Date</label>
-                    <input
-                      type="date"
-                      className="request-form-input"
-                      value={scheduledDate}
-                      onChange={(e) => setScheduledDate(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="request-form-group">
-                    <label className="request-form-label">Preferred Time Window</label>
-                    <div className="time-slot-grid">
-                      <button
-                        type="button"
-                        className={`time-slot-btn ${scheduledSlot === "MORNING" ? "selected" : ""}`}
-                        onClick={() => setScheduledSlot("MORNING")}
-                      >
-                        Morning
-                      </button>
-                      <button
-                        type="button"
-                        className={`time-slot-btn ${scheduledSlot === "AFTERNOON" ? "selected" : ""}`}
-                        onClick={() => setScheduledSlot("AFTERNOON")}
-                      >
-                        Afternoon
-                      </button>
-                      <button
-                        type="button"
-                        className={`time-slot-btn ${scheduledSlot === "EVENING" ? "selected" : ""}`}
-                        onClick={() => setScheduledSlot("EVENING")}
-                      >
-                        Evening
-                      </button>
+                <div className="request-form-group">
+                  <label className="request-form-label">Mostly Available Time</label>
+                  <div className="time-range-row">
+                    <div className="time-range-field">
+                      <span className="time-range-label">From</span>
+                      <input
+                        type="time"
+                        className="request-form-input"
+                        value={availableTimeFrom}
+                        onChange={(e) => setAvailableTimeFrom(e.target.value)}
+                      />
+                    </div>
+                    <div className="time-range-field">
+                      <span className="time-range-label">To</span>
+                      <input
+                        type="time"
+                        className="request-form-input"
+                        value={availableTimeTo}
+                        onChange={(e) => setAvailableTimeTo(e.target.value)}
+                      />
                     </div>
                   </div>
                 </div>
@@ -952,7 +936,7 @@ export default function RequestService() {
               <div className="request-success-info-row">
                 <span>Schedule:</span>
                 <span>
-                  {urgencyLabel} ({timeSlotLabel})
+                  {urgencyLabel} ({formatTime(availableTimeFrom)} - {formatTime(availableTimeTo)})
                 </span>
               </div>
               <div className="request-success-info-row">
@@ -973,6 +957,8 @@ export default function RequestService() {
                   setCurrentLevel(1);
                   setTitle("");
                   setDescription("");
+                  setAvailableTimeFrom("09:00");
+                  setAvailableTimeTo("17:00");
                   setUploadedImages([]);
                 }}
               >

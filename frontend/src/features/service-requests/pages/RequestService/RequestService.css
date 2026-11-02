@@ -812,6 +812,33 @@
     margin-top: 0.15rem;
 }
 
+.time-range-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 0.35rem;
+}
+
+@media (max-width: 640px) {
+    .time-range-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.time-range-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.time-range-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
 .schedule-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -825,35 +852,14 @@
     }
 }
 
-.time-slot-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.65rem;
+.request-form-input[type="time"],
+.request-form-input[type="date"] {
+    color-scheme: light;
 }
 
-.time-slot-btn {
-    padding: 0.75rem 0.5rem;
-    border-radius: 10px;
-    background: var(--surface-elevated);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    transition: all var(--transition-fast);
-}
-
-.time-slot-btn:hover {
-    border-color: var(--primary);
-    color: var(--text);
-}
-
-.time-slot-btn.selected {
-    background: var(--primary);
-    color: var(--primary-content) !important;
-    border-color: var(--primary);
-    font-weight: 700;
+[data-theme="dark"] .request-form-input[type="time"],
+[data-theme="dark"] .request-form-input[type="date"] {
+    color-scheme: dark;
 }
 
 .addresses-selection-list {
