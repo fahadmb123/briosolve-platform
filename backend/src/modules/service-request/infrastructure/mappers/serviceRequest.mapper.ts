@@ -60,6 +60,28 @@ export class ServiceRequestMapper {
         );
     }
 
+    static toDto(serviceRequest: ServiceRequest): ServiceRequestResponseDto {
+        return {
+            id: serviceRequest.id,
+            customer_id: serviceRequest.customer_id,
+            category_id: serviceRequest.category_id,
+            subservice_id: serviceRequest.subservice_id,
+            title: serviceRequest.title,
+            description: serviceRequest.description,
+            urgency: serviceRequest.urgency,
+            specific_date: serviceRequest.specific_date,
+            address_id: serviceRequest.address_id,
+            available_time_from: serviceRequest.available_time_from,
+            available_time_to: serviceRequest.available_time_to,
+            budget_type: serviceRequest.budget_type,
+            budget_amount: serviceRequest.budget_amount,
+            status: serviceRequest.status,
+            created_at: serviceRequest.created_at,
+            updated_at: serviceRequest.updated_at,
+            images: serviceRequest.images
+        };
+    }
+
     static toPersistence(data: CreateServiceRequestRepoDto) {
         let specificDateValue: Temporal.Instant | null = null;
         if (data.specificDate) {
@@ -67,17 +89,23 @@ export class ServiceRequestMapper {
             specificDateValue = Temporal.Instant.fromEpochMilliseconds(dateObj.getTime());
         }
 
+        const parseTime = (timeStr: string): Temporal.PlainTime => {
+            const trimmed = timeStr.trim();
+            const normalized = trimmed.length === 5 ? `${trimmed}:00` : trimmed;
+            return Temporal.PlainTime.from(normalized);
+        };
+
         return {
             customer_id: data.customerId as never,
             category_id: data.categoryId as never,
-            subservice_id: data.subserviceId ? (data.subserviceId as never) : null,
+            subservice_id: data.subserviceId as never,
             title: data.title as never,
             description: data.description as never,
             urgency: data.urgency as never,
             specific_date: specificDateValue,
             address_id: data.selectedAddressId as never,
-            available_time_from: data.availableTimeFrom as never,
-            available_time_to: data.availableTimeTo as never,
+            available_time_from: parseTime(data.availableTimeFrom) as never,
+            available_time_to: parseTime(data.availableTimeTo) as never,
             budget_type: data.budgetType as never,
             budget_amount: data.budgetAmount ? (Number(data.budgetAmount) as never) : null,
             status: "PENDING" as never,
@@ -93,29 +121,5 @@ export class ServiceRequestMapper {
             display_order: displayOrder,
             created_at: Temporal.Now.instant()
         };
-    }
-
-    static toDto(record: ServiceRequest): ServiceRequestResponseDto {
-        return {
-            id:record.id,
-            customer_id:record.customer_id,
-            category_id:record.category_id,
-            subservice_id:record.subservice_id ?? null,
-            title:record.title,
-            description:record.description,
-            urgency:record.urgency,
-            specific_date:record.specific_date,
-            address_id:record.address_id,
-            available_time_from:record.available_time_from?.toString() ?? "",
-            available_time_to:record.available_time_to?.toString() ?? "",
-            budget_type:record.budget_type,
-            budget_amount:record.budget_amount !== null && record.budget_amount !== undefined
-                ? Number(record.budget_amount)
-                : null,
-            status:record.status as ServiceRequestStatus,
-            created_at:record.created_at,
-            updated_at:record.updated_at,
-            images:record.images
-        }
     }
 }
