@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "dotenv/config";
 import { createServer } from "node:http";
 import { connectRedis } from "./shared/infrastructure/cache/redis/redis.client";
 import { logger } from "./shared/infrastructure/logger/logger";
@@ -22,6 +22,7 @@ import {
     providerRoutes,
     reactivationRoutes
 } from "./modules/user-management/infrastructure/composition";
+import { serviceRequestRoutes } from "./modules/service-request/infrastructure/composition";
 import { createNotificationUseCase } from "./modules/notification/infrastructure/composition/useCases";
 
 const PORT = process.env.PORT || 5000;
@@ -52,7 +53,8 @@ const startServer = async (): Promise<void> => {
             serviceRoutes,
             categoryRoutes,
             reactivationRoutes,
-            notificationRoutes
+            notificationRoutes,
+            serviceRequestRoutes
         })
 
         app.use("/api", rootRouter);
