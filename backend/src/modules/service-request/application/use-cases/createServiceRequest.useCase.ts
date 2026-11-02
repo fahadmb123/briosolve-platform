@@ -5,6 +5,7 @@ import { ImageUploadService } from "../../../../shared/application/interfaces/se
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 import { CreateServiceRequestInputDto } from "../dtos/request/create-service-request.dto";
 import { ServiceRequestResponseDto } from "../dtos/response/service-request.dto";
+import { ServiceRequestMapper } from "../../infrastructure/mappers/serviceRequest.mapper";
 
 export class CreateServiceRequestUseCase implements IUseCase<CreateServiceRequestInputDto, ServiceRequestResponseDto> {
     constructor(
@@ -35,7 +36,7 @@ export class CreateServiceRequestUseCase implements IUseCase<CreateServiceReques
 
         if (!serviceRequest) throw new ApplicationError("FAILED", "Failed to create service request", "INTERNAL")
 
-        return serviceRequest
+        return ServiceRequestMapper.toDto(serviceRequest)
     }
 }
 

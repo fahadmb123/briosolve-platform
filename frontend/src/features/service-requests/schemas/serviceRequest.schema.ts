@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const serviceRequestSchema = z.object({
   categoryId: z.string().min(1, { message: "Please select a service category" }),
-  subserviceId: z.string().optional(),
+  subserviceId: z.string().min(1, { message: "Please select a service" }),
   title: z
     .string()
     .min(1, { message: "Job title is required" })
