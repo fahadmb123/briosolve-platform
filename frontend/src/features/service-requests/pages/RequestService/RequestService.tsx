@@ -109,6 +109,7 @@ export default function RequestService() {
     "OPEN_BID"
   );
   const [budgetAmount, setBudgetAmount] = useState<string>("1500");
+  const [agreedToPolicy, setAgreedToPolicy] = useState<boolean>(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
@@ -169,6 +170,9 @@ export default function RequestService() {
       handleNextLevel();
       return;
     }
+    if (!agreedToPolicy) {
+      return;
+    }
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
@@ -217,7 +221,7 @@ export default function RequestService() {
             </div>
             <h1>Post a Service Request</h1>
             <p>
-              Complete the structured levels below to broadcast your requirement to verified local specialists and receive competitive quotes.
+              Complete the structured levels below to post your requirement to verified local specialists and receive competitive quotes.
             </p>
           </div>
 
@@ -746,6 +750,51 @@ export default function RequestService() {
                   )}
                 </div>
 
+                <div className="request-policy-card">
+                  <div className="request-policy-header">
+                    <i className="fas fa-shield-alt"></i>
+                    <span>Marketplace Policy & Workflow</span>
+                  </div>
+                  <div className="request-policy-steps">
+                    <div className="request-policy-step">
+                      <span className="policy-step-number">1</span>
+                      <p>
+                        <strong>Review & Quotations:</strong> Once posted, verified local specialists will review your request and submit quotations detailing their price and availability.
+                      </p>
+                    </div>
+                    <div className="request-policy-step">
+                      <span className="policy-step-number">2</span>
+                      <p>
+                        <strong>Choose & Accept:</strong> Compare received quotes, inspect provider credentials, and accept the offer that fits your preferences.
+                      </p>
+                    </div>
+                    <div className="request-policy-step">
+                      <span className="policy-step-number">3</span>
+                      <p>
+                        <strong>Initial Advance Payment:</strong> Accepting a quotation requires paying an initial advance amount. The quotation is officially confirmed only after this payment is completed.
+                      </p>
+                    </div>
+                    <div className="request-policy-step">
+                      <span className="policy-step-number">4</span>
+                      <p>
+                        <strong>10% Platform Fee:</strong> The initial payable amount includes a 10% platform fee to ensure payment protection, verified dispute resolution, and guaranteed service support.
+                      </p>
+                    </div>
+                  </div>
+                  <label className="request-policy-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={agreedToPolicy}
+                      onChange={(e) => setAgreedToPolicy(e.target.checked)}
+                      className="request-policy-checkbox"
+                      required
+                    />
+                    <span>
+                      I understand and agree to the request flow, quotation acceptance terms, and the 10% platform fee included in the initial advance payment.
+                    </span>
+                  </label>
+                </div>
+
                 <div className="level-navigation-bar">
                   <button
                     type="button"
@@ -757,18 +806,18 @@ export default function RequestService() {
                   </button>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !agreedToPolicy}
                     className="level-nav-next-btn"
                   >
                     {isSubmitting ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
-                        <span>Broadcasting...</span>
+                        <span>Posting Request...</span>
                       </>
                     ) : (
                       <>
                         <i className="fas fa-paper-plane"></i>
-                        <span>Broadcast Request</span>
+                        <span>Post Request</span>
                       </>
                     )}
                   </button>
@@ -871,18 +920,23 @@ export default function RequestService() {
               <div className="summary-actions">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || (currentLevel === 4 && !agreedToPolicy)}
                   className="summary-submit-btn"
                 >
                   {isSubmitting ? (
                     <>
                       <i className="fas fa-spinner fa-spin"></i>
-                      <span>Broadcasting Request...</span>
+                      <span>Posting Request...</span>
+                    </>
+                  ) : currentLevel === 4 ? (
+                    <>
+                      <i className="fas fa-paper-plane"></i>
+                      <span>Post Request</span>
                     </>
                   ) : (
                     <>
-                      <i className="fas fa-paper-plane"></i>
-                      <span>Broadcast Service Request</span>
+                      <span>Continue to Level {currentLevel + 1}</span>
+                      <i className="fas fa-arrow-right"></i>
                     </>
                   )}
                 </button>
@@ -900,10 +954,9 @@ export default function RequestService() {
             <div className="success-icon-badge">
               <i className="fas fa-check"></i>
             </div>
-            <h3>Request Broadcasted Successfully!</h3>
+            <h3>Request Posted Successfully!</h3>
             <p>
-              Your requirement has been sent to verified specialists in your
-              area. You will receive notifications as soon as quotes arrive.
+              Your requirement has been posted to verified specialists in your area. You will receive notifications as soon as quotes arrive.
             </p>
 
             <div className="request-success-info-box">
@@ -941,6 +994,7 @@ export default function RequestService() {
                   setDescription("");
                   setAvailableTimeFrom("09:00");
                   setAvailableTimeTo("17:00");
+                  setAgreedToPolicy(false);
                   setUploadedImages([]);
                 }}
               >
