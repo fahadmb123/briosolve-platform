@@ -523,7 +523,7 @@ export default function RequestService() {
                         <i className="fas fa-calendar-week"></i>
                       </div>
                       <div className="urgency-title">This Week</div>
-                      <div className="urgency-desc">Next 2-3 days</div>
+                      <div className="urgency-desc">Next 5 to 7 days</div>
                     </div>
 
                     <div
