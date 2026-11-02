@@ -1,11 +1,7 @@
 import React, { useState, useId, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import {
-  level1ServiceRequestSchema,
-  level2ServiceRequestSchema,
-  level3ServiceRequestSchema,
-  level4ServiceRequestSchema
-} from "../../schemas/serviceRequest.schema";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetAddresses, type Address, type AddressPayload } from "../../../addresses";
@@ -13,11 +9,16 @@ import { VerificationRequiredCard } from "../../../../shared/components/ui/Verif
 import "./RequestService.css";
 import { useGetCategoriesService } from "../../../service-catalog";
 import { ServiceSelectionSkeleton } from "../../components/ServiceSelectionSkeleton";
+import {
+  serviceRequestSchema,
+  type ServiceRequestInputType
+} from "../../schemas/serviceRequest.schema";
 
 interface ServiceItem {
   id: string;
   name: string;
   description?: string | null;
+  status?: string;
 }
 
 interface Category {
@@ -25,9 +26,9 @@ interface Category {
   name: string;
   description?: string;
   image?: string | null;
+  status?: string;
   services: ServiceItem[];
 }
-
 
 const LEVEL_STEPS = [
   {
@@ -57,29 +58,91 @@ const LEVEL_STEPS = [
 ];
 
 export default function RequestService() {
-  const verifications = useAuthStore(state=>state.verifications)
+  const verifications = useAuthStore((state) => state.verifications);
   const fileInputId = useId();
   const user = useAuthStore((s) => s.user);
-  const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
+  const isVerified =
+    verifications !== null && Object.values(verifications).every(Boolean);
   const getCategories = useGetCategoriesService();
-  const getAddresses = useGetAddresses()
+  const getAddresses = useGetAddresses();
   const [categories, setCategories] = useState<Category[]>([]);
   const [currentLevel, setCurrentLevel] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubservice, setSelectedSubservice] = useState<ServiceItem | null>(null);
-  const [addresses,setAddresses] = useState<AddressPayload[]>([])
+  const [addresses, setAddresses] = useState<AddressPayload[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+
+  const customerAddress =
+    typeof user?.current_address_id === "object"
+      ? (user.current_address_id as Address | null)
+      : null;
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    trigger,
+    reset,
+    formState: { errors }
+  } = useForm<ServiceRequestInputType>({
+    resolver: zodResolver(serviceRequestSchema),
+    mode: "onChange",
+    defaultValues: {
+      categoryId: "",
+      subserviceId: "",
+      title: "",
+      description: "",
+      urgency: "TODAY",
+      specificDate: new Date().toISOString().split("T")[0],
+      selectedAddressId: (customerAddress?.id as string) || "",
+      availableTimeFrom: "09:00",
+      availableTimeTo: "17:00",
+      budgetType: "OPEN_BID",
+      budgetAmount: "1500",
+      agreedToPolicy: false,
+    }
+  });
+
+  const title = watch("title");
+  const description = watch("description");
+  const urgency = watch("urgency");
+  const specificDate = watch("specificDate");
+  const selectedAddressId = watch("selectedAddressId");
+  const availableTimeFrom = watch("availableTimeFrom");
+  const availableTimeTo = watch("availableTimeTo");
+  const budgetType = watch("budgetType");
+  const budgetAmount = watch("budgetAmount");
+  const agreedToPolicy = watch("agreedToPolicy");
 
   useEffect(() => {
     getCategories.mutate(
       { page: 1, limit: 100, filter: "ACTIVE" },
       {
         onSuccess: (res) => {
-          const cats = res.data?.categories || [];
+          const rawCats = (res.data?.categories || []) as Category[];
+          const cats = rawCats.map((cat) => ({
+            ...cat,
+            services: (cat.services || []).filter(
+              (srv) => srv.status !== "INACTIVE"
+            ),
+          }));
           setCategories(cats);
           if (cats.length > 0) {
-            setSelectedCategory(cats[0]);
-            if (cats[0].services && cats[0].services.length > 0) {
-              setSelectedSubservice(cats[0].services[0]);
+            const firstCat = cats[0];
+            setSelectedCategory(firstCat);
+            setValue("categoryId", firstCat.id, { shouldValidate: true });
+            if (firstCat.services && firstCat.services.length > 0) {
+              setSelectedSubservice(firstCat.services[0]);
+              setValue("subserviceId", firstCat.services[0].id, { shouldValidate: true });
+              if (!watch("title")) {
+                setValue("title", firstCat.services[0].name, { shouldValidate: true });
+              }
+            } else {
+              setSelectedSubservice(null);
+              setValue("subserviceId", "", { shouldValidate: true });
             }
           }
         },
@@ -87,56 +150,42 @@ export default function RequestService() {
     );
   }, []);
 
-  useEffect(()=>{
-    (()=>{
-      getAddresses.mutate({page:1,search:'',limit:100},{
-        onSuccess:(response)=>{
-          setAddresses(response.data.addresses as []) 
-        }
-      })
-    })()
-  }, [])
-
-  const customerAddress =
-    typeof user?.current_address_id === "object"
-      ? (user.current_address_id as Address | null)
-      : null;
-
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [urgency, setUrgency] = useState<
-    "TODAY" | "THIS_WEEK" | "SPECIFIC_DATE" | "FLEXIBLE"
-  >("TODAY");
-  const [specificDate, setSpecificDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
-  );
-  const [availableTimeFrom, setAvailableTimeFrom] = useState<string>("09:00");
-  const [availableTimeTo, setAvailableTimeTo] = useState<string>("17:00");
-  const [selectedAddressId, setSelectedAddressId] = useState<string>(
-    customerAddress?.id as string
-  );
-  const [budgetType, setBudgetType] = useState<"OPEN_BID" | "FIXED">(
-    "OPEN_BID"
-  );
-  const [budgetAmount, setBudgetAmount] = useState<string>("1500");
-  const [agreedToPolicy, setAgreedToPolicy] = useState<boolean>(false);
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+  useEffect(() => {
+    getAddresses.mutate(
+      { page: 1, search: "", limit: 100 },
+      {
+        onSuccess: (response) => {
+          const addrList = (response.data.addresses || []) as AddressPayload[];
+          setAddresses(addrList);
+          if (addrList.length > 0 && !watch("selectedAddressId")) {
+            const defaultId = (customerAddress?.id as string) || addrList[0].id || "";
+            setValue("selectedAddressId", defaultId, { shouldValidate: true });
+          }
+        },
+      }
+    );
+  }, []);
 
   const handleCategorySelect = (category: Category) => {
-    setSelectedCategory(category);
-    clearFieldError("categoryId");
-    if (category.services && category.services.length > 0) {
-      setSelectedSubservice(category.services[0]);
-      clearFieldError("subserviceId");
+    const activeServices = (category.services || []).filter(
+      (srv) => srv.status !== "INACTIVE"
+    );
+    const categoryWithActiveServices = {
+      ...category,
+      services: activeServices,
+    };
+    setSelectedCategory(categoryWithActiveServices);
+    setValue("categoryId", category.id, { shouldValidate: true });
+    if (activeServices.length > 0) {
+      const firstSub = activeServices[0];
+      setSelectedSubservice(firstSub);
+      setValue("subserviceId", firstSub.id, { shouldValidate: true });
       if (!title) {
-        setTitle(category.services[0].name);
-        clearFieldError("title");
+        setValue("title", firstSub.name, { shouldValidate: true });
       }
     } else {
       setSelectedSubservice(null);
+      setValue("subserviceId", "", { shouldValidate: true });
     }
   };
 
@@ -161,92 +210,25 @@ export default function RequestService() {
   };
 
   const handlePresetBudget = (amount: string) => {
-    setBudgetAmount(amount);
-    clearFieldError("budgetAmount");
+    setValue("budgetAmount", amount, { shouldValidate: true });
   };
 
-  const clearFieldError = (field: string) => {
-    if (errors[field]) {
-      setErrors((prev) => {
-        const copy = { ...prev };
-        delete copy[field];
-        return copy;
-      });
+  const handleNextLevel = async () => {
+    let isValid = false;
+    if (currentLevel === 1) {
+      isValid = await trigger(["categoryId", "subserviceId"]);
+      if (!isValid && errors.categoryId) {
+        toast.error(errors.categoryId.message || "Please select a service category");
+      }
+    } else if (currentLevel === 2) {
+      isValid = await trigger(["title", "description", "urgency", "specificDate"]);
+    } else if (currentLevel === 3) {
+      isValid = await trigger(["selectedAddressId", "availableTimeFrom", "availableTimeTo"]);
+    } else if (currentLevel === 4) {
+      isValid = await trigger(["budgetType", "budgetAmount", "agreedToPolicy"]);
     }
-  };
 
-  const validateCurrentLevel = (level: number): boolean => {
-    if (level === 1) {
-      const result = level1ServiceRequestSchema.safeParse({
-        categoryId: selectedCategory?.id || "",
-        subserviceId: selectedSubservice?.id || ""
-      });
-      if (!result.success) {
-        const newErrors: Record<string, string> = {};
-        result.error.issues.forEach((issue) => {
-          const key = issue.path[0]?.toString() || "categoryId";
-          newErrors[key] = issue.message;
-        });
-        setErrors(newErrors);
-        toast.error(result.error.issues[0]?.message || "Please select a service category");
-        return false;
-      }
-    } else if (level === 2) {
-      const result = level2ServiceRequestSchema.safeParse({
-        title,
-        description,
-        urgency,
-        specificDate
-      });
-      if (!result.success) {
-        const newErrors: Record<string, string> = {};
-        result.error.issues.forEach((issue) => {
-          const key = issue.path[0]?.toString() || "title";
-          newErrors[key] = issue.message;
-        });
-        setErrors(newErrors);
-        return false;
-      }
-    } else if (level === 3) {
-      const result = level3ServiceRequestSchema.safeParse({
-        selectedAddressId: selectedAddressId || "",
-        availableTimeFrom,
-        availableTimeTo
-      });
-      if (!result.success) {
-        const newErrors: Record<string, string> = {};
-        result.error.issues.forEach((issue) => {
-          const key = issue.path[0]?.toString() || "selectedAddressId";
-          newErrors[key] = issue.message;
-        });
-        setErrors(newErrors);
-        return false;
-      }
-    } else if (level === 4) {
-      const result = level4ServiceRequestSchema.safeParse({
-        budgetType,
-        budgetAmount,
-        agreedToPolicy
-      });
-      if (!result.success) {
-        const newErrors: Record<string, string> = {};
-        result.error.issues.forEach((issue) => {
-          const key = issue.path[0]?.toString() || "budgetAmount";
-          newErrors[key] = issue.message;
-        });
-        setErrors(newErrors);
-        return false;
-      }
-    }
-    setErrors({});
-    return true;
-  };
-
-  const handleNextLevel = () => {
-    if (!validateCurrentLevel(currentLevel)) {
-      return;
-    }
-    if (currentLevel < 4) {
+    if (isValid && currentLevel < 4) {
       setCurrentLevel((prev) => prev + 1);
       window.scrollTo({ top: 120, behavior: "smooth" });
     }
@@ -254,21 +236,34 @@ export default function RequestService() {
 
   const handlePrevLevel = () => {
     if (currentLevel > 1) {
-      setErrors({});
       setCurrentLevel((prev) => prev - 1);
       window.scrollTo({ top: 120, behavior: "smooth" });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (currentLevel < 4) {
-      handleNextLevel();
+  const handleJumpToLevel = async (targetLevel: number) => {
+    if (targetLevel < currentLevel) {
+      setCurrentLevel(targetLevel);
+      window.scrollTo({ top: 120, behavior: "smooth" });
       return;
     }
-    if (!validateCurrentLevel(4)) {
-      return;
+    let isValid = false;
+    if (currentLevel === 1) {
+      isValid = await trigger(["categoryId", "subserviceId"]);
+    } else if (currentLevel === 2) {
+      isValid = await trigger(["title", "description", "urgency", "specificDate"]);
+    } else if (currentLevel === 3) {
+      isValid = await trigger(["selectedAddressId", "availableTimeFrom", "availableTimeTo"]);
+    } else {
+      isValid = true;
     }
+    if (isValid) {
+      setCurrentLevel(targetLevel);
+      window.scrollTo({ top: 120, behavior: "smooth" });
+    }
+  };
+
+  const onSubmit = () => {
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
@@ -277,7 +272,8 @@ export default function RequestService() {
   };
 
   const selectedAddress =
-    addresses.find((address)=>address.id === customerAddress?.id)
+    addresses.find((address) => address.id === selectedAddressId) ||
+    addresses.find((address) => address.id === customerAddress?.id);
 
   const urgencyLabel = {
     TODAY: "Today",
@@ -295,14 +291,39 @@ export default function RequestService() {
     return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
   };
 
+  const hasAnyActiveServices = categories.some(
+    (cat) => cat.services && cat.services.length > 0
+  );
 
-    if (!isVerified) {
+  if (!isVerified) {
     return (
       <div className="app-content request-service-container">
         <VerificationRequiredCard
           title="Complete Verification to Post a Request"
           description="To maintain marketplace trust, prevent spam, and ensure providers can reach you, please complete the required verifications before submitting your service request."
         />
+      </div>
+    );
+  }
+
+  if (!getCategories.isPending && (!hasAnyActiveServices || categories.length === 0)) {
+    return (
+      <div className="app-content request-service-container no-services-fullscreen-container">
+        <div className="no-services-fallback-card">
+          <div className="no-services-icon-badge">
+            <i className="fas fa-toolbox"></i>
+          </div>
+          <h2>We are sorry!</h2>
+          <p>
+            Currently we don't have any services available at this time. Please check back later.
+          </p>
+          <div className="no-services-actions">
+            <Link to="/dashboard" className="btn btn-primary">
+              <i className="fas fa-home mr-2"></i>
+              Back to Dashboard
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -338,7 +359,7 @@ export default function RequestService() {
               key={s.level}
               type="button"
               className={`mobile-level-pill ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}
-              onClick={() => setCurrentLevel(s.level)}
+              onClick={() => handleJumpToLevel(s.level)}
             >
               {isCompleted ? (
                 <i className="fas fa-check text-[10px]"></i>
@@ -351,7 +372,7 @@ export default function RequestService() {
         })}
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="request-service-layout">
           <div className="levels-stepper-column">
             <div className="levels-stepper-card">
@@ -373,7 +394,7 @@ export default function RequestService() {
                     <div
                       key={s.level}
                       className={`level-item ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}
-                      onClick={() => setCurrentLevel(s.level)}
+                      onClick={() => handleJumpToLevel(s.level)}
                     >
                       <div className="level-item-indicator">
                         <div className="level-bubble">
@@ -457,7 +478,7 @@ export default function RequestService() {
                     </div>
                     {errors.categoryId && (
                       <div className="text-danger text-xs mt-3">
-                        {errors.categoryId}
+                        {errors.categoryId.message}
                       </div>
                     )}
                   </div>
@@ -490,8 +511,9 @@ export default function RequestService() {
                                 className={`request-service-item-card ${isSubSelected ? "selected" : ""}`}
                                 onClick={() => {
                                   setSelectedSubservice(sub);
+                                  setValue("subserviceId", sub.id, { shouldValidate: true });
                                   if (!title) {
-                                    setTitle(sub.name);
+                                    setValue("title", sub.name, { shouldValidate: true });
                                   }
                                 }}
                               >
@@ -519,6 +541,12 @@ export default function RequestService() {
                         </div>
                       )}
 
+                      {errors.subserviceId && (
+                        <div className="text-danger text-xs mt-3">
+                          {errors.subserviceId.message}
+                        </div>
+                      )}
+
                       <div className="level-navigation-bar">
                         <div className="level-nav-summary">
                           <span>Selected:</span>
@@ -530,7 +558,7 @@ export default function RequestService() {
                         <button
                           type="button"
                           className="level-nav-next-btn"
-                          disabled={!selectedCategory || !selectedSubservice}
+                          disabled={!selectedCategory || (selectedCategory.services.length > 0 && !selectedSubservice)}
                           onClick={handleNextLevel}
                         >
                           <span>Continue to Level 2</span>
@@ -558,7 +586,7 @@ export default function RequestService() {
                     <span>
                       Requirement Title <span className="required-dot">*</span>
                     </span>
-                    <span className="char-count">{title.length}/100</span>
+                    <span className="char-count">{(title || "").length}/100</span>
                   </label>
                   <input
                     type="text"
@@ -566,15 +594,11 @@ export default function RequestService() {
                     maxLength={100}
                     className={`request-form-input ${errors.title ? "border-danger" : ""}`}
                     placeholder="e.g. Washbasin pipe leaking heavily under cabinet"
-                    value={title}
-                    onChange={(e) => {
-                      setTitle(e.target.value);
-                      clearFieldError("title");
-                    }}
+                    {...register("title")}
                   />
                   {errors.title && (
                     <span className="text-danger text-xs mt-1 block">
-                      {errors.title}
+                      {errors.title.message}
                     </span>
                   )}
                 </div>
@@ -584,7 +608,7 @@ export default function RequestService() {
                     <span>
                       Detailed Description <span className="required-dot">*</span>
                     </span>
-                    <span className="char-count">{description.length}/1000</span>
+                    <span className="char-count">{(description || "").length}/1000</span>
                   </label>
                   <textarea
                     required
@@ -592,15 +616,11 @@ export default function RequestService() {
                     maxLength={1000}
                     className={`request-form-textarea ${errors.description ? "border-danger" : ""}`}
                     placeholder="Describe the issue, work scope, materials available or needed, and any constraints..."
-                    value={description}
-                    onChange={(e) => {
-                      setDescription(e.target.value);
-                      clearFieldError("description");
-                    }}
+                    {...register("description")}
                   ></textarea>
                   {errors.description && (
                     <span className="text-danger text-xs mt-1 block">
-                      {errors.description}
+                      {errors.description.message}
                     </span>
                   )}
                 </div>
@@ -616,9 +636,7 @@ export default function RequestService() {
                     <div
                       className={`urgency-card ${urgency === "TODAY" ? "selected" : ""}`}
                       onClick={() => {
-                        setUrgency("TODAY");
-                        clearFieldError("urgency");
-                        clearFieldError("specificDate");
+                        setValue("urgency", "TODAY", { shouldValidate: true });
                       }}
                     >
                       <div className="urgency-icon text-primary">
@@ -631,9 +649,7 @@ export default function RequestService() {
                     <div
                       className={`urgency-card ${urgency === "THIS_WEEK" ? "selected" : ""}`}
                       onClick={() => {
-                        setUrgency("THIS_WEEK");
-                        clearFieldError("urgency");
-                        clearFieldError("specificDate");
+                        setValue("urgency", "THIS_WEEK", { shouldValidate: true });
                       }}
                     >
                       <div className="urgency-icon text-info">
@@ -646,8 +662,7 @@ export default function RequestService() {
                     <div
                       className={`urgency-card ${urgency === "SPECIFIC_DATE" ? "selected" : ""}`}
                       onClick={() => {
-                        setUrgency("SPECIFIC_DATE");
-                        clearFieldError("urgency");
+                        setValue("urgency", "SPECIFIC_DATE", { shouldValidate: true });
                       }}
                     >
                       <div className="urgency-icon text-warning">
@@ -660,9 +675,7 @@ export default function RequestService() {
                     <div
                       className={`urgency-card ${urgency === "FLEXIBLE" ? "selected" : ""}`}
                       onClick={() => {
-                        setUrgency("FLEXIBLE");
-                        clearFieldError("urgency");
-                        clearFieldError("specificDate");
+                        setValue("urgency", "FLEXIBLE", { shouldValidate: true });
                       }}
                     >
                       <div className="urgency-icon text-secondary">
@@ -674,7 +687,7 @@ export default function RequestService() {
                   </div>
                   {errors.urgency && (
                     <span className="text-danger text-xs mt-1 block">
-                      {errors.urgency}
+                      {errors.urgency.message}
                     </span>
                   )}
 
@@ -687,15 +700,11 @@ export default function RequestService() {
                         type="date"
                         min={new Date().toISOString().split("T")[0]}
                         className={`request-form-input ${errors.specificDate ? "border-danger" : ""}`}
-                        value={specificDate}
-                        onChange={(e) => {
-                          setSpecificDate(e.target.value);
-                          clearFieldError("specificDate");
-                        }}
+                        {...register("specificDate")}
                       />
                       {errors.specificDate && (
                         <span className="text-danger text-xs mt-1 block">
-                          {errors.specificDate}
+                          {errors.specificDate.message}
                         </span>
                       )}
                     </div>
@@ -725,118 +734,108 @@ export default function RequestService() {
 
             {currentLevel === 3 && (
               getAddresses.isPending ? (
-                <ServiceSelectionSkeleton/>
-              ):( 
-              <div className="request-section-card">
-                <div className="request-section-header">
-                  <div className="request-step-badge">3</div>
-                  <div className="request-section-title-group">
-                    <h2>Level 3: Location & Schedule</h2>
-                    <p>Select where and when you want the service done</p>
+                <ServiceSelectionSkeleton />
+              ) : (
+                <div className="request-section-card">
+                  <div className="request-section-header">
+                    <div className="request-step-badge">3</div>
+                    <div className="request-section-title-group">
+                      <h2>Level 3: Location & Schedule</h2>
+                      <p>Select where and when you want the service done</p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="addresses-selection-list">
-                  {addresses.map((addr) => {
-                    const isSelected = selectedAddressId === addr.id;
-                    return (
-                      <div
-                        key={addr.id}
-                        className={`address-select-card ${isSelected ? "selected" : ""}`}
-                        onClick={() => {
-                          setSelectedAddressId(addr.id!);
-                          clearFieldError("selectedAddressId");
-                        }}
-                      >
-                        <div className="address-radio-indicator">
-                          {isSelected && <div className="address-radio-dot"></div>}
-                        </div>
-                        <div className="address-card-body">
-                          <div className="address-card-header">
-                            <span className="address-type-tag">{addr.type}</span>
-                            <span className="address-text-main">{addr.landmark}</span>
+                  <div className="addresses-selection-list">
+                    {addresses.map((addr) => {
+                      const isSelected = selectedAddressId === addr.id;
+                      return (
+                        <div
+                          key={addr.id}
+                          className={`address-select-card ${isSelected ? "selected" : ""}`}
+                          onClick={() => {
+                            setValue("selectedAddressId", addr.id!, { shouldValidate: true });
+                          }}
+                        >
+                          <div className="address-radio-indicator">
+                            {isSelected && <div className="address-radio-dot"></div>}
                           </div>
-                         
+                          <div className="address-card-body">
+                            <div className="address-card-header">
+                              <span className="address-type-tag">{addr.type}</span>
+                              <span className="address-text-main">{addr.landmark || addr.area}</span>
+                            </div>
+                          </div>
                         </div>
+                      );
+                    })}
+                    {errors.selectedAddressId && (
+                      <div className="text-danger text-xs mt-1 mb-3">
+                        {errors.selectedAddressId.message}
                       </div>
-                    );
-                  })}
-                {errors.selectedAddressId && (
-                  <div className="text-danger text-xs mt-1 mb-3">
-                    {errors.selectedAddressId}
+                    )}
                   </div>
-                )}
-                </div>
 
-                <Link
-                  to="/settings"
-                  className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1.5 mb-4"
-                >
-                  <i className="fas fa-plus-circle"></i>
-                  <span>Add new location or manage addresses in Settings</span>
-                </Link>
+                  <Link
+                    to="/settings"
+                    className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1.5 mb-4"
+                  >
+                    <i className="fas fa-plus-circle"></i>
+                    <span>Add new location or manage addresses in Settings</span>
+                  </Link>
 
-                <div className="request-form-group">
-                  <label className="request-form-label">Mostly Available Time</label>
-                  <div className="time-range-row">
-                    <div className="time-range-field">
-                      <span className="time-range-label">From</span>
-                      <input
-                        type="time"
-                        className={`request-form-input ${errors.availableTimeFrom ? "border-danger" : ""}`}
-                        value={availableTimeFrom}
-                        onChange={(e) => {
-                          setAvailableTimeFrom(e.target.value);
-                          clearFieldError("availableTimeFrom");
-                          clearFieldError("availableTimeTo");
-                        }}
-                      />
-                      {errors.availableTimeFrom && (
-                        <span className="text-danger text-xs mt-1 block">
-                          {errors.availableTimeFrom}
-                        </span>
-                      )}
-                    </div>
-                    <div className="time-range-field">
-                      <span className="time-range-label">To</span>
-                      <input
-                        type="time"
-                        className={`request-form-input ${errors.availableTimeTo ? "border-danger" : ""}`}
-                        value={availableTimeTo}
-                        onChange={(e) => {
-                          setAvailableTimeTo(e.target.value);
-                          clearFieldError("availableTimeTo");
-                        }}
-                      />
-                      {errors.availableTimeTo && (
-                        <span className="text-danger text-xs mt-1 block">
-                          {errors.availableTimeTo}
-                        </span>
-                      )}
+                  <div className="request-form-group">
+                    <label className="request-form-label">Mostly Available Time</label>
+                    <div className="time-range-row">
+                      <div className="time-range-field">
+                        <span className="time-range-label">From</span>
+                        <input
+                          type="time"
+                          className={`request-form-input ${errors.availableTimeFrom ? "border-danger" : ""}`}
+                          {...register("availableTimeFrom")}
+                        />
+                        {errors.availableTimeFrom && (
+                          <span className="text-danger text-xs mt-1 block">
+                            {errors.availableTimeFrom.message}
+                          </span>
+                        )}
+                      </div>
+                      <div className="time-range-field">
+                        <span className="time-range-label">To</span>
+                        <input
+                          type="time"
+                          className={`request-form-input ${errors.availableTimeTo ? "border-danger" : ""}`}
+                          {...register("availableTimeTo")}
+                        />
+                        {errors.availableTimeTo && (
+                          <span className="text-danger text-xs mt-1 block">
+                            {errors.availableTimeTo.message}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="level-navigation-bar">
-                  <button
-                    type="button"
-                    className="level-nav-back-btn"
-                    onClick={handlePrevLevel}
-                  >
-                    <i className="fas fa-arrow-left"></i>
-                    <span>Back to Level 2</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="level-nav-next-btn"
-                    onClick={handleNextLevel}
-                  >
-                    <span>Continue to Level 4</span>
-                    <i className="fas fa-arrow-right"></i>
-                  </button>
+                  <div className="level-navigation-bar">
+                    <button
+                      type="button"
+                      className="level-nav-back-btn"
+                      onClick={handlePrevLevel}
+                    >
+                      <i className="fas fa-arrow-left"></i>
+                      <span>Back to Level 2</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="level-nav-next-btn"
+                      onClick={handleNextLevel}
+                    >
+                      <span>Continue to Level 4</span>
+                      <i className="fas fa-arrow-right"></i>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
 
             {currentLevel === 4 && (
               <div className="request-section-card">
@@ -852,7 +851,7 @@ export default function RequestService() {
                   <button
                     type="button"
                     className={`budget-tab-btn ${budgetType === "OPEN_BID" ? "selected" : ""}`}
-                    onClick={() => setBudgetType("OPEN_BID")}
+                    onClick={() => setValue("budgetType", "OPEN_BID", { shouldValidate: true })}
                   >
                     <i className="fas fa-tags mr-1.5"></i>
                     Open to Bids
@@ -860,7 +859,7 @@ export default function RequestService() {
                   <button
                     type="button"
                     className={`budget-tab-btn ${budgetType === "FIXED" ? "selected" : ""}`}
-                    onClick={() => setBudgetType("FIXED")}
+                    onClick={() => setValue("budgetType", "FIXED", { shouldValidate: true })}
                   >
                     <i className="fas fa-coins mr-1.5"></i>
                     Fixed Budget
@@ -879,15 +878,11 @@ export default function RequestService() {
                         max={100000}
                         step={50}
                         className={`request-form-input ${errors.budgetAmount ? "border-danger" : ""}`}
-                        value={budgetAmount}
-                        onChange={(e) => {
-                          setBudgetAmount(e.target.value);
-                          clearFieldError("budgetAmount");
-                        }}
+                        {...register("budgetAmount")}
                       />
                       {errors.budgetAmount && (
                         <span className="text-danger text-xs mt-1 block">
-                          {errors.budgetAmount}
+                          {errors.budgetAmount.message}
                         </span>
                       )}
                     </div>
@@ -976,25 +971,16 @@ export default function RequestService() {
                     <div className="request-policy-step">
                       <span className="policy-step-number">3</span>
                       <p>
-                        <strong>Initial Advance Payment:</strong> Accepting a quotation requires paying an initial advance amount. The quotation is officially confirmed only after this payment is completed.
-                      </p>
-                    </div>
-                    <div className="request-policy-step">
-                      <span className="policy-step-number">4</span>
-                      <p>
-                        <strong>10% Platform Fee:</strong> The initial payable amount includes a 10% platform fee to ensure payment protection, verified dispute resolution, and guaranteed service support.
+                        <strong>Advance & Platform Fee:</strong> To confirm and seal the contract upon accepting a quotation, you will pay the initial advance amount. Note: This advance includes the 10% platform service fee.
                       </p>
                     </div>
                   </div>
+
                   <label className="request-policy-checkbox-label">
                     <input
                       type="checkbox"
-                      checked={agreedToPolicy}
-                      onChange={(e) => {
-                        setAgreedToPolicy(e.target.checked);
-                        clearFieldError("agreedToPolicy");
-                      }}
                       className="request-policy-checkbox"
+                      {...register("agreedToPolicy")}
                     />
                     <span>
                       I understand and agree to the request flow, quotation acceptance terms, and the 10% platform fee included in the initial advance payment.
@@ -1002,7 +988,7 @@ export default function RequestService() {
                   </label>
                   {errors.agreedToPolicy && (
                     <span className="text-danger text-xs mt-1 block">
-                      {errors.agreedToPolicy}
+                      {errors.agreedToPolicy.message}
                     </span>
                   )}
                 </div>
@@ -1015,23 +1001,6 @@ export default function RequestService() {
                   >
                     <i className="fas fa-arrow-left"></i>
                     <span>Back to Level 3</span>
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting || !agreedToPolicy}
-                    className="level-nav-next-btn"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <i className="fas fa-spinner fa-spin"></i>
-                        <span>Posting Request...</span>
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-paper-plane"></i>
-                        <span>Post Request</span>
-                      </>
-                    )}
                   </button>
                 </div>
               </div>
@@ -1079,7 +1048,7 @@ export default function RequestService() {
                     Level 3
                   </span>
                   <span className="summary-item-value">
-                    {selectedAddress?.landmark}
+                    {selectedAddress?.landmark || selectedAddress?.area || "Not selected"}
                   </span>
                 </div>
 
@@ -1130,30 +1099,34 @@ export default function RequestService() {
               </div>
 
               <div className="summary-actions">
-                <button
-                  type="submit"
-                  disabled={isSubmitting || (currentLevel === 4 && !agreedToPolicy)}
-                  className="summary-submit-btn"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <i className="fas fa-spinner fa-spin"></i>
-                      <span>Posting Request...</span>
-                    </>
-                  ) : currentLevel === 4 ? (
-                    <>
-                      <i className="fas fa-paper-plane"></i>
-                      <span>Post Request</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Continue to Level {currentLevel + 1}</span>
-                      <i className="fas fa-arrow-right"></i>
-                    </>
-                  )}
-                </button>
-
-
+                {currentLevel < 4 ? (
+                  <button
+                    type="button"
+                    onClick={handleNextLevel}
+                    className="summary-submit-btn"
+                  >
+                    <span>Continue to Level {currentLevel + 1}</span>
+                    <i className="fas fa-arrow-right"></i>
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || !agreedToPolicy}
+                    className="summary-submit-btn"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin"></i>
+                        <span>Posting Request...</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-paper-plane"></i>
+                        <span>Post Request</span>
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -1188,7 +1161,7 @@ export default function RequestService() {
               </div>
               <div className="request-success-info-row">
                 <span>Location:</span>
-                <span>{selectedAddress?.landmark}</span>
+                <span>{selectedAddress?.landmark || selectedAddress?.area || "N/A"}</span>
               </div>
             </div>
 
@@ -1200,16 +1173,9 @@ export default function RequestService() {
                 type="button"
                 className="btn btn-secondary"
                 onClick={() => {
+                  reset();
                   setShowSuccessModal(false);
                   setCurrentLevel(1);
-                  setTitle("");
-                  setDescription("");
-                  setAvailableTimeFrom("09:00");
-                  setAvailableTimeTo("17:00");
-                  setUrgency("TODAY");
-                  setSpecificDate(new Date().toISOString().split("T")[0]);
-                  setAgreedToPolicy(false);
-                  setErrors({});
                   setUploadedImages([]);
                 }}
               >

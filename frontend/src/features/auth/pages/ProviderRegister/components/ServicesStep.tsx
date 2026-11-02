@@ -31,7 +31,11 @@ export function ServicesStep({ isActive, onNext, onBack }: ServicesStepProps) {
             setHasFetched(true);
             getCategories.mutate({ page: 1, limit: 100, filter: 'ACTIVE' }, {
                 onSuccess: (res) => {
-                    setCategories(res.data.categories);
+                    const activeCats = (res.data?.categories || []).map((cat: any) => ({
+                        ...cat,
+                        services: (cat.services || []).filter((s: any) => s.status === 'ACTIVE')
+                    }));
+                    setCategories(activeCats);
                 }
             });
         }
