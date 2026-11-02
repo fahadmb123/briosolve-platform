@@ -98,7 +98,7 @@ export default function RequestService() {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [urgency, setUrgency] = useState<
-    "EMERGENCY" | "TODAY" | "THIS_WEEK" | "FLEXIBLE"
+    "TODAY" | "THIS_WEEK" | "FLEXIBLE"
   >("TODAY");
   const [scheduledDate, setScheduledDate] = useState<string>(
     new Date().toISOString().split("T")[0]
@@ -184,7 +184,6 @@ export default function RequestService() {
     addresses.find((address)=>address.id === customerAddress?.id)
 
   const urgencyLabel = {
-    EMERGENCY: "Immediate (2-4 hrs)",
     TODAY: "Today",
     THIS_WEEK: "This Week",
     FLEXIBLE: "Flexible Date",
@@ -493,17 +492,6 @@ export default function RequestService() {
                   </label>
 
                   <div className="urgency-grid">
-                    <div
-                      className={`urgency-card ${urgency === "EMERGENCY" ? "selected" : ""}`}
-                      onClick={() => setUrgency("EMERGENCY")}
-                    >
-                      <div className="urgency-icon text-danger">
-                        <i className="fas fa-bolt"></i>
-                      </div>
-                      <div className="urgency-title">Emergency</div>
-                      <div className="urgency-desc">Within 2-4 hrs</div>
-                    </div>
-
                     <div
                       className={`urgency-card ${urgency === "TODAY" ? "selected" : ""}`}
                       onClick={() => setUrgency("TODAY")}
