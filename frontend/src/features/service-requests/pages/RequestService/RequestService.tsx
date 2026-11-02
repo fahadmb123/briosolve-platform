@@ -216,7 +216,7 @@ export default function RequestService() {
       window.scrollTo({ top: 120, behavior: "smooth" });
       return;
     }
-    let isValid = false;
+    let isValid:boolean;
     if (currentLevel === 1) {
       isValid = await trigger(["categoryId", "subserviceId"]);
     } else if (currentLevel === 2) {

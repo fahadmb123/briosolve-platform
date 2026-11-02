@@ -54,6 +54,7 @@ model users {
 
   notifications                  notifications[]
   push_subscriptions             push_subscriptions[]
+  service_requests               service_requests[]              @relation("CustomerServiceRequests")
 }
 
 enum weekday {
@@ -207,6 +208,7 @@ model addresses {
   user        users                @relation("UserAddresses", fields:[user_id], references:[id])
 
   current_for users[]              @relation("CurrentAddress")
+  service_requests service_requests[]
 }
 
 model customer_profiles {
@@ -232,6 +234,7 @@ model categories {
   updated_at  temporal.updatedAt()
 
   services    services[]
+  service_requests service_requests[]
 }
 
 model services {
@@ -247,6 +250,7 @@ model services {
   updated_at  temporal.updatedAt()
 
   category    categories           @relation(fields:[category_id], references:[id])
+  service_requests service_requests[]
 }
 
 model user_account_blocks {
@@ -318,4 +322,69 @@ model push_subscriptions {
   user       users         @relation(fields:[user_id], references:[id], onDelete: Cascade)
 
   @@index([user_id])
+}
+
+
+enum request_urgency {
+  TODAY
+  THIS_WEEK
+  SPECIFIC_DATE
+  FLEXIBLE
+}
+
+enum request_budget_type {
+  OPEN_BID
+  FIXED
+}
+
+enum service_request_status {
+  PENDING
+  ACTIVE
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+model service_requests {
+  id                  Uuid                   @id @default(uuid())
+  customer_id         Uuid
+  category_id         Uuid
+  subservice_id       Uuid?
+
+  title               VarChar(150)
+  description         VarChar(1000)
+  urgency             request_urgency
+  specific_date       DateTime?
+  address_id          Uuid
+  available_time_from Time
+  available_time_to   Time
+  budget_type         request_budget_type
+  budget_amount       Numeric(10, 2)?
+  status              service_request_status @default(PENDING)
+
+  created_at          DateTime               @default(now())
+  updated_at          temporal.updatedAt()
+
+  customer            users                  @relation("CustomerServiceRequests", fields:[customer_id], references:[id])
+  category            categories             @relation(fields:[category_id], references:[id])
+  subservice          services?              @relation(fields:[subservice_id], references:[id])
+  address             addresses              @relation(fields:[address_id], references:[id])
+
+  images              service_request_images[]
+}
+
+model service_request_images {
+  id                 Uuid             @id @default(uuid())
+  service_request_id Uuid
+
+  image_key          VarChar(500)
+  display_order      Int              @default(0)
+
+  created_at         DateTime         @default(now())
+
+  service_request    service_requests @relation(fields:[service_request_id], references:[id], onDelete: Cascade)
+
+  @@index([service_request_id])
 }
