@@ -18,9 +18,29 @@ export const level2ServiceRequestSchema = z.object({
     .trim()
     .min(15, { message: "Description must be at least 15 characters" })
     .max(1000, { message: "Description cannot exceed 1000 characters" }),
-  urgency: z.enum(["TODAY", "THIS_WEEK", "FLEXIBLE"], {
+  urgency: z.enum(["TODAY", "THIS_WEEK", "SPECIFIC_DATE", "FLEXIBLE"], {
     message: "Please choose when you need this"
-  })
+  }),
+  specificDate: z.string().optional()
+}).superRefine((data, ctx) => {
+  if (data.urgency === "SPECIFIC_DATE") {
+    if (!data.specificDate || !data.specificDate.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please select a specific date",
+        path: ["specificDate"]
+      });
+    } else {
+      const todayStr = new Date().toISOString().split("T")[0];
+      if (data.specificDate < todayStr) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Selected date cannot be in the past",
+          path: ["specificDate"]
+        });
+      }
+    }
+  }
 });
 
 export const level3ServiceRequestSchema = z.object({
@@ -86,7 +106,8 @@ export const fullServiceRequestSchema = z.object({
     .trim()
     .min(15, { message: "Description must be at least 15 characters" })
     .max(1000, { message: "Description cannot exceed 1000 characters" }),
-  urgency: z.enum(["TODAY", "THIS_WEEK", "FLEXIBLE"]),
+  urgency: z.enum(["TODAY", "THIS_WEEK", "SPECIFIC_DATE", "FLEXIBLE"]),
+  specificDate: z.string().optional(),
   selectedAddressId: z.string().min(1, { message: "Please select a service location address" }),
   availableTimeFrom: z.string().min(1, { message: "Start time is required" }),
   availableTimeTo: z.string().min(1, { message: "End time is required" }),

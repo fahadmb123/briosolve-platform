@@ -761,7 +761,7 @@
 
 .urgency-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.875rem;
 }
 
@@ -1504,4 +1504,13 @@
 .request-form-input.border-danger:focus,
 .request-form-textarea.border-danger:focus {
     box-shadow: 0 0 0 3px var(--danger-bg) !important;
+}
+
+
+.specific-date-selection-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
 }

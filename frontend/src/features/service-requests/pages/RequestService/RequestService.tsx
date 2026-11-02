@@ -105,8 +105,11 @@ export default function RequestService() {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [urgency, setUrgency] = useState<
-    "TODAY" | "THIS_WEEK" | "FLEXIBLE"
+    "TODAY" | "THIS_WEEK" | "SPECIFIC_DATE" | "FLEXIBLE"
   >("TODAY");
+  const [specificDate, setSpecificDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
   const [availableTimeFrom, setAvailableTimeFrom] = useState<string>("09:00");
   const [availableTimeTo, setAvailableTimeTo] = useState<string>("17:00");
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
@@ -192,7 +195,8 @@ export default function RequestService() {
       const result = level2ServiceRequestSchema.safeParse({
         title,
         description,
-        urgency
+        urgency,
+        specificDate
       });
       if (!result.success) {
         const newErrors: Record<string, string> = {};
@@ -278,6 +282,7 @@ export default function RequestService() {
   const urgencyLabel = {
     TODAY: "Today",
     THIS_WEEK: "This Week",
+    SPECIFIC_DATE: specificDate ? `On ${specificDate}` : "Specific Date",
     FLEXIBLE: "Flexible Date",
   }[urgency];
 
@@ -613,6 +618,7 @@ export default function RequestService() {
                       onClick={() => {
                         setUrgency("TODAY");
                         clearFieldError("urgency");
+                        clearFieldError("specificDate");
                       }}
                     >
                       <div className="urgency-icon text-primary">
@@ -627,6 +633,7 @@ export default function RequestService() {
                       onClick={() => {
                         setUrgency("THIS_WEEK");
                         clearFieldError("urgency");
+                        clearFieldError("specificDate");
                       }}
                     >
                       <div className="urgency-icon text-info">
@@ -637,10 +644,25 @@ export default function RequestService() {
                     </div>
 
                     <div
+                      className={`urgency-card ${urgency === "SPECIFIC_DATE" ? "selected" : ""}`}
+                      onClick={() => {
+                        setUrgency("SPECIFIC_DATE");
+                        clearFieldError("urgency");
+                      }}
+                    >
+                      <div className="urgency-icon text-warning">
+                        <i className="fas fa-calendar-alt"></i>
+                      </div>
+                      <div className="urgency-title">Specific Date</div>
+                      <div className="urgency-desc">Choose a date</div>
+                    </div>
+
+                    <div
                       className={`urgency-card ${urgency === "FLEXIBLE" ? "selected" : ""}`}
                       onClick={() => {
                         setUrgency("FLEXIBLE");
                         clearFieldError("urgency");
+                        clearFieldError("specificDate");
                       }}
                     >
                       <div className="urgency-icon text-secondary">
@@ -654,6 +676,29 @@ export default function RequestService() {
                     <span className="text-danger text-xs mt-1 block">
                       {errors.urgency}
                     </span>
+                  )}
+
+                  {urgency === "SPECIFIC_DATE" && (
+                    <div className="specific-date-selection-box">
+                      <label className="request-form-label">
+                        <span>Select Required Date <span className="required-dot">*</span></span>
+                      </label>
+                      <input
+                        type="date"
+                        min={new Date().toISOString().split("T")[0]}
+                        className={`request-form-input ${errors.specificDate ? "border-danger" : ""}`}
+                        value={specificDate}
+                        onChange={(e) => {
+                          setSpecificDate(e.target.value);
+                          clearFieldError("specificDate");
+                        }}
+                      />
+                      {errors.specificDate && (
+                        <span className="text-danger text-xs mt-1 block">
+                          {errors.specificDate}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -1161,6 +1206,8 @@ export default function RequestService() {
                   setDescription("");
                   setAvailableTimeFrom("09:00");
                   setAvailableTimeTo("17:00");
+                  setUrgency("TODAY");
+                  setSpecificDate(new Date().toISOString().split("T")[0]);
                   setAgreedToPolicy(false);
                   setErrors({});
                   setUploadedImages([]);
