@@ -105,7 +105,7 @@ export default function RequestService() {
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
     customerAddress?.id as string
   );
-  const [budgetType, setBudgetType] = useState<"OPEN_BID" | "FIXED" | "HOURLY">(
+  const [budgetType, setBudgetType] = useState<"OPEN_BID" | "FIXED">(
     "OPEN_BID"
   );
   const [budgetAmount, setBudgetAmount] = useState<string>("1500");
@@ -664,25 +664,13 @@ export default function RequestService() {
                     <i className="fas fa-coins mr-1.5"></i>
                     Fixed Budget
                   </button>
-                  <button
-                    type="button"
-                    className={`budget-tab-btn ${budgetType === "HOURLY" ? "selected" : ""}`}
-                    onClick={() => setBudgetType("HOURLY")}
-                  >
-                    <i className="fas fa-stopwatch mr-1.5"></i>
-                    Hourly Rate
-                  </button>
                 </div>
 
-                {budgetType !== "OPEN_BID" && (
+                {budgetType === "FIXED" && (
                   <div className="mb-4">
                     <div className="request-form-group">
                       <label className="request-form-label">
-                        <span>
-                          {budgetType === "FIXED"
-                            ? "Target Budget Amount (₹)"
-                            : "Preferred Hourly Rate (₹ / hr)"}
-                        </span>
+                        <span>Target Budget Amount (₹)</span>
                       </label>
                       <input
                         type="number"
@@ -699,10 +687,7 @@ export default function RequestService() {
                       <span className="text-xs text-secondary self-center mr-1">
                         Quick select:
                       </span>
-                      {(budgetType === "FIXED"
-                        ? ["500", "1000", "2000", "3500", "5000"]
-                        : ["200", "350", "500", "750", "1000"]
-                      ).map((amt) => (
+                      {["500", "1000", "2000", "3500", "5000"].map((amt) => (
                         <button
                           key={amt}
                           type="button"
@@ -710,7 +695,6 @@ export default function RequestService() {
                           onClick={() => handlePresetBudget(amt)}
                         >
                           ₹{amt}
-                          {budgetType === "HOURLY" ? "/hr" : ""}
                         </button>
                       ))}
                     </div>
@@ -846,9 +830,7 @@ export default function RequestService() {
                   <span className="summary-item-value highlight">
                     {budgetType === "OPEN_BID"
                       ? "Open to Quotes"
-                      : budgetType === "FIXED"
-                      ? `₹${budgetAmount}`
-                      : `₹${budgetAmount}/hr`}
+                      : `₹${budgetAmount}`}
                   </span>
                 </div>
 
