@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { useSendBecomeProviderOtp, useBecomeProvider } from '../../../../hooks/customer/useBecomeProvider';
 import { useAuthStore } from '../../../../../auth/stores/auth.store';
 import { OtpModal } from '../../../../../auth/components/OtpModal';
-import ServiceSelection from '../../../../components/customer/ServiceSelection';
+import ServiceSelection, { type Category } from '../../../../components/customer/ServiceSelection';
 import { useGetCategoriesService } from '../../../../../service-catalog';
 import type { ApiError } from '../../../../../../shared/api/ApiError';
 import { SpinnerOverlay } from '../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
@@ -16,12 +16,6 @@ type FormData = {
     bio: string;
 };
 
-interface Category {
-    id: string;
-    name: string;
-    services: { id: string; name: string }[];
-}
-
 export function BecomeProvider() {
     const [showOtpModal, setShowOtpModal] = useState(false);
     const [pendingData, setPendingData] = useState<FormData | null>(null);
@@ -29,7 +23,6 @@ export function BecomeProvider() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [serviceError, setServiceError] = useState('');
 
-    //const fetchUser = useAuthStore((s) => s.fetchUser);
     const clearAuth = useAuthStore((s) => s.clearAuth);
 
     const sendOtpMut = useSendBecomeProviderOtp();
@@ -39,9 +32,12 @@ export function BecomeProvider() {
     useEffect(() => {
         getCategories.mutate({ page: 1, limit: 100, filter: 'ACTIVE' }, {
             onSuccess: (res) => {
-                const activeCats = (res.data?.categories || []).map((cat: any) => ({
-                    ...cat,
-                    services: (cat.services || []).filter((s: any) => s.status === 'ACTIVE')
+                const activeCats: Category[] = (res.data?.categories || []).map((cat) => ({
+                    id: cat.id,
+                    name: cat.name,
+                    services: (cat.services || [])
+                        .filter((s) => s.status === 'ACTIVE')
+                        .map((s) => ({ id: s.id, name: s.name }))
                 }));
                 setCategories(activeCats);
             }
