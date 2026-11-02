@@ -33,7 +33,7 @@ export function Level4BudgetStep({
         <div className="request-step-badge">4</div>
         <div className="request-section-title-group">
           <h2>Level 4: Budget & Attachments</h2>
-          <p>Choose quotation preference and attach optional photos</p>
+          <p>Choose quotation preference and attach photos of the requirement</p>
         </div>
       </div>
 
@@ -97,7 +97,9 @@ export function Level4BudgetStep({
 
       <div className="request-form-group">
         <label className="request-form-label">
-          <span>Photos & Media (Optional)</span>
+          <span>
+            Photos & Media <span className="required-dot">*</span>
+          </span>
           <span className="char-count">{uploadedImages.length}/5</span>
         </label>
 
@@ -110,7 +112,10 @@ export function Level4BudgetStep({
           onChange={onFileUpload}
         />
 
-        <label htmlFor={fileInputId} className="file-dropzone">
+        <label
+          htmlFor={fileInputId}
+          className={`file-dropzone ${errors.images ? "border-danger" : ""}`}
+        >
           <div className="dropzone-icon">
             <i className="fas fa-cloud-upload-alt"></i>
           </div>
@@ -118,9 +123,14 @@ export function Level4BudgetStep({
             Click or drag images here to upload
           </div>
           <div className="dropzone-text-sub">
-            Supports JPG, PNG up to 10MB each (max 5 images)
+            Supports JPG, PNG up to 10MB each (at least 1, max 5 images)
           </div>
         </label>
+        {errors.images && (
+          <span className="text-danger text-xs mt-1 block">
+            {errors.images.message}
+          </span>
+        )}
 
         {uploadedImages.length > 0 && (
           <div className="uploaded-preview-grid">

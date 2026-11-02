@@ -24,6 +24,9 @@ export const serviceRequestSchema = z.object({
   availableTimeTo: z.string().min(1, { message: "End time is required" }),
   budgetType: z.enum(["OPEN_BID", "FIXED"]),
   budgetAmount: z.string().optional(),
+  images: z
+    .array(z.string())
+    .min(1, { message: "Please upload at least 1 image of the requirement" }),
   agreedToPolicy: z.boolean().refine((val) => val === true, {
     message: "You must accept the marketplace policy and terms before posting"
   })

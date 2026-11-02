@@ -75,6 +75,7 @@ export default function RequestService() {
       availableTimeTo: "17:00",
       budgetType: "OPEN_BID",
       budgetAmount: "1500",
+      images: [],
       agreedToPolicy: false,
     }
   });
@@ -99,7 +100,7 @@ export default function RequestService() {
       1: ["categoryId", "subserviceId"],
       2: ["title", "description", "urgency", "specificDate"],
       3: ["selectedAddressId", "availableTimeFrom", "availableTimeTo"],
-      4: ["budgetType", "budgetAmount", "agreedToPolicy"],
+      4: ["budgetType", "budgetAmount", "images", "agreedToPolicy"],
     };
     const currentKeys = levelKeysMap[currentLevel] || [];
     currentKeys.forEach((key) => {
@@ -205,7 +206,12 @@ export default function RequestService() {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          setUploadedImages((prev) => [...prev, event.target!.result as string]);
+          const newImage = event.target!.result as string;
+          setUploadedImages((prev) => {
+            const next = [...prev, newImage];
+            setValue("images", next, { shouldValidate: true });
+            return next;
+          });
         }
       };
       reader.readAsDataURL(file);
@@ -213,7 +219,11 @@ export default function RequestService() {
   };
 
   const handleRemoveImage = (indexToRemove: number) => {
-    setUploadedImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    setUploadedImages((prev) => {
+      const next = prev.filter((_, idx) => idx !== indexToRemove);
+      setValue("images", next, { shouldValidate: true });
+      return next;
+    });
   };
 
   const handlePresetBudget = (amount: string) => {
@@ -233,7 +243,7 @@ export default function RequestService() {
     } else if (currentLevel === 3) {
       isValid = await trigger(["selectedAddressId", "availableTimeFrom", "availableTimeTo"]);
     } else if (currentLevel === 4) {
-      isValid = await trigger(["budgetType", "budgetAmount", "agreedToPolicy"]);
+      isValid = await trigger(["budgetType", "budgetAmount", "images", "agreedToPolicy"]);
     }
 
     if (isValid && currentLevel < 4) {

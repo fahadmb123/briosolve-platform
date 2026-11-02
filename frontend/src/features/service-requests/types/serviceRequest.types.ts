@@ -14,7 +14,7 @@ export interface CreateServiceRequestPayload {
   availableTimeTo: string;
   budgetType: RequestBudgetType;
   budgetAmount?: string;
-  images?: string[];
+  images: string[];
 }
 
 export interface ServiceRequestImageItem {
