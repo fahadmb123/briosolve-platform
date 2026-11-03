@@ -7,6 +7,7 @@ import {
     INotificationRepository,
     UpdateNotificationData,
 } from "../../domain/repositories/INotification.repository";
+import { CreateNotificationRequestDto } from "../../application/dtos/request/create-notificastion.dto";
 
 export class PrismaNotificationRepository implements INotificationRepository {
 
@@ -75,5 +76,18 @@ export class PrismaNotificationRepository implements INotificationRepository {
             .count();
 
         return Number(count);
+    }
+
+    async createMany(data: CreateNotificationRequestDto[]): Promise<Notification[] | null>{
+        const notifications = await db.orm.public.notifications
+            .createAll(data.map((notification)=>{
+                    return NotificationMapper.toPersistence(notification)
+                }))
+                
+        if (!notifications) return null
+
+        return notifications.map(notification =>
+            NotificationMapper.toDomain(notification),
+        )
     }
 }

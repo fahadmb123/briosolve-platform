@@ -24,8 +24,8 @@ export class WebPushNotificationDeliveryAdapter implements INotificationDelivery
         }
     }
 
-    deliver(notification: NotificationResponseDto): void {
-        this.send(notification).catch((error) => {
+    async deliver(notification: NotificationResponseDto): Promise<void> {
+        await this.send(notification).catch((error) => {
             logger.error({ error }, "Web push delivery error");
         });
     }
