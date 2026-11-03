@@ -8,18 +8,9 @@ import { User } from "../../../domain/entities/user.entity";
 import { Address } from "../../../domain/entities/address.entity";
 import { UserMapper } from "../../../infrastructure/mappers/user.mapper";
 import { UserResponseDto } from "../../dtos/response/user/user-dto";
+import { CalculateDistance } from "../../../../../shared/presentation/http/utils/calculate-distance";
 
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371;
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return Math.round(R * c * 10) / 10;
-}
+
 
 export class GetNearbyProvidersUseCase implements IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto> {
     constructor(
@@ -69,7 +60,7 @@ export class GetNearbyProvidersUseCase implements IUseCase<GetNearbyProvidersDto
             const providerLat = Number(providerAddress.latitude);
             const providerLng = Number(providerAddress.longitude);
 
-            const distance = calculateDistance(customerLat, customerLng, providerLat, providerLng);
+            const distance = CalculateDistance(customerLat, customerLng, providerLat, providerLng);
             const providerRadius = provider.provider_profile?.service_radius_km ?? 20;
 
             if (distance <= providerRadius && distance <= customerRadius) {

@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'a298f3ee4972d04457be4a7126ccb62dc2fb6205ff1559e20009197db7d105b8'>;
+  StorageHashBase<'0a14a43251514154d7684d3224a22f4404c3b40b6d341b178357086c853d688f'>;
 export type ExecutionHash =
   ExecutionHashBase<'89d17058c50d3502b838fe2d2a5311e956fcea7fc725be481dc43cc29f8be52a'>;
 export type ProfileHash =
@@ -283,7 +283,6 @@ export type FieldOutputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
       readonly profile_image: Varchar<500> | null;
-      readonly service_radius_km: CodecTypes['pg/int4@1']['output'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly about: Varchar<500>;
@@ -472,7 +471,6 @@ export type FieldInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
-      readonly service_radius_km: CodecTypes['pg/int4@1']['input'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly about: CodecTypes['sql/varchar@1']['input'];
@@ -662,7 +660,6 @@ export type StorageColumnTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly profile_image: Varchar<500> | null;
-      readonly service_radius_km: CodecTypes['pg/int4@1']['output'] | null;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
     };
@@ -851,7 +848,6 @@ export type StorageColumnInputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly profile_image: CodecTypes['sql/varchar@1']['input'] | null;
-      readonly service_radius_km: CodecTypes['pg/int4@1']['input'] | null;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
     };
@@ -1137,7 +1133,6 @@ export namespace Models {
     id: CodecTypes['pg/uuid@1']['output'];
     user_id: CodecTypes['pg/uuid@1']['output'];
     profile_image: Varchar<500> | null;
-    service_radius_km: CodecTypes['pg/int4@1']['output'] | null;
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     about: Varchar<500>;
@@ -1596,15 +1591,6 @@ type ContractBase = Omit<
                   readonly codecId: 'sql/varchar@1';
                   readonly nullable: true;
                   readonly typeParams: { readonly length: 500 };
-                };
-                readonly service_radius_km: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 20>;
-                  };
                 };
                 readonly created_at: {
                   readonly nativeType: 'timestamptz';
@@ -3263,10 +3249,6 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly length: 500 };
                 };
               };
-              readonly service_radius_km: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
               readonly created_at: {
                 readonly nullable: false;
                 readonly type: {
@@ -3311,7 +3293,6 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly user_id: { readonly column: 'user_id' };
                 readonly profile_image: { readonly column: 'profile_image' };
-                readonly service_radius_km: { readonly column: 'service_radius_km' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
                 readonly about: { readonly column: 'about' };

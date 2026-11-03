@@ -872,13 +872,6 @@
                   }
                 }
               },
-              "service_radius_km": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/int4@1",
-                  "kind": "scalar"
-                }
-              },
               "updated_at": {
                 "nullable": false,
                 "type": {
@@ -925,9 +918,6 @@
                 },
                 "profile_image": {
                   "column": "profile_image"
-                },
-                "service_radius_km": {
-                  "column": "service_radius_km"
                 },
                 "updated_at": {
                   "column": "updated_at"
@@ -3360,15 +3350,6 @@
                     "length": 500
                   }
                 },
-                "service_radius_km": {
-                  "codecId": "pg/int4@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": 20
-                  },
-                  "nativeType": "int4",
-                  "nullable": true
-                },
                 "updated_at": {
                   "codecId": "pg/timestamptz-temporal@1",
                   "nativeType": "timestamptz",
@@ -5052,7 +5033,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "a298f3ee4972d04457be4a7126ccb62dc2fb6205ff1559e20009197db7d105b8"
+    "storageHash": "0a14a43251514154d7684d3224a22f4404c3b40b6d341b178357086c853d688f"
   },
   "execution": {
     "executionHash": "89d17058c50d3502b838fe2d2a5311e956fcea7fc725be481dc43cc29f8be52a",
