@@ -33,6 +33,7 @@ export class PrismaNotificationRepository implements INotificationRepository {
     async findByRecipientId(id: string): Promise<Notification[]> {
         const record = await db.orm.public.notifications
             .where({ recipient_id: id })
+            .orderBy((n) => n.created_at.desc())
             .all();
 
         return record.map((rec) => {

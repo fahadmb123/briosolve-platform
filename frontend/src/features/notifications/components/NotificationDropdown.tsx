@@ -35,7 +35,6 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
 
   const notifications = useNotificationStore((state) => state.notifications);
   const updateNotification = useNotificationStore(
@@ -52,26 +51,19 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     return "CUSTOMER";
   }, [role, user?.role]);
 
-  const headerNotifications = useMemo(
-    () =>
-      notifications.map((notification) =>
+  const unreadNotifications = useMemo(() => {
+    const sorted = [...notifications].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
+    return sorted
+      .filter((n) => !n.is_read)
+      .map((notification) =>
         mapNotificationToHeader(notification, resolvedRole),
-      ),
-    [notifications, resolvedRole],
-  );
+      );
+  }, [notifications, resolvedRole]);
 
-  const unreadCount = useMemo(
-    () => headerNotifications.filter((n) => n.unread).length,
-    [headerNotifications],
-  );
-
-  const displayedNotifications = useMemo(
-    () =>
-      activeTab === "unread"
-        ? headerNotifications.filter((n) => n.unread)
-        : headerNotifications,
-    [headerNotifications, activeTab],
-  );
+  const unreadCount = unreadNotifications.length;
 
   const targetViewAll = useMemo(() => {
     if (viewAllLink) return viewAllLink;
@@ -236,43 +228,11 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             )}
           </div>
 
-          <div className="notif-tabs-container">
-            <div className="notif-segmented-control">
-              <button
-                type="button"
-                className={`notif-segment-btn ${
-                  activeTab === "all" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("all")}
-              >
-                <span>Today</span>
-                <span className="notif-segment-count">
-                  {headerNotifications.length}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                className={`notif-segment-btn ${
-                  activeTab === "unread" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("unread")}
-              >
-                <span>Unread</span>
-                {unreadCount > 0 && (
-                  <span className="notif-segment-count unread-badge">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-            </div>
-          </div>
-
           <div className="notif-dropdown-body">
-            {displayedNotifications.length === 0 ? (
-              <NotificationDropdownEmpty activeTab={activeTab} />
+            {unreadNotifications.length === 0 ? (
+              <NotificationDropdownEmpty activeTab="unread" />
             ) : (
-              displayedNotifications.map((item) => (
+              unreadNotifications.map((item) => (
                 <NotificationDropdownItem
                   key={item.id}
                   item={item}

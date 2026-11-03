@@ -81,7 +81,7 @@ export class CreateServiceRequestUseCase implements IUseCase<CreateServiceReques
             recipientIds: nearestProvidersIds,
             title: "New Service Request",
             title_code: "NEW_SERVICE_REQUEST",
-            message: `${input.title} needed in ${input.urgency === "SPECIFIC_DATE" ? input.specificDate : input.urgency}`,
+            message: `${input.title} needed by ${input.specificDate || input.urgency}`,
             type: "INFO" as NotificationType
         };
 
