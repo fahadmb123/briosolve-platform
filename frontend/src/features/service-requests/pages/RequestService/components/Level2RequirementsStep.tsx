@@ -1,5 +1,6 @@
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import type { ServiceRequestInputType } from "../../../schemas/serviceRequest.schema";
+import { getTodayDate, getEndOfWeekDate, getFlexibleDate } from "../../../utils/serviceDate.utils";
 
 interface Level2RequirementsStepProps {
   register: UseFormRegister<ServiceRequestInputType>;
@@ -22,7 +23,10 @@ export function Level2RequirementsStep({
   onPrev,
   onNext,
 }: Level2RequirementsStepProps) {
-  const minDate = new Date().toISOString().split("T")[0];
+  const minDate = getTodayDate();
+  const todayDate = getTodayDate();
+  const endOfWeekDate = getEndOfWeekDate();
+  const flexibleDate = getFlexibleDate();
 
   return (
     <div className="request-section-card">
@@ -94,7 +98,7 @@ export function Level2RequirementsStep({
               <i className="fas fa-calendar-day"></i>
             </div>
             <div className="urgency-title">Today</div>
-            <div className="urgency-desc">Within today</div>
+            <div className="urgency-desc">{todayDate}</div>
           </div>
 
           <div
@@ -105,7 +109,7 @@ export function Level2RequirementsStep({
               <i className="fas fa-calendar-week"></i>
             </div>
             <div className="urgency-title">This Week</div>
-            <div className="urgency-desc">Next 5 to 7 days</div>
+            <div className="urgency-desc">By {endOfWeekDate}</div>
           </div>
 
           <div
@@ -127,7 +131,7 @@ export function Level2RequirementsStep({
               <i className="fas fa-clock"></i>
             </div>
             <div className="urgency-title">Flexible</div>
-            <div className="urgency-desc">Anytime soon</div>
+            <div className="urgency-desc">By {flexibleDate}</div>
           </div>
         </div>
         {errors.urgency && (

@@ -14,6 +14,7 @@ import {
   serviceRequestSchema,
   type ServiceRequestInputType
 } from "../../schemas/serviceRequest.schema";
+import { computeDateForUrgency } from "../../utils/serviceDate.utils";
 import {
   type Category,
   type ServiceItem,
@@ -69,7 +70,7 @@ export default function RequestService() {
       title: "",
       description: "",
       urgency: "TODAY",
-      specificDate: new Date().toISOString().split("T")[0],
+      specificDate: computeDateForUrgency("TODAY"),
       selectedAddressId: (customerAddress?.id as string) || "",
       availableTimeFrom: "09:00",
       availableTimeTo: "17:00",
@@ -230,6 +231,17 @@ export default function RequestService() {
     setValue("budgetAmount", amount, { shouldValidate: true });
   };
 
+  const handleUrgencySelect = (
+    selectedUrgency: ServiceRequestInputType["urgency"]
+  ) => {
+    setValue("urgency", selectedUrgency, { shouldValidate: true });
+    const computedDate = computeDateForUrgency(
+      selectedUrgency,
+      watch("specificDate")
+    );
+    setValue("specificDate", computedDate, { shouldValidate: true });
+  };
+
   const handleNextLevel = async () => {
     setDismissedErrors(false);
     let isValid = false;
@@ -286,6 +298,8 @@ export default function RequestService() {
   const onSubmit = (data: ServiceRequestInputType) => {
     setDismissedErrors(false);
     setSubmissionError(null);
+    const resolvedSpecificDate =
+      data.specificDate || computeDateForUrgency(data.urgency);
     createServiceRequestMutation.mutate(
       {
         categoryId: data.categoryId,
@@ -293,7 +307,7 @@ export default function RequestService() {
         title: data.title,
         description: data.description,
         urgency: data.urgency,
-        specificDate: data.specificDate,
+        specificDate: resolvedSpecificDate,
         selectedAddressId: data.selectedAddressId,
         availableTimeFrom: data.availableTimeFrom,
         availableTimeTo: data.availableTimeTo,
@@ -322,13 +336,13 @@ export default function RequestService() {
   ) => {
     switch (urg) {
       case "TODAY":
-        return "Today";
+        return date ? `Today (${date})` : "Today";
       case "THIS_WEEK":
-        return "This Week";
+        return date ? `This Week (By ${date})` : "This Week";
       case "SPECIFIC_DATE":
         return date ? `On ${date}` : "Specific Date";
       case "FLEXIBLE":
-        return "Flexible Date";
+        return date ? `Flexible (By ${date})` : "Flexible Date";
       default:
         return "Today";
     }
@@ -446,7 +460,7 @@ export default function RequestService() {
                 urgency={urgency}
                 titleValue={title}
                 descriptionValue={description}
-                onSelectUrgency={(u) => setValue("urgency", u, { shouldValidate: true })}
+                onSelectUrgency={handleUrgencySelect}
                 onPrev={handlePrevLevel}
                 onNext={handleNextLevel}
               />
