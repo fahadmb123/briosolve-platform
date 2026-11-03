@@ -2,7 +2,11 @@ import type { Prisma } from "@prisma/client";
 import { Temporal } from "@js-temporal/polyfill";
 import { ServiceRequest, ServiceRequestImage, ServiceRequestStatus } from "../../domain/entities/serviceRequest.entity";
 import { CreateServiceRequestRepoDto } from "../../application/dtos/request/create-service-request.dto";
-import { ServiceRequestResponseDto } from "../../application/dtos/response/service-request.dto";
+import {
+    ServiceRequestResponseDto,
+    ServiceRequestDetailsDto,
+    ServiceRequestAddressDto
+} from "../../application/dtos/response/service-request.dto";
 
 export type ServiceRequestRecord = Prisma.ServiceRequestGetPayload<{}>;
 export type ServiceRequestImageRecord = Prisma.ServiceRequestImageGetPayload<{}>;
@@ -79,6 +83,35 @@ export class ServiceRequestMapper {
             created_at: serviceRequest.created_at,
             updated_at: serviceRequest.updated_at,
             images: serviceRequest.images
+        };
+    }
+
+    static toDetailsDto(record: any): ServiceRequestDetailsDto {
+        const domain = ServiceRequestMapper.toDomain(record);
+        const dto = ServiceRequestMapper.toDto(domain);
+
+        let addressDetails: ServiceRequestAddressDto | null = null;
+        if (record.address) {
+            addressDetails = {
+                id: record.address.id,
+                house_no: record.address.house_no ?? null,
+                area: record.address.area || "",
+                city: record.address.city || "",
+                district: record.address.district ?? null,
+                state: record.address.state || "",
+                pincode: record.address.pincode || "",
+                landmark: record.address.landmark ?? null,
+                latitude: record.address.latitude !== null && record.address.latitude !== undefined ? Number(record.address.latitude) : null,
+                longitude: record.address.longitude !== null && record.address.longitude !== undefined ? Number(record.address.longitude) : null,
+            };
+        }
+
+        return {
+            ...dto,
+            category_name: record.category?.name,
+            subservice_name: record.subservice?.name ?? null,
+            address_details: addressDetails,
+            matched_providers_count: Array.isArray(record.providers) ? record.providers.length : 0
         };
     }
 

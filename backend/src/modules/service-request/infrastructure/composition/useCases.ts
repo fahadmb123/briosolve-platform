@@ -2,12 +2,13 @@ import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IU
 import { CreateBulkNotificationRequestDto } from "../../../notification/application/dtos/request/create-bulk-notifications.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { addressRepository, userRepository } from "../../../user-management/infrastructure/composition/repositories";
-import { imageUploadService } from "../../../user-management/infrastructure/composition/services";
 import { CreateServiceRequestUseCase } from "../../application/use-cases/createServiceRequest.useCase";
-import { serviceRequestRepository, serviceRequestProviderRepository } from "./respositories";
-import { providerSelectionService } from "./services";
+import { GetCustomerServiceRequestsUseCase } from "../../application/use-cases/getCustomerServiceRequests.useCase";
+import { CancelServiceRequestUseCase } from "../../application/use-cases/cancelServiceRequest.useCase";
+import { serviceRequestRepository, serviceRequestProviderRepository } from "./repositories";
+import { imageUploadService, providerSelectionService } from "./services";
 
-export function createServiceRequestUseCase (
+export function createServiceRequestUseCase(
     createBulkNotificationUseCase: IUseCase<CreateBulkNotificationRequestDto, NotificationResponseDto[]>
 ): CreateServiceRequestUseCase {
     return new CreateServiceRequestUseCase(
@@ -20,3 +21,11 @@ export function createServiceRequestUseCase (
         serviceRequestProviderRepository
     );
 }
+
+export const getCustomerServiceRequestsUseCase = new GetCustomerServiceRequestsUseCase(
+    serviceRequestRepository
+);
+
+export const cancelServiceRequestUseCase = new CancelServiceRequestUseCase(
+    serviceRequestRepository
+);

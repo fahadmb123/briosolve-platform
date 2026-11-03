@@ -19,3 +19,23 @@ export interface ServiceRequestResponseDto {
     updated_at: Date;
     images?: ServiceRequestImage[];
 }
+
+export interface ServiceRequestAddressDto {
+    id: string;
+    house_no?: string | null;
+    area: string;
+    city: string;
+    district?: string | null;
+    state: string;
+    pincode: string;
+    landmark?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+}
+
+export interface ServiceRequestDetailsDto extends ServiceRequestResponseDto {
+    category_name?: string;
+    subservice_name?: string | null;
+    address_details?: ServiceRequestAddressDto | null;
+    matched_providers_count?: number;
+}

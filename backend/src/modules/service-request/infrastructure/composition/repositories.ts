@@ -3,3 +3,4 @@ import { ServiceRequestProviderRepository } from "../repositories/prismaServiceR
 
 export const serviceRequestRepository = new ServiceRequestRepository();
 export const serviceRequestProviderRepository = new ServiceRequestProviderRepository();
+

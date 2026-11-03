@@ -225,7 +225,7 @@ export const TopNav: React.FC = () => {
                       <i className="fas fa-plus-circle"></i>
                     </Link>
                     <Link
-                      to="/dashboard"
+                      to="/my-requests"
                       className="topnav-dropdown-item"
                       role="menuitem"
                       onClick={closeAllMenus}
@@ -527,7 +527,7 @@ export const TopNav: React.FC = () => {
                   Request Service
                 </Link>
                 <Link
-                  to="/dashboard"
+                  to="/my-requests"
                   className="topnav-mobile-item"
                   onClick={closeAllMenus}
                 >

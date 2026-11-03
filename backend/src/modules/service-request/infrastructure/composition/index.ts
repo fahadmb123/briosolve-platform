@@ -5,9 +5,16 @@ import { buildServiceRequestRoute } from "../../presentation/routes/serviceReque
 import { createServiceRequestController } from "./controller";
 
 export function createServiceRequestRoutes(
-    createBulkNotificationUseCase:IUseCase<CreateBulkNotificationRequestDto,NotificationResponseDto[]>
-){
+    createBulkNotificationUseCase: IUseCase<CreateBulkNotificationRequestDto, NotificationResponseDto[]>
+) {
+    const serviceRequestController = createServiceRequestController(createBulkNotificationUseCase);
+
     return buildServiceRequestRoute({
-        serviceRequest: createServiceRequestController(createBulkNotificationUseCase)
-    })
+        serviceRequest: serviceRequestController
+    });
 }
+
+export * from "./repositories";
+export * from "./services";
+export * from "./useCases";
+export * from "./controller";

@@ -8,3 +8,4 @@ export const CustomerSettings = React.lazy(() => import('../../../features/setti
 export const CustomerNotifications = React.lazy(() => import('../../../features/notifications/pages/NotificationsCenter/NotificationsCenter'));
 export const CustomerNearbyProviders = React.lazy(() => import('../../../features/nearby-providers/pages/NearbyProviders/NearbyProviders'));
 export const CustomerRequestService = React.lazy(() => import('../../../features/service-requests/pages/RequestService/RequestService'));
+export const CustomerMyRequests = React.lazy(() => import('../../../features/service-requests/pages/MyRequests/MyRequests'));

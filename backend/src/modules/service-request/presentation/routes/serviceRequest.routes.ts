@@ -8,7 +8,9 @@ import { ServiceRequestRouteDependencies } from "../types/serviceRequest.route.d
 export function buildServiceRequestRoute(controller: ServiceRequestRouteDependencies): Router {
     const router = Router();
 
-    router.post("/",authMiddleware,requireRole(["CUSTOMER"]),validate(createServiceRequestSchema),controller.serviceRequest.createServiceRequest)
+    router.get("/", authMiddleware, requireRole(["CUSTOMER"]), controller.serviceRequest.getMyServiceRequests);
+    router.post("/", authMiddleware, requireRole(["CUSTOMER"]), validate(createServiceRequestSchema), controller.serviceRequest.createServiceRequest)
+    router.patch("/:id/cancel", authMiddleware, requireRole(["CUSTOMER"]), controller.serviceRequest.cancelServiceRequest);
 
     return router;
 }

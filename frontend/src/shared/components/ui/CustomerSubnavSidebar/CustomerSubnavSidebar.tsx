@@ -25,6 +25,11 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/request-service",
     icon: "fas fa-plus-circle",
   },
+  {
+    label: "My Requests",
+    to: "/my-requests",
+    icon: "fas fa-clipboard-list",
+  },
 ];
 
 const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
@@ -55,7 +60,8 @@ export const CustomerSubnavSidebar: React.FC = () => {
     location.pathname === "/dashboard" ||
     location.pathname.startsWith("/dashboard") ||
     location.pathname.startsWith("/nearby-providers") ||
-    location.pathname.startsWith("/request-service");
+    location.pathname.startsWith("/request-service") ||
+    location.pathname.startsWith("/my-requests");
 
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS
