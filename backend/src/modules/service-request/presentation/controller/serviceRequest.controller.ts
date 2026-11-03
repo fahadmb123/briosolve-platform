@@ -2,6 +2,7 @@ import { BaseController } from "../../../../shared/presentation/http/controller/
 import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { CreateServiceRequestInputDto } from "../../application/dtos/request/create-service-request.dto";
+import { UpdateServiceRequestDto } from "../../application/dtos/request/update-service-request.dto";
 import {
     ServiceRequestResponseDto,
     ServiceRequestDetailsDto
@@ -14,7 +15,8 @@ export class ServiceRequestController extends BaseController {
     constructor(
         private readonly _createServiceRequestUseCase: IUseCase<CreateServiceRequestInputDto, ServiceRequestResponseDto>,
         private readonly _getCustomerServiceRequestsUseCase: IUseCase<GetCustomerServiceRequestsInputDto, ServiceRequestDetailsDto[]>,
-        private readonly _cancelServiceRequestUseCase: IUseCase<CancelServiceRequestInputDto, ServiceRequestResponseDto>
+        private readonly _cancelServiceRequestUseCase: IUseCase<CancelServiceRequestInputDto, ServiceRequestResponseDto>,
+        private readonly _updateServiceRequestUseCase: IUseCase<UpdateServiceRequestDto, ServiceRequestDetailsDto>
     ) {
         super();
     }
@@ -46,6 +48,27 @@ export class ServiceRequestController extends BaseController {
 
             const requests = await this._getCustomerServiceRequestsUseCase.execute({ customerId });
             return this.sendSuccess(res, "Customer service requests retrieved successfully", requests, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    updateServiceRequest = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const customerId = req.user?.userId;
+            if (!customerId) {
+                throw new ApplicationError("UNAUTHORIZED", "Customer ID is required", "AUTHENTICATION");
+            }
+
+            const requestId = req.params.id as string;
+            const response = await this._updateServiceRequestUseCase.execute({
+                ...req.body,
+                id: requestId,
+                customerId,
+                imageUrls: req.body.images
+            });
+
+            return this.sendSuccess(res, "Service request updated successfully", response, 200);
         } catch (error) {
             next(error);
         }

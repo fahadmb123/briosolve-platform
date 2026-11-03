@@ -1,4 +1,4 @@
-import type { ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import type { ServiceRequestInputType } from "../../../schemas/serviceRequest.schema";
 
@@ -27,6 +27,7 @@ export function Level4BudgetStep({
   onRemoveImage,
   onPrev,
 }: Level4BudgetStepProps) {
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   return (
     <div className="request-section-card">
       <div className="request-section-header">
@@ -135,12 +136,25 @@ export function Level4BudgetStep({
         {uploadedImages.length > 0 && (
           <div className="uploaded-preview-grid">
             {uploadedImages.map((imgSrc, idx) => (
-              <div key={idx} className="uploaded-preview-item">
+              <div
+                key={idx}
+                className="uploaded-preview-item"
+                onClick={() => setPreviewImage(imgSrc)}
+                title="Click to view image"
+              >
                 <img src={imgSrc} alt={`Upload ${idx + 1}`} />
+                <div className="uploaded-preview-overlay">
+                  <i className="fas fa-search-plus"></i>
+                </div>
                 <button
                   type="button"
                   className="remove-upload-btn"
-                  onClick={() => onRemoveImage(idx)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveImage(idx);
+                  }}
+                  title="Remove image"
+                  aria-label="Remove image"
                 >
                   <i className="fas fa-times"></i>
                 </button>
@@ -203,6 +217,32 @@ export function Level4BudgetStep({
           <span>Back to Level 3</span>
         </button>
       </div>
+
+      {previewImage && (
+        <div
+          className="req-lightbox-overlay"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="req-lightbox-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={previewImage}
+              alt="Uploaded preview"
+              className="req-lightbox-img"
+            />
+            <button
+              type="button"
+              className="req-lightbox-close"
+              onClick={() => setPreviewImage(null)}
+              aria-label="Close image preview"
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

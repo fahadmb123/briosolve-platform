@@ -5,7 +5,8 @@ import { ServiceRequestController } from "../../presentation/controller/serviceR
 import {
     createServiceRequestUseCase,
     getCustomerServiceRequestsUseCase,
-    cancelServiceRequestUseCase
+    cancelServiceRequestUseCase,
+    updateServiceRequestUseCase
 } from "./useCases";
 
 export function createServiceRequestController(
@@ -16,6 +17,7 @@ export function createServiceRequestController(
     return new ServiceRequestController(
         serviceRequestUseCase,
         getCustomerServiceRequestsUseCase,
-        cancelServiceRequestUseCase
+        cancelServiceRequestUseCase,
+        updateServiceRequestUseCase
     );
 }

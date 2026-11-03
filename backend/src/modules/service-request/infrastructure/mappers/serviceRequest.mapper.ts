@@ -106,12 +106,16 @@ export class ServiceRequestMapper {
             };
         }
 
+        const providers = Array.isArray(record.providers) ? record.providers : [];
+        const quotationsCount = providers.filter((p: any) => p.status === "QUOTED").length;
+
         return {
             ...dto,
             category_name: record.category?.name,
             subservice_name: record.subservice?.name ?? null,
             address_details: addressDetails,
-            matched_providers_count: Array.isArray(record.providers) ? record.providers.length : 0
+            matched_providers_count: providers.length,
+            quotations_count: quotationsCount
         };
     }
 

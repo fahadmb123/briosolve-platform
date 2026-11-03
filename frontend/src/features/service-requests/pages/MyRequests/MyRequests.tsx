@@ -13,6 +13,7 @@ import {
   RequestCard,
   RequestDetailsModal,
   CancelConfirmModal,
+  EditRequestModal,
   type StatusFilterType,
   type SortOrderType
 } from "./components";
@@ -28,6 +29,9 @@ export default function MyRequests() {
   const [selectedRequestForCancel, setSelectedRequestForCancel] =
     useState<CustomerServiceRequestItem | null>(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState<boolean>(false);
+  const [selectedRequestForEdit, setSelectedRequestForEdit] =
+    useState<CustomerServiceRequestItem | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
   const getRequestsMutation = useGetMyServiceRequests();
   const cancelMutation = useCancelServiceRequest();
@@ -52,6 +56,7 @@ export default function MyRequests() {
   const counts: Record<StatusFilterType, number> = useMemo(() => {
     const map: Record<StatusFilterType, number> = {
       ALL: requests.length,
+      DRAFT: 0,
       PENDING: 0,
       ACTIVE: 0,
       ACCEPTED: 0,
@@ -121,6 +126,25 @@ export default function MyRequests() {
   const handleCloseCancel = () => {
     setIsCancelModalOpen(false);
     setSelectedRequestForCancel(null);
+  };
+
+  const handleOpenEdit = (request: CustomerServiceRequestItem) => {
+    setSelectedRequestForEdit(request);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEdit = () => {
+    setIsEditModalOpen(false);
+    setSelectedRequestForEdit(null);
+  };
+
+  const handleEditSuccess = (updated: CustomerServiceRequestItem) => {
+    setRequests((prev) =>
+      prev.map((r) => (r.id === updated.id ? { ...r, ...updated } : r))
+    );
+    if (selectedRequestForDetails?.id === updated.id) {
+      setSelectedRequestForDetails(updated);
+    }
   };
 
   const handleConfirmCancel = () => {
@@ -228,6 +252,7 @@ export default function MyRequests() {
               key={request.id}
               request={request}
               onViewDetails={handleOpenDetails}
+              onEditRequest={handleOpenEdit}
               onCancelRequest={handleOpenCancel}
             />
           ))}
@@ -238,7 +263,15 @@ export default function MyRequests() {
         request={selectedRequestForDetails}
         isOpen={isDetailsModalOpen}
         onClose={handleCloseDetails}
+        onEditRequest={handleOpenEdit}
         onCancelRequest={handleOpenCancel}
+      />
+
+      <EditRequestModal
+        request={selectedRequestForEdit}
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEdit}
+        onSuccess={handleEditSuccess}
       />
 
       <CancelConfirmModal

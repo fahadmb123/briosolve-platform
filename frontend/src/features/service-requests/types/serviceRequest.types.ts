@@ -1,6 +1,7 @@
 export type RequestUrgency = "TODAY" | "THIS_WEEK" | "SPECIFIC_DATE" | "FLEXIBLE";
 export type RequestBudgetType = "OPEN_BID" | "FIXED";
 export type ServiceRequestStatus =
+  | "DRAFT"
   | "PENDING"
   | "ACTIVE"
   | "ACCEPTED"
@@ -22,6 +23,21 @@ export interface CreateServiceRequestPayload {
   budgetType: RequestBudgetType;
   budgetAmount?: string;
   images: string[];
+}
+
+export interface UpdateServiceRequestPayload {
+  categoryId?: string;
+  subserviceId?: string | null;
+  title?: string;
+  description?: string;
+  urgency?: RequestUrgency;
+  specificDate?: string | null;
+  selectedAddressId?: string;
+  availableTimeFrom?: string;
+  availableTimeTo?: string;
+  budgetType?: RequestBudgetType;
+  budgetAmount?: string | null;
+  images?: string[];
 }
 
 export interface ServiceRequestImageItem {
@@ -67,6 +83,7 @@ export interface CustomerServiceRequestItem {
   updated_at: string;
   images?: ServiceRequestImageItem[];
   matched_providers_count?: number;
+  quotations_count?: number;
 }
 
 export interface ServiceRequestItem {
@@ -88,4 +105,3 @@ export interface ServiceRequestItem {
   updated_at: string;
   images?: ServiceRequestImageItem[];
 }
-

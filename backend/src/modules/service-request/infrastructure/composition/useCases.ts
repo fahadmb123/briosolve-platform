@@ -5,6 +5,7 @@ import { addressRepository, userRepository } from "../../../user-management/infr
 import { CreateServiceRequestUseCase } from "../../application/use-cases/createServiceRequest.useCase";
 import { GetCustomerServiceRequestsUseCase } from "../../application/use-cases/getCustomerServiceRequests.useCase";
 import { CancelServiceRequestUseCase } from "../../application/use-cases/cancelServiceRequest.useCase";
+import { UpdateServiceRequestUseCase } from "../../application/use-cases/updateServiceRequest.useCase";
 import { serviceRequestRepository, serviceRequestProviderRepository } from "./repositories";
 import { imageUploadService, providerSelectionService } from "./services";
 
@@ -28,4 +29,9 @@ export const getCustomerServiceRequestsUseCase = new GetCustomerServiceRequestsU
 
 export const cancelServiceRequestUseCase = new CancelServiceRequestUseCase(
     serviceRequestRepository
+);
+
+export const updateServiceRequestUseCase = new UpdateServiceRequestUseCase(
+    serviceRequestRepository,
+    imageUploadService
 );

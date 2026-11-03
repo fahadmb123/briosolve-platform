@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import type { CustomerServiceRequestItem } from "../../../types/serviceRequest.types";
+import { checkRequestEditPermission } from "../../../utils/serviceRequestEdit.utils";
 
 interface RequestDetailsModalProps {
   request: CustomerServiceRequestItem | null;
   isOpen: boolean;
   onClose: () => void;
+  onEditRequest: (request: CustomerServiceRequestItem) => void;
   onCancelRequest: (request: CustomerServiceRequestItem) => void;
 }
 
@@ -12,6 +14,7 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
   request,
   isOpen,
   onClose,
+  onEditRequest,
   onCancelRequest,
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
@@ -19,6 +22,7 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
   if (!isOpen || !request) return null;
 
   const canCancel = request.status === "PENDING" || request.status === "ACTIVE";
+  const permission = checkRequestEditPermission(request);
 
   const formattedDate = new Date(request.created_at).toLocaleDateString(undefined, {
     year: "numeric",
@@ -215,6 +219,21 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
         </div>
 
         <div className="myreq-modal-footer">
+          {permission.canEdit && (
+            <button
+              type="button"
+              className="myreq-btn-edit-modal"
+              onClick={() => {
+                onClose();
+                onEditRequest(request);
+              }}
+            >
+              <i className="fas fa-edit"></i>
+              <span>Edit Request</span>
+              {permission.isRestricted && <span className="myreq-edit-dot-restricted" />}
+            </button>
+          )}
+
           {canCancel && (
             <button
               type="button"

@@ -1,15 +1,18 @@
 import React from "react";
 import type { CustomerServiceRequestItem } from "../../../types/serviceRequest.types";
+import { checkRequestEditPermission } from "../../../utils/serviceRequestEdit.utils";
 
 interface RequestCardProps {
   request: CustomerServiceRequestItem;
   onViewDetails: (request: CustomerServiceRequestItem) => void;
+  onEditRequest: (request: CustomerServiceRequestItem) => void;
   onCancelRequest: (request: CustomerServiceRequestItem) => void;
 }
 
 export const RequestCard: React.FC<RequestCardProps> = ({
   request,
   onViewDetails,
+  onEditRequest,
   onCancelRequest,
 }) => {
   const getStatusBadge = (status: CustomerServiceRequestItem["status"]) => {
@@ -51,6 +54,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   };
 
   const statusInfo = getStatusBadge(request.status);
+  const permission = checkRequestEditPermission(request);
   const canCancel = request.status === "PENDING" || request.status === "ACTIVE";
 
   const addressText = request.address_details
@@ -147,6 +151,19 @@ export const RequestCard: React.FC<RequestCardProps> = ({
         </div>
 
         <div className="myreq-card-actions">
+          {permission.canEdit && (
+            <button
+              type="button"
+              className="myreq-btn-edit"
+              onClick={() => onEditRequest(request)}
+              title={permission.isRestricted ? "Edit request (Restricted - quotations received)" : "Edit request"}
+            >
+              <i className="fas fa-edit"></i>
+              <span>Edit</span>
+              {permission.isRestricted && <span className="myreq-edit-dot-restricted" />}
+            </button>
+          )}
+
           {canCancel && (
             <button
               type="button"

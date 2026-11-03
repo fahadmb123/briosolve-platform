@@ -38,4 +38,5 @@ export interface ServiceRequestDetailsDto extends ServiceRequestResponseDto {
     subservice_name?: string | null;
     address_details?: ServiceRequestAddressDto | null;
     matched_providers_count?: number;
+    quotations_count?: number;
 }
