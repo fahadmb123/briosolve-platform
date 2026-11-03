@@ -111,6 +111,7 @@ model provider_profiles {
   availabilities         provider_availability[]
   overrides              provider_availability_overrides[]
   verification_documents provider_verification_documents[]
+  service_requests       service_request_providers[]
 }
 
 model provider_verification_documents {
@@ -372,6 +373,7 @@ model service_requests {
   address             addresses              @relation(fields:[address_id], references:[id])
 
   images              service_request_images[]
+  providers           service_request_providers[]
 }
 
 model service_request_images {
@@ -386,4 +388,30 @@ model service_request_images {
   service_request    service_requests @relation(fields:[service_request_id], references:[id], onDelete: Cascade)
 
   @@index([service_request_id])
+}
+
+enum service_request_provider_status {
+  MATCHED
+  VIEWED
+  QUOTED
+  DECLINED
+  EXPIRED
+}
+
+model service_request_providers {
+  id                 Uuid                            @id @default(uuid())
+  service_request_id Uuid
+  provider_id        Uuid
+
+  status             service_request_provider_status @default(MATCHED)
+
+  matched_at         DateTime                        @default(now())
+  viewed_at          DateTime?
+
+  service_request    service_requests                @relation(fields:[service_request_id], references:[id], onDelete: Cascade)
+  provider           provider_profiles               @relation(fields:[provider_id], references:[id], onDelete: Cascade)
+
+  @@unique([service_request_id, provider_id])
+  @@index([service_request_id])
+  @@index([provider_id])
 }

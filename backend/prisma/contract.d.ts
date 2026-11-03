@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'0a14a43251514154d7684d3224a22f4404c3b40b6d341b178357086c853d688f'>;
+  StorageHashBase<'463956d5c0a4f5ae4cefb63f26d915c28fbbccb889fdf468414777e1fef652a9'>;
 export type ExecutionHash =
-  ExecutionHashBase<'89d17058c50d3502b838fe2d2a5311e956fcea7fc725be481dc43cc29f8be52a'>;
+  ExecutionHashBase<'15351d3a369f213be73a8924578fd71dcec0733737c19c644fcbbdbff35cd81a'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -373,6 +373,14 @@ export type FieldOutputTypes = {
       readonly display_order: CodecTypes['pg/int4@1']['output'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
+    readonly service_request_providers: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly service_request_id: CodecTypes['pg/uuid@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly status: 'MATCHED' | 'VIEWED' | 'QUOTED' | 'DECLINED' | 'EXPIRED';
+      readonly matched_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly viewed_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
+    };
     readonly service_requests: {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly customer_id: CodecTypes['pg/uuid@1']['output'];
@@ -560,6 +568,14 @@ export type FieldInputTypes = {
       readonly image_key: CodecTypes['sql/varchar@1']['input'];
       readonly display_order: CodecTypes['pg/int4@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly service_request_providers: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly service_request_id: CodecTypes['pg/uuid@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly status: 'MATCHED' | 'VIEWED' | 'QUOTED' | 'DECLINED' | 'EXPIRED';
+      readonly matched_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly viewed_at: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
     };
     readonly service_requests: {
       readonly id: CodecTypes['pg/uuid@1']['input'];
@@ -749,6 +765,14 @@ export type StorageColumnTypes = {
       readonly image_key: Varchar<500>;
       readonly service_request_id: CodecTypes['pg/uuid@1']['output'];
     };
+    readonly service_request_providers: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly matched_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly service_request_id: CodecTypes['pg/uuid@1']['output'];
+      readonly status: 'MATCHED' | 'VIEWED' | 'QUOTED' | 'DECLINED' | 'EXPIRED';
+      readonly viewed_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
+    };
     readonly service_requests: {
       readonly address_id: CodecTypes['pg/uuid@1']['output'];
       readonly available_time_from: CodecTypes['pg/time-temporal@1']['output'];
@@ -937,6 +961,14 @@ export type StorageColumnInputTypes = {
       readonly image_key: CodecTypes['sql/varchar@1']['input'];
       readonly service_request_id: CodecTypes['pg/uuid@1']['input'];
     };
+    readonly service_request_providers: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly matched_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly service_request_id: CodecTypes['pg/uuid@1']['input'];
+      readonly status: 'MATCHED' | 'VIEWED' | 'QUOTED' | 'DECLINED' | 'EXPIRED';
+      readonly viewed_at: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
+    };
     readonly service_requests: {
       readonly address_id: CodecTypes['pg/uuid@1']['input'];
       readonly available_time_from: CodecTypes['pg/time-temporal@1']['input'];
@@ -1048,11 +1080,17 @@ export namespace Models {
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     availabilities: public_provider_availability[];
     overrides: public_provider_availability_overrides[];
+    service_requests: public_service_request_providers[];
     services: public_provider_services[];
     user: public_users;
     verification_documents: public_provider_verification_documents[];
     readonly [RelationKeys]?:
-      'availabilities' | 'overrides' | 'services' | 'user' | 'verification_documents';
+      | 'availabilities'
+      | 'overrides'
+      | 'service_requests'
+      | 'services'
+      | 'user'
+      | 'verification_documents';
   };
   export type public_provider_verification_documents = {
     id: CodecTypes['pg/uuid@1']['output'];
@@ -1239,8 +1277,10 @@ export namespace Models {
     category: public_categories;
     customer: public_users;
     images: public_service_request_images[];
+    providers: public_service_request_providers[];
     subservice: public_services | null;
-    readonly [RelationKeys]?: 'address' | 'category' | 'customer' | 'images' | 'subservice';
+    readonly [RelationKeys]?:
+      'address' | 'category' | 'customer' | 'images' | 'providers' | 'subservice';
   };
   export type public_service_request_images = {
     id: CodecTypes['pg/uuid@1']['output'];
@@ -1250,6 +1290,17 @@ export namespace Models {
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     service_request: public_service_requests;
     readonly [RelationKeys]?: 'service_request';
+  };
+  export type public_service_request_providers = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    service_request_id: CodecTypes['pg/uuid@1']['output'];
+    provider_id: CodecTypes['pg/uuid@1']['output'];
+    status: 'MATCHED' | 'VIEWED' | 'QUOTED' | 'DECLINED' | 'EXPIRED';
+    matched_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    viewed_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
+    provider: public_provider_profiles;
+    service_request: public_service_requests;
+    readonly [RelationKeys]?: 'provider' | 'service_request';
   };
 }
 
@@ -1272,6 +1323,7 @@ export declare const models: {
     push_subscriptions: Models.public_push_subscriptions;
     service_requests: Models.public_service_requests;
     service_request_images: Models.public_service_request_images;
+    service_request_providers: Models.public_service_request_providers;
   };
 };
 
@@ -2294,6 +2346,89 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly service_request_providers: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly service_request_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly provider_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'MATCHED'>;
+                  };
+                };
+                readonly matched_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly viewed_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: true;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [
+                { readonly columns: readonly ['service_request_id', 'provider_id'] },
+              ];
+              indexes: readonly [
+                {
+                  readonly name: 'service_request_providers_service_request_id_idx_8060a003';
+                  readonly prefix: 'service_request_providers_service_request_id_idx';
+                  readonly columns: readonly ['service_request_id'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'service_request_providers_provider_id_idx_d89e110d';
+                  readonly prefix: 'service_request_providers_provider_id_idx';
+                  readonly columns: readonly ['provider_id'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'service_request_providers';
+                    readonly columns: readonly ['service_request_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'service_requests';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'service_request_providers';
+                    readonly columns: readonly ['provider_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_profiles';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly service_requests: {
               columns: {
                 readonly id: {
@@ -2752,6 +2887,10 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['TODAY', 'THIS_WEEK', 'SPECIFIC_DATE', 'FLEXIBLE'];
             };
+            readonly service_request_provider_status: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['MATCHED', 'VIEWED', 'QUOTED', 'DECLINED', 'EXPIRED'];
+            };
             readonly service_request_status: {
               readonly kind: 'valueSet';
               readonly values: readonly [
@@ -2861,6 +3000,10 @@ type ContractBase = Omit<
     readonly service_request_images: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'service_request_images';
+    };
+    readonly service_request_providers: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'service_request_providers';
     };
   };
   readonly domain: {
@@ -3666,6 +3809,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['provider_id'];
                 };
               };
+              readonly service_requests: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'service_request_providers';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['provider_id'];
+                };
+              };
               readonly services: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -4046,6 +4200,78 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly service_request_providers: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly service_request_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly provider_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly matched_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly viewed_at: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly provider: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_profiles';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['provider_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly service_request: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'service_requests';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['service_request_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'service_request_providers';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly service_request_id: { readonly column: 'service_request_id' };
+                readonly provider_id: { readonly column: 'provider_id' };
+                readonly status: { readonly column: 'status' };
+                readonly matched_at: { readonly column: 'matched_at' };
+                readonly viewed_at: { readonly column: 'viewed_at' };
+              };
+            };
+          };
           readonly service_requests: {
             readonly fields: {
               readonly id: {
@@ -4175,6 +4401,17 @@ type ContractBase = Omit<
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
                   readonly model: 'service_request_images';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['service_request_id'];
+                };
+              };
+              readonly providers: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'service_request_providers';
                 };
                 readonly cardinality: '1:N';
                 readonly on: {
@@ -4736,6 +4973,16 @@ type ContractBase = Omit<
               { readonly name: 'EXPIRED'; readonly value: 'EXPIRED' },
             ];
           };
+          readonly service_request_provider_status: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'MATCHED'; readonly value: 'MATCHED' },
+              { readonly name: 'VIEWED'; readonly value: 'VIEWED' },
+              { readonly name: 'QUOTED'; readonly value: 'QUOTED' },
+              { readonly name: 'DECLINED'; readonly value: 'DECLINED' },
+              { readonly name: 'EXPIRED'; readonly value: 'EXPIRED' },
+            ];
+          };
         };
       };
     };
@@ -4935,6 +5182,14 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'service_request_images';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'service_request_providers';
             readonly column: 'id';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };

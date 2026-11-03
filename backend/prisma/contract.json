@@ -56,6 +56,10 @@
       "model": "service_request_images",
       "namespace": "public"
     },
+    "service_request_providers": {
+      "model": "service_request_providers",
+      "namespace": "public"
+    },
     "service_requests": {
       "model": "service_requests",
       "namespace": "public"
@@ -172,6 +176,31 @@
               {
                 "name": "FLEXIBLE",
                 "value": "FLEXIBLE"
+              }
+            ]
+          },
+          "service_request_provider_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "MATCHED",
+                "value": "MATCHED"
+              },
+              {
+                "name": "VIEWED",
+                "value": "VIEWED"
+              },
+              {
+                "name": "QUOTED",
+                "value": "QUOTED"
+              },
+              {
+                "name": "DECLINED",
+                "value": "DECLINED"
+              },
+              {
+                "name": "EXPIRED",
+                "value": "EXPIRED"
               }
             ]
           },
@@ -1466,6 +1495,21 @@
                   "namespace": "public"
                 }
               },
+              "service_requests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "provider_id"
+                  ]
+                },
+                "to": {
+                  "model": "service_request_providers",
+                  "namespace": "public"
+                }
+              },
               "services": {
                 "cardinality": "1:N",
                 "on": {
@@ -2036,6 +2080,116 @@
               "table": "service_request_images"
             }
           },
+          "service_request_providers": {
+            "fields": {
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "matched_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "service_request_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "service_request_provider_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "viewed_at": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "provider": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "provider_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "provider_profiles",
+                  "namespace": "public"
+                }
+              },
+              "service_request": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "service_request_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "service_requests",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "id": {
+                  "column": "id"
+                },
+                "matched_at": {
+                  "column": "matched_at"
+                },
+                "provider_id": {
+                  "column": "provider_id"
+                },
+                "service_request_id": {
+                  "column": "service_request_id"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "viewed_at": {
+                  "column": "viewed_at"
+                }
+              },
+              "namespaceId": "public",
+              "table": "service_request_providers"
+            }
+          },
           "service_requests": {
             "fields": {
               "address_id": {
@@ -2240,6 +2394,21 @@
                 },
                 "to": {
                   "model": "service_request_images",
+                  "namespace": "public"
+                }
+              },
+              "providers": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "service_request_id"
+                  ]
+                },
+                "to": {
+                  "model": "service_request_providers",
                   "namespace": "public"
                 }
               },
@@ -4311,6 +4480,128 @@
               },
               "uniques": []
             },
+            "service_request_providers": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('MATCHED', 'VIEWED', 'QUOTED', 'DECLINED', 'EXPIRED')",
+                  "name": "service_request_providers_status_check_b3894f35",
+                  "prefix": "service_request_providers_status_check"
+                }
+              ],
+              "columns": {
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "matched_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "provider_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "service_request_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "MATCHED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "service_request_provider_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "viewed_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "service_request_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_request_providers"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_requests"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "provider_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_request_providers"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "provider_profiles"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "provider_id"
+                  ],
+                  "name": "service_request_providers_provider_id_idx_d89e110d",
+                  "prefix": "service_request_providers_provider_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "service_request_id"
+                  ],
+                  "name": "service_request_providers_service_request_id_idx_8060a003",
+                  "prefix": "service_request_providers_service_request_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "service_request_id",
+                    "provider_id"
+                  ]
+                }
+              ]
+            },
             "service_requests": {
               "checks": [
                 {
@@ -4972,6 +5263,16 @@
                 "FLEXIBLE"
               ]
             },
+            "service_request_provider_status": {
+              "kind": "valueSet",
+              "values": [
+                "MATCHED",
+                "VIEWED",
+                "QUOTED",
+                "DECLINED",
+                "EXPIRED"
+              ]
+            },
             "service_request_status": {
               "kind": "valueSet",
               "values": [
@@ -5033,10 +5334,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "0a14a43251514154d7684d3224a22f4404c3b40b6d341b178357086c853d688f"
+    "storageHash": "463956d5c0a4f5ae4cefb63f26d915c28fbbccb889fdf468414777e1fef652a9"
   },
   "execution": {
-    "executionHash": "89d17058c50d3502b838fe2d2a5311e956fcea7fc725be481dc43cc29f8be52a",
+    "executionHash": "15351d3a369f213be73a8924578fd71dcec0733737c19c644fcbbdbff35cd81a",
     "mutations": {
       "defaults": [
         {
@@ -5300,6 +5601,17 @@
             "column": "id",
             "namespace": "public",
             "table": "service_request_images"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "service_request_providers"
           }
         },
         {
