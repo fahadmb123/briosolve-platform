@@ -9,13 +9,15 @@ import { Address } from "../../../domain/entities/address.entity";
 import { UserMapper } from "../../../infrastructure/mappers/user.mapper";
 import { UserResponseDto } from "../../dtos/response/user/user-dto";
 import { CalculateDistance } from "../../../../../shared/presentation/http/utils/calculate-distance";
+import { IProviderServiceRepository } from "../../../../service-catalog/domain/repositories/IProviderServiceRepository";
 
 
 
 export class GetNearbyProvidersUseCase implements IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto> {
     constructor(
         private readonly _userRepository: IUserRepository,
-        private readonly _customerRepository: ICustomerRepository
+        private readonly _customerRepository: ICustomerRepository,
+         private readonly _providerServiceRepository : IProviderServiceRepository
     ) {}
 
     async execute(input: GetNearbyProvidersDto): Promise<GetNearbyProvidersOutputDto> {
@@ -24,8 +26,7 @@ export class GetNearbyProvidersUseCase implements IUseCase<GetNearbyProvidersDto
             throw new ApplicationError("NOT_FOUND", "Customer not found", "NOT_FOUND");
         }
 
-        const customerProfile = await this._customerRepository.findById(input.userId);
-        const customerRadius = input.radius ?? customerProfile?.service_radius_km ?? 20;
+        const customerRadius = input.radius ??  20;
 
         const customerAddress = customer.current_address_id as Address | null;
         if (!customerAddress || customerAddress.latitude == null || customerAddress.longitude == null) {
@@ -50,7 +51,12 @@ export class GetNearbyProvidersUseCase implements IUseCase<GetNearbyProvidersDto
         for (const provider of providers) {
             if (provider.id === customer.id) continue;
             if (provider.status !== "ACTIVE") continue;
-            if (provider.provider_profile?.kyc_status !== "APPROVED") continue;
+            if (provider.provider_profile?.kyc_status !== "APPROVED") continue
+            if (!provider.email_verified || !provider.phone_verified) continue
+
+            const providerServices = await this._providerServiceRepository.getProviderServices(provider.provider_profile.id)
+
+            if (!provider.current_address_id || providerServices.length === 0) continue
 
             const providerAddress = provider.current_address_id as Address | null;
             if (!providerAddress || providerAddress.latitude == null || providerAddress.longitude == null) {

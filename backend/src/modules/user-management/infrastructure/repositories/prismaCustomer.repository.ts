@@ -19,7 +19,6 @@ export class CustomerRepository implements ICustomerRepository {
                 .where({ user_id: userId as Varchar<255> })
                 .update({
                     about: existing.about || "",
-                    service_radius_km: existing.service_radius_km ?? 20,
                     updated_at: Temporal.Now.instant()
                 } as never);
             return;
@@ -55,7 +54,6 @@ export class CustomerRepository implements ICustomerRepository {
                     .update({
                         about: input.data.about !== undefined ? input.data.about : profile.about,
                         profile_image: input.data.profile_image !== undefined ? input.data.profile_image : profile.profile_image,
-                        service_radius_km: input.data.service_radius_km !== undefined ? input.data.service_radius_km : profile.service_radius_km,
                         updated_at: Temporal.Now.instant()
                     } as never);
             } else {

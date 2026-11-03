@@ -9,10 +9,11 @@ import { ServiceRequestMapper } from "../../infrastructure/mappers/serviceReques
 import { CreateBulkNotificationRequestDto } from "../../../notification/application/dtos/request/create-bulk-notifications.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { IUserRepository } from "../../../user-management/domain/repositories/IUserRepository";
-import { Address } from "../../../user-management/domain/entities/address.entity";
-import { CalculateDistance } from "../../../../shared/presentation/http/utils/calculate-distance";
 import { IAddressRepository } from "../../../user-management/domain/repositories/IAddressRepository";
 import { IProviderSelectionService } from "../interfaces/services/IProviderSelectionService";
+import { NotificationType } from "../../../notification/domain/entities/notification.entity";
+import { logger } from "../../../../shared/infrastructure/logger/logger";
+
 
 
 export class CreateServiceRequestUseCase implements IUseCase<CreateServiceRequestInputDto, ServiceRequestResponseDto> {
@@ -57,20 +58,30 @@ export class CreateServiceRequestUseCase implements IUseCase<CreateServiceReques
 
         const providers = await this._userRepository.getActiveProviders()
 
-        const nearestProvidersIds:string[] = this._providerSelectionService.getNearbyProviderIds(
+        const nearestProvidersIds:string[] = await this._providerSelectionService.getNearbyProviderIds({
             providers,
-            input.customerId,
+            customerId:input.customerId,
             customerLat,
-            customerLng
-        )
+            customerLng,
+            subServiceId:input.subserviceId
+        })
 
         const notification = {
             recipientIds:nearestProvidersIds,
-            type:"SUCCESS" ,
-            title_code:"NEW_SERVICE_REQUEST",
             title:"New Service Request",
-            message:`${input.title} needed in ${input.urgency === "SPECIFIC_DATE" ? input.specificDate : input.urgency}`
+            title_code:"NEW_SERVICE_REQUEST",
+            message:`${input.title} needed in ${input.urgency === "SPECIFIC_DATE" ? input.specificDate : input.urgency}`,
+            type:"INFO" as NotificationType
         };
+
+        try {
+            await this._createBulkNotificationUseCase.execute(notification);
+        } catch (error) {
+            logger.error(
+                { err: error,userId:input.customerId },
+                "Failed to create Service Request  notification",
+            );
+        }
 
         return ServiceRequestMapper.toDto(serviceRequest)
     }

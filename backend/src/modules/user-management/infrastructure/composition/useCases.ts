@@ -35,7 +35,10 @@ import { SendBecomeCustomerOtpUseCase } from "../../application/use-cases/onboar
 import { BecomeCustomerUseCase } from "../../application/use-cases/onboarding/becomeCustomer.useCase";
 import { providerServiceRepository } from "../../../service-catalog/infrastructure/composition/respositories";
 import { verificationDocumentRepository, verificationFileRepository } from "../../../kyc-verification/infrastructure/composition/repositories";
-
+import { GetNearbyProvidersUseCase } from "../../application/use-cases/customers/getNearbyProviders.useCase";
+import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
+import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 
 export const registerCustomerUseCase = new RegisterCustomerUseCase(
     userRepository,
@@ -176,11 +179,9 @@ export const becomeCustomerUseCase = new BecomeCustomerUseCase(
     verificationDocumentRepository,
     verificationFileRepository
 );
-import { GetNearbyProvidersUseCase } from "../../application/use-cases/customers/getNearbyProviders.useCase";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
-import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
+
 export const getNearbyProvidersUseCase = new GetNearbyProvidersUseCase(
     userRepository,
-    customerRepository
+    customerRepository,
+    providerServiceRepository
 );
