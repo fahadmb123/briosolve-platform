@@ -19,7 +19,11 @@ export default function CustomerLayout() {
     location.pathname.startsWith("/profile") ||
     location.pathname.startsWith("/settings") ||
     location.pathname.startsWith("/notifications") ||
-    location.pathname.startsWith("/request-service");
+    location.pathname.startsWith("/request-service") ||
+    location.pathname.startsWith("/my-requests") ||
+    location.pathname.startsWith("/bookings") ||
+    location.pathname.startsWith("/messages") ||
+    location.pathname.startsWith("/reviews");
 
   return (
     <div className="top-nav-layout">

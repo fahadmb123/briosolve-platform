@@ -15,28 +15,28 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   const getStatusBadge = (status: CustomerServiceRequestItem["status"]) => {
     switch (status) {
       case "PENDING":
-        return { label: "Pending", className: "status-pending", icon: "fa-clock" };
+        return { label: "Pending Quotes", variant: "pending" };
       case "ACTIVE":
-        return { label: "Active", className: "status-active", icon: "fa-bolt" };
+        return { label: "Active", variant: "active" };
       case "ACCEPTED":
-        return { label: "Accepted", className: "status-accepted", icon: "fa-check" };
+        return { label: "Accepted", variant: "accepted" };
       case "IN_PROGRESS":
-        return { label: "In Progress", className: "status-in-progress", icon: "fa-spinner fa-spin" };
+        return { label: "In Progress", variant: "in-progress" };
       case "COMPLETED":
-        return { label: "Completed", className: "status-completed", icon: "fa-check-circle" };
+        return { label: "Completed", variant: "completed" };
       case "CANCELLED":
-        return { label: "Cancelled", className: "status-cancelled", icon: "fa-times-circle" };
+        return { label: "Cancelled", variant: "cancelled" };
       case "EXPIRED":
-        return { label: "Expired", className: "status-expired", icon: "fa-calendar-times" };
+        return { label: "Expired", variant: "expired" };
       default:
-        return { label: status, className: "status-default", icon: "fa-info-circle" };
+        return { label: status, variant: "default" };
     }
   };
 
   const getUrgencyText = () => {
     if (request.specific_date) {
       const dateStr = new Date(request.specific_date).toISOString().split("T")[0];
-      return `Needed by ${dateStr}`;
+      return `By ${dateStr}`;
     }
     switch (request.urgency) {
       case "TODAY":
@@ -64,115 +64,109 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   });
 
   return (
-    <div className="myreq-card">
-      <div className="myreq-card-top">
-        <div className="myreq-card-tags">
-          {request.category_name && (
-            <span className="myreq-category-tag">
-              <i className="fas fa-layer-group"></i>
-              <span>{request.category_name}</span>
-            </span>
-          )}
+    <div className="myreq-clean-card">
+      <div className="myreq-card-top-row">
+        <div className="myreq-card-category-crumbs">
+          <i className="fas fa-layer-group myreq-crumb-icon"></i>
+          <span className="myreq-category-name">{request.category_name || "Service"}</span>
           {request.subservice_name && (
-            <span className="myreq-subservice-tag">
-              <i className="fas fa-wrench"></i>
-              <span>{request.subservice_name}</span>
-            </span>
+            <>
+              <span className="myreq-crumb-separator">/</span>
+              <span className="myreq-subservice-name">{request.subservice_name}</span>
+            </>
           )}
         </div>
 
-        <div className={`myreq-status-badge ${statusInfo.className}`}>
-          <i className={`fas ${statusInfo.icon}`}></i>
+        <div className={`myreq-status-pill ${statusInfo.variant}`}>
+          <span className="myreq-status-dot"></span>
           <span>{statusInfo.label}</span>
         </div>
       </div>
 
-      <div className="myreq-card-body">
-        <h3 className="myreq-card-title">{request.title}</h3>
-        <p className="myreq-card-desc">{request.description}</p>
+      <div className="myreq-card-content">
+        <h3 className="myreq-card-headline" onClick={() => onViewDetails(request)}>
+          {request.title}
+        </h3>
+        <p className="myreq-card-description">{request.description}</p>
 
-        <div className="myreq-card-meta-grid">
-          <div className="myreq-meta-item">
-            <i className="fas fa-calendar-alt text-primary"></i>
+        <div className="myreq-meta-row">
+          <div className="myreq-meta-chip" title="Schedule">
+            <i className="far fa-calendar-alt"></i>
             <span>{getUrgencyText()}</span>
           </div>
 
-          <div className="myreq-meta-item">
-            <i className="fas fa-clock text-info"></i>
+          <div className="myreq-meta-chip" title="Time window">
+            <i className="far fa-clock"></i>
             <span>
               {request.available_time_from.slice(0, 5)} - {request.available_time_to.slice(0, 5)}
             </span>
           </div>
 
-          <div className="myreq-meta-item">
-            <i className="fas fa-map-marker-alt text-danger"></i>
-            <span className="truncate">{addressText}</span>
+          <div className="myreq-meta-chip" title="Location">
+            <i className="fas fa-map-marker-alt"></i>
+            <span className="myreq-meta-text-truncate">{addressText}</span>
           </div>
 
-          <div className="myreq-meta-item">
-            <i className="fas fa-wallet text-success"></i>
+          <div className="myreq-meta-chip budget" title="Budget">
+            <i className="fas fa-wallet"></i>
             <span>
               {request.budget_type === "FIXED" && request.budget_amount
-                ? `Fixed: ₹${request.budget_amount}`
-                : "Open for Bids"}
+                ? `₹${request.budget_amount}`
+                : "Open Bids"}
             </span>
           </div>
         </div>
 
         {request.images && request.images.length > 0 && (
-          <div className="myreq-card-photos">
+          <div className="myreq-photos-strip">
             {request.images.slice(0, 3).map((img, idx) => (
               <img
                 key={img.id || idx}
                 src={img.image_key}
-                alt="Request attachment"
-                className="myreq-photo-thumb"
+                alt="Attachment thumbnail"
+                className="myreq-photo-item"
+                onClick={() => onViewDetails(request)}
               />
             ))}
             {request.images.length > 3 && (
-              <span className="myreq-photo-more">+{request.images.length - 3}</span>
+              <span className="myreq-photos-overflow">+{request.images.length - 3}</span>
             )}
           </div>
         )}
       </div>
 
-      <div className="myreq-card-footer">
-        <div className="myreq-footer-left">
-          <span className="myreq-created-date">
-            <i className="far fa-clock"></i>
-            <span>Posted {formattedDate}</span>
-          </span>
+      <div className="myreq-card-bottom-row">
+        <div className="myreq-meta-footer">
+          <span className="myreq-post-date">Posted {formattedDate}</span>
           {typeof request.matched_providers_count === "number" && (
-            <span className="myreq-providers-count-pill">
-              <i className="fas fa-user-check"></i>
-              <span>{request.matched_providers_count} matched</span>
+            <span className="myreq-notified-badge">
+              <i className="fas fa-users"></i>
+              <span>{request.matched_providers_count} notified</span>
             </span>
           )}
         </div>
 
-        <div className="myreq-footer-actions">
+        <div className="myreq-card-actions">
           {canCancel && (
             <button
               type="button"
-              className="myreq-btn-cancel"
+              className="myreq-btn-link-danger"
               onClick={() => onCancelRequest(request)}
             >
-              <i className="fas fa-ban"></i>
-              <span>Cancel</span>
+              Cancel
             </button>
           )}
 
           <button
             type="button"
-            className="myreq-btn-view"
+            className="myreq-btn-details"
             onClick={() => onViewDetails(request)}
           >
             <span>View Details</span>
-            <i className="fas fa-arrow-right"></i>
+            <i className="fas fa-chevron-right"></i>
           </button>
         </div>
       </div>
     </div>
   );
 };
-

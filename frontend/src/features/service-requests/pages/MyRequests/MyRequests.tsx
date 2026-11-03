@@ -13,13 +13,15 @@ import {
   RequestCard,
   RequestDetailsModal,
   CancelConfirmModal,
-  type StatusFilterType
+  type StatusFilterType,
+  type SortOrderType
 } from "./components";
 
 export default function MyRequests() {
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<StatusFilterType>("ALL");
+  const [sortBy, setSortBy] = useState<SortOrderType>("NEWEST");
   const [selectedRequestForDetails, setSelectedRequestForDetails] =
     useState<CustomerServiceRequestItem | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
@@ -59,9 +61,9 @@ export default function MyRequests() {
       EXPIRED: 0
     };
 
-    requests.forEach((req) => {
-      if (req.status in map) {
-        map[req.status] = (map[req.status] || 0) + 1;
+    requests.forEach((r) => {
+      if (r.status in map) {
+        map[r.status as StatusFilterType] += 1;
       }
     });
 
@@ -69,35 +71,37 @@ export default function MyRequests() {
   }, [requests]);
 
   const filteredRequests = useMemo(() => {
-    return requests.filter((req) => {
+    let result = requests.filter((req) => {
       if (selectedStatus !== "ALL" && req.status !== selectedStatus) {
         return false;
       }
 
       if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchesTitle = req.title.toLowerCase().includes(query);
-        const matchesDesc = req.description.toLowerCase().includes(query);
-        const matchesCategory = req.category_name?.toLowerCase().includes(query) ?? false;
-        const matchesSubservice = req.subservice_name?.toLowerCase().includes(query) ?? false;
-        const matchesCity = req.address_details?.city.toLowerCase().includes(query) ?? false;
-        const matchesArea = req.address_details?.area.toLowerCase().includes(query) ?? false;
+        const query = searchQuery.toLowerCase().trim();
+        const titleMatch = req.title.toLowerCase().includes(query);
+        const descMatch = req.description.toLowerCase().includes(query);
+        const categoryMatch = (req.category_name || "").toLowerCase().includes(query);
+        const subserviceMatch = (req.subservice_name || "").toLowerCase().includes(query);
+        const locationMatch = req.address_details
+          ? `${req.address_details.area} ${req.address_details.city} ${req.address_details.landmark || ""}`
+              .toLowerCase()
+              .includes(query)
+          : false;
 
-        if (
-          !matchesTitle &&
-          !matchesDesc &&
-          !matchesCategory &&
-          !matchesSubservice &&
-          !matchesCity &&
-          !matchesArea
-        ) {
-          return false;
-        }
+        return titleMatch || descMatch || categoryMatch || subserviceMatch || locationMatch;
       }
 
       return true;
     });
-  }, [requests, selectedStatus, searchQuery]);
+
+    result.sort((a, b) => {
+      const timeA = new Date(a.created_at).getTime();
+      const timeB = new Date(b.created_at).getTime();
+      return sortBy === "NEWEST" ? timeB - timeA : timeA - timeB;
+    });
+
+    return result;
+  }, [requests, selectedStatus, searchQuery, sortBy]);
 
   const handleOpenDetails = (request: CustomerServiceRequestItem) => {
     setSelectedRequestForDetails(request);
@@ -105,8 +109,8 @@ export default function MyRequests() {
   };
 
   const handleCloseDetails = () => {
-    setSelectedRequestForDetails(null);
     setIsDetailsModalOpen(false);
+    setSelectedRequestForDetails(null);
   };
 
   const handleOpenCancel = (request: CustomerServiceRequestItem) => {
@@ -115,8 +119,8 @@ export default function MyRequests() {
   };
 
   const handleCloseCancel = () => {
-    setSelectedRequestForCancel(null);
     setIsCancelModalOpen(false);
+    setSelectedRequestForCancel(null);
   };
 
   const handleConfirmCancel = () => {
@@ -148,26 +152,20 @@ export default function MyRequests() {
   const isLoading = getRequestsMutation.isPending && requests.length === 0;
 
   return (
-    <div className="app-content myreq-container">
-      <div className="myreq-header">
-        <div className="myreq-title-row">
-          <div className="myreq-title-group">
-            <div className="myreq-badge-pill">
-              <span className="myreq-badge-dot"></span>
-              <span>Customer Workspace</span>
-            </div>
-            <h1>My Service Requests</h1>
-            <p>
-              Track, inspect, and manage all your posted service requirements and provider responses.
-            </p>
-          </div>
+    <div className="app-content myreq-wrapper">
+      <div className="myreq-top-header">
+        <div className="myreq-header-info">
+          <h1 className="myreq-page-title">My Service Requests</h1>
+          <p className="myreq-page-subtitle">
+            Manage your posted requirements, evaluate responses, and keep track of job progress.
+          </p>
+        </div>
 
-          <div className="myreq-header-actions">
-            <Link to="/request-service" className="myreq-btn-new-request">
-              <i className="fas fa-plus-circle"></i>
-              <span>Post New Request</span>
-            </Link>
-          </div>
+        <div className="myreq-header-actions">
+          <Link to="/request-service" className="myreq-btn-post">
+            <i className="fas fa-plus"></i>
+            <span>Post a Request</span>
+          </Link>
         </div>
       </div>
 
@@ -178,53 +176,53 @@ export default function MyRequests() {
         onSearchChange={setSearchQuery}
         selectedStatus={selectedStatus}
         onSelectStatus={setSelectedStatus}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
         counts={counts}
       />
 
       {isLoading ? (
-        <div className="myreq-list-grid">
-          {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="myreq-skeleton-card"></div>
-          ))}
+        <div className="myreq-loading-box">
+          <i className="fas fa-circle-notch fa-spin"></i>
+          <span>Loading your service requests...</span>
         </div>
       ) : filteredRequests.length === 0 ? (
-        <div className="myreq-empty-card">
-          <div className="myreq-empty-icon">
+        <div className="myreq-empty-panel">
+          <div className="myreq-empty-symbol">
             <i className="fas fa-clipboard-list"></i>
           </div>
           {requests.length === 0 ? (
             <>
-              <h3>No Service Requests Yet</h3>
-              <p>
-                You haven't posted any service requirements yet. Post a request to get matched with verified specialists in your local area.
+              <h3 className="myreq-empty-title">No service requests yet</h3>
+              <p className="myreq-empty-text">
+                Post your first service requirement to start receiving quotes from verified specialists in your neighborhood.
               </p>
-              <Link to="/request-service" className="myreq-btn-new-request">
+              <Link to="/request-service" className="myreq-btn-post">
                 <i className="fas fa-plus"></i>
                 <span>Post Your First Request</span>
               </Link>
             </>
           ) : (
             <>
-              <h3>No Matching Requests</h3>
-              <p>
-                No requests found matching your current filter criteria or search keyword.
+              <h3 className="myreq-empty-title">No matching requests</h3>
+              <p className="myreq-empty-text">
+                We couldn't find any requests matching your selected filters or search terms.
               </p>
               <button
                 type="button"
-                className="myreq-btn-secondary"
+                className="myreq-btn-subtle"
                 onClick={() => {
                   setSelectedStatus("ALL");
                   setSearchQuery("");
                 }}
               >
-                <i className="fas fa-undo mr-1"></i>
-                <span>Reset Filters</span>
+                Reset filters
               </button>
             </>
           )}
         </div>
       ) : (
-        <div className="myreq-list-grid">
+        <div className="myreq-cards-grid">
           {filteredRequests.map((request) => (
             <RequestCard
               key={request.id}

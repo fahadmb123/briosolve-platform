@@ -20,15 +20,33 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/nearby-providers",
     icon: "fas fa-search-location",
   },
+];
+
+const MORE_SUBNAV_ITEMS: SubnavItem[] = [
+  {
+    label: "My Requests",
+    to: "/my-requests",
+    icon: "fas fa-clipboard-list",
+  },
   {
     label: "Request Service",
     to: "/request-service",
     icon: "fas fa-plus-circle",
   },
   {
-    label: "My Requests",
-    to: "/my-requests",
-    icon: "fas fa-clipboard-list",
+    label: "Bookings",
+    to: "/dashboard#bookings",
+    icon: "fas fa-calendar-check",
+  },
+  {
+    label: "Messages",
+    to: "/dashboard#messages",
+    icon: "fas fa-comments",
+  },
+  {
+    label: "Reviews",
+    to: "/dashboard#reviews",
+    icon: "fas fa-star",
   },
 ];
 
@@ -56,28 +74,41 @@ export const CustomerSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/profile") ||
     location.pathname.startsWith("/notifications");
 
-  const isWorkspaceSection =
-    location.pathname === "/dashboard" ||
-    location.pathname.startsWith("/dashboard") ||
-    location.pathname.startsWith("/nearby-providers") ||
+  const isMoreSection =
+    location.pathname.startsWith("/my-requests") ||
     location.pathname.startsWith("/request-service") ||
-    location.pathname.startsWith("/my-requests");
+    location.pathname.startsWith("/bookings") ||
+    location.pathname.startsWith("/messages") ||
+    location.pathname.startsWith("/reviews");
+
+  const isWorkspaceSection =
+    !isSettingsSection &&
+    !isMoreSection &&
+    (location.pathname === "/dashboard" ||
+      location.pathname.startsWith("/dashboard") ||
+      location.pathname.startsWith("/nearby-providers"));
 
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS
-    : isWorkspaceSection
-      ? WORKSPACE_SUBNAV_ITEMS
-      : null;
+    : isMoreSection
+      ? MORE_SUBNAV_ITEMS
+      : isWorkspaceSection
+        ? WORKSPACE_SUBNAV_ITEMS
+        : null;
 
   const activeSubnavTitle = isSettingsSection
     ? "Settings"
-    : isWorkspaceSection
-      ? "Workspace"
-      : "";
+    : isMoreSection
+      ? "More"
+      : isWorkspaceSection
+        ? "Workspace"
+        : "";
 
   const activeSubnavIcon = isSettingsSection
     ? "fas fa-sliders-h"
-    : "fas fa-th-large";
+    : isMoreSection
+      ? "fas fa-layer-group"
+      : "fas fa-th-large";
 
   const isAccountSettingsActive =
     location.pathname === "/settings" ||
@@ -99,9 +130,9 @@ export const CustomerSubnavSidebar: React.FC = () => {
           const [toPath, toHash] = item.to.split("#");
           const isActive = toHash
             ? location.pathname === toPath && location.hash === `#${toHash}`
-            : toPath.endsWith("/dashboard")
+            : toPath === "/dashboard"
               ? location.pathname === toPath && (!location.hash || location.hash === "")
-              : location.pathname === toPath;
+              : location.pathname === toPath || location.pathname.startsWith(`${toPath}/`);
 
           return (
             <Link

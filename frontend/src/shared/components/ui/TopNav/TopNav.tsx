@@ -199,7 +199,7 @@ export const TopNav: React.FC = () => {
                 <button
                   type="button"
                   className={`topnav-link topnav-dropdown-trigger ${
-                    openDropdown === "more" ? "active" : ""
+                    openDropdown === "more" || location.pathname.startsWith("/my-requests") || location.pathname.startsWith("/request-service") ? "active" : ""
                   }`}
                   onClick={() => toggleDropdown("more")}
                   aria-expanded={openDropdown === "more"}

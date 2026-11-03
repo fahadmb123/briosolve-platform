@@ -16,47 +16,44 @@ export const RequestStatsCards: React.FC<RequestStatsCardsProps> = ({ requests }
   const completedCount = requests.filter((r) => r.status === "COMPLETED").length;
 
   return (
-    <div className="myreq-stats-grid">
-      <div className="myreq-stat-card">
-        <div className="myreq-stat-icon-wrapper total">
-          <i className="fas fa-clipboard-list"></i>
+    <div className="myreq-stats-bar">
+      <div className="myreq-stat-cell">
+        <div className="myreq-stat-cell-header">
+          <span className="myreq-stat-dot total"></span>
+          <span className="myreq-stat-name">Total Postings</span>
         </div>
-        <div className="myreq-stat-info">
-          <span className="myreq-stat-label">Total Requests</span>
-          <span className="myreq-stat-value">{totalCount}</span>
-        </div>
+        <span className="myreq-stat-number">{totalCount}</span>
       </div>
 
-      <div className="myreq-stat-card">
-        <div className="myreq-stat-icon-wrapper pending">
-          <i className="fas fa-hourglass-half"></i>
+      <div className="myreq-stat-divider" />
+
+      <div className="myreq-stat-cell">
+        <div className="myreq-stat-cell-header">
+          <span className="myreq-stat-dot pending"></span>
+          <span className="myreq-stat-name">Awaiting Quotes</span>
         </div>
-        <div className="myreq-stat-info">
-          <span className="myreq-stat-label">Pending / Matching</span>
-          <span className="myreq-stat-value">{pendingCount}</span>
-        </div>
+        <span className="myreq-stat-number">{pendingCount}</span>
       </div>
 
-      <div className="myreq-stat-card">
-        <div className="myreq-stat-icon-wrapper in-progress">
-          <i className="fas fa-tools"></i>
+      <div className="myreq-stat-divider" />
+
+      <div className="myreq-stat-cell">
+        <div className="myreq-stat-cell-header">
+          <span className="myreq-stat-dot in-progress"></span>
+          <span className="myreq-stat-name">In Progress</span>
         </div>
-        <div className="myreq-stat-info">
-          <span className="myreq-stat-label">In Progress</span>
-          <span className="myreq-stat-value">{inProgressCount}</span>
-        </div>
+        <span className="myreq-stat-number">{inProgressCount}</span>
       </div>
 
-      <div className="myreq-stat-card">
-        <div className="myreq-stat-icon-wrapper completed">
-          <i className="fas fa-check-circle"></i>
+      <div className="myreq-stat-divider" />
+
+      <div className="myreq-stat-cell">
+        <div className="myreq-stat-cell-header">
+          <span className="myreq-stat-dot completed"></span>
+          <span className="myreq-stat-name">Completed</span>
         </div>
-        <div className="myreq-stat-info">
-          <span className="myreq-stat-label">Completed</span>
-          <span className="myreq-stat-value">{completedCount}</span>
-        </div>
+        <span className="myreq-stat-number">{completedCount}</span>
       </div>
     </div>
   );
 };
-

@@ -22,7 +22,7 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
 
   const formattedDate = new Date(request.created_at).toLocaleDateString(undefined, {
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
@@ -41,46 +41,69 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
       case "FLEXIBLE":
         return "Flexible Schedule";
       default:
-        return "Standard";
+        return "Standard Schedule";
+    }
+  };
+
+  const getStatusVariant = (status: CustomerServiceRequestItem["status"]) => {
+    switch (status) {
+      case "PENDING":
+        return "pending";
+      case "ACTIVE":
+        return "active";
+      case "ACCEPTED":
+        return "accepted";
+      case "IN_PROGRESS":
+        return "in-progress";
+      case "COMPLETED":
+        return "completed";
+      case "CANCELLED":
+        return "cancelled";
+      case "EXPIRED":
+        return "expired";
+      default:
+        return "default";
     }
   };
 
   return (
     <div className="myreq-modal-overlay" onClick={onClose}>
       <div
-        className="myreq-modal-container"
+        className="myreq-modal-dialog"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >
         <div className="myreq-modal-header">
-          <div className="myreq-modal-header-title-group">
-            <div className="myreq-modal-badges">
-              {request.category_name && (
-                <span className="myreq-category-tag">
-                  <i className="fas fa-layer-group"></i>
-                  <span>{request.category_name}</span>
-                </span>
-              )}
-              {request.subservice_name && (
-                <span className="myreq-subservice-tag">
-                  <i className="fas fa-wrench"></i>
-                  <span>{request.subservice_name}</span>
-                </span>
-              )}
-              <span className={`myreq-status-badge status-${request.status.toLowerCase().replace('_', '-')}`}>
-                {request.status}
+          <div className="myreq-modal-header-titles">
+            <div className="myreq-modal-header-tag-row">
+              <span className="myreq-modal-category">
+                <i className="fas fa-layer-group"></i>
+                <span>{request.category_name || "General"}</span>
+                {request.subservice_name && (
+                  <>
+                    <span className="separator">/</span>
+                    <span>{request.subservice_name}</span>
+                  </>
+                )}
+              </span>
+
+              <span className={`myreq-status-pill ${getStatusVariant(request.status)}`}>
+                <span className="myreq-status-dot"></span>
+                <span>{request.status.replace("_", " ")}</span>
               </span>
             </div>
-            <h2>{request.title}</h2>
-            <span className="myreq-modal-created-time">
-              <i className="far fa-clock"></i> Posted on {formattedDate}
-            </span>
+
+            <h2 className="myreq-modal-title">{request.title}</h2>
+            <div className="myreq-modal-date-row">
+              <i className="far fa-clock"></i>
+              <span>Created on {formattedDate}</span>
+            </div>
           </div>
 
           <button
             type="button"
-            className="myreq-modal-close-btn"
+            className="myreq-modal-btn-close"
             onClick={onClose}
             aria-label="Close modal"
           >
@@ -88,103 +111,91 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
           </button>
         </div>
 
-        <div className="myreq-modal-body">
-          <div className="myreq-modal-section">
-            <h4 className="myreq-modal-section-title">
-              <i className="fas fa-align-left text-primary"></i>
-              <span>Requirement Description</span>
-            </h4>
-            <p className="myreq-modal-description-text">{request.description}</p>
+        <div className="myreq-modal-content-scroll">
+          <div className="myreq-modal-block">
+            <h4 className="myreq-block-heading">Description</h4>
+            <p className="myreq-description-body">{request.description}</p>
           </div>
 
-          <div className="myreq-modal-grid-2">
-            <div className="myreq-modal-section">
-              <h4 className="myreq-modal-section-title">
-                <i className="fas fa-calendar-check text-info"></i>
-                <span>Schedule & Urgency</span>
-              </h4>
-              <div className="myreq-modal-info-list">
-                <div className="myreq-modal-info-row">
-                  <span className="label">Timeline:</span>
-                  <span className="value font-medium">{getUrgencyText()}</span>
+          <div className="myreq-modal-two-col">
+            <div className="myreq-modal-block">
+              <h4 className="myreq-block-heading">Schedule & Timing</h4>
+              <div className="myreq-key-value-list">
+                <div className="myreq-kv-item">
+                  <span className="myreq-kv-key">Timeline</span>
+                  <span className="myreq-kv-val">{getUrgencyText()}</span>
                 </div>
-                <div className="myreq-modal-info-row">
-                  <span className="label">Preferred Window:</span>
-                  <span className="value font-medium">
+                <div className="myreq-kv-item">
+                  <span className="myreq-kv-key">Preferred Hours</span>
+                  <span className="myreq-kv-val">
                     {request.available_time_from.slice(0, 5)} - {request.available_time_to.slice(0, 5)}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="myreq-modal-section">
-              <h4 className="myreq-modal-section-title">
-                <i className="fas fa-wallet text-success"></i>
-                <span>Budget & Pricing</span>
-              </h4>
-              <div className="myreq-modal-info-list">
-                <div className="myreq-modal-info-row">
-                  <span className="label">Budget Type:</span>
-                  <span className="value font-medium">
-                    {request.budget_type === "FIXED" ? "Fixed Budget" : "Open for Quotes"}
+            <div className="myreq-modal-block">
+              <h4 className="myreq-block-heading">Budget Details</h4>
+              <div className="myreq-key-value-list">
+                <div className="myreq-kv-item">
+                  <span className="myreq-kv-key">Pricing Model</span>
+                  <span className="myreq-kv-val">
+                    {request.budget_type === "FIXED" ? "Fixed Price" : "Open for Quotes"}
                   </span>
                 </div>
                 {request.budget_type === "FIXED" && request.budget_amount && (
-                  <div className="myreq-modal-info-row">
-                    <span className="label">Estimated Amount:</span>
-                    <span className="value font-bold text-success">₹{request.budget_amount}</span>
+                  <div className="myreq-kv-item">
+                    <span className="myreq-kv-key">Target Amount</span>
+                    <span className="myreq-kv-val bold">₹{request.budget_amount}</span>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="myreq-modal-section">
-            <h4 className="myreq-modal-section-title">
-              <i className="fas fa-map-marked-alt text-danger"></i>
-              <span>Service Location</span>
-            </h4>
+          <div className="myreq-modal-block">
+            <h4 className="myreq-block-heading">Service Location</h4>
             {request.address_details ? (
-              <div className="myreq-modal-address-box">
-                <p className="address-line">
-                  {request.address_details.house_no ? `${request.address_details.house_no}, ` : ""}
-                  {request.address_details.area}
-                </p>
-                <p className="address-line">
-                  {request.address_details.city}
-                  {request.address_details.district ? `, ${request.address_details.district}` : ""},{" "}
-                  {request.address_details.state} - {request.address_details.pincode}
-                </p>
-                {request.address_details.landmark && (
-                  <p className="address-landmark">
-                    <i className="fas fa-map-pin text-xs mr-1"></i> Landmark: {request.address_details.landmark}
+              <div className="myreq-location-box">
+                <i className="fas fa-map-pin myreq-location-pin"></i>
+                <div className="myreq-location-details">
+                  <p className="myreq-address-primary">
+                    {request.address_details.house_no ? `${request.address_details.house_no}, ` : ""}
+                    {request.address_details.area}
                   </p>
-                )}
+                  <p className="myreq-address-secondary">
+                    {request.address_details.city}
+                    {request.address_details.district ? `, ${request.address_details.district}` : ""},{" "}
+                    {request.address_details.state} - {request.address_details.pincode}
+                  </p>
+                  {request.address_details.landmark && (
+                    <span className="myreq-address-landmark">
+                      Landmark: {request.address_details.landmark}
+                    </span>
+                  )}
+                </div>
               </div>
             ) : (
-              <p className="text-secondary text-sm">Primary address on file</p>
+              <p className="myreq-text-secondary">Default address on file</p>
             )}
           </div>
 
           {request.images && request.images.length > 0 && (
-            <div className="myreq-modal-section">
-              <h4 className="myreq-modal-section-title">
-                <i className="fas fa-camera text-warning"></i>
-                <span>Attached Photos ({request.images.length})</span>
-              </h4>
-              <div className="myreq-modal-gallery">
+            <div className="myreq-modal-block">
+              <h4 className="myreq-block-heading">Attachments ({request.images.length})</h4>
+              <div className="myreq-modal-thumbnails-grid">
                 {request.images.map((img, idx) => (
                   <div
                     key={img.id || idx}
-                    className="myreq-gallery-thumb-wrapper"
+                    className="myreq-modal-thumb-item"
                     onClick={() => setSelectedPhoto(img.image_key)}
                   >
                     <img
                       src={img.image_key}
-                      alt={`Attachment ${idx + 1}`}
-                      className="myreq-gallery-thumb"
+                      alt={`Requirement visual ${idx + 1}`}
+                      className="myreq-modal-thumb-img"
                     />
-                    <div className="myreq-gallery-zoom-overlay">
+                    <div className="myreq-modal-thumb-zoom">
                       <i className="fas fa-search-plus"></i>
                     </div>
                   </div>
@@ -194,10 +205,10 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
           )}
 
           {typeof request.matched_providers_count === "number" && (
-            <div className="myreq-modal-section myreq-providers-notice">
-              <i className="fas fa-bell text-primary"></i>
+            <div className="myreq-callout-notice">
+              <i className="fas fa-info-circle"></i>
               <div>
-                <strong>{request.matched_providers_count} verified providers</strong> in your area were notified about this requirement. You will receive notifications as soon as quotes are submitted.
+                <strong>{request.matched_providers_count} nearby verified providers</strong> were dispatched this requirement. Review incoming responses in your notifications or bookings when available.
               </div>
             </div>
           )}
@@ -207,19 +218,19 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
           {canCancel && (
             <button
               type="button"
-              className="myreq-btn-danger"
+              className="myreq-btn-danger-outline"
               onClick={() => {
                 onClose();
                 onCancelRequest(request);
               }}
             >
               <i className="fas fa-ban"></i>
-              <span>Cancel This Request</span>
+              <span>Cancel Request</span>
             </button>
           )}
 
-          <button type="button" className="myreq-btn-secondary" onClick={onClose}>
-            <span>Close</span>
+          <button type="button" className="myreq-btn-subtle" onClick={onClose}>
+            Close
           </button>
         </div>
       </div>
@@ -241,4 +252,3 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
     </div>
   );
 };
-

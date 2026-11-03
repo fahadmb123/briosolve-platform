@@ -21,34 +21,34 @@ export const CancelConfirmModal: React.FC<CancelConfirmModalProps> = ({
   return (
     <div className="myreq-modal-overlay" onClick={onClose}>
       <div
-        className="myreq-cancel-modal-container"
+        className="myreq-confirm-dialog"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >
-        <div className="myreq-cancel-icon-badge">
+        <div className="myreq-confirm-icon-box">
           <i className="fas fa-exclamation-triangle"></i>
         </div>
 
-        <h3 className="myreq-cancel-title">Cancel Service Request?</h3>
+        <h3 className="myreq-confirm-headline">Cancel Service Request?</h3>
 
-        <p className="myreq-cancel-message">
-          Are you sure you want to cancel <strong>"{request.title}"</strong>? Once cancelled, matched providers will no longer submit quotes for this job.
+        <p className="myreq-confirm-explanation">
+          Are you sure you want to cancel <strong>"{request.title}"</strong>? Once cancelled, active providers won't be able to submit quotes for this job.
         </p>
 
-        <div className="myreq-cancel-actions">
+        <div className="myreq-confirm-action-row">
           <button
             type="button"
-            className="myreq-btn-cancel-keep"
+            className="myreq-btn-subtle"
             onClick={onClose}
             disabled={isCancelling}
           >
-            No, Keep Request
+            Keep Request
           </button>
 
           <button
             type="button"
-            className="myreq-btn-cancel-confirm"
+            className="myreq-btn-confirm-cancel"
             onClick={onConfirm}
             disabled={isCancelling}
           >
@@ -58,10 +58,7 @@ export const CancelConfirmModal: React.FC<CancelConfirmModalProps> = ({
                 <span>Cancelling...</span>
               </>
             ) : (
-              <>
-                <i className="fas fa-trash-alt"></i>
-                <span>Yes, Cancel</span>
-              </>
+              "Yes, Cancel Request"
             )}
           </button>
         </div>
@@ -69,4 +66,3 @@ export const CancelConfirmModal: React.FC<CancelConfirmModalProps> = ({
     </div>
   );
 };
-
