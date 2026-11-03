@@ -17,6 +17,11 @@ export const getMyServiceRequests = async (): Promise<response<CustomerServiceRe
   return res.data;
 };
 
+export const getProviderServiceRequests = async (): Promise<response<CustomerServiceRequestItem[]>> => {
+  const res = await apiClient.get("/api/service-request/provider");
+  return res.data;
+};
+
 export const updateServiceRequest = async (id: string, data: UpdateServiceRequestPayload): Promise<response<CustomerServiceRequestItem>> => {
   const res = await apiClient.put(`/api/service-request/${id}`, data);
   return res.data;

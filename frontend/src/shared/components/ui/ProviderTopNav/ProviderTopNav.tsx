@@ -21,7 +21,9 @@ export const ProviderTopNav: React.FC = () => {
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
-    location.pathname.startsWith("/provider/dashboard");
+    location.pathname.startsWith("/provider/dashboard") ||
+    location.pathname.startsWith("/provider/service-requests") ||
+    location.pathname.startsWith("/provider/requests");
 
 
   const user = useAuthStore((state) => state.user);
@@ -191,7 +193,7 @@ export const ProviderTopNav: React.FC = () => {
                       </div>
                     </NavLink>
                     <Link
-                      to="#"
+                      to="/provider/service-requests"
                       className="prov-panel-item"
                       onClick={closeAll}
                     >

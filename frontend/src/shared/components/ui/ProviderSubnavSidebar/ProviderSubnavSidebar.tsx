@@ -17,7 +17,7 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
   },
   {
     label: "Service Requests",
-    to: "/provider/dashboard#requests",
+    to: "/provider/service-requests",
     icon: "fas fa-search-dollar",
   },
   {
@@ -65,7 +65,9 @@ export const ProviderSubnavSidebar: React.FC = () => {
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
-    location.pathname.startsWith("/provider/dashboard");
+    location.pathname.startsWith("/provider/dashboard") ||
+    location.pathname.startsWith("/provider/service-requests") ||
+    location.pathname.startsWith("/provider/requests");
 
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS

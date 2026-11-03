@@ -7,6 +7,7 @@ import { ServiceRequestDetailsDto } from "../../application/dtos/response/servic
 export interface IServiceRequestRepository extends BaseRepository<ServiceRequest | null> {
     create(data: CreateServiceRequestRepoDto): Promise<ServiceRequest | null>;
     findByCustomerId(customerId: string): Promise<ServiceRequestDetailsDto[]>;
+    findByProviderId(providerProfileId: string): Promise<ServiceRequestDetailsDto[]>;
     findDetailsById(id: string, customerId: string): Promise<ServiceRequestDetailsDto | null>;
     update(id: string, customerId: string, data: UpdateServiceRequestRepoDto): Promise<ServiceRequest | null>;
     cancel(id: string, customerId: string): Promise<ServiceRequest | null>;

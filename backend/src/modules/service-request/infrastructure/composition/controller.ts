@@ -7,7 +7,8 @@ import {
     createServiceRequestUseCase,
     getCustomerServiceRequestsUseCase,
     createCancelServiceRequestUseCase,
-    updateServiceRequestUseCase
+    updateServiceRequestUseCase,
+    getProviderServiceRequestsUseCase
 } from "./useCases";
 
 export function createServiceRequestController(
@@ -21,6 +22,7 @@ export function createServiceRequestController(
         serviceRequestUseCase,
         getCustomerServiceRequestsUseCase,
         cancelServiceRequestUseCase,
-        updateServiceRequestUseCase
+        updateServiceRequestUseCase,
+        getProviderServiceRequestsUseCase
     );
 }

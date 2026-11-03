@@ -47,6 +47,42 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         return records.map((record) => ServiceRequestMapper.toDetailsDto(record));
     }
 
+    async findByProviderId(providerProfileId: string): Promise<ServiceRequestDetailsDto[]> {
+        const matches = await db.orm.public.service_request_providers
+            .where({ provider_id: providerProfileId as never })
+            .all();
+
+        if (matches.length === 0) return [];
+
+        const requestIds = matches.map((m) => m.service_request_id);
+
+        const records = await Promise.all(
+            requestIds.map(async (requestId) => {
+                return await db.orm.public.service_requests
+                    .where({ id: requestId as never })
+                    .include("images")
+                    .include("category")
+                    .include("subservice")
+                    .include("address")
+                    .include("providers")
+                    .first();
+            })
+        );
+
+        const validRecords = records
+            .filter((r): r is NonNullable<typeof r> => r !== null)
+            .sort((a, b) => {
+                const aTime = (a.created_at as unknown as { epochMilliseconds?: bigint | number })?.epochMilliseconds;
+                const bTime = (b.created_at as unknown as { epochMilliseconds?: bigint | number })?.epochMilliseconds;
+                if (aTime && bTime) {
+                    return Number(bTime) - Number(aTime);
+                }
+                return new Date(b.created_at as unknown as string | Date).getTime() - new Date(a.created_at as unknown as string | Date).getTime();
+            });
+
+        return validRecords.map((record) => ServiceRequestMapper.toDetailsDto(record));
+    }
+
     async update(id: string, customerId: string, data: UpdateServiceRequestRepoDto): Promise<ServiceRequest | null> {
         return await db.transaction(async (tx) => {
             const updatePayload: Record<string, unknown> = {

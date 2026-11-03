@@ -8,6 +8,7 @@ import {
     ServiceRequestDetailsDto
 } from "../../application/dtos/response/service-request.dto";
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
+import { GetProviderServiceRequestsInputDto } from "../../application/use-cases/getProviderServiceRequests.useCase";
 import { CancelServiceRequestInputDto } from "../../application/use-cases/cancelServiceRequest.useCase";
 import { ApplicationError } from "../../../../shared/application/errors/applicationError";
 
@@ -16,7 +17,8 @@ export class ServiceRequestController extends BaseController {
         private readonly _createServiceRequestUseCase: IUseCase<CreateServiceRequestInputDto, ServiceRequestResponseDto>,
         private readonly _getCustomerServiceRequestsUseCase: IUseCase<GetCustomerServiceRequestsInputDto, ServiceRequestDetailsDto[]>,
         private readonly _cancelServiceRequestUseCase: IUseCase<CancelServiceRequestInputDto, ServiceRequestResponseDto>,
-        private readonly _updateServiceRequestUseCase: IUseCase<UpdateServiceRequestDto, ServiceRequestDetailsDto>
+        private readonly _updateServiceRequestUseCase: IUseCase<UpdateServiceRequestDto, ServiceRequestDetailsDto>,
+        private readonly _getProviderServiceRequestsUseCase: IUseCase<GetProviderServiceRequestsInputDto, ServiceRequestDetailsDto[]>
     ) {
         super();
     }
@@ -48,6 +50,20 @@ export class ServiceRequestController extends BaseController {
 
             const requests = await this._getCustomerServiceRequestsUseCase.execute({ customerId });
             return this.sendSuccess(res, "Customer service requests retrieved successfully", requests, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    getProviderServiceRequests = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId;
+            if (!userId) {
+                throw new ApplicationError("UNAUTHORIZED", "Provider user ID is required", "AUTHENTICATION");
+            }
+
+            const requests = await this._getProviderServiceRequestsUseCase.execute({ userId });
+            return this.sendSuccess(res, "Provider service requests retrieved successfully", requests, 200);
         } catch (error) {
             next(error);
         }

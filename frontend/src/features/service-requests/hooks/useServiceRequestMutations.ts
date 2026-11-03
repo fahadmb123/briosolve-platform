@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createServiceRequest,
   getMyServiceRequests,
+  getProviderServiceRequests,
   updateServiceRequest,
   cancelServiceRequest
 } from "../services/serviceRequest.service";
@@ -20,6 +21,12 @@ export const useCreateServiceRequest = () => {
 export const useGetMyServiceRequests = () => {
   return useMutation({
     mutationFn: getMyServiceRequests
+  });
+};
+
+export const useGetProviderServiceRequests = () => {
+  return useMutation({
+    mutationFn: getProviderServiceRequests
   });
 };
 
