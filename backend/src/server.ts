@@ -43,7 +43,7 @@ const startServer = async (): Promise<void> => {
         const notificationRoutes = createNotificationRouter(notificationController)
         const userRoutes = createUserRoutes(notificationUseCase)
         const verificationRoutes = createVerificationRoutes(notificationUseCase)
-        const serviceRequestRoutes = createServiceRequestRoutes(bulkNotificationUseCase)
+        const serviceRequestRoutes = createServiceRequestRoutes(bulkNotificationUseCase, notificationUseCase)
         
         const rootRouter = createRootRouter({
             authRoutes,

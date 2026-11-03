@@ -1,5 +1,6 @@
 import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
 import { CreateBulkNotificationRequestDto } from "../../../notification/application/dtos/request/create-bulk-notifications.dto";
+import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { addressRepository, userRepository } from "../../../user-management/infrastructure/composition/repositories";
 import { CreateServiceRequestUseCase } from "../../application/use-cases/createServiceRequest.useCase";
@@ -23,11 +24,16 @@ export function createServiceRequestUseCase(
     );
 }
 
-export const getCustomerServiceRequestsUseCase = new GetCustomerServiceRequestsUseCase(
-    serviceRequestRepository
-);
+export function createCancelServiceRequestUseCase(
+    createNotificationUseCase: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): CancelServiceRequestUseCase {
+    return new CancelServiceRequestUseCase(
+        serviceRequestRepository,
+        createNotificationUseCase
+    );
+}
 
-export const cancelServiceRequestUseCase = new CancelServiceRequestUseCase(
+export const getCustomerServiceRequestsUseCase = new GetCustomerServiceRequestsUseCase(
     serviceRequestRepository
 );
 
