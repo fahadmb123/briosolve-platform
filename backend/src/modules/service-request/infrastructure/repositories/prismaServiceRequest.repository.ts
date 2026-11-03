@@ -85,42 +85,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
     async update(id: string, customerId: string, data: UpdateServiceRequestRepoDto): Promise<ServiceRequest | null> {
         return await db.transaction(async (tx) => {
-            const updatePayload: Record<string, unknown> = {
-                updated_at: Temporal.Now.instant()
-            };
-
-            if (data.title !== undefined) updatePayload.title = data.title;
-            if (data.description !== undefined) updatePayload.description = data.description;
-            if (data.categoryId !== undefined) updatePayload.category_id = data.categoryId;
-            if (data.subserviceId !== undefined) updatePayload.subservice_id = data.subserviceId;
-            if (data.urgency !== undefined) updatePayload.urgency = data.urgency;
-            if (data.selectedAddressId !== undefined) updatePayload.address_id = data.selectedAddressId;
-
-            if (data.specificDate !== undefined) {
-                if (data.specificDate) {
-                    const dateObj = new Date(data.specificDate);
-                    updatePayload.specific_date = Temporal.Instant.fromEpochMilliseconds(dateObj.getTime());
-                } else {
-                    updatePayload.specific_date = null;
-                }
-            }
-
-            if (data.availableTimeFrom !== undefined) {
-                const trimmed = data.availableTimeFrom.trim();
-                const normalized = trimmed.length === 5 ? `${trimmed}:00` : trimmed;
-                updatePayload.available_time_from = Temporal.PlainTime.from(normalized);
-            }
-
-            if (data.availableTimeTo !== undefined) {
-                const trimmed = data.availableTimeTo.trim();
-                const normalized = trimmed.length === 5 ? `${trimmed}:00` : trimmed;
-                updatePayload.available_time_to = Temporal.PlainTime.from(normalized);
-            }
-
-            if (data.budgetType !== undefined) updatePayload.budget_type = data.budgetType;
-            if (data.budgetAmount !== undefined) {
-                updatePayload.budget_amount = data.budgetAmount !== null ? Number(data.budgetAmount) : null;
-            }
+            const updatePayload = ServiceRequestMapper.toUpdatePersistence(data);
 
             await tx.orm.public.service_requests
                 .where({ id: id as never, customer_id: customerId as never })

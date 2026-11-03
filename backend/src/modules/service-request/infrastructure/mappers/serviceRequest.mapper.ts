@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { Temporal } from "@js-temporal/polyfill";
 import { ServiceRequest, ServiceRequestImage, ServiceRequestStatus } from "../../domain/entities/serviceRequest.entity";
 import { CreateServiceRequestRepoDto } from "../../application/dtos/request/create-service-request.dto";
+import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/update-service-request.dto";
 import {
     ServiceRequestResponseDto,
     ServiceRequestDetailsDto,
@@ -158,5 +159,43 @@ export class ServiceRequestMapper {
             display_order: displayOrder,
             created_at: Temporal.Now.instant()
         };
+    }
+
+    static toUpdatePersistence(data: UpdateServiceRequestRepoDto): Record<string, unknown> {
+        const updatePayload: Record<string, unknown> = {
+            updated_at: Temporal.Now.instant()
+        };
+
+        const fieldTransforms: Partial<Record<keyof UpdateServiceRequestRepoDto, (val: any) => [string, unknown]>> = {
+            title: (v) => ["title", v],
+            description: (v) => ["description", v],
+            categoryId: (v) => ["category_id", v],
+            subserviceId: (v) => ["subservice_id", v],
+            urgency: (v) => ["urgency", v],
+            selectedAddressId: (v) => ["address_id", v],
+            budgetType: (v) => ["budget_type", v],
+            budgetAmount: (v) => ["budget_amount", v !== null && v !== undefined ? Number(v) : null],
+            specificDate: (v) => ["specific_date", v ? Temporal.Instant.fromEpochMilliseconds(new Date(v).getTime()) : null],
+            availableTimeFrom: (v) => {
+                const trimmed = String(v).trim();
+                return ["available_time_from", Temporal.PlainTime.from(trimmed.length === 5 ? `${trimmed}:00` : trimmed)];
+            },
+            availableTimeTo: (v) => {
+                const trimmed = String(v).trim();
+                return ["available_time_to", Temporal.PlainTime.from(trimmed.length === 5 ? `${trimmed}:00` : trimmed)];
+            }
+        };
+
+        for (const [key, value] of Object.entries(data)) {
+            if (value !== undefined && key in fieldTransforms) {
+                const transform = fieldTransforms[key as keyof UpdateServiceRequestRepoDto];
+                if (transform) {
+                    const [targetField, targetValue] = transform(value);
+                    updatePayload[targetField] = targetValue;
+                }
+            }
+        }
+
+        return updatePayload;
     }
 }
