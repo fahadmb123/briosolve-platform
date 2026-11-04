@@ -1,4 +1,4 @@
-import { MessageType } from "../../../domain/entities/message.entity";
+import { MessageType } from "../../../../domain/entities/message.entity";
 
 export interface SendMessageRequestDto {
     conversationId: string;

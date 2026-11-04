@@ -2,8 +2,8 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { IConversationParticipantRepository } from "../../domain/repositories/IConversationParticipantRepository";
-import { StartConversationRequestDto } from "../dtos/request/start-conversation.dto";
-import { ConversationResponseDto } from "../dtos/response/conversation-response.dto";
+import { StartConversationRequestDto } from "../dtos/request/conversation/start-conversation.dto";
+import { ConversationResponseDto } from "../dtos/response/conversation/conversation-response.dto";
 import { ConversationMapper } from "../../infrastructure/mappers/conversation.mapper";
 
 export class StartConversationUseCase implements IUseCase<StartConversationRequestDto, ConversationResponseDto> {

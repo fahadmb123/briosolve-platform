@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { Message, MessageType } from "../../domain/entities/message.entity";
-import { MessageResponseDto } from "../../application/dtos/response/message-response.dto";
+import { MessageResponseDto } from "../../application/dtos/response/message/message-response.dto";
 
 export type MessageRecord = Prisma.MessageGetPayload<{}>;
 

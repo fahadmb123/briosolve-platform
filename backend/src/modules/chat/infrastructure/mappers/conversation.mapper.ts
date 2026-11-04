@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { Conversation, ConversationStatus } from "../../domain/entities/conversation.entity";
-import { ConversationResponseDto } from "../../application/dtos/response/conversation-response.dto";
+import { ConversationResponseDto } from "../../application/dtos/response/conversation/conversation-response.dto";
 
 export type ConversationRecord = Prisma.ConversationGetPayload<{}>;
 
