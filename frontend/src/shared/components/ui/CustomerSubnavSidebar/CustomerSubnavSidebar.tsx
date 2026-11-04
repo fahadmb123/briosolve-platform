@@ -50,7 +50,7 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
   },
   {
     label: "Messages",
-    to: "/dashboard#messages",
+    to: "/messages",
     icon: "fas fa-comments",
   },
   {

@@ -73,6 +73,10 @@ export default function Verification() {
   }, [fetchVerifications]);
 
 
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
+
   const handleApproveDocument = useCallback(
     (dossier: AdminKycDossier, doc: AdminKycDocument) => {
       setDocToApprove({ dossier, doc });
@@ -166,7 +170,7 @@ export default function Verification() {
           </div>
         ),
       },
-      
+
       {
         key: "experience",
         header: "Trade Experience",
@@ -200,13 +204,12 @@ export default function Verification() {
         header: "Audit State",
         render: (item) => (
           <span
-            className={`badge text-xs uppercase px-2.5 py-1 rounded font-semibold ${
-              item.kyc_status === "APPROVED"
+            className={`badge text-xs uppercase px-2.5 py-1 rounded font-semibold ${item.kyc_status === "APPROVED"
                 ? "bg-success/15 text-success border border-success/20"
                 : item.kyc_status === "REJECTED"
-                ? "bg-danger/15 text-danger border border-danger/20"
-                : "bg-warning/15 text-warning border border-warning/20"
-            }`}
+                  ? "bg-danger/15 text-danger border border-danger/20"
+                  : "bg-warning/15 text-warning border border-warning/20"
+              }`}
           >
             {item.kyc_status}
           </span>
