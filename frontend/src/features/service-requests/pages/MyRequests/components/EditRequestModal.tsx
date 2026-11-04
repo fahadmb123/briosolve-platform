@@ -536,18 +536,20 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                     <div className="myreq-edit-photo-overlay">
                       <i className="fas fa-search-plus"></i>
                     </div>
-                    <button
-                      type="button"
-                      className="myreq-edit-photo-remove"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveImage(idx);
-                      }}
-                      title="Remove image"
-                      aria-label="Remove image"
-                    >
-                      <i className="fas fa-times"></i>
-                    </button>
+                    {uploadedImages.length > 1 && (
+                      <button
+                        type="button"
+                        className="myreq-edit-photo-remove"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveImage(idx);
+                        }}
+                        title="Remove image"
+                        aria-label="Remove image"
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    )}
                   </div>
                 ))}
 

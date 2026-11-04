@@ -96,6 +96,16 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
             </button>
           </div>
 
+          {request.status === "CANCELLED" && (
+            <div className="provreq-cancelled-callout">
+              <i className="fas fa-ban"></i>
+              <div>
+                <strong>Request Cancelled by Customer</strong>
+                <p>This customer has cancelled this service request. Quotations are closed.</p>
+              </div>
+            </div>
+          )}
+
           <button
             type="button"
             className="provreq-modal-btn-close"
@@ -215,17 +225,24 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
             Close
           </button>
 
-          <button
-            type="button"
-            className="provreq-btn-quote"
-            onClick={() => {
-              onClose();
-              onQuote(request);
-            }}
-          >
-            <i className="fas fa-paper-plane mr-1.5"></i>
-            <span>Submit Quotation</span>
-          </button>
+          {request.status === "CANCELLED" ? (
+            <button type="button" className="provreq-btn-quote disabled" disabled>
+              <i className="fas fa-ban mr-1.5"></i>
+              <span>Request Cancelled</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="provreq-btn-quote"
+              onClick={() => {
+                onClose();
+                onQuote(request);
+              }}
+            >
+              <i className="fas fa-paper-plane mr-1.5"></i>
+              <span>Submit Quotation</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

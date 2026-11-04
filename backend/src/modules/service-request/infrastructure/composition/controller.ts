@@ -16,7 +16,10 @@ export function createServiceRequestController(
     createNotificationUseCase: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
 ): ServiceRequestController {
     const serviceRequestUseCase = createServiceRequestUseCase(createBulkNotificationUseCase);
-    const cancelServiceRequestUseCase = createCancelServiceRequestUseCase(createNotificationUseCase);
+    const cancelServiceRequestUseCase = createCancelServiceRequestUseCase(
+        createNotificationUseCase,
+        createBulkNotificationUseCase
+    );
 
     return new ServiceRequestController(
         serviceRequestUseCase,

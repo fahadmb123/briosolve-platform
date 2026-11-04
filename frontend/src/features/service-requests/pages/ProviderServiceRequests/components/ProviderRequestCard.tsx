@@ -144,10 +144,17 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
           <span className="provreq-post-date">
             <i className="far fa-calendar mr-1"></i> Posted {formattedDate}
           </span>
-          <span className="provreq-status-dot-active">
-            <span className="provreq-pulse-dot"></span>
-            Open for Quotes
-          </span>
+          {request.status === "CANCELLED" ? (
+            <span className="provreq-status-dot-cancelled">
+              <span className="provreq-dot-cancelled"></span>
+              Cancelled
+            </span>
+          ) : (
+            <span className="provreq-status-dot-active">
+              <span className="provreq-pulse-dot"></span>
+              Open for Quotes
+            </span>
+          )}
         </div>
 
         <div className="provreq-card-actions">
@@ -160,14 +167,26 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
             <span>View Scope</span>
           </button>
 
-          <button
-            type="button"
-            className="provreq-btn-quote"
-            onClick={() => onQuote(request)}
-          >
-            <i className="fas fa-paper-plane"></i>
-            <span>Send Quote</span>
-          </button>
+          {request.status === "CANCELLED" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This request has been cancelled by the customer"
+            >
+              <i className="fas fa-ban"></i>
+              <span>Cancelled</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="provreq-btn-quote"
+              onClick={() => onQuote(request)}
+            >
+              <i className="fas fa-paper-plane"></i>
+              <span>Send Quote</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -40,6 +40,7 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
     async findByServiceRequestId(serviceRequestId: string): Promise<ServiceRequestProvider[]> {
         const records = await db.orm.public.service_request_providers
             .where({ service_request_id: serviceRequestId as never })
+            .include("provider")
             .all();
 
         return records.map((record) => ServiceRequestProviderMapper.toDomain(record));

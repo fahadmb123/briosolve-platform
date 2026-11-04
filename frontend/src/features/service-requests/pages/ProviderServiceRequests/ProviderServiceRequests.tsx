@@ -27,7 +27,27 @@ export default function ProviderServiceRequests() {
 
   useEffect(() => {
     fetchRequests();
+
+    const handleNotification = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (
+        customEvent.detail?.title_code === "SERVICE_REQUEST_CANCELLED" ||
+        customEvent.detail?.title_code === "NEW_SERVICE_REQUEST"
+      ) {
+        fetchRequests();
+      }
+    };
+
+    window.addEventListener("app:notification", handleNotification);
+    return () => {
+      window.removeEventListener("app:notification", handleNotification);
+    };
   }, []);
+
+  const currentSelectedRequest = useMemo(() => {
+    if (!selectedRequest) return null;
+    return requests.find((r) => r.id === selectedRequest.id) || selectedRequest;
+  }, [selectedRequest, requests]);
 
   const stats = useMemo(() => {
     const total = requests.length;
@@ -236,7 +256,7 @@ export default function ProviderServiceRequests() {
       )}
 
       <ProviderRequestDetailsModal
-        request={selectedRequest}
+        request={currentSelectedRequest}
         isOpen={Boolean(selectedRequest)}
         onClose={() => setSelectedRequest(null)}
         onQuote={handleQuoteClick}

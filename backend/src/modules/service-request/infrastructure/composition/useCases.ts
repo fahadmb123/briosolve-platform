@@ -26,11 +26,14 @@ export function createServiceRequestUseCase(
 }
 
 export function createCancelServiceRequestUseCase(
-    createNotificationUseCase: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+    createNotificationUseCase: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
+    createBulkNotificationUseCase: IUseCase<CreateBulkNotificationRequestDto, NotificationResponseDto[]>
 ): CancelServiceRequestUseCase {
     return new CancelServiceRequestUseCase(
         serviceRequestRepository,
-        createNotificationUseCase
+        createNotificationUseCase,
+        createBulkNotificationUseCase,
+        serviceRequestProviderRepository
     );
 }
 

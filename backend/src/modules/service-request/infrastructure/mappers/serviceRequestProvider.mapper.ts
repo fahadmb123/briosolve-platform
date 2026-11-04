@@ -2,6 +2,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import type { Prisma } from "@prisma/client";
 import { ServiceRequestProvider, ServiceRequestProviderStatus } from "../../domain/entities/serviceRequestProvider.entity";
 import { ServiceRequestMapper } from "./serviceRequest.mapper";
+import { ProviderProfileMapper } from "../../../user-management/infrastructure/mappers/providerProfile.mapper";
 
 export type ServiceRequestProviderRecord = Prisma.ServiceRequestProviderGetPayload<{}>;
 export type ServiceRequestProviderRaw = ServiceRequestProviderRecord;
@@ -31,7 +32,8 @@ export class ServiceRequestProviderMapper {
             record.status as ServiceRequestProviderStatus,
             matchedAt,
             viewedAt,
-            record.service_request ? ServiceRequestMapper.toDomain(record.service_request) : undefined
+            record.service_request ? ServiceRequestMapper.toDomain(record.service_request) : undefined,
+            (record as any).provider ? ProviderProfileMapper.toDomain((record as any).provider) : undefined
         );
     }
 

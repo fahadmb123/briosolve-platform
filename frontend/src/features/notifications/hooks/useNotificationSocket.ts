@@ -43,6 +43,7 @@ export function useNotificationSocket(): void {
             }
             addNotification(notification);
             playNotificationSound();
+            window.dispatchEvent(new CustomEvent("app:notification", { detail: notification }));
         };
 
         const handleConnect = () => {

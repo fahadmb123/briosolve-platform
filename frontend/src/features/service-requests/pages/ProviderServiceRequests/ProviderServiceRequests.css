@@ -513,12 +513,59 @@
     color: #10b981;
 }
 
+.provreq-status-dot-cancelled {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.725rem;
+    font-weight: 600;
+    color: #ef4444;
+}
+
 .provreq-pulse-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: #10b981;
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+}
+
+.provreq-dot-cancelled {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ef4444;
+}
+
+.provreq-cancelled-callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    margin-bottom: 1.25rem;
+}
+
+.provreq-cancelled-callout i {
+    font-size: 1rem;
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+}
+
+.provreq-cancelled-callout strong {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.15rem;
+}
+
+.provreq-cancelled-callout p {
+    margin: 0;
+    color: var(--text-secondary, #71717a);
 }
 
 .provreq-card-actions {
@@ -567,6 +614,16 @@
     background: var(--primary-hover, #048c7a);
     transform: translateY(-1px);
     box-shadow: 0 3px 10px rgba(5, 173, 152, 0.25);
+}
+
+.provreq-btn-quote.disabled,
+.provreq-btn-quote:disabled {
+    background: var(--surface-hover, #f4f4f5) !important;
+    color: var(--text-muted, #a1a1aa) !important;
+    border-color: var(--border, #e4e4e7) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 .provreq-empty-state {
