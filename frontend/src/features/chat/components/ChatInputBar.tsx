@@ -2,10 +2,11 @@ import React, { useState } from "react";
 
 interface ChatInputBarProps {
   onSendMessage: (text: string) => void;
+  prompts?: string[];
   disabled?: boolean;
 }
 
-const QUICK_PROMPTS = [
+const DEFAULT_PROMPTS = [
   "Are you available today?",
   "Could you share arrival time estimate?",
   "Does the quote include replacement parts?",
@@ -14,6 +15,7 @@ const QUICK_PROMPTS = [
 
 export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   onSendMessage,
+  prompts = DEFAULT_PROMPTS,
   disabled = false,
 }) => {
   const [inputText, setInputText] = useState("");
@@ -35,7 +37,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   return (
     <div className="chat-input-wrapper">
       <div className="chat-quick-prompts-row">
-        {QUICK_PROMPTS.map((prompt, idx) => (
+        {prompts.map((prompt, idx) => (
           <button
             key={idx}
             type="button"
@@ -79,4 +81,3 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
     </div>
   );
 };
-

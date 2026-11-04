@@ -3,16 +3,21 @@ import type { ChatMessage } from "../types/chat.types";
 
 interface ChatMessageBubbleProps {
   message: ChatMessage;
+  currentRole?: "CUSTOMER" | "PROVIDER";
   onAcceptQuote?: (quoteId: string) => void;
   onDeclineQuote?: (quoteId: string) => void;
 }
 
 export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
   message,
+  currentRole = "CUSTOMER",
   onAcceptQuote,
   onDeclineQuote,
 }) => {
-  const isMe = message.senderRole === "CUSTOMER";
+  const isMe =
+    currentRole === "PROVIDER"
+      ? message.senderRole === "PROVIDER"
+      : message.senderRole === "CUSTOMER";
 
   return (
     <div className={`chat-message-row ${isMe ? "outgoing" : "incoming"}`}>
@@ -65,28 +70,43 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
             </div>
 
             <div className="chat-quote-actions">
-              {message.quotePayload.status === "PENDING" ? (
-                <>
-                  <button
-                    type="button"
-                    className="chat-quote-btn-accept"
-                    onClick={() =>
-                      onAcceptQuote?.(message.quotePayload!.quoteId)
-                    }
+              {currentRole === "CUSTOMER" ? (
+                message.quotePayload.status === "PENDING" ? (
+                  <>
+                    <button
+                      type="button"
+                      className="chat-quote-btn-accept"
+                      onClick={() =>
+                        onAcceptQuote?.(message.quotePayload!.quoteId)
+                      }
+                    >
+                      <i className="fas fa-check" />
+                      <span>Accept Quote</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="chat-quote-btn-decline"
+                      onClick={() =>
+                        onDeclineQuote?.(message.quotePayload!.quoteId)
+                      }
+                    >
+                      <span>Decline</span>
+                    </button>
+                  </>
+                ) : (
+                  <div
+                    className={`chat-quote-status-tag ${message.quotePayload.status.toLowerCase()}`}
                   >
-                    <i className="fas fa-check" />
-                    <span>Accept Quote</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="chat-quote-btn-decline"
-                    onClick={() =>
-                      onDeclineQuote?.(message.quotePayload!.quoteId)
-                    }
-                  >
-                    <span>Decline</span>
-                  </button>
-                </>
+                    <i
+                      className={`fas ${
+                        message.quotePayload.status === "ACCEPTED"
+                          ? "fa-check-circle"
+                          : "fa-times-circle"
+                      }`}
+                    />
+                    <span>Quote {message.quotePayload.status}</span>
+                  </div>
+                )
               ) : (
                 <div
                   className={`chat-quote-status-tag ${message.quotePayload.status.toLowerCase()}`}
@@ -95,10 +115,18 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
                     className={`fas ${
                       message.quotePayload.status === "ACCEPTED"
                         ? "fa-check-circle"
-                        : "fa-times-circle"
+                        : message.quotePayload.status === "DECLINED"
+                        ? "fa-times-circle"
+                        : "fa-clock"
                     }`}
                   />
-                  <span>Quote {message.quotePayload.status}</span>
+                  <span>
+                    {message.quotePayload.status === "ACCEPTED"
+                      ? "Accepted by Client"
+                      : message.quotePayload.status === "DECLINED"
+                      ? "Declined by Client"
+                      : "Awaiting Client Acceptance"}
+                  </span>
                 </div>
               )}
             </div>
@@ -127,7 +155,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
               {message.status === "READ" ? (
                 <i
                   className="fas fa-check-double read"
-                  title="Seen by provider"
+                  title="Seen"
                 />
               ) : message.status === "DELIVERED" ? (
                 <i className="fas fa-check-double" title="Delivered" />
@@ -141,4 +169,3 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
     </div>
   );
 };
-

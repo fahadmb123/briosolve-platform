@@ -7,4 +7,4 @@ export { ChatMessageList } from "./ChatMessageList";
 export { ChatInputBar } from "./ChatInputBar";
 export { ChatInfoDrawer } from "./ChatInfoDrawer";
 export { EmptyChatState } from "./EmptyChatState";
-
+export { CreateQuoteModal } from "./CreateQuoteModal";

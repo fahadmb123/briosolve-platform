@@ -27,7 +27,7 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
   },
   {
     label: "Messages",
-    to: "/provider/dashboard#messages",
+    to: "/provider/messages",
     icon: "fas fa-comments",
   },
 ];
@@ -67,7 +67,9 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname === "/provider/dashboard" ||
     location.pathname.startsWith("/provider/dashboard") ||
     location.pathname.startsWith("/provider/service-requests") ||
-    location.pathname.startsWith("/provider/requests");
+    location.pathname.startsWith("/provider/requests") ||
+    location.pathname.startsWith("/provider/messages") ||
+    location.pathname.startsWith("/provider/chat");
 
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS
@@ -107,7 +109,7 @@ export const ProviderSubnavSidebar: React.FC = () => {
             ? location.pathname === toPath && location.hash === `#${toHash}`
             : toPath.endsWith("/dashboard")
             ? location.pathname === toPath && (!location.hash || location.hash === "")
-            : location.pathname === toPath;
+            : location.pathname.startsWith(toPath);
 
           return (
             <Link

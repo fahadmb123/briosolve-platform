@@ -3,18 +3,22 @@ import type { ChatParticipant, ChatLinkedRequest } from "../types/chat.types";
 
 interface ChatHeaderProps {
   participant: ChatParticipant;
-  linkedRequest: ChatLinkedRequest;
+  linkedRequest?: ChatLinkedRequest;
+  currentRole?: "CUSTOMER" | "PROVIDER";
   isInfoOpen: boolean;
   onToggleInfo: () => void;
   onBackToMobileList: () => void;
+  onOpenCreateQuote?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   participant,
   linkedRequest,
+  currentRole = "CUSTOMER",
   isInfoOpen,
   onToggleInfo,
   onBackToMobileList,
+  onOpenCreateQuote,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -48,7 +52,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           <div className="chat-header-name-row">
             <h3 className="chat-header-name">{participant.name}</h3>
             {participant.isVerified && (
-              <span className="chat-verified-badge" title="Verified Specialist">
+              <span className="chat-verified-badge" title="Verified Member">
                 <i className="fas fa-check-circle" />
               </span>
             )}
@@ -64,12 +68,27 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               ? "Active now"
               : participant.lastSeen
               ? `Last seen ${participant.lastSeen}`
-              : participant.businessName || "Service Provider"}
+              : participant.businessName || (currentRole === "PROVIDER" ? "Client" : "Service Provider")}
+            {linkedRequest && (
+              <span className="chat-header-req-tag"> • {linkedRequest.categoryName}</span>
+            )}
           </p>
         </div>
       </div>
 
       <div className="chat-header-actions">
+        {currentRole === "PROVIDER" && onOpenCreateQuote && (
+          <button
+            type="button"
+            className="chat-action-btn quote-primary"
+            onClick={onOpenCreateQuote}
+            title="Draft and send an official quote"
+          >
+            <i className="fas fa-file-invoice-dollar" />
+            <span className="chat-btn-text">Send Quote</span>
+          </button>
+        )}
+
         {participant.phone && (
           <a
             href={`tel:${participant.phone}`}
@@ -85,7 +104,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           type="button"
           className={`chat-action-btn ${isInfoOpen ? "active" : ""}`}
           onClick={onToggleInfo}
-          title="Toggle request & provider details"
+          title="Toggle details"
         >
           <i className="fas fa-info-circle" />
           <span className="chat-btn-text">Details</span>
@@ -115,7 +134,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 }}
               >
                 <i className="fas fa-file-alt" />
-                <span>View Request #{linkedRequest.id}</span>
+                <span>View Request Details</span>
               </button>
               <button
                 type="button"
@@ -123,7 +142,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 onClick={() => setShowMenu(false)}
               >
                 <i className="fas fa-shield-alt" />
-                <span>Report Conversation</span>
+                <span>Safety & Help</span>
               </button>
             </div>
           )}
@@ -132,4 +151,3 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     </header>
   );
 };
-

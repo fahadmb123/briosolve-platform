@@ -219,7 +219,7 @@ export const ProviderTopNav: React.FC = () => {
                       <span className="prov-mono-badge">3</span>
                     </Link>
                     <Link
-                      to="#"
+                      to="/provider/messages"
                       className="prov-panel-item"
                       onClick={closeAll}
                     >
@@ -687,7 +687,7 @@ export const ProviderTopNav: React.FC = () => {
               <span>Bookings</span>
               <span className="prov-mono-badge">3</span>
             </Link>
-            <Link to="#" className="prov-mobile-item" onClick={closeAll}>
+            <Link to="/provider/messages" className="prov-mobile-item" onClick={closeAll}>
               <span>Messages</span>
               <span className="prov-mono-badge">2</span>
             </Link>

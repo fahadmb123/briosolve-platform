@@ -5,6 +5,7 @@ import type { ChatParticipant, ChatLinkedRequest } from "../types/chat.types";
 interface ChatInfoDrawerProps {
   participant: ChatParticipant;
   linkedRequest: ChatLinkedRequest;
+  currentRole?: "CUSTOMER" | "PROVIDER";
   isOpen: boolean;
   onClose: () => void;
 }
@@ -12,15 +13,21 @@ interface ChatInfoDrawerProps {
 export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
   participant,
   linkedRequest,
+  currentRole = "CUSTOMER",
   isOpen,
   onClose,
 }) => {
   if (!isOpen) return null;
 
+  const isProvider = currentRole === "PROVIDER";
+  const requestsRoute = isProvider ? "/provider/service-requests" : "/my-requests";
+
   return (
     <aside className="chat-info-sidebar">
       <div className="chat-info-header">
-        <h4 className="chat-info-heading">Service & Provider Info</h4>
+        <h4 className="chat-info-heading">
+          {isProvider ? "Client & Request Info" : "Service & Provider Info"}
+        </h4>
         <button
           type="button"
           className="chat-info-close-btn"
@@ -43,7 +50,9 @@ export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
           />
           <h4 className="chat-info-provider-name">{participant.name}</h4>
           <p className="chat-info-business-title">
-            {participant.businessName || "Verified Professional"}
+            {isProvider
+              ? "Verified Client"
+              : participant.businessName || "Verified Professional"}
           </p>
 
           <div className="chat-info-stats-row">
@@ -66,7 +75,9 @@ export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
                   "Standard"
                 )}
               </span>
-              <span className="chat-info-stat-label">KYC Badge</span>
+              <span className="chat-info-stat-label">
+                {isProvider ? "Client Trust" : "KYC Badge"}
+              </span>
             </div>
           </div>
         </div>
@@ -106,10 +117,10 @@ export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
             </div>
 
             <Link
-              to="/my-requests"
+              to={requestsRoute}
               className="chat-info-view-full-btn"
             >
-              <span>Manage in My Requests</span>
+              <span>{isProvider ? "View in Service Requests" : "Manage in My Requests"}</span>
               <i className="fas fa-arrow-right" />
             </Link>
           </div>
@@ -121,8 +132,9 @@ export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
           </h5>
           <div className="chat-safety-box">
             <p className="chat-safety-text">
-              Always inspect quotes thoroughly before acceptance. Never share
-              passwords or make off-platform advance wire transfers.
+              {isProvider
+                ? "Always submit formal quotations through the chat so quotes are backed by Briosolve Guarantee and client reviews."
+                : "Always inspect quotes thoroughly before acceptance. Never make off-platform advance wire transfers."}
             </p>
           </div>
         </div>
@@ -130,4 +142,3 @@ export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
     </aside>
   );
 };
-

@@ -4,13 +4,18 @@ import type { ChatLinkedRequest } from "../types/chat.types";
 
 interface ChatRequestBannerProps {
   request: ChatLinkedRequest;
+  currentRole?: "CUSTOMER" | "PROVIDER";
   onOpenDetails: () => void;
 }
 
 export const ChatRequestBanner: React.FC<ChatRequestBannerProps> = ({
   request,
+  currentRole = "CUSTOMER",
   onOpenDetails,
 }) => {
+  const requestsRoute =
+    currentRole === "PROVIDER" ? "/provider/service-requests" : "/my-requests";
+
   return (
     <div className="chat-request-banner">
       <div className="chat-banner-left">
@@ -42,8 +47,8 @@ export const ChatRequestBanner: React.FC<ChatRequestBannerProps> = ({
       </div>
 
       <div className="chat-banner-right">
-        <Link to="/my-requests" className="chat-banner-btn-outline">
-          <span>Go to Requests</span>
+        <Link to={requestsRoute} className="chat-banner-btn-outline">
+          <span>{currentRole === "PROVIDER" ? "Marketplace Requests" : "My Requests"}</span>
           <i className="fas fa-external-link-alt" />
         </Link>
         <button
@@ -57,4 +62,3 @@ export const ChatRequestBanner: React.FC<ChatRequestBannerProps> = ({
     </div>
   );
 };
-
