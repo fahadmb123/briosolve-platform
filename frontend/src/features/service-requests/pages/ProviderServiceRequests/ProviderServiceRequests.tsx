@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMutations";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { ProviderRequestCard, ProviderRequestDetailsModal } from "../../components/provider-requests";
+import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
 import "./ProviderServiceRequests.css";
 
 export default function ProviderServiceRequests() {
@@ -222,12 +223,10 @@ export default function ProviderServiceRequests() {
       </div>
 
       {getRequestsMutation.isPending && requests.length === 0 ? (
-        <div className="provreq-empty-state">
-          <div className="provreq-empty-icon">
-            <i className="fas fa-spinner fa-spin"></i>
-          </div>
-          <h3>Scanning Marketplace Opportunities...</h3>
-          <p>Matching customer requests with your verified skill categories and radius</p>
+        <div className="provreq-cards-grid">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <ServiceRequestCardSkeleton key={idx} variant="provider" />
+          ))}
         </div>
       ) : filteredRequests.length === 0 ? (
         <div className="provreq-empty-state">

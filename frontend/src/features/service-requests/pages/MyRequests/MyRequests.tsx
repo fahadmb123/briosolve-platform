@@ -17,6 +17,7 @@ import {
   type StatusFilterType,
   type SortOrderType
 } from "../../components/my-requests";
+import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
 
 export default function MyRequests() {
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
@@ -206,9 +207,10 @@ export default function MyRequests() {
       />
 
       {isLoading ? (
-        <div className="myreq-loading-box">
-          <i className="fas fa-circle-notch fa-spin"></i>
-          <span>Loading your service requests...</span>
+        <div className="myreq-cards-grid">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <ServiceRequestCardSkeleton key={idx} variant="customer" />
+          ))}
         </div>
       ) : filteredRequests.length === 0 ? (
         <div className="myreq-empty-panel">
