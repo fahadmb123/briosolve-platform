@@ -55,6 +55,8 @@ model users {
   notifications                  notifications[]
   push_subscriptions             push_subscriptions[]
   service_requests               service_requests[]              @relation("CustomerServiceRequests")
+  conversation_participants      conversation_participants[]
+  messages                       messages[]
 }
 
 enum weekday {
@@ -187,69 +189,69 @@ model provider_services {
 }
 
 model addresses {
-  id          Uuid                 @id @default(uuid())
-  user_id     Uuid
+  id               Uuid                 @id @default(uuid())
+  user_id          Uuid
 
-  house_no    VarChar(100)?
-  area        VarChar(255)
-  city        VarChar(100)
-  district    VarChar(100)
-  state       VarChar(100)
-  country     VarChar(100)
-  pincode     VarChar(20)
-  landmark    VarChar(255)?
-  type        VarChar(50)
+  house_no         VarChar(100)?
+  area             VarChar(255)
+  city             VarChar(100)
+  district         VarChar(100)
+  state            VarChar(100)
+  country          VarChar(100)
+  pincode          VarChar(20)
+  landmark         VarChar(255)?
+  type             VarChar(50)
 
-  latitude    Numeric(10, 7)?
-  longitude   Numeric(10, 7)?
+  latitude         Numeric(10, 7)?
+  longitude        Numeric(10, 7)?
 
-  created_at  DateTime             @default(now())
-  updated_at  temporal.updatedAt()
+  created_at       DateTime             @default(now())
+  updated_at       temporal.updatedAt()
 
-  user        users                @relation("UserAddresses", fields:[user_id], references:[id])
+  user             users                @relation("UserAddresses", fields:[user_id], references:[id])
 
-  current_for users[]              @relation("CurrentAddress")
+  current_for      users[]              @relation("CurrentAddress")
   service_requests service_requests[]
 }
 
 model customer_profiles {
-  id                Uuid                 @id @default(uuid())
-  user_id           Uuid                 @unique
-  profile_image     VarChar(500)?
-  created_at        DateTime             @default(now())
-  updated_at        temporal.updatedAt()
-  about             VarChar(500)
+  id            Uuid                 @id @default(uuid())
+  user_id       Uuid                 @unique
+  profile_image VarChar(500)?
+  created_at    DateTime             @default(now())
+  updated_at    temporal.updatedAt()
+  about         VarChar(500)
 
-  user              users                @relation(fields:[user_id], references:[id])
+  user          users                @relation(fields:[user_id], references:[id])
 }
 
 model categories {
-  id          Uuid                 @id @default(uuid())
-  name        VarChar(100)         @unique
-  description VarChar(500)?
-  image       VarChar(500)?
-  status      active_status        @default(ACTIVE)
+  id               Uuid                 @id @default(uuid())
+  name             VarChar(100)         @unique
+  description      VarChar(500)?
+  image            VarChar(500)?
+  status           active_status        @default(ACTIVE)
 
-  created_at  DateTime             @default(now())
-  updated_at  temporal.updatedAt()
+  created_at       DateTime             @default(now())
+  updated_at       temporal.updatedAt()
 
-  services    services[]
+  services         services[]
   service_requests service_requests[]
 }
 
 model services {
-  id          Uuid                 @id @default(uuid())
-  category_id Uuid
+  id               Uuid                 @id @default(uuid())
+  category_id      Uuid
 
-  name        VarChar(150)
-  description VarChar(1000)?
-  image       VarChar(500)?
-  status      active_status        @default(ACTIVE)
+  name             VarChar(150)
+  description      VarChar(1000)?
+  image            VarChar(500)?
+  status           active_status        @default(ACTIVE)
 
-  created_at  DateTime             @default(now())
-  updated_at  temporal.updatedAt()
+  created_at       DateTime             @default(now())
+  updated_at       temporal.updatedAt()
 
-  category    categories           @relation(fields:[category_id], references:[id])
+  category         categories           @relation(fields:[category_id], references:[id])
   service_requests service_requests[]
 }
 
@@ -324,7 +326,6 @@ model push_subscriptions {
   @@index([user_id])
 }
 
-
 enum request_urgency {
   TODAY
   THIS_WEEK
@@ -348,7 +349,7 @@ enum service_request_status {
 }
 
 model service_requests {
-  id                  Uuid                   @id @default(uuid())
+  id                  Uuid                        @id @default(uuid())
   customer_id         Uuid
   category_id         Uuid
   subservice_id       Uuid?
@@ -362,15 +363,15 @@ model service_requests {
   available_time_to   Time
   budget_type         request_budget_type
   budget_amount       Numeric(10, 2)?
-  status              service_request_status @default(PENDING)
+  status              service_request_status      @default(PENDING)
 
-  created_at          DateTime               @default(now())
+  created_at          DateTime                    @default(now())
   updated_at          temporal.updatedAt()
 
-  customer            users                  @relation("CustomerServiceRequests", fields:[customer_id], references:[id])
-  category            categories             @relation(fields:[category_id], references:[id])
-  subservice          services?              @relation(fields:[subservice_id], references:[id])
-  address             addresses              @relation(fields:[address_id], references:[id])
+  customer            users                       @relation("CustomerServiceRequests", fields:[customer_id], references:[id])
+  category            categories                  @relation(fields:[category_id], references:[id])
+  subservice          services?                   @relation(fields:[subservice_id], references:[id])
+  address             addresses                   @relation(fields:[address_id], references:[id])
 
   images              service_request_images[]
   providers           service_request_providers[]
@@ -414,4 +415,65 @@ model service_request_providers {
   @@unique([service_request_id, provider_id])
   @@index([service_request_id])
   @@index([provider_id])
+}
+
+enum conversation_type {
+  DIRECT
+  GROUP
+}
+
+enum conversation_status {
+  ACTIVE
+  CLOSED
+}
+
+enum message_type {
+  TEXT
+  IMAGE
+  FILE
+}
+
+model conversations {
+  id           Uuid                        @id @default(uuid())
+  type         conversation_type           @default(DIRECT)
+  status       conversation_status         @default(ACTIVE)
+
+  created_at   DateTime                    @default(now())
+  updated_at   temporal.updatedAt()
+
+  participants conversation_participants[]
+  messages     messages[]
+}
+
+model conversation_participants {
+  id              Uuid          @id @default(uuid())
+  conversation_id Uuid
+  user_id         Uuid
+  last_read_at    DateTime?
+  joined_at       DateTime      @default(now())
+
+  conversation    conversations @relation(fields:[conversation_id], references:[id], onDelete: Cascade)
+  user            users         @relation(fields:[user_id], references:[id], onDelete: Cascade)
+
+  @@unique([conversation_id, user_id])
+  @@index([conversation_id])
+  @@index([user_id])
+}
+
+model messages {
+  id              Uuid                 @id @default(uuid())
+  conversation_id Uuid
+  sender_id       Uuid
+  content         String
+  message_type    message_type         @default(TEXT)
+  created_at      DateTime             @default(now())
+  updated_at      temporal.updatedAt()
+  deleted_at      DateTime?
+
+  conversation    conversations        @relation(fields:[conversation_id], references:[id], onDelete: Cascade)
+  sender          users                @relation(fields:[sender_id], references:[id], onDelete: Cascade)
+
+  @@index([conversation_id])
+  @@index([sender_id])
+  @@index([created_at])
 }
