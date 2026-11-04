@@ -6,12 +6,14 @@ import { IMessageRepository } from "../../domain/repositories/IMessageRepository
 import { SendMessageRequestDto } from "../dtos/request/send-message.dto";
 import { MessageResponseDto } from "../dtos/response/message-response.dto";
 import { MessageMapper } from "../../infrastructure/mappers/message.mapper";
+import { IMessageDelivery } from "../interfaces/IMessageDelivery";
 
 export class SendMessageUseCase implements IUseCase<SendMessageRequestDto, MessageResponseDto> {
     constructor(
         private readonly _conversationRepository: IConversationRepository,
         private readonly _participantRepository: IConversationParticipantRepository,
-        private readonly _messageRepository: IMessageRepository
+        private readonly _messageRepository: IMessageRepository,
+        private _messageDelivery: IMessageDelivery
     ) {}
 
     async execute(input: SendMessageRequestDto): Promise<MessageResponseDto> {
@@ -76,6 +78,11 @@ export class SendMessageUseCase implements IUseCase<SendMessageRequestDto, Messa
                 "INTERNAL"
             );
         }
+
+        await this._messageDelivery.sendToConversation(
+            input.conversationId,
+            message
+        );
 
         return MessageMapper.toDto(message);
     }
