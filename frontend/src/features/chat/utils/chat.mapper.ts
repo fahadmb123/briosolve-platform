@@ -1,5 +1,5 @@
-import type { BackendMessageDto } from "../services/chat.service";
-import type { ChatMessage } from "../types/chat.types";
+import type { BackendConversationDto, BackendMessageDto } from "../services/chat.service";
+import type { ChatConversation, ChatMessage, ChatParticipant } from "../types/chat.types";
 
 export function toChatMessage(dto: BackendMessageDto, currentUserId?: string): ChatMessage {
     const isMe = currentUserId ? dto.sender_id === currentUserId : false;
@@ -22,3 +22,40 @@ export function toChatMessage(dto: BackendMessageDto, currentUserId?: string): C
     };
 }
 
+export function toChatConversation(
+    dto: BackendConversationDto,
+    fallbackParticipant?: Partial<ChatParticipant>
+): ChatConversation {
+    return {
+        id: dto.id,
+        participant: {
+            id: fallbackParticipant?.id || dto.id,
+            name: fallbackParticipant?.name || "Participant",
+            role: fallbackParticipant?.role || "PROVIDER",
+            avatar: fallbackParticipant?.avatar,
+            businessName: fallbackParticipant?.businessName,
+            rating: fallbackParticipant?.rating || 5.0,
+            reviewsCount: fallbackParticipant?.reviewsCount || 0,
+            isVerified: fallbackParticipant?.isVerified ?? true,
+            isOnline: fallbackParticipant?.isOnline ?? true,
+        },
+        linkedRequest: {
+            id: "req-active",
+            title: "General Service Inquiry",
+            categoryName: "Services",
+            urgency: "FLEXIBLE",
+            budgetType: "OPEN_BID",
+            status: "ACTIVE",
+            location: "Active Service Area",
+        },
+        lastMessage: {
+            text: "Started a conversation",
+            senderId: "",
+            createdAt: new Date(dto.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            isUnread: false,
+        },
+        unreadCount: 0,
+        hasActiveQuote: false,
+        updatedAt: dto.created_at,
+    };
+}
