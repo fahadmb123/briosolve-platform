@@ -1,3 +1,4 @@
+import { BaseRepository } from "../../../../shared/base/repository/baseRepository";
 import { Message, MessageType } from "../entities/message.entity";
 
 export interface CreateMessageData {
@@ -7,13 +8,9 @@ export interface CreateMessageData {
     message_type: MessageType;
 }
 
-export interface IMessageRepository {
+export interface IMessageRepository extends BaseRepository<Message | null>{
     create(data: CreateMessageData): Promise<Message>;
 
-    findByConversation(
-        conversationId: string,
-        cursor?: string,
-        limit?: number
-    ): Promise<Message[]>;
+    findByConversation(conversationId: string,cursor?: string,limit?: number): Promise<Message[]>;
 }
 
