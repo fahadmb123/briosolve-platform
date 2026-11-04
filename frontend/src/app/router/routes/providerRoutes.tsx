@@ -17,7 +17,6 @@ export const providerRoutes = (
       <Route index element={<Navigate to="dashboard" replace />} />
       <Route path="dashboard" element={<ProviderDashboard />} />
       <Route path="service-requests" element={<ProviderServiceRequests />} />
-      <Route path="requests" element={<Navigate to="/provider/service-requests" replace />} />
       <Route path="profile" element={<ProviderProfile />} />
       <Route path="kyc" element={<ProviderKyc />} />
       <Route path="verification" element={<Navigate to="/provider/kyc" replace />} />
