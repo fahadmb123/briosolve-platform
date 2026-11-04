@@ -121,12 +121,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
         if (!existing) return null;
 
-        if (
-            existing.status !== "PENDING" &&
-            existing.status !== "OPEN" &&
-            existing.status !== "QUOTED" &&
-            existing.status !== "ACTIVE"
-        ) {
+        if (existing.status !== "ACTIVE") {
             throw new ApplicationError("INVALID_STATE", "Only pending or open requests can be cancelled", "VALIDATION");
         }
 

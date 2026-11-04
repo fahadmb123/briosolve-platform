@@ -50,7 +50,7 @@ export function ReviewStep({ isActive, isPending, onBack, onSubmit }: ReviewStep
                     </div>
                     <div className="col-span-2">
                         <div className="text-xs text-secondary mb-1">KYC Status</div>
-                        <div className="font-medium text-warning"><i className="fas fa-clock mr-1"></i> Will be uploaded after registration in Settings</div>
+                        <div className="font-medium text-warning"><i className="fas fa-clock mr-1"></i> Will be completed immediately after registration in KYC Verification</div>
                     </div>
                 </div>
             </div>

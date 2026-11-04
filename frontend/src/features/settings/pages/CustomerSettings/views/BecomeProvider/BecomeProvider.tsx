@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useSendBecomeProviderOtp, useBecomeProvider } from '../../../../hooks/customer/useBecomeProvider';
@@ -23,7 +24,7 @@ export function BecomeProvider() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [serviceError, setServiceError] = useState('');
 
-    const clearAuth = useAuthStore((s) => s.clearAuth);
+    const navigate = useNavigate();
 
     const sendOtpMut = useSendBecomeProviderOtp();
     const becomeProviderMut = useBecomeProvider();
@@ -79,9 +80,9 @@ export function BecomeProvider() {
             services: selectedServices
         }, {
             onSuccess: async () => {
-                toast.success('You are now a provider! Please sign in again.');
-                clearAuth();
-                window.location.href = '/login';
+                toast.success('You are now a provider!');
+                await useAuthStore.getState().fetchUser();
+                navigate('/provider/kyc', { replace: true });
             },
             onError: (err: ApiError) => toast.error(err.message || 'Failed to switch account')
         });
