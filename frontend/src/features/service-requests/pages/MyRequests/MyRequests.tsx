@@ -76,7 +76,7 @@ export default function MyRequests() {
   }, [requests]);
 
   const filteredRequests = useMemo(() => {
-    let result = requests.filter((req) => {
+    const result = requests.filter((req) => {
       if (selectedStatus !== "ALL" && req.status !== selectedStatus) {
         return false;
       }
