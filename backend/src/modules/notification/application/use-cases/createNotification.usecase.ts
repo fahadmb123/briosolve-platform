@@ -26,7 +26,7 @@ export class CreateNotificationUseCase implements IUseCase<CreateNotificationReq
 
         const response = NotificationMapper.toDto(notification)
 
-        this._notificationDelivery.deliver(response)
+        await this._notificationDelivery.deliver(response)
 
         return response
     }

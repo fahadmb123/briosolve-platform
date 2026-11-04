@@ -8,8 +8,8 @@ export class SocketIoNotificationDeliveryAdapter implements INotificationDeliver
         private readonly _io: Server,
     ) {}
 
-    deliver(notification: NotificationResponseDto): void {
-        this._io
+    async deliver(notification: NotificationResponseDto): Promise<void> {
+        await this._io
             .to(`user:${notification.recipient_id}`)
             .emit("notification:new", notification);
     }

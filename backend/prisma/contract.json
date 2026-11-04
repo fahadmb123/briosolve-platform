@@ -52,6 +52,18 @@
       "model": "push_subscriptions",
       "namespace": "public"
     },
+    "service_request_images": {
+      "model": "service_request_images",
+      "namespace": "public"
+    },
+    "service_request_providers": {
+      "model": "service_request_providers",
+      "namespace": "public"
+    },
+    "service_requests": {
+      "model": "service_requests",
+      "namespace": "public"
+    },
     "services": {
       "model": "services",
       "namespace": "public"
@@ -130,6 +142,98 @@
               {
                 "name": "REJECTED",
                 "value": "REJECTED"
+              }
+            ]
+          },
+          "request_budget_type": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "OPEN_BID",
+                "value": "OPEN_BID"
+              },
+              {
+                "name": "FIXED",
+                "value": "FIXED"
+              }
+            ]
+          },
+          "request_urgency": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "TODAY",
+                "value": "TODAY"
+              },
+              {
+                "name": "THIS_WEEK",
+                "value": "THIS_WEEK"
+              },
+              {
+                "name": "SPECIFIC_DATE",
+                "value": "SPECIFIC_DATE"
+              },
+              {
+                "name": "FLEXIBLE",
+                "value": "FLEXIBLE"
+              }
+            ]
+          },
+          "service_request_provider_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "MATCHED",
+                "value": "MATCHED"
+              },
+              {
+                "name": "VIEWED",
+                "value": "VIEWED"
+              },
+              {
+                "name": "QUOTED",
+                "value": "QUOTED"
+              },
+              {
+                "name": "DECLINED",
+                "value": "DECLINED"
+              },
+              {
+                "name": "EXPIRED",
+                "value": "EXPIRED"
+              }
+            ]
+          },
+          "service_request_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "ACTIVE",
+                "value": "ACTIVE"
+              },
+              {
+                "name": "ACCEPTED",
+                "value": "ACCEPTED"
+              },
+              {
+                "name": "IN_PROGRESS",
+                "value": "IN_PROGRESS"
+              },
+              {
+                "name": "COMPLETED",
+                "value": "COMPLETED"
+              },
+              {
+                "name": "CANCELLED",
+                "value": "CANCELLED"
+              },
+              {
+                "name": "EXPIRED",
+                "value": "EXPIRED"
               }
             ]
           },
@@ -550,6 +654,21 @@
                   "namespace": "public"
                 }
               },
+              "service_requests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "address_id"
+                  ]
+                },
+                "to": {
+                  "model": "service_requests",
+                  "namespace": "public"
+                }
+              },
               "user": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -687,6 +806,21 @@
               }
             },
             "relations": {
+              "service_requests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "category_id"
+                  ]
+                },
+                "to": {
+                  "model": "service_requests",
+                  "namespace": "public"
+                }
+              },
               "services": {
                 "cardinality": "1:N",
                 "on": {
@@ -767,13 +901,6 @@
                   }
                 }
               },
-              "service_radius_km": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/int4@1",
-                  "kind": "scalar"
-                }
-              },
               "updated_at": {
                 "nullable": false,
                 "type": {
@@ -820,9 +947,6 @@
                 },
                 "profile_image": {
                   "column": "profile_image"
-                },
-                "service_radius_km": {
-                  "column": "service_radius_km"
                 },
                 "updated_at": {
                   "column": "updated_at"
@@ -1371,6 +1495,21 @@
                   "namespace": "public"
                 }
               },
+              "service_requests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "provider_id"
+                  ]
+                },
+                "to": {
+                  "model": "service_request_providers",
+                  "namespace": "public"
+                }
+              },
               "services": {
                 "cardinality": "1:N",
                 "on": {
@@ -1860,6 +1999,491 @@
               "table": "push_subscriptions"
             }
           },
+          "service_request_images": {
+            "fields": {
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "display_order": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "image_key": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 500
+                  }
+                }
+              },
+              "service_request_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "service_request": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "service_request_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "service_requests",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "created_at": {
+                  "column": "created_at"
+                },
+                "display_order": {
+                  "column": "display_order"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "image_key": {
+                  "column": "image_key"
+                },
+                "service_request_id": {
+                  "column": "service_request_id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "service_request_images"
+            }
+          },
+          "service_request_providers": {
+            "fields": {
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "matched_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "service_request_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "service_request_provider_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "viewed_at": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "provider": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "provider_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "provider_profiles",
+                  "namespace": "public"
+                }
+              },
+              "service_request": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "service_request_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "service_requests",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "id": {
+                  "column": "id"
+                },
+                "matched_at": {
+                  "column": "matched_at"
+                },
+                "provider_id": {
+                  "column": "provider_id"
+                },
+                "service_request_id": {
+                  "column": "service_request_id"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "viewed_at": {
+                  "column": "viewed_at"
+                }
+              },
+              "namespaceId": "public",
+              "table": "service_request_providers"
+            }
+          },
+          "service_requests": {
+            "fields": {
+              "address_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "available_time_from": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/time-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "available_time_to": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/time-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "budget_amount": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 10,
+                    "scale": 2
+                  }
+                }
+              },
+              "budget_type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "request_budget_type",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "category_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "customer_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "description": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 1000
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "specific_date": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "service_request_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "subservice_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "title": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 150
+                  }
+                }
+              },
+              "updated_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "urgency": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "request_urgency",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              }
+            },
+            "relations": {
+              "address": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "address_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "addresses",
+                  "namespace": "public"
+                }
+              },
+              "category": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "category_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "categories",
+                  "namespace": "public"
+                }
+              },
+              "customer": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "customer_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "users",
+                  "namespace": "public"
+                }
+              },
+              "images": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "service_request_id"
+                  ]
+                },
+                "to": {
+                  "model": "service_request_images",
+                  "namespace": "public"
+                }
+              },
+              "providers": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "service_request_id"
+                  ]
+                },
+                "to": {
+                  "model": "service_request_providers",
+                  "namespace": "public"
+                }
+              },
+              "subservice": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "subservice_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "services",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "address_id": {
+                  "column": "address_id"
+                },
+                "available_time_from": {
+                  "column": "available_time_from"
+                },
+                "available_time_to": {
+                  "column": "available_time_to"
+                },
+                "budget_amount": {
+                  "column": "budget_amount"
+                },
+                "budget_type": {
+                  "column": "budget_type"
+                },
+                "category_id": {
+                  "column": "category_id"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "customer_id": {
+                  "column": "customer_id"
+                },
+                "description": {
+                  "column": "description"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "specific_date": {
+                  "column": "specific_date"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "subservice_id": {
+                  "column": "subservice_id"
+                },
+                "title": {
+                  "column": "title"
+                },
+                "updated_at": {
+                  "column": "updated_at"
+                },
+                "urgency": {
+                  "column": "urgency"
+                }
+              },
+              "namespaceId": "public",
+              "table": "service_requests"
+            }
+          },
           "services": {
             "fields": {
               "category_id": {
@@ -1948,6 +2572,21 @@
                 },
                 "to": {
                   "model": "categories",
+                  "namespace": "public"
+                }
+              },
+              "service_requests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "subservice_id"
+                  ]
+                },
+                "to": {
+                  "model": "service_requests",
                   "namespace": "public"
                 }
               }
@@ -2387,6 +3026,21 @@
                 },
                 "to": {
                   "model": "account_reactivation_requests",
+                  "namespace": "public"
+                }
+              },
+              "service_requests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "customer_id"
+                  ]
+                },
+                "to": {
+                  "model": "service_requests",
                   "namespace": "public"
                 }
               }
@@ -2864,15 +3518,6 @@
                   "typeParams": {
                     "length": 500
                   }
-                },
-                "service_radius_km": {
-                  "codecId": "pg/int4@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": 20
-                  },
-                  "nativeType": "int4",
-                  "nullable": true
                 },
                 "updated_at": {
                   "codecId": "pg/timestamptz-temporal@1",
@@ -3760,6 +4405,446 @@
                 }
               ]
             },
+            "service_request_images": {
+              "columns": {
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "display_order": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "image_key": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 500
+                  }
+                },
+                "service_request_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "service_request_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_request_images"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_requests"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "service_request_id"
+                  ],
+                  "name": "service_request_images_service_request_id_idx_8060a003",
+                  "prefix": "service_request_images_service_request_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "service_request_providers": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('MATCHED', 'VIEWED', 'QUOTED', 'DECLINED', 'EXPIRED')",
+                  "name": "service_request_providers_status_check_b3894f35",
+                  "prefix": "service_request_providers_status_check"
+                }
+              ],
+              "columns": {
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "matched_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "provider_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "service_request_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "MATCHED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "service_request_provider_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "viewed_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "service_request_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_request_providers"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_requests"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "provider_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_request_providers"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "provider_profiles"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "provider_id"
+                  ],
+                  "name": "service_request_providers_provider_id_idx_d89e110d",
+                  "prefix": "service_request_providers_provider_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "service_request_id"
+                  ],
+                  "name": "service_request_providers_service_request_id_idx_8060a003",
+                  "prefix": "service_request_providers_service_request_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "service_request_id",
+                    "provider_id"
+                  ]
+                }
+              ]
+            },
+            "service_requests": {
+              "checks": [
+                {
+                  "expression": "\"budget_type\" IN ('OPEN_BID', 'FIXED')",
+                  "name": "service_requests_budget_type_check_0f89b5ef",
+                  "prefix": "service_requests_budget_type_check"
+                },
+                {
+                  "expression": "\"status\" IN ('PENDING', 'ACTIVE', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'EXPIRED')",
+                  "name": "service_requests_status_check_bada4c1d",
+                  "prefix": "service_requests_status_check"
+                },
+                {
+                  "expression": "\"urgency\" IN ('TODAY', 'THIS_WEEK', 'SPECIFIC_DATE', 'FLEXIBLE')",
+                  "name": "service_requests_urgency_check_6c656154",
+                  "prefix": "service_requests_urgency_check"
+                }
+              ],
+              "columns": {
+                "address_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "available_time_from": {
+                  "codecId": "pg/time-temporal@1",
+                  "nativeType": "time",
+                  "nullable": false
+                },
+                "available_time_to": {
+                  "codecId": "pg/time-temporal@1",
+                  "nativeType": "time",
+                  "nullable": false
+                },
+                "budget_amount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 10,
+                    "scale": 2
+                  }
+                },
+                "budget_type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "request_budget_type",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "category_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "customer_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "description": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 1000
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "specific_date": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "service_request_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "subservice_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
+                },
+                "title": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 150
+                  }
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "urgency": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "request_urgency",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "customer_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_requests"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "category_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_requests"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "categories"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "subservice_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_requests"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "services"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "address_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_requests"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "addresses"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "address_id"
+                  ],
+                  "name": "service_requests_address_id_idx_f563b795",
+                  "prefix": "service_requests_address_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "category_id"
+                  ],
+                  "name": "service_requests_category_id_idx_da7213d4",
+                  "prefix": "service_requests_category_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "customer_id"
+                  ],
+                  "name": "service_requests_customer_id_idx_e16dfa6b",
+                  "prefix": "service_requests_customer_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "subservice_id"
+                  ],
+                  "name": "service_requests_subservice_id_idx_cb8729b6",
+                  "prefix": "service_requests_subservice_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "services": {
               "checks": [
                 {
@@ -4162,6 +5247,44 @@
                 "REJECTED"
               ]
             },
+            "request_budget_type": {
+              "kind": "valueSet",
+              "values": [
+                "OPEN_BID",
+                "FIXED"
+              ]
+            },
+            "request_urgency": {
+              "kind": "valueSet",
+              "values": [
+                "TODAY",
+                "THIS_WEEK",
+                "SPECIFIC_DATE",
+                "FLEXIBLE"
+              ]
+            },
+            "service_request_provider_status": {
+              "kind": "valueSet",
+              "values": [
+                "MATCHED",
+                "VIEWED",
+                "QUOTED",
+                "DECLINED",
+                "EXPIRED"
+              ]
+            },
+            "service_request_status": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "ACTIVE",
+                "ACCEPTED",
+                "IN_PROGRESS",
+                "COMPLETED",
+                "CANCELLED",
+                "EXPIRED"
+              ]
+            },
             "user_role": {
               "kind": "valueSet",
               "values": [
@@ -4211,10 +5334,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "1d17f557e4e3e391fe5a7594fd9dd954a0926df3d668d46e9ceb6cc8e77d14bf"
+    "storageHash": "463956d5c0a4f5ae4cefb63f26d915c28fbbccb889fdf468414777e1fef652a9"
   },
   "execution": {
-    "executionHash": "0c91cf47b4b0284166c37286e961234147769649211d5226c99d1509a52854f9",
+    "executionHash": "15351d3a369f213be73a8924578fd71dcec0733737c19c644fcbbdbff35cd81a",
     "mutations": {
       "defaults": [
         {
@@ -4467,6 +5590,54 @@
             "column": "id",
             "namespace": "public",
             "table": "push_subscriptions"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "service_request_images"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "service_request_providers"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "service_requests"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "service_requests"
           }
         },
         {

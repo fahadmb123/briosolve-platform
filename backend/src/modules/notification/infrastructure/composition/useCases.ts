@@ -10,6 +10,7 @@ import { WebPushNotificationDeliveryAdapter } from "../adapters/web-push-notific
 import { CompositeNotificationDeliveryAdapter } from "../adapters/composite-notification-delivery.adapter";
 import { SavePushSubscriptionUseCase } from "../../application/use-cases/savePushSubscription.useCase";
 import { DeletePushSubscriptionUseCase } from "../../application/use-cases/deletePushSubscription.useCase";
+import { CreateBulkNotificationsUseCase } from "../../application/use-cases/createBulkNotifications.useCase";
 
 export const getNotificationsUseCase = new GetNotificationsUseCase(
     notificastionRepository,
@@ -40,17 +41,34 @@ export const deletePushSubscriptionUseCase = new DeletePushSubscriptionUseCase(
     pushSubscriptionRepository,
 );
 
+const webPushDelivery = new WebPushNotificationDeliveryAdapter(pushSubscriptionRepository);
+
 export function createNotificationUseCase(
     io: Server,
 ): CreateNotificationUseCase {
     const socketIoDelivery = new SocketIoNotificationDeliveryAdapter(io);
-    const webPushDelivery = new WebPushNotificationDeliveryAdapter(pushSubscriptionRepository);
     const notificationDelivery = new CompositeNotificationDeliveryAdapter([
         socketIoDelivery,
         webPushDelivery,
     ]);
 
     return new CreateNotificationUseCase(
+        notificastionRepository,
+        notificationDelivery,
+    );
+}
+
+
+export function createBulkNotificationUseCase(
+    io: Server,
+): CreateBulkNotificationsUseCase {
+    const socketIoDelivery = new SocketIoNotificationDeliveryAdapter(io);
+    const notificationDelivery = new CompositeNotificationDeliveryAdapter([
+        socketIoDelivery,
+        webPushDelivery,
+    ]);
+
+    return new CreateBulkNotificationsUseCase(
         notificastionRepository,
         notificationDelivery,
     );

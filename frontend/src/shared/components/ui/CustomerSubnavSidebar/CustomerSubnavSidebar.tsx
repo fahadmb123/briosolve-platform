@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuthStore } from "../../../../features/auth/stores/auth.store";
 import "./CustomerSubnavSidebar.css";
 
 interface SubnavItem {
@@ -20,67 +21,86 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-search-location",
   },
   {
-    label: "Request Service",
-    to: "/request-service",
-    icon: "fas fa-plus-circle",
-  },
-  {
-    label: "Notifications",
-    to: "/notifications",
-    icon: "fas fa-bell",
-  },
-];
-
-const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
-  {
     label: "Profile",
     to: "/profile",
     icon: "fas fa-user",
   },
   {
-    label: "Account Settings",
-    to: "/settings",
-    icon: "fas fa-cog",
-  },
-  {
     label: "Notifications",
     to: "/notifications",
     icon: "fas fa-bell",
   },
 ];
 
+const MORE_SUBNAV_ITEMS: SubnavItem[] = [
+  {
+    label: "My Requests",
+    to: "/my-requests",
+    icon: "fas fa-clipboard-list",
+  },
+  {
+    label: "Request Service",
+    to: "/request-service",
+    icon: "fas fa-plus-circle",
+  },
+  {
+    label: "Bookings",
+    to: "/dashboard#bookings",
+    icon: "fas fa-calendar-check",
+  },
+  {
+    label: "Messages",
+    to: "/dashboard#messages",
+    icon: "fas fa-comments",
+  },
+  {
+    label: "Reviews",
+    to: "/dashboard#reviews",
+    icon: "fas fa-star",
+  },
+];
+
 export const CustomerSubnavSidebar: React.FC = () => {
   const location = useLocation();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const verifications = useAuthStore((state) => state.verifications);
+  const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
 
-  const isSettingsSection =
-    location.pathname.startsWith("/settings") ||
-    location.pathname.startsWith("/profile");
+  const isMoreSection =
+    location.pathname.startsWith("/my-requests") ||
+    location.pathname.startsWith("/request-service") ||
+    location.pathname.startsWith("/bookings") ||
+    location.pathname.startsWith("/messages") ||
+    location.pathname.startsWith("/reviews");
 
   const isWorkspaceSection =
-    location.pathname === "/dashboard" ||
-    location.pathname.startsWith("/dashboard") ||
-    location.pathname.startsWith("/nearby-providers") ||
-    location.pathname.startsWith("/request-service");
+    !isMoreSection &&
+    (location.pathname === "/dashboard" ||
+      location.pathname.startsWith("/dashboard") ||
+      location.pathname.startsWith("/nearby-providers") ||
+      location.pathname.startsWith("/profile") ||
+      location.pathname.startsWith("/notifications") ||
+      location.pathname.startsWith("/settings"));
 
-  const isNotifications = location.pathname.startsWith("/notifications");
-
-  const activeSubnavItems = isSettingsSection
-    ? SETTINGS_SUBNAV_ITEMS
+  const activeSubnavItems = isMoreSection
+    ? MORE_SUBNAV_ITEMS
     : isWorkspaceSection
-    ? WORKSPACE_SUBNAV_ITEMS
-    : isNotifications
-    ? SETTINGS_SUBNAV_ITEMS
-    : null;
+      ? WORKSPACE_SUBNAV_ITEMS
+      : null;
 
-  const activeSubnavTitle = isSettingsSection || isNotifications
-    ? "Settings"
+  const activeSubnavTitle = isMoreSection
+    ? "More"
     : isWorkspaceSection
-    ? "Workspace"
-    : "";
+      ? "Workspace"
+      : "";
 
-  const activeSubnavIcon = isSettingsSection || isNotifications
-    ? "fas fa-sliders-h"
+  const activeSubnavIcon = isMoreSection
+    ? "fas fa-layer-group"
     : "fas fa-th-large";
+
+  const isAccountSettingsActive =
+    location.pathname === "/settings" ||
+    location.pathname.startsWith("/settings");
 
   if (!activeSubnavItems) return null;
 
@@ -98,9 +118,9 @@ export const CustomerSubnavSidebar: React.FC = () => {
           const [toPath, toHash] = item.to.split("#");
           const isActive = toHash
             ? location.pathname === toPath && location.hash === `#${toHash}`
-            : toPath.endsWith("/dashboard")
-            ? location.pathname === toPath && (!location.hash || location.hash === "")
-            : location.pathname === toPath;
+            : toPath === "/dashboard"
+              ? location.pathname === toPath && (!location.hash || location.hash === "")
+              : location.pathname === toPath || location.pathname.startsWith(`${toPath}/`);
 
           return (
             <Link
@@ -117,7 +137,24 @@ export const CustomerSubnavSidebar: React.FC = () => {
           );
         })}
       </nav>
+
+      <div className="cust-subnav-sidebar-footer">
+        <Link
+          to="/settings"
+          className={`cust-subnav-sidebar-item ${isAccountSettingsActive ? "active" : ""}`}
+        >
+          <div className="cust-subnav-sidebar-icon">
+            <i className="fas fa-cog"></i>
+          </div>
+          <span className="cust-subnav-sidebar-label">Account Settings</span>
+          {!isVerified && (
+            <span className="cust-subnav-warning-badge" title="Verification required">
+              <i className="fas fa-exclamation"></i>
+            </span>
+          )}
+          {isAccountSettingsActive && <span className="cust-subnav-sidebar-pill" />}
+        </Link>
+      </div>
     </aside>
   );
 };
-

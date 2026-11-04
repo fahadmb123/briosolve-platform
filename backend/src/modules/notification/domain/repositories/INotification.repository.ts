@@ -1,4 +1,5 @@
 import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { CreateNotificationRequestDto } from "../../application/dtos/request/create-notificastion.dto";
 import { Notification } from "../entities/notification.entity";
 
 export interface CreateNotificationData {
@@ -29,4 +30,5 @@ export interface INotificationRepository extends BaseRepository<Notification | n
   update(id: string, data: UpdateNotificationData): Promise<Notification | null>;
   markAllAsRead(recipientId: string): Promise<Notification[] | null>;
   getUnreadCount(recipientId: string): Promise<number>;
+  createMany(data: CreateNotificationRequestDto[]): Promise<Notification[] | null>
 }

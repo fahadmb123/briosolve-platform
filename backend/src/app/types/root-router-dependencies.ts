@@ -11,4 +11,5 @@ export interface RootRouterDependencies {
     verificationRoutes: ExpressRouter;
     reactivationRoutes: ExpressRouter;
     notificationRoutes: ExpressRouter;
+    serviceRequestRoutes: ExpressRouter;
 }

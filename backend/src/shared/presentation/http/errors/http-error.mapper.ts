@@ -13,9 +13,6 @@ const statusMap: Record<ErrorKind, number> = {
     INTERNAL: 500,
 }
 
-
-
-
 export class HttpErrorMapper {
     static map(error: unknown) {
         const isApplicationError = error instanceof ApplicationError || 
@@ -28,6 +25,16 @@ export class HttpErrorMapper {
                 code: appError.code,
                 message: appError.message,
             }
+        }
+
+        if (typeof error === "object" && error !== null && ("statusCode" in error || "status" in error)) {
+            const err = error as { statusCode?: number; status?: number; code?: string; message?: string };
+            const statusCode = err.statusCode || err.status || 500;
+            return {
+                statusCode,
+                code: err.code || (statusCode === 413 ? "PAYLOAD_TOO_LARGE" : "REQUEST_ERROR"),
+                message: err.message || "Request error",
+            };
         }
 
         return {

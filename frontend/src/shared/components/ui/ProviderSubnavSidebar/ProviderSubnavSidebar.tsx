@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuthStore } from "../../../../features/auth/stores/auth.store";
 import "./ProviderSubnavSidebar.css";
 
 interface SubnavItem {
@@ -16,7 +17,7 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
   },
   {
     label: "Service Requests",
-    to: "/provider/dashboard#requests",
+    to: "/provider/service-requests",
     icon: "fas fa-search-dollar",
   },
   {
@@ -43,11 +44,6 @@ const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-id-card",
   },
   {
-    label: "Account Settings",
-    to: "/provider/settings",
-    icon: "fas fa-cog",
-  },
-  {
     label: "Notification Alerts",
     to: "/provider/notifications",
     icon: "fas fa-bell",
@@ -56,6 +52,9 @@ const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
 
 export const ProviderSubnavSidebar: React.FC = () => {
   const location = useLocation();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const verifications = useAuthStore((state) => state.verifications);
+  const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
 
   const isSettingsSection =
     location.pathname.startsWith("/provider/settings") ||
@@ -66,7 +65,9 @@ export const ProviderSubnavSidebar: React.FC = () => {
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
-    location.pathname.startsWith("/provider/dashboard");
+    location.pathname.startsWith("/provider/dashboard") ||
+    location.pathname.startsWith("/provider/service-requests") ||
+    location.pathname.startsWith("/provider/requests");
 
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS
@@ -83,6 +84,10 @@ export const ProviderSubnavSidebar: React.FC = () => {
   const activeSubnavIcon = isSettingsSection
     ? "fas fa-sliders-h"
     : "fas fa-th-large";
+
+  const isAccountSettingsActive =
+    location.pathname === "/provider/settings" ||
+    location.pathname.startsWith("/provider/settings");
 
   if (!activeSubnavItems) return null;
 
@@ -119,7 +124,24 @@ export const ProviderSubnavSidebar: React.FC = () => {
           );
         })}
       </nav>
+
+      <div className="prov-subnav-sidebar-footer">
+        <Link
+          to="/provider/settings"
+          className={`prov-subnav-sidebar-item ${isAccountSettingsActive ? "active" : ""}`}
+        >
+          <div className="prov-subnav-sidebar-icon">
+            <i className="fas fa-cog"></i>
+          </div>
+          <span className="prov-subnav-sidebar-label">Account Settings</span>
+          {!isVerified && (
+            <span className="prov-subnav-warning-badge" title="Verification required">
+              <i className="fas fa-exclamation"></i>
+            </span>
+          )}
+          {isAccountSettingsActive && <span className="prov-subnav-sidebar-pill" />}
+        </Link>
+      </div>
     </aside>
   );
 };
-

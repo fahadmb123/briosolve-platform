@@ -27,6 +27,7 @@ declare module "@prisma/client" {
             user?: UserGetPayload | null;
             verification_documents?: VerificationDocumentGetPayload[] | null;
             services?: ProviderServiceGetPayload[] | null;
+            service_requests?: ServiceRequestProviderGetPayload[] | null;
         };
         export type provider_profilesGetPayload<T = {}> = ProviderProfileGetPayload<T>;
 
@@ -62,6 +63,25 @@ declare module "@prisma/client" {
         };
         export type servicesGetPayload<T = {}> = ServiceGetPayload<T>;
 
+        export type ServiceRequestImageGetPayload<T = {}> = DefaultModelRow<"service_request_images">;
+        export type service_request_imagesGetPayload<T = {}> = ServiceRequestImageGetPayload<T>;
+
+        export type ServiceRequestProviderGetPayload<T = {}> = DefaultModelRow<"service_request_providers"> & {
+            service_request?: ServiceRequestGetPayload | null;
+            provider?: ProviderProfileGetPayload | null;
+        };
+        export type service_request_providersGetPayload<T = {}> = ServiceRequestProviderGetPayload<T>;
+
+        export type ServiceRequestGetPayload<T = {}> = DefaultModelRow<"service_requests"> & {
+            images?: ServiceRequestImageGetPayload[] | null;
+            providers?: ServiceRequestProviderGetPayload[] | null;
+            category?: CategoryGetPayload | null;
+            subservice?: ServiceGetPayload | null;
+            address?: AddressGetPayload | null;
+            customer?: UserGetPayload | null;
+        };
+        export type service_requestsGetPayload<T = {}> = ServiceRequestGetPayload<T>;
+
         export type UserAccountBlockGetPayload<T = {}> = DefaultModelRow<"user_account_blocks"> & {
             user?: UserGetPayload | null;
             admin?: UserGetPayload | null;
@@ -92,4 +112,3 @@ declare module "@prisma/client" {
         export type CreateInput<Table extends PublicTables> = import("@prisma/orm-postgres/orm-client").CreateInput<Contract, Table, "public">;
     }
 }
-

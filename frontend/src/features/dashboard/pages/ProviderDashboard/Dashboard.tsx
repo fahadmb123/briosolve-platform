@@ -19,7 +19,7 @@ export default function Dashboard() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Link to="#" className="btn btn-primary">
+                        <Link to="/provider/service-requests" className="btn btn-primary">
                             <i className="fas fa-search-dollar mr-1"></i> Browse Service Requests
                         </Link>
                         <Link to="/provider/kyc" className="btn btn-outline text-xs">
@@ -119,8 +119,8 @@ export default function Dashboard() {
                                 <h2 className="h5 mb-0">New Opportunities Matching Your Skills</h2>
                                 <p className="text-xs text-secondary mb-0">Plumbing &amp; AC repair requests posted recently in your radius</p>
                             </div>
-                            <Link to="#" className="btn btn-outline text-xs">
-                                View All (8) <i className="fas fa-arrow-right ml-1"></i>
+                            <Link to="/provider/service-requests" className="btn btn-outline text-xs">
+                                View All Opportunities <i className="fas fa-arrow-right ml-1"></i>
                             </Link>
                         </div>
 

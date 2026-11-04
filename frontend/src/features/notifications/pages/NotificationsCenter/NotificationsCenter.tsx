@@ -78,7 +78,11 @@ export default function NotificationsCenter({
   const unifiedNotifications: UnifiedNotificationItem[] = useMemo(() => {
     const now = Date.now();
     const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
-    return notifications
+    const sorted = [...notifications].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    return sorted
       .filter((n) => now - new Date(n.created_at).getTime() <= oneWeekMs)
       .map((n) => mapNotificationToUnified(n, activeRole));
   }, [notifications, activeRole]);

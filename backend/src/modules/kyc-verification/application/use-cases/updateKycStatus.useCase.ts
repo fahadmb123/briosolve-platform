@@ -63,7 +63,7 @@ export class UpdateKycStatusUseCase implements IUseCase<UpdateKycStatusInput, vo
                     ? "Your KYC verification is complete and your provider account is fully verified."
                     : "Your KYC verification document has been approved.")
                 : input.rejectionReason || "Your KYC verification document was rejected.",
-        } as const;
+        } ;
 
         try {
             await this._createNotificationUseCase.execute(notification);

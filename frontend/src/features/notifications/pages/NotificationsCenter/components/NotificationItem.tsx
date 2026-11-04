@@ -57,6 +57,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                   className={`notif-action-btn ${
                     item.primaryAction.variant || "primary"
                   }`}
+                  onClick={() => {
+                    if (item.unread) {
+                      onToggleRead(item.id);
+                    }
+                  }}
                 >
                   {item.primaryAction.icon && (
                     <i className={`fas ${item.primaryAction.icon}`}></i>
@@ -69,6 +74,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                   className={`notif-action-btn ${
                     item.primaryAction.variant || "primary"
                   }`}
+                  onClick={() => {
+                    if (item.unread) {
+                      onToggleRead(item.id);
+                    }
+                  }}
                 >
                   {item.primaryAction.icon && (
                     <i className={`fas ${item.primaryAction.icon}`}></i>
@@ -84,6 +94,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                   className={`notif-action-btn ${
                     item.secondaryAction.variant || "secondary"
                   }`}
+                  onClick={() => {
+                    if (item.unread) {
+                      onToggleRead(item.id);
+                    }
+                  }}
                 >
                   {item.secondaryAction.icon && (
                     <i className={`fas ${item.secondaryAction.icon}`}></i>
@@ -96,6 +111,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                   className={`notif-action-btn ${
                     item.secondaryAction.variant || "secondary"
                   }`}
+                  onClick={() => {
+                    if (item.unread) {
+                      onToggleRead(item.id);
+                    }
+                  }}
                 >
                   {item.secondaryAction.icon && (
                     <i className={`fas ${item.secondaryAction.icon}`}></i>

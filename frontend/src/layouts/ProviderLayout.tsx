@@ -21,7 +21,9 @@ export default function ProviderLayout() {
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
-    location.pathname.startsWith("/provider/dashboard");
+    location.pathname.startsWith("/provider/dashboard") ||
+    location.pathname.startsWith("/provider/service-requests") ||
+    location.pathname.startsWith("/provider/requests");
 
   const hasSubnav = isSettingsSection || isWorkspaceSection;
 

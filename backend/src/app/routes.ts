@@ -15,6 +15,7 @@ export function createRootRouter(route: RootRouterDependencies) {
     router.use("/category", route.categoryRoutes);
     router.use("/reactivation", route.reactivationRoutes);
     router.use("/notification", route.notificationRoutes);
+    router.use("/service-request", route.serviceRequestRoutes);
 
     return router;
 }

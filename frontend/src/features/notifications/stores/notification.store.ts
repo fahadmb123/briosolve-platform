@@ -13,10 +13,17 @@ interface NotificationState {
     removeNotification: (id: string) => void;
 }
 
+const sortByCreatedAtDesc = (items: NotificationResponseDto[]): NotificationResponseDto[] => {
+    return [...items].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+};
+
 export const useNotificationStore = create<NotificationState>()((set) => ({
     notifications: [],
 
-    setNotifications: (notifications) => set({ notifications }),
+    setNotifications: (notifications) =>
+        set({ notifications: sortByCreatedAtDesc(notifications) }),
 
     addNotification: (notification) =>
         set((state) => {
@@ -25,7 +32,7 @@ export const useNotificationStore = create<NotificationState>()((set) => ({
             }
 
             return {
-                notifications: [notification, ...state.notifications],
+                notifications: sortByCreatedAtDesc([notification, ...state.notifications]),
             };
         }),
 

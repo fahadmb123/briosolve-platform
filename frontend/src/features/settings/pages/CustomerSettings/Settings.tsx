@@ -24,53 +24,91 @@ export default function Settings() {
             ? user.current_address_id
             : null;
 
+    const isAllVerificationCompleted = Boolean(isContactVerified && currentAddress);
+
     const renderMenu = () => (
-        <div className="settings-glass-grid">
-            <SettingsMenuCard
-                icon="fas fa-paint-brush"
-                title="Theme & Appearance"
-                description="Choose your preferred visual style across all customer screens."
-                onClick={() => setActiveView('appearance')}
-            />
-            
-            <SettingsMenuCard
-                icon="fas fa-id-card"
-                title="Account & Contact"
-                description="Update your sign-in email and verified mobile number."
-                onClick={() => setActiveView('contact')}
-                badge={isContactVerified ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
-            />
+        <div className="flex flex-col gap-6">
+            <div className="settings-group-box">
+                <div className="settings-group-header">
+                    <div className="settings-group-title-area">
+                        <div className="settings-group-icon verification">
+                            <i className="fas fa-shield-alt"></i>
+                        </div>
+                        <div>
+                            <h2 className="settings-group-title">Required Verifications</h2>
+                            <p className="settings-group-desc">Mandatory credentials to verify identity and maintain trusted access.</p>
+                        </div>
+                    </div>
+                    <div className="settings-group-badge">
+                        <span className={`badge ${isAllVerificationCompleted ? 'badge-success' : 'badge-warning'} text-xs font-semibold px-2.5 py-1`}>
+                            <i className={`fas ${isAllVerificationCompleted ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-1`}></i>
+                            {isAllVerificationCompleted ? 'All Verified' : 'Action Required'}
+                        </span>
+                    </div>
+                </div>
 
-            <SettingsMenuCard
-                icon="fas fa-shield-alt"
-                title="Password & Security"
-                description="Update your sign-in credentials to protect your marketplace account."
-                onClick={() => setActiveView('security')}
-            />
+                <div className="settings-glass-grid">
+                    <SettingsMenuCard
+                        icon="fas fa-id-card"
+                        title="Account & Contact"
+                        description="Update your sign-in email and verified mobile number."
+                        onClick={() => setActiveView('contact')}
+                        badge={isContactVerified ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
+                    />
 
-            <SettingsMenuCard
-                icon="fas fa-bell"
-                title="Notification Alerts"
-                description="Configure which activity generates direct push or email alerts."
-                onClick={() => setActiveView('notifications')}
-            />
+                    <SettingsMenuCard
+                        icon="fas fa-map-pin"
+                        title="Manage Addresses"
+                        description="Save multiple addresses for quick booking and dispatch."
+                        onClick={() => setActiveView('addresses')}
+                        badge={currentAddress ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
+                    />
+                </div>
+            </div>
 
+            <div className="settings-group-box">
+                <div className="settings-group-header">
+                    <div className="settings-group-title-area">
+                        <div className="settings-group-icon preferences">
+                            <i className="fas fa-sliders-h"></i>
+                        </div>
+                        <div>
+                            <h2 className="settings-group-title">General Settings & Preferences</h2>
+                            <p className="settings-group-desc">Customize theme style, security credentials, and platform preferences.</p>
+                        </div>
+                    </div>
+                </div>
 
-            <SettingsMenuCard
-                icon="fas fa-map-pin"
-                title="Manage Addresses"
-                description="Save multiple addresses for quick booking and dispatch."
-                onClick={() => setActiveView('addresses')}
-                badge={currentAddress ? { text: 'Verified', type: 'success' } : { text: 'Action Required', type: 'warning' }}
-            />
+                <div className="settings-glass-grid">
+                    <SettingsMenuCard
+                        icon="fas fa-paint-brush"
+                        title="Theme & Appearance"
+                        description="Choose your preferred visual style across all customer screens."
+                        onClick={() => setActiveView('appearance')}
+                    />
 
-            <SettingsMenuCard
-                icon="fas fa-store"
-                title="Become a Provider"
-                description="Switch your account and start offering services on the marketplace."
-                onClick={() => setActiveView('become-provider')}
-            />
+                    <SettingsMenuCard
+                        icon="fas fa-shield-alt"
+                        title="Password & Security"
+                        description="Update your sign-in credentials to protect your marketplace account."
+                        onClick={() => setActiveView('security')}
+                    />
 
+                    <SettingsMenuCard
+                        icon="fas fa-bell"
+                        title="Notification Alerts"
+                        description="Configure which activity generates direct push or email alerts."
+                        onClick={() => setActiveView('notifications')}
+                    />
+
+                    <SettingsMenuCard
+                        icon="fas fa-store"
+                        title="Become a Provider"
+                        description="Switch your account and start offering services on the marketplace."
+                        onClick={() => setActiveView('become-provider')}
+                    />
+                </div>
+            </div>
         </div>
     );
 

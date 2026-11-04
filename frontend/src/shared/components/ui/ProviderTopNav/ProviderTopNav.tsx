@@ -21,7 +21,9 @@ export const ProviderTopNav: React.FC = () => {
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
-    location.pathname.startsWith("/provider/dashboard");
+    location.pathname.startsWith("/provider/dashboard") ||
+    location.pathname.startsWith("/provider/service-requests") ||
+    location.pathname.startsWith("/provider/requests");
 
 
   const user = useAuthStore((state) => state.user);
@@ -32,7 +34,9 @@ export const ProviderTopNav: React.FC = () => {
 
   const [activePanel, setActivePanel] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const navRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null)
+  const verifications = useAuthStore(state=>state.verifications)
+  const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
 
   const handleLogout = async () => {
     if (!isAuthenticated) {
@@ -189,7 +193,7 @@ export const ProviderTopNav: React.FC = () => {
                       </div>
                     </NavLink>
                     <Link
-                      to="#"
+                      to="/provider/service-requests"
                       className="prov-panel-item"
                       onClick={closeAll}
                     >
@@ -410,6 +414,11 @@ export const ProviderTopNav: React.FC = () => {
               aria-expanded={activePanel === "settings"}
             >
               <span>Settings</span>
+              {!isVerified && (
+                <span className="prov-nav-warning-badge" title="Verification required">
+                  <i className="fas fa-exclamation"></i>
+                </span>
+              )}
               <i
                 className={`fas fa-chevron-down prov-caret ${
                   activePanel === "settings" ? "rotate" : ""
@@ -469,6 +478,11 @@ export const ProviderTopNav: React.FC = () => {
                         <i className="fas fa-cog"></i>
                         <span>Account Settings</span>
                       </div>
+                      {!isVerified && (
+                        <span className="prov-nav-warning-badge" title="Verification required">
+                          <i className="fas fa-exclamation"></i>
+                        </span>
+                      )}
                     </NavLink>
                     <NavLink
                       to="/provider/notifications"
@@ -560,7 +574,7 @@ export const ProviderTopNav: React.FC = () => {
                   </div>
                   <div className="prov-header-email">{user?.email}</div>
                   <div className="prov-header-meta">
-                    {profile?.kyc_status === "APPROVED" ? (
+                    {isVerified ? (
                       <>
                         <span className="prov-mono-badge">Verified Provider</span>
                       </>
@@ -601,6 +615,11 @@ export const ProviderTopNav: React.FC = () => {
                     <i className="fas fa-cog"></i>
                     <span>Settings</span>
                   </div>
+                  {!isVerified && (
+                    <span className="prov-nav-warning-badge" title="Verification required">
+                      <i className="fas fa-exclamation"></i>
+                    </span>
+                  )}
                 </NavLink>
                 <Link
                   to="/provider/verification"
@@ -738,10 +757,15 @@ export const ProviderTopNav: React.FC = () => {
             </NavLink>
             <NavLink
               to="/provider/settings"
-              className="prov-mobile-item"
+              className="prov-mobile-item flex items-center justify-between"
               onClick={closeAll}
             >
               <span>Account Settings</span>
+              {!isVerified && (
+                <span className="prov-nav-warning-badge" title="Verification required">
+                  <i className="fas fa-exclamation"></i>
+                </span>
+              )}
             </NavLink>
             <NavLink
               to="/provider/notifications"

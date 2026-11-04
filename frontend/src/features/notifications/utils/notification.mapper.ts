@@ -67,6 +67,32 @@ export function mapNotificationToHeader(
 ): HeaderNotification {
     const createdAt = new Date(notification.created_at);
     const theme = NOTIFICATION_ICON_THEMES[notification.type];
+    const content = `${notification.title} ${notification.message}`.toLowerCase();
+
+    let link: string = NOTIFICATION_ROUTES[role] || NOTIFICATION_ROUTES.CUSTOMER;
+    if (role === "PROVIDER") {
+        if (
+            content.includes("lead") ||
+            content.includes("request") ||
+            content.includes("nearby")
+        ) {
+            link = "/provider/service-requests";
+        } else if (
+            content.includes("kyc") ||
+            content.includes("verification") ||
+            content.includes("document")
+        ) {
+            link = "/provider/kyc";
+        }
+    } else if (role === "CUSTOMER") {
+        if (
+            content.includes("request") ||
+            content.includes("quote") ||
+            content.includes("bid")
+        ) {
+            link = "/my-requests";
+        }
+    }
 
     return {
         id: notification.id,
@@ -77,7 +103,7 @@ export function mapNotificationToHeader(
         icon: theme.icon,
         iconColor: theme.iconColor,
         iconBg: theme.iconBg,
-        link: NOTIFICATION_ROUTES[role] || NOTIFICATION_ROUTES.CUSTOMER,
+        link,
     };
 }
 
@@ -117,13 +143,14 @@ export function mapNotificationToUnified(
         if (
             content.includes("quote") ||
             content.includes("bid") ||
-            content.includes("estimate")
+            content.includes("estimate") ||
+            content.includes("request")
         ) {
             category = "quote";
             primaryAction = {
-                label: "View Quotes",
-                link: "/quotes",
-                icon: "fa-file-invoice-dollar",
+                label: "View Requests",
+                link: "/my-requests",
+                icon: "fa-clipboard-list",
                 variant: "primary",
             };
         } else if (
@@ -135,7 +162,7 @@ export function mapNotificationToUnified(
             category = "booking";
             primaryAction = {
                 label: "View Bookings",
-                link: "/bookings",
+                link: "/dashboard#bookings",
                 icon: "fa-calendar-check",
                 variant: "primary",
             };
@@ -152,9 +179,9 @@ export function mapNotificationToUnified(
         ) {
             category = "lead";
             primaryAction = {
-                label: "View Leads",
-                link: "/provider/leads",
-                icon: "fa-bolt",
+                label: content.includes("cancel") ? "View Requests" : "View Leads",
+                link: "/provider/service-requests",
+                icon: content.includes("cancel") ? "fa-clipboard-list" : "fa-bolt",
                 variant: "primary",
             };
         } else if (
@@ -165,7 +192,7 @@ export function mapNotificationToUnified(
             category = "accepted";
             primaryAction = {
                 label: "View Quotes",
-                link: "/provider/quotes",
+                link: "/provider/service-requests",
                 icon: "fa-check-double",
                 variant: "primary",
             };
@@ -177,7 +204,7 @@ export function mapNotificationToUnified(
             category = "booking";
             primaryAction = {
                 label: "View Schedule",
-                link: "/provider/bookings",
+                link: "/provider/dashboard#bookings",
                 icon: "fa-calendar",
                 variant: "primary",
             };

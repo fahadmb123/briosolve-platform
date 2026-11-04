@@ -4,7 +4,6 @@ import { toast } from 'react-hot-toast';
 import type { ApiError } from "../../../shared/api/ApiError";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/auth.store";
-
 import { useResetFlowStore } from "../stores/reset-flow.store";
 
 export const useOtpVarify = (isInline?: boolean) => {
@@ -39,10 +38,9 @@ export const useOtpVarify = (isInline?: boolean) => {
                 }
 
                 if (!isInline) {
-                    console.log("Heyoooooo")
                     if (response.data.for && response.data.for.includes("BECOME_PROVIDER")) {
-                        useAuthStore.getState().clearAuth();
-                        navigate("/login", { replace: true });
+                        await useAuthStore.getState().fetchUser();
+                        navigate("/provider/kyc", { replace: true });
                     } else if (currentUser?.role === "PROVIDER") {
                         navigate("/provider/settings", { replace: true, state: { activeSection: 'account' } });
                     } else if (currentUser?.role === "ADMIN") {
@@ -86,6 +84,13 @@ export const useLogin = () => {
             
             if (user.role === "CUSTOMER") {
                 navigate("/", { replace: true });
+            } else if (user.role === "PROVIDER") {
+                const kycStatus = user.provider_profile?.kyc_status;
+                if (!kycStatus || kycStatus !== "APPROVED") {
+                    navigate("/provider/kyc", { replace: true });
+                } else {
+                    navigate("/provider/dashboard", { replace: true });
+                }
             } else {
                 navigate(`/${user.role.toLocaleLowerCase()}`, { replace: true });
             }
