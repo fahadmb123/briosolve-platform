@@ -4,6 +4,7 @@ import { IConversationRepository } from "../../domain/repositories/IConversation
 import { IConversationParticipantRepository } from "../../domain/repositories/IConversationParticipantRepository";
 import { StartConversationRequestDto } from "../dtos/request/start-conversation.dto";
 import { ConversationResponseDto } from "../dtos/response/conversation-response.dto";
+import { ConversationMapper } from "../../infrastructure/mappers/conversation.mapper";
 
 export class StartConversationUseCase implements IUseCase<StartConversationRequestDto, ConversationResponseDto> {
     constructor(
@@ -33,7 +34,9 @@ export class StartConversationUseCase implements IUseCase<StartConversationReque
             input.recipientId
         );
 
-        if (existingConversation) return existingConversation
+        if (existingConversation) {
+            return ConversationMapper.toDto(existingConversation);
+        }
 
         const conversation = await this._conversationRepository.create();
 
@@ -56,11 +59,6 @@ export class StartConversationUseCase implements IUseCase<StartConversationReque
             }
         ]);
 
-        return {
-            id: conversation.id,
-            status: conversation.status,
-            created_at: conversation.created_at
-        };
+        return ConversationMapper.toDto(conversation);
     }
 }
-
