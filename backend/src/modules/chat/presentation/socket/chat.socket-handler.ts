@@ -1,10 +1,9 @@
-import type { Server, Socket } from "socket.io";
+import type { Socket } from "socket.io";
 import { JoinConversationUseCase } from "../../application/use-cases/joinConversation.useCase";
 import type { SocketData } from "../../../../shared/realtime/types/socket-data.types";
 
 export class ChatSocketHandler {
     constructor(
-        private readonly _io: Server,
         private readonly _joinConversationUseCase: JoinConversationUseCase
     ) {}
 
@@ -40,4 +39,3 @@ export class ChatSocketHandler {
         });
     }
 }
-
