@@ -44,7 +44,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
         </div>
       )}
 
-      <div className="chat-input-box">
+      <div className="chat-input-row">
         <textarea
           rows={1}
           placeholder="Type a message... (Press Enter to send)"
@@ -57,7 +57,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
         <div className="chat-input-actions">
           <button
             type="button"
-            className="chat-send-btn"
+            className={`chat-send-btn ${inputText.trim() ? "active" : ""}`}
             onClick={handleSend}
             disabled={!inputText.trim() || disabled}
             aria-label="Send message"

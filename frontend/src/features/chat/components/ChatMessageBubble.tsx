@@ -4,6 +4,7 @@ import type { ChatMessage } from "../types/chat.types";
 interface ChatMessageBubbleProps {
   message: ChatMessage;
   currentRole?: "CUSTOMER" | "PROVIDER";
+  currentUserId?: string;
   onAcceptQuote?: (quoteId: string) => void;
   onDeclineQuote?: (quoteId: string) => void;
 }
@@ -11,11 +12,13 @@ interface ChatMessageBubbleProps {
 export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
   message,
   currentRole = "CUSTOMER",
+  currentUserId,
   onAcceptQuote,
   onDeclineQuote,
 }) => {
-  const isMe =
-    currentRole === "PROVIDER"
+  const isMe = currentUserId
+    ? message.senderId === currentUserId
+    : currentRole === "PROVIDER"
       ? message.senderRole === "PROVIDER"
       : message.senderRole === "CUSTOMER";
 

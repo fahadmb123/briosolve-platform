@@ -135,7 +135,7 @@ export default function ProviderChat() {
 
   const handleSocketNewMessage = useCallback(
     (backendMsg: BackendMessageDto) => {
-      const chatMsg = toChatMessage(backendMsg, currentUser?.id);
+      const chatMsg = toChatMessage(backendMsg, currentUser?.id, "PROVIDER");
 
       setMessagesMap((prev) => {
         const existing = prev[backendMsg.conversation_id] || [];
@@ -182,7 +182,7 @@ export default function ProviderChat() {
         onSuccess: (res) => {
           if (res?.data) {
             const mapped = res.data.map((msg) =>
-              toChatMessage(msg, currentUser?.id)
+              toChatMessage(msg, currentUser?.id, "PROVIDER")
             );
             setMessagesMap((prev) => ({
               ...prev,
@@ -389,19 +389,24 @@ export default function ProviderChat() {
               <ChatHeader
                 participant={selectedConversation.participant}
                 linkedRequest={selectedConversation.linkedRequest}
+                currentRole="PROVIDER"
                 isInfoOpen={isInfoOpen}
                 onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
+                onOpenCreateQuote={() => setIsQuoteModalOpen(true)}
               />
 
               <ChatRequestBanner
                 request={selectedConversation.linkedRequest}
+                currentRole="PROVIDER"
                 onOpenDetails={() => setIsInfoOpen(true)}
               />
 
               <div className="chat-thread-body">
                 <ChatMessageList
                   messages={activeMessages}
+                  currentRole="PROVIDER"
+                  currentUserId={currentUser?.id}
                   onAcceptQuote={() => {}}
                   onDeclineQuote={() => {}}
                 />
@@ -413,7 +418,8 @@ export default function ProviderChat() {
                   className="provider-prompt-pill"
                   onClick={() => setIsQuoteModalOpen(true)}
                 >
-                  Create Quotation
+                  <i className="fas fa-file-invoice-dollar" />
+                  <span>Create Quotation</span>
                 </button>
               </div>
 

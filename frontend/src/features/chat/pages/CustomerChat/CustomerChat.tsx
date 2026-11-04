@@ -31,35 +31,26 @@ export default function CustomerChat() {
   const currentUser = useAuthStore((state) => state.user);
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const queryConversationId =
-    searchParams.get("conversationId") ||
-    (location.state as { conversationId?: string })?.conversationId ||
-    null;
-
+  const queryConversationId =  searchParams.get("conversationId") || (location.state as { conversationId?: string })?.conversationId || null
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(
-    queryConversationId || null
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(queryConversationId || null)
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<ConversationFilter>("ALL");
-  const [messagesMap, setMessagesMap] = useState<Record<string, ChatMessage[]>>(
-    {}
-  );
+  const [messagesMap, setMessagesMap] = useState<Record<string, ChatMessage[]>>({})
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(
-    Boolean(queryConversationId)
-  );
-
+  const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(Boolean(queryConversationId))
   const getConversationsMutation = useGetConversations();
   const getMessagesMutation = useGetMessages();
   const sendMessageMutation = useSendMessage();
   const markMessagesAsReadMutation = useMarkMessagesAsRead();
 
   useEffect(() => {
-    if (queryConversationId) {
-      setSelectedId(queryConversationId);
-      setIsMobileThreadOpen(true);
-    }
+    (()=>{
+      if (queryConversationId) {
+        setSelectedId(queryConversationId);
+        setIsMobileThreadOpen(true);
+      }
+    })()
   }, [queryConversationId]);
 
   const fetchConversations = useCallback(() => {
@@ -133,7 +124,7 @@ export default function CustomerChat() {
 
   const handleSocketNewMessage = useCallback(
     (backendMsg: BackendMessageDto) => {
-      const chatMsg = toChatMessage(backendMsg, currentUser?.id);
+      const chatMsg = toChatMessage(backendMsg, currentUser?.id, "CUSTOMER");
 
       setMessagesMap((prev) => {
         const existing = prev[backendMsg.conversation_id] || [];
@@ -180,7 +171,7 @@ export default function CustomerChat() {
         onSuccess: (res) => {
           if (res?.data) {
             const mapped = res.data.map((msg) =>
-              toChatMessage(msg, currentUser?.id)
+              toChatMessage(msg, currentUser?.id, "CUSTOMER")
             );
             setMessagesMap((prev) => ({
               ...prev,
@@ -370,6 +361,7 @@ export default function CustomerChat() {
               <ChatHeader
                 participant={selectedConversation.participant}
                 linkedRequest={selectedConversation.linkedRequest}
+                currentRole="CUSTOMER"
                 isInfoOpen={isInfoOpen}
                 onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
@@ -377,12 +369,15 @@ export default function CustomerChat() {
 
               <ChatRequestBanner
                 request={selectedConversation.linkedRequest}
+                currentRole="CUSTOMER"
                 onOpenDetails={() => setIsInfoOpen(true)}
               />
 
               <div className="chat-thread-body">
                 <ChatMessageList
                   messages={activeMessages}
+                  currentRole="CUSTOMER"
+                  currentUserId={currentUser?.id}
                   onAcceptQuote={handleAcceptQuote}
                   onDeclineQuote={handleDeclineQuote}
                 />

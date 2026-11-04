@@ -5,6 +5,7 @@ import { ChatMessageBubble } from "./ChatMessageBubble";
 interface ChatMessageListProps {
   messages: ChatMessage[];
   currentRole?: "CUSTOMER" | "PROVIDER";
+  currentUserId?: string;
   onAcceptQuote?: (quoteId: string) => void;
   onDeclineQuote?: (quoteId: string) => void;
 }
@@ -12,6 +13,7 @@ interface ChatMessageListProps {
 export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   messages,
   currentRole = "CUSTOMER",
+  currentUserId,
   onAcceptQuote,
   onDeclineQuote,
 }) => {
@@ -40,6 +42,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
           key={msg.id}
           message={msg}
           currentRole={currentRole}
+          currentUserId={currentUserId}
           onAcceptQuote={onAcceptQuote}
           onDeclineQuote={onDeclineQuote}
         />

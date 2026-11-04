@@ -1,7 +1,11 @@
 import type { BackendConversationDto, BackendMessageDto } from "../services/chat.service";
 import type { ChatConversation, ChatMessage, ChatParticipant } from "../types/chat.types";
 
-export function toChatMessage(dto: BackendMessageDto, currentUserId?: string): ChatMessage {
+export function toChatMessage(
+    dto: BackendMessageDto,
+    currentUserId?: string,
+    currentUserRole?: "CUSTOMER" | "PROVIDER"
+): ChatMessage {
     const isMe = currentUserId ? dto.sender_id === currentUserId : false;
 
     const createdAtDate = new Date(dto.created_at);
@@ -9,12 +13,16 @@ export function toChatMessage(dto: BackendMessageDto, currentUserId?: string): C
         ? ""
         : createdAtDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
+    const role = isMe
+        ? (currentUserRole || "CUSTOMER")
+        : (currentUserRole === "PROVIDER" ? "CUSTOMER" : "PROVIDER");
+
     return {
         id: dto.id,
         conversationId: dto.conversation_id,
         senderId: dto.sender_id,
-        senderRole: isMe ? "CUSTOMER" : "PROVIDER",
-        senderName: isMe ? "You" : "Participant",
+        senderRole: role,
+        senderName: isMe ? "You" : (role === "PROVIDER" ? "Provider" : "Customer"),
         text: dto.content,
         type: dto.message_type === "IMAGE" ? "IMAGE" : "TEXT",
         status: "SENT",
