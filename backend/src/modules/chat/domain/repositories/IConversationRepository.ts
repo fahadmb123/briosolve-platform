@@ -7,4 +7,6 @@ export interface IConversationRepository extends BaseRepository<Conversation | n
     findById(id: string): Promise<Conversation | null>;
 
     findDirectConversation(userId: string, recipientId: string): Promise<Conversation | null>;
+
+    findByUserId(userId: string): Promise<Conversation[]>;
 }
