@@ -76,7 +76,7 @@ export default function MyRequests() {
   }, [requests]);
 
   const filteredRequests = useMemo(() => {
-    const result = requests.filter((req) => {
+    let result = requests.filter((req) => {
       if (selectedStatus !== "ALL" && req.status !== selectedStatus) {
         return false;
       }
@@ -89,8 +89,8 @@ export default function MyRequests() {
         const subserviceMatch = (req.subservice_name || "").toLowerCase().includes(query);
         const locationMatch = req.address_details
           ? `${req.address_details.area} ${req.address_details.city} ${req.address_details.landmark || ""}`
-              .toLowerCase()
-              .includes(query)
+            .toLowerCase()
+            .includes(query)
           : false;
 
         return titleMatch || descMatch || categoryMatch || subserviceMatch || locationMatch;

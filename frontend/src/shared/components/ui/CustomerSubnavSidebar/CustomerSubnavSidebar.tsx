@@ -20,6 +20,16 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/nearby-providers",
     icon: "fas fa-search-location",
   },
+  {
+    label: "Profile",
+    to: "/profile",
+    icon: "fas fa-user",
+  },
+  {
+    label: "Notifications",
+    to: "/notifications",
+    icon: "fas fa-bell",
+  },
 ];
 
 const MORE_SUBNAV_ITEMS: SubnavItem[] = [
@@ -50,29 +60,11 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
   },
 ];
 
-const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
-  {
-    label: "Profile",
-    to: "/profile",
-    icon: "fas fa-user",
-  },
-  {
-    label: "Notifications",
-    to: "/notifications",
-    icon: "fas fa-bell",
-  },
-];
-
 export const CustomerSubnavSidebar: React.FC = () => {
   const location = useLocation();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const verifications = useAuthStore((state) => state.verifications);
   const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
-
-  const isSettingsSection =
-    location.pathname.startsWith("/settings") ||
-    location.pathname.startsWith("/profile") ||
-    location.pathname.startsWith("/notifications");
 
   const isMoreSection =
     location.pathname.startsWith("/my-requests") ||
@@ -82,33 +74,29 @@ export const CustomerSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/reviews");
 
   const isWorkspaceSection =
-    !isSettingsSection &&
     !isMoreSection &&
     (location.pathname === "/dashboard" ||
       location.pathname.startsWith("/dashboard") ||
-      location.pathname.startsWith("/nearby-providers"));
+      location.pathname.startsWith("/nearby-providers") ||
+      location.pathname.startsWith("/profile") ||
+      location.pathname.startsWith("/notifications") ||
+      location.pathname.startsWith("/settings"));
 
-  const activeSubnavItems = isSettingsSection
-    ? SETTINGS_SUBNAV_ITEMS
-    : isMoreSection
-      ? MORE_SUBNAV_ITEMS
-      : isWorkspaceSection
-        ? WORKSPACE_SUBNAV_ITEMS
-        : null;
+  const activeSubnavItems = isMoreSection
+    ? MORE_SUBNAV_ITEMS
+    : isWorkspaceSection
+      ? WORKSPACE_SUBNAV_ITEMS
+      : null;
 
-  const activeSubnavTitle = isSettingsSection
-    ? "Settings"
-    : isMoreSection
-      ? "More"
-      : isWorkspaceSection
-        ? "Workspace"
-        : "";
+  const activeSubnavTitle = isMoreSection
+    ? "More"
+    : isWorkspaceSection
+      ? "Workspace"
+      : "";
 
-  const activeSubnavIcon = isSettingsSection
-    ? "fas fa-sliders-h"
-    : isMoreSection
-      ? "fas fa-layer-group"
-      : "fas fa-th-large";
+  const activeSubnavIcon = isMoreSection
+    ? "fas fa-layer-group"
+    : "fas fa-th-large";
 
   const isAccountSettingsActive =
     location.pathname === "/settings" ||
