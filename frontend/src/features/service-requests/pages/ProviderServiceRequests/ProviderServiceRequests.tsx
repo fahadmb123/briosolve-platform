@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMutations";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
-import { ProviderRequestCard, ProviderRequestDetailsModal } from "./components";
+import { ProviderRequestCard, ProviderRequestDetailsModal } from "../../components/provider-requests";
 import "./ProviderServiceRequests.css";
 
 export default function ProviderServiceRequests() {

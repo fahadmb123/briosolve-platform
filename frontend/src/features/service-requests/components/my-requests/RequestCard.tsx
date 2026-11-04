@@ -1,6 +1,6 @@
 import React from "react";
-import type { CustomerServiceRequestItem } from "../../../types/serviceRequest.types";
-import { checkRequestEditPermission } from "../../../utils/serviceRequestEdit.utils";
+import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
+import { checkRequestEditPermission } from "../../utils/serviceRequestEdit.utils";
 
 interface RequestCardProps {
   request: CustomerServiceRequestItem;

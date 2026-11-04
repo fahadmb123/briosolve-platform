@@ -1,5 +1,5 @@
 import React from "react";
-import type { ServiceRequestStatus } from "../../../types/serviceRequest.types";
+import type { ServiceRequestStatus } from "../../types/serviceRequest.types";
 
 export type StatusFilterType = "ALL" | ServiceRequestStatus;
 

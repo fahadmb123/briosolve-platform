@@ -1,4 +1,4 @@
-import { ServiceSelectionSkeleton } from "../../../components/ServiceSelectionSkeleton";
+import { ServiceSelectionSkeleton } from "../ServiceSelectionSkeleton";
 import type { Category, ServiceItem } from "./types";
 
 interface Level1ServiceStepProps {

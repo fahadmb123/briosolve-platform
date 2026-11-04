@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import type { CustomerServiceRequestItem } from "../../../types/serviceRequest.types";
+import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 
 interface ProviderRequestDetailsModalProps {
   request: CustomerServiceRequestItem | null;

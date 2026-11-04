@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
-import type { AddressPayload } from "../../../../addresses";
-import { ServiceSelectionSkeleton } from "../../../components/ServiceSelectionSkeleton";
-import type { ServiceRequestInputType } from "../../../schemas/serviceRequest.schema";
+import type { AddressPayload } from "../../../addresses";
+import { ServiceSelectionSkeleton } from "../ServiceSelectionSkeleton";
+import type { ServiceRequestInputType } from "../../schemas/serviceRequest.schema";
 
 interface Level3ScheduleStepProps {
   addresses: AddressPayload[];

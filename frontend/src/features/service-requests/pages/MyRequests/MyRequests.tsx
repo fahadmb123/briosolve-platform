@@ -16,7 +16,7 @@ import {
   EditRequestModal,
   type StatusFilterType,
   type SortOrderType
-} from "./components";
+} from "../../components/my-requests";
 
 export default function MyRequests() {
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
@@ -76,7 +76,7 @@ export default function MyRequests() {
   }, [requests]);
 
   const filteredRequests = useMemo(() => {
-    let result = requests.filter((req) => {
+    const result = requests.filter((req) => {
       if (selectedStatus !== "ALL" && req.status !== selectedStatus) {
         return false;
       }

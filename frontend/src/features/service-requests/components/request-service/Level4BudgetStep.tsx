@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from "react";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
-import type { ServiceRequestInputType } from "../../../schemas/serviceRequest.schema";
+import type { ServiceRequestInputType } from "../../schemas/serviceRequest.schema";
 
 interface Level4BudgetStepProps {
   fileInputId: string;

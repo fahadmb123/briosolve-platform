@@ -4,13 +4,13 @@ import type {
   CustomerServiceRequestItem,
   RequestUrgency,
   RequestBudgetType
-} from "../../../types/serviceRequest.types";
-import { checkRequestEditPermission } from "../../../utils/serviceRequestEdit.utils";
-import { computeDateForUrgency } from "../../../utils/serviceDate.utils";
-import { useUpdateServiceRequest } from "../../../hooks/useServiceRequestMutations";
-import { useGetCategoriesService } from "../../../../service-catalog";
-import { useGetAddresses, type AddressPayload } from "../../../../addresses";
-import type { Category } from "../../RequestService/components";
+} from "../../types/serviceRequest.types";
+import { checkRequestEditPermission } from "../../utils/serviceRequestEdit.utils";
+import { computeDateForUrgency } from "../../utils/serviceDate.utils";
+import { useUpdateServiceRequest } from "../../hooks/useServiceRequestMutations";
+import { useGetCategoriesService } from "../../../service-catalog";
+import { useGetAddresses, type AddressPayload } from "../../../addresses";
+import type { Category } from "../request-service";
 
 interface EditRequestModalProps {
   request: CustomerServiceRequestItem | null;

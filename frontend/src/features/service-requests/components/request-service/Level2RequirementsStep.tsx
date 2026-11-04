@@ -1,6 +1,6 @@
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
-import type { ServiceRequestInputType } from "../../../schemas/serviceRequest.schema";
-import { getTodayDate, getEndOfWeekDate, getFlexibleDate } from "../../../utils/serviceDate.utils";
+import type { ServiceRequestInputType } from "../../schemas/serviceRequest.schema";
+import { getTodayDate, getEndOfWeekDate, getFlexibleDate } from "../../utils/serviceDate.utils";
 
 interface Level2RequirementsStepProps {
   register: UseFormRegister<ServiceRequestInputType>;

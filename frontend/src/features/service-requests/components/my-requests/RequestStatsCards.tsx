@@ -1,5 +1,5 @@
 import React from "react";
-import type { CustomerServiceRequestItem } from "../../../types/serviceRequest.types";
+import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 
 interface RequestStatsCardsProps {
   requests: CustomerServiceRequestItem[];

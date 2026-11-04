@@ -28,7 +28,7 @@ import {
   RequestSummary,
   RequestSuccessModal,
   RequestErrorBox
-} from "./components";
+} from "../../components/request-service";
 
 export default function RequestService() {
   const verifications = useAuthStore((state) => state.verifications);
