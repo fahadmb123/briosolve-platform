@@ -1,4 +1,4 @@
-import { CalculateDistance } from "../../../../shared/presentation/http/utils/calculate-distance";
+import { CalculateDistance } from "../../../../shared/utils/calculate-distance";
 import { IProviderServiceRepository } from "../../../service-catalog/domain/repositories/IProviderServiceRepository";
 import { Address } from "../../../user-management/domain/entities/address.entity";
 import { User } from "../../../user-management/domain/entities/user.entity";

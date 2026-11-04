@@ -1,9 +1,9 @@
-import { BcryptPasswordHasherService } from "../../../../shared/infrastructure/security/becryptPasswordHasher.service";
-import { SecureOtpGeneratorService } from "../../../../shared/infrastructure/security/secureOtpGenerate.service";
-import { NodemailerEmailSender } from "../../../../shared/infrastructure/email/nodemailer/nodemailerEmail-sender";
-import { RedisPendingRegistrationStore } from "../../../../shared/infrastructure/cache/redis/redisPendingRegistration.store";
-import { JwtService } from "../../../../shared/infrastructure/security/jwt.service";
-import { TextBeeSmsService } from "../../../../shared/infrastructure/services/textBeeSmsService";
+import { BcryptPasswordHasherService } from "../../../../shared/services/becryptPasswordHasher.service";
+import { SecureOtpGeneratorService } from "../../../../shared/services/secureOtpGenerate.service";
+import { NodemailerEmailSender } from "../../../../shared/services/nodemailerEmail-sender";
+import { RedisPendingRegistrationStore } from "../../../../shared/database/redisPendingRegistration.store";
+import { JwtService } from "../../../../shared/services/jwt.service";
+import { TextBeeSmsService } from "../../../../shared/services/textBeeSmsService";
 
 
 

@@ -5,7 +5,7 @@ type DefaultModelRow<Table extends PublicTables> =
     import("@prisma/orm-postgres/orm-client").DefaultModelRow<Contract, Table, "public">;
 
 declare module "@prisma/client" {
-    export type PrismaClient = typeof import("../shared/infrastructure/persistence/prisma/client").db;
+    export type PrismaClient = typeof import("../shared/database/client").db;
     export const PrismaClient: new () => PrismaClient;
 
     export namespace Prisma {

@@ -1,5 +1,5 @@
 import { IPushSubscriptionRepository } from "../../domain/repositories/IPushSubscription.respository";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { DeletePushSubscriptionRequestDto } from "../dtos/request/delete-push-subscription.dto";
 
 export class DeletePushSubscriptionUseCase implements IUseCase<DeletePushSubscriptionRequestDto, void> {

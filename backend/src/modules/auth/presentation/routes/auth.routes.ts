@@ -1,11 +1,10 @@
 import { Router } from "express";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import validate from "../../../../shared/middlewares/validate-request";
 import { otpSchema } from "../validators/registerCustomer.schema";
 import { emailSchema, loginSchema, resetPasswordSchema, phoneSchema, updatePasswordSchema } from "../validators/auth.schema";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
+import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/middlewares/role.middleware";
 import { AuthRouteDependencies } from "../types/auth-route-dependencies";
-
 
 export function buildAuthRoute(controller:AuthRouteDependencies):Router{
     const router = Router()

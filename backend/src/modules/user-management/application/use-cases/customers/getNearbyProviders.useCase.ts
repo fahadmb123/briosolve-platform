@@ -1,5 +1,5 @@
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { ICustomerRepository } from "../../../domain/repositories/ICustomerRespository";
 import { GetNearbyProvidersDto } from "../../dtos/request/customer/get-nearby-providers.dto";
@@ -8,7 +8,7 @@ import { User } from "../../../domain/entities/user.entity";
 import { Address } from "../../../domain/entities/address.entity";
 import { UserMapper } from "../../../infrastructure/mappers/user.mapper";
 import { UserResponseDto } from "../../dtos/response/user/user-dto";
-import { CalculateDistance } from "../../../../../shared/presentation/http/utils/calculate-distance";
+import { CalculateDistance } from "../../../../../shared/utils/calculate-distance";
 import { IProviderServiceRepository } from "../../../../service-catalog/domain/repositories/IProviderServiceRepository";
 
 

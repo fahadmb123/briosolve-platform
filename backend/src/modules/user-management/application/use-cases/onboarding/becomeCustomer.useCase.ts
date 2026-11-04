@@ -1,10 +1,10 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { ICustomerRepository } from "../../../domain/repositories/ICustomerRespository";
 import { IProviderRepository } from "../../../domain/repositories/IProviderRepository";
 import { IProviderAvailabilityRepository } from "../../../domain/repositories/IProviderAvailabilityRepository";
-import type { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import type { IPendingRegistrationStore } from "../../../../../shared/interfaces/IPendingRegistration-store";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { BecomeCustomerInputDto } from "../../dtos/request/onboading/become-customer.dto";
 import { IProviderServiceRepository } from "../../../../service-catalog/domain/repositories/IProviderServiceRepository";
 import { IVerificationDocumentRepository } from "../../../../kyc-verification/domain/repositories/IVerificationDocumentRepository";

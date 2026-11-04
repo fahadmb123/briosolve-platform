@@ -7,7 +7,7 @@ import { UpdateKycStatusUseCase } from "../../application/use-cases/updateKycSta
 import { verificationDocumentRepository } from "./repositories";
 import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
 import { imageService } from "./services";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 

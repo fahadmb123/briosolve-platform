@@ -1,5 +1,5 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { AccountReactivationRequest } from "../../domain/entities/accountReactivationRequest.entity";
 import {
     IAccountReactivationRequestRepository,

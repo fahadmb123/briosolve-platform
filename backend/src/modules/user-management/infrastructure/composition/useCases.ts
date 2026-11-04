@@ -36,7 +36,7 @@ import { BecomeCustomerUseCase } from "../../application/use-cases/onboarding/be
 import { providerServiceRepository } from "../../../service-catalog/infrastructure/composition/respositories";
 import { verificationDocumentRepository, verificationFileRepository } from "../../../kyc-verification/infrastructure/composition/repositories";
 import { GetNearbyProvidersUseCase } from "../../application/use-cases/customers/getNearbyProviders.useCase";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 

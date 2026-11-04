@@ -1,4 +1,4 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { BaseRepository } from "../../../../shared/base/repository/baseRepository";
 import { PushSubscription } from "../entities/pushSubscription.entity";
 
 export interface IPushSubscriptionRepository extends BaseRepository<PushSubscription | null> {

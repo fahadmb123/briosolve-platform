@@ -1,14 +1,14 @@
 import "dotenv/config";
 import { createServer } from "node:http";
-import { connectRedis } from "./shared/infrastructure/cache/redis/redis.client";
-import { logger } from "./shared/infrastructure/logger/logger";
-import { createSocketServer } from "./shared/infrastructure/realtime/server/socket-server";
+import { connectRedis } from "./shared/database/redis.client";
+import { logger } from "./shared/logger/logger";
+import { createSocketServer } from "./shared/realtime/server/socket-server";
 import { jwtService } from "./modules/auth/infrastructure/composition/services";
 import { createApp } from "./app/app";
 import { createRootRouter } from "./app/routes";
 import { createNotificationRouter } from "./modules/notification/presentation/routes/notification.routes";
 import { createNotificationController } from "./modules/notification/infrastructure/composition/constrollers";
-import { errorHandler } from "./shared/presentation/http/middlewares/error-handler";
+import { errorHandler } from "./shared/middlewares/error-handler";
 import { authRoutes } from "./modules/auth/infrastructure/composition";
 import { createVerificationRoutes } from "./modules/kyc-verification/infrastructure/composition";
 import { 

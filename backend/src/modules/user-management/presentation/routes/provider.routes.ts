@@ -1,13 +1,13 @@
 import { Router } from "express";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import validate from "../../../../shared/middlewares/validate-request";
 import { providerRegistrationSchema, providerProfileSchema } from "../../../auth/presentation/validators/registerProvider.schema";
 import { completeProviderRegistrationSchema } from "../../../auth/presentation/validators/completeProviderRegistration.schema";
 import { setProviderAvailabilitySchema, createAvailabilityOverrideSchema } from "../validators/availability";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
-import { upload } from "../../../../shared/infrastructure/utils/multer";
-import { validateFile } from "../../../../shared/presentation/http/middlewares/validate-file";
-import { imageFileSchema } from "../../../../shared/presentation/http/validators/imageFile.schema";
+import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/middlewares/role.middleware";
+import { upload } from "../../../../shared/utils/multer";
+import { validateFile } from "../../../../shared/middlewares/validate-file";
+import { imageFileSchema } from "../../../../shared/validators/imageFile.schema";
 import { ProviderRouteDependencies } from "../types/provider.route.dependencies";
 
 export function buildProviderRoute(controller: ProviderRouteDependencies): Router {

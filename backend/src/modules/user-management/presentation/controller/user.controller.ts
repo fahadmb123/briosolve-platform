@@ -1,8 +1,8 @@
 import { NextFunction ,Response,Request} from "express"
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
+import { BaseController } from "../../../../shared/base/controller/baseController";
 import { IUpdateUserStatusUseCase } from "../../application/interfaces/use-cases/users/update-user.interface";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { GetProfileUseCaseOutputDto } from "../../application/dtos/response/user/get-profile.dto";
 import { GetProfileUseCaseInputDto } from "../../application/dtos/request/user/get-profile.dto";
 

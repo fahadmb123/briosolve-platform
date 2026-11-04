@@ -1,7 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { User } from "../../domain/entities/user.entity";
 import { IUserRepository } from "../../domain/repositories/user.repository";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import { UserMapper } from "../mappers/user.mapper";
 

@@ -1,6 +1,6 @@
 import { NextFunction,Request,Response } from "express"
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { BaseController } from "../../../../shared/base/controller/baseController";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { AddAddressInputUseCaseDto } from "../../application/dtos/request/address/add-address.dto";
 import { GetAddressesInputDto } from "../../application/dtos/request/address/get-addresses.dto";
 import { GetAddressesOutputDto } from "../../application/dtos/response/address/get-addresses.dto";

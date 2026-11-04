@@ -34,7 +34,7 @@ import {
 } from "./useCases";
 import { imageUploadService } from "./services";
 import { jwtService } from "../../../auth/infrastructure/composition/services";
-import type { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import type { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import type { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import type { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 
@@ -77,7 +77,6 @@ export const addressController = new AddressController(
     deleteAddressUseCase,
     setDefaultAddressUseCase
 )
-
 
 export const providerController = new ProviderController(
     preRegisterProviderUseCase,

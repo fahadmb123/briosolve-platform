@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { accessTokenCookie, refreshTokenCookie, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { BaseController } from "../../../../shared/base/controller/baseController";
+import { accessTokenCookie, refreshTokenCookie, registrationCookie } from "../../../../shared/utils/cookieConfig";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IGetProvidersUseCase } from "../../application/interfaces/use-cases/providers/get-providers.interface";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
+import { ImageUploadService } from "../../../../shared/interfaces/services/IImageUpload.service";
 import { UserResponseDto } from "../../application/dtos/response/user/user-dto";
 import { RegisterProviderInput } from "../../application/dtos/request/provider/register-provider.dto";
 import { EmailVerificationUseCaseOutputDto } from "../../application/dtos/response/user/email-verification.dto";
@@ -19,7 +19,7 @@ import { ProviderAvailabilityResponseDto } from "../../application/dtos/response
 import { ProviderAvailabilityOverrideResponseDto } from "../../application/dtos/response/provider/provider-availability-override.dto";
 import { CompleteProviderRegistrationInput } from "../../application/dtos/request/provider/complete-provider-registration.dto";
 import { BecomeCustomerInputDto } from "../../application/dtos/request/onboading/become-customer.dto";
-import { IJwtService } from "../../../../shared/application/Dto/services/jwtDto.service";
+import { IJwtService } from "../../../../shared/interfaces/jwtDto.service";
 
 
 

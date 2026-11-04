@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IOtpGenerator } from "../../../../../shared/application/interfaces/services/IOtpGenerator.service";
-import { IPasswordHasher } from "../../../../../shared/application/interfaces/services/IPasswordHasher.service";
-import { ISmsService } from "../../../../../shared/application/interfaces/services/ISms.service";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
-import { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
+import { IOtpGenerator } from "../../../../../shared/interfaces/services/IOtpGenerator.service";
+import { IPasswordHasher } from "../../../../../shared/interfaces/services/IPasswordHasher.service";
+import { ISmsService } from "../../../../../shared/interfaces/services/ISms.service";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
+import { IPendingRegistrationStore } from "../../../../../shared/interfaces/IPendingRegistration-store";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { SendSmsOtpUseCaseOutputDto } from "../../dtos/response/send-sms-otp.dto";
 import { SendSmsOtpUseCaseInputDto } from "../../dtos/request/send-sms-otp.dto";

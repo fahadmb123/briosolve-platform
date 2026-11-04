@@ -1,5 +1,5 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { Category } from "../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
 import { CategoryMapper, CategoryRecord } from "../mappers/category.mapper.";

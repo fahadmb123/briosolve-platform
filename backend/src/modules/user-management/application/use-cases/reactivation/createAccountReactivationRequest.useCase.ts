@@ -1,10 +1,10 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { IUserAccountBlockRepository } from "../../../domain/repositories/IUserAccountBlockRepository";
 import { IAccountReactivationRequestRepository } from "../../../domain/repositories/IAccountReactivationRequestRepository";
 import { AccountReactivationRequest } from "../../../domain/entities/accountReactivationRequest.entity";
-import { IEmailSender } from "../../../../../shared/application/interfaces/services/IEmailSender.service";
-import type { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store";
+import { IEmailSender } from "../../../../../shared/interfaces/services/IEmailSender.service";
+import type { IPendingRegistrationStore } from "../../../../../shared/interfaces/IPendingRegistration-store";
 
 export type RequestReactivationDto = {
     email: string;

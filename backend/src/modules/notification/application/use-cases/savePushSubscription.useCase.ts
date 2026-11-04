@@ -1,7 +1,7 @@
 import { IPushSubscriptionRepository } from "../../domain/repositories/IPushSubscription.respository";
 import { IUserRepository } from "../../../auth/public";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { SavePushSubscriptionRequestDto } from "../dtos/request/save-push-subscription.dto";
 
 export class SavePushSubscriptionUseCase implements IUseCase<SavePushSubscriptionRequestDto, void> {

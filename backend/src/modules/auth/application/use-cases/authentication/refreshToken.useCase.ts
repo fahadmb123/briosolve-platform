@@ -1,6 +1,6 @@
-import { IJwtService } from "../../../../../shared/application/Dto/services/jwtDto.service";
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IJwtService } from "../../../../../shared/interfaces/jwtDto.service";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { RefreshTokenOutputDto } from "../../dtos/response/refresh-token.dto";
 import { RefreshTokenInputDto } from "../../dtos/request/refresh-token.dto";

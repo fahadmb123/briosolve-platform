@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
+import { BaseController } from "../../../../shared/base/controller/baseController";
+import { registrationCookie } from "../../../../shared/utils/cookieConfig";
 import { CreateAccountReactivationRequestUseCase } from "../../application/use-cases/reactivation/createAccountReactivationRequest.useCase";
 import { GetReactivationRequestsUseCase } from "../../application/use-cases/reactivation/getReactivationRequests.useCase";
 import { SendReactivationOtpUseCase } from "../../application/use-cases/reactivation/sendReactivationOtp.useCase";

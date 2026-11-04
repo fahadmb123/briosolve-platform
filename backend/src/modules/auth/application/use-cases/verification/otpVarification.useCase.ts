@@ -1,8 +1,8 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store"
-import { IPasswordHasher } from "../../../../../shared/application/interfaces/services/IPasswordHasher.service";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
+import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../../shared/interfaces/IPendingRegistration-store"
+import { IPasswordHasher } from "../../../../../shared/interfaces/services/IPasswordHasher.service";
 import { ICustomerRepository } from "../../../domain/repositories/customer.respository";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { OtpVarificationInput } from "../../dtos/request/otp-verification.dto";
 import { UserResponseDto } from "../../dtos/response/user.dto";

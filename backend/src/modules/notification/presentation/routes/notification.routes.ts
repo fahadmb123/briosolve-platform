@@ -6,8 +6,8 @@ import {
     savePushSubscriptionSchema,
     deletePushSubscriptionSchema,
 } from "../validators/notification.validator";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
+import validate from "../../../../shared/middlewares/validate-request";
 
 export function createNotificationRouter(notificationController: NotificationController) {
     const router = Router();

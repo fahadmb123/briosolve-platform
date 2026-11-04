@@ -1,8 +1,7 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { BaseRepository } from "../../../../shared/base/repository/baseRepository";
 import { User } from "../entities/user.entity";
 import { ProviderProfile } from "../entities/providerProfile.entity";
 import { UpdateProviderProfileInputDto } from "../../application/dtos/request/provider/update-provider-profile.dto";
-
 
 export type CreateProviderInput = {
     name: string;

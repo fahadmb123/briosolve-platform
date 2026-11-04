@@ -1,5 +1,5 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types"
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client"
+import { db } from "../../../../shared/database/client"
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity"
 import { ICustomerRepository } from "../../domain/repositories/customer.respository";
 import { User } from "../../domain/entities/user.entity";
