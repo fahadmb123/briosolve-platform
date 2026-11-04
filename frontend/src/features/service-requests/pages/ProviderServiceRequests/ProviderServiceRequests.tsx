@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMutations";
-import { useStartConversation } from "../../../chat/hooks/useChatMutations";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { ProviderRequestCard, ProviderRequestDetailsModal } from "../../components/provider-requests";
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
@@ -20,7 +19,6 @@ export default function ProviderServiceRequests() {
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
 
   const getRequestsMutation = useGetProviderServiceRequests();
-  const startConversationMutation = useStartConversation();
 
   const fetchRequests = () => {
     getRequestsMutation.mutate(undefined, {
@@ -112,20 +110,21 @@ export default function ProviderServiceRequests() {
       return;
     }
 
-    startConversationMutation.mutate(req.customer_id, {
-      onSuccess: (res) => {
-        if (res?.data?.id) {
-          navigate(`/provider/messages?conversationId=${res.data.id}`, {
-            state: {
-              conversationId: res.data.id,
-              customerId: req.customer_id,
-              requestTitle: req.title,
-            },
-          });
-        }
-      },
-      onError: (err) => {
-        toast.error(err.message || "Failed to start chat with customer");
+    const addressStr = req.address_details
+      ? `${req.address_details.area || ""}, ${req.address_details.city || ""}`.trim().replace(/^,|,$/g, "")
+      : "Service Location";
+
+    navigate(`/provider/messages?recipientId=${req.customer_id}`, {
+      state: {
+        recipientId: req.customer_id,
+        recipientName: "Customer",
+        requestTitle: req.title,
+        requestId: req.id,
+        categoryName: req.category_name || "Services",
+        urgency: req.urgency,
+        budgetType: req.budget_type,
+        budgetAmount: req.budget_amount || undefined,
+        location: addressStr || "Service Location",
       },
     });
   };
@@ -291,7 +290,6 @@ export default function ProviderServiceRequests() {
         onQuote={handleQuoteClick}
         onSelectPhoto={setLightboxPhoto}
         onChat={handleChatClick}
-        isChatLoading={startConversationMutation.isPending}
       />
 
       {lightboxPhoto && (

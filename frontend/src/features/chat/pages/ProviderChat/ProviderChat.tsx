@@ -23,6 +23,7 @@ import {
   useGetMessages,
   useSendMessage,
   useMarkMessagesAsRead,
+  useStartConversation,
 } from "../../hooks/useChatMutations";
 import { toChatMessage, toChatConversation } from "../../utils/chat.mapper";
 import { useChatSocket } from "../../hooks/useChatSocket";
@@ -36,10 +37,15 @@ export default function ProviderChat() {
     searchParams.get("conversationId") ||
     (location.state as { conversationId?: string })?.conversationId ||
     null;
+  const queryRecipientId =
+    searchParams.get("recipientId") ||
+    (location.state as { recipientId?: string; customerId?: string })?.recipientId ||
+    (location.state as { customerId?: string })?.customerId ||
+    null;
 
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(
-    queryConversationId || null
+    queryConversationId || queryRecipientId || null
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<ConversationFilter>("ALL");
@@ -48,7 +54,7 @@ export default function ProviderChat() {
   );
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(
-    Boolean(queryConversationId)
+    Boolean(queryConversationId || queryRecipientId)
   );
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
 
@@ -56,13 +62,7 @@ export default function ProviderChat() {
   const getMessagesMutation = useGetMessages();
   const sendMessageMutation = useSendMessage();
   const markMessagesAsReadMutation = useMarkMessagesAsRead();
-
-  useEffect(() => {
-    if (queryConversationId) {
-      setSelectedId(queryConversationId);
-      setIsMobileThreadOpen(true);
-    }
-  }, [queryConversationId]);
+  const startConversationMutation = useStartConversation();
 
   const fetchConversations = useCallback(() => {
     getConversationsMutation.mutate(undefined, {
@@ -72,47 +72,92 @@ export default function ProviderChat() {
           setConversations(mapped);
           setSelectedId((curr) => {
             if (curr && mapped.some((m) => m.id === curr)) return curr;
+            if (queryRecipientId) {
+              const matched = mapped.find(
+                (m) => m.participant.id === queryRecipientId
+              );
+              if (matched) return matched.id;
+              return queryRecipientId;
+            }
             if (queryConversationId) return queryConversationId;
             return mapped[0].id;
           });
+        } else if (queryRecipientId) {
+          setSelectedId(queryRecipientId);
         } else if (queryConversationId) {
           setSelectedId(queryConversationId);
         }
       },
     });
-  }, [queryConversationId]);
+  }, [queryConversationId, queryRecipientId]);
 
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
+
+  useEffect(() => {
+    if (queryRecipientId) {
+      const matched = conversations.find(
+        (m) => m.participant.id === queryRecipientId
+      );
+      if (matched) {
+        setSelectedId(matched.id);
+      } else {
+        setSelectedId(queryRecipientId);
+      }
+      setIsMobileThreadOpen(true);
+    } else if (queryConversationId) {
+      setSelectedId(queryConversationId);
+      setIsMobileThreadOpen(true);
+    }
+  }, [queryConversationId, queryRecipientId, conversations]);
 
   const selectedConversation = useMemo(() => {
     const existing = conversations.find((c) => c.id === selectedId);
     if (existing) return existing;
     if (selectedId) {
       const locState = location.state as {
+        recipientId?: string;
         customerId?: string;
+        recipientName?: string;
+        customerName?: string;
+        recipientAvatar?: string;
+        customerAvatar?: string;
         requestTitle?: string;
+        requestId?: string;
+        categoryName?: string;
+        urgency?: "TODAY" | "THIS_WEEK" | "SPECIFIC_DATE" | "FLEXIBLE";
+        budgetType?: "FIXED" | "OPEN_BID";
+        budgetAmount?: number;
+        location?: string;
       } | null;
+
+      const recipientId =
+        locState?.recipientId || locState?.customerId || selectedId;
+      const recipientName =
+        locState?.recipientName || locState?.customerName || "Customer";
+
       return {
         id: selectedId,
         participant: {
-          id: locState?.customerId || selectedId,
-          name: "Customer",
+          id: recipientId,
+          name: recipientName,
           role: "CUSTOMER" as const,
+          avatar: locState?.recipientAvatar || locState?.customerAvatar,
           rating: 5.0,
           reviewsCount: 0,
           isVerified: true,
           isOnline: true,
         },
         linkedRequest: {
-          id: "req-active",
+          id: locState?.requestId || "req-active",
           title: locState?.requestTitle || "Service Request",
-          categoryName: "Services",
-          urgency: "FLEXIBLE" as const,
-          budgetType: "OPEN_BID" as const,
+          categoryName: locState?.categoryName || "Services",
+          urgency: locState?.urgency || ("FLEXIBLE" as const),
+          budgetType: locState?.budgetType || ("OPEN_BID" as const),
+          budgetAmount: locState?.budgetAmount,
           status: "ACTIVE" as const,
-          location: "Client Area",
+          location: locState?.location || "Client Area",
         },
         lastMessage: {
           text: "",
@@ -168,13 +213,17 @@ export default function ProviderChat() {
     [currentUser?.id]
   );
 
+  const isRealConversation = Boolean(
+    selectedId && conversations.some((c) => c.id === selectedId)
+  );
+
   useChatSocket({
-    conversationId: selectedId,
+    conversationId: isRealConversation ? selectedId : null,
     onNewMessage: handleSocketNewMessage,
   });
 
   useEffect(() => {
-    if (!selectedId) return;
+    if (!selectedId || !conversations.some((c) => c.id === selectedId)) return;
 
     getMessagesMutation.mutate(
       { conversationId: selectedId },
@@ -194,7 +243,7 @@ export default function ProviderChat() {
     );
 
     markMessagesAsReadMutation.mutate(selectedId);
-  }, [selectedId, currentUser?.id]);
+  }, [selectedId, currentUser?.id, conversations]);
 
   const filteredConversations = useMemo(() => {
     return conversations.filter((conv) => {
@@ -231,76 +280,172 @@ export default function ProviderChat() {
   };
 
   const handleSendMessage = (text: string) => {
-    if (!selectedId || !text.trim()) return;
+    const trimmed = text.trim();
+    if (!selectedId || !trimmed) return;
 
-    const tempId = `pmsg-${Date.now()}`;
-    const optimisticMsg: ChatMessage = {
-      id: tempId,
-      conversationId: selectedId,
-      senderId: currentUser?.id || "prov-current",
-      senderRole: "PROVIDER",
-      senderName: "You",
-      text: text.trim(),
-      type: "TEXT",
-      status: "SENDING",
-      createdAt: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
+    const isExisting = conversations.some((c) => c.id === selectedId);
 
-    setMessagesMap((prev) => ({
-      ...prev,
-      [selectedId]: [...(prev[selectedId] || []), optimisticMsg],
-    }));
-
-    sendMessageMutation.mutate(
-      {
+    if (isExisting) {
+      const tempId = `pmsg-${Date.now()}`;
+      const optimisticMsg: ChatMessage = {
+        id: tempId,
         conversationId: selectedId,
-        payload: {
-          content: text.trim(),
-          messageType: "TEXT",
+        senderId: currentUser?.id || "prov-current",
+        senderRole: "PROVIDER",
+        senderName: "You",
+        text: trimmed,
+        type: "TEXT",
+        status: "SENDING",
+        createdAt: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      setMessagesMap((prev) => ({
+        ...prev,
+        [selectedId]: [...(prev[selectedId] || []), optimisticMsg],
+      }));
+
+      sendMessageMutation.mutate(
+        {
+          conversationId: selectedId,
+          payload: {
+            content: trimmed,
+            messageType: "TEXT",
+          },
         },
-      },
-      {
-        onSuccess: (res) => {
-          if (res?.data) {
-            const confirmedMsg = toChatMessage(res.data, currentUser?.id);
+        {
+          onSuccess: (res) => {
+            if (res?.data) {
+              const confirmedMsg = toChatMessage(
+                res.data,
+                currentUser?.id,
+                "PROVIDER"
+              );
+              setMessagesMap((prev) => ({
+                ...prev,
+                [selectedId]: (prev[selectedId] || []).map((m) =>
+                  m.id === tempId ? confirmedMsg : m
+                ),
+              }));
+            }
+          },
+          onError: () => {
             setMessagesMap((prev) => ({
               ...prev,
-              [selectedId]: (prev[selectedId] || []).map((m) =>
-                m.id === tempId ? confirmedMsg : m
+              [selectedId]: (prev[selectedId] || []).filter(
+                (m) => m.id !== tempId
               ),
             }));
+          },
+        }
+      );
+
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === selectedId
+            ? {
+                ...c,
+                lastMessage: {
+                  text: trimmed,
+                  senderId: currentUser?.id || "prov-current",
+                  createdAt: optimisticMsg.createdAt,
+                  isUnread: false,
+                },
+                updatedAt: new Date().toISOString(),
+              }
+            : c
+        )
+      );
+    } else {
+      const targetRecipientId =
+        selectedConversation?.participant?.id || queryRecipientId;
+      if (!targetRecipientId) {
+        toast.error("Recipient details not available");
+        return;
+      }
+
+      startConversationMutation.mutate(targetRecipientId, {
+        onSuccess: (convRes) => {
+          if (!convRes?.data?.id) {
+            toast.error("Failed to start conversation");
+            return;
           }
-        },
-        onError: () => {
+
+          const newConvId = convRes.data.id;
+          const newConv = toChatConversation(
+            convRes.data,
+            selectedConversation?.participant
+          );
+
+          setConversations((prev) => [
+            newConv,
+            ...prev.filter((c) => c.id !== newConvId),
+          ]);
+          setSelectedId(newConvId);
+
+          const tempId = `pmsg-${Date.now()}`;
+          const optimisticMsg: ChatMessage = {
+            id: tempId,
+            conversationId: newConvId,
+            senderId: currentUser?.id || "prov-current",
+            senderRole: "PROVIDER",
+            senderName: "You",
+            text: trimmed,
+            type: "TEXT",
+            status: "SENDING",
+            createdAt: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          };
+
           setMessagesMap((prev) => ({
             ...prev,
-            [selectedId]: (prev[selectedId] || []).filter(
-              (m) => m.id !== tempId
-            ),
+            [newConvId]: [optimisticMsg],
           }));
-        },
-      }
-    );
 
-    setConversations((prev) =>
-      prev.map((c) =>
-        c.id === selectedId
-          ? {
-              ...c,
-              lastMessage: {
-                text: text.trim(),
-                senderId: currentUser?.id || "prov-current",
-                createdAt: optimisticMsg.createdAt,
-                isUnread: false,
+          sendMessageMutation.mutate(
+            {
+              conversationId: newConvId,
+              payload: {
+                content: trimmed,
+                messageType: "TEXT",
               },
-              updatedAt: new Date().toISOString(),
+            },
+            {
+              onSuccess: (res) => {
+                if (res?.data) {
+                  const confirmedMsg = toChatMessage(
+                    res.data,
+                    currentUser?.id,
+                    "PROVIDER"
+                  );
+                  setMessagesMap((prev) => ({
+                    ...prev,
+                    [newConvId]: (prev[newConvId] || []).map((m) =>
+                      m.id === tempId ? confirmedMsg : m
+                    ),
+                  }));
+                }
+              },
+              onError: () => {
+                setMessagesMap((prev) => ({
+                  ...prev,
+                  [newConvId]: (prev[newConvId] || []).filter(
+                    (m) => m.id !== tempId
+                  ),
+                }));
+              },
             }
-          : c
-      )
-    );
+          );
+        },
+        onError: (err) => {
+          toast.error(err.message || "Failed to start conversation");
+        },
+      });
+    }
   };
 
   const handleCreateQuote = (payload: {
@@ -311,57 +456,97 @@ export default function ProviderChat() {
   }) => {
     if (!selectedId) return;
 
-    const newQuoteMessage: ChatMessage = {
-      id: `pmsg-quote-${Date.now()}`,
-      conversationId: selectedId,
-      senderId: currentUser?.id || "prov-current",
-      senderRole: "PROVIDER",
-      senderName: "You",
-      text: "Submitted a formal quotation for your request.",
-      type: "QUOTE",
-      status: "SENT",
-      createdAt: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      quotePayload: {
-        quoteId: `quote-${Date.now()}`,
-        requestId: selectedConversation?.linkedRequest.id || "req-active",
-        requestTitle:
-          selectedConversation?.linkedRequest.title || "Service Request",
-        amount: payload.amount,
-        durationHours: payload.durationHours,
-        includesParts: payload.includesParts,
-        notes: payload.notes,
-        status: "PENDING",
-      },
+    const isExisting = conversations.some((c) => c.id === selectedId);
+
+    const emitQuoteMessage = (convId: string) => {
+      const newQuoteMessage: ChatMessage = {
+        id: `pmsg-quote-${Date.now()}`,
+        conversationId: convId,
+        senderId: currentUser?.id || "prov-current",
+        senderRole: "PROVIDER",
+        senderName: "You",
+        text: "Submitted a formal quotation for your request.",
+        type: "QUOTE",
+        status: "SENT",
+        createdAt: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        quotePayload: {
+          quoteId: `quote-${Date.now()}`,
+          requestId: selectedConversation?.linkedRequest.id || "req-active",
+          requestTitle:
+            selectedConversation?.linkedRequest.title || "Service Request",
+          amount: payload.amount,
+          durationHours: payload.durationHours,
+          includesParts: payload.includesParts,
+          notes: payload.notes,
+          status: "PENDING",
+        },
+      };
+
+      setMessagesMap((prev) => ({
+        ...prev,
+        [convId]: [...(prev[convId] || []), newQuoteMessage],
+      }));
+
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === convId
+            ? {
+                ...c,
+                hasActiveQuote: true,
+                lastMessage: {
+                  text: `Quotation: ₹${payload.amount}`,
+                  senderId: currentUser?.id || "prov-current",
+                  createdAt: newQuoteMessage.createdAt,
+                  isUnread: false,
+                },
+                updatedAt: new Date().toISOString(),
+              }
+            : c
+        )
+      );
+
+      setIsQuoteModalOpen(false);
+      toast.success("Quote generated and sent to customer!");
     };
 
-    setMessagesMap((prev) => ({
-      ...prev,
-      [selectedId]: [...(prev[selectedId] || []), newQuoteMessage],
-    }));
+    if (isExisting) {
+      emitQuoteMessage(selectedId);
+    } else {
+      const targetRecipientId =
+        selectedConversation?.participant?.id || queryRecipientId;
+      if (!targetRecipientId) {
+        toast.error("Recipient details not available");
+        return;
+      }
 
-    setConversations((prev) =>
-      prev.map((c) =>
-        c.id === selectedId
-          ? {
-              ...c,
-              hasActiveQuote: true,
-              lastMessage: {
-                text: `Quotation: $${payload.amount}`,
-                senderId: currentUser?.id || "prov-current",
-                createdAt: newQuoteMessage.createdAt,
-                isUnread: false,
-              },
-              updatedAt: new Date().toISOString(),
-            }
-          : c
-      )
-    );
+      startConversationMutation.mutate(targetRecipientId, {
+        onSuccess: (convRes) => {
+          if (!convRes?.data?.id) {
+            toast.error("Failed to start conversation");
+            return;
+          }
 
-    setIsQuoteModalOpen(false);
-    toast.success("Quote generated and sent to customer!");
+          const newConvId = convRes.data.id;
+          const newConv = toChatConversation(
+            convRes.data,
+            selectedConversation?.participant
+          );
+
+          setConversations((prev) => [
+            newConv,
+            ...prev.filter((c) => c.id !== newConvId),
+          ]);
+          setSelectedId(newConvId);
+          emitQuoteMessage(newConvId);
+        },
+        onError: (err) => {
+          toast.error(err.message || "Failed to start conversation");
+        },
+      });
+    }
   };
 
   return (
