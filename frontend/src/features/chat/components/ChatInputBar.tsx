@@ -6,16 +6,9 @@ interface ChatInputBarProps {
   disabled?: boolean;
 }
 
-const DEFAULT_PROMPTS = [
-  "Are you available today?",
-  "Could you share arrival time estimate?",
-  "Does the quote include replacement parts?",
-  "My address is confirmed.",
-];
-
 export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   onSendMessage,
-  prompts = DEFAULT_PROMPTS,
+  prompts = [],
   disabled = false,
 }) => {
   const [inputText, setInputText] = useState("");
@@ -36,47 +29,42 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
 
   return (
     <div className="chat-input-wrapper">
-      <div className="chat-quick-prompts-row">
-        {prompts.map((prompt, idx) => (
-          <button
-            key={idx}
-            type="button"
-            className="chat-prompt-pill"
-            onClick={() => onSendMessage(prompt)}
-          >
-            {prompt}
-          </button>
-        ))}
-      </div>
+      {prompts.length > 0 && (
+        <div className="chat-quick-prompts-row">
+          {prompts.map((prompt, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className="chat-prompt-pill"
+              onClick={() => onSendMessage(prompt)}
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      )}
 
-      <div className="chat-input-row">
-        <button
-          type="button"
-          className="chat-attach-btn"
-          title="Attach photo or document"
-        >
-          <i className="fas fa-paperclip" />
-        </button>
-
+      <div className="chat-input-box">
         <textarea
           rows={1}
-          className="chat-textarea"
           placeholder="Type a message... (Press Enter to send)"
+          className="chat-textarea"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled}
         />
-
-        <button
-          type="button"
-          className={`chat-send-btn ${inputText.trim() ? "active" : ""}`}
-          onClick={handleSend}
-          disabled={!inputText.trim() || disabled}
-          aria-label="Send message"
-        >
-          <i className="fas fa-paper-plane" />
-        </button>
+        <div className="chat-input-actions">
+          <button
+            type="button"
+            className="chat-send-btn"
+            onClick={handleSend}
+            disabled={!inputText.trim() || disabled}
+            aria-label="Send message"
+          >
+            <i className="fas fa-paper-plane" />
+          </button>
+        </div>
       </div>
     </div>
   );

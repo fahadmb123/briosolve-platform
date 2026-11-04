@@ -1,9 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import {
-  MOCK_PROVIDER_CONVERSATIONS,
-  MOCK_PROVIDER_MESSAGES_MAP,
-} from "../../data/mockChatData";
 import type {
   ChatConversation,
   ChatMessage,
@@ -22,43 +19,114 @@ import {
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { type BackendMessageDto } from "../../services/chat.service";
 import {
+  useGetConversations,
   useGetMessages,
   useSendMessage,
   useMarkMessagesAsRead,
-} from "../../hooks/useChat";
-import { toChatMessage } from "../../utils/chat.mapper";
+} from "../../hooks/useChatMutations";
+import { toChatMessage, toChatConversation } from "../../utils/chat.mapper";
 import { useChatSocket } from "../../hooks/useChatSocket";
 import "../CustomerChat/CustomerChat.css";
 
-const PROVIDER_PROMPTS = [
-  "I can visit your location within 45 minutes.",
-  "Could you please confirm your flat or house number?",
-  "I have submitted our official quotation above.",
-  "Replacement parts and 30-day warranty are included.",
-];
-
 export default function ProviderChat() {
   const currentUser = useAuthStore((state) => state.user);
-  const [conversations, setConversations] = useState<ChatConversation[]>(
-    MOCK_PROVIDER_CONVERSATIONS
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const queryConversationId =
+    searchParams.get("conversationId") ||
+    (location.state as { conversationId?: string })?.conversationId ||
+    null;
+
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(
+    queryConversationId || null
   );
-  const [selectedId, setSelectedId] = useState<string | null>("pconv-1");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<ConversationFilter>("ALL");
-  const [messagesMap, setMessagesMap] = useState<
-    Record<string, ChatMessage[]>
-  >(MOCK_PROVIDER_MESSAGES_MAP);
+  const [messagesMap, setMessagesMap] = useState<Record<string, ChatMessage[]>>(
+    {}
+  );
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(false);
+  const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(
+    Boolean(queryConversationId)
+  );
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
 
+  const getConversationsMutation = useGetConversations();
   const getMessagesMutation = useGetMessages();
   const sendMessageMutation = useSendMessage();
   const markMessagesAsReadMutation = useMarkMessagesAsRead();
 
+  useEffect(() => {
+    if (queryConversationId) {
+      setSelectedId(queryConversationId);
+      setIsMobileThreadOpen(true);
+    }
+  }, [queryConversationId]);
+
+  const fetchConversations = useCallback(() => {
+    getConversationsMutation.mutate(undefined, {
+      onSuccess: (res) => {
+        if (res?.data && res.data.length > 0) {
+          const mapped = res.data.map((c) => toChatConversation(c));
+          setConversations(mapped);
+          setSelectedId((curr) => {
+            if (curr && mapped.some((m) => m.id === curr)) return curr;
+            if (queryConversationId) return queryConversationId;
+            return mapped[0].id;
+          });
+        } else if (queryConversationId) {
+          setSelectedId(queryConversationId);
+        }
+      },
+    });
+  }, [queryConversationId]);
+
+  useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
+
   const selectedConversation = useMemo(() => {
-    return conversations.find((c) => c.id === selectedId) || null;
-  }, [conversations, selectedId]);
+    const existing = conversations.find((c) => c.id === selectedId);
+    if (existing) return existing;
+    if (selectedId) {
+      const locState = location.state as {
+        customerId?: string;
+        requestTitle?: string;
+      } | null;
+      return {
+        id: selectedId,
+        participant: {
+          id: locState?.customerId || selectedId,
+          name: "Customer",
+          role: "CUSTOMER" as const,
+          rating: 5.0,
+          reviewsCount: 0,
+          isVerified: true,
+          isOnline: true,
+        },
+        linkedRequest: {
+          id: "req-active",
+          title: locState?.requestTitle || "Service Request",
+          categoryName: "Services",
+          urgency: "FLEXIBLE" as const,
+          budgetType: "OPEN_BID" as const,
+          status: "ACTIVE" as const,
+          location: "Client Area",
+        },
+        lastMessage: {
+          text: "",
+          senderId: "",
+          createdAt: "",
+          isUnread: false,
+        },
+        unreadCount: 0,
+        hasActiveQuote: false,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+    return null;
+  }, [conversations, selectedId, location.state]);
 
   const activeMessages = useMemo(() => {
     if (!selectedId) return [];
@@ -108,17 +176,11 @@ export default function ProviderChat() {
   useEffect(() => {
     if (!selectedId) return;
 
-    const isUuid =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        selectedId
-      );
-    if (!isUuid) return;
-
     getMessagesMutation.mutate(
       { conversationId: selectedId },
       {
         onSuccess: (res) => {
-          if (res.data) {
+          if (res?.data) {
             const mapped = res.data.map((msg) =>
               toChatMessage(msg, currentUser?.id)
             );
@@ -192,50 +254,36 @@ export default function ProviderChat() {
       [selectedId]: [...(prev[selectedId] || []), optimisticMsg],
     }));
 
-    const isUuid =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        selectedId
-      );
-
-    if (isUuid) {
-      sendMessageMutation.mutate(
-        {
-          conversationId: selectedId,
-          payload: {
-            content: text.trim(),
-            messageType: "TEXT",
-          },
+    sendMessageMutation.mutate(
+      {
+        conversationId: selectedId,
+        payload: {
+          content: text.trim(),
+          messageType: "TEXT",
         },
-        {
-          onSuccess: (res) => {
-            if (res.data) {
-              const confirmedMsg = toChatMessage(res.data, currentUser?.id);
-              setMessagesMap((prev) => ({
-                ...prev,
-                [selectedId]: (prev[selectedId] || []).map((m) =>
-                  m.id === tempId ? confirmedMsg : m
-                ),
-              }));
-            }
-          },
-          onError: () => {
+      },
+      {
+        onSuccess: (res) => {
+          if (res?.data) {
+            const confirmedMsg = toChatMessage(res.data, currentUser?.id);
             setMessagesMap((prev) => ({
               ...prev,
-              [selectedId]: (prev[selectedId] || []).filter(
-                (m) => m.id !== tempId
+              [selectedId]: (prev[selectedId] || []).map((m) =>
+                m.id === tempId ? confirmedMsg : m
               ),
             }));
-          },
-        }
-      );
-    } else {
-      setMessagesMap((prev) => ({
-        ...prev,
-        [selectedId]: (prev[selectedId] || []).map((m) =>
-          m.id === tempId ? { ...m, status: "SENT" } : m
-        ),
-      }));
-    }
+          }
+        },
+        onError: () => {
+          setMessagesMap((prev) => ({
+            ...prev,
+            [selectedId]: (prev[selectedId] || []).filter(
+              (m) => m.id !== tempId
+            ),
+          }));
+        },
+      }
+    );
 
     setConversations((prev) =>
       prev.map((c) =>
@@ -261,36 +309,37 @@ export default function ProviderChat() {
     includesParts: boolean;
     notes: string;
   }) => {
-    if (!selectedId || !selectedConversation) return;
+    if (!selectedId) return;
 
-    const newQuoteMsg: ChatMessage = {
+    const newQuoteMessage: ChatMessage = {
       id: `pmsg-quote-${Date.now()}`,
       conversationId: selectedId,
       senderId: currentUser?.id || "prov-current",
       senderRole: "PROVIDER",
       senderName: "You",
-      text: "Official Service Quotation",
+      text: "Submitted a formal quotation for your request.",
       type: "QUOTE",
+      status: "SENT",
+      createdAt: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       quotePayload: {
         quoteId: `quote-${Date.now()}`,
-        requestId: selectedConversation.linkedRequest.id,
-        requestTitle: selectedConversation.linkedRequest.title,
+        requestId: selectedConversation?.linkedRequest.id || "req-active",
+        requestTitle:
+          selectedConversation?.linkedRequest.title || "Service Request",
         amount: payload.amount,
         durationHours: payload.durationHours,
         includesParts: payload.includesParts,
         notes: payload.notes,
         status: "PENDING",
       },
-      status: "SENT",
-      createdAt: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
     };
 
     setMessagesMap((prev) => ({
       ...prev,
-      [selectedId]: [...(prev[selectedId] || []), newQuoteMsg],
+      [selectedId]: [...(prev[selectedId] || []), newQuoteMessage],
     }));
 
     setConversations((prev) =>
@@ -300,9 +349,9 @@ export default function ProviderChat() {
               ...c,
               hasActiveQuote: true,
               lastMessage: {
-                text: `Official Quotation submitted for ₹${payload.amount.toLocaleString()}`,
+                text: `Quotation: $${payload.amount}`,
                 senderId: currentUser?.id || "prov-current",
-                createdAt: newQuoteMsg.createdAt,
+                createdAt: newQuoteMessage.createdAt,
                 isUnread: false,
               },
               updatedAt: new Date().toISOString(),
@@ -311,11 +360,12 @@ export default function ProviderChat() {
       )
     );
 
-    toast.success("Quotation submitted to client!");
+    setIsQuoteModalOpen(false);
+    toast.success("Quote generated and sent to customer!");
   };
 
   return (
-    <div className="chat-layout-root provider-chat-mode">
+    <div className="chat-layout-root">
       <div
         className={`chat-container-card ${
           isMobileThreadOpen ? "mobile-thread-open" : "mobile-list-open"
@@ -339,30 +389,35 @@ export default function ProviderChat() {
               <ChatHeader
                 participant={selectedConversation.participant}
                 linkedRequest={selectedConversation.linkedRequest}
-                currentRole="PROVIDER"
                 isInfoOpen={isInfoOpen}
                 onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
-                onOpenCreateQuote={() => setIsQuoteModalOpen(true)}
               />
 
               <ChatRequestBanner
                 request={selectedConversation.linkedRequest}
-                currentRole="PROVIDER"
                 onOpenDetails={() => setIsInfoOpen(true)}
               />
 
               <div className="chat-thread-body">
                 <ChatMessageList
                   messages={activeMessages}
-                  currentRole="PROVIDER"
+                  onAcceptQuote={() => {}}
+                  onDeclineQuote={() => {}}
                 />
               </div>
 
-              <ChatInputBar
-                onSendMessage={handleSendMessage}
-                prompts={PROVIDER_PROMPTS}
-              />
+              <div className="provider-quick-prompts-bar">
+                <button
+                  type="button"
+                  className="provider-prompt-pill"
+                  onClick={() => setIsQuoteModalOpen(true)}
+                >
+                  Create Quotation
+                </button>
+              </div>
+
+              <ChatInputBar onSendMessage={handleSendMessage} />
             </div>
           ) : (
             <EmptyChatState currentRole="PROVIDER" />
@@ -374,7 +429,6 @@ export default function ProviderChat() {
             <ChatInfoDrawer
               participant={selectedConversation.participant}
               linkedRequest={selectedConversation.linkedRequest}
-              currentRole="PROVIDER"
               isOpen={isInfoOpen}
               onClose={() => setIsInfoOpen(false)}
             />

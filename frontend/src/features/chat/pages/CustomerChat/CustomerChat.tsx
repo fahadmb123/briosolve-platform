@@ -1,9 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import {
-  MOCK_CONVERSATIONS,
-  MOCK_MESSAGES_MAP,
-} from "../../data/mockChatData";
 import type {
   ChatConversation,
   ChatMessage,
@@ -21,33 +18,113 @@ import {
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { type BackendMessageDto } from "../../services/chat.service";
 import {
+  useGetConversations,
   useGetMessages,
   useSendMessage,
   useMarkMessagesAsRead,
-} from "../../hooks/useChat";
-import { toChatMessage } from "../../utils/chat.mapper";
+} from "../../hooks/useChatMutations";
+import { toChatMessage, toChatConversation } from "../../utils/chat.mapper";
 import { useChatSocket } from "../../hooks/useChatSocket";
 import "./CustomerChat.css";
 
 export default function CustomerChat() {
   const currentUser = useAuthStore((state) => state.user);
-  const [conversations, setConversations] =
-    useState<ChatConversation[]>(MOCK_CONVERSATIONS);
-  const [selectedId, setSelectedId] = useState<string | null>("conv-1");
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const queryConversationId =
+    searchParams.get("conversationId") ||
+    (location.state as { conversationId?: string })?.conversationId ||
+    null;
+
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(
+    queryConversationId || null
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<ConversationFilter>("ALL");
-  const [messagesMap, setMessagesMap] =
-    useState<Record<string, ChatMessage[]>>(MOCK_MESSAGES_MAP);
+  const [messagesMap, setMessagesMap] = useState<Record<string, ChatMessage[]>>(
+    {}
+  );
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(false);
+  const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(
+    Boolean(queryConversationId)
+  );
 
+  const getConversationsMutation = useGetConversations();
   const getMessagesMutation = useGetMessages();
   const sendMessageMutation = useSendMessage();
   const markMessagesAsReadMutation = useMarkMessagesAsRead();
 
+  useEffect(() => {
+    if (queryConversationId) {
+      setSelectedId(queryConversationId);
+      setIsMobileThreadOpen(true);
+    }
+  }, [queryConversationId]);
+
+  const fetchConversations = useCallback(() => {
+    getConversationsMutation.mutate(undefined, {
+      onSuccess: (res) => {
+        if (res?.data && res.data.length > 0) {
+          const mapped = res.data.map((c) => toChatConversation(c));
+          setConversations(mapped);
+          setSelectedId((curr) => {
+            if (curr && mapped.some((m) => m.id === curr)) return curr;
+            if (queryConversationId) return queryConversationId;
+            return mapped[0].id;
+          });
+        } else if (queryConversationId) {
+          setSelectedId(queryConversationId);
+        }
+      },
+    });
+  }, [queryConversationId]);
+
+  useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
+
   const selectedConversation = useMemo(() => {
-    return conversations.find((c) => c.id === selectedId) || null;
-  }, [conversations, selectedId]);
+    const existing = conversations.find((c) => c.id === selectedId);
+    if (existing) return existing;
+    if (selectedId) {
+      const locState = location.state as {
+        providerId?: string;
+        requestTitle?: string;
+      } | null;
+      return {
+        id: selectedId,
+        participant: {
+          id: locState?.providerId || selectedId,
+          name: "Provider",
+          role: "PROVIDER" as const,
+          rating: 5.0,
+          reviewsCount: 0,
+          isVerified: true,
+          isOnline: true,
+        },
+        linkedRequest: {
+          id: "req-active",
+          title: locState?.requestTitle || "Service Request",
+          categoryName: "Services",
+          urgency: "FLEXIBLE" as const,
+          budgetType: "OPEN_BID" as const,
+          status: "ACTIVE" as const,
+          location: "Service Location",
+        },
+        lastMessage: {
+          text: "",
+          senderId: "",
+          createdAt: "",
+          isUnread: false,
+        },
+        unreadCount: 0,
+        hasActiveQuote: false,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+    return null;
+  }, [conversations, selectedId, location.state]);
 
   const activeMessages = useMemo(() => {
     if (!selectedId) return [];
@@ -97,17 +174,11 @@ export default function CustomerChat() {
   useEffect(() => {
     if (!selectedId) return;
 
-    const isUuid =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        selectedId
-      );
-    if (!isUuid) return;
-
     getMessagesMutation.mutate(
       { conversationId: selectedId },
       {
         onSuccess: (res) => {
-          if (res.data) {
+          if (res?.data) {
             const mapped = res.data.map((msg) =>
               toChatMessage(msg, currentUser?.id)
             );
@@ -183,50 +254,36 @@ export default function CustomerChat() {
       [selectedId]: [...(prev[selectedId] || []), optimisticMsg],
     }));
 
-    const isUuid =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        selectedId
-      );
-
-    if (isUuid) {
-      sendMessageMutation.mutate(
-        {
-          conversationId: selectedId,
-          payload: {
-            content: text.trim(),
-            messageType: "TEXT",
-          },
+    sendMessageMutation.mutate(
+      {
+        conversationId: selectedId,
+        payload: {
+          content: text.trim(),
+          messageType: "TEXT",
         },
-        {
-          onSuccess: (res) => {
-            if (res.data) {
-              const confirmedMsg = toChatMessage(res.data, currentUser?.id);
-              setMessagesMap((prev) => ({
-                ...prev,
-                [selectedId]: (prev[selectedId] || []).map((m) =>
-                  m.id === tempId ? confirmedMsg : m
-                ),
-              }));
-            }
-          },
-          onError: () => {
+      },
+      {
+        onSuccess: (res) => {
+          if (res?.data) {
+            const confirmedMsg = toChatMessage(res.data, currentUser?.id);
             setMessagesMap((prev) => ({
               ...prev,
-              [selectedId]: (prev[selectedId] || []).filter(
-                (m) => m.id !== tempId
+              [selectedId]: (prev[selectedId] || []).map((m) =>
+                m.id === tempId ? confirmedMsg : m
               ),
             }));
-          },
-        }
-      );
-    } else {
-      setMessagesMap((prev) => ({
-        ...prev,
-        [selectedId]: (prev[selectedId] || []).map((m) =>
-          m.id === tempId ? { ...m, status: "SENT" } : m
-        ),
-      }));
-    }
+          }
+        },
+        onError: () => {
+          setMessagesMap((prev) => ({
+            ...prev,
+            [selectedId]: (prev[selectedId] || []).filter(
+              (m) => m.id !== tempId
+            ),
+          }));
+        },
+      }
+    );
 
     setConversations((prev) =>
       prev.map((c) =>
@@ -334,7 +391,7 @@ export default function CustomerChat() {
               <ChatInputBar onSendMessage={handleSendMessage} />
             </div>
           ) : (
-            <EmptyChatState />
+            <EmptyChatState currentRole="CUSTOMER" />
           )}
         </div>
 

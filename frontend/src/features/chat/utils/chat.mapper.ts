@@ -49,7 +49,7 @@ export function toChatConversation(
             location: "Active Service Area",
         },
         lastMessage: {
-            text: "Started a conversation",
+            text: "",
             senderId: "",
             createdAt: new Date(dto.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
             isUnread: false,

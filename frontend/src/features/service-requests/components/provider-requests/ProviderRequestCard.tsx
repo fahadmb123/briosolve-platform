@@ -6,6 +6,7 @@ interface ProviderRequestCardProps {
   onViewDetails: (request: CustomerServiceRequestItem) => void;
   onSelectPhoto: (photoUrl: string) => void;
   onQuote: (request: CustomerServiceRequestItem) => void;
+  onChat?: (request: CustomerServiceRequestItem) => void;
 }
 
 export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
@@ -13,6 +14,7 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
   onViewDetails,
   onSelectPhoto,
   onQuote,
+  onChat,
 }) => {
   const getUrgencyBadge = () => {
     switch (request.urgency) {
@@ -166,6 +168,18 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
             <i className="far fa-eye"></i>
             <span>View Scope</span>
           </button>
+
+          {request.status !== "CANCELLED" && onChat && (
+            <button
+              type="button"
+              className="provreq-btn-chat-card"
+              onClick={() => onChat(request)}
+              title="Chat with Customer"
+            >
+              <i className="fas fa-comment-dots"></i>
+              <span>Chat</span>
+            </button>
+          )}
 
           {request.status === "CANCELLED" ? (
             <button

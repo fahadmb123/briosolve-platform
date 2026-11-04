@@ -1,11 +1,15 @@
 import { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMutations";
+import { useStartConversation } from "../../../chat/hooks/useChatMutations";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { ProviderRequestCard, ProviderRequestDetailsModal } from "../../components/provider-requests";
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
 import "./ProviderServiceRequests.css";
 
 export default function ProviderServiceRequests() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("ALL");
@@ -16,6 +20,7 @@ export default function ProviderServiceRequests() {
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
 
   const getRequestsMutation = useGetProviderServiceRequests();
+  const startConversationMutation = useStartConversation();
 
   const fetchRequests = () => {
     getRequestsMutation.mutate(undefined, {
@@ -99,6 +104,30 @@ export default function ProviderServiceRequests() {
 
   const handleQuoteClick = (req: CustomerServiceRequestItem) => {
     setSelectedRequest(req);
+  };
+
+  const handleChatClick = (req: CustomerServiceRequestItem) => {
+    if (!req.customer_id) {
+      toast.error("Customer details not available for this request");
+      return;
+    }
+
+    startConversationMutation.mutate(req.customer_id, {
+      onSuccess: (res) => {
+        if (res?.data?.id) {
+          navigate(`/provider/messages?conversationId=${res.data.id}`, {
+            state: {
+              conversationId: res.data.id,
+              customerId: req.customer_id,
+              requestTitle: req.title,
+            },
+          });
+        }
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to start chat with customer");
+      },
+    });
   };
 
   return (
@@ -249,6 +278,7 @@ export default function ProviderServiceRequests() {
               onViewDetails={setSelectedRequest}
               onSelectPhoto={setLightboxPhoto}
               onQuote={handleQuoteClick}
+              onChat={handleChatClick}
             />
           ))}
         </div>
@@ -260,6 +290,8 @@ export default function ProviderServiceRequests() {
         onClose={() => setSelectedRequest(null)}
         onQuote={handleQuoteClick}
         onSelectPhoto={setLightboxPhoto}
+        onChat={handleChatClick}
+        isChatLoading={startConversationMutation.isPending}
       />
 
       {lightboxPhoto && (
