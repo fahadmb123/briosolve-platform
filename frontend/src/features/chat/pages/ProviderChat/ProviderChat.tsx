@@ -98,20 +98,22 @@ export default function ProviderChat() {
   }, [fetchConversations]);
 
   useEffect(() => {
-    if (queryRecipientId) {
-      const matched = conversations.find(
-        (m) => m.participant.id === queryRecipientId
-      );
-      if (matched) {
-        setSelectedId(matched.id);
-      } else {
-        setSelectedId(queryRecipientId);
+    (()=>{
+      if (queryRecipientId) {
+        const matched = conversations.find(
+          (m) => m.participant.id === queryRecipientId
+        );
+        if (matched) {
+          setSelectedId(matched.id);
+        } else {
+          setSelectedId(queryRecipientId);
+        }
+        setIsMobileThreadOpen(true);
+      } else if (queryConversationId) {
+        setSelectedId(queryConversationId);
+        setIsMobileThreadOpen(true);
       }
-      setIsMobileThreadOpen(true);
-    } else if (queryConversationId) {
-      setSelectedId(queryConversationId);
-      setIsMobileThreadOpen(true);
-    }
+    })()
   }, [queryConversationId, queryRecipientId, conversations]);
 
   const selectedConversation = useMemo(() => {
