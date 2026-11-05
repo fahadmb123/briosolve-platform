@@ -1,6 +1,7 @@
 import React from "react";
 import type { ChatConversation, ConversationFilter } from "../types/chat.types";
 import { ConversationItem } from "./ConversationItem";
+import { ConversationListSkeleton } from "./ChatSkeleton";
 
 interface ConversationListProps {
   conversations: ChatConversation[];
@@ -10,6 +11,7 @@ interface ConversationListProps {
   onSearchChange: (q: string) => void;
   filter: ConversationFilter;
   onFilterChange: (f: ConversationFilter) => void;
+  isLoading?: boolean;
 }
 
 export const ConversationList: React.FC<ConversationListProps> = ({
@@ -20,6 +22,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   onSearchChange,
   filter,
   onFilterChange,
+  isLoading = false,
 }) => {
   const unreadTotal = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
 
@@ -82,7 +85,9 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       </div>
 
       <div className="chat-conversations-scroll">
-        {conversations.length === 0 ? (
+        {isLoading ? (
+          <ConversationListSkeleton count={5} />
+        ) : conversations.length === 0 ? (
           <div className="chat-empty-conversations">
             <i className="far fa-comment-dots chat-empty-icon" />
             <p className="chat-empty-title">No conversations found</p>

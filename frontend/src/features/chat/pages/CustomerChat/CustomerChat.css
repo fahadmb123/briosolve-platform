@@ -162,6 +162,12 @@
   gap: 0.25rem;
 }
 
+.chat-conversations-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .chat-conv-item {
   display: flex;
   align-items: flex-start;

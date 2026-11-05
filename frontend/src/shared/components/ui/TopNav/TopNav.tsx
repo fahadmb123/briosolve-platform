@@ -159,24 +159,26 @@ export const TopNav: React.FC = () => {
               Home
             </NavLink>
 
-            <NavLink
-              to="/request-service"
-              className={({ isActive }) =>
-                `topnav-link ${isActive ? "active" : ""}`
-              }
-            >
-              Request Service
-            </NavLink>
-
             {isCustomer && (
-              <NavLink
-                to="/nearby-providers"
+              <>
+                <NavLink
+                  to="/nearby-providers"
+                  className={({ isActive }) =>
+                    `topnav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  Providers
+                </NavLink>
+                
+                <NavLink
+                to="/request-service"
                 className={({ isActive }) =>
                   `topnav-link ${isActive ? "active" : ""}`
                 }
               >
-                Providers
+                Request Service
               </NavLink>
+            </>
             )}
 
             {isAuthenticated && (

@@ -14,6 +14,8 @@ import {
   ChatInputBar,
   ChatInfoDrawer,
   EmptyChatState,
+  ChatMessageListSkeleton,
+  ChatThreadSkeleton,
 } from "../../components";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { type BackendMessageDto } from "../../services/chat.service";
@@ -490,6 +492,16 @@ export default function CustomerChat() {
     toast("Quotation declined.");
   };
 
+  const isConversationsLoading =
+    getConversationsMutation.isPending && conversations.length === 0;
+  const isMessagesLoading =
+    getMessagesMutation.isPending &&
+    Boolean(
+      selectedId &&
+        (!messagesMap[selectedId] || messagesMap[selectedId].length === 0) &&
+        conversations.some((c) => c.id === selectedId)
+    );
+
   return (
     <div className="chat-layout-root">
       <div
@@ -506,11 +518,14 @@ export default function CustomerChat() {
             onSearchChange={setSearchQuery}
             filter={filter}
             onFilterChange={setFilter}
+            isLoading={isConversationsLoading}
           />
         </div>
 
         <div className="chat-main-pane">
-          {selectedConversation ? (
+          {isConversationsLoading && !selectedConversation ? (
+            <ChatThreadSkeleton />
+          ) : selectedConversation ? (
             <div className="chat-thread-view">
               <ChatHeader
                 participant={selectedConversation.participant}
@@ -528,13 +543,17 @@ export default function CustomerChat() {
               />
 
               <div className="chat-thread-body">
-                <ChatMessageList
-                  messages={activeMessages}
-                  currentRole="CUSTOMER"
-                  currentUserId={currentUser?.id}
-                  onAcceptQuote={handleAcceptQuote}
-                  onDeclineQuote={handleDeclineQuote}
-                />
+                {isMessagesLoading ? (
+                  <ChatMessageListSkeleton />
+                ) : (
+                  <ChatMessageList
+                    messages={activeMessages}
+                    currentRole="CUSTOMER"
+                    currentUserId={currentUser?.id}
+                    onAcceptQuote={handleAcceptQuote}
+                    onDeclineQuote={handleDeclineQuote}
+                  />
+                )}
               </div>
 
               <ChatInputBar onSendMessage={handleSendMessage} />
