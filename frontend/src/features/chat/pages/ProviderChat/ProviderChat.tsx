@@ -82,7 +82,7 @@ export default function ProviderChat() {
               return queryRecipientId;
             }
             if (queryConversationId) return queryConversationId;
-            return mapped[0].id;
+            return null;
           });
         } else if (queryRecipientId) {
           setSelectedId(queryRecipientId);
@@ -199,15 +199,15 @@ export default function ProviderChat() {
         prev.map((c) =>
           c.id === backendMsg.conversation_id
             ? {
-                ...c,
-                lastMessage: {
-                  text: backendMsg.content,
-                  senderId: backendMsg.sender_id,
-                  createdAt: chatMsg.createdAt,
-                  isUnread: backendMsg.sender_id !== currentUser?.id,
-                },
-                updatedAt: new Date().toISOString(),
-              }
+              ...c,
+              lastMessage: {
+                text: backendMsg.content,
+                senderId: backendMsg.sender_id,
+                createdAt: chatMsg.createdAt,
+                isUnread: backendMsg.sender_id !== currentUser?.id,
+              },
+              updatedAt: new Date().toISOString(),
+            }
             : c
         )
       );
@@ -272,10 +272,10 @@ export default function ProviderChat() {
       prev.map((c) =>
         c.id === id
           ? {
-              ...c,
-              unreadCount: 0,
-              lastMessage: { ...c.lastMessage, isUnread: false },
-            }
+            ...c,
+            unreadCount: 0,
+            lastMessage: { ...c.lastMessage, isUnread: false },
+          }
           : c
       )
     );
@@ -348,15 +348,15 @@ export default function ProviderChat() {
         prev.map((c) =>
           c.id === selectedId
             ? {
-                ...c,
-                lastMessage: {
-                  text: trimmed,
-                  senderId: currentUser?.id || "prov-current",
-                  createdAt: optimisticMsg.createdAt,
-                  isUnread: false,
-                },
-                updatedAt: new Date().toISOString(),
-              }
+              ...c,
+              lastMessage: {
+                text: trimmed,
+                senderId: currentUser?.id || "prov-current",
+                createdAt: optimisticMsg.createdAt,
+                isUnread: false,
+              },
+              updatedAt: new Date().toISOString(),
+            }
             : c
         )
       );
@@ -497,16 +497,16 @@ export default function ProviderChat() {
         prev.map((c) =>
           c.id === convId
             ? {
-                ...c,
-                hasActiveQuote: true,
-                lastMessage: {
-                  text: `Quotation: ₹${payload.amount}`,
-                  senderId: currentUser?.id || "prov-current",
-                  createdAt: newQuoteMessage.createdAt,
-                  isUnread: false,
-                },
-                updatedAt: new Date().toISOString(),
-              }
+              ...c,
+              hasActiveQuote: true,
+              lastMessage: {
+                text: `Quotation: ₹${payload.amount}`,
+                senderId: currentUser?.id || "prov-current",
+                createdAt: newQuoteMessage.createdAt,
+                isUnread: false,
+              },
+              updatedAt: new Date().toISOString(),
+            }
             : c
         )
       );
@@ -559,16 +559,15 @@ export default function ProviderChat() {
     getMessagesMutation.isPending &&
     Boolean(
       selectedId &&
-        (!messagesMap[selectedId] || messagesMap[selectedId].length === 0) &&
-        conversations.some((c) => c.id === selectedId)
+      (!messagesMap[selectedId] || messagesMap[selectedId].length === 0) &&
+      conversations.some((c) => c.id === selectedId)
     );
 
   return (
     <div className="chat-layout-root">
       <div
-        className={`chat-container-card ${
-          isMobileThreadOpen ? "mobile-thread-open" : "mobile-list-open"
-        }`}
+        className={`chat-container-card ${isMobileThreadOpen ? "mobile-thread-open" : "mobile-list-open"
+          }`}
       >
         <div className="chat-left-pane">
           <ConversationList
@@ -612,8 +611,8 @@ export default function ProviderChat() {
                     messages={activeMessages}
                     currentRole="PROVIDER"
                     currentUserId={currentUser?.id}
-                    onAcceptQuote={() => {}}
-                    onDeclineQuote={() => {}}
+                    onAcceptQuote={() => { }}
+                    onDeclineQuote={() => { }}
                   />
                 )}
               </div>

@@ -80,7 +80,7 @@ export default function CustomerChat() {
               return queryRecipientId;
             }
             if (queryConversationId) return queryConversationId;
-            return mapped[0].id;
+            return null;
           });
         } else if (queryRecipientId) {
           setSelectedId(queryRecipientId);
@@ -96,7 +96,7 @@ export default function CustomerChat() {
   }, [fetchConversations]);
 
   useEffect(() => {
-    (()=>{
+    (() => {
       if (queryRecipientId) {
         const matched = conversations.find(
           (m) => m.participant.id === queryRecipientId
@@ -199,15 +199,15 @@ export default function CustomerChat() {
         prev.map((c) =>
           c.id === backendMsg.conversation_id
             ? {
-                ...c,
-                lastMessage: {
-                  text: backendMsg.content,
-                  senderId: backendMsg.sender_id,
-                  createdAt: chatMsg.createdAt,
-                  isUnread: backendMsg.sender_id !== currentUser?.id,
-                },
-                updatedAt: new Date().toISOString(),
-              }
+              ...c,
+              lastMessage: {
+                text: backendMsg.content,
+                senderId: backendMsg.sender_id,
+                createdAt: chatMsg.createdAt,
+                isUnread: backendMsg.sender_id !== currentUser?.id,
+              },
+              updatedAt: new Date().toISOString(),
+            }
             : c
         )
       );
@@ -274,10 +274,10 @@ export default function CustomerChat() {
       prev.map((c) =>
         c.id === id
           ? {
-              ...c,
-              unreadCount: 0,
-              lastMessage: { ...c.lastMessage, isUnread: false },
-            }
+            ...c,
+            unreadCount: 0,
+            lastMessage: { ...c.lastMessage, isUnread: false },
+          }
           : c
       )
     );
@@ -349,15 +349,15 @@ export default function CustomerChat() {
         prev.map((c) =>
           c.id === selectedId
             ? {
-                ...c,
-                lastMessage: {
-                  text: trimmed,
-                  senderId: currentUser?.id || "cust-current",
-                  createdAt: optimisticMsg.createdAt,
-                  isUnread: false,
-                },
-                updatedAt: new Date().toISOString(),
-              }
+              ...c,
+              lastMessage: {
+                text: trimmed,
+                senderId: currentUser?.id || "cust-current",
+                createdAt: optimisticMsg.createdAt,
+                isUnread: false,
+              },
+              updatedAt: new Date().toISOString(),
+            }
             : c
         )
       );
@@ -459,12 +459,12 @@ export default function CustomerChat() {
       [selectedId]: (prev[selectedId] || []).map((msg) =>
         msg.type === "QUOTE" && msg.quotePayload?.quoteId === quoteId
           ? {
-              ...msg,
-              quotePayload: {
-                ...msg.quotePayload,
-                status: "ACCEPTED",
-              },
-            }
+            ...msg,
+            quotePayload: {
+              ...msg.quotePayload,
+              status: "ACCEPTED",
+            },
+          }
           : msg
       ),
     }));
@@ -480,12 +480,12 @@ export default function CustomerChat() {
       [selectedId]: (prev[selectedId] || []).map((msg) =>
         msg.type === "QUOTE" && msg.quotePayload?.quoteId === quoteId
           ? {
-              ...msg,
-              quotePayload: {
-                ...msg.quotePayload,
-                status: "DECLINED",
-              },
-            }
+            ...msg,
+            quotePayload: {
+              ...msg.quotePayload,
+              status: "DECLINED",
+            },
+          }
           : msg
       ),
     }));
@@ -499,16 +499,15 @@ export default function CustomerChat() {
     getMessagesMutation.isPending &&
     Boolean(
       selectedId &&
-        (!messagesMap[selectedId] || messagesMap[selectedId].length === 0) &&
-        conversations.some((c) => c.id === selectedId)
+      (!messagesMap[selectedId] || messagesMap[selectedId].length === 0) &&
+      conversations.some((c) => c.id === selectedId)
     );
 
   return (
     <div className="chat-layout-root">
       <div
-        className={`chat-container-card ${
-          isMobileThreadOpen ? "mobile-thread-open" : "mobile-list-open"
-        }`}
+        className={`chat-container-card ${isMobileThreadOpen ? "mobile-thread-open" : "mobile-list-open"
+          }`}
       >
         <div className="chat-left-pane">
           <ConversationList
