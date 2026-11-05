@@ -379,7 +379,8 @@ export default function CustomerChat() {
           const newConvId = convRes.data.id;
           const newConv = toChatConversation(
             convRes.data,
-            selectedConversation?.participant
+            selectedConversation?.participant,
+            selectedConversation?.linkedRequest
           );
 
           setConversations((prev) => [

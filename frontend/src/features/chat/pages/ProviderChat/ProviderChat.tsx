@@ -378,7 +378,8 @@ export default function ProviderChat() {
           const newConvId = convRes.data.id;
           const newConv = toChatConversation(
             convRes.data,
-            selectedConversation?.participant
+            selectedConversation?.participant,
+            selectedConversation?.linkedRequest
           );
 
           setConversations((prev) => [
@@ -534,7 +535,8 @@ export default function ProviderChat() {
           const newConvId = convRes.data.id;
           const newConv = toChatConversation(
             convRes.data,
-            selectedConversation?.participant
+            selectedConversation?.participant,
+            selectedConversation?.linkedRequest
           );
 
           setConversations((prev) => [

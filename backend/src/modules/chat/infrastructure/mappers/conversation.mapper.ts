@@ -30,7 +30,8 @@ export class ConversationMapper {
         return {
             id: conversation.id,
             status: conversation.status,
-            created_at: conversation.created_at
+            created_at: conversation.created_at,
+            updated_at: conversation.updated_at
         };
     }
 }

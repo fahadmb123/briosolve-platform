@@ -35,6 +35,11 @@ export class StartConversationUseCase implements IUseCase<StartConversationReque
         );
 
         if (existingConversation) {
+            const details = await this._conversationRepository.findByIdWithDetails(
+                existingConversation.id,
+                input.userId
+            );
+            if (details) return details;
             return ConversationMapper.toDto(existingConversation);
         }
 
@@ -59,6 +64,11 @@ export class StartConversationUseCase implements IUseCase<StartConversationReque
             }
         ]);
 
+        const details = await this._conversationRepository.findByIdWithDetails(
+            conversation.id,
+            input.userId
+        );
+        if (details) return details;
         return ConversationMapper.toDto(conversation);
     }
 }

@@ -11,10 +11,46 @@ export interface BackendMessageDto {
     updated_at: string | null;
 }
 
+export interface BackendParticipantDto {
+    id: string;
+    name: string;
+    role: "CUSTOMER" | "PROVIDER";
+    avatar?: string | null;
+    business_name?: string | null;
+    phone?: string | null;
+    is_verified?: boolean;
+    is_online?: boolean;
+}
+
+export interface BackendLastMessageDto {
+    text: string;
+    sender_id: string;
+    created_at: string;
+    is_unread: boolean;
+}
+
+export interface BackendLinkedRequestDto {
+    id: string;
+    title: string;
+    category_name: string;
+    subservice_name?: string | null;
+    urgency: "TODAY" | "THIS_WEEK" | "SPECIFIC_DATE" | "FLEXIBLE";
+    budget_type: "FIXED" | "OPEN_BID";
+    budget_amount?: number | null;
+    status: "PENDING" | "ACTIVE" | "ACCEPTED" | "IN_PROGRESS" | "COMPLETED";
+    location?: string | null;
+    scheduled_time?: string | null;
+}
+
 export interface BackendConversationDto {
     id: string;
     status: string;
     created_at: string;
+    updated_at: string;
+    participant?: BackendParticipantDto;
+    last_message?: BackendLastMessageDto;
+    unread_count?: number;
+    linked_request?: BackendLinkedRequestDto | null;
 }
 
 export interface SendMessagePayload {
