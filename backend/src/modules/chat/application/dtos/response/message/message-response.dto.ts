@@ -1,4 +1,4 @@
-import { MessageType } from "../../../../domain/entities/message.entity";
+import { MessageStatus, MessageType } from "../../../../domain/entities/message.entity";
 
 export interface MessageResponseDto {
     id: string;
@@ -6,6 +6,7 @@ export interface MessageResponseDto {
     sender_id: string;
     content: string;
     message_type: MessageType;
+    status?: MessageStatus;
     created_at: Date;
     updated_at: Date | null;
 }

@@ -4,12 +4,13 @@ import {
     startConversationUseCase,
     getConversationsUseCase,
     getMessagesUseCase,
-    markMessagesAsReadUseCase,
+    createMarkMessagesAsReadUseCase,
     createSendMessageUseCase
 } from "./useCases";
 
 export function createChatController(io: Server): ChatController {
     const sendMessageUseCase = createSendMessageUseCase(io);
+    const markMessagesAsReadUseCase = createMarkMessagesAsReadUseCase(io);
     return new ChatController(
         startConversationUseCase,
         getConversationsUseCase,

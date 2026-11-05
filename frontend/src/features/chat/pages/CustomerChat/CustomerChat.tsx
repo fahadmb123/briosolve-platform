@@ -215,6 +215,23 @@ export default function CustomerChat() {
     [currentUser?.id]
   );
 
+  const handleSocketConversationRead = useCallback(
+    (data: { conversation_id: string; read_by: string }) => {
+      if (data.read_by === currentUser?.id) return;
+      setMessagesMap((prev) => {
+        const msgs = prev[data.conversation_id];
+        if (!msgs) return prev;
+        return {
+          ...prev,
+          [data.conversation_id]: msgs.map((m) =>
+            m.senderId === currentUser?.id ? { ...m, status: "READ" as const } : m
+          ),
+        };
+      });
+    },
+    [currentUser?.id]
+  );
+
   const isRealConversation = Boolean(
     selectedId && conversations.some((c) => c.id === selectedId)
   );
@@ -222,6 +239,7 @@ export default function CustomerChat() {
   useChatSocket({
     conversationId: isRealConversation ? selectedId : null,
     onNewMessage: handleSocketNewMessage,
+    onConversationRead: handleSocketConversationRead,
   });
 
   useEffect(() => {

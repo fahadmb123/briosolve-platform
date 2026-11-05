@@ -1,4 +1,5 @@
 export type MessageType = "TEXT" | "IMAGE" | "FILE";
+export type MessageStatus = "SENDING" | "SENT" | "DELIVERED" | "READ";
 
 export class Message {
     constructor(

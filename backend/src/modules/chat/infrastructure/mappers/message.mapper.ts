@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { Message, MessageType } from "../../domain/entities/message.entity";
+import { Message, MessageStatus, MessageType } from "../../domain/entities/message.entity";
 import { MessageResponseDto } from "../../application/dtos/response/message/message-response.dto";
 
 export type MessageRecord = Prisma.MessageGetPayload<{}>;
@@ -31,13 +31,14 @@ export class MessageMapper {
         );
     }
 
-    static toDto(message: Message): MessageResponseDto {
+    static toDto(message: Message, status?: MessageStatus): MessageResponseDto {
         return {
             id: message.id,
             conversation_id: message.conversation_id,
             sender_id: message.sender_id,
             content: message.content,
             message_type: message.message_type,
+            status: status || "SENT",
             created_at: message.created_at,
             updated_at: message.updated_at
         };

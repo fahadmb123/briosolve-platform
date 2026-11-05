@@ -7,6 +7,7 @@ export interface BackendMessageDto {
     sender_id: string;
     content: string;
     message_type: "TEXT" | "IMAGE" | "FILE";
+    status?: "SENDING" | "SENT" | "DELIVERED" | "READ";
     created_at: string;
     updated_at: string | null;
 }

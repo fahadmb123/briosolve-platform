@@ -1,20 +1,7 @@
 :root,
-[data-theme="light"] {
-  --chat-teal: #05ad98;
-  --chat-teal-hover: #049381;
-  --chat-thread-bg: #f8fafc;
-  --chat-thread-dots: #e2e8f0;
-  --chat-incoming-bubble: #ffffff;
-  --chat-incoming-text: #18181b;
-  --chat-incoming-border: #e4e4e7;
-  --chat-input-bg: #f8fafc;
-  --chat-input-border: #e2e8f0;
-  --chat-security-tip-bg: #fefce8;
-  --chat-security-tip-border: #fef08a;
-  --chat-security-tip-text: #854d0e;
-}
-
-[data-theme="dark"] {
+[data-theme="dark"],
+body.dark,
+.dark {
   --chat-teal: #05ad98;
   --chat-teal-hover: #049381;
   --chat-thread-bg: #0c0c10;
@@ -27,6 +14,23 @@
   --chat-security-tip-bg: rgba(234, 179, 8, 0.1);
   --chat-security-tip-border: rgba(234, 179, 8, 0.25);
   --chat-security-tip-text: #facc15;
+}
+
+[data-theme="light"],
+body.light,
+.light {
+  --chat-teal: #05ad98;
+  --chat-teal-hover: #049381;
+  --chat-thread-bg: #f8fafc;
+  --chat-thread-dots: #e2e8f0;
+  --chat-incoming-bubble: #ffffff;
+  --chat-incoming-text: #18181b;
+  --chat-incoming-border: #e4e4e7;
+  --chat-input-bg: #f8fafc;
+  --chat-input-border: #e2e8f0;
+  --chat-security-tip-bg: #fefce8;
+  --chat-security-tip-border: #fef08a;
+  --chat-security-tip-text: #854d0e;
 }
 
 .chat-layout-root {
@@ -664,16 +668,21 @@
   padding: 0.35rem 0.75rem;
   font-size: 0.76rem;
   font-weight: 600;
-  color: #ffffff;
-  background: #05ad98;
-  border: none;
+  color: #ffffff !important;
+  background: #05ad98 !important;
+  border: none !important;
   border-radius: 6px;
   cursor: pointer;
   transition: opacity 0.15s ease;
 }
 
+.chat-banner-btn-primary span,
+.chat-banner-btn-primary i {
+  color: #ffffff !important;
+}
+
 .chat-banner-btn-primary:hover {
-  background: #049381;
+  background: #049381 !important;
 }
 
 .chat-thread-body {
@@ -828,8 +837,12 @@
   align-items: center;
 }
 
-.chat-msg-status-ticks .read {
-  color: #05ad98;
+.chat-msg-status-ticks i {
+  line-height: 1;
+}
+
+.chat-msg-status-ticks i.read {
+  color: #05ad98 !important;
 }
 
 .chat-quote-card {
@@ -1499,13 +1512,19 @@
 }
 
 .chat-action-btn.quote-primary {
-  background: #05ad98;
-  color: #ffffff;
-  border-color: #05ad98;
+  background: #05ad98 !important;
+  color: #ffffff !important;
+  border: 1px solid #05ad98 !important;
+}
+
+.chat-action-btn.quote-primary span,
+.chat-action-btn.quote-primary i {
+  color: #ffffff !important;
 }
 
 .chat-action-btn.quote-primary:hover {
-  background: #049381;
+  background: #049381 !important;
+  border-color: #049381 !important;
 }
 
 .chat-quote-modal-card {

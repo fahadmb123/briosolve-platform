@@ -26,9 +26,13 @@ export const joinConversationUseCase = new JoinConversationUseCase(
     conversationParticipantRepository
 );
 
-export const markMessagesAsReadUseCase = new MarkMessagesAsReadUseCase(
-    conversationParticipantRepository
-);
+export function createMarkMessagesAsReadUseCase(io: Server): MarkMessagesAsReadUseCase {
+    const messageDelivery = new SocketIoMessageDeliveryAdapter(io);
+    return new MarkMessagesAsReadUseCase(
+        conversationParticipantRepository,
+        messageDelivery
+    );
+}
 
 export function createSendMessageUseCase(io: Server): SendMessageUseCase {
     const messageDelivery = new SocketIoMessageDeliveryAdapter(io);

@@ -1,11 +1,13 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IConversationParticipantRepository } from "../../domain/repositories/IConversationParticipantRepository";
+import { IMessageDelivery } from "../interfaces/IMessageDelivery";
 import { MarkMessagesAsReadRequestDto } from "../dtos/request/message/mark-messages-as-read.dto";
 
 export class MarkMessagesAsReadUseCase implements IUseCase<MarkMessagesAsReadRequestDto, void> {
     constructor(
-        private readonly _participantRepository: IConversationParticipantRepository
+        private readonly _participantRepository: IConversationParticipantRepository,
+        private readonly _messageDelivery: IMessageDelivery
     ) {}
 
     async execute(input: MarkMessagesAsReadRequestDto): Promise<void> {
@@ -34,6 +36,8 @@ export class MarkMessagesAsReadUseCase implements IUseCase<MarkMessagesAsReadReq
             input.conversationId,
             input.userId
         );
+
+        await this._messageDelivery.emitReadReceipt(input.conversationId, input.userId);
     }
 }
 

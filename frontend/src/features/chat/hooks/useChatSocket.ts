@@ -6,9 +6,10 @@ import type { BackendMessageDto } from "../services/chat.service";
 interface UseChatSocketProps {
     conversationId: string | null;
     onNewMessage: (message: BackendMessageDto) => void;
+    onConversationRead?: (data: { conversation_id: string; read_by: string; read_at: string }) => void;
 }
 
-export function useChatSocket({ conversationId, onNewMessage }: UseChatSocketProps): void {
+export function useChatSocket({ conversationId, onNewMessage, onConversationRead }: UseChatSocketProps): void {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     useEffect(() => {
@@ -26,11 +27,19 @@ export function useChatSocket({ conversationId, onNewMessage }: UseChatSocketPro
             }
         };
 
+        const handleConversationRead = (data: { conversation_id: string; read_by: string; read_at: string }) => {
+            if (data.conversation_id === conversationId && onConversationRead) {
+                onConversationRead(data);
+            }
+        };
+
         socket.on("message:new", handleNewMessage);
+        socket.on("conversation:read", handleConversationRead);
 
         return () => {
             socket.off("message:new", handleNewMessage);
+            socket.off("conversation:read", handleConversationRead);
         };
-    }, [isAuthenticated, conversationId, onNewMessage]);
+    }, [isAuthenticated, conversationId, onNewMessage, onConversationRead]);
 }
 
