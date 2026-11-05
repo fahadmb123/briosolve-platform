@@ -119,6 +119,13 @@ export default function ProviderChat() {
     })()
   }, [queryConversationId, queryRecipientId, conversations]);
 
+  useEffect(() => {
+    useChatStore.getState().setActiveConversationId(selectedId);
+    return () => {
+      useChatStore.getState().setActiveConversationId(null);
+    };
+  }, [selectedId]);
+
   const selectedConversation = useMemo(() => {
     const existing = conversations.find((c) => c.id === selectedId);
     if (existing) return existing;

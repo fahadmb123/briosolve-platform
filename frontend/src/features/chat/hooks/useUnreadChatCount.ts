@@ -25,7 +25,7 @@ export async function refreshGlobalUnreadCount(): Promise<void> {
                 useChatStore.getState().setUnreadCount(total);
             }
         } catch {
-            (()=>{})()
+            (() => {})();
         } finally {
             inflightPromise = null;
         }
@@ -34,8 +34,7 @@ export async function refreshGlobalUnreadCount(): Promise<void> {
     return inflightPromise;
 }
 
-export function useUnreadChatCount(): number {
-    const unreadCount = useChatStore((state) => state.unreadCount);
+export function useChatUnreadSync(): void {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const currentUserId = useAuthStore((state) => state.user?.id);
 
@@ -67,6 +66,12 @@ export function useUnreadChatCount(): number {
             if (authUser?.id && String(msg.sender_id).trim() === String(authUser.id).trim()) {
                 return;
             }
+
+            const activeConversationId = useChatStore.getState().activeConversationId;
+            if (activeConversationId && String(activeConversationId).trim() === String(msg.conversation_id).trim()) {
+                return;
+            }
+
             useChatStore.getState().incrementUnreadCount(1);
             lastFetchTime = 0;
             refreshGlobalUnreadCount();
@@ -92,7 +97,8 @@ export function useUnreadChatCount(): number {
             window.removeEventListener("chat:unread-refresh", handleWindowRefresh);
         };
     }, [isAuthenticated, currentUserId]);
-
-    return unreadCount;
 }
 
+export function useUnreadChatCount(): number {
+    return useChatStore((state) => state.unreadCount);
+}
