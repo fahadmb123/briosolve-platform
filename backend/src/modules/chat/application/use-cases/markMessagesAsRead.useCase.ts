@@ -35,8 +35,11 @@ export class MarkMessagesAsReadUseCase implements IUseCase<MarkMessagesAsReadReq
             input.userId
         );
 
-        const participantUserIds = participants.map(p => p.user_id);
-        await this._messageDelivery.emitReadReceipt(input.conversationId, input.userId, participantUserIds);
+        const recipientUserIds = participants
+            .map((p) => p.user_id)
+            .filter((id) => String(id).trim() !== String(input.userId).trim());
+
+        await this._messageDelivery.emitReadReceipt(input.conversationId, input.userId, recipientUserIds);
     }
 }
 

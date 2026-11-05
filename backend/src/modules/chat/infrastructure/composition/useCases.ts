@@ -7,6 +7,7 @@ import { JoinConversationUseCase } from "../../application/use-cases/joinConvers
 import { MarkMessagesAsReadUseCase } from "../../application/use-cases/markMessagesAsRead.useCase";
 import { SendMessageUseCase } from "../../application/use-cases/sendMessage.useCase";
 import { SocketIoMessageDeliveryAdapter } from "../adapters/socket-io-message-delivery.adapter";
+import { webPushDelivery } from "../../../notification/infrastructure/composition/useCases";
 
 export const startConversationUseCase = new StartConversationUseCase(
     conversationRepository,
@@ -35,7 +36,7 @@ export function createMarkMessagesAsReadUseCase(io: Server): MarkMessagesAsReadU
 }
 
 export function createSendMessageUseCase(io: Server): SendMessageUseCase {
-    const messageDelivery = new SocketIoMessageDeliveryAdapter(io);
+    const messageDelivery = new SocketIoMessageDeliveryAdapter(io, webPushDelivery);
     return new SendMessageUseCase(
         conversationRepository,
         conversationParticipantRepository,

@@ -77,11 +77,14 @@ export class SendMessageUseCase implements IUseCase<SendMessageRequestDto, Messa
             );
         }
 
-        const participantUserIds = participants.map(p => p.user_id);
+        const recipientUserIds = participants
+            .map((p) => p.user_id)
+            .filter((id) => String(id).trim() !== String(input.senderId).trim());
+
         await this._messageDelivery.sendToConversation(
             input.conversationId,
             message,
-            participantUserIds
+            recipientUserIds
         );
 
         return MessageMapper.toDto(message);

@@ -46,6 +46,10 @@ export function useChatSocket({ conversationId, onNewMessage, onConversationRead
         }
 
         socket.emit("conversation:join", conversationId);
+
+        return () => {
+            socket.emit("conversation:leave", conversationId);
+        };
     }, [isAuthenticated, conversationId]);
 }
 

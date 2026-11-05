@@ -37,5 +37,9 @@ export class ChatSocketHandler {
                 });
             }
         });
+
+        socket.on("conversation:leave", async (conversationId: string) => {
+            await socket.leave(`conversation:${conversationId}`);
+        });
     }
 }
