@@ -25,7 +25,7 @@ export function toChatMessage(
         senderName: isMe ? "You" : (role === "PROVIDER" ? "Provider" : "Customer"),
         text: dto.content,
         type: dto.message_type === "IMAGE" ? "IMAGE" : "TEXT",
-        status: dto.status || "SENT",
+        status: "SENT",
         createdAt: timeFormatted
     };
 }

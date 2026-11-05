@@ -476,6 +476,16 @@ body.light,
   margin: 0;
 }
 
+.chat-header-status-text.online {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.chat-header-status-text.offline {
+  color: var(--text-muted, #94a3b8);
+  font-weight: 400;
+}
+
 .chat-header-actions {
   display: flex;
   align-items: center;

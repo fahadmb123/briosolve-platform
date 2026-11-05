@@ -35,11 +35,10 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
           alt={participant.name}
           className="chat-avatar-img"
         />
-        {participant.isOnline ? (
-          <span className="chat-presence-dot online" title="Online now" />
-        ) : (
-          <span className="chat-presence-dot offline" title="Offline" />
-        )}
+        <span
+          className={`chat-presence-dot ${participant.isOnline ? "online" : "offline"}`}
+          title={participant.isOnline ? "Online now" : "Offline"}
+        />
       </div>
 
       <div className="chat-conv-content">

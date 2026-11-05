@@ -7,9 +7,15 @@ interface UseChatSocketProps {
     conversationId: string | null;
     onNewMessage: (message: BackendMessageDto) => void;
     onConversationRead?: (data: { conversation_id: string; read_by: string; read_at: string }) => void;
+    onUserStatus?: (data: { userId: string; isOnline: boolean }) => void;
 }
 
-export function useChatSocket({ conversationId, onNewMessage, onConversationRead }: UseChatSocketProps): void {
+export function useChatSocket({
+    conversationId,
+    onNewMessage,
+    onConversationRead,
+    onUserStatus,
+}: UseChatSocketProps): void {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     useEffect(() => {
@@ -29,14 +35,31 @@ export function useChatSocket({ conversationId, onNewMessage, onConversationRead
             }
         };
 
+        const handleUserStatus = (data: { userId: string; isOnline: boolean }) => {
+            if (onUserStatus) {
+                onUserStatus(data);
+            }
+        };
+
+        const handleConnect = () => {
+            socket.emit("chat:presence:enter");
+        };
+
         socket.on("message:new", handleNewMessage);
         socket.on("conversation:read", handleConversationRead);
+        socket.on("user:status", handleUserStatus);
+        socket.on("connect", handleConnect);
+
+        socket.emit("chat:presence:enter");
 
         return () => {
+            socket.emit("chat:presence:leave");
             socket.off("message:new", handleNewMessage);
             socket.off("conversation:read", handleConversationRead);
+            socket.off("user:status", handleUserStatus);
+            socket.off("connect", handleConnect);
         };
-    }, [isAuthenticated, onNewMessage, onConversationRead]);
+    }, [isAuthenticated, onNewMessage, onConversationRead, onUserStatus]);
 
     useEffect(() => {
         if (!isAuthenticated || !conversationId) return;
@@ -52,4 +75,3 @@ export function useChatSocket({ conversationId, onNewMessage, onConversationRead
         };
     }, [isAuthenticated, conversationId]);
 }
-

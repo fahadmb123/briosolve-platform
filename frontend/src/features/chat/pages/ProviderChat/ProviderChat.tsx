@@ -29,6 +29,7 @@ import {
 import { toChatMessage, toChatConversation } from "../../utils/chat.mapper";
 import { useChatSocket } from "../../hooks/useChatSocket";
 import { useChatStore } from "../../stores/chat.store";
+import { socket } from "../../../../shared/api/socket-client";
 import "../CustomerChat/CustomerChat.css";
 
 export default function ProviderChat() {
@@ -58,6 +59,7 @@ export default function ProviderChat() {
   const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(
     Boolean(queryConversationId || queryRecipientId)
   );
+  const [presenceMap, setPresenceMap] = useState<Record<string, boolean>>({});
 
   const getConversationsMutation = useGetConversations();
   const getMessagesMutation = useGetMessages();
@@ -126,7 +128,17 @@ export default function ProviderChat() {
 
   const selectedConversation = useMemo(() => {
     const existing = conversations.find((c) => c.id === selectedId);
-    if (existing) return existing;
+    if (existing) {
+      const pId = String(existing.participant.id).trim();
+      const isOnline = presenceMap[pId] ?? existing.participant.isOnline ?? false;
+      return {
+        ...existing,
+        participant: {
+          ...existing.participant,
+          isOnline,
+        },
+      };
+    }
     if (selectedId) {
       const locState = location.state as {
         recipientId?: string;
@@ -148,6 +160,8 @@ export default function ProviderChat() {
         locState?.recipientId || locState?.customerId || selectedId;
       const recipientName =
         locState?.recipientName || locState?.customerName || "Customer";
+      const pId = String(recipientId).trim();
+      const isOnline = presenceMap[pId] ?? false;
 
       return {
         id: selectedId,
@@ -159,7 +173,7 @@ export default function ProviderChat() {
           rating: 5.0,
           reviewsCount: 0,
           isVerified: true,
-          isOnline: true,
+          isOnline,
         },
         linkedRequest: {
           id: locState?.requestId || "req-active",
@@ -260,6 +274,37 @@ export default function ProviderChat() {
     [currentUser?.id]
   );
 
+  const handleSocketUserStatus = useCallback(
+    ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
+      const normalizedUserId = String(userId).trim();
+      setPresenceMap((prev) => ({ ...prev, [normalizedUserId]: isOnline }));
+      setConversations((prev) =>
+        prev.map((c) =>
+          String(c.participant.id).trim() === normalizedUserId
+            ? { ...c, participant: { ...c.participant, isOnline } }
+            : c
+        )
+      );
+    },
+    []
+  );
+
+  useEffect(() => {
+    const participantId = selectedConversation?.participant?.id;
+    if (!participantId) return;
+    const targetId = String(participantId).trim();
+    socket.emit("user:check_online", targetId, (isOnline: boolean) => {
+      setPresenceMap((prev) => ({ ...prev, [targetId]: isOnline }));
+      setConversations((prev) =>
+        prev.map((c) =>
+          String(c.participant.id).trim() === targetId
+            ? { ...c, participant: { ...c.participant, isOnline } }
+            : c
+        )
+      );
+    });
+  }, [selectedConversation?.participant?.id]);
+
   const isRealConversation = Boolean(
     selectedId && conversations.some((c) => c.id === selectedId)
   );
@@ -268,6 +313,7 @@ export default function ProviderChat() {
     conversationId: isRealConversation ? selectedId : null,
     onNewMessage: handleSocketNewMessage,
     onConversationRead: handleSocketConversationRead,
+    onUserStatus: handleSocketUserStatus,
   });
 
   useEffect(() => {
@@ -532,8 +578,6 @@ export default function ProviderChat() {
             <div className="chat-thread-view">
               <ChatHeader
                 participant={selectedConversation.participant}
-                linkedRequest={selectedConversation.linkedRequest}
-                currentRole="PROVIDER"
                 isInfoOpen={isInfoOpen}
                 onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}

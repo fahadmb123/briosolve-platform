@@ -41,7 +41,6 @@ export interface ChatParticipant {
   reviewsCount?: number;
   isVerified?: boolean;
   isOnline?: boolean;
-  lastSeen?: string;
   phone?: string;
 }
 

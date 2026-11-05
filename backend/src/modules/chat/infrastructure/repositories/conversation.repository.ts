@@ -3,6 +3,7 @@ import { Conversation } from "../../domain/entities/conversation.entity";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { ConversationMapper } from "../mappers/conversation.mapper";
 import { ConversationResponseDto } from "../../application/dtos/response/conversation/conversation-response.dto";
+import { PresenceTracker } from "../../../../shared/realtime/services/presence.tracker";
 
 function parseDate(val: unknown): Date {
     if (!val) return new Date();
@@ -153,7 +154,7 @@ export class ConversationRepository implements IConversationRepository {
                 business_name: businessName,
                 phone: otherUser.phone || null,
                 is_verified: isVerified,
-                is_online: true
+                is_online: PresenceTracker.isOnline(otherUser.id)
             };
         }
 

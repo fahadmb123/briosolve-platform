@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import type { ChatParticipant, ChatLinkedRequest } from "../types/chat.types";
+import type { ChatParticipant } from "../types/chat.types";
 
 interface ChatHeaderProps {
   participant: ChatParticipant;
-  linkedRequest?: ChatLinkedRequest;
-  currentRole?: "CUSTOMER" | "PROVIDER";
   isInfoOpen: boolean;
   onToggleInfo: () => void;
   onBackToMobileList: () => void;
@@ -12,8 +10,6 @@ interface ChatHeaderProps {
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   participant,
-  linkedRequest,
-  currentRole = "CUSTOMER",
   isInfoOpen,
   onToggleInfo,
   onBackToMobileList,
@@ -61,15 +57,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               </span>
             )}
           </div>
-          <p className="chat-header-status-text">
-            {participant.isOnline
-              ? "Active now"
-              : participant.lastSeen
-              ? `Last seen ${participant.lastSeen}`
-              : participant.businessName || (currentRole === "PROVIDER" ? "Client" : "Service Provider")}
-            {linkedRequest && (
-              <span className="chat-header-req-tag"> • {linkedRequest.categoryName}</span>
-            )}
+          <p className={`chat-header-status-text ${participant.isOnline ? "online" : "offline"}`}>
+            {participant.isOnline ? "Active now" : "Offline"}
           </p>
         </div>
       </div>
