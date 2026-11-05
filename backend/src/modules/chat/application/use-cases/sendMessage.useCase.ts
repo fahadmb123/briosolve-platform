@@ -51,10 +51,8 @@ export class SendMessageUseCase implements IUseCase<SendMessageRequestDto, Messa
             );
         }
 
-        const participant = await this._participantRepository.findByConversationAndUser(
-            input.conversationId,
-            input.senderId
-        );
+        const participants = await this._participantRepository.findByConversationId(input.conversationId);
+        const participant = participants.find(p => p.user_id === input.senderId);
 
         if (!participant) {
             throw new ApplicationError(
@@ -79,9 +77,11 @@ export class SendMessageUseCase implements IUseCase<SendMessageRequestDto, Messa
             );
         }
 
+        const participantUserIds = participants.map(p => p.user_id);
         await this._messageDelivery.sendToConversation(
             input.conversationId,
-            message
+            message,
+            participantUserIds
         );
 
         return MessageMapper.toDto(message);

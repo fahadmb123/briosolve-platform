@@ -13,22 +13,18 @@ export function useChatSocket({ conversationId, onNewMessage, onConversationRead
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     useEffect(() => {
-        if (!isAuthenticated || !conversationId) return;
+        if (!isAuthenticated) return;
 
         if (!socket.connected) {
             socket.connect();
         }
 
-        socket.emit("conversation:join", conversationId);
-
         const handleNewMessage = (message: BackendMessageDto) => {
-            if (message.conversation_id === conversationId) {
-                onNewMessage(message);
-            }
+            onNewMessage(message);
         };
 
         const handleConversationRead = (data: { conversation_id: string; read_by: string; read_at: string }) => {
-            if (data.conversation_id === conversationId && onConversationRead) {
+            if (onConversationRead) {
                 onConversationRead(data);
             }
         };
@@ -40,6 +36,16 @@ export function useChatSocket({ conversationId, onNewMessage, onConversationRead
             socket.off("message:new", handleNewMessage);
             socket.off("conversation:read", handleConversationRead);
         };
-    }, [isAuthenticated, conversationId, onNewMessage, onConversationRead]);
+    }, [isAuthenticated, onNewMessage, onConversationRead]);
+
+    useEffect(() => {
+        if (!isAuthenticated || !conversationId) return;
+
+        if (!socket.connected) {
+            socket.connect();
+        }
+
+        socket.emit("conversation:join", conversationId);
+    }, [isAuthenticated, conversationId]);
 }
 

@@ -197,24 +197,38 @@ export default function ProviderChat() {
         };
       });
 
-      setConversations((prev) =>
-        prev.map((c) =>
-          c.id === backendMsg.conversation_id
-            ? {
+      setConversations((prev) => {
+        const exists = prev.some((c) => c.id === backendMsg.conversation_id);
+        if (!exists) {
+          getConversationsMutation.mutate();
+          return prev;
+        }
+
+        return prev
+          .map((c) => {
+            if (c.id !== backendMsg.conversation_id) return c;
+            const isFromOther = backendMsg.sender_id !== currentUser?.id;
+            const isNotSelected = selectedId !== backendMsg.conversation_id;
+            return {
               ...c,
               lastMessage: {
                 text: backendMsg.content,
                 senderId: backendMsg.sender_id,
                 createdAt: chatMsg.createdAt,
-                isUnread: backendMsg.sender_id !== currentUser?.id,
+                isUnread: isFromOther && isNotSelected,
               },
+              unreadCount: isFromOther && isNotSelected ? (c.unreadCount || 0) + 1 : c.unreadCount,
               updatedAt: new Date().toISOString(),
-            }
-            : c
-        )
-      );
+            };
+          })
+          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      });
+
+      if (selectedId === backendMsg.conversation_id && backendMsg.sender_id !== currentUser?.id) {
+        markMessagesAsReadMutation.mutate(backendMsg.conversation_id);
+      }
     },
-    [currentUser?.id]
+    [currentUser?.id, selectedId, getConversationsMutation, markMessagesAsReadMutation]
   );
 
   const handleSocketConversationRead = useCallback(

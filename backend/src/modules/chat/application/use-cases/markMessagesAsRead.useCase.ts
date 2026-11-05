@@ -19,10 +19,8 @@ export class MarkMessagesAsReadUseCase implements IUseCase<MarkMessagesAsReadReq
             );
         }
 
-        const participant = await this._participantRepository.findByConversationAndUser(
-            input.conversationId,
-            input.userId
-        );
+        const participants = await this._participantRepository.findByConversationId(input.conversationId);
+        const participant = participants.find(p => p.user_id === input.userId);
 
         if (!participant) {
             throw new ApplicationError(
@@ -37,7 +35,8 @@ export class MarkMessagesAsReadUseCase implements IUseCase<MarkMessagesAsReadReq
             input.userId
         );
 
-        await this._messageDelivery.emitReadReceipt(input.conversationId, input.userId);
+        const participantUserIds = participants.map(p => p.user_id);
+        await this._messageDelivery.emitReadReceipt(input.conversationId, input.userId, participantUserIds);
     }
 }
 
