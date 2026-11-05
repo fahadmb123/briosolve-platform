@@ -6,16 +6,12 @@ interface ChatMessageListProps {
   messages: ChatMessage[];
   currentRole?: "CUSTOMER" | "PROVIDER";
   currentUserId?: string;
-  onAcceptQuote?: (quoteId: string) => void;
-  onDeclineQuote?: (quoteId: string) => void;
 }
 
 export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   messages,
   currentRole = "CUSTOMER",
   currentUserId,
-  onAcceptQuote,
-  onDeclineQuote,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -43,8 +39,6 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
           message={msg}
           currentRole={currentRole}
           currentUserId={currentUserId}
-          onAcceptQuote={onAcceptQuote}
-          onDeclineQuote={onDeclineQuote}
         />
       ))}
 

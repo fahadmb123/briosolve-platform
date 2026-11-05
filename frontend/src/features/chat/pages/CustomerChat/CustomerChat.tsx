@@ -178,7 +178,6 @@ export default function CustomerChat() {
           isUnread: false,
         },
         unreadCount: 0,
-        hasActiveQuote: false,
         updatedAt: new Date().toISOString(),
       };
     }
@@ -297,7 +296,6 @@ export default function CustomerChat() {
   const filteredConversations = useMemo(() => {
     return conversations.filter((conv) => {
       if (filter === "UNREAD" && conv.unreadCount === 0) return false;
-      if (filter === "QUOTES" && !conv.hasActiveQuote) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -498,48 +496,6 @@ export default function CustomerChat() {
     }
   };
 
-  const handleAcceptQuote = (quoteId: string) => {
-    if (!selectedId) return;
-
-    setMessagesMap((prev) => ({
-      ...prev,
-      [selectedId]: (prev[selectedId] || []).map((msg) =>
-        msg.type === "QUOTE" && msg.quotePayload?.quoteId === quoteId
-          ? {
-            ...msg,
-            quotePayload: {
-              ...msg.quotePayload,
-              status: "ACCEPTED",
-            },
-          }
-          : msg
-      ),
-    }));
-
-    toast.success("Quotation accepted! Provider has been notified.");
-  };
-
-  const handleDeclineQuote = (quoteId: string) => {
-    if (!selectedId) return;
-
-    setMessagesMap((prev) => ({
-      ...prev,
-      [selectedId]: (prev[selectedId] || []).map((msg) =>
-        msg.type === "QUOTE" && msg.quotePayload?.quoteId === quoteId
-          ? {
-            ...msg,
-            quotePayload: {
-              ...msg.quotePayload,
-              status: "DECLINED",
-            },
-          }
-          : msg
-      ),
-    }));
-
-    toast("Quotation declined.");
-  };
-
   const isConversationsLoading =
     getConversationsMutation.isPending && conversations.length === 0;
   const isMessagesLoading =
@@ -597,8 +553,6 @@ export default function CustomerChat() {
                     messages={activeMessages}
                     currentRole="CUSTOMER"
                     currentUserId={currentUser?.id}
-                    onAcceptQuote={handleAcceptQuote}
-                    onDeclineQuote={handleDeclineQuote}
                   />
                 )}
               </div>

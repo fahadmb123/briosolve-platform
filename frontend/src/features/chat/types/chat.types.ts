@@ -2,18 +2,7 @@ export type MessageSenderRole = "CUSTOMER" | "PROVIDER" | "SYSTEM";
 
 export type MessageStatus = "SENDING" | "SENT" | "DELIVERED" | "READ";
 
-export type MessageType = "TEXT" | "QUOTE" | "IMAGE" | "ACTION_CARD";
-
-export interface ChatQuotePayload {
-  quoteId: string;
-  requestId: string;
-  requestTitle: string;
-  amount: number;
-  durationHours?: number;
-  includesParts: boolean;
-  notes?: string;
-  status: "PENDING" | "ACCEPTED" | "DECLINED";
-}
+export type MessageType = "TEXT" | "IMAGE" | "ACTION_CARD";
 
 export interface ChatMessage {
   id: string;
@@ -24,7 +13,6 @@ export interface ChatMessage {
   senderAvatar?: string;
   text: string;
   type: MessageType;
-  quotePayload?: ChatQuotePayload;
   imageUrl?: string;
   status: MessageStatus;
   createdAt: string;
@@ -68,9 +56,7 @@ export interface ChatConversation {
     isUnread: boolean;
   };
   unreadCount: number;
-  hasActiveQuote: boolean;
   updatedAt: string;
 }
 
-export type ConversationFilter = "ALL" | "UNREAD" | "QUOTES";
-
+export type ConversationFilter = "ALL" | "UNREAD";

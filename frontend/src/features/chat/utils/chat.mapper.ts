@@ -95,7 +95,6 @@ export function toChatConversation(
             isUnread: dto.last_message?.is_unread ?? false,
         },
         unreadCount: dto.unread_count ?? 0,
-        hasActiveQuote: false,
         updatedAt: dto.updated_at || dto.created_at,
     };
 }

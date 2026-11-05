@@ -14,7 +14,6 @@ import {
   ChatInputBar,
   ChatInfoDrawer,
   EmptyChatState,
-  CreateQuoteModal,
   ChatMessageListSkeleton,
   ChatThreadSkeleton,
 } from "../../components";
@@ -59,7 +58,6 @@ export default function ProviderChat() {
   const [isMobileThreadOpen, setIsMobileThreadOpen] = useState(
     Boolean(queryConversationId || queryRecipientId)
   );
-  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
 
   const getConversationsMutation = useGetConversations();
   const getMessagesMutation = useGetMessages();
@@ -180,7 +178,6 @@ export default function ProviderChat() {
           isUnread: false,
         },
         unreadCount: 0,
-        hasActiveQuote: false,
         updatedAt: new Date().toISOString(),
       };
     }
@@ -299,7 +296,6 @@ export default function ProviderChat() {
   const filteredConversations = useMemo(() => {
     return conversations.filter((conv) => {
       if (filter === "UNREAD" && conv.unreadCount === 0) return false;
-      if (filter === "QUOTES" && !conv.hasActiveQuote) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -500,108 +496,6 @@ export default function ProviderChat() {
     }
   };
 
-  const handleCreateQuote = (payload: {
-    amount: number;
-    durationHours: number;
-    includesParts: boolean;
-    notes: string;
-  }) => {
-    if (!selectedId) return;
-
-    const isExisting = conversations.some((c) => c.id === selectedId);
-
-    const emitQuoteMessage = (convId: string) => {
-      const newQuoteMessage: ChatMessage = {
-        id: `pmsg-quote-${Date.now()}`,
-        conversationId: convId,
-        senderId: currentUser?.id || "prov-current",
-        senderRole: "PROVIDER",
-        senderName: "You",
-        text: "Submitted a formal quotation for your request.",
-        type: "QUOTE",
-        status: "SENT",
-        createdAt: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        quotePayload: {
-          quoteId: `quote-${Date.now()}`,
-          requestId: selectedConversation?.linkedRequest.id || "req-active",
-          requestTitle:
-            selectedConversation?.linkedRequest.title || "Service Request",
-          amount: payload.amount,
-          durationHours: payload.durationHours,
-          includesParts: payload.includesParts,
-          notes: payload.notes,
-          status: "PENDING",
-        },
-      };
-
-      setMessagesMap((prev) => ({
-        ...prev,
-        [convId]: [...(prev[convId] || []), newQuoteMessage],
-      }));
-
-      setConversations((prev) =>
-        prev.map((c) =>
-          c.id === convId
-            ? {
-              ...c,
-              hasActiveQuote: true,
-              lastMessage: {
-                text: `Quotation: ₹${payload.amount}`,
-                senderId: currentUser?.id || "prov-current",
-                createdAt: newQuoteMessage.createdAt,
-                isUnread: false,
-              },
-              updatedAt: new Date().toISOString(),
-            }
-            : c
-        )
-      );
-
-      setIsQuoteModalOpen(false);
-      toast.success("Quote generated and sent to customer!");
-    };
-
-    if (isExisting) {
-      emitQuoteMessage(selectedId);
-    } else {
-      const targetRecipientId =
-        selectedConversation?.participant?.id || queryRecipientId;
-      if (!targetRecipientId) {
-        toast.error("Recipient details not available");
-        return;
-      }
-
-      startConversationMutation.mutate(targetRecipientId, {
-        onSuccess: (convRes) => {
-          if (!convRes?.data?.id) {
-            toast.error("Failed to start conversation");
-            return;
-          }
-
-          const newConvId = convRes.data.id;
-          const newConv = toChatConversation(
-            convRes.data,
-            selectedConversation?.participant,
-            selectedConversation?.linkedRequest
-          );
-
-          setConversations((prev) => [
-            newConv,
-            ...prev.filter((c) => c.id !== newConvId),
-          ]);
-          setSelectedId(newConvId);
-          emitQuoteMessage(newConvId);
-        },
-        onError: (err) => {
-          toast.error(err.message || "Failed to start conversation");
-        },
-      });
-    }
-  };
-
   const isConversationsLoading =
     getConversationsMutation.isPending && conversations.length === 0;
   const isMessagesLoading =
@@ -643,7 +537,6 @@ export default function ProviderChat() {
                 isInfoOpen={isInfoOpen}
                 onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
-                onOpenCreateQuote={() => setIsQuoteModalOpen(true)}
               />
 
               <ChatRequestBanner
@@ -660,21 +553,8 @@ export default function ProviderChat() {
                     messages={activeMessages}
                     currentRole="PROVIDER"
                     currentUserId={currentUser?.id}
-                    onAcceptQuote={() => { }}
-                    onDeclineQuote={() => { }}
                   />
                 )}
-              </div>
-
-              <div className="provider-quick-prompts-bar">
-                <button
-                  type="button"
-                  className="provider-prompt-pill"
-                  onClick={() => setIsQuoteModalOpen(true)}
-                >
-                  <i className="fas fa-file-invoice-dollar" />
-                  <span>Create Quotation</span>
-                </button>
               </div>
 
               <ChatInputBar onSendMessage={handleSendMessage} />
@@ -695,16 +575,6 @@ export default function ProviderChat() {
           </div>
         )}
       </div>
-
-      {selectedConversation && (
-        <CreateQuoteModal
-          isOpen={isQuoteModalOpen}
-          participant={selectedConversation.participant}
-          linkedRequest={selectedConversation.linkedRequest}
-          onClose={() => setIsQuoteModalOpen(false)}
-          onSubmitQuote={handleCreateQuote}
-        />
-      )}
     </div>
   );
 }

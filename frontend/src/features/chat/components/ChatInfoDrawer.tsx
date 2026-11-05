@@ -133,8 +133,8 @@ export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
           <div className="chat-safety-box">
             <p className="chat-safety-text">
               {isProvider
-                ? "Always submit formal quotations through the chat so quotes are backed by Briosolve Guarantee and client reviews."
-                : "Always inspect quotes thoroughly before acceptance. Never make off-platform advance wire transfers."}
+                ? "Keep all communications within the platform to maintain your service guarantees and client reviews."
+                : "Keep all communication and transactions within Briosolve. Never make off-platform advance wire transfers."}
             </p>
           </div>
         </div>

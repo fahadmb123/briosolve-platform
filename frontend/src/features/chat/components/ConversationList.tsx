@@ -74,13 +74,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           >
             Unread
           </button>
-          <button
-            type="button"
-            className={`chat-filter-btn ${filter === "QUOTES" ? "active" : ""}`}
-            onClick={() => onFilterChange("QUOTES")}
-          >
-            With Quotes
-          </button>
         </div>
       </div>
 

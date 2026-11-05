@@ -8,7 +8,6 @@ interface ChatHeaderProps {
   isInfoOpen: boolean;
   onToggleInfo: () => void;
   onBackToMobileList: () => void;
-  onOpenCreateQuote?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -18,7 +17,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   isInfoOpen,
   onToggleInfo,
   onBackToMobileList,
-  onOpenCreateQuote,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -77,18 +75,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       </div>
 
       <div className="chat-header-actions">
-        {currentRole === "PROVIDER" && onOpenCreateQuote && (
-          <button
-            type="button"
-            className="chat-action-btn quote-primary"
-            onClick={onOpenCreateQuote}
-            title="Draft and send an official quote"
-          >
-            <i className="fas fa-file-invoice-dollar" />
-            <span className="chat-btn-text">Send Quote</span>
-          </button>
-        )}
-
         {participant.phone && (
           <a
             href={`tel:${participant.phone}`}

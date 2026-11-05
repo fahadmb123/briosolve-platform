@@ -5,16 +5,12 @@ interface ChatMessageBubbleProps {
   message: ChatMessage;
   currentRole?: "CUSTOMER" | "PROVIDER";
   currentUserId?: string;
-  onAcceptQuote?: (quoteId: string) => void;
-  onDeclineQuote?: (quoteId: string) => void;
 }
 
 export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
   message,
   currentRole = "CUSTOMER",
   currentUserId,
-  onAcceptQuote,
-  onDeclineQuote,
 }) => {
   const isMe = currentUserId
     ? message.senderId === currentUserId
@@ -33,108 +29,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
       )}
 
       <div className="chat-bubble-container">
-        {message.type === "QUOTE" && message.quotePayload ? (
-          <div className="chat-quote-card">
-            <div className="chat-quote-header">
-              <div className="chat-quote-badge">
-                <i className="fas fa-file-invoice-dollar" />
-                <span>Service Quotation</span>
-              </div>
-              <span className="chat-quote-amount">
-                ₹{message.quotePayload.amount.toLocaleString()}
-              </span>
-            </div>
-
-            <div className="chat-quote-body">
-              <h5 className="chat-quote-title">
-                {message.quotePayload.requestTitle}
-              </h5>
-              {message.quotePayload.notes && (
-                <p className="chat-quote-notes">{message.quotePayload.notes}</p>
-              )}
-
-              <div className="chat-quote-specs">
-                {message.quotePayload.durationHours && (
-                  <span className="chat-quote-spec-chip">
-                    <i className="far fa-hourglass" /> Est.{" "}
-                    {message.quotePayload.durationHours} hr
-                  </span>
-                )}
-                <span className="chat-quote-spec-chip">
-                  <i className="fas fa-tools" />{" "}
-                  {message.quotePayload.includesParts
-                    ? "Parts Included"
-                    : "Labour Only"}
-                </span>
-                <span className="chat-quote-spec-chip">
-                  <i className="fas fa-shield-alt" /> 30-Day Guarantee
-                </span>
-              </div>
-            </div>
-
-            <div className="chat-quote-actions">
-              {currentRole === "CUSTOMER" ? (
-                message.quotePayload.status === "PENDING" ? (
-                  <>
-                    <button
-                      type="button"
-                      className="chat-quote-btn-accept"
-                      onClick={() =>
-                        onAcceptQuote?.(message.quotePayload!.quoteId)
-                      }
-                    >
-                      <i className="fas fa-check" />
-                      <span>Accept Quote</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-quote-btn-decline"
-                      onClick={() =>
-                        onDeclineQuote?.(message.quotePayload!.quoteId)
-                      }
-                    >
-                      <span>Decline</span>
-                    </button>
-                  </>
-                ) : (
-                  <div
-                    className={`chat-quote-status-tag ${message.quotePayload.status.toLowerCase()}`}
-                  >
-                    <i
-                      className={`fas ${
-                        message.quotePayload.status === "ACCEPTED"
-                          ? "fa-check-circle"
-                          : "fa-times-circle"
-                      }`}
-                    />
-                    <span>Quote {message.quotePayload.status}</span>
-                  </div>
-                )
-              ) : (
-                <div
-                  className={`chat-quote-status-tag ${message.quotePayload.status.toLowerCase()}`}
-                >
-                  <i
-                    className={`fas ${
-                      message.quotePayload.status === "ACCEPTED"
-                        ? "fa-check-circle"
-                        : message.quotePayload.status === "DECLINED"
-                        ? "fa-times-circle"
-                        : "fa-clock"
-                    }`}
-                  />
-                  <span>
-                    {message.quotePayload.status === "ACCEPTED"
-                      ? "Accepted by Client"
-                      : message.quotePayload.status === "DECLINED"
-                      ? "Declined by Client"
-                      : "Awaiting Client Acceptance"}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : message.type === "IMAGE" && message.imageUrl ? (
+        {message.type === "IMAGE" && message.imageUrl ? (
           <div className="chat-image-card">
             <img
               src={message.imageUrl}
