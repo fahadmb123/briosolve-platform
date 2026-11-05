@@ -6,9 +6,11 @@ import { useTheme } from "../../../hooks/useTheme";
 import NotificationDropdown from "../../../../features/notifications/components/NotificationDropdown";
 import type { UserRole } from "../../../../features/notifications/types/notification.types";
 import "./TopNav.css";
+import { useUnreadChatCount } from "../../../../features/chat";
 
 export const TopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const unreadMessagesCount = useUnreadChatCount();
   const verifications = useAuthStore(state=>state.verifications)
   const navigate = useNavigate();
   const location = useLocation();
@@ -251,6 +253,11 @@ export const TopNav: React.FC = () => {
                       onClick={closeAllMenus}
                     >
                       <span>Messages</span>
+                      {unreadMessagesCount > 0 && (
+                        <span className="prov-mono-badge">
+                          {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                        </span>
+                      )}
                       <i className="fas fa-comments"></i>
                     </Link>
                     <Link
@@ -312,6 +319,20 @@ export const TopNav: React.FC = () => {
 
           {isAuthenticated ? (
             <>
+              <Link
+                to="/messages"
+                className="topnav-icon-btn topnav-msg-nav-btn"
+                title="Messages"
+                aria-label="Messages"
+              >
+                <i className="fas fa-comments"></i>
+                {unreadMessagesCount > 0 && (
+                  <span className="topnav-msg-badge">
+                    {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                  </span>
+                )}
+              </Link>
+
               <NotificationDropdown
                 role={resolvedRole}
                 viewAllLink={notificationRoute}
@@ -547,7 +568,12 @@ export const TopNav: React.FC = () => {
                   className="topnav-mobile-item"
                   onClick={closeAllMenus}
                 >
-                  Messages
+                  <span>Messages</span>
+                  {unreadMessagesCount > 0 && (
+                    <span className="prov-mono-badge">
+                      {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                    </span>
+                  )}
                 </Link>
                 <Link
                   to="/dashboard"

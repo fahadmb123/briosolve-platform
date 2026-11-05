@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../../features/auth/stores/auth.store";
 import "./CustomerSubnavSidebar.css";
+import { useUnreadChatCount } from "../../../../features/chat";
 
 interface SubnavItem {
   label: string;
@@ -62,6 +63,7 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
 
 export const CustomerSubnavSidebar: React.FC = () => {
   const location = useLocation();
+  const unreadMessagesCount = useUnreadChatCount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const verifications = useAuthStore((state) => state.verifications);
   const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
@@ -132,6 +134,11 @@ export const CustomerSubnavSidebar: React.FC = () => {
                 <i className={item.icon}></i>
               </div>
               <span className="cust-subnav-sidebar-label">{item.label}</span>
+              {item.to.includes("messages") && unreadMessagesCount > 0 && (
+                <span className="cust-subnav-unread-badge">
+                  {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                </span>
+              )}
               {isActive && <span className="cust-subnav-sidebar-pill" />}
             </Link>
           );

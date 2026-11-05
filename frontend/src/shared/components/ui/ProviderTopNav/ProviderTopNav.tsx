@@ -6,9 +6,11 @@ import { useTheme } from "../../../hooks/useTheme";
 import type { ProviderProfile } from "../../../types/Dtos";
 import NotificationDropdown from "../../../../features/notifications/components/NotificationDropdown";
 import "./ProviderTopNav.css";
+import { useUnreadChatCount } from "../../../../features/chat";
 
 export const ProviderTopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const unreadMessagesCount = useUnreadChatCount();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -227,7 +229,11 @@ export const ProviderTopNav: React.FC = () => {
                         <i className="fas fa-comments"></i>
                         <span>Messages</span>
                       </div>
-                      <span className="prov-mono-badge">2</span>
+                      {unreadMessagesCount > 0 && (
+                        <span className="prov-mono-badge">
+                          {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                        </span>
+                      )}
                     </Link>
                   </div>
                 </div>
@@ -522,6 +528,20 @@ export const ProviderTopNav: React.FC = () => {
             <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
           </button>
 
+          <Link
+            to="/provider/messages"
+            className="prov-icon-btn prov-msg-nav-btn"
+            title="Messages"
+            aria-label="Messages"
+          >
+            <i className="fas fa-comments"></i>
+            {unreadMessagesCount > 0 && (
+              <span className="prov-icon-badge">
+                {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+              </span>
+            )}
+          </Link>
+
           <NotificationDropdown
             role="PROVIDER"
             viewAllLink="/provider/notifications"
@@ -689,7 +709,11 @@ export const ProviderTopNav: React.FC = () => {
             </Link>
             <Link to="/provider/messages" className="prov-mobile-item" onClick={closeAll}>
               <span>Messages</span>
-              <span className="prov-mono-badge">2</span>
+              {unreadMessagesCount > 0 && (
+                <span className="prov-mono-badge">
+                  {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                </span>
+              )}
             </Link>
           </div>
 

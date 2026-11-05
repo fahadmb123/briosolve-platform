@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../../features/auth/stores/auth.store";
+import { useUnreadChatCount } from "../../../../features/chat";
 import "./ProviderSubnavSidebar.css";
 
 interface SubnavItem {
@@ -52,6 +53,7 @@ const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
 
 export const ProviderSubnavSidebar: React.FC = () => {
   const location = useLocation();
+  const unreadMessagesCount = useUnreadChatCount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const verifications = useAuthStore((state) => state.verifications);
   const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
@@ -111,6 +113,8 @@ export const ProviderSubnavSidebar: React.FC = () => {
             ? location.pathname === toPath && (!location.hash || location.hash === "")
             : location.pathname.startsWith(toPath);
 
+          const isMessages = item.to.includes("messages");
+
           return (
             <Link
               key={item.to}
@@ -121,6 +125,11 @@ export const ProviderSubnavSidebar: React.FC = () => {
                 <i className={item.icon}></i>
               </div>
               <span className="prov-subnav-sidebar-label">{item.label}</span>
+              {isMessages && unreadMessagesCount > 0 && (
+                <span className="prov-subnav-unread-badge">
+                  {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                </span>
+              )}
               {isActive && <span className="prov-subnav-sidebar-pill" />}
             </Link>
           );

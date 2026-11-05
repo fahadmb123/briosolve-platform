@@ -29,6 +29,7 @@ import {
 } from "../../hooks/useChatMutations";
 import { toChatMessage, toChatConversation } from "../../utils/chat.mapper";
 import { useChatSocket } from "../../hooks/useChatSocket";
+import { useChatStore } from "../../stores/chat.store";
 import "../CustomerChat/CustomerChat.css";
 
 export default function ProviderChat() {
@@ -72,6 +73,8 @@ export default function ProviderChat() {
         if (res?.data && res.data.length > 0) {
           const mapped = res.data.map((c) => toChatConversation(c));
           setConversations(mapped);
+          const totalUnread = mapped.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
+          useChatStore.getState().setUnreadCount(totalUnread);
           setSelectedId((curr) => {
             if (curr && mapped.some((m) => m.id === curr)) return curr;
             if (queryRecipientId) {
@@ -198,17 +201,17 @@ export default function ProviderChat() {
       });
 
       setConversations((prev) => {
-        const exists = prev.some((c) => c.id === backendMsg.conversation_id);
+        const exists = prev.some((c) => String(c.id).trim() === String(backendMsg.conversation_id).trim());
         if (!exists) {
-          getConversationsMutation.mutate();
+          fetchConversations();
           return prev;
         }
 
-        return prev
+        const updated = prev
           .map((c) => {
-            if (c.id !== backendMsg.conversation_id) return c;
-            const isFromOther = backendMsg.sender_id !== currentUser?.id;
-            const isNotSelected = selectedId !== backendMsg.conversation_id;
+            if (String(c.id).trim() !== String(backendMsg.conversation_id).trim()) return c;
+            const isFromOther = String(backendMsg.sender_id).trim() !== String(currentUser?.id).trim();
+            const isNotSelected = String(selectedId).trim() !== String(backendMsg.conversation_id).trim();
             return {
               ...c,
               lastMessage: {
@@ -222,13 +225,18 @@ export default function ProviderChat() {
             };
           })
           .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
+        const totalUnread = updated.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
+        useChatStore.getState().setUnreadCount(totalUnread);
+
+        return updated;
       });
 
-      if (selectedId === backendMsg.conversation_id && backendMsg.sender_id !== currentUser?.id) {
+      if (String(selectedId).trim() === String(backendMsg.conversation_id).trim() && String(backendMsg.sender_id).trim() !== String(currentUser?.id).trim()) {
         markMessagesAsReadMutation.mutate(backendMsg.conversation_id);
       }
     },
-    [currentUser?.id, selectedId, getConversationsMutation, markMessagesAsReadMutation]
+    [currentUser?.id, selectedId, fetchConversations, markMessagesAsReadMutation]
   );
 
   const handleSocketConversationRead = useCallback(

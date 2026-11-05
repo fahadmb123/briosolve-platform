@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '../features/auth/stores/auth.store';
 import { LoadingScreen } from '../shared/components/ui/LoadingScreen/LoadingScreen';
 import { useNotificationSocket } from '../features/notifications/hooks/useNotificationSocket';
+import { useUnreadChatCount } from '../features/chat';
 import AccountSuspended from './pages/AccountSuspended/AccountSuspended';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
   const suspended = useAuthStore((state) => state.isSuspended);
 
   useNotificationSocket();
+  useUnreadChatCount();
 
   useEffect(() => {
     fetchUser().finally(() => {

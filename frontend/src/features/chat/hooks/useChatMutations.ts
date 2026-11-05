@@ -69,6 +69,7 @@ export const useMarkMessagesAsRead = () => {
       queryClient.invalidateQueries({
         queryKey: ["chatConversations"],
       });
+      window.dispatchEvent(new CustomEvent("chat:unread-refresh"));
     },
   });
 };
