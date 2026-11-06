@@ -15,6 +15,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,6 +52,9 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
     onSendMessage(trimmed, fileToSend);
 
     setInputText("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
@@ -66,6 +70,12 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputText(e.target.value);
+    e.target.style.height = "auto";
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
   };
 
   const canSend = Boolean(inputText.trim() || selectedFile) && !disabled;
@@ -135,11 +145,12 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
         </button>
 
         <textarea
+          ref={textareaRef}
           rows={1}
           placeholder="Type a message... (Press Enter to send)"
           className="chat-textarea"
           value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
+          onChange={handleTextareaChange}
           onKeyDown={handleKeyDown}
           disabled={disabled}
         />
