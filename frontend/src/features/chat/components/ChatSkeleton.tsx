@@ -67,9 +67,6 @@ export const ChatMessageBubbleSkeleton: React.FC<ChatMessageBubbleSkeletonProps>
             }}
           />
         </div>
-        <div className="chat-bubble-footer">
-          <Skeleton width={36} height={10} borderRadius={3} />
-        </div>
       </div>
     </div>
   );

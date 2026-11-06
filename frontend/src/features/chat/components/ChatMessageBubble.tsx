@@ -20,6 +20,21 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
       ? message.senderRole === "PROVIDER"
       : message.senderRole === "CUSTOMER";
 
+  const renderStatusTicks = () => {
+    if (!isMe) return null;
+    return (
+      <span className="chat-msg-status-ticks">
+        {message.status === "READ" ? (
+          <i className="fas fa-check-double read" title="Seen" />
+        ) : message.status === "DELIVERED" ? (
+          <i className="fas fa-check-double" title="Delivered" />
+        ) : (
+          <i className="fas fa-check" title="Sent" />
+        )}
+      </span>
+    );
+  };
+
   return (
     <div className={`chat-message-row ${isMe ? "outgoing" : "incoming"}`}>
       {!isMe && message.senderAvatar && (
@@ -45,38 +60,38 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
             }}
             title="Click to view full photo"
           >
-            <img
-              src={message.imageUrl}
-              alt={message.text || "Attached photo"}
-              className="chat-attached-image"
-            />
+            <div className="chat-image-wrapper">
+              <img
+                src={message.imageUrl}
+                alt={message.text || "Attached photo"}
+                className="chat-attached-image"
+              />
+              {!message.text && (
+                <div className="chat-image-overlay-meta">
+                  <span className="chat-msg-time">{message.createdAt}</span>
+                  {renderStatusTicks()}
+                </div>
+              )}
+            </div>
             {message.text && (
-              <p className="chat-image-caption">{message.text}</p>
+              <div className="chat-image-caption-row">
+                <span className="chat-image-caption-text">{message.text}</span>
+                <span className="chat-bubble-meta">
+                  <span className="chat-msg-time">{message.createdAt}</span>
+                  {renderStatusTicks()}
+                </span>
+              </div>
             )}
           </div>
         ) : (
           <div className="chat-text-bubble">
-            <p className="chat-bubble-text">{message.text}</p>
+            <span className="chat-bubble-text">{message.text}</span>
+            <span className="chat-bubble-meta">
+              <span className="chat-msg-time">{message.createdAt}</span>
+              {renderStatusTicks()}
+            </span>
           </div>
         )}
-
-        <div className="chat-bubble-footer">
-          <span className="chat-msg-time">{message.createdAt}</span>
-          {isMe && (
-            <span className="chat-msg-status-ticks">
-              {message.status === "READ" ? (
-                <i
-                  className="fas fa-check-double read"
-                  title="Seen"
-                />
-              ) : message.status === "DELIVERED" ? (
-                <i className="fas fa-check-double" title="Delivered" />
-              ) : (
-                <i className="fas fa-check" title="Sent" />
-              )}
-            </span>
-          )}
-        </div>
       </div>
     </div>
   );
