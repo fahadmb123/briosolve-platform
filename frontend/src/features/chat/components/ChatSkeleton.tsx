@@ -14,9 +14,6 @@ export const ConversationItemSkeleton: React.FC = () => {
           <Skeleton width={38} height={12} borderRadius={4} />
         </div>
         <div style={{ marginTop: 6 }}>
-          <Skeleton width={140} height={14} borderRadius={4} />
-        </div>
-        <div style={{ marginTop: 6 }}>
           <Skeleton width="85%" height={12} borderRadius={4} />
         </div>
       </div>

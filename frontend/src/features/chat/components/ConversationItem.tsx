@@ -12,7 +12,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   isSelected,
   onSelect,
 }) => {
-  const { participant, linkedRequest, lastMessage, unreadCount } = conversation;
+  const { participant, lastMessage, unreadCount } = conversation;
 
   return (
     <div
@@ -52,11 +52,6 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
             )}
           </div>
           <span className="chat-conv-time">{lastMessage.createdAt}</span>
-        </div>
-
-        <div className="chat-conv-request-tag">
-          <i className="fas fa-wrench chat-tag-icon" />
-          <span className="chat-tag-text">{linkedRequest.title}</span>
         </div>
 
         <div className="chat-conv-bottom">
