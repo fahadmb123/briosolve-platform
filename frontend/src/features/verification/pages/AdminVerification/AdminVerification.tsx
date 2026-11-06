@@ -243,48 +243,6 @@ export default function Verification() {
           description="Evaluate trade diplomas, municipal licenses, and government IDs prior to granting marketplace Verified badges."
         />
 
-        <div
-          className="admin-kpi-grid mb-6"
-          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
-        >
-          <div className="admin-kpi-card">
-            <div className="admin-kpi-icon bg-warning-light text-warning">
-              <i className="fas fa-clock"></i>
-            </div>
-            <div>
-              <div className="admin-kpi-val">{stats.pending}</div>
-              <div className="admin-kpi-lbl">Pending Review</div>
-            </div>
-          </div>
-          <div className="admin-kpi-card">
-            <div className="admin-kpi-icon bg-success-light text-success">
-              <i className="fas fa-check-double"></i>
-            </div>
-            <div>
-              <div className="admin-kpi-val">{stats.approved}</div>
-              <div className="admin-kpi-lbl">Total Verified</div>
-            </div>
-          </div>
-          <div className="admin-kpi-card">
-            <div className="admin-kpi-icon bg-danger-light text-danger">
-              <i className="fas fa-ban"></i>
-            </div>
-            <div>
-              <div className="admin-kpi-val">{stats.rejected}</div>
-              <div className="admin-kpi-lbl">Total Rejected</div>
-            </div>
-          </div>
-          <div className="admin-kpi-card">
-            <div className="admin-kpi-icon bg-info-light text-info">
-              <i className="fas fa-layer-group"></i>
-            </div>
-            <div>
-              <div className="admin-kpi-val">{stats.total}</div>
-              <div className="admin-kpi-lbl">Total Applications</div>
-            </div>
-          </div>
-        </div>
-
         <div className="admin-filter-bar mb-6">
           <div className="admin-search-input">
             <i className="fas fa-search"></i>
