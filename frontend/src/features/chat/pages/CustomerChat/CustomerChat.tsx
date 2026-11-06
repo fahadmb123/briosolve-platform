@@ -746,6 +746,8 @@ export default function CustomerChat() {
                   <ChatMessageListSkeleton />
                 ) : (
                   <ChatMessageList
+                    key={selectedConversation.id}
+                    conversationId={selectedConversation.id}
                     messages={activeMessages}
                     currentRole="CUSTOMER"
                     currentUserId={currentUser?.id}

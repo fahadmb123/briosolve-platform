@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import type { ChatMessage } from "../types/chat.types";
 import { ChatMessageBubble } from "./ChatMessageBubble";
 import { ChatImageModal } from "./ChatImageModal";
@@ -7,6 +7,7 @@ interface ChatMessageListProps {
   messages: ChatMessage[];
   currentRole?: "CUSTOMER" | "PROVIDER";
   currentUserId?: string;
+  conversationId?: string;
 }
 
 function getMessageDateLabel(msg: ChatMessage): string {
@@ -49,12 +50,46 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   messages,
   currentRole = "CUSTOMER",
   currentUserId,
+  conversationId,
 }) => {
   const [previewImage, setPreviewImage] = useState<{ url: string; caption?: string } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const isInitialOpenRef = useRef<boolean>(true);
+  const prevConversationIdRef = useRef<string | undefined>(conversationId);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (conversationId && conversationId !== prevConversationIdRef.current) {
+      prevConversationIdRef.current = conversationId;
+      isInitialOpenRef.current = true;
+    }
+  }, [conversationId]);
+
+  useLayoutEffect(() => {
+    if (!bottomRef.current) return;
+
+    const scrollToBottomDirect = () => {
+      const container = bottomRef.current?.closest(".chat-thread-body") as HTMLElement | null;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      } else {
+        bottomRef.current?.scrollIntoView({ behavior: "instant" as ScrollBehavior });
+      }
+    };
+
+    if (isInitialOpenRef.current) {
+      scrollToBottomDirect();
+      if (messages.length > 0) {
+        isInitialOpenRef.current = false;
+      }
+      const rafId = requestAnimationFrame(scrollToBottomDirect);
+      const timerId = setTimeout(scrollToBottomDirect, 50);
+      return () => {
+        cancelAnimationFrame(rafId);
+        clearTimeout(timerId);
+      };
+    } else {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   return (
