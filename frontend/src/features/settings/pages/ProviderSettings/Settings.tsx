@@ -11,11 +11,15 @@ import { AvailabilitySettings } from '../../../availability';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { BecomeCustomer } from '../../components/provider/BecomeCustomer';
+import { ServiceAreaRadius as ProviderServiceAreaRadius } from '../../components/provider/ProviderServiceAreaRadius';
+import type { ProviderProfile } from '../../../profiles';
 const Addresses = lazy(() => import('../CustomerSettings/views/Addresses/Addresses').then(m => ({ default: m.Addresses })));
 
 export default function Settings() {
   const location = useLocation();
   const user = useAuthStore((state) => state.user);
+  const profile = useAuthStore((state) => state.profile);
+  const providerProfile = profile as ProviderProfile | null;
   const [activeSection, setActiveSection] = useState((location.state as { activeSection?: string })?.activeSection || 'grid');
   const [tradeServicesInfo, setTradeServicesInfo] = useState<{ total: number; active: number } | null>(null);
   const getProviderServices = useGetProviderServices();
@@ -64,7 +68,13 @@ export default function Settings() {
 
   const handleSelectAccount = useCallback(() => setActiveSection('account'), []);
   const handleSelectBusiness = useCallback(() => setActiveSection('business'), []);
+  const radiusBadge = useMemo(() => ({
+    text: `${providerProfile?.service_radius_km || 20} km`,
+    type: 'info' as const
+  }), [providerProfile?.service_radius_km]);
+
   const handleSelectServices = useCallback(() => setActiveSection('services'), []);
+  const handleSelectServiceArea = useCallback(() => setActiveSection('service-area'), []);
   const handleSelectAvailability = useCallback(() => setActiveSection('availability'), []);
   const handleSelectNotifications = useCallback(() => setActiveSection('notifications'), []);
   const handleSelectAddresses = useCallback(() => setActiveSection('addresses'), []);
@@ -131,6 +141,13 @@ export default function Settings() {
                                 description="Manage the service categories you specialize in."
                                 onClick={handleSelectServices}
                                 badge={tradeServicesBadge}
+                            />
+                            <SettingsMenuCard
+                                icon="fas fa-crosshairs"
+                                title="Service Area & Radius"
+                                description="Define your dispatch location and travel perimeter for receiving job leads."
+                                onClick={handleSelectServiceArea}
+                                badge={radiusBadge}
                             />
                         </div>
                     </div>
@@ -286,6 +303,10 @@ export default function Settings() {
                                 </div>
                             </div>
                         </div>
+                        )}
+
+                        {activeSection === 'service-area' && (
+                            <ProviderServiceAreaRadius onManageAddress={handleSelectAddresses} />
                         )}
 
                         {activeSection === 'addresses' && (

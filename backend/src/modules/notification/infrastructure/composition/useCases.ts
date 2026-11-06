@@ -41,7 +41,7 @@ export const deletePushSubscriptionUseCase = new DeletePushSubscriptionUseCase(
     pushSubscriptionRepository,
 );
 
-const webPushDelivery = new WebPushNotificationDeliveryAdapter(pushSubscriptionRepository);
+export const webPushDelivery = new WebPushNotificationDeliveryAdapter(pushSubscriptionRepository);
 
 export function createNotificationUseCase(
     io: Server,

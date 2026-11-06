@@ -4,7 +4,6 @@ import { CustomerProfileMapper, CustomerProfileRecord } from "./customerProfile.
 import { ProviderProfileMapper, ProviderProfileRecord } from "./providerProfile.mapper";
 import { UserResponseDto } from "../../../user-management/application/dtos/response/user/user-dto";
 
-
 export type UserRecord = Prisma.UserGetPayload<{}>;
 
 export class UserMapper {

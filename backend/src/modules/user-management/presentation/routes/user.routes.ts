@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/middlewares/role.middleware";
+import validate from "../../../../shared/middlewares/validate-request";
 import { addressSchema } from "../validators/address";
 import { UserRouteDependencies } from "../types/user.route.dependencies";
 

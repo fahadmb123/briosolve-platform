@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../../features/auth/stores/auth.store";
+import { useUnreadChatCount } from "../../../../features/chat";
 import "./ProviderSubnavSidebar.css";
 
 interface SubnavItem {
@@ -27,7 +28,7 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
   },
   {
     label: "Messages",
-    to: "/provider/dashboard#messages",
+    to: "/provider/messages",
     icon: "fas fa-comments",
   },
 ];
@@ -52,6 +53,7 @@ const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
 
 export const ProviderSubnavSidebar: React.FC = () => {
   const location = useLocation();
+  const unreadMessagesCount = useUnreadChatCount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const verifications = useAuthStore((state) => state.verifications);
   const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
@@ -67,7 +69,9 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname === "/provider/dashboard" ||
     location.pathname.startsWith("/provider/dashboard") ||
     location.pathname.startsWith("/provider/service-requests") ||
-    location.pathname.startsWith("/provider/requests");
+    location.pathname.startsWith("/provider/requests") ||
+    location.pathname.startsWith("/provider/messages") ||
+    location.pathname.startsWith("/provider/chat");
 
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS
@@ -107,7 +111,9 @@ export const ProviderSubnavSidebar: React.FC = () => {
             ? location.pathname === toPath && location.hash === `#${toHash}`
             : toPath.endsWith("/dashboard")
             ? location.pathname === toPath && (!location.hash || location.hash === "")
-            : location.pathname === toPath;
+            : location.pathname.startsWith(toPath);
+
+          const isMessages = item.to.includes("messages");
 
           return (
             <Link
@@ -119,6 +125,11 @@ export const ProviderSubnavSidebar: React.FC = () => {
                 <i className={item.icon}></i>
               </div>
               <span className="prov-subnav-sidebar-label">{item.label}</span>
+              {isMessages && unreadMessagesCount > 0 && (
+                <span className="prov-subnav-unread-badge">
+                  {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                </span>
+              )}
               {isActive && <span className="prov-subnav-sidebar-pill" />}
             </Link>
           );

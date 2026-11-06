@@ -1,7 +1,7 @@
-import { IJwtService } from "../../../../../shared/application/Dto/services/jwtDto.service";
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IPasswordHasher } from "../../../../../shared/application/interfaces/services/IPasswordHasher.service";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IJwtService } from "../../../../../shared/interfaces/jwtDto.service";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
+import { IPasswordHasher } from "../../../../../shared/interfaces/services/IPasswordHasher.service";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { LoginOutputDto } from "../../dtos/response/login.dto";
 import { LoginInputDto } from "../../dtos/request/login.dto";

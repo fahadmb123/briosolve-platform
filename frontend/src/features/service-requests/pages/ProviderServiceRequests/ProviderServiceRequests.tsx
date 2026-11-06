@@ -1,11 +1,19 @@
 import { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMutations";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { ProviderRequestCard, ProviderRequestDetailsModal } from "../../components/provider-requests";
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
+import { useAuthStore } from "../../../auth/stores/auth.store";
+import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
 import "./ProviderServiceRequests.css";
 
 export default function ProviderServiceRequests() {
+  const navigate = useNavigate();
+  const verifications = useAuthStore((state) => state.verifications);
+  const isVerified =
+    verifications !== null && Object.values(verifications).every(Boolean);
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("ALL");
@@ -27,6 +35,7 @@ export default function ProviderServiceRequests() {
   };
 
   useEffect(() => {
+    if (!isVerified) return;
     fetchRequests();
 
     const handleNotification = (e: Event) => {
@@ -43,20 +52,13 @@ export default function ProviderServiceRequests() {
     return () => {
       window.removeEventListener("app:notification", handleNotification);
     };
-  }, []);
+  }, [isVerified]);
 
   const currentSelectedRequest = useMemo(() => {
     if (!selectedRequest) return null;
     return requests.find((r) => r.id === selectedRequest.id) || selectedRequest;
   }, [selectedRequest, requests]);
 
-  const stats = useMemo(() => {
-    const total = requests.length;
-    const urgent = requests.filter((r) => r.urgency === "TODAY" || r.urgency === "THIS_WEEK").length;
-    const fixed = requests.filter((r) => r.budget_type === "FIXED").length;
-    const openBids = requests.filter((r) => r.budget_type === "OPEN_BID").length;
-    return { total, urgent, fixed, openBids };
-  }, [requests]);
 
   const filteredRequests = useMemo(() => {
     return requests
@@ -101,6 +103,42 @@ export default function ProviderServiceRequests() {
     setSelectedRequest(req);
   };
 
+  const handleChatClick = (req: CustomerServiceRequestItem) => {
+    if (!req.customer_id) {
+      toast.error("Customer details not available for this request");
+      return;
+    }
+
+    const addressStr = req.address_details
+      ? `${req.address_details.area || ""}, ${req.address_details.city || ""}`.trim().replace(/^,|,$/g, "")
+      : "Service Location";
+
+    navigate(`/provider/messages?recipientId=${req.customer_id}`, {
+      state: {
+        recipientId: req.customer_id,
+        recipientName: "Customer",
+        requestTitle: req.title,
+        requestId: req.id,
+        categoryName: req.category_name || "Services",
+        urgency: req.urgency,
+        budgetType: req.budget_type,
+        budgetAmount: req.budget_amount || undefined,
+        location: addressStr || "Service Location",
+      },
+    });
+  };
+
+  if (!isVerified) {
+    return (
+      <div className="provreq-page-container">
+        <VerificationRequiredCard
+          title="Complete Verification to View Service Requests"
+          description="To maintain marketplace trust, protect customer details, and unlock lead opportunities, please complete your provider credentials and identity verification."
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="provreq-page-container">
       <div className="provreq-hero-banner">
@@ -128,43 +166,6 @@ export default function ProviderServiceRequests() {
         </div>
       </div>
 
-      <div className="provreq-stats-bar">
-        <div className="provreq-stat-card">
-          <div className="provreq-stat-top">
-            <span className="provreq-stat-dot matched"></span>
-            <span className="provreq-stat-name">Matched Leads</span>
-          </div>
-          <span className="provreq-stat-number">{stats.total}</span>
-          <span className="provreq-stat-hint">In your service area</span>
-        </div>
-
-        <div className="provreq-stat-card">
-          <div className="provreq-stat-top">
-            <span className="provreq-stat-dot urgent"></span>
-            <span className="provreq-stat-name">Urgent / This Week</span>
-          </div>
-          <span className="provreq-stat-number">{stats.urgent}</span>
-          <span className="provreq-stat-hint">Immediate dispatch requests</span>
-        </div>
-
-        <div className="provreq-stat-card">
-          <div className="provreq-stat-top">
-            <span className="provreq-stat-dot fixed"></span>
-            <span className="provreq-stat-name">Fixed Budget</span>
-          </div>
-          <span className="provreq-stat-number">{stats.fixed}</span>
-          <span className="provreq-stat-hint">Pre-set customer budgets</span>
-        </div>
-
-        <div className="provreq-stat-card">
-          <div className="provreq-stat-top">
-            <span className="provreq-stat-dot bids"></span>
-            <span className="provreq-stat-name">Open for Bids</span>
-          </div>
-          <span className="provreq-stat-number">{stats.openBids}</span>
-          <span className="provreq-stat-hint">Competitive quotation scope</span>
-        </div>
-      </div>
 
       <div className="provreq-filter-bar">
         <div className="provreq-filter-top-row">
@@ -249,6 +250,7 @@ export default function ProviderServiceRequests() {
               onViewDetails={setSelectedRequest}
               onSelectPhoto={setLightboxPhoto}
               onQuote={handleQuoteClick}
+              onChat={handleChatClick}
             />
           ))}
         </div>
@@ -260,6 +262,7 @@ export default function ProviderServiceRequests() {
         onClose={() => setSelectedRequest(null)}
         onQuote={handleQuoteClick}
         onSelectPhoto={setLightboxPhoto}
+        onChat={handleChatClick}
       />
 
       {lightboxPhoto && (

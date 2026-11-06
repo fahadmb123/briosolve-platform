@@ -1,6 +1,6 @@
 import type { INotificationDelivery } from "../../application/interfaces/INotificationDelivery";
 import type { NotificationResponseDto } from "../../application/dtos/response/notification-response.dto";
-import { logger } from "../../../../shared/infrastructure/logger/logger";
+import { logger } from "../../../../shared/logger/logger";
 
 export class CompositeNotificationDeliveryAdapter implements INotificationDelivery {
     constructor(

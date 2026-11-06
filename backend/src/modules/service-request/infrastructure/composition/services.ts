@@ -1,4 +1,4 @@
-import { CloudinaryService } from "../../../../shared/infrastructure/services/cloudinary.service";
+import { CloudinaryService } from "../../../../shared/services/cloudinary.service";
 import { providerServiceRepository } from "../../../service-catalog/infrastructure/composition/respositories";
 import { ProviderSelectionService } from "../../application/services/provider-selection.service";
 

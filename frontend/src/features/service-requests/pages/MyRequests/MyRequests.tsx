@@ -8,7 +8,6 @@ import {
 } from "../../hooks/useServiceRequestMutations";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import {
-  RequestStatsCards,
   RequestFilterBar,
   RequestCard,
   RequestDetailsModal,
@@ -193,8 +192,6 @@ export default function MyRequests() {
           </Link>
         </div>
       </div>
-
-      <RequestStatsCards requests={requests} />
 
       <RequestFilterBar
         searchQuery={searchQuery}

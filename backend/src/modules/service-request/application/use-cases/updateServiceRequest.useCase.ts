@@ -1,8 +1,8 @@
 import { Buffer } from "node:buffer";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
-import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
+import { ImageUploadService } from "../../../../shared/interfaces/services/IImageUpload.service";
 import { UpdateServiceRequestDto } from "../dtos/request/update-service-request.dto";
 import { ServiceRequestDetailsDto } from "../dtos/response/service-request.dto";
 

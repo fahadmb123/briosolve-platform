@@ -1,8 +1,8 @@
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
+import { BaseController } from "../../../../shared/base/controller/baseController";
 import type { NextFunction,Request,Response } from "express";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
+import { ImageUploadService } from "../../../../shared/interfaces/services/IImageUpload.service";
 import { AddServiceUseCaseInputDto } from "../../application/dtos/service/request/add-service.dto";
 import { UpdateServiceUseCaseDto } from "../../application/dtos/service/request/update-service.dto";
 import { GetServicesDto } from "../../application/dtos/category/response/get-service.dto";

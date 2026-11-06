@@ -1,5 +1,5 @@
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { INotificationRepository } from "../../domain/repositories/INotification.repository";
 import { NotificationMapper } from "../../infrastructure/mappers/notification.mapper";
 import { CreateBulkNotificationRequestDto } from "../dtos/request/create-bulk-notifications.dto";

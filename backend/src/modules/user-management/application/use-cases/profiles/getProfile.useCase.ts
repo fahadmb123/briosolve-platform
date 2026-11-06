@@ -1,11 +1,10 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { ICustomerRepository } from "../../../domain/repositories/ICustomerRespository";
 import { IProviderRepository } from "../../../domain/repositories/IProviderRepository";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { GetProfileUseCaseInputDto } from "../../dtos/request/user/get-profile.dto";
 import { GetProfileUseCaseOutputDto } from "../../dtos/response/user/get-profile.dto";
-
 
 export default class GetProfileUseCase implements IUseCase<GetProfileUseCaseInputDto, GetProfileUseCaseOutputDto> {
     constructor(

@@ -1,9 +1,9 @@
 import { Buffer } from "node:buffer";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
 import { IServiceRequestProviderRepository } from "../../domain/repositories/IServiceRequestProviderRepository";
-import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ImageUploadService } from "../../../../shared/interfaces/services/IImageUpload.service";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { CreateServiceRequestInputDto } from "../dtos/request/create-service-request.dto";
 import { ServiceRequestResponseDto } from "../dtos/response/service-request.dto";
 import { ServiceRequestMapper } from "../../infrastructure/mappers/serviceRequest.mapper";
@@ -13,7 +13,7 @@ import { IUserRepository } from "../../../user-management/domain/repositories/IU
 import { IAddressRepository } from "../../../user-management/domain/repositories/IAddressRepository";
 import { IProviderSelectionService } from "../interfaces/services/IProviderSelectionService";
 import { NotificationType } from "../../../notification/domain/entities/notification.entity";
-import { logger } from "../../../../shared/infrastructure/logger/logger";
+import { logger } from "../../../../shared/logger/logger";
 
 export class CreateServiceRequestUseCase implements IUseCase<CreateServiceRequestInputDto, ServiceRequestResponseDto> {
     constructor(

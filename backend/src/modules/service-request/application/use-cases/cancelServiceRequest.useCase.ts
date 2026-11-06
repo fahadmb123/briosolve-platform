@@ -1,13 +1,13 @@
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
 import { IServiceRequestProviderRepository } from "../../domain/repositories/IServiceRequestProviderRepository";
 import { ServiceRequestResponseDto } from "../dtos/response/service-request.dto";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { ServiceRequestMapper } from "../../infrastructure/mappers/serviceRequest.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { CreateBulkNotificationRequestDto } from "../../../notification/application/dtos/request/create-bulk-notifications.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
-import { logger } from "../../../../shared/infrastructure/logger/logger";
+import { logger } from "../../../../shared/logger/logger";
 
 export interface CancelServiceRequestInputDto {
     customerId: string;

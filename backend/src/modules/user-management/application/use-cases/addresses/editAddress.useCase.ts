@@ -1,6 +1,6 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
 import { Address } from "../../../domain/entities/address.entity";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { IAddressRepository } from "../../../domain/repositories/IAddressRepository";
 import { EditAddressInputUseCaseDto } from "../../dtos/request/address/edit-address.dto";
 import { AddressResponseDto } from "../../dtos/response/address/address.dto";

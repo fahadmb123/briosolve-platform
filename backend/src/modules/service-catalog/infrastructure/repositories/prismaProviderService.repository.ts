@@ -1,8 +1,7 @@
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
 import { ProviderServiceMapper } from "../mappers/providerService.mapper";
-
 
 export class ProviderServiceRepository implements IProviderServiceRepository {
     async getProviderServices(providerId: string): Promise<ProviderService[]> {
@@ -101,4 +100,3 @@ export class ProviderServiceRepository implements IProviderServiceRepository {
         return 
     }
 }
-

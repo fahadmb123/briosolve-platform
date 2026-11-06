@@ -23,7 +23,8 @@ export class ProviderProfileMapper {
             record.travel_buffer_minutes !== undefined && record.travel_buffer_minutes !== null ? Number(record.travel_buffer_minutes) : 30,
             record.completed_jobs !== undefined && record.completed_jobs !== null ? Number(record.completed_jobs) : 0,
             (record.kyc_status as KycStatus) || "NOT_SUBMITTED",
-            record.skills || null
+            record.skills || null,
+            (record as any).services ?? []
         );
     }
 }

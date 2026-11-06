@@ -1,5 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../../domain/entities/verificationDocument.entity";
 import {
     IVerificationDocumentRepository,

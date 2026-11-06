@@ -15,6 +15,7 @@ export class ProviderProfile {
         public readonly travel_buffer_minutes?: number,
         public readonly completed_jobs?: number,
         public readonly kyc_status?: KycStatus,
-        public readonly skills?: string | null
+        public readonly skills?: string | null,
+        public readonly services?: any[]
     ) {}
 }

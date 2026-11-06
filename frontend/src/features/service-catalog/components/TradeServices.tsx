@@ -8,6 +8,7 @@ import {
     useDeleteProviderCategory
 } from '../hooks/useTradeService';
 import type { PopulatedProviderService } from '../../settings';
+import { useAuthStore } from '../../auth/stores/auth.store';
 import { TradeServicesSkeleton } from './TradeServicesSkeleton';
 import Skeleton from 'react-loading-skeleton';
 
@@ -173,6 +174,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                 setIsAddCategoryModalOpen(false);
                 setSelectedServiceIds([]);
                 toast.success('Categories and services added successfully');
+                useAuthStore.getState().fetchUser();
             }
         });
     }, [selectedServiceIds, addProviderServices]);
@@ -213,6 +215,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                 setServiceModalCategory(null);
                 setSelectedServiceIdsToAdd([]);
                 toast.success('Services added successfully');
+                useAuthStore.getState().fetchUser();
             }
         });
     }, [serviceModalCategory, selectedServiceIdsToAdd, addProviderServices]);
@@ -224,6 +227,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                 setProviderServices(res.data || []);
                 setServiceToDelete(null);
                 toast.success('Service removed successfully');
+                useAuthStore.getState().fetchUser();
             }
         });
     }, [serviceToDelete, deleteProviderService]);
@@ -235,6 +239,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
             onSuccess: (res) => {
                 setProviderServices(res.data || []);
                 toast.success(`Removed ${categoryToDelete.name} category`);
+                useAuthStore.getState().fetchUser();
                 setCategoryToDelete(null);
             }
         });

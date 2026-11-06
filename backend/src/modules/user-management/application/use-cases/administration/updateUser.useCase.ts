@@ -1,14 +1,14 @@
 import { IUpdateUserStatusUseCase } from "../../interfaces/use-cases/users/update-user.interface";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { IUserAccountBlockRepository } from "../../../domain/repositories/IUserAccountBlockRepository";
-import { IEmailSender } from "../../../../../shared/application/interfaces/services/IEmailSender.service";
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
+import { IEmailSender } from "../../../../../shared/interfaces/services/IEmailSender.service";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
 import { IAccountReactivationRequestRepository } from "../../../domain/repositories/IAccountReactivationRequestRepository";
 import { UpdateUserStatusDto } from "../../dtos/request/user/update-user-status.dto";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../../notification/application/dtos/response/notification-response.dto";
-import { logger } from "../../../../../shared/infrastructure/logger/logger";
+import { logger } from "../../../../../shared/logger/logger";
 
 export default class UpdateUserStatusUseCase implements IUpdateUserStatusUseCase {
     constructor(

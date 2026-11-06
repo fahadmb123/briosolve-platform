@@ -1,4 +1,4 @@
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { PushSubscription } from "../../domain/entities/pushSubscription.entity";
 import { IPushSubscriptionRepository } from "../../domain/repositories/IPushSubscription.respository";
 import { PushSubscriptionMapper } from "../mappers/pushSubscription.mapper";

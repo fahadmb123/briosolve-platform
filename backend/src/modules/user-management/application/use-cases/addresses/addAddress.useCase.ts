@@ -1,5 +1,5 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { IAddressRepository } from "../../../domain/repositories/IAddressRepository";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { AddAddressInputUseCaseDto } from "../../dtos/request/address/add-address.dto";

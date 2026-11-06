@@ -1,5 +1,5 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { ICustomerRepository } from "../../../domain/repositories/ICustomerRespository";
 import { UpdateCustomerProfileInputDto } from "../../dtos/request/customer/update-customer-profile.dto";

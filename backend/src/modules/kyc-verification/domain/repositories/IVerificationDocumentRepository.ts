@@ -1,4 +1,4 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { BaseRepository } from "../../../../shared/base/repository/baseRepository";
 import { GetAdminKycRequestsInput } from "../../application/dtos/admin/request/get-admin-kyc.dto";
 import { GetAdminKycResponse } from "../../application/dtos/admin/response/get-admin-kyc.dto";
 import { CreateVerificationDocumentInputDto } from "../../application/dtos/verification-document/request/create-verification-document.dto";

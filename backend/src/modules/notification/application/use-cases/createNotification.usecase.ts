@@ -1,9 +1,9 @@
 import { INotificationRepository } from "../../domain/repositories/INotification.repository";
 import { CreateNotificationRequestDto } from "../dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../dtos/response/notification-response.dto";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { NotificationMapper } from "../../infrastructure/mappers/notification.mapper";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { INotificationDelivery } from "../interfaces/INotificationDelivery";
 
 

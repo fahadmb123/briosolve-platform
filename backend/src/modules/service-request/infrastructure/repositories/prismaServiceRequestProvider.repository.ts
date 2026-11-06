@@ -1,5 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { ServiceRequestProvider, ServiceRequestProviderStatus } from "../../domain/entities/serviceRequestProvider.entity";
 import { IServiceRequestProviderRepository } from "../../domain/repositories/IServiceRequestProviderRepository";
 import { ServiceRequestProviderMapper } from "../mappers/serviceRequestProvider.mapper";

@@ -1,8 +1,8 @@
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ProviderService } from "../../domain/entities/providerService.entity";
 import { IProviderServiceRepository } from "../../domain/repositories/IProviderServiceRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { AddProviderServicesInputDto } from "../dtos/provider/request/add-provider-service.dto";
 import { ProviderServiceResponseDto } from "../dtos/provider/response/provider-service.dto";
 

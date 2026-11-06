@@ -1,0 +1,92 @@
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
+import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import { IConversationParticipantRepository } from "../../domain/repositories/IConversationParticipantRepository";
+import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
+import { MessageMapper } from "../../infrastructure/mappers/message.mapper";
+import { IMessageDelivery } from "../interfaces/IMessageDelivery";
+import { SendMessageRequestDto } from "../dtos/request/message/send-message.dto";
+import { MessageResponseDto } from "../dtos/response/message/message-response.dto";
+
+export class SendMessageUseCase implements IUseCase<SendMessageRequestDto, MessageResponseDto> {
+    constructor(
+        private readonly _conversationRepository: IConversationRepository,
+        private readonly _participantRepository: IConversationParticipantRepository,
+        private readonly _messageRepository: IMessageRepository,
+        private _messageDelivery: IMessageDelivery
+    ) {}
+
+    async execute(input: SendMessageRequestDto): Promise<MessageResponseDto> {
+        if (!input.conversationId || !input.senderId) {
+            throw new ApplicationError(
+                "VALIDATION_ERROR",
+                "Conversation ID and Sender ID are required",
+                "VALIDATION"
+            );
+        }
+
+        if (!input.content || !input.content.trim()) {
+            throw new ApplicationError(
+                "MESSAGE_CONTENT_REQUIRED",
+                "Message content cannot be empty",
+                "VALIDATION"
+            );
+        }
+
+        const conversation = await this._conversationRepository.findById(input.conversationId);
+
+        if (!conversation) {
+            throw new ApplicationError(
+                "CONVERSATION_NOT_FOUND",
+                "Conversation not found",
+                "NOT_FOUND"
+            );
+        }
+
+        if (conversation.status !== "ACTIVE") {
+            throw new ApplicationError(
+                "CONVERSATION_INACTIVE",
+                "This conversation is not active",
+                "VALIDATION"
+            );
+        }
+
+        const participants = await this._participantRepository.findByConversationId(input.conversationId);
+        const participant = participants.find(p => p.user_id === input.senderId);
+
+        if (!participant) {
+            throw new ApplicationError(
+                "NOT_CONVERSATION_PARTICIPANT",
+                "You are not a participant of this conversation",
+                "AUTHORIZATION"
+            );
+        }
+
+        const message = await this._messageRepository.create({
+            conversation_id: input.conversationId,
+            sender_id: input.senderId,
+            content: input.content.trim(),
+            message_type: input.messageType
+        });
+
+        if (!message) {
+            throw new ApplicationError(
+                "MESSAGE_SEND_FAILED",
+                "Failed to send message",
+                "INTERNAL"
+            );
+        }
+
+        const recipientUserIds = participants
+            .map((p) => p.user_id)
+            .filter((id) => String(id).trim() !== String(input.senderId).trim());
+
+        await this._messageDelivery.sendToConversation(
+            input.conversationId,
+            message,
+            recipientUserIds
+        );
+
+        return MessageMapper.toDto(message);
+    }
+}

@@ -1,0 +1,40 @@
+import {IPendingCustomerRegistration,IPendingRegistrationStore,} from "../interfaces/IPendingRegistration-store";
+import { redisClient } from "./redis.client";
+
+
+
+export class RedisPendingRegistrationStore implements IPendingRegistrationStore {
+
+    async save(registrationId: string,data: IPendingCustomerRegistration,ttlSeconds: number): Promise<void> {
+      
+        const key = `pending-registration:${registrationId}`
+        await redisClient.set(key, JSON.stringify(data),{EX: ttlSeconds})
+
+    }
+
+    async update(registrationId: string, data: IPendingCustomerRegistration): Promise<void> {
+        const key = `pending-registration:${registrationId}`;
+        const ttl = await redisClient.ttl(key);
+        if (ttl > 0) {
+            await redisClient.set(key, JSON.stringify(data), { EX: ttl });
+        }
+    }
+
+    async get(registrationId: string): Promise<IPendingCustomerRegistration | null> {
+        const key = `pending-registration:${registrationId}`
+        const data = await redisClient.get(key)
+
+        if (!data) return null
+        return JSON.parse(data) as IPendingCustomerRegistration;
+    }
+
+    async delete(registrationId: string): Promise<void> {
+        const key = `pending-registration:${registrationId}`
+        await redisClient.del(key)
+    }
+    async getTtl(registrationId: string): Promise<number> {
+        const key = `pending-registration:${registrationId}`;
+
+        return await redisClient.ttl(key);
+    }
+}

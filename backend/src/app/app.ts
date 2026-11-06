@@ -2,8 +2,8 @@ import express from "express";
 import path from "node:path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { envConfig } from "../shared/infrastructure/config/env.config";
-import { requestLogger } from "../shared/presentation/http/middlewares/request-logger";
+import { envConfig } from "../shared/config/env.config";
+import { requestLogger } from "../shared/middlewares/request-logger";
 import helmet from "helmet";
 
 export function createApp() {

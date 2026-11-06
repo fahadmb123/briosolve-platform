@@ -1,13 +1,12 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { IProviderRepository, CreateProviderInput, CreateProviderProfileInput } from "../../domain/repositories/IProviderRepository";
 import { User } from "../../domain/entities/user.entity";
 import { ProviderProfile } from "../../domain/entities/providerProfile.entity";
 import { UserMapper } from "../mappers/user.mapper";
 import { ProviderProfileMapper, ProviderProfileRaw } from "../mappers/providerProfile.mapper";
 import { UpdateProviderProfileInputDto } from "../../application/dtos/request/provider/update-provider-profile.dto";
-
 
 export class ProviderRepository implements IProviderRepository {
     async createProvider(data: CreateProviderInput): Promise<User> {

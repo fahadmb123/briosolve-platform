@@ -1,5 +1,5 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { IProviderRepository } from "../../../domain/repositories/IProviderRepository";
 import { IProviderAvailabilityRepository } from "../../../domain/repositories/IProviderAvailabilityRepository";
 import { SetProviderAvailabilityInputDto } from "../../dtos/request/provider/set-provider-availability.dto";

@@ -1,0 +1,1292 @@
+[
+  {
+    "id": "dropColumn.customer_profiles.service_radius_km",
+    "label": "Drop column \"service_radius_km\" from \"customer_profiles\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "service_radius_km",
+        "table": "customer_profiles"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"service_radius_km\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "customer_profiles",
+          "service_radius_km"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop column \"service_radius_km\"",
+        "sql": "ALTER TABLE \"public\".\"customer_profiles\" DROP COLUMN \"service_radius_km\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"service_radius_km\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "customer_profiles",
+          "service_radius_km"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.conversation_participants",
+    "label": "Create table \"conversation_participants\"",
+    "summary": "Creates table \"conversation_participants\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "conversation_participants"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"conversation_participants\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"conversation_participants\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"conversation_participants\"",
+        "sql": "CREATE TABLE \"public\".\"conversation_participants\" (\n  \"conversation_id\" uuid NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"joined_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"last_read_at\" timestamptz,\n  \"user_id\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"conversation_participants\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"conversation_participants\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.conversations",
+    "label": "Create table \"conversations\"",
+    "summary": "Creates table \"conversations\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "conversations"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"conversations\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"conversations\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"conversations\"",
+        "sql": "CREATE TABLE \"public\".\"conversations\" (\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"status\" text DEFAULT 'ACTIVE' NOT NULL,\n  \"type\" text DEFAULT 'DIRECT' NOT NULL,\n  \"updated_at\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"conversations_status_check_f94a3a5d\" CHECK (\"status\" IN ('ACTIVE', 'CLOSED')),\n  CONSTRAINT \"conversations_type_check_88fadaa3\" CHECK (\"type\" IN ('DIRECT', 'GROUP'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"conversations\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"conversations\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.messages",
+    "label": "Create table \"messages\"",
+    "summary": "Creates table \"messages\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "messages"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"messages\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"messages\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"messages\"",
+        "sql": "CREATE TABLE \"public\".\"messages\" (\n  \"content\" text NOT NULL,\n  \"conversation_id\" uuid NOT NULL,\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deleted_at\" timestamptz,\n  \"id\" uuid NOT NULL,\n  \"message_type\" text DEFAULT 'TEXT' NOT NULL,\n  \"sender_id\" uuid NOT NULL,\n  \"updated_at\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"messages_message_type_check_ca908fbd\" CHECK (\"message_type\" IN ('TEXT', 'IMAGE', 'FILE'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"messages\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"messages\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.service_request_images",
+    "label": "Create table \"service_request_images\"",
+    "summary": "Creates table \"service_request_images\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "service_request_images"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"service_request_images\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_images\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"service_request_images\"",
+        "sql": "CREATE TABLE \"public\".\"service_request_images\" (\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"display_order\" int4 DEFAULT 0 NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"image_key\" character varying(500) NOT NULL,\n  \"service_request_id\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"service_request_images\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_images\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.service_request_providers",
+    "label": "Create table \"service_request_providers\"",
+    "summary": "Creates table \"service_request_providers\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "service_request_providers"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"service_request_providers\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_providers\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"service_request_providers\"",
+        "sql": "CREATE TABLE \"public\".\"service_request_providers\" (\n  \"id\" uuid NOT NULL,\n  \"matched_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"provider_id\" uuid NOT NULL,\n  \"service_request_id\" uuid NOT NULL,\n  \"status\" text DEFAULT 'MATCHED' NOT NULL,\n  \"viewed_at\" timestamptz,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"service_request_providers_status_check_b3894f35\" CHECK (\"status\" IN ('MATCHED', 'VIEWED', 'QUOTED', 'DECLINED', 'EXPIRED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"service_request_providers\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_providers\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.service_requests",
+    "label": "Create table \"service_requests\"",
+    "summary": "Creates table \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"service_requests\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"service_requests\"",
+        "sql": "CREATE TABLE \"public\".\"service_requests\" (\n  \"address_id\" uuid NOT NULL,\n  \"available_time_from\" time NOT NULL,\n  \"available_time_to\" time NOT NULL,\n  \"budget_amount\" numeric(10,2),\n  \"budget_type\" text NOT NULL,\n  \"category_id\" uuid NOT NULL,\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"customer_id\" uuid NOT NULL,\n  \"description\" character varying(1000) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"specific_date\" timestamptz,\n  \"status\" text DEFAULT 'PENDING' NOT NULL,\n  \"subservice_id\" uuid,\n  \"title\" character varying(150) NOT NULL,\n  \"updated_at\" timestamptz NOT NULL,\n  \"urgency\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"service_requests_budget_type_check_0f89b5ef\" CHECK (\"budget_type\" IN ('OPEN_BID', 'FIXED')),\n  CONSTRAINT \"service_requests_status_check_bada4c1d\" CHECK (\"status\" IN ('PENDING', 'ACTIVE', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'EXPIRED')),\n  CONSTRAINT \"service_requests_urgency_check_6c656154\" CHECK (\"urgency\" IN ('TODAY', 'THIS_WEEK', 'SPECIFIC_DATE', 'FLEXIBLE'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"service_requests\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.conversation_participants.conversation_participants_conversation_id_user_id_key",
+    "label": "Add unique constraint on \"conversation_participants\" (conversation_id, user_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "conversation_participants_conversation_id_user_id_key",
+        "table": "conversation_participants"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"conversation_participants_conversation_id_user_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "conversation_participants_conversation_id_user_id_key",
+          "public",
+          "\"public\".\"conversation_participants\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"conversation_participants_conversation_id_user_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"conversation_participants\" ADD CONSTRAINT \"conversation_participants_conversation_id_user_id_key\" UNIQUE (\"conversation_id\", \"user_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"conversation_participants_conversation_id_user_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "conversation_participants_conversation_id_user_id_key",
+          "public",
+          "\"public\".\"conversation_participants\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.service_request_providers.service_request_providers_service_request_id_provider_id_key",
+    "label": "Add unique constraint on \"service_request_providers\" (service_request_id, provider_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "service_request_providers_service_request_id_provider_id_key",
+        "table": "service_request_providers"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"service_request_providers_service_request_id_provider_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_request_providers_service_request_id_provider_id_key",
+          "public",
+          "\"public\".\"service_request_providers\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"service_request_providers_service_request_id_provider_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"service_request_providers\" ADD CONSTRAINT \"service_request_providers_service_request_id_provider_id_key\" UNIQUE (\"service_request_id\", \"provider_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"service_request_providers_service_request_id_provider_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_request_providers_service_request_id_provider_id_key",
+          "public",
+          "\"public\".\"service_request_providers\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.conversation_participants.conversation_participants_conversation_id_idx_0c3639df",
+    "label": "Create index \"conversation_participants_conversation_id_idx_0c3639df\" on \"conversation_participants\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "conversation_participants_conversation_id_idx_0c3639df",
+        "table": "conversation_participants"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"conversation_participants_conversation_id_idx_0c3639df\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"conversation_participants_conversation_id_idx_0c3639df\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"conversation_participants_conversation_id_idx_0c3639df\"",
+        "sql": "CREATE INDEX \"conversation_participants_conversation_id_idx_0c3639df\" ON \"public\".\"conversation_participants\" (\"conversation_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"conversation_participants_conversation_id_idx_0c3639df\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"conversation_participants_conversation_id_idx_0c3639df\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.conversation_participants.conversation_participants_user_id_idx_6c952402",
+    "label": "Create index \"conversation_participants_user_id_idx_6c952402\" on \"conversation_participants\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "conversation_participants_user_id_idx_6c952402",
+        "table": "conversation_participants"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"conversation_participants_user_id_idx_6c952402\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"conversation_participants_user_id_idx_6c952402\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"conversation_participants_user_id_idx_6c952402\"",
+        "sql": "CREATE INDEX \"conversation_participants_user_id_idx_6c952402\" ON \"public\".\"conversation_participants\" (\"user_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"conversation_participants_user_id_idx_6c952402\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"conversation_participants_user_id_idx_6c952402\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.messages.messages_conversation_id_idx_0c3639df",
+    "label": "Create index \"messages_conversation_id_idx_0c3639df\" on \"messages\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "messages_conversation_id_idx_0c3639df",
+        "table": "messages"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"messages_conversation_id_idx_0c3639df\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"messages_conversation_id_idx_0c3639df\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"messages_conversation_id_idx_0c3639df\"",
+        "sql": "CREATE INDEX \"messages_conversation_id_idx_0c3639df\" ON \"public\".\"messages\" (\"conversation_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"messages_conversation_id_idx_0c3639df\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"messages_conversation_id_idx_0c3639df\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.messages.messages_created_at_idx_225d8c0f",
+    "label": "Create index \"messages_created_at_idx_225d8c0f\" on \"messages\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "messages_created_at_idx_225d8c0f",
+        "table": "messages"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"messages_created_at_idx_225d8c0f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"messages_created_at_idx_225d8c0f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"messages_created_at_idx_225d8c0f\"",
+        "sql": "CREATE INDEX \"messages_created_at_idx_225d8c0f\" ON \"public\".\"messages\" (\"created_at\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"messages_created_at_idx_225d8c0f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"messages_created_at_idx_225d8c0f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.messages.messages_sender_id_idx_311853a4",
+    "label": "Create index \"messages_sender_id_idx_311853a4\" on \"messages\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "messages_sender_id_idx_311853a4",
+        "table": "messages"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"messages_sender_id_idx_311853a4\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"messages_sender_id_idx_311853a4\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"messages_sender_id_idx_311853a4\"",
+        "sql": "CREATE INDEX \"messages_sender_id_idx_311853a4\" ON \"public\".\"messages\" (\"sender_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"messages_sender_id_idx_311853a4\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"messages_sender_id_idx_311853a4\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.service_request_images.service_request_images_service_request_id_idx_8060a003",
+    "label": "Create index \"service_request_images_service_request_id_idx_8060a003\" on \"service_request_images\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "service_request_images_service_request_id_idx_8060a003",
+        "table": "service_request_images"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"service_request_images_service_request_id_idx_8060a003\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_images_service_request_id_idx_8060a003\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"service_request_images_service_request_id_idx_8060a003\"",
+        "sql": "CREATE INDEX \"service_request_images_service_request_id_idx_8060a003\" ON \"public\".\"service_request_images\" (\"service_request_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"service_request_images_service_request_id_idx_8060a003\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_images_service_request_id_idx_8060a003\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.service_request_providers.service_request_providers_provider_id_idx_d89e110d",
+    "label": "Create index \"service_request_providers_provider_id_idx_d89e110d\" on \"service_request_providers\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "service_request_providers_provider_id_idx_d89e110d",
+        "table": "service_request_providers"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"service_request_providers_provider_id_idx_d89e110d\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_providers_provider_id_idx_d89e110d\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"service_request_providers_provider_id_idx_d89e110d\"",
+        "sql": "CREATE INDEX \"service_request_providers_provider_id_idx_d89e110d\" ON \"public\".\"service_request_providers\" (\"provider_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"service_request_providers_provider_id_idx_d89e110d\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_providers_provider_id_idx_d89e110d\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.service_request_providers.service_request_providers_service_request_id_idx_8060a003",
+    "label": "Create index \"service_request_providers_service_request_id_idx_8060a003\" on \"service_request_providers\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "service_request_providers_service_request_id_idx_8060a003",
+        "table": "service_request_providers"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"service_request_providers_service_request_id_idx_8060a003\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_providers_service_request_id_idx_8060a003\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"service_request_providers_service_request_id_idx_8060a003\"",
+        "sql": "CREATE INDEX \"service_request_providers_service_request_id_idx_8060a003\" ON \"public\".\"service_request_providers\" (\"service_request_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"service_request_providers_service_request_id_idx_8060a003\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_request_providers_service_request_id_idx_8060a003\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.service_requests.service_requests_address_id_idx_f563b795",
+    "label": "Create index \"service_requests_address_id_idx_f563b795\" on \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "service_requests_address_id_idx_f563b795",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"service_requests_address_id_idx_f563b795\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests_address_id_idx_f563b795\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"service_requests_address_id_idx_f563b795\"",
+        "sql": "CREATE INDEX \"service_requests_address_id_idx_f563b795\" ON \"public\".\"service_requests\" (\"address_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"service_requests_address_id_idx_f563b795\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests_address_id_idx_f563b795\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.service_requests.service_requests_category_id_idx_da7213d4",
+    "label": "Create index \"service_requests_category_id_idx_da7213d4\" on \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "service_requests_category_id_idx_da7213d4",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"service_requests_category_id_idx_da7213d4\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests_category_id_idx_da7213d4\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"service_requests_category_id_idx_da7213d4\"",
+        "sql": "CREATE INDEX \"service_requests_category_id_idx_da7213d4\" ON \"public\".\"service_requests\" (\"category_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"service_requests_category_id_idx_da7213d4\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests_category_id_idx_da7213d4\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.service_requests.service_requests_customer_id_idx_e16dfa6b",
+    "label": "Create index \"service_requests_customer_id_idx_e16dfa6b\" on \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "service_requests_customer_id_idx_e16dfa6b",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"service_requests_customer_id_idx_e16dfa6b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests_customer_id_idx_e16dfa6b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"service_requests_customer_id_idx_e16dfa6b\"",
+        "sql": "CREATE INDEX \"service_requests_customer_id_idx_e16dfa6b\" ON \"public\".\"service_requests\" (\"customer_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"service_requests_customer_id_idx_e16dfa6b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests_customer_id_idx_e16dfa6b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.service_requests.service_requests_subservice_id_idx_cb8729b6",
+    "label": "Create index \"service_requests_subservice_id_idx_cb8729b6\" on \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "service_requests_subservice_id_idx_cb8729b6",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"service_requests_subservice_id_idx_cb8729b6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests_subservice_id_idx_cb8729b6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"service_requests_subservice_id_idx_cb8729b6\"",
+        "sql": "CREATE INDEX \"service_requests_subservice_id_idx_cb8729b6\" ON \"public\".\"service_requests\" (\"subservice_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"service_requests_subservice_id_idx_cb8729b6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"service_requests_subservice_id_idx_cb8729b6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.conversation_participants.conversation_participants_conversation_id_fkey",
+    "label": "Add foreign key \"conversation_participants_conversation_id_fkey\" on \"conversation_participants\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "conversation_participants_conversation_id_fkey",
+        "table": "conversation_participants"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"conversation_participants_conversation_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "conversation_participants_conversation_id_fkey",
+          "public",
+          "\"public\".\"conversation_participants\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"conversation_participants_conversation_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"conversation_participants\"\nADD CONSTRAINT \"conversation_participants_conversation_id_fkey\"\nFOREIGN KEY (\"conversation_id\")\nREFERENCES \"public\".\"conversations\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"conversation_participants_conversation_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "conversation_participants_conversation_id_fkey",
+          "public",
+          "\"public\".\"conversation_participants\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.conversation_participants.conversation_participants_user_id_fkey",
+    "label": "Add foreign key \"conversation_participants_user_id_fkey\" on \"conversation_participants\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "conversation_participants_user_id_fkey",
+        "table": "conversation_participants"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"conversation_participants_user_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "conversation_participants_user_id_fkey",
+          "public",
+          "\"public\".\"conversation_participants\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"conversation_participants_user_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"conversation_participants\"\nADD CONSTRAINT \"conversation_participants_user_id_fkey\"\nFOREIGN KEY (\"user_id\")\nREFERENCES \"public\".\"users\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"conversation_participants_user_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "conversation_participants_user_id_fkey",
+          "public",
+          "\"public\".\"conversation_participants\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.messages.messages_conversation_id_fkey",
+    "label": "Add foreign key \"messages_conversation_id_fkey\" on \"messages\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "messages_conversation_id_fkey",
+        "table": "messages"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"messages_conversation_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "messages_conversation_id_fkey",
+          "public",
+          "\"public\".\"messages\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"messages_conversation_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"messages\"\nADD CONSTRAINT \"messages_conversation_id_fkey\"\nFOREIGN KEY (\"conversation_id\")\nREFERENCES \"public\".\"conversations\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"messages_conversation_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "messages_conversation_id_fkey",
+          "public",
+          "\"public\".\"messages\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.messages.messages_sender_id_fkey",
+    "label": "Add foreign key \"messages_sender_id_fkey\" on \"messages\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "messages_sender_id_fkey",
+        "table": "messages"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"messages_sender_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "messages_sender_id_fkey",
+          "public",
+          "\"public\".\"messages\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"messages_sender_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"messages\"\nADD CONSTRAINT \"messages_sender_id_fkey\"\nFOREIGN KEY (\"sender_id\")\nREFERENCES \"public\".\"users\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"messages_sender_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "messages_sender_id_fkey",
+          "public",
+          "\"public\".\"messages\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.service_request_images.service_request_images_service_request_id_fkey",
+    "label": "Add foreign key \"service_request_images_service_request_id_fkey\" on \"service_request_images\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "service_request_images_service_request_id_fkey",
+        "table": "service_request_images"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"service_request_images_service_request_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_request_images_service_request_id_fkey",
+          "public",
+          "\"public\".\"service_request_images\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"service_request_images_service_request_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"service_request_images\"\nADD CONSTRAINT \"service_request_images_service_request_id_fkey\"\nFOREIGN KEY (\"service_request_id\")\nREFERENCES \"public\".\"service_requests\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"service_request_images_service_request_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_request_images_service_request_id_fkey",
+          "public",
+          "\"public\".\"service_request_images\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.service_request_providers.service_request_providers_service_request_id_fkey",
+    "label": "Add foreign key \"service_request_providers_service_request_id_fkey\" on \"service_request_providers\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "service_request_providers_service_request_id_fkey",
+        "table": "service_request_providers"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"service_request_providers_service_request_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_request_providers_service_request_id_fkey",
+          "public",
+          "\"public\".\"service_request_providers\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"service_request_providers_service_request_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"service_request_providers\"\nADD CONSTRAINT \"service_request_providers_service_request_id_fkey\"\nFOREIGN KEY (\"service_request_id\")\nREFERENCES \"public\".\"service_requests\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"service_request_providers_service_request_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_request_providers_service_request_id_fkey",
+          "public",
+          "\"public\".\"service_request_providers\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.service_request_providers.service_request_providers_provider_id_fkey",
+    "label": "Add foreign key \"service_request_providers_provider_id_fkey\" on \"service_request_providers\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "service_request_providers_provider_id_fkey",
+        "table": "service_request_providers"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"service_request_providers_provider_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_request_providers_provider_id_fkey",
+          "public",
+          "\"public\".\"service_request_providers\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"service_request_providers_provider_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"service_request_providers\"\nADD CONSTRAINT \"service_request_providers_provider_id_fkey\"\nFOREIGN KEY (\"provider_id\")\nREFERENCES \"public\".\"provider_profiles\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"service_request_providers_provider_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_request_providers_provider_id_fkey",
+          "public",
+          "\"public\".\"service_request_providers\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.service_requests.service_requests_customer_id_fkey",
+    "label": "Add foreign key \"service_requests_customer_id_fkey\" on \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "service_requests_customer_id_fkey",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"service_requests_customer_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_customer_id_fkey",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"service_requests_customer_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"service_requests\"\nADD CONSTRAINT \"service_requests_customer_id_fkey\"\nFOREIGN KEY (\"customer_id\")\nREFERENCES \"public\".\"users\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"service_requests_customer_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_customer_id_fkey",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.service_requests.service_requests_category_id_fkey",
+    "label": "Add foreign key \"service_requests_category_id_fkey\" on \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "service_requests_category_id_fkey",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"service_requests_category_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_category_id_fkey",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"service_requests_category_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"service_requests\"\nADD CONSTRAINT \"service_requests_category_id_fkey\"\nFOREIGN KEY (\"category_id\")\nREFERENCES \"public\".\"categories\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"service_requests_category_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_category_id_fkey",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.service_requests.service_requests_subservice_id_fkey",
+    "label": "Add foreign key \"service_requests_subservice_id_fkey\" on \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "service_requests_subservice_id_fkey",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"service_requests_subservice_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_subservice_id_fkey",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"service_requests_subservice_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"service_requests\"\nADD CONSTRAINT \"service_requests_subservice_id_fkey\"\nFOREIGN KEY (\"subservice_id\")\nREFERENCES \"public\".\"services\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"service_requests_subservice_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_subservice_id_fkey",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.service_requests.service_requests_address_id_fkey",
+    "label": "Add foreign key \"service_requests_address_id_fkey\" on \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "service_requests_address_id_fkey",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"service_requests_address_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_address_id_fkey",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"service_requests_address_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"service_requests\"\nADD CONSTRAINT \"service_requests_address_id_fkey\"\nFOREIGN KEY (\"address_id\")\nREFERENCES \"public\".\"addresses\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"service_requests_address_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_address_id_fkey",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ]
+  }
+]

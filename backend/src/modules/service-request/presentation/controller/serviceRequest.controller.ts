@@ -1,6 +1,6 @@
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
+import { BaseController } from "../../../../shared/base/controller/baseController";
 import type { NextFunction, Request, Response } from "express";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateServiceRequestInputDto } from "../../application/dtos/request/create-service-request.dto";
 import { UpdateServiceRequestDto } from "../../application/dtos/request/update-service-request.dto";
 import {
@@ -10,7 +10,7 @@ import {
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
 import { GetProviderServiceRequestsInputDto } from "../../application/use-cases/getProviderServiceRequests.useCase";
 import { CancelServiceRequestInputDto } from "../../application/use-cases/cancelServiceRequest.useCase";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export class ServiceRequestController extends BaseController {
     constructor(

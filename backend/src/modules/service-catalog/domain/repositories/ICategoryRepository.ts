@@ -1,4 +1,4 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { BaseRepository } from "../../../../shared/base/repository/baseRepository";
 import { AddCategoryUseCaseInputDto } from "../../application/dtos/category/request/add-category.dto";
 import { UpdateCategoryUseCaseDto } from "../../application/dtos/category/request/update-category.dto";
 import { GetCategoriesDto } from "../../application/dtos/category/response/get-categories.dto";

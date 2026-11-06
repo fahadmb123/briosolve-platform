@@ -1,6 +1,6 @@
-import { ApplicationError } from "../../../../../shared/application/errors/applicationError";
-import { IPendingRegistrationStore } from "../../../../../shared/application/interfaces/IPendingRegistration-store";
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../../shared/errors/applicationError";
+import { IPendingRegistrationStore } from "../../../../../shared/interfaces/IPendingRegistration-store";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { IProviderRepository } from "../../../domain/repositories/IProviderRepository";
 import { IProviderAvailabilityRepository } from "../../../domain/repositories/IProviderAvailabilityRepository";
 import { UserMapper } from "../../../infrastructure/mappers/user.mapper";

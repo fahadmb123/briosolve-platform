@@ -6,9 +6,11 @@ import { useTheme } from "../../../hooks/useTheme";
 import type { ProviderProfile } from "../../../types/Dtos";
 import NotificationDropdown from "../../../../features/notifications/components/NotificationDropdown";
 import "./ProviderTopNav.css";
+import { useUnreadChatCount } from "../../../../features/chat";
 
 export const ProviderTopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const unreadMessagesCount = useUnreadChatCount();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -219,7 +221,7 @@ export const ProviderTopNav: React.FC = () => {
                       <span className="prov-mono-badge">3</span>
                     </Link>
                     <Link
-                      to="#"
+                      to="/provider/messages"
                       className="prov-panel-item"
                       onClick={closeAll}
                     >
@@ -227,7 +229,11 @@ export const ProviderTopNav: React.FC = () => {
                         <i className="fas fa-comments"></i>
                         <span>Messages</span>
                       </div>
-                      <span className="prov-mono-badge">2</span>
+                      {unreadMessagesCount > 0 && (
+                        <span className="prov-mono-badge">
+                          {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                        </span>
+                      )}
                     </Link>
                   </div>
                 </div>
@@ -512,15 +518,19 @@ export const ProviderTopNav: React.FC = () => {
         </nav>
 
         <div className="prov-topnav-right">
-          <button
-            type="button"
-            className="prov-icon-btn"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            title="Toggle theme"
+          <Link
+            to="/provider/messages"
+            className="prov-icon-btn prov-msg-nav-btn"
+            title="Messages"
+            aria-label="Messages"
           >
-            <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
-          </button>
+            <i className="fas fa-comments"></i>
+            {unreadMessagesCount > 0 && (
+              <span className="prov-icon-badge">
+                {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+              </span>
+            )}
+          </Link>
 
           <NotificationDropdown
             role="PROVIDER"
@@ -631,6 +641,16 @@ export const ProviderTopNav: React.FC = () => {
                     <span>Switch to User</span>
                   </div>
                 </Link>
+                <button
+                  type="button"
+                  className="prov-panel-item"
+                  onClick={toggleTheme}
+                >
+                  <div className="prov-item-main">
+                    <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                    <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                  </div>
+                </button>
                 <div className="prov-dropdown-divider"></div>
                 <button
                   type="button"
@@ -687,9 +707,13 @@ export const ProviderTopNav: React.FC = () => {
               <span>Bookings</span>
               <span className="prov-mono-badge">3</span>
             </Link>
-            <Link to="#" className="prov-mobile-item" onClick={closeAll}>
+            <Link to="/provider/messages" className="prov-mobile-item" onClick={closeAll}>
               <span>Messages</span>
-              <span className="prov-mono-badge">2</span>
+              {unreadMessagesCount > 0 && (
+                <span className="prov-mono-badge">
+                  {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                </span>
+              )}
             </Link>
           </div>
 
@@ -781,6 +805,14 @@ export const ProviderTopNav: React.FC = () => {
             >
               <span>Switch to User</span>
             </Link>
+            <button
+              type="button"
+              className="prov-mobile-item flex items-center justify-between"
+              onClick={toggleTheme}
+            >
+              <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+              <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+            </button>
             <button
               type="button"
               className="prov-mobile-item prov-logout-item"

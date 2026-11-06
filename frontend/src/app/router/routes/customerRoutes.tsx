@@ -1,5 +1,5 @@
 import { Route } from 'react-router-dom';
-import { CustomerDashboard, CustomerNotifications, CustomerProfile, CustomerRegister, CustomerSettings, CustomerNearbyProviders, CustomerRequestService, CustomerMyRequests } from '../lazy/customer.lazy';
+import { CustomerDashboard, CustomerNotifications, CustomerProfile, CustomerRegister, CustomerSettings, CustomerNearbyProviders, CustomerRequestService, CustomerMyRequests, CustomerChat } from '../lazy/customer.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
 import RoleRoute from '../guards/RoleRoute';
 import PublicRoute from '../guards/PublicRoute';
@@ -18,6 +18,8 @@ export const customerRoutes = (
         <Route path="notifications" element={<CustomerNotifications />} />
         <Route path="nearby-providers" element={<CustomerNearbyProviders />} />
         <Route path="my-requests" element={<CustomerMyRequests />} />
+        <Route path="messages" element={<CustomerChat />} />
+        <Route path="chat" element={<CustomerChat />} />
       </Route>
     </Route>
   </>
