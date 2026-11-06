@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { socket } from "../../../shared/api/socket-client";
 import { useAuthStore } from "../../auth/stores/auth.store";
 import type { BackendMessageDto } from "../services/chat.service";
@@ -18,6 +18,42 @@ export function useChatSocket({
 }: UseChatSocketProps): void {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
+    const onNewMessageRef = useRef(onNewMessage);
+    const onConversationReadRef = useRef(onConversationRead);
+    const onUserStatusRef = useRef(onUserStatus);
+
+    useEffect(() => {
+        onNewMessageRef.current = onNewMessage;
+    });
+
+    useEffect(() => {
+        onConversationReadRef.current = onConversationRead;
+    });
+
+    useEffect(() => {
+        onUserStatusRef.current = onUserStatus;
+    });
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        if (!socket.connected) {
+            socket.connect();
+        }
+
+        const handleConnect = () => {
+            socket.emit("chat:presence:enter");
+        };
+
+        socket.on("connect", handleConnect);
+        socket.emit("chat:presence:enter");
+
+        return () => {
+            socket.emit("chat:presence:leave");
+            socket.off("connect", handleConnect);
+        };
+    }, [isAuthenticated]);
+
     useEffect(() => {
         if (!isAuthenticated) return;
 
@@ -26,40 +62,27 @@ export function useChatSocket({
         }
 
         const handleNewMessage = (message: BackendMessageDto) => {
-            onNewMessage(message);
+            onNewMessageRef.current?.(message);
         };
 
         const handleConversationRead = (data: { conversation_id: string; read_by: string; read_at: string }) => {
-            if (onConversationRead) {
-                onConversationRead(data);
-            }
+            onConversationReadRef.current?.(data);
         };
 
         const handleUserStatus = (data: { userId: string; isOnline: boolean }) => {
-            if (onUserStatus) {
-                onUserStatus(data);
-            }
-        };
-
-        const handleConnect = () => {
-            socket.emit("chat:presence:enter");
+            onUserStatusRef.current?.(data);
         };
 
         socket.on("message:new", handleNewMessage);
         socket.on("conversation:read", handleConversationRead);
         socket.on("user:status", handleUserStatus);
-        socket.on("connect", handleConnect);
-
-        socket.emit("chat:presence:enter");
 
         return () => {
-            socket.emit("chat:presence:leave");
             socket.off("message:new", handleNewMessage);
             socket.off("conversation:read", handleConversationRead);
             socket.off("user:status", handleUserStatus);
-            socket.off("connect", handleConnect);
         };
-    }, [isAuthenticated, onNewMessage, onConversationRead, onUserStatus]);
+    }, [isAuthenticated]);
 
     useEffect(() => {
         if (!isAuthenticated || !conversationId) return;

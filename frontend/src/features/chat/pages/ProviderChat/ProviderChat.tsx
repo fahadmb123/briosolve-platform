@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import type {
@@ -100,23 +100,29 @@ export default function ProviderChat() {
     fetchConversations();
   }, [fetchConversations]);
 
+  const initialSelectionResolvedRef = useRef(false);
+
   useEffect(() => {
-    (()=>{
-      if (queryRecipientId) {
-        const matched = conversations.find(
-          (m) => m.participant.id === queryRecipientId
-        );
-        if (matched) {
-          setSelectedId(matched.id);
-        } else {
-          setSelectedId(queryRecipientId);
-        }
-        setIsMobileThreadOpen(true);
-      } else if (queryConversationId) {
-        setSelectedId(queryConversationId);
-        setIsMobileThreadOpen(true);
+    if (initialSelectionResolvedRef.current) return;
+    if (conversations.length === 0 && !queryRecipientId && !queryConversationId) return;
+
+    if (queryRecipientId) {
+      const matched = conversations.find(
+        (m) => m.participant.id === queryRecipientId
+      );
+      if (matched) {
+        setSelectedId(matched.id);
+        initialSelectionResolvedRef.current = true;
+      } else if (conversations.length > 0) {
+        setSelectedId(queryRecipientId);
+        initialSelectionResolvedRef.current = true;
       }
-    })()
+      setIsMobileThreadOpen(true);
+    } else if (queryConversationId) {
+      setSelectedId(queryConversationId);
+      initialSelectionResolvedRef.current = true;
+      setIsMobileThreadOpen(true);
+    }
   }, [queryConversationId, queryRecipientId, conversations]);
 
   useEffect(() => {
@@ -196,11 +202,28 @@ export default function ProviderChat() {
       };
     }
     return null;
-  }, [conversations, selectedId, location.state]);
+  }, [conversations, selectedId, location.state, presenceMap]);
 
   const activeMessages = useMemo(() => {
     if (!selectedId) return [];
-    return messagesMap[selectedId] || [];
+    const list = messagesMap[selectedId] || [];
+    const confirmedTexts = new Set(
+      list
+        .filter((m) => m.status !== "SENDING" && !m.id.startsWith("temp-") && !m.id.startsWith("pmsg-"))
+        .map((m) => `${m.senderId}_${m.text}`)
+    );
+    const seenIds = new Set<string>();
+    const unique: ChatMessage[] = [];
+    for (const msg of list) {
+      if (seenIds.has(msg.id)) continue;
+      const isPending = msg.status === "SENDING" || msg.id.startsWith("temp-") || msg.id.startsWith("pmsg-");
+      if (isPending && confirmedTexts.has(`${msg.senderId}_${msg.text}`)) {
+        continue;
+      }
+      seenIds.add(msg.id);
+      unique.push(msg);
+    }
+    return unique;
   }, [messagesMap, selectedId]);
 
   const handleSocketNewMessage = useCallback(
@@ -212,6 +235,24 @@ export default function ProviderChat() {
         if (existing.some((m) => m.id === chatMsg.id)) {
           return prev;
         }
+
+        const isOwn = String(backendMsg.sender_id).trim() === String(currentUser?.id).trim();
+        if (isOwn) {
+          const pendingIndex = existing.findIndex(
+            (m) =>
+              (m.status === "SENDING" || m.id.startsWith("temp-") || m.id.startsWith("pmsg-")) &&
+              m.text === chatMsg.text
+          );
+          if (pendingIndex !== -1) {
+            const next = [...existing];
+            next[pendingIndex] = chatMsg;
+            return {
+              ...prev,
+              [backendMsg.conversation_id]: next,
+            };
+          }
+        }
+
         return {
           ...prev,
           [backendMsg.conversation_id]: [...existing, chatMsg],
@@ -277,14 +318,23 @@ export default function ProviderChat() {
   const handleSocketUserStatus = useCallback(
     ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
       const normalizedUserId = String(userId).trim();
-      setPresenceMap((prev) => ({ ...prev, [normalizedUserId]: isOnline }));
-      setConversations((prev) =>
-        prev.map((c) =>
+      setPresenceMap((prev) => {
+        if (prev[normalizedUserId] === isOnline) return prev;
+        return { ...prev, [normalizedUserId]: isOnline };
+      });
+      setConversations((prev) => {
+        const target = prev.find(
+          (c) => String(c.participant.id).trim() === normalizedUserId
+        );
+        if (!target || target.participant.isOnline === isOnline) {
+          return prev;
+        }
+        return prev.map((c) =>
           String(c.participant.id).trim() === normalizedUserId
             ? { ...c, participant: { ...c.participant, isOnline } }
             : c
-        )
-      );
+        );
+      });
     },
     []
   );
@@ -294,14 +344,23 @@ export default function ProviderChat() {
     if (!participantId) return;
     const targetId = String(participantId).trim();
     socket.emit("user:check_online", targetId, (isOnline: boolean) => {
-      setPresenceMap((prev) => ({ ...prev, [targetId]: isOnline }));
-      setConversations((prev) =>
-        prev.map((c) =>
+      setPresenceMap((prev) => {
+        if (prev[targetId] === isOnline) return prev;
+        return { ...prev, [targetId]: isOnline };
+      });
+      setConversations((prev) => {
+        const target = prev.find(
+          (c) => String(c.participant.id).trim() === targetId
+        );
+        if (!target || target.participant.isOnline === isOnline) {
+          return prev;
+        }
+        return prev.map((c) =>
           String(c.participant.id).trim() === targetId
             ? { ...c, participant: { ...c.participant, isOnline } }
             : c
-        )
-      );
+        );
+      });
     });
   }, [selectedConversation?.participant?.id]);
 
@@ -316,8 +375,22 @@ export default function ProviderChat() {
     onUserStatus: handleSocketUserStatus,
   });
 
+  const fetchedConversationIdRef = useRef<string | null>(null);
+
   useEffect(() => {
-    if (!selectedId || !conversations.some((c) => c.id === selectedId)) return;
+    if (!selectedId) {
+      fetchedConversationIdRef.current = null;
+      return;
+    }
+
+    const isReal = conversations.some((c) => c.id === selectedId);
+    if (!isReal) return;
+
+    if (fetchedConversationIdRef.current === selectedId) {
+      return;
+    }
+
+    fetchedConversationIdRef.current = selectedId;
 
     getMessagesMutation.mutate(
       { conversationId: selectedId },
@@ -359,8 +432,12 @@ export default function ProviderChat() {
     setSelectedId(id);
     setIsMobileThreadOpen(true);
 
-    setConversations((prev) =>
-      prev.map((c) =>
+    setConversations((prev) => {
+      const target = prev.find((c) => c.id === id);
+      if (!target || (target.unreadCount === 0 && !target.lastMessage.isUnread)) {
+        return prev;
+      }
+      return prev.map((c) =>
         c.id === id
           ? {
             ...c,
@@ -368,8 +445,8 @@ export default function ProviderChat() {
             lastMessage: { ...c.lastMessage, isUnread: false },
           }
           : c
-      )
-    );
+      );
+    });
   };
 
   const handleSendMessage = (text: string) => {
@@ -379,7 +456,7 @@ export default function ProviderChat() {
     const isExisting = conversations.some((c) => c.id === selectedId);
 
     if (isExisting) {
-      const tempId = `pmsg-${Date.now()}`;
+      const tempId = `pmsg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       const optimisticMsg: ChatMessage = {
         id: tempId,
         conversationId: selectedId,
@@ -416,12 +493,22 @@ export default function ProviderChat() {
                 currentUser?.id,
                 "PROVIDER"
               );
-              setMessagesMap((prev) => ({
-                ...prev,
-                [selectedId]: (prev[selectedId] || []).map((m) =>
-                  m.id === tempId ? confirmedMsg : m
-                ),
-              }));
+              setMessagesMap((prev) => {
+                const list = prev[selectedId] || [];
+                const alreadyHasConfirmed = list.some((m) => m.id === confirmedMsg.id);
+                if (alreadyHasConfirmed) {
+                  return {
+                    ...prev,
+                    [selectedId]: list.filter((m) => m.id !== tempId),
+                  };
+                }
+                return {
+                  ...prev,
+                  [selectedId]: list.map((m) =>
+                    m.id === tempId ? confirmedMsg : m
+                  ),
+                };
+              });
             }
           },
           onError: () => {
@@ -479,7 +566,7 @@ export default function ProviderChat() {
           ]);
           setSelectedId(newConvId);
 
-          const tempId = `pmsg-${Date.now()}`;
+          const tempId = `pmsg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
           const optimisticMsg: ChatMessage = {
             id: tempId,
             conversationId: newConvId,
@@ -516,12 +603,22 @@ export default function ProviderChat() {
                     currentUser?.id,
                     "PROVIDER"
                   );
-                  setMessagesMap((prev) => ({
-                    ...prev,
-                    [newConvId]: (prev[newConvId] || []).map((m) =>
-                      m.id === tempId ? confirmedMsg : m
-                    ),
-                  }));
+                  setMessagesMap((prev) => {
+                    const list = prev[newConvId] || [];
+                    const alreadyHasConfirmed = list.some((m) => m.id === confirmedMsg.id);
+                    if (alreadyHasConfirmed) {
+                      return {
+                        ...prev,
+                        [newConvId]: list.filter((m) => m.id !== tempId),
+                      };
+                    }
+                    return {
+                      ...prev,
+                      [newConvId]: list.map((m) =>
+                        m.id === tempId ? confirmedMsg : m
+                      ),
+                    };
+                  });
                 }
               },
               onError: () => {

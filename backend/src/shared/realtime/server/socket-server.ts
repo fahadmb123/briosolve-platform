@@ -24,22 +24,22 @@ export function createSocketServer(httpServer: HttpServer, jwtService: IJwtServi
         chatSocketHandler.register(socket);
 
         socket.on("chat:presence:enter", () => {
-            PresenceTracker.add(normalizedUserId, socket.id);
-            io.emit("user:status", { userId: normalizedUserId, isOnline: true });
+            const becameOnline = PresenceTracker.add(normalizedUserId, socket.id);
+            if (becameOnline) {
+                io.emit("user:status", { userId: normalizedUserId, isOnline: true });
+            }
         });
 
         socket.on("chat:presence:leave", () => {
-            PresenceTracker.remove(normalizedUserId, socket.id);
-            const stillOnline = PresenceTracker.isOnline(normalizedUserId);
-            if (!stillOnline) {
+            const becameOffline = PresenceTracker.remove(normalizedUserId, socket.id);
+            if (becameOffline) {
                 io.emit("user:status", { userId: normalizedUserId, isOnline: false });
             }
         });
 
         socket.on("disconnect", () => {
-            PresenceTracker.remove(normalizedUserId, socket.id);
-            const stillOnline = PresenceTracker.isOnline(normalizedUserId);
-            if (!stillOnline) {
+            const becameOffline = PresenceTracker.remove(normalizedUserId, socket.id);
+            if (becameOffline) {
                 io.emit("user:status", { userId: normalizedUserId, isOnline: false });
             }
         });
