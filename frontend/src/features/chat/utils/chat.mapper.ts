@@ -26,7 +26,8 @@ export function toChatMessage(
         text: dto.content,
         type: dto.message_type === "IMAGE" ? "IMAGE" : "TEXT",
         status: "SENT",
-        createdAt: timeFormatted
+        createdAt: timeFormatted,
+        rawCreatedAt: dto.created_at
     };
 }
 

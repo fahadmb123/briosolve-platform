@@ -459,6 +459,7 @@ export default function CustomerChat() {
 
     if (isExisting) {
       const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      const now = new Date();
       const optimisticMsg: ChatMessage = {
         id: tempId,
         conversationId: selectedId,
@@ -468,10 +469,11 @@ export default function CustomerChat() {
         text: trimmed,
         type: "TEXT",
         status: "SENDING",
-        createdAt: new Date().toLocaleTimeString([], {
+        createdAt: now.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
+        rawCreatedAt: now.toISOString(),
       };
 
       setMessagesMap((prev) => ({
@@ -568,6 +570,7 @@ export default function CustomerChat() {
           setSelectedId(newConvId);
 
           const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+          const now = new Date();
           const optimisticMsg: ChatMessage = {
             id: tempId,
             conversationId: newConvId,
@@ -577,10 +580,11 @@ export default function CustomerChat() {
             text: trimmed,
             type: "TEXT",
             status: "SENDING",
-            createdAt: new Date().toLocaleTimeString([], {
+            createdAt: now.toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             }),
+            rawCreatedAt: now.toISOString(),
           };
 
           setMessagesMap((prev) => ({

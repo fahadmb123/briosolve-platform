@@ -457,6 +457,7 @@ export default function ProviderChat() {
 
     if (isExisting) {
       const tempId = `pmsg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      const now = new Date();
       const optimisticMsg: ChatMessage = {
         id: tempId,
         conversationId: selectedId,
@@ -466,10 +467,11 @@ export default function ProviderChat() {
         text: trimmed,
         type: "TEXT",
         status: "SENDING",
-        createdAt: new Date().toLocaleTimeString([], {
+        createdAt: now.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
+        rawCreatedAt: now.toISOString(),
       };
 
       setMessagesMap((prev) => ({
@@ -567,6 +569,7 @@ export default function ProviderChat() {
           setSelectedId(newConvId);
 
           const tempId = `pmsg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+          const now = new Date();
           const optimisticMsg: ChatMessage = {
             id: tempId,
             conversationId: newConvId,
@@ -576,10 +579,11 @@ export default function ProviderChat() {
             text: trimmed,
             type: "TEXT",
             status: "SENDING",
-            createdAt: new Date().toLocaleTimeString([], {
+            createdAt: now.toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             }),
+            rawCreatedAt: now.toISOString(),
           };
 
           setMessagesMap((prev) => ({

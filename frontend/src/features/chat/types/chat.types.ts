@@ -16,6 +16,7 @@ export interface ChatMessage {
   imageUrl?: string;
   status: MessageStatus;
   createdAt: string;
+  rawCreatedAt?: string;
 }
 
 export interface ChatLinkedRequest {
