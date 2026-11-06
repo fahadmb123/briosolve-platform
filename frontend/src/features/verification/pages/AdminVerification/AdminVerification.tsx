@@ -19,7 +19,7 @@ import type {
 
 export default function Verification() {
   const [dossiers, setDossiers] = useState<AdminKycDossier[]>([]);
-  const [stats, setStats] = useState<AdminKycStats>({
+  const [, setStats] = useState<AdminKycStats>({
     pending: 0,
     approved: 0,
     rejected: 0,
