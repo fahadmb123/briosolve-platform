@@ -9,7 +9,6 @@ import type {
 import {
   ConversationList,
   ChatHeader,
-  ChatRequestBanner,
   ChatMessageList,
   ChatInputBar,
   ChatInfoDrawer,
@@ -727,12 +726,6 @@ export default function CustomerChat() {
                 isInfoOpen={isInfoOpen}
                 onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
-              />
-
-              <ChatRequestBanner
-                request={selectedConversation.linkedRequest}
-                currentRole="CUSTOMER"
-                onOpenDetails={() => setIsInfoOpen(true)}
               />
 
               <div className="chat-thread-body">

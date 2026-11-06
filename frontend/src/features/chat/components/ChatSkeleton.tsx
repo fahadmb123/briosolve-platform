@@ -127,7 +127,6 @@ export const ChatThreadSkeleton: React.FC = () => {
   return (
     <div className="chat-thread-view" style={{ pointerEvents: "none" }} aria-hidden="true">
       <ChatHeaderSkeleton />
-      <ChatRequestBannerSkeleton />
       <div className="chat-thread-body">
         <ChatMessageListSkeleton />
       </div>
