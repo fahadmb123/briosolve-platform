@@ -53,13 +53,6 @@ export default function ProviderServiceRequests() {
     return requests.find((r) => r.id === selectedRequest.id) || selectedRequest;
   }, [selectedRequest, requests]);
 
-  const stats = useMemo(() => {
-    const total = requests.length;
-    const urgent = requests.filter((r) => r.urgency === "TODAY" || r.urgency === "THIS_WEEK").length;
-    const fixed = requests.filter((r) => r.budget_type === "FIXED").length;
-    const openBids = requests.filter((r) => r.budget_type === "OPEN_BID").length;
-    return { total, urgent, fixed, openBids };
-  }, [requests]);
 
   const filteredRequests = useMemo(() => {
     return requests
@@ -156,43 +149,6 @@ export default function ProviderServiceRequests() {
         </div>
       </div>
 
-      <div className="provreq-stats-bar">
-        <div className="provreq-stat-card">
-          <div className="provreq-stat-top">
-            <span className="provreq-stat-dot matched"></span>
-            <span className="provreq-stat-name">Matched Leads</span>
-          </div>
-          <span className="provreq-stat-number">{stats.total}</span>
-          <span className="provreq-stat-hint">In your service area</span>
-        </div>
-
-        <div className="provreq-stat-card">
-          <div className="provreq-stat-top">
-            <span className="provreq-stat-dot urgent"></span>
-            <span className="provreq-stat-name">Urgent / This Week</span>
-          </div>
-          <span className="provreq-stat-number">{stats.urgent}</span>
-          <span className="provreq-stat-hint">Immediate dispatch requests</span>
-        </div>
-
-        <div className="provreq-stat-card">
-          <div className="provreq-stat-top">
-            <span className="provreq-stat-dot fixed"></span>
-            <span className="provreq-stat-name">Fixed Budget</span>
-          </div>
-          <span className="provreq-stat-number">{stats.fixed}</span>
-          <span className="provreq-stat-hint">Pre-set customer budgets</span>
-        </div>
-
-        <div className="provreq-stat-card">
-          <div className="provreq-stat-top">
-            <span className="provreq-stat-dot bids"></span>
-            <span className="provreq-stat-name">Open for Bids</span>
-          </div>
-          <span className="provreq-stat-number">{stats.openBids}</span>
-          <span className="provreq-stat-hint">Competitive quotation scope</span>
-        </div>
-      </div>
 
       <div className="provreq-filter-bar">
         <div className="provreq-filter-top-row">
