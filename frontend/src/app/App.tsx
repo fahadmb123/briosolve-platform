@@ -12,6 +12,7 @@ import { LoadingScreen } from '../shared/components/ui/LoadingScreen/LoadingScre
 import { useNotificationSocket } from '../features/notifications/hooks/useNotificationSocket';
 import { useChatUnreadSync } from '../features/chat';
 import AccountSuspended from './pages/AccountSuspended/AccountSuspended';
+import { useCheckNetworkStatus } from '../shared/hooks/useCheckNetworkStatus';
 
 function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
@@ -19,8 +20,10 @@ function App() {
   const suspended = useAuthStore((state) => state.isSuspended);
 
   useNotificationSocket();
+  useCheckNetworkStatus()
   useChatUnreadSync();
 
+  
   useEffect(() => {
     fetchUser().finally(() => {
       setIsInitializing(false);
