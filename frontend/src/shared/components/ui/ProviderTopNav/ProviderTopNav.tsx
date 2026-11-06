@@ -518,16 +518,6 @@ export const ProviderTopNav: React.FC = () => {
         </nav>
 
         <div className="prov-topnav-right">
-          <button
-            type="button"
-            className="prov-icon-btn"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            title="Toggle theme"
-          >
-            <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
-          </button>
-
           <Link
             to="/provider/messages"
             className="prov-icon-btn prov-msg-nav-btn"
@@ -651,6 +641,16 @@ export const ProviderTopNav: React.FC = () => {
                     <span>Switch to User</span>
                   </div>
                 </Link>
+                <button
+                  type="button"
+                  className="prov-panel-item"
+                  onClick={toggleTheme}
+                >
+                  <div className="prov-item-main">
+                    <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                    <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                  </div>
+                </button>
                 <div className="prov-dropdown-divider"></div>
                 <button
                   type="button"
@@ -805,6 +805,14 @@ export const ProviderTopNav: React.FC = () => {
             >
               <span>Switch to User</span>
             </Link>
+            <button
+              type="button"
+              className="prov-mobile-item flex items-center justify-between"
+              onClick={toggleTheme}
+            >
+              <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+              <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+            </button>
             <button
               type="button"
               className="prov-mobile-item prov-logout-item"

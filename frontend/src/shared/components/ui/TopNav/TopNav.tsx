@@ -307,16 +307,6 @@ export const TopNav: React.FC = () => {
         </div>
 
         <div className="topnav-right">
-          <button
-            type="button"
-            className="topnav-icon-btn"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            title="Toggle theme"
-          >
-            <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
-          </button>
-
           {isAuthenticated ? (
             <>
               <Link
@@ -452,6 +442,15 @@ export const TopNav: React.FC = () => {
                         <i className="fas fa-briefcase"></i>
                       </Link>
                     )}
+                    <button
+                      type="button"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={toggleTheme}
+                    >
+                      <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                      <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                    </button>
                     <div className="topnav-dropdown-divider"></div>
                     <button
                       type="button"
@@ -659,6 +658,14 @@ export const TopNav: React.FC = () => {
                     Become a Provider
                   </Link>
                 )}
+                <button
+                  type="button"
+                  className="topnav-mobile-item flex items-center justify-between"
+                  onClick={toggleTheme}
+                >
+                  <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                  <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                </button>
                 <button
                   type="button"
                   className="topnav-mobile-item topnav-mobile-logout"
