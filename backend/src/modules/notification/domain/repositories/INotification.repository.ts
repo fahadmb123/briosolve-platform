@@ -1,4 +1,4 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { BaseRepository } from "../../../../shared/base/repository/baseRepository";
 import { CreateNotificationRequestDto } from "../../application/dtos/request/create-notificastion.dto";
 import { Notification } from "../entities/notification.entity";
 

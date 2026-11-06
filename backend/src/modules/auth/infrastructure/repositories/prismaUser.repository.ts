@@ -1,7 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { User } from "../../domain/entities/user.entity";
 import { IUserRepository } from "../../domain/repositories/user.repository";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import { UserMapper } from "../mappers/user.mapper";
 
@@ -13,7 +13,7 @@ export class PrismaUserRepository implements IUserRepository {
             .where({ email: email as Varchar<255> })
             .include("current_address")
             .include("customer_profile")
-            .include("provider_profile")
+            .include("provider_profile", (p) => p.include("services", (s) => s.include("service")))
             .first();
         if (!user) return null;
         return UserMapper.toDomain(user);
@@ -24,7 +24,7 @@ export class PrismaUserRepository implements IUserRepository {
             .where({ id: id as Varchar<255> })
             .include("current_address")
             .include("customer_profile")
-            .include("provider_profile")
+            .include("provider_profile", (p) => p.include("services", (s) => s.include("service")))
             .first();
         if (!user) return null;
         return UserMapper.toDomain(user);
@@ -35,7 +35,7 @@ export class PrismaUserRepository implements IUserRepository {
             .where({ phone: phone as Varchar<20> })
             .include("current_address")
             .include("customer_profile")
-            .include("provider_profile")
+            .include("provider_profile", (p) => p.include("services", (s) => s.include("service")))
             .first();
         if (!response) return null;
 

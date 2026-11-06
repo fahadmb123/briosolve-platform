@@ -1038,3 +1038,50 @@
     transform: scale(1.15);
 }
 
+
+.provreq-btn-chat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 7px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--surface-hover, #f4f4f5);
+    color: var(--primary, #05ad98) !important;
+    border: 1px solid var(--primary, #05ad98);
+    transition: all 0.15s ease;
+}
+
+.provreq-btn-chat:hover:not(:disabled) {
+    background: var(--primary, #05ad98);
+    color: var(--primary-content, #ffffff) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(5, 173, 152, 0.25);
+}
+
+.provreq-btn-chat:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.provreq-btn-chat-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 7px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--surface-hover, #f4f4f5);
+    border: 1px solid var(--primary, #05ad98);
+    color: var(--primary, #05ad98) !important;
+    transition: all 0.15s ease;
+}
+
+.provreq-btn-chat-card:hover {
+    background: var(--primary, #05ad98);
+    color: var(--primary-content, #ffffff) !important;
+}

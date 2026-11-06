@@ -1,8 +1,8 @@
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { Service } from "../../domain/entities/service.entity";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
-import { ImageUploadService } from "../../../../shared/application/interfaces/services/IImageUpload.service";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
+import { ImageUploadService } from "../../../../shared/interfaces/services/IImageUpload.service";
 import { UpdateServiceUseCaseDto } from "../dtos/service/request/update-service.dto";
 import { ServiceResponseDto } from "../dtos/service/response/service.dto";
 

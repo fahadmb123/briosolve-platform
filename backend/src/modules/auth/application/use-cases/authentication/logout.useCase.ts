@@ -1,4 +1,4 @@
-import { IUseCase } from "../../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { LogoutInputDto } from "../../dtos/request/logout.dto";
 
 export default class LogoutUseCase implements IUseCase<LogoutInputDto, void> {

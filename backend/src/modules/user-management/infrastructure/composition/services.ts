@@ -1,8 +1,8 @@
-import { RedisPendingRegistrationStore } from "../../../../shared/infrastructure/cache/redis/redisPendingRegistration.store";
-import { NodemailerEmailSender } from "../../../../shared/infrastructure/email/nodemailer/nodemailerEmail-sender";
-import { BcryptPasswordHasherService } from "../../../../shared/infrastructure/security/becryptPasswordHasher.service";
-import { SecureOtpGeneratorService } from "../../../../shared/infrastructure/security/secureOtpGenerate.service";
-import { CloudinaryService } from "../../../../shared/infrastructure/services/cloudinary.service";
+import { RedisPendingRegistrationStore } from "../../../../shared/database/redisPendingRegistration.store";
+import { NodemailerEmailSender } from "../../../../shared/services/nodemailerEmail-sender";
+import { BcryptPasswordHasherService } from "../../../../shared/services/becryptPasswordHasher.service";
+import { SecureOtpGeneratorService } from "../../../../shared/services/secureOtpGenerate.service";
+import { CloudinaryService } from "../../../../shared/services/cloudinary.service";
 
 export const passwordHasher = new BcryptPasswordHasherService();
 export const otpGenerate = new SecureOtpGeneratorService();

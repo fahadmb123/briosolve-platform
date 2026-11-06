@@ -2,7 +2,7 @@ import webpush from "web-push";
 import type { INotificationDelivery } from "../../application/interfaces/INotificationDelivery";
 import type { NotificationResponseDto } from "../../application/dtos/response/notification-response.dto";
 import type { IPushSubscriptionRepository } from "../../domain/repositories/IPushSubscription.respository";
-import { logger } from "../../../../shared/infrastructure/logger/logger";
+import { logger } from "../../../../shared/logger/logger";
 
 export class WebPushNotificationDeliveryAdapter implements INotificationDelivery {
     private _vapidConfigured = false;

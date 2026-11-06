@@ -1,12 +1,12 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { ServiceRequest } from "../../domain/entities/serviceRequest.entity";
 import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
 import { CreateServiceRequestRepoDto } from "../../application/dtos/request/create-service-request.dto";
 import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/update-service-request.dto";
 import { ServiceRequestDetailsDto } from "../../application/dtos/response/service-request.dto";
 import { ServiceRequestMapper } from "../mappers/serviceRequest.mapper";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export class ServiceRequestRepository implements IServiceRequestRepository {
     async findById(id: string): Promise<ServiceRequest | null> {

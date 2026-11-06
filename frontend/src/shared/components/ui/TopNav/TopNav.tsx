@@ -6,9 +6,11 @@ import { useTheme } from "../../../hooks/useTheme";
 import NotificationDropdown from "../../../../features/notifications/components/NotificationDropdown";
 import type { UserRole } from "../../../../features/notifications/types/notification.types";
 import "./TopNav.css";
+import { useUnreadChatCount } from "../../../../features/chat";
 
 export const TopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const unreadMessagesCount = useUnreadChatCount();
   const verifications = useAuthStore(state=>state.verifications)
   const navigate = useNavigate();
   const location = useLocation();
@@ -159,24 +161,26 @@ export const TopNav: React.FC = () => {
               Home
             </NavLink>
 
-            <NavLink
-              to="/request-service"
-              className={({ isActive }) =>
-                `topnav-link ${isActive ? "active" : ""}`
-              }
-            >
-              Request Service
-            </NavLink>
-
             {isCustomer && (
-              <NavLink
-                to="/nearby-providers"
+              <>
+                <NavLink
+                  to="/nearby-providers"
+                  className={({ isActive }) =>
+                    `topnav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  Providers
+                </NavLink>
+                
+                <NavLink
+                to="/request-service"
                 className={({ isActive }) =>
                   `topnav-link ${isActive ? "active" : ""}`
                 }
               >
-                Providers
+                Request Service
               </NavLink>
+            </>
             )}
 
             {isAuthenticated && (
@@ -243,12 +247,17 @@ export const TopNav: React.FC = () => {
                       <i className="fas fa-calendar-check"></i>
                     </Link>
                     <Link
-                      to="/dashboard"
+                      to="/messages"
                       className="topnav-dropdown-item"
                       role="menuitem"
                       onClick={closeAllMenus}
                     >
                       <span>Messages</span>
+                      {unreadMessagesCount > 0 && (
+                        <span className="prov-mono-badge">
+                          {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                        </span>
+                      )}
                       <i className="fas fa-comments"></i>
                     </Link>
                     <Link
@@ -298,18 +307,22 @@ export const TopNav: React.FC = () => {
         </div>
 
         <div className="topnav-right">
-          <button
-            type="button"
-            className="topnav-icon-btn"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            title="Toggle theme"
-          >
-            <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
-          </button>
-
           {isAuthenticated ? (
             <>
+              <Link
+                to="/messages"
+                className="topnav-icon-btn topnav-msg-nav-btn"
+                title="Messages"
+                aria-label="Messages"
+              >
+                <i className="fas fa-comments"></i>
+                {unreadMessagesCount > 0 && (
+                  <span className="topnav-msg-badge">
+                    {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                  </span>
+                )}
+              </Link>
+
               <NotificationDropdown
                 role={resolvedRole}
                 viewAllLink={notificationRoute}
@@ -429,6 +442,15 @@ export const TopNav: React.FC = () => {
                         <i className="fas fa-briefcase"></i>
                       </Link>
                     )}
+                    <button
+                      type="button"
+                      className="topnav-dropdown-item"
+                      role="menuitem"
+                      onClick={toggleTheme}
+                    >
+                      <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                      <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                    </button>
                     <div className="topnav-dropdown-divider"></div>
                     <button
                       type="button"
@@ -541,11 +563,16 @@ export const TopNav: React.FC = () => {
                   Bookings
                 </Link>
                 <Link
-                  to="/dashboard"
+                  to="/messages"
                   className="topnav-mobile-item"
                   onClick={closeAllMenus}
                 >
-                  Messages
+                  <span>Messages</span>
+                  {unreadMessagesCount > 0 && (
+                    <span className="prov-mono-badge">
+                      {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                    </span>
+                  )}
                 </Link>
                 <Link
                   to="/dashboard"
@@ -631,6 +658,14 @@ export const TopNav: React.FC = () => {
                     Become a Provider
                   </Link>
                 )}
+                <button
+                  type="button"
+                  className="topnav-mobile-item flex items-center justify-between"
+                  onClick={toggleTheme}
+                >
+                  <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                  <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                </button>
                 <button
                   type="button"
                   className="topnav-mobile-item topnav-mobile-logout"

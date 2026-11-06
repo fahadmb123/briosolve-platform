@@ -1,8 +1,8 @@
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { ServiceRequestDetailsDto } from "../dtos/response/service-request.dto";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export interface GetProviderServiceRequestsInputDto {
     userId: string;

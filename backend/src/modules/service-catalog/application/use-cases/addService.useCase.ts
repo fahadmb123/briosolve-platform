@@ -1,7 +1,7 @@
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { Service } from "../../domain/entities/service.entity";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { AddServiceUseCaseInputDto } from "../dtos/service/request/add-service.dto";
 import { ServiceResponseDto } from "../dtos/service/response/service.dto";
 

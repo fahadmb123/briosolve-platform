@@ -5,7 +5,7 @@ type DefaultModelRow<Table extends PublicTables> =
     import("@prisma/orm-postgres/orm-client").DefaultModelRow<Contract, Table, "public">;
 
 declare module "@prisma/client" {
-    export type PrismaClient = typeof import("../shared/infrastructure/persistence/prisma/client").db;
+    export type PrismaClient = typeof import("../shared/database/client").db;
     export const PrismaClient: new () => PrismaClient;
 
     export namespace Prisma {
@@ -15,6 +15,8 @@ declare module "@prisma/client" {
             current_address?: AddressGetPayload | null;
             customer_profile?: CustomerProfileGetPayload | null;
             provider_profile?: ProviderProfileGetPayload | null;
+            conversation_participants?: ConversationParticipantGetPayload[] | null;
+            messages?: MessageGetPayload[] | null;
         };
         export type usersGetPayload<T = {}> = UserGetPayload<T>;
 
@@ -53,18 +55,15 @@ declare module "@prisma/client" {
         export type AddressGetPayload<T = {}> = DefaultModelRow<"addresses">;
         export type addressesGetPayload<T = {}> = AddressGetPayload<T>;
 
-        export type CategoryGetPayload<T = {}> = DefaultModelRow<"categories"> & {
-            services?: ServiceGetPayload[] | null;
-        };
-        export type categoriesGetPayload<T = {}> = CategoryGetPayload<T>;
-
         export type ServiceGetPayload<T = {}> = DefaultModelRow<"services"> & {
             category?: CategoryGetPayload | null;
         };
         export type servicesGetPayload<T = {}> = ServiceGetPayload<T>;
 
-        export type ServiceRequestImageGetPayload<T = {}> = DefaultModelRow<"service_request_images">;
-        export type service_request_imagesGetPayload<T = {}> = ServiceRequestImageGetPayload<T>;
+        export type CategoryGetPayload<T = {}> = DefaultModelRow<"categories"> & {
+            services?: ServiceGetPayload[] | null;
+        };
+        export type categoriesGetPayload<T = {}> = CategoryGetPayload<T>;
 
         export type ServiceRequestProviderGetPayload<T = {}> = DefaultModelRow<"service_request_providers"> & {
             service_request?: ServiceRequestGetPayload | null;
@@ -72,11 +71,14 @@ declare module "@prisma/client" {
         };
         export type service_request_providersGetPayload<T = {}> = ServiceRequestProviderGetPayload<T>;
 
+        export type ServiceRequestImageGetPayload<T = {}> = DefaultModelRow<"service_request_images">;
+        export type service_request_imagesGetPayload<T = {}> = ServiceRequestImageGetPayload<T>;
+
         export type ServiceRequestGetPayload<T = {}> = DefaultModelRow<"service_requests"> & {
-            images?: ServiceRequestImageGetPayload[] | null;
-            providers?: ServiceRequestProviderGetPayload[] | null;
             category?: CategoryGetPayload | null;
             subservice?: ServiceGetPayload | null;
+            images?: ServiceRequestImageGetPayload[] | null;
+            providers?: ServiceRequestProviderGetPayload[] | null;
             address?: AddressGetPayload | null;
             customer?: UserGetPayload | null;
         };
@@ -101,6 +103,24 @@ declare module "@prisma/client" {
         export type PushSubscriptionGetPayload<T = {}> = DefaultModelRow<"push_subscriptions">;
         export type PushSubscriptionsGetPayload<T = {}> = DefaultModelRow<"push_subscriptions">;
         export type push_subscriptionsGetPayload<T = {}> = PushSubscriptionGetPayload<T>;
+
+        export type ConversationGetPayload<T = {}> = DefaultModelRow<"conversations"> & {
+            participants?: ConversationParticipantGetPayload[] | null;
+            messages?: MessageGetPayload[] | null;
+        };
+        export type conversationsGetPayload<T = {}> = ConversationGetPayload<T>;
+
+        export type ConversationParticipantGetPayload<T = {}> = DefaultModelRow<"conversation_participants"> & {
+            conversation?: ConversationGetPayload | null;
+            user?: UserGetPayload | null;
+        };
+        export type conversation_participantsGetPayload<T = {}> = ConversationParticipantGetPayload<T>;
+
+        export type MessageGetPayload<T = {}> = DefaultModelRow<"messages"> & {
+            conversation?: ConversationGetPayload | null;
+            sender?: UserGetPayload | null;
+        };
+        export type messagesGetPayload<T = {}> = MessageGetPayload<T>;
 
         export type NotificationCreateInput = import("@prisma/orm-postgres/orm-client").CreateInput<Contract, "notifications", "public">;
         export type notificationsCreateInput = NotificationCreateInput;

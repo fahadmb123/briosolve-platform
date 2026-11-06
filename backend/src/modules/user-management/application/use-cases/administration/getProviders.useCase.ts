@@ -3,7 +3,6 @@ import { IGetProvidersUseCase } from "../../interfaces/use-cases/providers/get-p
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { getProvidersDto } from "../../dtos/request/provider/get-providers.dto";
 
-
 export default class GetProvidersUseCase implements IGetProvidersUseCase {
     constructor(
         private readonly _userRepository: IUserRepository

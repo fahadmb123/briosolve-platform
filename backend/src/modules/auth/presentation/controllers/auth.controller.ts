@@ -1,11 +1,11 @@
 import { NextFunction, Response, Request } from "express";
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { IUserTokenPayload } from "../../../../shared/application/interfaces/IToken";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { sendSuccess } from "../../../../shared/presentation/http/response/response";
-import { accessTokenCookie, refreshTokenCookie, clearAccessTokenCookieOptions, clearRefreshTokenCookieOptions, registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
+import { BaseController } from "../../../../shared/base/controller/baseController";
+import { IUserTokenPayload } from "../../../../shared/interfaces/IToken";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
+import { sendSuccess } from "../../../../shared/utils/response";
+import { accessTokenCookie, refreshTokenCookie, clearAccessTokenCookieOptions, clearRefreshTokenCookieOptions, registrationCookie } from "../../../../shared/utils/cookieConfig";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { LoginOutputDto } from "../../application/dtos/response/login.dto";
 import { LoginInputDto } from "../../application/dtos/request/login.dto";
 import { EmailVerificationUseCaseInputDto } from "../../application/dtos/request/email-verification.dto";

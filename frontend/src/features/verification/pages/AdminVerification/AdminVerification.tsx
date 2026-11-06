@@ -19,7 +19,7 @@ import type {
 
 export default function Verification() {
   const [dossiers, setDossiers] = useState<AdminKycDossier[]>([]);
-  const [stats, setStats] = useState<AdminKycStats>({
+  const [, setStats] = useState<AdminKycStats>({
     pending: 0,
     approved: 0,
     rejected: 0,
@@ -72,6 +72,10 @@ export default function Verification() {
     fetchVerifications();
   }, [fetchVerifications]);
 
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   const handleApproveDocument = useCallback(
     (dossier: AdminKycDossier, doc: AdminKycDocument) => {
@@ -166,7 +170,7 @@ export default function Verification() {
           </div>
         ),
       },
-      
+
       {
         key: "experience",
         header: "Trade Experience",
@@ -200,13 +204,12 @@ export default function Verification() {
         header: "Audit State",
         render: (item) => (
           <span
-            className={`badge text-xs uppercase px-2.5 py-1 rounded font-semibold ${
-              item.kyc_status === "APPROVED"
+            className={`badge text-xs uppercase px-2.5 py-1 rounded font-semibold ${item.kyc_status === "APPROVED"
                 ? "bg-success/15 text-success border border-success/20"
                 : item.kyc_status === "REJECTED"
-                ? "bg-danger/15 text-danger border border-danger/20"
-                : "bg-warning/15 text-warning border border-warning/20"
-            }`}
+                  ? "bg-danger/15 text-danger border border-danger/20"
+                  : "bg-warning/15 text-warning border border-warning/20"
+              }`}
           >
             {item.kyc_status}
           </span>
@@ -239,48 +242,6 @@ export default function Verification() {
           title="Provider Verification Queue"
           description="Evaluate trade diplomas, municipal licenses, and government IDs prior to granting marketplace Verified badges."
         />
-
-        <div
-          className="admin-kpi-grid mb-6"
-          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
-        >
-          <div className="admin-kpi-card">
-            <div className="admin-kpi-icon bg-warning-light text-warning">
-              <i className="fas fa-clock"></i>
-            </div>
-            <div>
-              <div className="admin-kpi-val">{stats.pending}</div>
-              <div className="admin-kpi-lbl">Pending Review</div>
-            </div>
-          </div>
-          <div className="admin-kpi-card">
-            <div className="admin-kpi-icon bg-success-light text-success">
-              <i className="fas fa-check-double"></i>
-            </div>
-            <div>
-              <div className="admin-kpi-val">{stats.approved}</div>
-              <div className="admin-kpi-lbl">Total Verified</div>
-            </div>
-          </div>
-          <div className="admin-kpi-card">
-            <div className="admin-kpi-icon bg-danger-light text-danger">
-              <i className="fas fa-ban"></i>
-            </div>
-            <div>
-              <div className="admin-kpi-val">{stats.rejected}</div>
-              <div className="admin-kpi-lbl">Total Rejected</div>
-            </div>
-          </div>
-          <div className="admin-kpi-card">
-            <div className="admin-kpi-icon bg-info-light text-info">
-              <i className="fas fa-layer-group"></i>
-            </div>
-            <div>
-              <div className="admin-kpi-val">{stats.total}</div>
-              <div className="admin-kpi-lbl">Total Applications</div>
-            </div>
-          </div>
-        </div>
 
         <div className="admin-filter-bar mb-6">
           <div className="admin-search-input">

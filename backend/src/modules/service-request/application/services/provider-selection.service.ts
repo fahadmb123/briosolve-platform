@@ -1,4 +1,4 @@
-import { CalculateDistance } from "../../../../shared/presentation/http/utils/calculate-distance";
+import { CalculateDistance } from "../../../../shared/utils/calculate-distance";
 import { IProviderServiceRepository } from "../../../service-catalog/domain/repositories/IProviderServiceRepository";
 import { Address } from "../../../user-management/domain/entities/address.entity";
 import { User } from "../../../user-management/domain/entities/user.entity";
@@ -15,8 +15,8 @@ export class ProviderSelectionService implements IProviderSelectionService{
         for(const provider of input.providers){
             if (provider.id === input.customerId) continue;
             if (provider.status !== "ACTIVE") continue;
-            if (provider.provider_profile?.kyc_status !== "APPROVED") continue;
-            if (!provider.email_verified || !provider.phone_verified) continue;
+            if (!provider.provider_profile) continue;
+
 
             const providerAddress = provider.current_address_id as Address | null;
 

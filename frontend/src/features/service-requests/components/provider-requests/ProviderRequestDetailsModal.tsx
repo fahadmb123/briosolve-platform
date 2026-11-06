@@ -7,6 +7,8 @@ interface ProviderRequestDetailsModalProps {
   onClose: () => void;
   onQuote: (request: CustomerServiceRequestItem) => void;
   onSelectPhoto: (photoUrl: string) => void;
+  onChat?: (request: CustomerServiceRequestItem) => void;
+  isChatLoading?: boolean;
 }
 
 export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> = ({
@@ -15,6 +17,8 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
   onClose,
   onQuote,
   onSelectPhoto,
+  onChat,
+  isChatLoading = false,
 }) => {
   const [copiedId, setCopiedId] = useState<boolean>(false);
 
@@ -224,6 +228,18 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
           <button type="button" className="provreq-btn-subtle" onClick={onClose}>
             Close
           </button>
+
+          {request.status !== "CANCELLED" && onChat && (
+            <button
+              type="button"
+              className="provreq-btn-chat"
+              onClick={() => onChat(request)}
+              disabled={isChatLoading}
+            >
+              <i className={`fas ${isChatLoading ? "fa-spinner fa-spin" : "fa-comment-dots"} mr-1.5`}></i>
+              <span>{isChatLoading ? "Opening Chat..." : "Chat with Customer"}</span>
+            </button>
+          )}
 
           {request.status === "CANCELLED" ? (
             <button type="button" className="provreq-btn-quote disabled" disabled>

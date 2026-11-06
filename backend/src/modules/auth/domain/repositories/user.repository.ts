@@ -1,4 +1,4 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository"
+import { BaseRepository } from "../../../../shared/base/repository/baseRepository"
 import { User } from "../entities/user.entity"
 
 type userPartial = Partial<User>

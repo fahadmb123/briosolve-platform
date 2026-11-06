@@ -1,7 +1,7 @@
 import { NextFunction,Response,Request } from "express";
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
-import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig";
+import { BaseController } from "../../../../shared/base/controller/baseController";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
+import { registrationCookie } from "../../../../shared/utils/cookieConfig";
 import { ResetPasswordDto } from "../../application/dtos/request/reset-password.dto";
 import { SendSmsOtpUseCaseOutputDto } from "../../application/dtos/response/send-sms-otp.dto";
 import { UpdatePasswordInputDto } from "../../application/dtos/request/update-password.dto";

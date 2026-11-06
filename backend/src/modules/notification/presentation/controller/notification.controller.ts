@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../application/dtos/response/notification-response.dto";
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
+import { BaseController } from "../../../../shared/base/controller/baseController";
 import { GetNotificationRequestDto } from "../../application/dtos/request/get-notifications.dto";
 import { UpdateNotificationRequestDto } from "../../application/dtos/request/update-notificsation.dto";
 import { SavePushSubscriptionRequestDto } from "../../application/dtos/request/save-push-subscription.dto";

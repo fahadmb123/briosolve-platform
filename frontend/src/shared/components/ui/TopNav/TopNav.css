@@ -850,3 +850,28 @@
     padding: 0 1rem;
   }
 }
+
+
+.topnav-msg-nav-btn {
+  position: relative;
+  text-decoration: none;
+}
+
+.topnav-msg-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #05ad98;
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 0 0 2px var(--surface, #141418);
+}

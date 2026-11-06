@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { upload } from "../../../../shared/infrastructure/utils/multer";
-import validate from "../../../../shared/presentation/http/middlewares/validate-request";
+import { upload } from "../../../../shared/utils/multer";
+import validate from "../../../../shared/middlewares/validate-request";
 import { createServiceSchema } from "../schemas/create-service.schema";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
+import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/middlewares/role.middleware";
 import { ServiceRouteDependencies } from "../types/service.route.dependencies";
 
 export function buildServiceRoute(controller:ServiceRouteDependencies):Router{

@@ -30,6 +30,7 @@ export interface IProviderVerifications {
     email: boolean;
     identity: boolean;
     address: boolean;
+    services:boolean
 }
 
 export interface ICustomerVerifications {
@@ -101,6 +102,10 @@ export const useAuthStore = create<IAuthState>()((set) => ({
                         email: userData.email_verified,
                         identity: userData.provider_profile?.kyc_status === "APPROVED",
                         address: userData.current_address_id !== null,
+                        services: Boolean(
+                            userData.provider_profile?.services &&
+                            userData.provider_profile.services.length > 0
+                        ),
                     }
                     : {
                         phone: userData.phone_verified,

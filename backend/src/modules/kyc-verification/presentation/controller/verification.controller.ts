@@ -1,8 +1,8 @@
-import { BaseController } from "../../../../shared/presentation/http/controller/baseController";
+import { BaseController } from "../../../../shared/base/controller/baseController";
 import type { NextFunction, Request, Response } from "express";
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase";
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { UpdateKycStatusInput } from "../../application/use-cases/updateKycStatus.useCase";
-import { ApplicationError } from "../../../../shared/application/errors/applicationError";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { UpdateVerificationInputDto } from "../../application/dtos/verification/request/update-verification.dto";
 import { UploadVerificationInputDto } from "../../application/dtos/verification/request/upload-verification.dto";
 import { UploadVerificationDocumentResponseDto } from "../../application/dtos/verification/response/upload-verification-document.dto";

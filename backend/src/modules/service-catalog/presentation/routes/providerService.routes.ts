@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authMiddleware } from "../../../../shared/presentation/http/middlewares/auth.middleware";
-import { requireRole } from "../../../../shared/presentation/http/middlewares/role.middleware";
+import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/middlewares/role.middleware";
 import { ProviderServiceDependencies } from "../types/providerService.route.dependencies";
 
 export function buildProviderServiceRoute(controller:ProviderServiceDependencies):Router{

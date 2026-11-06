@@ -1,5 +1,5 @@
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { User } from "../../domain/entities/user.entity";
 import { IUserRepository, GetUsersWithRoleInput } from "../../domain/repositories/IUserRepository";
 import { UserMapper } from "../mappers/user.mapper";
@@ -15,7 +15,7 @@ export class UserRepository implements IUserRepository{
         let query = db.orm.public.users.where({ role });
 
         if (role === "PROVIDER") {
-            query = query.include("provider_profile").include("current_address");
+            query = query.include("provider_profile", (p) => p.include("services", (s) => s.include("service"))).include("current_address");
         } else if (role === "CUSTOMER") {
             query = query.include("customer_profile").include("current_address");
         }
@@ -66,12 +66,12 @@ export class UserRepository implements IUserRepository{
     async getActiveProviders(): Promise<User[]> {
         const users = await db.orm.public.users
             .where({ role: "PROVIDER", status: "ACTIVE" })
-            .include("provider_profile")
+            .include("provider_profile", (p) => p.include("services", (s) => s.include("service")))
             .include("current_address")
             .all();
 
         return users
-            .filter(user => user.provider_profile?.kyc_status === "APPROVED")
+
             .map(user => UserMapper.toDomain(user));
     }
 }

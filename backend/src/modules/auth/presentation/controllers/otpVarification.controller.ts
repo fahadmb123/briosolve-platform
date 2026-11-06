@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express"
-import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/application/interfaces/IPendingRegistration-store"
+import { IPendingCustomerRegistration, IPendingRegistrationStore } from "../../../../shared/interfaces/IPendingRegistration-store"
 import { ResendOtpOutput } from "../../application/use-cases/verification/resendOtp.useCase"
-import { IUseCase } from "../../../../shared/application/interfaces/use-cases/IUseCase"
-import { sendSuccess } from "../../../../shared/presentation/http/response/response"
-import { registrationCookie } from "../../../../shared/presentation/http/cookies/cookieConfig"
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase"
+import { sendSuccess } from "../../../../shared/utils/response"
+import { registrationCookie } from "../../../../shared/utils/cookieConfig"
 import { OtpVarificationInput } from "../../application/dtos/request/otp-verification.dto"
 import { UserResponseDto } from "../../application/dtos/response/user.dto"
 

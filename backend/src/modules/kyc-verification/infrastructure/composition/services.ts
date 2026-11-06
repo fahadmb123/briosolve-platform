@@ -1,3 +1,3 @@
-import { CloudinaryService } from "../../../../shared/infrastructure/services/cloudinary.service";
+import { CloudinaryService } from "../../../../shared/services/cloudinary.service";
 
 export const imageService = new CloudinaryService();

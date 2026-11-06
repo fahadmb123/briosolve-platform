@@ -1,5 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { db } from "../../../../shared/infrastructure/persistence/prisma/client";
+import { db } from "../../../../shared/database/client";
 import { IProviderAvailabilityRepository, AvailabilitySlotInput, CreateAvailabilityOverrideInput } from "../../domain/repositories/IProviderAvailabilityRepository";
 import { ProviderAvailability } from "../../domain/entities/providerAvailability.entity";
 import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity";

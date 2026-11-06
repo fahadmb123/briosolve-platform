@@ -1,4 +1,4 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { BaseRepository } from "../../../../shared/base/repository/baseRepository";
 import { ServiceRequest } from "../entities/serviceRequest.entity";
 import { CreateServiceRequestRepoDto } from "../../application/dtos/request/create-service-request.dto";
 import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/update-service-request.dto";

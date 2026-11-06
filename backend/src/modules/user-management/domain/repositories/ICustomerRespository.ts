@@ -1,4 +1,4 @@
-import { BaseRepository } from "../../../../shared/domain/repositories/baseRepository";
+import { BaseRepository } from "../../../../shared/base/repository/baseRepository";
 import { UpdateCustomerProfileInputDto } from "../../application/dtos/request/customer/update-customer-profile.dto";
 import { CustomerProfile } from "../entities/customerProfile.entity";
 
