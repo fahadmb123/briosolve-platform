@@ -1085,3 +1085,339 @@
     background: var(--primary, #05ad98);
     color: var(--primary-content, #ffffff) !important;
 }
+
+.provreq-customer-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    background: var(--surface-hover, #f8f8f9);
+    border: 1px solid var(--border, #e4e4e7);
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.provreq-customer-left {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 0;
+}
+
+.provreq-customer-avatar-img {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary, #05ad98);
+    flex-shrink: 0;
+}
+
+.provreq-customer-avatar-placeholder {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary, #05ad98), #0d9488);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(5, 173, 152, 0.25);
+}
+
+.provreq-customer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.provreq-customer-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.provreq-customer-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text, #09090b);
+}
+
+.provreq-customer-verified-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--primary, #05ad98);
+    background: rgba(5, 173, 152, 0.1);
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+}
+
+.provreq-customer-contacts {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.provreq-customer-contact-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary, #71717a);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.provreq-customer-contact-chip:hover {
+    color: var(--primary, #05ad98);
+    text-decoration: underline;
+}
+
+.provreq-customer-chat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 7px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--surface, #ffffff);
+    color: var(--primary, #05ad98);
+    border: 1px solid var(--primary, #05ad98);
+    transition: all 0.15s ease;
+}
+
+.provreq-customer-chat-btn:hover:not(:disabled) {
+    background: var(--primary, #05ad98);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.provreq-customer-chat-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.provreq-distance-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1.1rem;
+    border-radius: 10px;
+    margin-bottom: 0.85rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.provreq-distance-banner.in-radius {
+    background: rgba(5, 173, 152, 0.08);
+    border: 1px solid rgba(5, 173, 152, 0.25);
+}
+
+.provreq-distance-banner.out-radius {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.provreq-distance-left {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 0;
+}
+
+.provreq-distance-icon-wrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+.provreq-distance-banner.in-radius .provreq-distance-icon-wrap {
+    background: rgba(5, 173, 152, 0.16);
+    color: var(--primary, #05ad98);
+}
+
+.provreq-distance-banner.out-radius .provreq-distance-icon-wrap {
+    background: rgba(245, 158, 11, 0.16);
+    color: #d97706;
+}
+
+.provreq-distance-number-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.provreq-distance-number {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text, #09090b);
+}
+
+.provreq-radius-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.725rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+}
+
+.provreq-radius-badge.badge-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #059669;
+}
+
+.provreq-radius-badge.badge-warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+}
+
+.provreq-distance-subtext {
+    font-size: 0.775rem;
+    color: var(--text-secondary, #71717a);
+    margin: 0.15rem 0 0 0;
+}
+
+.provreq-address-card {
+    background: var(--surface, #ffffff);
+    border: 1px solid var(--border, #e4e4e7);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.provreq-address-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.65rem 1rem;
+    background: var(--surface-hover, #f8f8f9);
+    border-bottom: 1px solid var(--border-light, #f1f1f3);
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.provreq-address-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text, #09090b);
+}
+
+.provreq-address-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.provreq-btn-address-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid var(--border, #e4e4e7);
+    background: var(--surface, #ffffff);
+    color: var(--text, #09090b);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.provreq-btn-address-action:hover {
+    background: var(--surface-hover, #f4f4f5);
+    border-color: var(--primary, #05ad98);
+    color: var(--primary, #05ad98);
+}
+
+.provreq-btn-address-action.maps {
+    color: #0284c7;
+    border-color: rgba(2, 132, 199, 0.3);
+    background: rgba(2, 132, 199, 0.05);
+}
+
+.provreq-btn-address-action.maps:hover {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0284c7;
+}
+
+.provreq-ext-icon {
+    font-size: 0.65rem;
+}
+
+.provreq-address-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+    padding: 1rem;
+}
+
+@media (max-width: 600px) {
+    .provreq-address-fields-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.provreq-address-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.provreq-addr-field-label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary, #71717a);
+    font-weight: 600;
+}
+
+.provreq-addr-field-val {
+    font-size: 0.85rem;
+    color: var(--text, #09090b);
+    font-weight: 500;
+}
+
+.provreq-landmark-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #d97706;
+    font-weight: 500;
+}
+
+.provreq-meta-chip.distance {
+    color: #0284c7;
+    background: rgba(2, 132, 199, 0.09);
+    border-color: rgba(2, 132, 199, 0.2);
+}
+
+.provreq-meta-chip.customer {
+    color: #7c3aed;
+    background: rgba(124, 58, 237, 0.09);
+    border-color: rgba(124, 58, 237, 0.2);
+}

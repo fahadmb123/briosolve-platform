@@ -7,6 +7,7 @@ import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/upda
 import { ServiceRequestDetailsDto } from "../../application/dtos/response/service-request.dto";
 import { ServiceRequestMapper } from "../mappers/serviceRequest.mapper";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
+import { CalculateDistance } from "../../../../shared/utils/calculate-distance";
 
 export class ServiceRequestRepository implements IServiceRequestRepository {
     async findById(id: string): Promise<ServiceRequest | null> {
@@ -26,6 +27,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             .include("category")
             .include("subservice")
             .include("address")
+            .include("customer", (c) => c.include("customer_profile"))
             .include("providers")
             .first();
 
@@ -40,6 +42,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             .include("category")
             .include("subservice")
             .include("address")
+            .include("customer", (c) => c.include("customer_profile"))
             .include("providers")
             .orderBy((req) => req.created_at.desc())
             .all();
@@ -54,6 +57,25 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
         if (matches.length === 0) return [];
 
+        const providerProfile = await db.orm.public.provider_profiles
+            .where({ id: providerProfileId as never })
+            .first();
+
+        let providerLat: number | null = null;
+        let providerLng: number | null = null;
+
+        if (providerProfile) {
+            const providerUser = await db.orm.public.users
+                .where({ id: providerProfile.user_id as never })
+                .include("current_address")
+                .first();
+
+            if (providerUser?.current_address?.latitude != null && providerUser?.current_address?.longitude != null) {
+                providerLat = Number(providerUser.current_address.latitude);
+                providerLng = Number(providerUser.current_address.longitude);
+            }
+        }
+
         const requestIds = matches.map((m) => m.service_request_id);
 
         const records = await Promise.all(
@@ -64,6 +86,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
                     .include("category")
                     .include("subservice")
                     .include("address")
+                    .include("customer", (c) => c.include("customer_profile"))
                     .include("providers")
                     .first();
             })
@@ -80,7 +103,23 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
                 return new Date(b.created_at as unknown as string | Date).getTime() - new Date(a.created_at as unknown as string | Date).getTime();
             });
 
-        return validRecords.map((record) => ServiceRequestMapper.toDetailsDto(record));
+        return validRecords.map((record) => {
+            let distanceKm: number | null = null;
+            if (
+                providerLat != null &&
+                providerLng != null &&
+                record.address?.latitude != null &&
+                record.address?.longitude != null
+            ) {
+                distanceKm = CalculateDistance(
+                    providerLat,
+                    providerLng,
+                    Number(record.address.latitude),
+                    Number(record.address.longitude)
+                );
+            }
+            return ServiceRequestMapper.toDetailsDto(record, distanceKm);
+        });
     }
 
     async update(id: string, customerId: string, data: UpdateServiceRequestRepoDto): Promise<ServiceRequest | null> {

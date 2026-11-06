@@ -6,7 +6,8 @@ import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/upda
 import {
     ServiceRequestResponseDto,
     ServiceRequestDetailsDto,
-    ServiceRequestAddressDto
+    ServiceRequestAddressDto,
+    ServiceRequestCustomerDto
 } from "../../application/dtos/response/service-request.dto";
 
 export type ServiceRequestRecord = Prisma.ServiceRequestGetPayload<{}>;
@@ -87,7 +88,7 @@ export class ServiceRequestMapper {
         };
     }
 
-    static toDetailsDto(record: any): ServiceRequestDetailsDto {
+    static toDetailsDto(record: any, distanceKm?: number | null): ServiceRequestDetailsDto {
         const domain = ServiceRequestMapper.toDomain(record);
         const dto = ServiceRequestMapper.toDto(domain);
 
@@ -107,6 +108,17 @@ export class ServiceRequestMapper {
             };
         }
 
+        let customerDetails: ServiceRequestCustomerDto | null = null;
+        if (record.customer) {
+            customerDetails = {
+                id: record.customer.id,
+                name: record.customer.name,
+                email: record.customer.email,
+                phone: record.customer.phone ?? null,
+                profile_image: record.customer.customer_profile?.profile_image ?? null
+            };
+        }
+
         const providers = Array.isArray(record.providers) ? record.providers : [];
         const quotationsCount = providers.filter((p: any) => p.status === "QUOTED").length;
 
@@ -115,6 +127,8 @@ export class ServiceRequestMapper {
             category_name: record.category?.name,
             subservice_name: record.subservice?.name ?? null,
             address_details: addressDetails,
+            customer_details: customerDetails,
+            distance_km: distanceKm !== undefined ? distanceKm : null,
             matched_providers_count: providers.length,
             quotations_count: quotationsCount
         };
