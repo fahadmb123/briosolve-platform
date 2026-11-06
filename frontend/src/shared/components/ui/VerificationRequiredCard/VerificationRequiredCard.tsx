@@ -108,6 +108,21 @@ export const VerificationRequiredCard: React.FC<VerificationRequiredCardProps> =
           },
         ]
       : []),
+    ...(verifications && "services" in verifications
+      ? [
+          {
+            id: "services",
+            title: "Trade Services",
+            description: "Select the specialized trade skills and service categories you provide.",
+            icon: "fas fa-wrench",
+            isVerified: Boolean(verifications.services),
+            actionText: "Select Services",
+            onAction: () => {
+              navigate("/provider/settings", { state: { activeSection: "services" } });
+            },
+          },
+        ]
+      : []),
   ];
 
   const completedCount = verificationItems.filter((item) => item.isVerified).length;

@@ -15,7 +15,7 @@ export class UserRepository implements IUserRepository{
         let query = db.orm.public.users.where({ role });
 
         if (role === "PROVIDER") {
-            query = query.include("provider_profile").include("current_address");
+            query = query.include("provider_profile", (p) => p.include("services", (s) => s.include("service"))).include("current_address");
         } else if (role === "CUSTOMER") {
             query = query.include("customer_profile").include("current_address");
         }
@@ -66,7 +66,7 @@ export class UserRepository implements IUserRepository{
     async getActiveProviders(): Promise<User[]> {
         const users = await db.orm.public.users
             .where({ role: "PROVIDER", status: "ACTIVE" })
-            .include("provider_profile")
+            .include("provider_profile", (p) => p.include("services", (s) => s.include("service")))
             .include("current_address")
             .all();
 

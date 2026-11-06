@@ -13,6 +13,7 @@ export type CustomerProfile = {
     service_radius_km?: number | null;
     created_at: Temporal.Instant | string | Date;
     updated_at: Temporal.Instant | string | Date;
+    services?: PopulatedProviderService[];
 };
 
 export type ProviderProfile = {
@@ -30,6 +31,7 @@ export type ProviderProfile = {
     skills?: string | null;
     created_at: Temporal.Instant | string | Date;
     updated_at: Temporal.Instant | string | Date;
+    services?: PopulatedProviderService[];
 };
 
 export interface PopulatedProviderService {

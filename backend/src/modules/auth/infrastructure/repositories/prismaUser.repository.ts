@@ -13,7 +13,7 @@ export class PrismaUserRepository implements IUserRepository {
             .where({ email: email as Varchar<255> })
             .include("current_address")
             .include("customer_profile")
-            .include("provider_profile")
+            .include("provider_profile", (p) => p.include("services", (s) => s.include("service")))
             .first();
         if (!user) return null;
         return UserMapper.toDomain(user);
@@ -24,7 +24,7 @@ export class PrismaUserRepository implements IUserRepository {
             .where({ id: id as Varchar<255> })
             .include("current_address")
             .include("customer_profile")
-            .include("provider_profile")
+            .include("provider_profile", (p) => p.include("services", (s) => s.include("service")))
             .first();
         if (!user) return null;
         return UserMapper.toDomain(user);
@@ -35,7 +35,7 @@ export class PrismaUserRepository implements IUserRepository {
             .where({ phone: phone as Varchar<20> })
             .include("current_address")
             .include("customer_profile")
-            .include("provider_profile")
+            .include("provider_profile", (p) => p.include("services", (s) => s.include("service")))
             .first();
         if (!response) return null;
 
