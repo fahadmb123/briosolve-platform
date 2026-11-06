@@ -50,3 +50,20 @@ export interface ServiceRequestDetailsDto extends ServiceRequestResponseDto {
     matched_providers_count?: number;
     quotations_count?: number;
 }
+
+export interface GetCustomerRequestsOutputDto {
+    requests: ServiceRequestDetailsDto[];
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+    counts: Record<string, number>;
+}
+
+export interface GetProviderRequestsOutputDto {
+    requests: ServiceRequestDetailsDto[];
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+}

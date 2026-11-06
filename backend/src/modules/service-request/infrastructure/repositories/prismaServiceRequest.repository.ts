@@ -4,7 +4,13 @@ import { ServiceRequest } from "../../domain/entities/serviceRequest.entity";
 import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
 import { CreateServiceRequestRepoDto } from "../../application/dtos/request/create-service-request.dto";
 import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/update-service-request.dto";
-import { ServiceRequestDetailsDto } from "../../application/dtos/response/service-request.dto";
+import {
+    ServiceRequestDetailsDto,
+    GetCustomerRequestsOutputDto,
+    GetProviderRequestsOutputDto
+} from "../../application/dtos/response/service-request.dto";
+import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
+import { GetProviderServiceRequestsInputDto } from "../../application/use-cases/getProviderServiceRequests.useCase";
 import { ServiceRequestMapper } from "../mappers/serviceRequest.mapper";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { CalculateDistance } from "../../../../shared/utils/calculate-distance";
@@ -35,27 +41,87 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         return ServiceRequestMapper.toDetailsDto(record);
     }
 
-    async findByCustomerId(customerId: string): Promise<ServiceRequestDetailsDto[]> {
-        const records = await db.orm.public.service_requests
-            .where({ customer_id: customerId as never })
+    async findByCustomerId(
+        input: GetCustomerServiceRequestsInputDto
+    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts: Record<string, number> }> {
+        const { customerId, page = 1, limit = 10, search, status, sortBy = "NEWEST" } = input;
+        const skip = (page - 1) * limit;
+
+        let query = db.orm.public.service_requests.where({ customer_id: customerId as never });
+
+        if (status && status !== "ALL") {
+            query = query.where({ status: status as never });
+        }
+
+        if (search && search.trim()) {
+            query = query.where((req) => req.title.ilike(`%${search.trim()}%`));
+        }
+
+        if (sortBy === "OLDEST") {
+            query = query.orderBy((req) => req.created_at.asc());
+        } else {
+            query = query.orderBy((req) => req.created_at.desc());
+        }
+
+        const records = await query
             .include("images")
             .include("category")
             .include("subservice")
             .include("address")
             .include("customer", (c) => c.include("customer_profile"))
             .include("providers")
-            .orderBy((req) => req.created_at.desc())
+            .offset(skip)
+            .limit(limit)
             .all();
 
-        return records.map((record) => ServiceRequestMapper.toDetailsDto(record));
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+
+        const allRecords = await db.orm.public.service_requests
+            .where({ customer_id: customerId as never })
+            .all();
+
+        const counts: Record<string, number> = {
+            ALL: allRecords.length,
+            DRAFT: 0,
+            PENDING: 0,
+            ACTIVE: 0,
+            ACCEPTED: 0,
+            IN_PROGRESS: 0,
+            COMPLETED: 0,
+            CANCELLED: 0,
+            EXPIRED: 0
+        };
+
+        allRecords.forEach((r) => {
+            if (r.status in counts) {
+                counts[r.status] += 1;
+            }
+        });
+
+        return {
+            requests: records.map((record) => ServiceRequestMapper.toDetailsDto(record)),
+            total: totalResult.total,
+            counts
+        };
     }
 
-    async findByProviderId(providerProfileId: string): Promise<ServiceRequestDetailsDto[]> {
+    async findByProviderId(
+        providerProfileId: string,
+        input?: Omit<GetProviderServiceRequestsInputDto, "userId">
+    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number }> {
+        const { page = 1, limit = 10, search, urgency, budgetType, sortBy = "NEWEST" } = input || {};
+        const skip = (page - 1) * limit;
+
         const matches = await db.orm.public.service_request_providers
             .where({ provider_id: providerProfileId as never })
             .all();
 
-        if (matches.length === 0) return [];
+        if (matches.length === 0) {
+            return {
+                requests: [],
+                total: 0
+            };
+        }
 
         const providerProfile = await db.orm.public.provider_profiles
             .where({ id: providerProfileId as never })
@@ -92,18 +158,9 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             })
         );
 
-        const validRecords = records
-            .filter((r): r is NonNullable<typeof r> => r !== null)
-            .sort((a, b) => {
-                const aTime = (a.created_at as unknown as { epochMilliseconds?: bigint | number })?.epochMilliseconds;
-                const bTime = (b.created_at as unknown as { epochMilliseconds?: bigint | number })?.epochMilliseconds;
-                if (aTime && bTime) {
-                    return Number(bTime) - Number(aTime);
-                }
-                return new Date(b.created_at as unknown as string | Date).getTime() - new Date(a.created_at as unknown as string | Date).getTime();
-            });
+        const validRecords = records.filter((r): r is NonNullable<typeof r> => r !== null);
 
-        return validRecords.map((record) => {
+        let dtos = validRecords.map((record) => {
             let distanceKm: number | null = null;
             if (
                 providerLat != null &&
@@ -120,6 +177,51 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             }
             return ServiceRequestMapper.toDetailsDto(record, distanceKm);
         });
+
+        if (urgency && urgency !== "ALL") {
+            dtos = dtos.filter((r) => r.urgency === urgency);
+        }
+
+        if (budgetType && budgetType !== "ALL") {
+            dtos = dtos.filter((r) => r.budget_type === budgetType);
+        }
+
+        if (search && search.trim()) {
+            const q = search.toLowerCase().trim();
+            dtos = dtos.filter((r) => {
+                const matchTitle = r.title.toLowerCase().includes(q);
+                const matchDesc = r.description.toLowerCase().includes(q);
+                const matchCat = (r.category_name || "").toLowerCase().includes(q);
+                const matchSub = (r.subservice_name || "").toLowerCase().includes(q);
+                const matchArea = (r.address_details?.area || "").toLowerCase().includes(q);
+                const matchCity = (r.address_details?.city || "").toLowerCase().includes(q);
+                const matchLandmark = (r.address_details?.landmark || "").toLowerCase().includes(q);
+                return matchTitle || matchDesc || matchCat || matchSub || matchArea || matchCity || matchLandmark;
+            });
+        }
+
+        dtos.sort((a, b) => {
+            if (sortBy === "BUDGET_HIGH") {
+                const aAmt = a.budget_amount ?? 0;
+                const bAmt = b.budget_amount ?? 0;
+                return bAmt - aAmt;
+            }
+            if (sortBy === "URGENT") {
+                const urgencyOrder: Record<string, number> = { TODAY: 1, THIS_WEEK: 2, SPECIFIC_DATE: 3, FLEXIBLE: 4 };
+                return (urgencyOrder[a.urgency] ?? 5) - (urgencyOrder[b.urgency] ?? 5);
+            }
+            const timeA = new Date(a.created_at).getTime();
+            const timeB = new Date(b.created_at).getTime();
+            return timeB - timeA;
+        });
+
+        const total = dtos.length;
+        const paginated = dtos.slice(skip, skip + limit);
+
+        return {
+            requests: paginated,
+            total
+        };
     }
 
     async update(id: string, customerId: string, data: UpdateServiceRequestRepoDto): Promise<ServiceRequest | null> {

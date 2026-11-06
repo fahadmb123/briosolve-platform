@@ -1421,3 +1421,92 @@
     background: rgba(124, 58, 237, 0.09);
     border-color: rgba(124, 58, 237, 0.2);
 }
+
+
+.provreq-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding: 1rem 0;
+}
+
+.provreq-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #e4e4e7);
+    background: var(--surface, #ffffff);
+    color: var(--text, #09090b);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.provreq-page-btn:hover:not(:disabled) {
+    border-color: var(--primary, #05ad98);
+    color: var(--primary, #05ad98);
+}
+
+.provreq-page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.provreq-page-info {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #71717a);
+    font-weight: 500;
+}
+
+.provreq-pagination-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+}
+
+.provreq-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.provreq-page-btn {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border, #e4e4e7);
+    background: var(--surface, #ffffff);
+    color: var(--text, #09090b);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.provreq-page-btn:hover:not(:disabled) {
+    border-color: var(--primary, #05ad98);
+    color: var(--primary, #05ad98);
+    background: var(--surface-hover, #f8f8f9);
+}
+
+.provreq-page-btn.active {
+    background: var(--primary, #05ad98);
+    border-color: var(--primary, #05ad98);
+    color: #ffffff;
+}
+
+.provreq-page-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}

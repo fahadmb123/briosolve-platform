@@ -5,7 +5,9 @@ import { CreateServiceRequestInputDto } from "../../application/dtos/request/cre
 import { UpdateServiceRequestDto } from "../../application/dtos/request/update-service-request.dto";
 import {
     ServiceRequestResponseDto,
-    ServiceRequestDetailsDto
+    ServiceRequestDetailsDto,
+    GetCustomerRequestsOutputDto,
+    GetProviderRequestsOutputDto
 } from "../../application/dtos/response/service-request.dto";
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
 import { GetProviderServiceRequestsInputDto } from "../../application/use-cases/getProviderServiceRequests.useCase";
@@ -15,10 +17,10 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 export class ServiceRequestController extends BaseController {
     constructor(
         private readonly _createServiceRequestUseCase: IUseCase<CreateServiceRequestInputDto, ServiceRequestResponseDto>,
-        private readonly _getCustomerServiceRequestsUseCase: IUseCase<GetCustomerServiceRequestsInputDto, ServiceRequestDetailsDto[]>,
+        private readonly _getCustomerServiceRequestsUseCase: IUseCase<GetCustomerServiceRequestsInputDto, GetCustomerRequestsOutputDto>,
         private readonly _cancelServiceRequestUseCase: IUseCase<CancelServiceRequestInputDto, ServiceRequestResponseDto>,
         private readonly _updateServiceRequestUseCase: IUseCase<UpdateServiceRequestDto, ServiceRequestDetailsDto>,
-        private readonly _getProviderServiceRequestsUseCase: IUseCase<GetProviderServiceRequestsInputDto, ServiceRequestDetailsDto[]>
+        private readonly _getProviderServiceRequestsUseCase: IUseCase<GetProviderServiceRequestsInputDto, GetProviderRequestsOutputDto>
     ) {
         super();
     }
@@ -48,8 +50,22 @@ export class ServiceRequestController extends BaseController {
                 throw new ApplicationError("UNAUTHORIZED", "Customer ID is required", "AUTHENTICATION");
             }
 
-            const requests = await this._getCustomerServiceRequestsUseCase.execute({ customerId });
-            return this.sendSuccess(res, "Customer service requests retrieved successfully", requests, 200);
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search as string | undefined;
+            const status = req.query.status as string | undefined;
+            const sortBy = req.query.sortBy as "NEWEST" | "OLDEST" | undefined;
+
+            const response = await this._getCustomerServiceRequestsUseCase.execute({
+                customerId,
+                page,
+                limit,
+                search,
+                status,
+                sortBy
+            });
+
+            return this.sendSuccess(res, "Customer service requests retrieved successfully", response, 200);
         } catch (error) {
             next(error);
         }
@@ -62,8 +78,24 @@ export class ServiceRequestController extends BaseController {
                 throw new ApplicationError("UNAUTHORIZED", "Provider user ID is required", "AUTHENTICATION");
             }
 
-            const requests = await this._getProviderServiceRequestsUseCase.execute({ userId });
-            return this.sendSuccess(res, "Provider service requests retrieved successfully", requests, 200);
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search as string | undefined;
+            const urgency = req.query.urgency as string | undefined;
+            const budgetType = req.query.budgetType as string | undefined;
+            const sortBy = req.query.sortBy as "NEWEST" | "URGENT" | "BUDGET_HIGH" | undefined;
+
+            const response = await this._getProviderServiceRequestsUseCase.execute({
+                userId,
+                page,
+                limit,
+                search,
+                urgency,
+                budgetType,
+                sortBy
+            });
+
+            return this.sendSuccess(res, "Provider service requests retrieved successfully", response, 200);
         } catch (error) {
             next(error);
         }
