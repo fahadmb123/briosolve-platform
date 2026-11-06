@@ -751,7 +751,7 @@ export default function CustomerChat() {
           <div className={`chat-info-pane ${isInfoOpen ? "open" : ""}`}>
             <ChatInfoDrawer
               participant={selectedConversation.participant}
-              linkedRequest={selectedConversation.linkedRequest}
+              currentRole="CUSTOMER"
               isOpen={isInfoOpen}
               onClose={() => setIsInfoOpen(false)}
             />
