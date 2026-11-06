@@ -5,18 +5,17 @@ import { useAuthStore } from '../features/auth/stores/auth.store';
 import { useLogout } from '../features/auth/hooks/use-otp-varify';
 import NotificationDropdown from '../features/notifications/components/NotificationDropdown';
 
-
 export default function AdminLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
     const { theme, toggleTheme } = useTheme();
     const clearAuth = useAuthStore((state) => state.clearAuth);
-    const logout = useLogout()
-    const navigate = useNavigate()
+    const logout = useLogout();
+    const navigate = useNavigate();
     const handleLogout = async () => {
-        await logout.mutateAsync()
+        await logout.mutateAsync();
         clearAuth();
         navigate('/login');
-    }
+    };
 
     return (
         <div className={`app-container sidebar-modal-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
@@ -107,10 +106,10 @@ export default function AdminLayout() {
                 <div className="menu-label mt-6">Marketplace Operations</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink to="/admin/service-requests" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-file-invoice"></i>
                             <span>Service Requests</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">

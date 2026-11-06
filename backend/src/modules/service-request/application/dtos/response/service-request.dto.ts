@@ -67,3 +67,20 @@ export interface GetProviderRequestsOutputDto {
     page: number;
     limit: number;
 }
+
+export interface GetAdminServiceRequestsInputDto {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    sortBy?: "NEWEST" | "OLDEST";
+}
+
+export interface GetAdminRequestsOutputDto {
+    requests: ServiceRequestDetailsDto[];
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+    counts: Record<string, number>;
+}

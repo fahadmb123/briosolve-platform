@@ -7,7 +7,9 @@ import {
     ServiceRequestResponseDto,
     ServiceRequestDetailsDto,
     GetCustomerRequestsOutputDto,
-    GetProviderRequestsOutputDto
+    GetProviderRequestsOutputDto,
+    GetAdminServiceRequestsInputDto,
+    GetAdminRequestsOutputDto
 } from "../../application/dtos/response/service-request.dto";
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
 import { GetProviderServiceRequestsInputDto } from "../../application/use-cases/getProviderServiceRequests.useCase";
@@ -20,7 +22,9 @@ export class ServiceRequestController extends BaseController {
         private readonly _getCustomerServiceRequestsUseCase: IUseCase<GetCustomerServiceRequestsInputDto, GetCustomerRequestsOutputDto>,
         private readonly _cancelServiceRequestUseCase: IUseCase<CancelServiceRequestInputDto, ServiceRequestResponseDto>,
         private readonly _updateServiceRequestUseCase: IUseCase<UpdateServiceRequestDto, ServiceRequestDetailsDto>,
-        private readonly _getProviderServiceRequestsUseCase: IUseCase<GetProviderServiceRequestsInputDto, GetProviderRequestsOutputDto>
+        private readonly _getProviderServiceRequestsUseCase: IUseCase<GetProviderServiceRequestsInputDto, GetProviderRequestsOutputDto>,
+        private readonly _getAdminServiceRequestsUseCase: IUseCase<GetAdminServiceRequestsInputDto, GetAdminRequestsOutputDto>,
+        private readonly _adminCancelServiceRequestUseCase: IUseCase<string, void>
     ) {
         super();
     }
@@ -136,6 +140,38 @@ export class ServiceRequestController extends BaseController {
             });
 
             return this.sendSuccess(res, "Service request cancelled successfully", response, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    getAdminServiceRequests = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search as string | undefined;
+            const status = req.query.status as string | undefined;
+            const sortBy = req.query.sortBy as "NEWEST" | "OLDEST" | undefined;
+
+            const response = await this._getAdminServiceRequestsUseCase.execute({
+                page,
+                limit,
+                search,
+                status,
+                sortBy
+            });
+
+            return this.sendSuccess(res, "Admin service requests retrieved successfully", response, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    adminCancelServiceRequest = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const requestId = req.params.id as string;
+            await this._adminCancelServiceRequestUseCase.execute(requestId);
+            return this.sendSuccess(res, "Service request cancelled successfully", null, 200);
         } catch (error) {
             next(error);
         }

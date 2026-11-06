@@ -7,7 +7,8 @@ import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/upda
 import {
     ServiceRequestDetailsDto,
     GetCustomerRequestsOutputDto,
-    GetProviderRequestsOutputDto
+    GetProviderRequestsOutputDto,
+    GetAdminServiceRequestsInputDto
 } from "../../application/dtos/response/service-request.dto";
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
 import { GetProviderServiceRequestsInputDto } from "../../application/use-cases/getProviderServiceRequests.useCase";
@@ -307,6 +308,82 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
             if (!finalRecord) return null;
             return ServiceRequestMapper.toDomain(finalRecord);
+        });
+    }
+
+    async findAdminRequests(
+        input: GetAdminServiceRequestsInputDto
+    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts: Record<string, number> }> {
+        const { page = 1, limit = 10, search, status, sortBy = "NEWEST" } = input;
+        const skip = (page - 1) * limit;
+
+        let query = db.orm.public.service_requests;
+
+        if (status && status !== "ALL") {
+            query = query.where({ status: status as never });
+        }
+
+        if (search && search.trim()) {
+            query = query.where((req) => req.title.ilike(`%${search.trim()}%`));
+        }
+
+        if (sortBy === "OLDEST") {
+            query = query.orderBy((req) => req.created_at.asc());
+        } else {
+            query = query.orderBy((req) => req.created_at.desc());
+        }
+
+        const records = await query
+            .include("images")
+            .include("category")
+            .include("subservice")
+            .include("address")
+            .include("customer", (c) => c.include("customer_profile"))
+            .include("providers")
+            .offset(skip)
+            .limit(limit)
+            .all();
+
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+
+        const allRecords = await db.orm.public.service_requests.all();
+
+        const counts: Record<string, number> = {
+            ALL: allRecords.length,
+            DRAFT: 0,
+            PENDING: 0,
+            ACTIVE: 0,
+            ACCEPTED: 0,
+            IN_PROGRESS: 0,
+            COMPLETED: 0,
+            CANCELLED: 0,
+            EXPIRED: 0
+        };
+
+        allRecords.forEach((r) => {
+            if (r.status in counts) {
+                counts[r.status] += 1;
+            }
+        });
+
+        return {
+            requests: records.map((record) => ServiceRequestMapper.toDetailsDto(record)),
+            total: totalResult.total,
+            counts
+        };
+    }
+
+    async adminCancel(id: string): Promise<ServiceRequest | null> {
+        return await db.transaction(async (tx) => {
+            const updated = await tx.orm.public.service_requests
+                .where({ id: id as never })
+                .update({
+                    status: "CANCELLED" as never,
+                    updated_at: Temporal.Now.instant()
+                } as never);
+
+            if (!updated) return null;
+            return ServiceRequestMapper.toDomain(updated);
         });
     }
 }
