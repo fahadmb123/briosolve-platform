@@ -23,7 +23,9 @@ export class GetMessagesUseCase implements IUseCase<GetMessagesRequestDto, Messa
         }
 
         const participants = await this._participantRepository.findByConversationId(input.conversationId);
-        const currentParticipant = participants.find(p => p.user_id === input.userId);
+        const currentParticipant = participants.find(
+            p => String(p.user_id).trim() === String(input.userId).trim()
+        );
 
         if (!currentParticipant) {
             throw new ApplicationError(
@@ -39,16 +41,18 @@ export class GetMessagesUseCase implements IUseCase<GetMessagesRequestDto, Messa
             input.limit
         );
 
-        const otherParticipant = participants.find(p => p.user_id !== input.userId);
+        const otherParticipant = participants.find(
+            p => String(p.user_id).trim() !== String(input.userId).trim()
+        );
         const otherLastRead = otherParticipant?.last_read_at
             ? new Date(otherParticipant.last_read_at).getTime()
             : 0;
 
         return messages.map(message => {
             let status: MessageStatus = "DELIVERED";
-            if (message.sender_id === input.userId) {
+            if (String(message.sender_id).trim() === String(input.userId).trim()) {
                 const msgTime = new Date(message.created_at).getTime();
-                status = otherLastRead >= msgTime ? "READ" : "DELIVERED";
+                status = (otherLastRead > 0 && otherLastRead >= msgTime) ? "READ" : "DELIVERED";
             } else {
                 status = "READ";
             }

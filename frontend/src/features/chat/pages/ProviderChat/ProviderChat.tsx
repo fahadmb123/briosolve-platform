@@ -301,14 +301,14 @@ export default function ProviderChat() {
 
   const handleSocketConversationRead = useCallback(
     (data: { conversation_id: string; read_by: string }) => {
-      if (data.read_by === currentUser?.id) return;
+      if (String(data.read_by).trim() === String(currentUser?.id).trim()) return;
       setMessagesMap((prev) => {
         const msgs = prev[data.conversation_id];
         if (!msgs) return prev;
         return {
           ...prev,
           [data.conversation_id]: msgs.map((m) =>
-            m.senderId === currentUser?.id ? { ...m, status: "READ" as const } : m
+            String(m.senderId).trim() === String(currentUser?.id).trim() ? { ...m, status: "READ" as const } : m
           ),
         };
       });

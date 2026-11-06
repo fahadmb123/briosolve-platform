@@ -6,7 +6,7 @@ export function toChatMessage(
     currentUserId?: string,
     currentUserRole?: "CUSTOMER" | "PROVIDER"
 ): ChatMessage {
-    const isMe = currentUserId ? dto.sender_id === currentUserId : false;
+    const isMe = currentUserId ? String(dto.sender_id).trim() === String(currentUserId).trim() : false;
 
     const createdAtDate = new Date(dto.created_at);
     const timeFormatted = isNaN(createdAtDate.getTime())
@@ -26,7 +26,7 @@ export function toChatMessage(
         text: dto.message_type === "IMAGE" ? "" : dto.content,
         type: dto.message_type === "IMAGE" ? "IMAGE" : "TEXT",
         imageUrl: dto.message_type === "IMAGE" ? dto.content : undefined,
-        status: "SENT",
+        status: dto.status || "SENT",
         createdAt: timeFormatted,
         rawCreatedAt: dto.created_at
     };
