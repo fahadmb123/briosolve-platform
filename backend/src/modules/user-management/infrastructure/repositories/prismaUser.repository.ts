@@ -71,7 +71,7 @@ export class UserRepository implements IUserRepository{
             .all();
 
         return users
-            .filter(user => user.provider_profile?.kyc_status === "APPROVED")
+
             .map(user => UserMapper.toDomain(user));
     }
 }

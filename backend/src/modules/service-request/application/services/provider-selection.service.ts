@@ -15,8 +15,8 @@ export class ProviderSelectionService implements IProviderSelectionService{
         for(const provider of input.providers){
             if (provider.id === input.customerId) continue;
             if (provider.status !== "ACTIVE") continue;
-            if (provider.provider_profile?.kyc_status !== "APPROVED") continue;
-            if (!provider.email_verified || !provider.phone_verified) continue;
+            if (!provider.provider_profile) continue;
+
 
             const providerAddress = provider.current_address_id as Address | null;
 

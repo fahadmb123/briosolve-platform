@@ -5,10 +5,15 @@ import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMuta
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { ProviderRequestCard, ProviderRequestDetailsModal } from "../../components/provider-requests";
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
+import { useAuthStore } from "../../../auth/stores/auth.store";
+import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
 import "./ProviderServiceRequests.css";
 
 export default function ProviderServiceRequests() {
   const navigate = useNavigate();
+  const verifications = useAuthStore((state) => state.verifications);
+  const isVerified =
+    verifications !== null && Object.values(verifications).every(Boolean);
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("ALL");
@@ -30,6 +35,7 @@ export default function ProviderServiceRequests() {
   };
 
   useEffect(() => {
+    if (!isVerified) return;
     fetchRequests();
 
     const handleNotification = (e: Event) => {
@@ -46,7 +52,7 @@ export default function ProviderServiceRequests() {
     return () => {
       window.removeEventListener("app:notification", handleNotification);
     };
-  }, []);
+  }, [isVerified]);
 
   const currentSelectedRequest = useMemo(() => {
     if (!selectedRequest) return null;
@@ -121,6 +127,17 @@ export default function ProviderServiceRequests() {
       },
     });
   };
+
+  if (!isVerified) {
+    return (
+      <div className="provreq-page-container">
+        <VerificationRequiredCard
+          title="Complete Verification to View Service Requests"
+          description="To maintain marketplace trust, protect customer details, and unlock lead opportunities, please complete your provider credentials and identity verification."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="provreq-page-container">
