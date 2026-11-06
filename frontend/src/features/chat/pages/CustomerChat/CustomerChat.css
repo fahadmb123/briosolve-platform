@@ -239,12 +239,18 @@ body.light,
 
 .chat-presence-dot {
   position: absolute;
-  bottom: 1px;
-  right: 1px;
-  width: 10px;
-  height: 10px;
+  bottom: 0px;
+  right: 0px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
-  border: 2px solid var(--surface, #ffffff);
+  border: 2.5px solid var(--surface, #141418);
+  box-sizing: border-box;
+}
+
+[data-theme="light"] .chat-presence-dot,
+body.light .chat-presence-dot {
+  border-color: #ffffff;
 }
 
 .chat-presence-dot.online {
