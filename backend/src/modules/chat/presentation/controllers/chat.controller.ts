@@ -8,6 +8,8 @@ import { GetMessagesRequestDto } from "../../application/dtos/request/message/ge
 import { MessageResponseDto } from "../../application/dtos/response/message/message-response.dto";
 import { SendMessageRequestDto } from "../../application/dtos/request/message/send-message.dto";
 import { MarkMessagesAsReadRequestDto } from "../../application/dtos/request/message/mark-messages-as-read.dto";
+import { ImageUploadService } from "../../../../shared/interfaces/services/IImageUpload.service";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export class ChatController extends BaseController {
     constructor(
@@ -15,7 +17,8 @@ export class ChatController extends BaseController {
         private readonly _getConversationsUseCase: IUseCase<GetConversationsRequestDto, ConversationResponseDto[]>,
         private readonly _getMessagesUseCase: IUseCase<GetMessagesRequestDto, MessageResponseDto[]>,
         private readonly _sendMessageUseCase: IUseCase<SendMessageRequestDto, MessageResponseDto>,
-        private readonly _markMessagesAsReadUseCase: IUseCase<MarkMessagesAsReadRequestDto, void>
+        private readonly _markMessagesAsReadUseCase: IUseCase<MarkMessagesAsReadRequestDto, void>,
+        private readonly _imageUploadService?: ImageUploadService
     ) {
         super();
     }
@@ -96,6 +99,23 @@ export class ChatController extends BaseController {
             });
 
             this.sendSuccess(res, "Messages marked as read", null);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    uploadAttachment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            if (!req.file) {
+                throw new ApplicationError("NO_FILE_PROVIDED", "No image file provided", "VALIDATION");
+            }
+
+            if (!this._imageUploadService) {
+                throw new ApplicationError("UPLOAD_SERVICE_UNAVAILABLE", "Image upload service not available", "INTERNAL");
+            }
+
+            const imageUrl = await this._imageUploadService.uploadImage(req.file.buffer, "chat");
+            this.sendSuccess(res, "Image uploaded successfully", { imageUrl });
         } catch (error) {
             next(error);
         }

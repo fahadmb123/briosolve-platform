@@ -23,8 +23,9 @@ export function toChatMessage(
         senderId: dto.sender_id,
         senderRole: role,
         senderName: isMe ? "You" : (role === "PROVIDER" ? "Provider" : "Customer"),
-        text: dto.content,
+        text: dto.message_type === "IMAGE" ? "" : dto.content,
         type: dto.message_type === "IMAGE" ? "IMAGE" : "TEXT",
+        imageUrl: dto.message_type === "IMAGE" ? dto.content : undefined,
         status: "SENT",
         createdAt: timeFormatted,
         rawCreatedAt: dto.created_at

@@ -18,7 +18,7 @@ import {
   ChatThreadSkeleton,
 } from "../../components";
 import { useAuthStore } from "../../../auth/stores/auth.store";
-import { type BackendMessageDto } from "../../services/chat.service";
+import { type BackendMessageDto, uploadChatAttachment } from "../../services/chat.service";
 import {
   useGetConversations,
   useGetMessages,
@@ -207,17 +207,18 @@ export default function CustomerChat() {
   const activeMessages = useMemo(() => {
     if (!selectedId) return [];
     const list = messagesMap[selectedId] || [];
-    const confirmedTexts = new Set(
+    const confirmedKeys = new Set(
       list
         .filter((m) => m.status !== "SENDING" && !m.id.startsWith("temp-") && !m.id.startsWith("pmsg-"))
-        .map((m) => `${m.senderId}_${m.text}`)
+        .map((m) => (m.type === "IMAGE" ? `${m.senderId}_IMAGE` : `${m.senderId}_${m.text}`))
     );
     const seenIds = new Set<string>();
     const unique: ChatMessage[] = [];
     for (const msg of list) {
       if (seenIds.has(msg.id)) continue;
       const isPending = msg.status === "SENDING" || msg.id.startsWith("temp-") || msg.id.startsWith("pmsg-");
-      if (isPending && confirmedTexts.has(`${msg.senderId}_${msg.text}`)) {
+      const key = msg.type === "IMAGE" ? `${msg.senderId}_IMAGE` : `${msg.senderId}_${msg.text}`;
+      if (isPending && confirmedKeys.has(key)) {
         continue;
       }
       seenIds.add(msg.id);
@@ -241,7 +242,7 @@ export default function CustomerChat() {
           const pendingIndex = existing.findIndex(
             (m) =>
               (m.status === "SENDING" || m.id.startsWith("temp-") || m.id.startsWith("pmsg-")) &&
-              m.text === chatMsg.text
+              (chatMsg.type === "IMAGE" ? (m.type === "IMAGE" || Boolean(m.imageUrl)) : m.text === chatMsg.text)
           );
           if (pendingIndex !== -1) {
             const next = [...existing];
@@ -274,7 +275,7 @@ export default function CustomerChat() {
             return {
               ...c,
               lastMessage: {
-                text: backendMsg.content,
+                text: backendMsg.message_type === "IMAGE" ? "Photo" : backendMsg.content,
                 senderId: backendMsg.sender_id,
                 createdAt: chatMsg.createdAt,
                 isUnread: isFromOther && isNotSelected,
@@ -451,9 +452,9 @@ export default function CustomerChat() {
     });
   };
 
-  const handleSendMessage = (text: string) => {
+  const handleSendMessage = async (text: string, imageFile?: File) => {
     const trimmed = text.trim();
-    if (!selectedId || !trimmed) return;
+    if (!selectedId || (!trimmed && !imageFile)) return;
 
     const isExisting = conversations.some((c) => c.id === selectedId);
 
@@ -467,7 +468,8 @@ export default function CustomerChat() {
         senderRole: "CUSTOMER",
         senderName: "You",
         text: trimmed,
-        type: "TEXT",
+        type: imageFile ? "IMAGE" : "TEXT",
+        imageUrl: imageFile ? URL.createObjectURL(imageFile) : undefined,
         status: "SENDING",
         createdAt: now.toLocaleTimeString([], {
           hour: "2-digit",
@@ -481,12 +483,50 @@ export default function CustomerChat() {
         [selectedId]: [...(prev[selectedId] || []), optimisticMsg],
       }));
 
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === selectedId
+            ? {
+              ...c,
+              lastMessage: {
+                text: imageFile ? (trimmed || "Photo") : trimmed,
+                senderId: currentUser?.id || "cust-current",
+                createdAt: optimisticMsg.createdAt,
+                isUnread: false,
+              },
+              updatedAt: new Date().toISOString(),
+            }
+            : c
+        )
+      );
+
+      let contentToSend = trimmed;
+      let messageTypeToSend: "TEXT" | "IMAGE" = "TEXT";
+
+      if (imageFile) {
+        try {
+          const uploadRes = await uploadChatAttachment(imageFile);
+          if (!uploadRes?.data?.imageUrl) {
+            throw new Error("Failed to upload image");
+          }
+          contentToSend = uploadRes.data.imageUrl;
+          messageTypeToSend = "IMAGE";
+        } catch {
+          toast.error("Failed to upload image");
+          setMessagesMap((prev) => ({
+            ...prev,
+            [selectedId]: (prev[selectedId] || []).filter((m) => m.id !== tempId),
+          }));
+          return;
+        }
+      }
+
       sendMessageMutation.mutate(
         {
           conversationId: selectedId,
           payload: {
-            content: trimmed,
-            messageType: "TEXT",
+            content: contentToSend,
+            messageType: messageTypeToSend,
           },
         },
         {
@@ -524,23 +564,6 @@ export default function CustomerChat() {
           },
         }
       );
-
-      setConversations((prev) =>
-        prev.map((c) =>
-          c.id === selectedId
-            ? {
-              ...c,
-              lastMessage: {
-                text: trimmed,
-                senderId: currentUser?.id || "cust-current",
-                createdAt: optimisticMsg.createdAt,
-                isUnread: false,
-              },
-              updatedAt: new Date().toISOString(),
-            }
-            : c
-        )
-      );
     } else {
       const targetRecipientId =
         selectedConversation?.participant?.id || queryRecipientId;
@@ -550,7 +573,7 @@ export default function CustomerChat() {
       }
 
       startConversationMutation.mutate(targetRecipientId, {
-        onSuccess: (convRes) => {
+        onSuccess: async (convRes) => {
           if (!convRes?.data?.id) {
             toast.error("Failed to start conversation");
             return;
@@ -578,7 +601,8 @@ export default function CustomerChat() {
             senderRole: "CUSTOMER",
             senderName: "You",
             text: trimmed,
-            type: "TEXT",
+            type: imageFile ? "IMAGE" : "TEXT",
+            imageUrl: imageFile ? URL.createObjectURL(imageFile) : undefined,
             status: "SENDING",
             createdAt: now.toLocaleTimeString([], {
               hour: "2-digit",
@@ -592,12 +616,33 @@ export default function CustomerChat() {
             [newConvId]: [optimisticMsg],
           }));
 
+          let contentToSend = trimmed;
+          let messageTypeToSend: "TEXT" | "IMAGE" = "TEXT";
+
+          if (imageFile) {
+            try {
+              const uploadRes = await uploadChatAttachment(imageFile);
+              if (!uploadRes?.data?.imageUrl) {
+                throw new Error("Failed to upload image");
+              }
+              contentToSend = uploadRes.data.imageUrl;
+              messageTypeToSend = "IMAGE";
+            } catch {
+              toast.error("Failed to upload image");
+              setMessagesMap((prev) => ({
+                ...prev,
+                [newConvId]: (prev[newConvId] || []).filter((m) => m.id !== tempId),
+              }));
+              return;
+            }
+          }
+
           sendMessageMutation.mutate(
             {
               conversationId: newConvId,
               payload: {
-                content: trimmed,
-                messageType: "TEXT",
+                content: contentToSend,
+                messageType: messageTypeToSend,
               },
             },
             {

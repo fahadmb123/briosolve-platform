@@ -94,3 +94,14 @@ export const markMessagesAsRead = async (conversationId: string): Promise<respon
     return res.data;
 };
 
+export const uploadChatAttachment = async (file: File): Promise<response<{ imageUrl: string }>> => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const res = await apiClient.post("/api/chat/upload", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    });
+    return res.data;
+};
+
