@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import type { ChatMessage } from "../types/chat.types";
 import { ChatMessageBubble } from "./ChatMessageBubble";
+import { ChatImageModal } from "./ChatImageModal";
 
 interface ChatMessageListProps {
   messages: ChatMessage[];
@@ -49,6 +50,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   currentRole = "CUSTOMER",
   currentUserId,
 }) => {
+  const [previewImage, setPreviewImage] = useState<{ url: string; caption?: string } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,12 +84,20 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
               message={msg}
               currentRole={currentRole}
               currentUserId={currentUserId}
+              onImageClick={(url, caption) => setPreviewImage({ url, caption })}
             />
           </React.Fragment>
         );
       })}
 
       <div ref={bottomRef} />
+
+      <ChatImageModal
+        isOpen={Boolean(previewImage)}
+        imageUrl={previewImage?.url || ""}
+        caption={previewImage?.caption}
+        onClose={() => setPreviewImage(null)}
+      />
     </div>
   );
 };

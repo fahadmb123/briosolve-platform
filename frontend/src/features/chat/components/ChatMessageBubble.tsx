@@ -5,12 +5,14 @@ interface ChatMessageBubbleProps {
   message: ChatMessage;
   currentRole?: "CUSTOMER" | "PROVIDER";
   currentUserId?: string;
+  onImageClick?: (imageUrl: string, caption?: string) => void;
 }
 
 export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
   message,
   currentRole = "CUSTOMER",
   currentUserId,
+  onImageClick,
 }) => {
   const isMe = currentUserId
     ? message.senderId === currentUserId
@@ -30,7 +32,19 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
 
       <div className="chat-bubble-container">
         {message.type === "IMAGE" && message.imageUrl ? (
-          <div className="chat-image-card">
+          <div
+            className="chat-image-card"
+            onClick={() => onImageClick?.(message.imageUrl!, message.text)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onImageClick?.(message.imageUrl!, message.text);
+              }
+            }}
+            title="Click to view full photo"
+          >
             <img
               src={message.imageUrl}
               alt={message.text || "Attached photo"}
