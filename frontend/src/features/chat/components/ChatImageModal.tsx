@@ -80,3 +80,4 @@ export const ChatImageModal: React.FC<ChatImageModalProps> = ({
     </div>
   );
 };
+
