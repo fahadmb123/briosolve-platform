@@ -30,6 +30,7 @@ import { useChatSocket } from "../../hooks/useChatSocket";
 import { useChatStore } from "../../stores/chat.store";
 import { socket } from "../../../../shared/api/socket-client";
 import "../CustomerChat/CustomerChat.css";
+import { playChatRecieveSound, playChatSendSound, playMessageSound } from "../../utils/sound.utils";
 
 export default function ProviderChat() {
   const currentUser = useAuthStore((state) => state.user);
@@ -289,7 +290,17 @@ export default function ProviderChat() {
         useChatStore.getState().setUnreadCount(totalUnread);
 
         return updated;
-      });
+      })
+
+      const isFromOther = String(backendMsg.sender_id).trim() !== String(currentUser?.id).trim();
+      const isViewingThisChat = String(selectedId).trim() === String(backendMsg.conversation_id).trim();
+      if (isFromOther) {
+        if (isViewingThisChat) {
+          playChatRecieveSound()
+        } else {
+          playMessageSound()
+        }
+      }
 
       if (String(selectedId).trim() === String(backendMsg.conversation_id).trim() && String(backendMsg.sender_id).trim() !== String(currentUser?.id).trim()) {
         markMessagesAsReadMutation.mutate(backendMsg.conversation_id);
@@ -517,6 +528,8 @@ export default function ProviderChat() {
           return;
         }
       }
+
+      playChatSendSound()
 
       sendMessageMutation.mutate(
         {

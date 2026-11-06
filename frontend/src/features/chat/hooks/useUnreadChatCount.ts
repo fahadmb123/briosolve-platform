@@ -3,6 +3,7 @@ import { socket } from "../../../shared/api/socket-client";
 import { useAuthStore } from "../../auth/stores/auth.store";
 import { useChatStore } from "../stores/chat.store";
 import { getConversations, type BackendMessageDto } from "../services/chat.service";
+import { playMessageSound } from "../utils/sound.utils";
 
 let lastFetchTime = 0;
 let inflightPromise: Promise<void> | null = null;
@@ -72,6 +73,7 @@ export function useChatUnreadSync(): void {
                 return;
             }
 
+            playMessageSound();
             useChatStore.getState().incrementUnreadCount(1);
             lastFetchTime = 0;
             refreshGlobalUnreadCount();
