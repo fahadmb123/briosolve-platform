@@ -6,8 +6,6 @@ import { CustomerProfile } from "../../domain/entities/customerProfile.entity"
 import { CustomerProfileMapper } from "../mappers/customerProfile.mapper"
 import { UpdateCustomerProfileInputDto } from "../../application/dtos/request/customer/update-customer-profile.dto";
 
-
-
 export class CustomerRepository implements ICustomerRepository {
     async createCustomerProfile(userId:string): Promise<void> {
         const existing = await db.orm.public.customer_profiles
@@ -27,7 +25,6 @@ export class CustomerRepository implements ICustomerRepository {
         await db.orm.public.customer_profiles.create({
             user_id: userId, 
             about: "",
-            service_radius_km: 20,
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant()
         } as never);
@@ -61,7 +58,6 @@ export class CustomerRepository implements ICustomerRepository {
                     user_id: input.id,
                     about: input.data.about || "",
                     profile_image: input.data.profile_image || null,
-                    service_radius_km: input.data.service_radius_km ?? 20,
                     created_at: Temporal.Now.instant(),
                     updated_at: Temporal.Now.instant()
                 } as never);

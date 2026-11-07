@@ -7,8 +7,6 @@ import { UserMapper } from "../mappers/user.mapper";
 import { CustomerProfileMapper } from "../mappers/customerProfile.mapper";
 import { RegisterCustomerInput } from "../../application/dtos/request/register-customer.dto";
 
-
-
 export class PrismaCustomerRepository implements ICustomerRepository {
 
     async createCustomer(data: RegisterCustomerInput): Promise<User> {
@@ -26,7 +24,6 @@ export class PrismaCustomerRepository implements ICustomerRepository {
             await tx.orm.public.customer_profiles.create({
                 user_id: user.id, 
                 about: "",
-                service_radius_km: 20,
             } as never)
 
             return UserMapper.toDomain(user)
