@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import "./MyRequests.css";
@@ -20,14 +20,9 @@ import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardS
 
 export default function MyRequests() {
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<StatusFilterType>("ALL");
-  const [sortBy, setSortBy] = useState<SortOrderType>("NEWEST");
   const [page, setPage] = useState<number>(1);
-  const [limit] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [, setTotal] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(0);
   const [counts, setCounts] = useState<Record<StatusFilterType, number>>({
     ALL: 0,
     DRAFT: 0,
@@ -40,6 +35,9 @@ export default function MyRequests() {
     EXPIRED: 0
   });
 
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilterType>("ALL");
+  const [sortBy, setSortBy] = useState<SortOrderType>("NEWEST");
   const [selectedRequestForDetails, setSelectedRequestForDetails] =
     useState<CustomerServiceRequestItem | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
@@ -53,30 +51,28 @@ export default function MyRequests() {
   const getRequestsMutation = useGetMyServiceRequests();
   const cancelMutation = useCancelServiceRequest();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
   const fetchRequests = useCallback(() => {
     getRequestsMutation.mutate(
       {
         page,
-        limit,
-        search: debouncedSearch.trim() || undefined,
+        limit: 10,
+        search: searchQuery.trim() || undefined,
         status: selectedStatus !== "ALL" ? selectedStatus : undefined,
         sortBy
       },
       {
         onSuccess: (res) => {
           if (res.data) {
-            setRequests(res.data.requests);
-            setTotal(res.data.total);
-            setTotalPages(res.data.totalPages);
-            if (res.data.counts) {
-              setCounts(res.data.counts as Record<StatusFilterType, number>);
+            const data = res.data;
+            if (Array.isArray(data)) {
+              setRequests(data);
+            } else {
+              setRequests(data.requests || []);
+              if (data.counts) {
+                setCounts((prev) => ({ ...prev, ...data.counts }));
+              }
+              if (data.total !== undefined) setTotal(data.total);
+              if (data.totalPages !== undefined) setTotalPages(data.totalPages);
             }
           }
         },
@@ -85,19 +81,19 @@ export default function MyRequests() {
         }
       }
     );
-  }, [page, limit, debouncedSearch, selectedStatus, sortBy]);
+  }, [page, searchQuery, selectedStatus, sortBy]);
 
   useEffect(() => {
     fetchRequests();
   }, [fetchRequests]);
 
-  const handleSearchChange = (val: string) => {
-    setSearchQuery(val);
+  const handleStatusChange = (status: StatusFilterType) => {
+    setSelectedStatus(status);
     setPage(1);
   };
 
-  const handleStatusChange = (status: StatusFilterType) => {
-    setSelectedStatus(status);
+  const handleSearchChange = (q: string) => {
+    setSearchQuery(q);
     setPage(1);
   };
 
@@ -152,19 +148,7 @@ export default function MyRequests() {
     cancelMutation.mutate(selectedRequestForCancel.id, {
       onSuccess: () => {
         toast.success("Service request cancelled");
-        setRequests((prev) =>
-          prev.map((r) =>
-            r.id === selectedRequestForCancel.id
-              ? { ...r, status: "CANCELLED" }
-              : r
-          )
-        );
         handleCloseCancel();
-        if (selectedRequestForDetails?.id === selectedRequestForCancel.id) {
-          setSelectedRequestForDetails((prev) =>
-            prev ? { ...prev, status: "CANCELLED" } : null
-          );
-        }
         fetchRequests();
       },
       onError: () => {
@@ -173,9 +157,27 @@ export default function MyRequests() {
     });
   };
 
-  const pageNumbers = useMemo(() => {
-    return Array.from({ length: totalPages }, (_, index) => index + 1);
-  }, [totalPages]);
+  const paginationItems = useMemo(() => {
+    const cleanItems: (number | string)[] = [];
+    let last = 0;
+
+    for (let i = 1; i <= totalPages; i++) {
+      let shouldInclude = false;
+      if (i === 1 || i === totalPages) shouldInclude = true;
+      else if (page <= 2 && i <= 3) shouldInclude = true;
+      else if (page >= totalPages - 1 && i >= totalPages - 2) shouldInclude = true;
+      else if (i >= page - 1 && i <= page + 1) shouldInclude = true;
+
+      if (shouldInclude) {
+        if (last && i - last > 1) {
+          cleanItems.push("...");
+        }
+        cleanItems.push(i);
+        last = i;
+      }
+    }
+    return cleanItems;
+  }, [page, totalPages]);
 
   const isLoading = getRequestsMutation.isPending && requests.length === 0;
 
@@ -218,7 +220,7 @@ export default function MyRequests() {
           <div className="myreq-empty-symbol">
             <i className="fas fa-clipboard-list"></i>
           </div>
-          {counts.ALL === 0 && !searchQuery ? (
+          {searchQuery === "" && selectedStatus === "ALL" ? (
             <>
               <h3 className="myreq-empty-title">No service requests yet</h3>
               <p className="myreq-empty-text">
@@ -276,16 +278,22 @@ export default function MyRequests() {
                   <i className="fas fa-chevron-left"></i>
                 </button>
 
-                {pageNumbers.map((pageNumber) => (
-                  <button
-                    key={pageNumber}
-                    type="button"
-                    className={`myreq-page-btn ${page === pageNumber ? "active" : ""}`}
-                    onClick={() => setPage(pageNumber)}
-                  >
-                    {pageNumber}
-                  </button>
-                ))}
+                {paginationItems.map((item, idx) =>
+                  item === "..." ? (
+                    <span key={`ellipsis-${idx}`} className="myreq-page-ellipsis">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      className={`myreq-page-btn ${page === item ? "active" : ""}`}
+                      onClick={() => setPage(item as number)}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
 
                 <button
                   type="button"

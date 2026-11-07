@@ -1,8 +1,9 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
 import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
+import { AdminPagination } from "../../../admin/components/AdminPagination";
 import {
   useGetAdminServiceRequests,
   useAdminCancelServiceRequest
@@ -86,10 +87,6 @@ export default function AdminServiceRequests() {
       }
     });
   }, [requestToCancel, cancelMutation, selectedRequest]);
-
-  const pageNumbers = useMemo(() => {
-    return Array.from({ length: totalPages }, (_, index) => index + 1);
-  }, [totalPages]);
 
   const getStatusBadge = (status: CustomerServiceRequestItem["status"]) => {
     switch (status) {
@@ -313,44 +310,13 @@ export default function AdminServiceRequests() {
               </tbody>
             </table>
           </div>
-
-          <div className="admin-pagination">
-            <div>
-              Showing <strong>{` ${page} of ${totalPages || 1} pages`}</strong>
-            </div>
-
-            <div className="pagination-controls">
-              <button
-                type="button"
-                className="page-btn"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                <i className="fas fa-chevron-left"></i>
-              </button>
-
-              {pageNumbers.map((pageNumber) => (
-                <button
-                  key={pageNumber}
-                  type="button"
-                  className={`page-btn ${page === pageNumber ? "active" : ""}`}
-                  onClick={() => setPage(pageNumber)}
-                >
-                  {pageNumber}
-                </button>
-              ))}
-
-              <button
-                type="button"
-                className="page-btn"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              >
-                <i className="fas fa-chevron-right"></i>
-              </button>
-            </div>
-          </div>
         </div>
+
+        <AdminPagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       </div>
 
       <div className={`admin-modal-overlay ${selectedRequest ? "active" : ""}`}>

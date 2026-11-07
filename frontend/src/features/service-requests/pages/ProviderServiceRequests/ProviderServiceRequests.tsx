@@ -107,9 +107,27 @@ export default function ProviderServiceRequests() {
     return requests.find((r) => r.id === selectedRequest.id) || selectedRequest;
   }, [selectedRequest, requests]);
 
-  const pageNumbers = useMemo(() => {
-    return Array.from({ length: totalPages }, (_, index) => index + 1);
-  }, [totalPages]);
+  const paginationItems = useMemo(() => {
+    const cleanItems: (number | string)[] = [];
+    let last = 0;
+
+    for (let i = 1; i <= totalPages; i++) {
+      let shouldInclude = false;
+      if (i === 1 || i === totalPages) shouldInclude = true;
+      else if (page <= 2 && i <= 3) shouldInclude = true;
+      else if (page >= totalPages - 1 && i >= totalPages - 2) shouldInclude = true;
+      else if (i >= page - 1 && i <= page + 1) shouldInclude = true;
+
+      if (shouldInclude) {
+        if (last && i - last > 1) {
+          cleanItems.push("...");
+        }
+        cleanItems.push(i);
+        last = i;
+      }
+    }
+    return cleanItems;
+  }, [page, totalPages]);
 
   const handleQuoteClick = (req: CustomerServiceRequestItem) => {
     setSelectedRequest(req);
@@ -278,16 +296,22 @@ export default function ProviderServiceRequests() {
                   <i className="fas fa-chevron-left"></i>
                 </button>
 
-                {pageNumbers.map((pageNumber) => (
-                  <button
-                    key={pageNumber}
-                    type="button"
-                    className={`provreq-page-btn ${page === pageNumber ? "active" : ""}`}
-                    onClick={() => setPage(pageNumber)}
-                  >
-                    {pageNumber}
-                  </button>
-                ))}
+                {paginationItems.map((item, idx) =>
+                  item === "..." ? (
+                    <span key={`ellipsis-${idx}`} className="provreq-page-ellipsis">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      className={`provreq-page-btn ${page === item ? "active" : ""}`}
+                      onClick={() => setPage(item as number)}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
 
                 <button
                   type="button"
