@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './ResetPassword.css';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { Link } from 'react-router-dom';
@@ -7,12 +6,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { resetPasswordSchema, type ResetPasswordInputType } from '../../schemas/validation';
 import { useResetPassword } from '../../hooks/use-otp-varify';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
+import { PasswordInput } from '../../../../shared/components/ui/PasswordInput/PasswordInput';
 
 export default function ResetPassword() {
     const {toggleTheme} = useTheme()
     const resetPassword = useResetPassword()
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordInputType>({
         resolver: zodResolver(resetPasswordSchema),
@@ -49,44 +47,23 @@ export default function ResetPassword() {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="form-group mb-4">
                             <label className="form-label" htmlFor="new-password">New Password</label>
-                            <div className="input-icon-wrapper">
-                                <i className="fas fa-lock"></i>
-                                <input {...register("password")} type={showPassword ? "text" : "password"} id="new-password" className={`form-control ${errors.password ? 'is-invalid border-danger' : ''}`} placeholder="At least 6 characters" />
-                                <button 
-                                    type="button" 
-                                    className="toggle-password" 
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    aria-label="Toggle Password Visibility"
-                                >
-                                    <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                                </button>
-                            </div>
-                            {errors.password && (
-                                <span className="field-error text-xs text-danger mt-1 block">
-                                    {errors.password.message}
-                                </span>
-                            )}
+                            <PasswordInput
+                                id="new-password"
+                                placeholder="At least 6 characters"
+                                error={errors.password?.message}
+                                {...register("password")}
+                            />
                         </div>
 
                         <div className="form-group mb-6">
                             <label className="form-label" htmlFor="confirm-new-password">Confirm New Password</label>
-                            <div className="input-icon-wrapper">
-                                <i className="fas fa-check-double"></i>
-                                <input {...register("confirmPassword")} type={showConfirmPassword ? "text" : "password"} id="confirm-new-password" className={`form-control ${errors.confirmPassword ? 'is-invalid border-danger' : ''}`} placeholder="Repeat your new password" />
-                                <button 
-                                    type="button" 
-                                    className="toggle-password" 
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    aria-label="Toggle Confirm Password Visibility"
-                                >
-                                    <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                                </button>
-                            </div>
-                            {errors.confirmPassword && (
-                                <span className="field-error text-xs text-danger mt-1 block">
-                                    {errors.confirmPassword.message}
-                                </span>
-                            )}
+                            <PasswordInput
+                                id="confirm-new-password"
+                                icon="fas fa-check-double"
+                                placeholder="Repeat your new password"
+                                error={errors.confirmPassword?.message}
+                                {...register("confirmPassword")}
+                            />
                         </div>
 
                         <button type="submit" className="btn btn-primary w-full btn-lg mb-5">

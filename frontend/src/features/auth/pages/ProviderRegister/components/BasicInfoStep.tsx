@@ -1,9 +1,9 @@
-
 import { useFormContext } from 'react-hook-form';
 import type { ProviderRegistrationInputType } from '../../../schemas/provider/providerRegistration.schema';
 import { usePreRegisterProvider } from '../../../hooks/provider/usePreRegisterProvider';
 import { OtpModal } from './OtpModal';
 import { useState } from 'react';
+import { PasswordInput } from '../../../../../shared/components/ui/PasswordInput/PasswordInput';
 
 interface BasicInfoStepProps {
     isActive: boolean;
@@ -12,9 +12,9 @@ interface BasicInfoStepProps {
 
 export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
     const { register, formState: { errors }, trigger, getValues } = useFormContext<ProviderRegistrationInputType>();
-    const [showOtpModal, setShowOtpModal] = useState(false)
-    const preRegisterMutation = usePreRegisterProvider()
-    const [isEmailVarified,setIsEmailVarified] = useState(false)
+    const [showOtpModal, setShowOtpModal] = useState(false);
+    const preRegisterMutation = usePreRegisterProvider();
+    const [isEmailVarified, setIsEmailVarified] = useState(false);
     
     if (!isActive) return null;
 
@@ -45,7 +45,7 @@ export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
     };
 
     const handleOtpSuccess = () => {
-        setIsEmailVarified(true)
+        setIsEmailVarified(true);
         setShowOtpModal(false);
         onNext();
     };
@@ -95,32 +95,22 @@ export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
             <div className="grid-2 gap-4 mb-4">
                 <div className="form-group">
                     <label className="form-label" htmlFor="password">Password <span className="text-danger">*</span></label>
-                    <div className="input-with-icon">
-                        <i className="fas fa-lock input-icon"></i>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            className={`form-control ${errors.password ? 'border-danger' : ''}`} 
-                            placeholder="••••••••" 
-                            {...register("password")}
-                        />
-                    </div>
-                    {errors.password && <span className="text-danger text-xs mt-1 block">{errors.password.message}</span>}
+                    <PasswordInput 
+                        id="password" 
+                        placeholder="••••••••" 
+                        error={errors.password?.message}
+                        {...register("password")}
+                    />
                 </div>
 
                 <div className="form-group">
                     <label className="form-label" htmlFor="confirmPassword">Confirm Password <span className="text-danger">*</span></label>
-                    <div className="input-with-icon">
-                        <i className="fas fa-lock input-icon"></i>
-                        <input 
-                            type="password" 
-                            id="confirmPassword" 
-                            className={`form-control ${errors.confirmPassword ? 'border-danger' : ''}`} 
-                            placeholder="••••••••" 
-                            {...register("confirmPassword")}
-                        />
-                    </div>
-                    {errors.confirmPassword && <span className="text-danger text-xs mt-1 block">{errors.confirmPassword.message}</span>}
+                    <PasswordInput 
+                        id="confirmPassword" 
+                        placeholder="••••••••" 
+                        error={errors.confirmPassword?.message}
+                        {...register("confirmPassword")}
+                    />
                 </div>
             </div>
 
