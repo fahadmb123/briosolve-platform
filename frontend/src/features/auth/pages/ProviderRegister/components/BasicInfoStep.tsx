@@ -3,6 +3,7 @@ import type { ProviderRegistrationInputType } from '../../../schemas/provider/pr
 import { usePreRegisterProvider } from '../../../hooks/provider/usePreRegisterProvider';
 import { OtpModal } from './OtpModal';
 import { useState } from 'react';
+import { PasswordInput } from '../../../../../shared/components/ui/PasswordInput/PasswordInput';
 
 interface BasicInfoStepProps {
     isActive: boolean;
@@ -14,8 +15,6 @@ export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
     const [showOtpModal, setShowOtpModal] = useState(false);
     const preRegisterMutation = usePreRegisterProvider();
     const [isEmailVarified, setIsEmailVarified] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     
     if (!isActive) return null;
 
@@ -96,50 +95,22 @@ export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
             <div className="grid-2 gap-4 mb-4">
                 <div className="form-group">
                     <label className="form-label" htmlFor="password">Password <span className="text-danger">*</span></label>
-                    <div className="input-with-icon">
-                        <i className="fas fa-lock input-icon"></i>
-                        <input 
-                            type={showPassword ? "text" : "password"} 
-                            id="password" 
-                            className={`form-control ${errors.password ? 'border-danger' : ''}`} 
-                            placeholder="••••••••" 
-                            {...register("password")}
-                        />
-                        <button 
-                            type="button" 
-                            className="toggle-password" 
-                            onClick={() => setShowPassword(!showPassword)}
-                            aria-label="Toggle Password Visibility"
-                            style={{ background: 'none', border: 'none', position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-secondary)', zIndex: 3 }}
-                        >
-                            <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                        </button>
-                    </div>
-                    {errors.password && <span className="text-danger text-xs mt-1 block">{errors.password.message}</span>}
+                    <PasswordInput 
+                        id="password" 
+                        placeholder="••••••••" 
+                        error={errors.password?.message}
+                        {...register("password")}
+                    />
                 </div>
 
                 <div className="form-group">
                     <label className="form-label" htmlFor="confirmPassword">Confirm Password <span className="text-danger">*</span></label>
-                    <div className="input-with-icon">
-                        <i className="fas fa-lock input-icon"></i>
-                        <input 
-                            type={showConfirmPassword ? "text" : "password"} 
-                            id="confirmPassword" 
-                            className={`form-control ${errors.confirmPassword ? 'border-danger' : ''}`} 
-                            placeholder="••••••••" 
-                            {...register("confirmPassword")}
-                        />
-                        <button 
-                            type="button" 
-                            className="toggle-password" 
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            aria-label="Toggle Confirm Password Visibility"
-                            style={{ background: 'none', border: 'none', position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-secondary)', zIndex: 3 }}
-                        >
-                            <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                        </button>
-                    </div>
-                    {errors.confirmPassword && <span className="text-danger text-xs mt-1 block">{errors.confirmPassword.message}</span>}
+                    <PasswordInput 
+                        id="confirmPassword" 
+                        placeholder="••••••••" 
+                        error={errors.confirmPassword?.message}
+                        {...register("confirmPassword")}
+                    />
                 </div>
             </div>
 

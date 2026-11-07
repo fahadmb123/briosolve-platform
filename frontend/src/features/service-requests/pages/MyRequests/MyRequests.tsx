@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import "./MyRequests.css";
@@ -17,6 +17,7 @@ import {
   type SortOrderType
 } from "../../components/my-requests";
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
+import { Pagination } from "../../../../shared/components/ui/Pagination/Pagination";
 
 export default function MyRequests() {
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
@@ -157,28 +158,6 @@ export default function MyRequests() {
     });
   };
 
-  const paginationItems = useMemo(() => {
-    const cleanItems: (number | string)[] = [];
-    let last = 0;
-
-    for (let i = 1; i <= totalPages; i++) {
-      let shouldInclude = false;
-      if (i === 1 || i === totalPages) shouldInclude = true;
-      else if (page <= 2 && i <= 3) shouldInclude = true;
-      else if (page >= totalPages - 1 && i >= totalPages - 2) shouldInclude = true;
-      else if (i >= page - 1 && i <= page + 1) shouldInclude = true;
-
-      if (shouldInclude) {
-        if (last && i - last > 1) {
-          cleanItems.push("...");
-        }
-        cleanItems.push(i);
-        last = i;
-      }
-    }
-    return cleanItems;
-  }, [page, totalPages]);
-
   const isLoading = getRequestsMutation.isPending && requests.length === 0;
 
   return (
@@ -265,48 +244,13 @@ export default function MyRequests() {
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="myreq-pagination-row">
-              <div className="myreq-pagination-controls">
-                <button
-                  type="button"
-                  className="myreq-page-btn"
-                  disabled={page === 1}
-                  onClick={() => setPage(page - 1)}
-                  aria-label="Previous Page"
-                >
-                  <i className="fas fa-chevron-left"></i>
-                </button>
-
-                {paginationItems.map((item, idx) =>
-                  item === "..." ? (
-                    <span key={`ellipsis-${idx}`} className="myreq-page-ellipsis">
-                      ...
-                    </span>
-                  ) : (
-                    <button
-                      key={item}
-                      type="button"
-                      className={`myreq-page-btn ${page === item ? "active" : ""}`}
-                      onClick={() => setPage(item as number)}
-                    >
-                      {item}
-                    </button>
-                  )
-                )}
-
-                <button
-                  type="button"
-                  className="myreq-page-btn"
-                  disabled={page === totalPages}
-                  onClick={() => setPage(page + 1)}
-                  aria-label="Next Page"
-                >
-                  <i className="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            showTotalText={false}
+            className="justify-center"
+          />
         </>
       )}
 

@@ -1,5 +1,6 @@
 import React from "react";
 import type { User } from "../../types/profile.types";
+import { StatusBadge } from "../../../../shared/components/ui/StatusBadge";
 
 interface ProviderRowProps {
     provider: User;
@@ -35,28 +36,10 @@ const ProviderRow = React.memo<ProviderRowProps>(({ provider, onView, onToggleSt
                 </span>
             </td>
             <td>
-                <span className={`badge ${
-                    kycStatus === 'APPROVED' ? 'badge-verified' : 
-                    kycStatus === 'PENDING' ? 'badge-pending' : 
-                    kycStatus === 'REJECTED' ? 'badge-danger-alert' : 
-                    'badge-secondary'
-                }`}>
-                    <i className={`fas ${
-                        kycStatus === 'APPROVED' ? 'fa-check-circle mr-1' :
-                        kycStatus === 'PENDING' ? 'fa-clock mr-1' :
-                        kycStatus === 'REJECTED' ? 'fa-times-circle mr-1' :
-                        'fa-circle mr-1'
-                    }`}></i>
-                    {kycStatus === 'APPROVED' ? 'Verified' :
-                     kycStatus === 'PENDING' ? 'In Review' :
-                     kycStatus === 'REJECTED' ? 'Rejected' :
-                     'Not Submitted'}
-                </span>
+                <StatusBadge status={kycStatus} />
             </td>
             <td>
-                <span className={`badge ${provider.status === 'ACTIVE' ? 'badge-verified' : provider.status === 'BLOCKED' ? 'badge-danger-alert' : 'badge-pending'}`}>
-                    {provider.status === 'ACTIVE' ? 'Active' : provider.status === 'BLOCKED' ? 'Suspended' : provider.status}
-                </span>
+                <StatusBadge status={provider.status} icon="" />
             </td>
             <td className="text-right">
                 <div className="flex items-center justify-end gap-2">

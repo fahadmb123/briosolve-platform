@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useForm } from 'react-hook-form';
@@ -7,12 +6,11 @@ import { loginSchema, type LoginInputType } from '../../schemas/validation';
 import './Login.css';
 import { useLogin } from '../../hooks/use-otp-varify';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
-
+import { PasswordInput } from '../../../../shared/components/ui/PasswordInput/PasswordInput';
 
 export default function Login() {
-    const { toggleTheme } = useTheme()
-    const login = useLogin()
-    const [showPassword, setShowPassword] = useState(false);
+    const { toggleTheme } = useTheme();
+    const login = useLogin();
 
     const {
         register,
@@ -21,14 +19,13 @@ export default function Login() {
     } = useForm<LoginInputType>({
         resolver: zodResolver(loginSchema),
         mode: "onChange"
-    })
+    });
 
     const handleLogin = (data: LoginInputType) => {
         login.mutate(data);
-    }
+    };
 
     return (
-        
         <div className="auth-page-wrapper">
             <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
                 <i className="fas fa-sun"></i>
@@ -36,7 +33,6 @@ export default function Login() {
             {login.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
             <div className="auth-card-container">
                 <div className="auth-card">
-                    
                     <div className="auth-form-header">
                         <Link to="/" className="brand-logo-container justify-center mb-4" aria-label="Briosolve Home">
                             <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
@@ -64,30 +60,15 @@ export default function Login() {
 
                         <div className="form-group mb-4">
                             <label className="form-label" htmlFor="password">Password</label>
-                            <div className="input-icon-wrapper">
-                                <i className="fas fa-lock"></i>
-                                <input 
-                                    type={showPassword ? "text" : "password"} 
-                                    id="password" 
-                                    className={`form-control ${errors.password ? 'border-danger' : ''}`}
-                                    placeholder="••••••••" 
-                                    {...register("password")}
-                                />
-                                <button 
-                                    type="button" 
-                                    className="toggle-password" 
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    aria-label="Toggle Password Visibility"
-                                    style={{ background: 'none', border: 'none', position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-secondary)' }}
-                                >
-                                    <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                                </button>
-                            </div>
-                            {errors.password && <div className="text-danger text-xs mt-2">{errors.password.message}</div>}
+                            <PasswordInput
+                                id="password"
+                                placeholder="••••••••"
+                                error={errors.password?.message}
+                                {...register("password")}
+                            />
                         </div>
 
                         <div className="flex items-center justify-between mb-6">
-                            
                             <Link to="/forgot-password" className="text-primary font-medium text-xs">Forgot Password?</Link>
                         </div>
 
@@ -101,7 +82,6 @@ export default function Login() {
                 </div>
             </div>
             
-            {/* Floating Home Box */}
             <div className="navbar-action-box always-visible" style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 100 }}>
                 <Link to="/" className="btn btn-outline btn-sm" style={{ borderRadius: '2rem' }}>
                     <i className="fas fa-home mr-1"></i> Home

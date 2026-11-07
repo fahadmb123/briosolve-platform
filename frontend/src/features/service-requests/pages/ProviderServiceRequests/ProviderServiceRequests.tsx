@@ -7,6 +7,7 @@ import { ProviderRequestCard, ProviderRequestDetailsModal } from "../../componen
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
+import { Pagination } from "../../../../shared/components/ui/Pagination/Pagination";
 import "./ProviderServiceRequests.css";
 
 export default function ProviderServiceRequests() {
@@ -106,28 +107,6 @@ export default function ProviderServiceRequests() {
     if (!selectedRequest) return null;
     return requests.find((r) => r.id === selectedRequest.id) || selectedRequest;
   }, [selectedRequest, requests]);
-
-  const paginationItems = useMemo(() => {
-    const cleanItems: (number | string)[] = [];
-    let last = 0;
-
-    for (let i = 1; i <= totalPages; i++) {
-      let shouldInclude = false;
-      if (i === 1 || i === totalPages) shouldInclude = true;
-      else if (page <= 2 && i <= 3) shouldInclude = true;
-      else if (page >= totalPages - 1 && i >= totalPages - 2) shouldInclude = true;
-      else if (i >= page - 1 && i <= page + 1) shouldInclude = true;
-
-      if (shouldInclude) {
-        if (last && i - last > 1) {
-          cleanItems.push("...");
-        }
-        cleanItems.push(i);
-        last = i;
-      }
-    }
-    return cleanItems;
-  }, [page, totalPages]);
 
   const handleQuoteClick = (req: CustomerServiceRequestItem) => {
     setSelectedRequest(req);
@@ -283,48 +262,13 @@ export default function ProviderServiceRequests() {
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="provreq-pagination-row">
-              <div className="provreq-pagination-controls">
-                <button
-                  type="button"
-                  className="provreq-page-btn"
-                  disabled={page === 1}
-                  onClick={() => setPage(page - 1)}
-                  aria-label="Previous Page"
-                >
-                  <i className="fas fa-chevron-left"></i>
-                </button>
-
-                {paginationItems.map((item, idx) =>
-                  item === "..." ? (
-                    <span key={`ellipsis-${idx}`} className="provreq-page-ellipsis">
-                      ...
-                    </span>
-                  ) : (
-                    <button
-                      key={item}
-                      type="button"
-                      className={`provreq-page-btn ${page === item ? "active" : ""}`}
-                      onClick={() => setPage(item as number)}
-                    >
-                      {item}
-                    </button>
-                  )
-                )}
-
-                <button
-                  type="button"
-                  className="provreq-page-btn"
-                  disabled={page === totalPages}
-                  onClick={() => setPage(page + 1)}
-                  aria-label="Next Page"
-                >
-                  <i className="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            showTotalText={false}
+            className="justify-center"
+          />
         </>
       )}
 
