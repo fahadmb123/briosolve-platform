@@ -73,33 +73,15 @@ export default function AdminLayout() {
                 <ul className="sidebar-menu">
                     <li>
                         <NavLink to="/admin/categories" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-                            <i className="fas fa-th-large"></i>
+                            <i className="fas fa-layer-group"></i>
                             <span>Categories</span>
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/admin/services" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-                            <i className="fas fa-concierge-bell"></i>
+                            <i className="fas fa-tools"></i>
                             <span>Services</span>
                         </NavLink>
-                    </li>
-                    <li>
-                        <Link to="#" className="sidebar-item">
-                            <i className="fas fa-box-open"></i>
-                            <span>Products</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="#" className="sidebar-item">
-                            <i className="fas fa-tags"></i>
-                            <span>Product Categories</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="#" className="sidebar-item">
-                            <i className="fas fa-shopping-cart"></i>
-                            <span>Product Orders</span>
-                        </Link>
                     </li>
                 </ul>
 
