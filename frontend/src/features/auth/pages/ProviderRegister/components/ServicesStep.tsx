@@ -27,18 +27,20 @@ export function ServicesStep({ isActive, onNext, onBack }: ServicesStepProps) {
     const [hasFetched, setHasFetched] = useState(false);
 
     useEffect(() => {
-        if (isActive && !hasFetched) {
-            setHasFetched(true);
-            getCategories.mutate({ page: 1, limit: 100, filter: 'ACTIVE' }, {
-                onSuccess: (res) => {
-                    const activeCats = (res.data?.categories || []).map((cat: any) => ({
-                        ...cat,
-                        services: (cat.services || []).filter((s: any) => s.status === 'ACTIVE')
-                    }));
-                    setCategories(activeCats);
-                }
-            });
-        }
+        (()=>{
+            if (isActive && !hasFetched) {
+                setHasFetched(true);
+                getCategories.mutate({ page: 1, limit: 100, filter: 'ACTIVE' }, {
+                    onSuccess: (res) => {
+                        const activeCats = (res.data?.categories || []).map((cat: any) => ({
+                            ...cat,
+                            services: (cat.services || []).filter((s: any) => s.status === 'ACTIVE')
+                        }));
+                        setCategories(activeCats);
+                    }
+                });
+            }
+        })()
     }, [isActive, hasFetched]);
 
     if (!isActive) return null;

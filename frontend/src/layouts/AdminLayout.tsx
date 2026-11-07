@@ -57,7 +57,6 @@ export default function AdminLayout() {
                         <NavLink to="/admin/verification" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-user-check"></i>
                             <span>Verification</span>
-                            <span className="badge badge-warning ml-auto">18</span>
                         </NavLink>
                     </li>
 
