@@ -64,7 +64,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       </div>
 
       <div className="chat-header-actions">
-        {participant.phone && (
+        {/*participant.phone && (
           <a
             href={`tel:${participant.phone}`}
             className="chat-action-btn phone"
@@ -73,7 +73,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             <i className="fas fa-phone-alt" />
             <span className="chat-btn-text">Call</span>
           </a>
-        )}
+        )*/}
 
         <button
           type="button"
