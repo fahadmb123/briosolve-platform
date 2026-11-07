@@ -11,6 +11,8 @@ export function buildServiceRequestRoute(controller: ServiceRequestRouteDependen
 
     router.get("/", authMiddleware, requireRole(["CUSTOMER"]), controller.serviceRequest.getMyServiceRequests);
     router.get("/provider", authMiddleware, requireRole(["PROVIDER"]), controller.serviceRequest.getProviderServiceRequests);
+    router.get("/admin", authMiddleware, requireRole(["ADMIN"]), controller.serviceRequest.getAdminServiceRequests);
+    router.patch("/:id/admin-cancel", authMiddleware, requireRole(["ADMIN"]), controller.serviceRequest.adminCancelServiceRequest);
     router.post("/", authMiddleware, requireRole(["CUSTOMER"]), validate(createServiceRequestSchema), controller.serviceRequest.createServiceRequest);
     router.put("/:id", authMiddleware, requireRole(["CUSTOMER"]), validate(updateServiceRequestSchema), controller.serviceRequest.updateServiceRequest);
     router.patch("/:id/cancel", authMiddleware, requireRole(["CUSTOMER"]), controller.serviceRequest.cancelServiceRequest);

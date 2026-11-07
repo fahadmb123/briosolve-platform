@@ -746,6 +746,8 @@ export default function ProviderChat() {
                   <ChatMessageListSkeleton />
                 ) : (
                   <ChatMessageList
+                    key={selectedConversation.id}
+                    conversationId={selectedConversation.id}
                     messages={activeMessages}
                     currentRole="PROVIDER"
                     currentUserId={currentUser?.id}

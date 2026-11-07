@@ -1,5 +1,7 @@
 import { useState, type FC } from "react";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
+import { useAuthStore } from "../../../auth/stores/auth.store";
+import { calculateDistanceKm, formatDistance } from "../../utils/distance.utils";
 
 interface ProviderRequestDetailsModalProps {
   request: CustomerServiceRequestItem | null;
@@ -21,6 +23,9 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
   isChatLoading = false,
 }) => {
   const [copiedId, setCopiedId] = useState<boolean>(false);
+  const [copiedAddress, setCopiedAddress] = useState<boolean>(false);
+
+  const user = useAuthStore((state) => state.user);
 
   if (!isOpen || !request) return null;
 
@@ -29,6 +34,49 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
     setCopiedId(true);
     setTimeout(() => setCopiedId(false), 2000);
   };
+
+  const address = request.address_details;
+  const fullAddressString = address
+    ? [
+        address.house_no,
+        address.landmark ? `Near ${address.landmark}` : null,
+        address.area,
+        address.city,
+        address.district,
+        address.state,
+        address.pincode,
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : "Local client service area";
+
+  const copyAddress = () => {
+    navigator.clipboard.writeText(fullAddressString);
+    setCopiedAddress(true);
+    setTimeout(() => setCopiedAddress(false), 2000);
+  };
+
+  const providerAddress = user?.current_address_id;
+  const providerLat = providerAddress?.latitude != null ? Number(providerAddress.latitude) : null;
+  const providerLng = providerAddress?.longitude != null ? Number(providerAddress.longitude) : null;
+  const serviceRadiusKm = user?.provider_profile?.service_radius_km ?? 20;
+
+  const reqLat = address?.latitude != null ? Number(address.latitude) : null;
+  const reqLng = address?.longitude != null ? Number(address.longitude) : null;
+
+  const computedDistance =
+    request.distance_km ??
+    (providerLat != null && providerLng != null && reqLat != null && reqLng != null
+      ? calculateDistanceKm(providerLat, providerLng, reqLat, reqLng)
+      : null);
+
+  const formattedDist = formatDistance(computedDistance);
+  const isWithinRadius = computedDistance !== null ? computedDistance <= serviceRadiusKm : true;
+
+  const mapsUrl =
+    reqLat != null && reqLng != null
+      ? `https://www.google.com/maps/search/?api=1&query=${reqLat},${reqLng}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddressString)}`;
 
   const getUrgencyText = () => {
     if (request.specific_date) {
@@ -58,12 +106,8 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
     year: "numeric",
   });
 
-  const address = request.address_details;
-  const fullAddressString = address
-    ? [address.house_no, address.landmark, address.area, address.city, address.district, address.state, address.pincode]
-        .filter(Boolean)
-        .join(", ")
-    : "Local client service area";
+  const customer = request.customer_details;
+  const customerInitial = (customer?.name || "Customer").charAt(0).toUpperCase();
 
   return (
     <div className="provreq-modal-overlay" onClick={onClose}>
@@ -121,6 +165,68 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
         </div>
 
         <div className="provreq-modal-content-scroll">
+          <div className="provreq-customer-card">
+            <div className="provreq-customer-left">
+              {customer?.profile_image ? (
+                <img
+                  src={customer.profile_image}
+                  alt={customer.name}
+                  className="provreq-customer-avatar-img"
+                />
+              ) : (
+                <div className="provreq-customer-avatar-placeholder">
+                  {customerInitial}
+                </div>
+              )}
+              <div className="provreq-customer-meta">
+                <div className="provreq-customer-name-row">
+                  <span className="provreq-customer-name">
+                    {customer?.name || "Customer"}
+                  </span>
+                  <span className="provreq-customer-verified-tag">
+                    <i className="fas fa-check-circle"></i>
+                    <span>Verified Customer</span>
+                  </span>
+                </div>
+                <div className="provreq-customer-contacts">
+                  {customer?.phone && (
+                    <a
+                      href={`tel:${customer.phone}`}
+                      className="provreq-customer-contact-chip"
+                      title="Call customer"
+                    >
+                      <i className="fas fa-phone-alt"></i>
+                      <span>{customer.phone}</span>
+                    </a>
+                  )}
+                  {customer?.email && (
+                    <a
+                      href={`mailto:${customer.email}`}
+                      className="provreq-customer-contact-chip"
+                      title="Email customer"
+                    >
+                      <i className="fas fa-envelope"></i>
+                      <span>{customer.email}</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {request.status !== "CANCELLED" && onChat && (
+              <button
+                type="button"
+                className="provreq-customer-chat-btn"
+                onClick={() => onChat(request)}
+                disabled={isChatLoading}
+                title="Send a message to this customer"
+              >
+                <i className={`fas ${isChatLoading ? "fa-spinner fa-spin" : "fa-comment-dots"}`}></i>
+                <span>Message</span>
+              </button>
+            )}
+          </div>
+
           <div className="provreq-detail-section">
             <h4 className="provreq-section-heading">
               <i className="fas fa-align-left"></i>
@@ -179,19 +285,107 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
           <div className="provreq-detail-section">
             <h4 className="provreq-section-heading">
               <i className="fas fa-map-marker-alt"></i>
-              <span>Service Location</span>
+              <span>Customer Address & Distance</span>
             </h4>
-            <div className="provreq-location-box">
-              <div className="provreq-location-main">
-                <strong>{address?.area || "Local Area"}, {address?.city || "City"}</strong>
-                <p>{fullAddressString}</p>
-              </div>
-              {address?.landmark && (
-                <div className="provreq-landmark-chip">
-                  <i className="fas fa-map-pin"></i>
-                  <span>Near: {address.landmark}</span>
+
+            <div className={`provreq-distance-banner ${isWithinRadius ? "in-radius" : "out-radius"}`}>
+              <div className="provreq-distance-left">
+                <div className="provreq-distance-icon-wrap">
+                  <i className="fas fa-location-arrow"></i>
                 </div>
-              )}
+                <div>
+                  <div className="provreq-distance-number-row">
+                    <span className="provreq-distance-number">
+                      {formattedDist ? `${formattedDist} away` : "Distance estimated upon dispatch"}
+                    </span>
+                    {computedDistance !== null && (
+                      <span className={`provreq-radius-badge ${isWithinRadius ? "badge-success" : "badge-warning"}`}>
+                        <i className={`fas ${isWithinRadius ? "fa-check-circle" : "fa-exclamation-circle"}`}></i>
+                        {isWithinRadius ? `Within your ${serviceRadiusKm} km coverage` : `Beyond ${serviceRadiusKm} km coverage`}
+                      </span>
+                    )}
+                  </div>
+                  <p className="provreq-distance-subtext">
+                    {providerAddress?.area || providerAddress?.city
+                      ? `Calculated from your base: ${[providerAddress.area, providerAddress.city].filter(Boolean).join(", ")}`
+                      : "Distance from your profile location"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="provreq-address-card">
+              <div className="provreq-address-card-header">
+                <div className="provreq-address-card-title">
+                  <i className="fas fa-home"></i>
+                  <span>Service Address Breakdown</span>
+                </div>
+                <div className="provreq-address-header-actions">
+                  <button
+                    type="button"
+                    className="provreq-btn-address-action"
+                    onClick={copyAddress}
+                    title="Copy full address"
+                  >
+                    <i className={`fas ${copiedAddress ? "fa-check text-success" : "fa-copy"}`}></i>
+                    <span>{copiedAddress ? "Copied" : "Copy Address"}</span>
+                  </button>
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="provreq-btn-address-action maps"
+                    title="Open location in Google Maps"
+                  >
+                    <i className="fas fa-map-marked-alt"></i>
+                    <span>Google Maps</span>
+                    <i className="fas fa-external-link-alt provreq-ext-icon"></i>
+                  </a>
+                </div>
+              </div>
+
+              <div className="provreq-address-fields-grid">
+                <div className="provreq-address-field">
+                  <span className="provreq-addr-field-label">House / Flat / Building</span>
+                  <span className="provreq-addr-field-val">{address?.house_no || "—"}</span>
+                </div>
+
+                <div className="provreq-address-field">
+                  <span className="provreq-addr-field-label">Area / Street</span>
+                  <span className="provreq-addr-field-val font-semibold">{address?.area || "—"}</span>
+                </div>
+
+                <div className="provreq-address-field">
+                  <span className="provreq-addr-field-label">Landmark</span>
+                  <span className="provreq-addr-field-val">
+                    {address?.landmark ? (
+                      <span className="provreq-landmark-text">
+                        <i className="fas fa-map-pin mr-1 text-amber-500"></i>
+                        {address.landmark}
+                      </span>
+                    ) : (
+                      "—"
+                    )}
+                  </span>
+                </div>
+
+                <div className="provreq-address-field">
+                  <span className="provreq-addr-field-label">City / Town</span>
+                  <span className="provreq-addr-field-val font-semibold">{address?.city || "—"}</span>
+                </div>
+
+                <div className="provreq-address-field">
+                  <span className="provreq-addr-field-label">District & State</span>
+                  <span className="provreq-addr-field-val">
+                    {[address?.district, address?.state].filter(Boolean).join(", ") || "—"}
+                  </span>
+                </div>
+
+                <div className="provreq-address-field">
+                  <span className="provreq-addr-field-label">Postal PIN Code</span>
+                  <span className="provreq-addr-field-val font-mono">{address?.pincode || "—"}</span>
+                </div>
+              </div>
             </div>
           </div>
 

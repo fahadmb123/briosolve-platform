@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import "./MyRequests.css";
@@ -20,6 +20,21 @@ import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardS
 
 export default function MyRequests() {
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [, setTotal] = useState<number>(0);
+  const [counts, setCounts] = useState<Record<StatusFilterType, number>>({
+    ALL: 0,
+    DRAFT: 0,
+    PENDING: 0,
+    ACTIVE: 0,
+    ACCEPTED: 0,
+    IN_PROGRESS: 0,
+    COMPLETED: 0,
+    CANCELLED: 0,
+    EXPIRED: 0
+  });
+
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<StatusFilterType>("ALL");
   const [sortBy, setSortBy] = useState<SortOrderType>("NEWEST");
@@ -37,76 +52,55 @@ export default function MyRequests() {
   const cancelMutation = useCancelServiceRequest();
 
   const fetchRequests = useCallback(() => {
-    getRequestsMutation.mutate(undefined, {
-      onSuccess: (res) => {
-        if (res.data) {
-          setRequests(res.data);
-        }
+    getRequestsMutation.mutate(
+      {
+        page,
+        limit: 10,
+        search: searchQuery.trim() || undefined,
+        status: selectedStatus !== "ALL" ? selectedStatus : undefined,
+        sortBy
       },
-      onError: () => {
-        toast.error("Failed to load your service requests");
+      {
+        onSuccess: (res) => {
+          if (res.data) {
+            const data = res.data;
+            if (Array.isArray(data)) {
+              setRequests(data);
+            } else {
+              setRequests(data.requests || []);
+              if (data.counts) {
+                setCounts((prev) => ({ ...prev, ...data.counts }));
+              }
+              if (data.total !== undefined) setTotal(data.total);
+              if (data.totalPages !== undefined) setTotalPages(data.totalPages);
+            }
+          }
+        },
+        onError: () => {
+          toast.error("Failed to load your service requests");
+        }
       }
-    });
-  }, []);
+    );
+  }, [page, searchQuery, selectedStatus, sortBy]);
 
   useEffect(() => {
     fetchRequests();
   }, [fetchRequests]);
 
-  const counts: Record<StatusFilterType, number> = useMemo(() => {
-    const map: Record<StatusFilterType, number> = {
-      ALL: requests.length,
-      DRAFT: 0,
-      PENDING: 0,
-      ACTIVE: 0,
-      ACCEPTED: 0,
-      IN_PROGRESS: 0,
-      COMPLETED: 0,
-      CANCELLED: 0,
-      EXPIRED: 0
-    };
+  const handleStatusChange = (status: StatusFilterType) => {
+    setSelectedStatus(status);
+    setPage(1);
+  };
 
-    requests.forEach((r) => {
-      if (r.status in map) {
-        map[r.status as StatusFilterType] += 1;
-      }
-    });
+  const handleSearchChange = (q: string) => {
+    setSearchQuery(q);
+    setPage(1);
+  };
 
-    return map;
-  }, [requests]);
-
-  const filteredRequests = useMemo(() => {
-    const result = requests.filter((req) => {
-      if (selectedStatus !== "ALL" && req.status !== selectedStatus) {
-        return false;
-      }
-
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
-        const titleMatch = req.title.toLowerCase().includes(query);
-        const descMatch = req.description.toLowerCase().includes(query);
-        const categoryMatch = (req.category_name || "").toLowerCase().includes(query);
-        const subserviceMatch = (req.subservice_name || "").toLowerCase().includes(query);
-        const locationMatch = req.address_details
-          ? `${req.address_details.area} ${req.address_details.city} ${req.address_details.landmark || ""}`
-            .toLowerCase()
-            .includes(query)
-          : false;
-
-        return titleMatch || descMatch || categoryMatch || subserviceMatch || locationMatch;
-      }
-
-      return true;
-    });
-
-    result.sort((a, b) => {
-      const timeA = new Date(a.created_at).getTime();
-      const timeB = new Date(b.created_at).getTime();
-      return sortBy === "NEWEST" ? timeB - timeA : timeA - timeB;
-    });
-
-    return result;
-  }, [requests, selectedStatus, searchQuery, sortBy]);
+  const handleSortChange = (sort: SortOrderType) => {
+    setSortBy(sort);
+    setPage(1);
+  };
 
   const handleOpenDetails = (request: CustomerServiceRequestItem) => {
     setSelectedRequestForDetails(request);
@@ -145,6 +139,7 @@ export default function MyRequests() {
     if (selectedRequestForDetails?.id === updated.id) {
       setSelectedRequestForDetails(updated);
     }
+    fetchRequests();
   };
 
   const handleConfirmCancel = () => {
@@ -153,25 +148,36 @@ export default function MyRequests() {
     cancelMutation.mutate(selectedRequestForCancel.id, {
       onSuccess: () => {
         toast.success("Service request cancelled");
-        setRequests((prev) =>
-          prev.map((r) =>
-            r.id === selectedRequestForCancel.id
-              ? { ...r, status: "CANCELLED" }
-              : r
-          )
-        );
         handleCloseCancel();
-        if (selectedRequestForDetails?.id === selectedRequestForCancel.id) {
-          setSelectedRequestForDetails((prev) =>
-            prev ? { ...prev, status: "CANCELLED" } : null
-          );
-        }
+        fetchRequests();
       },
       onError: () => {
         toast.error("Failed to cancel request");
       }
     });
   };
+
+  const paginationItems = useMemo(() => {
+    const cleanItems: (number | string)[] = [];
+    let last = 0;
+
+    for (let i = 1; i <= totalPages; i++) {
+      let shouldInclude = false;
+      if (i === 1 || i === totalPages) shouldInclude = true;
+      else if (page <= 2 && i <= 3) shouldInclude = true;
+      else if (page >= totalPages - 1 && i >= totalPages - 2) shouldInclude = true;
+      else if (i >= page - 1 && i <= page + 1) shouldInclude = true;
+
+      if (shouldInclude) {
+        if (last && i - last > 1) {
+          cleanItems.push("...");
+        }
+        cleanItems.push(i);
+        last = i;
+      }
+    }
+    return cleanItems;
+  }, [page, totalPages]);
 
   const isLoading = getRequestsMutation.isPending && requests.length === 0;
 
@@ -195,11 +201,11 @@ export default function MyRequests() {
 
       <RequestFilterBar
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={handleSearchChange}
         selectedStatus={selectedStatus}
-        onSelectStatus={setSelectedStatus}
+        onSelectStatus={handleStatusChange}
         sortBy={sortBy}
-        onSortChange={setSortBy}
+        onSortChange={handleSortChange}
         counts={counts}
       />
 
@@ -209,12 +215,12 @@ export default function MyRequests() {
             <ServiceRequestCardSkeleton key={idx} variant="customer" />
           ))}
         </div>
-      ) : filteredRequests.length === 0 ? (
+      ) : requests.length === 0 ? (
         <div className="myreq-empty-panel">
           <div className="myreq-empty-symbol">
             <i className="fas fa-clipboard-list"></i>
           </div>
-          {requests.length === 0 ? (
+          {searchQuery === "" && selectedStatus === "ALL" ? (
             <>
               <h3 className="myreq-empty-title">No service requests yet</h3>
               <p className="myreq-empty-text">
@@ -237,6 +243,7 @@ export default function MyRequests() {
                 onClick={() => {
                   setSelectedStatus("ALL");
                   setSearchQuery("");
+                  setPage(1);
                 }}
               >
                 Reset filters
@@ -245,17 +252,62 @@ export default function MyRequests() {
           )}
         </div>
       ) : (
-        <div className="myreq-cards-grid">
-          {filteredRequests.map((request) => (
-            <RequestCard
-              key={request.id}
-              request={request}
-              onViewDetails={handleOpenDetails}
-              onEditRequest={handleOpenEdit}
-              onCancelRequest={handleOpenCancel}
-            />
-          ))}
-        </div>
+        <>
+          <div className="myreq-cards-grid">
+            {requests.map((request) => (
+              <RequestCard
+                key={request.id}
+                request={request}
+                onViewDetails={handleOpenDetails}
+                onEditRequest={handleOpenEdit}
+                onCancelRequest={handleOpenCancel}
+              />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="myreq-pagination-row">
+              <div className="myreq-pagination-controls">
+                <button
+                  type="button"
+                  className="myreq-page-btn"
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                  aria-label="Previous Page"
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+
+                {paginationItems.map((item, idx) =>
+                  item === "..." ? (
+                    <span key={`ellipsis-${idx}`} className="myreq-page-ellipsis">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      className={`myreq-page-btn ${page === item ? "active" : ""}`}
+                      onClick={() => setPage(item as number)}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
+
+                <button
+                  type="button"
+                  className="myreq-page-btn"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(page + 1)}
+                  aria-label="Next Page"
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <RequestDetailsModal

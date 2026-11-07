@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMutations";
@@ -15,24 +15,52 @@ export default function ProviderServiceRequests() {
   const isVerified =
     verifications !== null && Object.values(verifications).every(Boolean);
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("" );
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("ALL");
   const [budgetFilter, setBudgetFilter] = useState<string>("ALL");
   const [sortBy, setSortBy] = useState<"NEWEST" | "BUDGET_HIGH" | "URGENT">("NEWEST");
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(10);
+  const [, setTotal] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   const [selectedRequest, setSelectedRequest] = useState<CustomerServiceRequestItem | null>(null);
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
 
   const getRequestsMutation = useGetProviderServiceRequests();
 
-  const fetchRequests = () => {
-    getRequestsMutation.mutate(undefined, {
-      onSuccess: (res) => {
-        const data = (res.data || []) as CustomerServiceRequestItem[];
-        setRequests(data);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const fetchRequests = useCallback(() => {
+    getRequestsMutation.mutate(
+      {
+        page,
+        limit,
+        search: debouncedSearch.trim() || undefined,
+        urgency: urgencyFilter !== "ALL" ? urgencyFilter : undefined,
+        budgetType: budgetFilter !== "ALL" ? budgetFilter : undefined,
+        sortBy,
       },
-    });
-  };
+      {
+        onSuccess: (res) => {
+          if (res.data) {
+            setRequests(res.data.requests || []);
+            setTotal(res.data.total || 0);
+            setTotalPages(res.data.totalPages || 0);
+          }
+        },
+        onError: () => {
+          toast.error("Failed to load service requests");
+        },
+      }
+    );
+  }, [page, limit, debouncedSearch, urgencyFilter, budgetFilter, sortBy]);
 
   useEffect(() => {
     if (!isVerified) return;
@@ -52,52 +80,54 @@ export default function ProviderServiceRequests() {
     return () => {
       window.removeEventListener("app:notification", handleNotification);
     };
-  }, [isVerified]);
+  }, [isVerified, fetchRequests]);
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    setPage(1);
+  };
+
+  const handleUrgencyChange = (urgency: string) => {
+    setUrgencyFilter(urgency);
+    setPage(1);
+  };
+
+  const handleBudgetChange = (budget: string) => {
+    setBudgetFilter(budget);
+    setPage(1);
+  };
+
+  const handleSortChange = (sort: "NEWEST" | "BUDGET_HIGH" | "URGENT") => {
+    setSortBy(sort);
+    setPage(1);
+  };
 
   const currentSelectedRequest = useMemo(() => {
     if (!selectedRequest) return null;
     return requests.find((r) => r.id === selectedRequest.id) || selectedRequest;
   }, [selectedRequest, requests]);
 
+  const paginationItems = useMemo(() => {
+    const cleanItems: (number | string)[] = [];
+    let last = 0;
 
-  const filteredRequests = useMemo(() => {
-    return requests
-      .filter((req) => {
-        if (searchQuery.trim()) {
-          const q = searchQuery.toLowerCase();
-          const matchTitle = req.title.toLowerCase().includes(q);
-          const matchDesc = req.description.toLowerCase().includes(q);
-          const matchCat = (req.category_name || "").toLowerCase().includes(q);
-          const matchArea = (req.address_details?.area || "").toLowerCase().includes(q);
-          const matchCity = (req.address_details?.city || "").toLowerCase().includes(q);
-          if (!matchTitle && !matchDesc && !matchCat && !matchArea && !matchCity) {
-            return false;
-          }
-        }
+    for (let i = 1; i <= totalPages; i++) {
+      let shouldInclude = false;
+      if (i === 1 || i === totalPages) shouldInclude = true;
+      else if (page <= 2 && i <= 3) shouldInclude = true;
+      else if (page >= totalPages - 1 && i >= totalPages - 2) shouldInclude = true;
+      else if (i >= page - 1 && i <= page + 1) shouldInclude = true;
 
-        if (urgencyFilter !== "ALL" && req.urgency !== urgencyFilter) {
-          return false;
+      if (shouldInclude) {
+        if (last && i - last > 1) {
+          cleanItems.push("...");
         }
-
-        if (budgetFilter !== "ALL" && req.budget_type !== budgetFilter) {
-          return false;
-        }
-
-        return true;
-      })
-      .sort((a, b) => {
-        if (sortBy === "BUDGET_HIGH") {
-          const aAmt = a.budget_amount ?? 0;
-          const bAmt = b.budget_amount ?? 0;
-          return bAmt - aAmt;
-        }
-        if (sortBy === "URGENT") {
-          const urgencyOrder = { TODAY: 1, THIS_WEEK: 2, SPECIFIC_DATE: 3, FLEXIBLE: 4 };
-          return (urgencyOrder[a.urgency] ?? 5) - (urgencyOrder[b.urgency] ?? 5);
-        }
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      });
-  }, [requests, searchQuery, urgencyFilter, budgetFilter, sortBy]);
+        cleanItems.push(i);
+        last = i;
+      }
+    }
+    return cleanItems;
+  }, [page, totalPages]);
 
   const handleQuoteClick = (req: CustomerServiceRequestItem) => {
     setSelectedRequest(req);
@@ -166,7 +196,6 @@ export default function ProviderServiceRequests() {
         </div>
       </div>
 
-
       <div className="provreq-filter-bar">
         <div className="provreq-filter-top-row">
           <div className="provreq-search-box">
@@ -175,7 +204,7 @@ export default function ProviderServiceRequests() {
               type="text"
               placeholder="Search by title, location, category..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="provreq-search-input"
             />
           </div>
@@ -183,7 +212,7 @@ export default function ProviderServiceRequests() {
           <div className="provreq-filter-controls">
             <select
               value={budgetFilter}
-              onChange={(e) => setBudgetFilter(e.target.value)}
+              onChange={(e) => handleBudgetChange(e.target.value)}
               className="provreq-sort-select"
             >
               <option value="ALL">All Budget Types</option>
@@ -193,7 +222,7 @@ export default function ProviderServiceRequests() {
 
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              onChange={(e) => handleSortChange(e.target.value as typeof sortBy)}
               className="provreq-sort-select"
             >
               <option value="NEWEST">Newest First</option>
@@ -215,7 +244,7 @@ export default function ProviderServiceRequests() {
               key={pill.id}
               type="button"
               className={`provreq-filter-pill ${urgencyFilter === pill.id ? "active" : ""}`}
-              onClick={() => setUrgencyFilter(pill.id)}
+              onClick={() => handleUrgencyChange(pill.id)}
             >
               {pill.label}
             </button>
@@ -229,31 +258,74 @@ export default function ProviderServiceRequests() {
             <ServiceRequestCardSkeleton key={idx} variant="provider" />
           ))}
         </div>
-      ) : filteredRequests.length === 0 ? (
+      ) : requests.length === 0 ? (
         <div className="provreq-empty-state">
           <div className="provreq-empty-icon">
             <i className="fas fa-inbox"></i>
           </div>
           <h3>No Matching Service Requests Found</h3>
           <p>
-            {requests.length === 0
-              ? "New service requests posted by local customers within your radius will appear here."
-              : "Try adjusting your search terms or filter selections to view more opportunities."}
+            Try adjusting your search terms or filter selections to view more opportunities.
           </p>
         </div>
       ) : (
-        <div className="provreq-cards-grid">
-          {filteredRequests.map((request) => (
-            <ProviderRequestCard
-              key={request.id}
-              request={request}
-              onViewDetails={setSelectedRequest}
-              onSelectPhoto={setLightboxPhoto}
-              onQuote={handleQuoteClick}
-              onChat={handleChatClick}
-            />
-          ))}
-        </div>
+        <>
+          <div className="provreq-cards-grid">
+            {requests.map((request) => (
+              <ProviderRequestCard
+                key={request.id}
+                request={request}
+                onViewDetails={setSelectedRequest}
+                onSelectPhoto={setLightboxPhoto}
+                onQuote={handleQuoteClick}
+                onChat={handleChatClick}
+              />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="provreq-pagination-row">
+              <div className="provreq-pagination-controls">
+                <button
+                  type="button"
+                  className="provreq-page-btn"
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                  aria-label="Previous Page"
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+
+                {paginationItems.map((item, idx) =>
+                  item === "..." ? (
+                    <span key={`ellipsis-${idx}`} className="provreq-page-ellipsis">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      className={`provreq-page-btn ${page === item ? "active" : ""}`}
+                      onClick={() => setPage(item as number)}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
+
+                <button
+                  type="button"
+                  className="provreq-page-btn"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(page + 1)}
+                  aria-label="Next Page"
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <ProviderRequestDetailsModal

@@ -8,6 +8,8 @@ import { GetCustomerServiceRequestsUseCase } from "../../application/use-cases/g
 import { GetProviderServiceRequestsUseCase } from "../../application/use-cases/getProviderServiceRequests.useCase";
 import { CancelServiceRequestUseCase } from "../../application/use-cases/cancelServiceRequest.useCase";
 import { UpdateServiceRequestUseCase } from "../../application/use-cases/updateServiceRequest.useCase";
+import { GetAdminServiceRequestsUseCase } from "../../application/use-cases/getAdminServiceRequests.useCase";
+import { AdminCancelServiceRequestUseCase } from "../../application/use-cases/adminCancelServiceRequest.useCase";
 import { serviceRequestRepository, serviceRequestProviderRepository } from "./repositories";
 import { imageUploadService, providerSelectionService } from "./services";
 
@@ -49,4 +51,12 @@ export const getProviderServiceRequestsUseCase = new GetProviderServiceRequestsU
 export const updateServiceRequestUseCase = new UpdateServiceRequestUseCase(
     serviceRequestRepository,
     imageUploadService
+);
+
+export const getAdminServiceRequestsUseCase = new GetAdminServiceRequestsUseCase(
+    serviceRequestRepository
+);
+
+export const adminCancelServiceRequestUseCase = new AdminCancelServiceRequestUseCase(
+    serviceRequestRepository
 );

@@ -61,6 +61,14 @@ export interface ServiceRequestAddressItem {
   longitude?: number | null;
 }
 
+export interface ServiceRequestCustomerItem {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  profile_image?: string | null;
+}
+
 export interface CustomerServiceRequestItem {
   id: string;
   customer_id: string;
@@ -74,6 +82,8 @@ export interface CustomerServiceRequestItem {
   specific_date?: string | null;
   address_id: string;
   address_details?: ServiceRequestAddressItem | null;
+  customer_details?: ServiceRequestCustomerItem | null;
+  distance_km?: number | null;
   available_time_from: string;
   available_time_to: string;
   budget_type: RequestBudgetType;

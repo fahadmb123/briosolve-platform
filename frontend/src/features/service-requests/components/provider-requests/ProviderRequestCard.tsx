@@ -1,5 +1,7 @@
 import type { FC } from "react";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
+import { useAuthStore } from "../../../auth/stores/auth.store";
+import { calculateDistanceKm, formatDistance } from "../../utils/distance.utils";
 
 interface ProviderRequestCardProps {
   request: CustomerServiceRequestItem;
@@ -16,6 +18,22 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
   onQuote,
   onChat,
 }) => {
+  const user = useAuthStore((state) => state.user);
+  const providerAddress = user?.current_address_id;
+  const providerLat = providerAddress?.latitude != null ? Number(providerAddress.latitude) : null;
+  const providerLng = providerAddress?.longitude != null ? Number(providerAddress.longitude) : null;
+
+  const reqLat = request.address_details?.latitude != null ? Number(request.address_details.latitude) : null;
+  const reqLng = request.address_details?.longitude != null ? Number(request.address_details.longitude) : null;
+
+  const computedDistance =
+    request.distance_km ??
+    (providerLat != null && providerLng != null && reqLat != null && reqLng != null
+      ? calculateDistanceKm(providerLat, providerLng, reqLat, reqLng)
+      : null);
+
+  const formattedDist = formatDistance(computedDistance);
+
   const getUrgencyBadge = () => {
     switch (request.urgency) {
       case "TODAY":
@@ -80,10 +98,24 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
         <p className="provreq-card-description">{request.description}</p>
 
         <div className="provreq-meta-grid">
-          <div className="provreq-meta-chip" title="Location">
+          <div className="provreq-meta-chip location" title="Service location">
             <i className="fas fa-map-marker-alt"></i>
             <span className="provreq-meta-text-truncate">{addressText}</span>
           </div>
+
+          {formattedDist && (
+            <div className="provreq-meta-chip distance" title="Distance from your base">
+              <i className="fas fa-location-arrow"></i>
+              <span>{formattedDist} away</span>
+            </div>
+          )}
+
+          {request.customer_details?.name && (
+            <div className="provreq-meta-chip customer" title="Customer">
+              <i className="fas fa-user-circle"></i>
+              <span className="provreq-meta-text-truncate">{request.customer_details.name}</span>
+            </div>
+          )}
 
           <div className="provreq-meta-chip" title="Available time slot">
             <i className="far fa-calendar-check"></i>

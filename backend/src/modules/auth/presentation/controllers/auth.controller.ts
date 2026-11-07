@@ -2,7 +2,6 @@ import { NextFunction, Response, Request } from "express";
 import { BaseController } from "../../../../shared/base/controller/baseController";
 import { IUserTokenPayload } from "../../../../shared/interfaces/IToken";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
-import { sendSuccess } from "../../../../shared/utils/response";
 import { accessTokenCookie, refreshTokenCookie, clearAccessTokenCookieOptions, clearRefreshTokenCookieOptions, registrationCookie } from "../../../../shared/utils/cookieConfig";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
@@ -41,7 +40,7 @@ export class AuthController extends BaseController {
             res.cookie("access_token", response.accessToken, accessTokenCookie);
             res.cookie("refresh_token", response.refreshToken, refreshTokenCookie);
 
-            return sendSuccess(res, "Authenticated", {
+            return this.sendSuccess(res, "Authenticated", {
                 accessToken: response.accessToken,
                 user: UserMapper.toDto(response.isExist)
             });
@@ -67,7 +66,7 @@ export class AuthController extends BaseController {
             res.cookie("access_token", response.accessToken, accessTokenCookie);
             res.cookie("refresh_token", response.refreshToken, refreshTokenCookie);
 
-            return sendSuccess(res, "Token refreshed successfully");
+            return this.sendSuccess(res, "Token refreshed successfully");
         } catch (err) {
             next(err);
         }
@@ -84,7 +83,7 @@ export class AuthController extends BaseController {
             res.clearCookie("access_token", clearAccessTokenCookieOptions);
             res.clearCookie("refresh_token", clearRefreshTokenCookieOptions);
 
-            return sendSuccess(res, "Logged Out");
+            return this.sendSuccess(res, "Logged Out");
         } catch (err) {
             res.clearCookie("access_token", clearAccessTokenCookieOptions);
             res.clearCookie("refresh_token", clearRefreshTokenCookieOptions);
@@ -97,7 +96,7 @@ export class AuthController extends BaseController {
             const user = req.user!;
             const response = await this._getMeUseCase.execute(user);
 
-            return this.sendSuccess(res, "", response)
+            return this.sendSuccess(res, "", response);
         } catch (err) {
             next(err);
         }
