@@ -1,4 +1,3 @@
-
 import { useFormContext } from 'react-hook-form';
 import type { ProviderRegistrationInputType } from '../../../schemas/provider/providerRegistration.schema';
 import { usePreRegisterProvider } from '../../../hooks/provider/usePreRegisterProvider';
@@ -12,9 +11,11 @@ interface BasicInfoStepProps {
 
 export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
     const { register, formState: { errors }, trigger, getValues } = useFormContext<ProviderRegistrationInputType>();
-    const [showOtpModal, setShowOtpModal] = useState(false)
-    const preRegisterMutation = usePreRegisterProvider()
-    const [isEmailVarified,setIsEmailVarified] = useState(false)
+    const [showOtpModal, setShowOtpModal] = useState(false);
+    const preRegisterMutation = usePreRegisterProvider();
+    const [isEmailVarified, setIsEmailVarified] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     
     if (!isActive) return null;
 
@@ -45,7 +46,7 @@ export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
     };
 
     const handleOtpSuccess = () => {
-        setIsEmailVarified(true)
+        setIsEmailVarified(true);
         setShowOtpModal(false);
         onNext();
     };
@@ -98,12 +99,21 @@ export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
                     <div className="input-with-icon">
                         <i className="fas fa-lock input-icon"></i>
                         <input 
-                            type="password" 
+                            type={showPassword ? "text" : "password"} 
                             id="password" 
                             className={`form-control ${errors.password ? 'border-danger' : ''}`} 
                             placeholder="••••••••" 
                             {...register("password")}
                         />
+                        <button 
+                            type="button" 
+                            className="toggle-password" 
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label="Toggle Password Visibility"
+                            style={{ background: 'none', border: 'none', position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-secondary)', zIndex: 3 }}
+                        >
+                            <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                        </button>
                     </div>
                     {errors.password && <span className="text-danger text-xs mt-1 block">{errors.password.message}</span>}
                 </div>
@@ -113,12 +123,21 @@ export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
                     <div className="input-with-icon">
                         <i className="fas fa-lock input-icon"></i>
                         <input 
-                            type="password" 
+                            type={showConfirmPassword ? "text" : "password"} 
                             id="confirmPassword" 
                             className={`form-control ${errors.confirmPassword ? 'border-danger' : ''}`} 
                             placeholder="••••••••" 
                             {...register("confirmPassword")}
                         />
+                        <button 
+                            type="button" 
+                            className="toggle-password" 
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            aria-label="Toggle Confirm Password Visibility"
+                            style={{ background: 'none', border: 'none', position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-secondary)', zIndex: 3 }}
+                        >
+                            <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                        </button>
                     </div>
                     {errors.confirmPassword && <span className="text-danger text-xs mt-1 block">{errors.confirmPassword.message}</span>}
                 </div>
