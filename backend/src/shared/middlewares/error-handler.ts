@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { HttpErrorMapper } from "../errors/http-error.mapper";
 import { logger } from "../logger/logger";
+import { CommonResponse } from "../models/common-response.model";
 
 export const errorHandler = (error: unknown, req: Request, res: Response, next: NextFunction): void => {
     const httpError = HttpErrorMapper.map(error);
@@ -11,10 +12,10 @@ export const errorHandler = (error: unknown, req: Request, res: Response, next: 
         logger.warn({ method: req.method, url: req.url, statusCode: httpError.statusCode, code: httpError.code }, "Client error");
     }
 
+    const response = CommonResponse.error(httpError.message, httpError.code ? [httpError.code] : null);
+
     res.status(httpError.statusCode).json({
-        success: false,
-        code: httpError.code,
-        message: httpError.message,
+        ...response.toJSON(),
+        code: httpError.code
     });
 };
-

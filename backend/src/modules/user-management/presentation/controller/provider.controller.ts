@@ -78,8 +78,7 @@ export class ProviderController extends BaseController {
         try {
             const registrationId = req.cookies.registration_id;
             if (!registrationId) {
-                res.status(401).json({ success: false, message: "Registration session expired. Please start over." });
-                return;
+                return this.sendError(res, "Registration session expired. Please start over.", 401);
             }
 
             const payload: CompleteProviderRegistrationInput = {
