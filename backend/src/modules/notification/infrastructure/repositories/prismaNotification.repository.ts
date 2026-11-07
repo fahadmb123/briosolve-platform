@@ -69,14 +69,14 @@ export class PrismaNotificationRepository implements INotificationRepository {
     }
 
     async getUnreadCount(recipientId: string): Promise<number> {
-        const count = await db.orm.public.notifications
+        const result = await db.orm.public.notifications
             .where({
                 recipient_id: recipientId,
                 is_read: false
             })
-            .count();
+            .aggregate((agg) => ({ total: agg.count() }));
 
-        return Number(count);
+        return Number(result.total ?? 0);
     }
 
     async createMany(data: CreateNotificationRequestDto[]): Promise<Notification[] | null>{
