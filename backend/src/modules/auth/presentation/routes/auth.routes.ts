@@ -1,31 +1,32 @@
 import { Router } from "express";
 import validate from "../../../../shared/middlewares/validate-request";
+import { rateLimiter } from "../../../../shared/middlewares/rate-limiter";
 import { otpSchema } from "../validators/registerCustomer.schema";
 import { emailSchema, loginSchema, resetPasswordSchema, phoneSchema, updatePasswordSchema } from "../validators/auth.schema";
 import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
 import { requireRole } from "../../../../shared/middlewares/role.middleware";
 import { AuthRouteDependencies } from "../types/auth-route-dependencies";
 
-export function buildAuthRoute(controller:AuthRouteDependencies):Router{
-    const router = Router()
+export function buildAuthRoute(controller: AuthRouteDependencies): Router {
+    const router = Router();
     
-    router.post("/refresh", controller.auth.refresh)
-    router.post("/logout", controller.auth.logout)
-    router.get("/logout", controller.auth.logout)
-    router.get("/otp-status", controller.otpVarification.getStatus)
-    router.get("/me", authMiddleware, requireRole(["CUSTOMER", "PROVIDER", "ADMIN"]), controller.auth.getMe)
+    router.post("/refresh", controller.auth.refresh);
+    router.post("/logout", controller.auth.logout);
+    router.get("/logout", controller.auth.logout);
+    router.get("/otp-status", controller.otpVarification.getStatus);
+    router.get("/me", authMiddleware, requireRole(["CUSTOMER", "PROVIDER", "ADMIN"]), controller.auth.getMe);
 
-    router.post("/login", validate(loginSchema), controller.auth.login);
-    router.post("/email-verify", validate(emailSchema), controller.auth.emailVerify);
-    router.post("/reset-password", validate(resetPasswordSchema), controller.security.resetPassword)
-    router.post("/otp-varify", validate(otpSchema), controller.otpVarification.validate);
-    router.post("/resend-otp", controller.otpVarification.resend);
+    router.post("/login", rateLimiter({ windowSeconds: 60, maxRequests: 5, prefix: "login" }), validate(loginSchema), controller.auth.login);
+    router.post("/email-verify", rateLimiter({ windowSeconds: 300, maxRequests: 5, prefix: "email-verify" }), validate(emailSchema), controller.auth.emailVerify);
+    router.post("/reset-password", rateLimiter({ windowSeconds: 300, maxRequests: 5, prefix: "reset-password" }), validate(resetPasswordSchema), controller.security.resetPassword);
+    router.post("/otp-varify", rateLimiter({ windowSeconds: 60, maxRequests: 10, prefix: "otp-verify" }), validate(otpSchema), controller.otpVarification.validate);
+    router.post("/resend-otp", rateLimiter({ windowSeconds: 300, maxRequests: 3, prefix: "resend-otp" }), controller.otpVarification.resend);
 
     router.patch("/email", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), validate(emailSchema), controller.auth.emailVerify);
-    router.patch("/password", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), validate(updatePasswordSchema), controller.security.updatePassword)
+    router.patch("/password", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), validate(updatePasswordSchema), controller.security.updatePassword);
     router.patch("/phone", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), validate(phoneSchema), controller.security.updatePhone);
 
-    router.delete("/phone", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), controller.security.deletePhone)
+    router.delete("/phone", authMiddleware, requireRole(["CUSTOMER", "PROVIDER"]), controller.security.deletePhone);
 
-    return router
+    return router;
 }
