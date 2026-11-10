@@ -34,3 +34,25 @@
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+
+@media (max-width: 480px) {
+    .confirm-modal-content {
+        padding: 1.15rem 0.875rem;
+        width: calc(100% - 24px);
+        max-width: 100%;
+        margin: 0 12px;
+        border-radius: 12px;
+    }
+
+    .confirm-modal-content .flex.gap-3.justify-end {
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .confirm-modal-content .flex.gap-3.justify-end button {
+        width: 100%;
+        min-height: 42px;
+        justify-content: center;
+    }
+}

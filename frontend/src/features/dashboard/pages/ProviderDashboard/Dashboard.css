@@ -190,3 +190,41 @@
 .hover-primary:hover {
     color: var(--primary);
 }
+
+@media (max-width: 640px) {
+    .pro-welcome-banner {
+        padding: 1.25rem 1rem;
+        border-radius: 1rem;
+        gap: 1.25rem;
+    }
+
+    .pro-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-widget {
+        padding: 1rem 0.875rem;
+        border-radius: 0.875rem;
+    }
+
+    .stat-value {
+        font-size: 1.45rem;
+    }
+
+    .stat-title {
+        font-size: 0.8125rem;
+    }
+
+    .stat-meta {
+        font-size: 0.72rem;
+    }
+
+    .stat-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+}

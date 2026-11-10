@@ -818,3 +818,102 @@ body.theme-admin .app-header.admin-app-header {
 .skeleton-dot:nth-child(1) { animation-delay: 0s; }
 .skeleton-dot:nth-child(2) { animation-delay: 0.2s; }
 .skeleton-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@media (max-width: 768px) {
+    .admin-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.875rem;
+    }
+
+    .admin-search-input {
+        min-width: 100%;
+        width: 100%;
+    }
+
+    .admin-filters-group {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .admin-select {
+        width: 100%;
+        font-size: 0.8125rem;
+    }
+
+    .admin-table-header {
+        padding: 0.875rem 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .admin-table th, .admin-table td {
+        padding: 0.65rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+
+    .admin-modal-overlay {
+        padding: 0.75rem !important;
+    }
+
+    .admin-modal {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 12px;
+    }
+
+    .admin-modal-header,
+    .admin-modal-footer {
+        padding: 0.75rem 0.875rem;
+    }
+
+    .admin-modal-footer {
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+    }
+
+    .admin-modal-footer > *,
+    .admin-modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-kpi-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .admin-kpi-card {
+        padding: 0.875rem 1rem;
+    }
+
+    .admin-kpi-val {
+        font-size: 1.35rem;
+    }
+
+    .admin-filters-group {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-app-header {
+        padding: 0 0.75rem;
+        height: 56px;
+    }
+
+    .badge-admin, .badge-verified, .badge-pending, .badge-danger-alert, .badge-neutral {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+    }
+
+    .admin-table th, .admin-table td {
+        padding: 0.5rem 0.65rem;
+        font-size: 0.75rem;
+    }
+}

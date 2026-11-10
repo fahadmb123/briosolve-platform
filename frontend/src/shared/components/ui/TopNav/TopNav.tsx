@@ -142,8 +142,9 @@ export const TopNav: React.FC = () => {
   }, [location.pathname, closeAllMenus]);
 
   return (
-    <header className={`topnav-header`} ref={navRef}>
-      <div className="topnav-container">
+    <>
+      <header className={`topnav-header`} ref={navRef}>
+        <div className="topnav-container">
         <div className="topnav-left">
           <Link to="/" className="topnav-brand" onClick={closeAllMenus}>
             <img src="/briosolve-logo.svg" alt="Briosolve" className="topnav-brand-logo" />
@@ -493,199 +494,321 @@ export const TopNav: React.FC = () => {
           </button>
         </div>
       </div>
+    </header>
 
       
 
       {mobileMenuOpen && (
-        <div className="topnav-mobile-menu">
-          <div className="topnav-mobile-section">
-            <div className="topnav-mobile-label">Navigation</div>
-            <NavLink
-              to="/"
-              end
-              className="topnav-mobile-item"
-              onClick={closeAllMenus}
-            >
-              Home
-            </NavLink>
-
-            <NavLink
-              to="/request-service"
-              className={({ isActive }) =>
-                `topnav-link ${isActive ? "active" : ""}`
-              }
-            >
-              Request Service
-            </NavLink>
-            {isCustomer && (
-              <NavLink
-                to="/nearby-providers"
-                className="topnav-mobile-item"
-                onClick={closeAllMenus}
-              >
-                Providers
-              </NavLink>
-            )}
-            {isAuthenticated && (
-              <NavLink
-                to={dashboardRoute}
-                className="topnav-mobile-item"
-                onClick={closeAllMenus}
-              >
-                Dashboard
-              </NavLink>
-            )}
-          </div>
-
-          {isCustomer && (
-            <>
-              <div className="topnav-mobile-section">
-                <div className="topnav-mobile-label">Activity</div>
-                <Link
-                  to="/request-service"
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  Request Service
-                </Link>
-                <Link
-                  to="/my-requests"
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  My Requests
-                </Link>
-                <Link
-                  to="/dashboard"
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  Bookings
-                </Link>
-                <Link
-                  to="/messages"
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  <span>Messages</span>
-                  {unreadMessagesCount > 0 && (
-                    <span className="prov-mono-badge">
-                      {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  to="/dashboard"
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  Reviews
-                </Link>
-              </div>
-
-              <div className="topnav-mobile-section">
-                <div className="topnav-mobile-label">Features</div>
-                <Link
-                  to="/dashboard"
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  AI Assistant
-                </Link>
-                <Link
-                  to="/dashboard"
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  Products
-                </Link>
-                <Link
-                  to="/#how-it-works"
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  How It Works
-                </Link>
-              </div>
-            </>
-          )}
-
-          <div className="topnav-mobile-section">
-            <div className="topnav-mobile-label">Account</div>
+        <>
+          <div className="topnav-mobile-backdrop" onClick={closeAllMenus}></div>
+          <div className="topnav-mobile-menu">
             {isAuthenticated ? (
-              <>
-                <Link
-                  to={profileRoute}
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  Profile
-                </Link>
-                {isProvider && (
-                  <Link
-                    to="/provider/kyc"
-                    className="topnav-mobile-item"
-                    onClick={closeAllMenus}
-                  >
-                    KYC Verification
-                  </Link>
-                )}
-                <Link
-                  to={notificationRoute}
-                  className="topnav-mobile-item"
-                  onClick={closeAllMenus}
-                >
-                  Notifications
-                </Link>
-                <Link
-                  to={settingsRoute}
-                  className="topnav-mobile-item flex items-center justify-between"
-                  onClick={closeAllMenus}
-                >
-                  <span>Settings</span>
-                  {!isVerified && (
-                    <span className="topnav-warning-badge" title="Verification required">
-                      <i className="fas fa-exclamation"></i>
-                    </span>
+              <div className="topnav-mobile-user-card">
+                <span className="topnav-mobile-user-avatar">
+                  {profile?.profile_image ? (
+                    <img
+                      src={`${
+                        profile.profile_image.startsWith("http")
+                          ? ""
+                          : import.meta.env.VITE_API_URL || "http://localhost:5000"
+                      }${profile.profile_image}`}
+                      alt={user?.name || "User"}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          user?.name || "User",
+                        )}&background=000&color=fff&rounded=false`;
+                      }}
+                    />
+                  ) : (
+                    <span>{user?.name?.charAt(0).toUpperCase() || "U"}</span>
                   )}
-                </Link>
-                {isCustomer && (
-                  <Link
-                    to="/provider/register"
-                    className="topnav-mobile-item"
-                    onClick={closeAllMenus}
-                  >
-                    Become a Provider
-                  </Link>
-                )}
+                </span>
+                <div className="topnav-mobile-user-info">
+                  <div className="topnav-mobile-user-name">{user?.name || "Customer"}</div>
+                  <div className="topnav-mobile-user-email">{user?.email}</div>
+                  <div className="topnav-mobile-user-badge">
+                    {isVerified ? (
+                      <span className="prov-mono-badge">
+                        {isProvider ? "Verified Provider" : "Verified Customer"}
+                      </span>
+                    ) : (
+                      <span className="prov-mono-badge">Not Verified</span>
+                    )}
+                  </div>
+                </div>
                 <button
                   type="button"
-                  className="topnav-mobile-item flex items-center justify-between"
-                  onClick={toggleTheme}
+                  className="topnav-mobile-close-btn"
+                  onClick={closeAllMenus}
+                  aria-label="Close menu"
                 >
-                  <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
-                  <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                  <i className="fas fa-times"></i>
                 </button>
-                <button
-                  type="button"
-                  className="topnav-mobile-item topnav-mobile-logout"
-                  onClick={handleLogout}
-                >
-                  Log Out
-                </button>
-              </>
+              </div>
             ) : (
-              <Link
-                to="/login"
+              <div className="topnav-mobile-guest-card">
+                <div className="topnav-mobile-guest-title">Welcome to Briosolve</div>
+                <div className="topnav-mobile-guest-sub">Connect with verified local specialists</div>
+                <div className="flex gap-2 mt-2">
+                  <Link to="/login" className="btn btn-primary btn-sm flex-1 justify-center" onClick={closeAllMenus}>Sign In</Link>
+                  <Link to="/register" className="btn btn-secondary btn-sm flex-1 justify-center" onClick={closeAllMenus}>Register</Link>
+                </div>
+              </div>
+            )}
+
+            <div className="topnav-mobile-section">
+              <div className="topnav-mobile-label">Navigation</div>
+              <NavLink
+                to="/"
+                end
                 className="topnav-mobile-item"
                 onClick={closeAllMenus}
               >
-                Sign In
-              </Link>
+                Home
+              </NavLink>
+
+              <NavLink
+                to="/request-service"
+                className={({ isActive }) =>
+                  `topnav-mobile-item ${isActive ? "active" : ""}`
+                }
+                onClick={closeAllMenus}
+              >
+                Request Service
+              </NavLink>
+              {isCustomer && (
+                <NavLink
+                  to="/nearby-providers"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  Providers
+                </NavLink>
+              )}
+              {isAuthenticated && (
+                <NavLink
+                  to={dashboardRoute}
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  Dashboard
+                </NavLink>
+              )}
+            </div>
+
+            {isCustomer && (
+              <>
+                <div className="topnav-mobile-section">
+                  <div className="topnav-mobile-label">Activity</div>
+                  <Link
+                    to="/request-service"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    Request Service
+                  </Link>
+                  <Link
+                    to="/my-requests"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    My Requests
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    Bookings
+                  </Link>
+                  <Link
+                    to="/messages"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    <span>Messages</span>
+                    {unreadMessagesCount > 0 && (
+                      <span className="prov-mono-badge">
+                        {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    Reviews
+                  </Link>
+                </div>
+
+                <div className="topnav-mobile-section">
+                  <div className="topnav-mobile-label">Features</div>
+                  <Link
+                    to="/dashboard"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    AI Assistant
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    Products
+                  </Link>
+                  <Link
+                    to="/#how-it-works"
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    How It Works
+                  </Link>
+                </div>
+              </>
             )}
+
+            <div className="topnav-mobile-section">
+              <div className="topnav-mobile-label">Account</div>
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to={profileRoute}
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    Profile
+                  </Link>
+                  {isProvider && (
+                    <Link
+                      to="/provider/kyc"
+                      className="topnav-mobile-item"
+                      onClick={closeAllMenus}
+                    >
+                      KYC Verification
+                    </Link>
+                  )}
+                  <Link
+                    to={notificationRoute}
+                    className="topnav-mobile-item"
+                    onClick={closeAllMenus}
+                  >
+                    Notifications
+                  </Link>
+                  <Link
+                    to={settingsRoute}
+                    className="topnav-mobile-item flex items-center justify-between"
+                    onClick={closeAllMenus}
+                  >
+                    <span>Settings</span>
+                    {!isVerified && (
+                      <span className="topnav-warning-badge" title="Verification required">
+                        <i className="fas fa-exclamation"></i>
+                      </span>
+                    )}
+                  </Link>
+                  {isCustomer && (
+                    <Link
+                      to="/provider/register"
+                      className="topnav-mobile-item"
+                      onClick={closeAllMenus}
+                    >
+                      Become a Provider
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    className="topnav-mobile-item flex items-center justify-between"
+                    onClick={toggleTheme}
+                  >
+                    <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                    <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                  </button>
+                  <button
+                    type="button"
+                    className="topnav-mobile-item topnav-mobile-logout"
+                    onClick={handleLogout}
+                  >
+                    Log Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="topnav-mobile-item"
+                  onClick={closeAllMenus}
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
-    </header>
+
+      <nav className="topnav-bottom-bar" aria-label="Mobile Bottom Navigation">
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) => `topnav-bottom-item ${isActive ? "active" : ""}`}
+          onClick={closeAllMenus}
+        >
+          <i className="fas fa-home"></i>
+          <span>Home</span>
+        </NavLink>
+
+        <NavLink
+          to="/nearby-providers"
+          className={({ isActive }) => `topnav-bottom-item ${isActive ? "active" : ""}`}
+          onClick={closeAllMenus}
+        >
+          <i className="fas fa-search-location"></i>
+          <span>Providers</span>
+        </NavLink>
+
+        <NavLink
+          to="/request-service"
+          className={({ isActive }) => `topnav-bottom-item topnav-bottom-item-center ${isActive ? "active" : ""}`}
+          onClick={closeAllMenus}
+        >
+          <div className="topnav-bottom-center-icon">
+            <i className="fas fa-plus"></i>
+          </div>
+          <span>Request</span>
+        </NavLink>
+
+        {isCustomer ? (
+          <NavLink
+            to="/my-requests"
+            className={({ isActive }) => `topnav-bottom-item ${isActive ? "active" : ""}`}
+            onClick={closeAllMenus}
+          >
+            <i className="fas fa-file-invoice"></i>
+            <span>Requests</span>
+          </NavLink>
+        ) : (
+          <NavLink
+            to={isAuthenticated ? dashboardRoute : "/login"}
+            className={({ isActive }) => `topnav-bottom-item ${isActive ? "active" : ""}`}
+            onClick={closeAllMenus}
+          >
+            <i className={isAuthenticated ? "fas fa-chart-line" : "fas fa-user"}></i>
+            <span>{isAuthenticated ? "Dashboard" : "Sign In"}</span>
+          </NavLink>
+        )}
+
+        <button
+          type="button"
+          className={`topnav-bottom-item ${mobileMenuOpen ? "active" : ""}`}
+          onClick={() => setMobileMenuOpen((prev) => !prev)}
+          aria-label="Toggle navigation drawer"
+        >
+          <i className={mobileMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
+          <span>Menu</span>
+        </button>
+      </nav>
+    </>
   );
 };

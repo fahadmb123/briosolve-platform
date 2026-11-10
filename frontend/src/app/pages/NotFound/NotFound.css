@@ -93,3 +93,27 @@
         font-size: 1rem;
     }
 }
+
+@media (max-width: 480px) {
+    .notfound-wrapper {
+        padding: 1.5rem 1rem;
+    }
+    .notfound-title {
+        font-size: 5rem;
+    }
+    .notfound-subtitle {
+        font-size: 1.25rem;
+    }
+    .notfound-description {
+        font-size: 0.875rem;
+        margin-bottom: 2rem;
+    }
+    .notfound-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.75rem;
+    }
+    .notfound-actions a {
+        width: 100%;
+    }
+}

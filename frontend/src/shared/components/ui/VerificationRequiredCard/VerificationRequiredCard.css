@@ -370,3 +370,36 @@
   }
 }
 
+@media (max-width: 640px) {
+  .verification-required-card {
+    padding: 1.15rem 0.875rem;
+    border-radius: var(--radius-lg, 12px);
+    gap: 1.25rem;
+  }
+
+  .verification-required-badge-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.15rem;
+    border-radius: 10px;
+  }
+
+  .verification-required-header-text h2 {
+    font-size: 1.15rem;
+  }
+
+  .verification-required-header-text p {
+    font-size: 0.8rem;
+  }
+
+  .verification-required-item {
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .verification-required-btn {
+    min-height: 42px;
+    font-size: 0.8rem;
+  }
+}
+
