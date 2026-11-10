@@ -111,20 +111,21 @@ export function Level4BudgetStep({
           accept="image/png, image/jpeg, image/webp"
           className="hidden"
           onChange={onFileUpload}
+          disabled={uploadedImages.length >= 5}
         />
 
         <label
-          htmlFor={fileInputId}
-          className={`file-dropzone ${errors.images ? "border-danger" : ""}`}
+          htmlFor={uploadedImages.length >= 5 ? undefined : fileInputId}
+          className={`file-dropzone ${errors.images ? "border-danger" : ""} ${uploadedImages.length >= 5 ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <div className="dropzone-icon">
-            <i className="fas fa-cloud-upload-alt"></i>
+            <i className={`fas ${uploadedImages.length >= 5 ? "fa-check-circle text-success" : "fa-cloud-upload-alt"}`}></i>
           </div>
           <div className="dropzone-text-main">
-            Click or drag images here to upload
+            {uploadedImages.length >= 5 ? "Maximum 5 images uploaded" : "Click or drag images here to upload"}
           </div>
           <div className="dropzone-text-sub">
-            Supports JPG, PNG up to 10MB each (at least 1, max 5 images)
+            {uploadedImages.length >= 5 ? "Remove an image below if you want to upload a different one" : "Supports JPG, PNG up to 10MB each (at least 1, max 5 images)"}
           </div>
         </label>
         {errors.images && (

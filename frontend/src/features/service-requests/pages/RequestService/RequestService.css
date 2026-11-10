@@ -1740,3 +1740,62 @@
     font-weight: 500;
     line-height: 1.4;
 }
+
+@media (max-width: 640px) {
+    .request-service-container {
+        padding: 0.875rem 0.65rem 3rem;
+    }
+
+    .request-service-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.65rem;
+    }
+
+    .request-service-title-group h1 {
+        font-size: 1.25rem;
+    }
+
+    .request-service-title-group p {
+        font-size: 0.78rem;
+    }
+
+    .request-form-card {
+        padding: 1rem 0.75rem;
+        border-radius: 12px;
+    }
+
+    .category-selection-grid,
+    .request-categories-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.65rem !important;
+    }
+
+    .subservice-grid,
+    .request-services-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+    }
+
+    .urgency-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .urgency-card {
+        padding: 0.75rem;
+    }
+
+    .level-navigation-bar {
+        flex-direction: column-reverse;
+        gap: 0.65rem;
+        width: 100%;
+    }
+
+    .level-nav-next-btn,
+    .level-nav-prev-btn {
+        width: 100%;
+        min-height: 42px;
+        justify-content: center;
+    }
+}

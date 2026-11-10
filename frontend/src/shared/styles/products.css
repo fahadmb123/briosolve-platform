@@ -304,3 +304,22 @@
         margin-top: 1rem;
     }
 }
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .product-card-body {
+        padding: 0.875rem;
+    }
+    .product-card-img-wrapper {
+        height: 160px;
+    }
+    .product-title {
+        font-size: 1rem;
+    }
+    .product-details-container {
+        padding: 0.75rem;
+    }
+}

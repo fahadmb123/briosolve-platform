@@ -1522,3 +1522,63 @@
     font-weight: 600;
     font-size: 0.875rem;
 }
+
+@media (max-width: 600px) {
+    .provreq-top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding-bottom: 0.875rem;
+    }
+
+    .provreq-page-title {
+        font-size: 1.25rem;
+    }
+
+    .provreq-page-subtitle {
+        font-size: 0.78rem;
+    }
+
+    .provreq-stats-bar {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        padding: 0.65rem;
+    }
+
+    .provreq-card-content {
+        padding: 0.875rem 0.75rem;
+    }
+
+    .provreq-card-title {
+        font-size: 0.95rem;
+    }
+
+    .provreq-card-desc {
+        font-size: 0.78rem;
+    }
+
+    .provreq-card-bottom-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+    }
+
+    .provreq-card-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .provreq-meta-row {
+        grid-template-columns: 1fr;
+    }
+
+    .provreq-btn-details {
+        min-height: 38px;
+    }
+}
+
+@media (max-width: 400px) {
+    .provreq-stats-bar {
+        grid-template-columns: 1fr;
+    }
+}

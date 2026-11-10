@@ -455,3 +455,43 @@ body:not([data-theme="light"]) .leaflet-tile {
     background-color: var(--surface-elevated) !important;
 }
 
+@media (max-width: 640px) {
+    .loc-modal-overlay,
+    .admin-modal-overlay {
+        padding: 0.75rem !important;
+    }
+
+    .loc-modal,
+    .admin-modal {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 92vh !important;
+        border-radius: 12px !important;
+    }
+
+    .loc-modal-header,
+    .admin-modal-header {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .loc-modal-body,
+    .admin-modal-body {
+        padding: 0.875rem !important;
+    }
+
+    .loc-modal-footer,
+    .admin-modal-footer {
+        padding: 0.75rem 1rem !important;
+        flex-direction: column-reverse !important;
+        gap: 0.5rem !important;
+    }
+
+    .loc-modal-footer > *,
+    .admin-modal-footer > *,
+    .loc-modal-footer .btn,
+    .admin-modal-footer .btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+

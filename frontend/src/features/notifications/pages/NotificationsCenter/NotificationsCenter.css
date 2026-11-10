@@ -707,7 +707,8 @@
   .notif-header-banner {
     flex-direction: column;
     align-items: stretch;
-    padding: 1.25rem;
+    padding: 1.15rem 1rem;
+    border-radius: 12px;
   }
 
   .notif-header-actions {
@@ -717,6 +718,8 @@
   .notif-toolbar-card {
     flex-direction: column;
     align-items: stretch;
+    padding: 0.875rem;
+    border-radius: 12px;
   }
 
   .notif-controls {
@@ -726,11 +729,13 @@
 
   .notif-stat-strip {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 
   .notif-item {
-    padding: 1rem;
-    gap: 0.85rem;
+    padding: 0.875rem 0.75rem;
+    gap: 0.75rem;
+    border-radius: 10px;
   }
 
   .notif-headline {
@@ -740,8 +745,38 @@
 }
 
 @media (max-width: 480px) {
+  .notif-center-container {
+    padding-bottom: 2rem;
+  }
+
+  .notif-title-group h1 {
+    font-size: 1.25rem;
+  }
+
   .notif-stat-strip {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .notif-item {
+    padding: 0.75rem;
+    gap: 0.65rem;
+  }
+
+  .notif-item-body h4 {
+    font-size: 0.85rem;
+  }
+
+  .notif-item-body p {
+    font-size: 0.78rem;
+  }
+
+  .notif-header-banner {
+    padding: 1rem 0.875rem;
+  }
+
+  .notif-toolbar-card {
+    padding: 0.75rem;
   }
 }
 

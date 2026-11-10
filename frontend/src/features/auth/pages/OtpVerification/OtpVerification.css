@@ -121,9 +121,34 @@
 }
 
 @media (max-width: 480px) {
+    .auth-page-wrapper {
+        padding: 1.25rem 0.875rem;
+    }
+    .auth-card {
+        padding: 1.35rem 1rem;
+        border-radius: var(--radius-lg, 12px);
+    }
+    .verify-icon-wrapper {
+        width: 64px;
+        height: 64px;
+    }
+    .verify-icon-circle {
+        width: 52px;
+        height: 52px;
+        font-size: 1.35rem;
+    }
     .otp-single-input {
-        font-size: 1.5rem;
-        letter-spacing: 0.75rem;
+        font-size: 1.35rem;
+        letter-spacing: 0.4rem;
+        padding: 0.65rem 0.5rem;
+        max-width: 250px;
+    }
+    .otp-single-input::placeholder {
+        letter-spacing: 0.4rem;
+    }
+    .btn {
+        min-height: 42px;
+        font-size: 0.8125rem;
     }
 }
 

@@ -166,3 +166,17 @@
     background: rgba(255, 255, 255, 0.4);
 }
 
+@media (max-width: 600px) {
+    .admin-sr-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sr-modal-body {
+        padding: 1rem 0.875rem;
+    }
+
+    .admin-sr-section {
+        padding: 0.875rem 1rem;
+    }
+}
+

@@ -452,3 +452,15 @@
 [data-theme="dark"] .notif-empty-icon {
     background-color: rgba(255, 255, 255, 0.06);
 }
+
+@media (max-width: 480px) {
+    .notif-dropdown-modal {
+        position: fixed;
+        top: 64px;
+        left: 0.5rem;
+        right: 0.5rem;
+        width: auto;
+        max-width: none;
+        max-height: calc(100vh - 80px);
+    }
+}
