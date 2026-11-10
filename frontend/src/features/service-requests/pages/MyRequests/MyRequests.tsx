@@ -152,8 +152,8 @@ export default function MyRequests() {
         handleCloseCancel();
         fetchRequests();
       },
-      onError: () => {
-        toast.error("Failed to cancel request");
+      onError: (err: any) => {
+        toast.error(err?.response?.data?.message || err?.message || "Failed to cancel request");
       }
     });
   };

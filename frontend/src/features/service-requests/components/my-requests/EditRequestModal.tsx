@@ -146,21 +146,62 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
     setSpecificDate(computed);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
-    const fileList = Array.from(files).slice(0, 5 - uploadedImages.length);
-    fileList.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          const newImg = event.target.result as string;
-          setUploadedImages((prev) => [...prev, newImg]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    const currentCount = uploadedImages.length;
+
+    if (currentCount >= 5) {
+      toast.error("Maximum 5 images allowed");
+      e.target.value = "";
+      return;
+    }
+
+    const rawFiles = Array.from(files);
+    const validFiles: File[] = [];
+
+    for (const file of rawFiles) {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`"${file.name}" is not a supported image file`);
+        continue;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`"${file.name}" exceeds the 10MB size limit`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    const availableSlots = 5 - currentCount;
+    if (validFiles.length > availableSlots) {
+      toast.error(`You can only upload up to 5 images. Only the first ${availableSlots} will be added.`);
+    }
+
+    const filesToRead = validFiles.slice(0, availableSlots);
+    if (filesToRead.length === 0) {
+      e.target.value = "";
+      return;
+    }
+
+    const readPromises = filesToRead.map(
+      (file) =>
+        new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            if (event.target?.result) {
+              resolve(event.target.result as string);
+            }
+          };
+          reader.readAsDataURL(file);
+        })
+    );
+
+    const newImages = await Promise.all(readPromises);
+    setUploadedImages((prev) => [...prev, ...newImages].slice(0, 5));
+
+    e.target.value = "";
   };
 
   const handleRemoveImage = (indexToRemove: number) => {

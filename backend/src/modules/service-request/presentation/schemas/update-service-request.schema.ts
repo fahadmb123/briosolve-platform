@@ -12,7 +12,7 @@ export const updateServiceRequestSchema = z.object({
     availableTimeTo: z.string().optional(),
     budgetType: z.enum(["OPEN_BID", "FIXED"]).optional(),
     budgetAmount: z.string().optional().nullable(),
-    images: z.array(z.string()).optional()
+    images: z.array(z.string()).max(5, "Maximum 5 images allowed").optional()
 }).superRefine((data, ctx) => {
     if (data.urgency === "SPECIFIC_DATE") {
         if (!data.specificDate || !data.specificDate.trim()) {

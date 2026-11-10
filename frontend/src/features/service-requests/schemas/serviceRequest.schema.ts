@@ -26,7 +26,8 @@ export const serviceRequestSchema = z.object({
   budgetAmount: z.string().optional(),
   images: z
     .array(z.string())
-    .min(1, { message: "Please upload at least 1 image of the requirement" }),
+    .min(1, { message: "Please upload at least 1 image of the requirement" })
+    .max(5, { message: "Maximum 5 images allowed" }),
   agreedToPolicy: z.boolean().refine((val) => val === true, {
     message: "You must accept the marketplace policy and terms before posting"
   })

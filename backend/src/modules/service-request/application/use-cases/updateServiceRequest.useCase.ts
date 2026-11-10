@@ -56,11 +56,17 @@ export class UpdateServiceRequestUseCase implements IUseCase<UpdateServiceReques
 
         let processedImageUrls = dto.imageUrls;
         if (dto.imageUrls && dto.imageUrls.length > 0) {
+            if (dto.imageUrls.length > 5) {
+                throw new ApplicationError("VALIDATION", "Maximum 5 images allowed", "VALIDATION");
+            }
             processedImageUrls = await Promise.all(
                 dto.imageUrls.map(async (img) => {
                     if (img.startsWith("data:")) {
                         const base64Data = img.replace(/^data:image\/\w+;base64,/, "");
                         const buffer = Buffer.from(base64Data, "base64");
+                        if (buffer.length > 10 * 1024 * 1024) {
+                            throw new ApplicationError("VALIDATION", "Each image must not exceed 10MB", "VALIDATION");
+                        }
                         return await this._imageUploadService.uploadImage(buffer, "service-requests");
                     }
                     return img;
