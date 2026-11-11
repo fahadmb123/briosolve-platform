@@ -133,6 +133,17 @@ export const CallModalContainer: React.FC = () => {
   }, [status]);
 
   useEffect(() => {
+    if (status !== "idle") {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [status]);
+
+  useEffect(() => {
     if (status !== "calling" || !participant || !roomName) return;
 
     let isCancelled = false;
