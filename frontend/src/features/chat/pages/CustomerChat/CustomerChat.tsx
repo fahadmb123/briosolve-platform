@@ -741,23 +741,27 @@ export default function CustomerChat() {
                 onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
                 onStartAudioCall={() => {
+                  const roomName = `room-${[currentUser?.id, selectedConversation.participant.id].sort().join("-")}`;
                   useCallStore.getState().startOutgoingCall(
                     {
                       id: selectedConversation.participant.id,
                       name: selectedConversation.participant.name,
                       avatar: selectedConversation.participant.avatar,
                     },
-                    "audio"
+                    "audio",
+                    roomName
                   );
                 }}
                 onStartVideoCall={() => {
+                  const roomName = `room-${[currentUser?.id, selectedConversation.participant.id].sort().join("-")}`;
                   useCallStore.getState().startOutgoingCall(
                     {
                       id: selectedConversation.participant.id,
                       name: selectedConversation.participant.name,
                       avatar: selectedConversation.participant.avatar,
                     },
-                    "video"
+                    "video",
+                    roomName
                   );
                 }}
               />

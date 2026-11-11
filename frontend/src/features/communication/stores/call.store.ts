@@ -7,11 +7,12 @@ interface CallState {
   participant: CallParticipant | null;
   serverUrl?: string;
   roomToken?: string;
+  roomName?: string;
   isMicMuted: boolean;
   isCameraOff: boolean;
 
-  startOutgoingCall: (participant: CallParticipant, type: CallType) => void;
-  receiveIncomingCall: (caller: CallParticipant, type: CallType) => void;
+  startOutgoingCall: (participant: CallParticipant, type: CallType, roomName?: string) => void;
+  receiveIncomingCall: (caller: CallParticipant, type: CallType, roomName: string) => void;
   acceptCall: (serverUrl?: string, roomToken?: string) => void;
   endCall: () => void;
   toggleMic: () => void;
@@ -24,23 +25,26 @@ export const useCallStore = create<CallState>()((set) => ({
   participant: null,
   serverUrl: undefined,
   roomToken: undefined,
+  roomName: undefined,
   isMicMuted: false,
   isCameraOff: false,
 
-  startOutgoingCall: (participant, type) =>
+  startOutgoingCall: (participant, type, roomName) =>
     set({
       status: "calling",
       callType: type,
       participant,
+      roomName,
       isMicMuted: false,
       isCameraOff: false,
     }),
 
-  receiveIncomingCall: (caller, type) =>
+  receiveIncomingCall: (caller, type, roomName) =>
     set({
       status: "ringing",
       callType: type,
       participant: caller,
+      roomName,
       isMicMuted: false,
       isCameraOff: false,
     }),
@@ -58,6 +62,7 @@ export const useCallStore = create<CallState>()((set) => ({
       participant: null,
       serverUrl: undefined,
       roomToken: undefined,
+      roomName: undefined,
       isMicMuted: false,
       isCameraOff: false,
     }),

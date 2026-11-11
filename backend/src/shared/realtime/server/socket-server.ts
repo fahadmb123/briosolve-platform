@@ -5,6 +5,7 @@ import { envConfig } from "../../config/env.config";
 import { createSocketAuthMiddleware } from "../middleware/socket-auth.middleware";
 import { chatSocketHandler } from "../../../modules/chat/infrastructure/composition/socket";
 import { PresenceTracker } from "../services/presence.tracker";
+import { CallSocketHandler } from "../../../modules/communication/presentation/socket/call.socket-handler";
 
 export function createSocketServer(httpServer: HttpServer, jwtService: IJwtService) {
     const io = new Server(httpServer, {
@@ -14,6 +15,8 @@ export function createSocketServer(httpServer: HttpServer, jwtService: IJwtServi
         },
     });
 
+    const callSocketHandler = new CallSocketHandler(io);
+
     io.use(createSocketAuthMiddleware(jwtService));
 
     io.on("connection", (socket) => {
@@ -22,6 +25,7 @@ export function createSocketServer(httpServer: HttpServer, jwtService: IJwtServi
 
         socket.join(`user:${normalizedUserId}`);
         chatSocketHandler.register(socket);
+        callSocketHandler.register(socket);
 
         socket.on("chat:presence:enter", () => {
             const becameOnline = PresenceTracker.add(normalizedUserId, socket.id);

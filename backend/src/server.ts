@@ -25,6 +25,7 @@ import {
 import { createBulkNotificationUseCase, createNotificationUseCase } from "./modules/notification/infrastructure/composition/useCases";
 import { createServiceRequestRoutes } from "./modules/service-request/infrastructure/composition";
 import { createChatRoutes } from "./modules/chat/infrastructure/composition";
+import { communicationRoutes } from "./modules/communication/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -59,7 +60,8 @@ const startServer = async (): Promise<void> => {
             reactivationRoutes,
             notificationRoutes,
             serviceRequestRoutes,
-            chatRoutes
+            chatRoutes,
+            communicationRoutes
         });
 
         app.use("/api", rootRouter);

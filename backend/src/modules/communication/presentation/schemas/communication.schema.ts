@@ -15,5 +15,12 @@ export const getCommunicationsSchema = z.object({
     limit: z.string().optional().transform((val) => (val ? parseInt(val, 10) : 10))
 });
 
+export const generateCallTokenSchema = z.object({
+    roomName: z.string().min(1, "Room name is required"),
+    participantName: z.string().optional(),
+    callType: z.enum(["audio", "video"]).optional().default("audio")
+});
+
 export type SendCommunicationSchema = z.infer<typeof sendCommunicationSchema>;
 export type GetCommunicationsSchema = z.infer<typeof getCommunicationsSchema>;
+export type GenerateCallTokenSchema = z.infer<typeof generateCallTokenSchema>;
