@@ -11,10 +11,21 @@ export const OutgoingCallModal: React.FC<OutgoingCallModalProps> = ({
   if (!isOpen) return null;
 
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(recipient.name)}&background=05AD98&color=fff`;
+  const roleLabel = recipient.role === "PROVIDER" ? "Service Provider" : recipient.role === "CUSTOMER" ? "Customer" : "Marketplace Member";
 
   return (
     <div className="comm-call-overlay" role="dialog" aria-modal="true" aria-label="Outgoing Call">
       <div className="comm-call-modal-card">
+        <div className="comm-modal-header-pills">
+          <span className="comm-call-type-badge">
+            <i className={callType === "video" ? "fas fa-video" : "fas fa-phone-alt"} />
+            Outgoing {callType === "video" ? "Video" : "Voice"}
+          </span>
+          <span className="comm-security-pill">
+            <i className="fas fa-lock" /> Encrypted
+          </span>
+        </div>
+
         <div className="comm-avatar-ring-wrap">
           <div className="comm-pulse-ring" />
           <div className="comm-pulse-ring-delayed" />
@@ -27,8 +38,12 @@ export const OutgoingCallModal: React.FC<OutgoingCallModalProps> = ({
 
         <h3 className="comm-call-title">{recipient.name}</h3>
         <p className="comm-call-subtitle">
-          <i className={callType === "video" ? "fas fa-video" : "fas fa-phone-alt"} />
-          <span>Calling ({callType === "video" ? "Video" : "Audio"})...</span>
+          <span>Calling {roleLabel}</span>
+          <span className="comm-status-dots">
+            <span />
+            <span />
+            <span />
+          </span>
         </p>
 
         <div className="comm-call-actions-row">
@@ -37,15 +52,14 @@ export const OutgoingCallModal: React.FC<OutgoingCallModalProps> = ({
               type="button"
               onClick={onCancel}
               className="comm-action-btn-circle comm-btn-cancel"
-              aria-label="Cancel Call"
+              aria-label="End Call"
             >
               <i className="fas fa-phone-slash" />
             </button>
-            <span>Cancel</span>
+            <span>End Call</span>
           </div>
         </div>
       </div>
     </div>
   );
 };
-

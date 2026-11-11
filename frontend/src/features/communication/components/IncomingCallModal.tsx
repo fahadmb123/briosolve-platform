@@ -12,10 +12,21 @@ export const IncomingCallModal: React.FC<IncomingCallModalProps> = ({
   if (!isOpen) return null;
 
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(caller.name)}&background=05AD98&color=fff`;
+  const roleLabel = caller.role === "PROVIDER" ? "Service Provider" : caller.role === "CUSTOMER" ? "Customer" : "Marketplace Member";
 
   return (
     <div className="comm-call-overlay" role="dialog" aria-modal="true" aria-label="Incoming Call">
       <div className="comm-call-modal-card">
+        <div className="comm-modal-header-pills">
+          <span className="comm-call-type-badge">
+            <i className={callType === "video" ? "fas fa-video" : "fas fa-phone-alt"} />
+            Incoming {callType === "video" ? "Video" : "Voice"}
+          </span>
+          <span className="comm-security-pill">
+            <i className="fas fa-lock" /> Encrypted
+          </span>
+        </div>
+
         <div className="comm-avatar-ring-wrap">
           <div className="comm-pulse-ring" />
           <div className="comm-pulse-ring-delayed" />
@@ -28,8 +39,12 @@ export const IncomingCallModal: React.FC<IncomingCallModalProps> = ({
 
         <h3 className="comm-call-title">{caller.name}</h3>
         <p className="comm-call-subtitle">
-          <i className={callType === "video" ? "fas fa-video" : "fas fa-phone-alt"} />
-          <span>Incoming {callType === "video" ? "Video" : "Audio"} Call...</span>
+          <span>{roleLabel}</span>
+          <span className="comm-status-dots">
+            <span />
+            <span />
+            <span />
+          </span>
         </p>
 
         <div className="comm-call-actions-row">
@@ -61,4 +76,3 @@ export const IncomingCallModal: React.FC<IncomingCallModalProps> = ({
     </div>
   );
 };
-
