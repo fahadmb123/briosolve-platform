@@ -1,8 +1,10 @@
 const CALLING_SOUND_PATH = "/sounds/calling.wav";
 const INCOMING_RING_SOUND_PATH = "/sounds/incoming-ring.wav";
+const CALL_END_SOUND_PATH = "/sounds/call-end.wav";
 
 let callingAudio: HTMLAudioElement | null = null;
 let incomingRingAudio: HTMLAudioElement | null = null;
+let callEndAudio: HTMLAudioElement | null = null;
 
 const getCallingAudio = (): HTMLAudioElement | null => {
   if (typeof Audio === "undefined") return null;
@@ -20,6 +22,14 @@ const getIncomingRingAudio = (): HTMLAudioElement | null => {
     incomingRingAudio.loop = true;
   }
   return incomingRingAudio;
+};
+
+const getCallEndAudio = (): HTMLAudioElement | null => {
+  if (typeof Audio === "undefined") return null;
+  if (!callEndAudio) {
+    callEndAudio = new Audio(CALL_END_SOUND_PATH);
+  }
+  return callEndAudio;
 };
 
 export const startCallingSound = (): void => {
@@ -55,3 +65,10 @@ export const stopCallSounds = (): void => {
   stopIncomingRingSound();
 };
 
+export const playCallEndSound = (): void => {
+  stopCallSounds();
+  const audio = getCallEndAudio();
+  if (!audio) return;
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
+};

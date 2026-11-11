@@ -10,6 +10,7 @@ import {
   startCallingSound,
   startIncomingRingSound,
   stopCallSounds,
+  playCallEndSound,
 } from "../utils/call-sound.utils";
 
 export const CallModalContainer: React.FC = () => {
@@ -31,6 +32,7 @@ export const CallModalContainer: React.FC = () => {
 
   const currentUser = useAuthStore((state) => state.user);
   const pendingTokenRef = useRef<{ serverUrl?: string; token?: string }>({});
+  const prevStatusRef = useRef(status);
 
   useEffect(() => {
     const handleIncoming = (data: {
@@ -99,7 +101,11 @@ export const CallModalContainer: React.FC = () => {
       startIncomingRingSound();
     } else {
       stopCallSounds();
+      if (prevStatusRef.current === "connected" || prevStatusRef.current === "calling") {
+        playCallEndSound();
+      }
     }
+    prevStatusRef.current = status;
 
     return () => {
       stopCallSounds();
