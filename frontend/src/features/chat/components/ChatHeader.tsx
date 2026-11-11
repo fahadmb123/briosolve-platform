@@ -6,6 +6,8 @@ interface ChatHeaderProps {
   isInfoOpen: boolean;
   onToggleInfo: () => void;
   onBackToMobileList: () => void;
+  onStartAudioCall?: () => void;
+  onStartVideoCall?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -13,6 +15,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   isInfoOpen,
   onToggleInfo,
   onBackToMobileList,
+  onStartAudioCall,
+  onStartVideoCall,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -64,16 +68,31 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       </div>
 
       <div className="chat-header-actions">
-        {/*participant.phone && (
-          <a
-            href={`tel:${participant.phone}`}
-            className="chat-action-btn phone"
-            title={`Call ${participant.name}`}
+        {onStartAudioCall && (
+          <button
+            type="button"
+            className="chat-action-btn"
+            onClick={onStartAudioCall}
+            title={`Audio call ${participant.name}`}
+            aria-label={`Audio call ${participant.name}`}
           >
             <i className="fas fa-phone-alt" />
             <span className="chat-btn-text">Call</span>
-          </a>
-        )*/}
+          </button>
+        )}
+
+        {onStartVideoCall && (
+          <button
+            type="button"
+            className="chat-action-btn"
+            onClick={onStartVideoCall}
+            title={`Video call ${participant.name}`}
+            aria-label={`Video call ${participant.name}`}
+          >
+            <i className="fas fa-video" />
+            <span className="chat-btn-text">Video</span>
+          </button>
+        )}
 
         <button
           type="button"
