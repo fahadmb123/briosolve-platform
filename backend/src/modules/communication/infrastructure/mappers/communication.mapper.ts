@@ -1,5 +1,6 @@
 import { Communication, CommunicationChannel, CommunicationStatus } from "../../domain/entities/communication.entity";
 import { CommunicationResponseDto } from "../../application/dtos/response/communication-response.dto";
+import { SendCommunicationRequestDto } from "../../application/dtos/request/send-communication.dto";
 
 export class CommunicationMapper {
     static toDomain(raw: {
@@ -40,6 +41,18 @@ export class CommunicationMapper {
             metadata: entity.metadata,
             createdAt: entity.created_at.toISOString(),
             updatedAt: entity.updated_at.toISOString()
+        };
+    }
+
+    static toPersistence(data: SendCommunicationRequestDto) {
+        return {
+            sender_id: data.senderId ?? null,
+            recipient_id: data.recipientId,
+            channel: data.channel,
+            subject: data.subject ?? null,
+            content: data.content,
+            status: "SENT" as CommunicationStatus,
+            metadata: data.metadata ?? null
         };
     }
 }

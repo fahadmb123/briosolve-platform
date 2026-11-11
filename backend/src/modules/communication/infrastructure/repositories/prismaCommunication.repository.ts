@@ -16,18 +16,13 @@ export class PrismaCommunicationRepository implements ICommunicationRepository {
     async create(data: SendCommunicationRequestDto): Promise<Communication> {
         const id = randomUUID();
         const now = new Date();
-        const communication = new Communication(
+        const persistenceData = CommunicationMapper.toPersistence(data);
+        const communication = CommunicationMapper.toDomain({
             id,
-            data.senderId ?? null,
-            data.recipientId,
-            data.channel,
-            data.subject ?? null,
-            data.content,
-            "SENT",
-            data.metadata ?? null,
-            now,
-            now
-        );
+            ...persistenceData,
+            created_at: now,
+            updated_at: now
+        });
         this._items.set(id, communication);
         return communication;
     }

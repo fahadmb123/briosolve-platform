@@ -18,4 +18,11 @@ export class CustomerProfileMapper {
             updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw)
         );
     }
+
+    static toPersistence(userId: string, about: string = "") {
+        return {
+            user_id: userId as never,
+            about: about as never
+        };
+    }
 }

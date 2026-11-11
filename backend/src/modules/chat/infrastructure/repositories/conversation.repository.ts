@@ -16,10 +16,9 @@ function parseDate(val: unknown): Date {
 
 export class ConversationRepository implements IConversationRepository {
     async create(): Promise<Conversation | null> {
-        const record = await db.orm.public.conversations.create({
-            type: "DIRECT",
-            status: "ACTIVE"
-        });
+        const record = await db.orm.public.conversations.create(
+            ConversationMapper.toPersistence() as never
+        );
 
         if (!record) return null;
         return ConversationMapper.toDomain(record);
