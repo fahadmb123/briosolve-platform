@@ -537,52 +537,6 @@
   transform: translateY(1px);
 }
 
-.comm-header-action-btns {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.comm-header-call-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: var(--surface-hover, #292932);
-  color: var(--text, #ffffff);
-  border: 1px solid var(--border, #282832);
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.15s ease;
-}
-
-.comm-header-call-btn:hover:not(:disabled) {
-  background: #05ad98;
-  color: #ffffff;
-  border-color: #05ad98;
-  transform: translateY(-1px);
-}
-
-.comm-header-call-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.comm-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(6, 78, 59, 0.9);
-  color: #a7f3d0;
-  border: 1px solid #059669;
-  border-radius: 9999px;
-  padding: 4px 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
 .comm-status-dot {
   width: 8px;
   height: 8px;

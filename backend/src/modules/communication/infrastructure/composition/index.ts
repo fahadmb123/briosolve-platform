@@ -11,7 +11,6 @@ export function createCommunicationRoutes(): Router {
 
 export const communicationRoutes = createCommunicationRoutes();
 
-export * from "./repositories";
 export * from "./useCases";
 export * from "./controller";
-
+export * from "./services";

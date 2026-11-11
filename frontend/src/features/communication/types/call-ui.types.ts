@@ -36,21 +36,3 @@ export interface ActiveCallModalProps {
   onToggleMic?: () => void;
   onToggleCamera?: () => void;
 }
-
-export interface CallActionButtonsProps {
-  onStartAudioCall?: () => void;
-  onStartVideoCall?: () => void;
-  disabled?: boolean;
-  size?: "sm" | "md" | "lg";
-  className?: string;
-}
-
-export interface CallStatusBadgeProps {
-  participantName: string;
-  callType: CallType;
-  duration?: string;
-  onExpand?: () => void;
-  onEndCall?: () => void;
-  className?: string;
-}
-
