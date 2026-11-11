@@ -6,6 +6,11 @@ import { ActiveCallModal } from "./ActiveCallModal";
 import { socket } from "../../../shared/api/socket-client";
 import { fetchCallToken } from "../api/call.api";
 import { useAuthStore } from "../../auth/stores/auth.store";
+import {
+  startCallingSound,
+  startIncomingRingSound,
+  stopCallSounds,
+} from "../utils/call-sound.utils";
 
 export const CallModalContainer: React.FC = () => {
   const {
@@ -86,6 +91,20 @@ export const CallModalContainer: React.FC = () => {
       socket.off("call:ended", handleEnded);
     };
   }, [receiveIncomingCall, acceptCall, endCall]);
+
+  useEffect(() => {
+    if (status === "calling") {
+      startCallingSound();
+    } else if (status === "ringing") {
+      startIncomingRingSound();
+    } else {
+      stopCallSounds();
+    }
+
+    return () => {
+      stopCallSounds();
+    };
+  }, [status]);
 
   useEffect(() => {
     if (status !== "calling" || !participant || !roomName) return;
