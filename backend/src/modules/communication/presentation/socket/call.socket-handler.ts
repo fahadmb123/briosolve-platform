@@ -1,5 +1,7 @@
+import { randomUUID } from "node:crypto";
 import type { Server, Socket } from "socket.io";
 import type { SocketData } from "../../../../shared/realtime/types/socket-data.types";
+import type { INotificationDelivery } from "../../../notification/application/interfaces/INotificationDelivery";
 
 export interface InitiateCallPayload {
     recipientId: string;
@@ -26,7 +28,10 @@ export interface EndCallPayload {
 }
 
 export class CallSocketHandler {
-    constructor(private readonly _io: Server) {}
+    constructor(
+        private readonly _io: Server,
+        private readonly _pushDelivery?: INotificationDelivery
+    ) {}
 
     register(socket: Socket<any, any, any, SocketData>): void {
         const userId = socket.data.user?.userId;
@@ -34,13 +39,29 @@ export class CallSocketHandler {
 
         socket.on("call:initiate", (payload: InitiateCallPayload) => {
             if (!payload || !payload.recipientId) return;
-            this._io.to(`user:${String(payload.recipientId).trim()}`).emit("call:incoming", {
+            const recipientId = String(payload.recipientId).trim();
+
+            this._io.to(`user:${recipientId}`).emit("call:incoming", {
                 callerId: normalizedUserId,
                 callerName: payload.callerName,
                 callerAvatar: payload.callerAvatar,
                 roomName: payload.roomName,
                 callType: payload.callType || "audio"
             });
+
+            if (this._pushDelivery) {
+                const callTypeLabel = payload.callType === "video" ? "Video" : "Audio";
+                this._pushDelivery.deliver({
+                    id: randomUUID(),
+                    recipient_id: recipientId,
+                    type: "INFO",
+                    title: `Incoming ${callTypeLabel} Call`,
+                    message: `${payload.callerName || "Someone"} is calling you...`,
+                    is_read: false,
+                    read_at: null,
+                    created_at: new Date() as any
+                }).catch(() => {});
+            }
         });
 
         socket.on("call:accept", (payload: AcceptCallPayload) => {

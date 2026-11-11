@@ -22,7 +22,7 @@ import {
     providerRoutes,
     reactivationRoutes
 } from "./modules/user-management/infrastructure/composition";
-import { createBulkNotificationUseCase, createNotificationUseCase } from "./modules/notification/infrastructure/composition/useCases";
+import { createBulkNotificationUseCase, createNotificationUseCase, webPushDelivery } from "./modules/notification/infrastructure/composition/useCases";
 import { createServiceRequestRoutes } from "./modules/service-request/infrastructure/composition";
 import { createChatRoutes } from "./modules/chat/infrastructure/composition";
 import { communicationRoutes } from "./modules/communication/infrastructure/composition";
@@ -37,7 +37,7 @@ const startServer = async (): Promise<void> => {
         const app = createApp();
         const httpServer = createServer(app);
 
-        const io = createSocketServer(httpServer, jwtService);
+        const io = createSocketServer(httpServer, jwtService, webPushDelivery);
 
         const notificationUseCase = createNotificationUseCase(io);
         const bulkNotificationUseCase = createBulkNotificationUseCase(io);

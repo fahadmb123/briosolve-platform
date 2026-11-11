@@ -6,8 +6,9 @@ import { createSocketAuthMiddleware } from "../middleware/socket-auth.middleware
 import { chatSocketHandler } from "../../../modules/chat/infrastructure/composition/socket";
 import { PresenceTracker } from "../services/presence.tracker";
 import { CallSocketHandler } from "../../../modules/communication/presentation/socket/call.socket-handler";
+import type { INotificationDelivery } from "../../../modules/notification/application/interfaces/INotificationDelivery";
 
-export function createSocketServer(httpServer: HttpServer, jwtService: IJwtService) {
+export function createSocketServer(httpServer: HttpServer, jwtService: IJwtService, pushDelivery?: INotificationDelivery) {
     const io = new Server(httpServer, {
         cors: {
             origin: envConfig.CORS_ORIGIN,
@@ -15,7 +16,7 @@ export function createSocketServer(httpServer: HttpServer, jwtService: IJwtServi
         },
     });
 
-    const callSocketHandler = new CallSocketHandler(io);
+    const callSocketHandler = new CallSocketHandler(io, pushDelivery);
 
     io.use(createSocketAuthMiddleware(jwtService));
 
