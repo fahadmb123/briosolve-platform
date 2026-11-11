@@ -22,11 +22,26 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
   return (
     <header className="chat-main-header">
-      <div className="chat-header-left">
+      <div
+        className="chat-header-left"
+        onClick={onToggleInfo}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggleInfo();
+          }
+        }}
+        title="View details"
+      >
         <button
           type="button"
           className="chat-back-mobile-btn"
-          onClick={onBackToMobileList}
+          onClick={(e) => {
+            e.stopPropagation();
+            onBackToMobileList();
+          }}
           aria-label="Back to conversations"
         >
           <i className="fas fa-chevron-left" />
@@ -71,7 +86,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         {onStartAudioCall && (
           <button
             type="button"
-            className="chat-action-btn"
+            className="chat-action-btn chat-call-btn chat-call-audio-btn"
             onClick={onStartAudioCall}
             title={`Audio call ${participant.name}`}
             aria-label={`Audio call ${participant.name}`}
@@ -84,7 +99,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         {onStartVideoCall && (
           <button
             type="button"
-            className="chat-action-btn"
+            className="chat-action-btn chat-call-btn chat-call-video-btn"
             onClick={onStartVideoCall}
             title={`Video call ${participant.name}`}
             aria-label={`Video call ${participant.name}`}
@@ -96,7 +111,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
         <button
           type="button"
-          className={`chat-action-btn ${isInfoOpen ? "active" : ""}`}
+          className={`chat-action-btn chat-details-btn ${isInfoOpen ? "active" : ""}`}
           onClick={onToggleInfo}
           title="Toggle details"
         >
@@ -107,7 +122,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         <div className="chat-dropdown-wrap">
           <button
             type="button"
-            className="chat-action-btn icon-only"
+            className="chat-action-btn icon-only chat-more-btn"
             onClick={() => setShowMenu((prev) => !prev)}
             aria-label="More conversation options"
           >

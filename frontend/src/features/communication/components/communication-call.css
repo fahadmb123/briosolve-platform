@@ -1,11 +1,11 @@
 .comm-call-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 100000 !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(9, 9, 12, 0.78);
+  background: rgba(9, 9, 12, 0.84);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   padding: 16px;
@@ -596,6 +596,10 @@
   height: 100% !important;
   width: 100% !important;
   background: transparent !important;
+}
+
+.lk-video-conference .lk-control-bar {
+  display: none !important;
 }
 
 @media (max-width: 640px) {
