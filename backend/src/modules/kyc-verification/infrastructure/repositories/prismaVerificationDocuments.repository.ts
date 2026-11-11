@@ -82,13 +82,9 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
                         .delete();
                 }
             } else {
-                const created = await tx.orm.public.provider_verification_documents.create({
-                    provider_id: input.provider_id as never,
-                    document_type: input.document_type as never,
-                    document_name: input.document_name as never,
-                    status: 'PENDING',
-                    rejection_reason: null
-                } as never);
+                const created = await tx.orm.public.provider_verification_documents.create(
+                    VerificationDocumentMapper.toPersistence(input) as never
+                );
 
                 documentId = (created as unknown as { id: string }).id;
             }

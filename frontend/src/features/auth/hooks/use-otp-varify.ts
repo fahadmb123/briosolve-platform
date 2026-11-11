@@ -77,22 +77,28 @@ export const useLogin = () => {
 
     return useMutation({
         mutationFn: login,
-        onSuccess: (response) => {
+        onSuccess: async (response) => {
             const user = response.data.user;
             useAuthStore.getState().setUser(user);
             useAuthStore.getState().setProfile(user.customer_profile || user.provider_profile || null);
-            
-            if (user.role === "CUSTOMER") {
+
+            try {
+                await useAuthStore.getState().fetchUser();
+            } catch {
+            }
+
+            const currentUser = useAuthStore.getState().user || user;
+            if (currentUser.role === "CUSTOMER") {
                 navigate("/", { replace: true });
-            } else if (user.role === "PROVIDER") {
-                const kycStatus = user.provider_profile?.kyc_status;
+            } else if (currentUser.role === "PROVIDER") {
+                const kycStatus = currentUser.provider_profile?.kyc_status;
                 if (!kycStatus || kycStatus !== "APPROVED") {
                     navigate("/provider/kyc", { replace: true });
                 } else {
                     navigate("/provider/dashboard", { replace: true });
                 }
             } else {
-                navigate(`/${user.role.toLocaleLowerCase()}`, { replace: true });
+                navigate(`/${currentUser.role.toLocaleLowerCase()}`, { replace: true });
             }
             toast.success(response.message);
         },

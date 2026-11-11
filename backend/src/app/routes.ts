@@ -17,6 +17,7 @@ export function createRootRouter(route: RootRouterDependencies) {
     router.use("/notification", route.notificationRoutes);
     router.use("/service-request", route.serviceRequestRoutes);
     router.use("/chat", route.chatRoutes);
+    router.use("/communication", route.communicationRoutes);
 
     return router;
 }

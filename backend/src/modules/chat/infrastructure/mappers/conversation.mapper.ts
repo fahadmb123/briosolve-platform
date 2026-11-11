@@ -34,5 +34,12 @@ export class ConversationMapper {
             updated_at: conversation.updated_at
         };
     }
+
+    static toPersistence(type: "DIRECT" | "GROUP" = "DIRECT", status: "ACTIVE" | "ARCHIVED" = "ACTIVE") {
+        return {
+            type,
+            status
+        };
+    }
 }
 

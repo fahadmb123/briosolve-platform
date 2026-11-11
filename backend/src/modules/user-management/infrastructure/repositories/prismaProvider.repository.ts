@@ -11,29 +11,18 @@ import { UpdateProviderProfileInputDto } from "../../application/dtos/request/pr
 export class ProviderRepository implements IProviderRepository {
     async createProvider(data: CreateProviderInput): Promise<User> {
         return await db.transaction(async (tx) => {
-            const user = await tx.orm.public.users.create({
-                name: data.name,
-                email: data.email,
-                password_hash: data.password,
-                role: "PROVIDER" as const,
-                status: "ACTIVE" as const,
-                email_verified: true,
-                phone_verified: false,
-            } as never);
+            const user = await tx.orm.public.users.create(
+                UserMapper.toPersistence(data, "PROVIDER") as never
+            );
 
-            const profile = await tx.orm.public.provider_profiles.create({
-                user_id: user.id,
-                business_name: data.businessName,
-                experience: data.experience,
-                bio: data.bio,
-                profile_image: null
-            } as never);
+            const profile = await tx.orm.public.provider_profiles.create(
+                ProviderProfileMapper.toPersistence(user.id, data) as never
+            );
 
             for (const serviceId of data.services) {
-                await tx.orm.public.provider_services.create({
-                    provider_id: profile.id,
-                    service_id: serviceId as never
-                } as never);
+                await tx.orm.public.provider_services.create(
+                    ProviderProfileMapper.toPersistenceService(profile.id, serviceId) as never
+                );
             }
 
             return UserMapper.toDomain(user);
@@ -42,19 +31,14 @@ export class ProviderRepository implements IProviderRepository {
 
     async createProviderProfile(data: CreateProviderProfileInput): Promise<{ id: string }> {
         return await db.transaction(async (tx) => {
-            const profile = await tx.orm.public.provider_profiles.create({
-                user_id: data.userId,
-                business_name: data.businessName,
-                experience: data.experience,
-                bio: data.bio,
-                profile_image: null
-            } as never);
+            const profile = await tx.orm.public.provider_profiles.create(
+                ProviderProfileMapper.toPersistence(data.userId, data) as never
+            );
 
             for (const serviceId of data.services) {
-                await tx.orm.public.provider_services.create({
-                    provider_id: profile.id,
-                    service_id: serviceId as never
-                } as never);
+                await tx.orm.public.provider_services.create(
+                    ProviderProfileMapper.toPersistenceService(profile.id, serviceId) as never
+                );
             }
 
             return { id: profile.id };
@@ -92,18 +76,9 @@ export class ProviderRepository implements IProviderRepository {
                         updated_at: Temporal.Now.instant()
                     } as never);
             } else {
-                await tx.orm.public.provider_profiles.create({
-                    user_id: input.id,
-                    business_name: businessName || "",
-                    experience: input.data.experience || "",
-                    bio: input.data.bio || "",
-                    profile_image: input.data.profile_image || null,
-                    service_radius_km: input.data.service_radius_km !== undefined ? input.data.service_radius_km : 20,
-                    accepting_leads: input.data.accepting_leads !== undefined ? input.data.accepting_leads : true,
-                    travel_buffer_minutes: input.data.travel_buffer_minutes !== undefined ? input.data.travel_buffer_minutes : 30,
-                    created_at: Temporal.Now.instant(),
-                    updated_at: Temporal.Now.instant()
-                } as never);
+                await tx.orm.public.provider_profiles.create(
+                    ProviderProfileMapper.toPersistence(input.id, input.data) as never
+                );
             }
         });
     }

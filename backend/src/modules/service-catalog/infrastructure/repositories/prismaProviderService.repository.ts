@@ -27,10 +27,9 @@ export class ProviderServiceRepository implements IProviderServiceRepository {
                     .first();
 
                 if (!existing) {
-                    await tx.orm.public.provider_services.create({
-                        provider_id: providerId,
-                        service_id: serviceId as never
-                    } as never);
+                    await tx.orm.public.provider_services.create(
+                        ProviderServiceMapper.toPersistence(providerId, serviceId) as never
+                    );
                 }
             }
 

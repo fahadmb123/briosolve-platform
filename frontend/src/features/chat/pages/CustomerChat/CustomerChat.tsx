@@ -28,6 +28,7 @@ import {
 import { toChatMessage, toChatConversation } from "../../utils/chat.mapper";
 import { useChatSocket } from "../../hooks/useChatSocket";
 import { useChatStore } from "../../stores/chat.store";
+import { useCallStore } from "../../../communication";
 import { socket } from "../../../../shared/api/socket-client";
 import "./CustomerChat.css";
 import { playChatRecieveSound, playChatSendSound, playMessageSound } from "../../utils/sound.utils";
@@ -739,6 +740,32 @@ export default function CustomerChat() {
                 isInfoOpen={isInfoOpen}
                 onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
+                onStartAudioCall={() => {
+                  const roomName = `room-${[currentUser?.id, selectedConversation.participant.id].sort().join("-")}`;
+                  useCallStore.getState().startOutgoingCall(
+                    {
+                      id: selectedConversation.participant.id,
+                      name: selectedConversation.participant.name,
+                      avatar: selectedConversation.participant.avatar,
+                    },
+                    "audio",
+                    roomName,
+                    selectedConversation.id
+                  );
+                }}
+                onStartVideoCall={() => {
+                  const roomName = `room-${[currentUser?.id, selectedConversation.participant.id].sort().join("-")}`;
+                  useCallStore.getState().startOutgoingCall(
+                    {
+                      id: selectedConversation.participant.id,
+                      name: selectedConversation.participant.name,
+                      avatar: selectedConversation.participant.avatar,
+                    },
+                    "video",
+                    roomName,
+                    selectedConversation.id
+                  );
+                }}
               />
 
               <div className="chat-thread-body">
