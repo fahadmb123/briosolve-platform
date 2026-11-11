@@ -70,11 +70,34 @@ export const useAuthStore = create<IAuthState>()((set) => ({
         set({
             isSuspended:suspended
         }),
-    setUser: (user: IAuthUser) =>
+    setUser: (user: IAuthUser) => {
+        const isBlocked = user?.status === UserStatus.BLOCKED;
+        const verifications: IVerifications =
+            user.role === "PROVIDER"
+                ? {
+                    phone: user.phone_verified,
+                    email: user.email_verified,
+                    identity: user.provider_profile?.kyc_status === "APPROVED",
+                    address: user.current_address_id !== null,
+                    services: Boolean(
+                        user.provider_profile?.services &&
+                        user.provider_profile.services.length > 0
+                    ),
+                }
+                : {
+                    phone: user.phone_verified,
+                    email: user.email_verified,
+                    address: user.current_address_id !== null,
+                };
+
         set({
             user,
-            isAuthenticated: true,
-        }),
+            profile: user.customer_profile || user.provider_profile || null,
+            verifications,
+            isAuthenticated: !isBlocked,
+            isSuspended: isBlocked,
+        });
+    },
         
     setProfile: (profile: CustomerProfile | ProviderProfile | null) =>
         set({
