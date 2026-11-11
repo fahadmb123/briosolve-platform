@@ -28,6 +28,7 @@ import {
 import { toChatMessage, toChatConversation } from "../../utils/chat.mapper";
 import { useChatSocket } from "../../hooks/useChatSocket";
 import { useChatStore } from "../../stores/chat.store";
+import { useCallStore } from "../../../communication";
 import { socket } from "../../../../shared/api/socket-client";
 import "../CustomerChat/CustomerChat.css";
 import { playChatRecieveSound, playChatSendSound, playMessageSound } from "../../utils/sound.utils";
@@ -739,6 +740,26 @@ export default function ProviderChat() {
                 isInfoOpen={isInfoOpen}
                 onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
+                onStartAudioCall={() => {
+                  useCallStore.getState().startOutgoingCall(
+                    {
+                      id: selectedConversation.participant.id,
+                      name: selectedConversation.participant.name,
+                      avatar: selectedConversation.participant.avatar,
+                    },
+                    "audio"
+                  );
+                }}
+                onStartVideoCall={() => {
+                  useCallStore.getState().startOutgoingCall(
+                    {
+                      id: selectedConversation.participant.id,
+                      name: selectedConversation.participant.name,
+                      avatar: selectedConversation.participant.avatar,
+                    },
+                    "video"
+                  );
+                }}
               />
 
               <div className="chat-thread-body">

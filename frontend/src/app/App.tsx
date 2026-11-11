@@ -13,6 +13,7 @@ import { useNotificationSocket } from '../features/notifications/hooks/useNotifi
 import { useChatUnreadSync } from '../features/chat';
 import AccountSuspended from './pages/AccountSuspended/AccountSuspended';
 import { useCheckNetworkStatus } from '../shared/hooks/useCheckNetworkStatus';
+import { CallModalContainer } from '../features/communication';
 
 function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
@@ -46,6 +47,7 @@ function App() {
         ) : (
           <>
             <Toaster position="top-center" />
+            <CallModalContainer />
             <AppRouter />
           </>
         )}
