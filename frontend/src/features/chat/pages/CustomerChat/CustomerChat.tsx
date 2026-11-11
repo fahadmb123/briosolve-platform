@@ -749,7 +749,8 @@ export default function CustomerChat() {
                       avatar: selectedConversation.participant.avatar,
                     },
                     "audio",
-                    roomName
+                    roomName,
+                    selectedConversation.id
                   );
                 }}
                 onStartVideoCall={() => {
@@ -761,7 +762,8 @@ export default function CustomerChat() {
                       avatar: selectedConversation.participant.avatar,
                     },
                     "video",
-                    roomName
+                    roomName,
+                    selectedConversation.id
                   );
                 }}
               />

@@ -8,11 +8,13 @@ interface CallState {
   serverUrl?: string;
   roomToken?: string;
   roomName?: string;
+  conversationId?: string;
+  isCaller?: boolean;
   isMicMuted: boolean;
   isCameraOff: boolean;
 
-  startOutgoingCall: (participant: CallParticipant, type: CallType, roomName?: string) => void;
-  receiveIncomingCall: (caller: CallParticipant, type: CallType, roomName: string) => void;
+  startOutgoingCall: (participant: CallParticipant, type: CallType, roomName?: string, conversationId?: string) => void;
+  receiveIncomingCall: (caller: CallParticipant, type: CallType, roomName: string, conversationId?: string) => void;
   acceptCall: (serverUrl?: string, roomToken?: string) => void;
   endCall: () => void;
   toggleMic: () => void;
@@ -26,25 +28,31 @@ export const useCallStore = create<CallState>()((set) => ({
   serverUrl: undefined,
   roomToken: undefined,
   roomName: undefined,
+  conversationId: undefined,
+  isCaller: false,
   isMicMuted: false,
   isCameraOff: false,
 
-  startOutgoingCall: (participant, type, roomName) =>
+  startOutgoingCall: (participant, type, roomName, conversationId) =>
     set({
       status: "calling",
       callType: type,
       participant,
       roomName,
+      conversationId,
+      isCaller: true,
       isMicMuted: false,
       isCameraOff: false,
     }),
 
-  receiveIncomingCall: (caller, type, roomName) =>
+  receiveIncomingCall: (caller, type, roomName, conversationId) =>
     set({
       status: "ringing",
       callType: type,
       participant: caller,
       roomName,
+      conversationId,
+      isCaller: false,
       isMicMuted: false,
       isCameraOff: false,
     }),
@@ -63,6 +71,8 @@ export const useCallStore = create<CallState>()((set) => ({
       serverUrl: undefined,
       roomToken: undefined,
       roomName: undefined,
+      conversationId: undefined,
+      isCaller: false,
       isMicMuted: false,
       isCameraOff: false,
     }),
@@ -70,4 +80,3 @@ export const useCallStore = create<CallState>()((set) => ({
   toggleMic: () => set((state) => ({ isMicMuted: !state.isMicMuted })),
   toggleCamera: () => set((state) => ({ isCameraOff: !state.isCameraOff })),
 }));
-

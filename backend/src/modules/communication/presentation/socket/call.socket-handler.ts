@@ -9,6 +9,7 @@ export interface InitiateCallPayload {
     callType: "audio" | "video";
     callerName: string;
     callerAvatar?: string;
+    conversationId?: string;
 }
 
 export interface AcceptCallPayload {
@@ -25,6 +26,7 @@ export interface RejectCallPayload {
 export interface EndCallPayload {
     targetUserId: string;
     roomName: string;
+    duration?: number;
 }
 
 export class CallSocketHandler {
@@ -46,7 +48,8 @@ export class CallSocketHandler {
                 callerName: payload.callerName,
                 callerAvatar: payload.callerAvatar,
                 roomName: payload.roomName,
-                callType: payload.callType || "audio"
+                callType: payload.callType || "audio",
+                conversationId: payload.conversationId
             });
 
             if (this._pushDelivery) {
@@ -85,9 +88,9 @@ export class CallSocketHandler {
             if (!payload || !payload.targetUserId) return;
             this._io.to(`user:${String(payload.targetUserId).trim()}`).emit("call:ended", {
                 userId: normalizedUserId,
-                roomName: payload.roomName
+                roomName: payload.roomName,
+                duration: payload.duration
             });
         });
     }
 }
-

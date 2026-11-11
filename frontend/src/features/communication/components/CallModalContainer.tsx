@@ -4,7 +4,7 @@ import { IncomingCallModal } from "./IncomingCallModal";
 import { OutgoingCallModal } from "./OutgoingCallModal";
 import { ActiveCallModal } from "./ActiveCallModal";
 import { socket } from "../../../shared/api/socket-client";
-import { fetchCallToken } from "../api/call.api";
+import { fetchCallToken, recordCallMessage } from "../api/call.api";
 import { useAuthStore } from "../../auth/stores/auth.store";
 import {
   startCallingSound,
@@ -33,6 +33,7 @@ export const CallModalContainer: React.FC = () => {
   const currentUser = useAuthStore((state) => state.user);
   const pendingTokenRef = useRef<{ serverUrl?: string; token?: string }>({});
   const prevStatusRef = useRef(status);
+  const connectedAtRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleIncoming = (data: {
@@ -41,6 +42,7 @@ export const CallModalContainer: React.FC = () => {
       callerAvatar?: string;
       roomName: string;
       callType: "audio" | "video";
+      conversationId?: string;
     }) => {
       receiveIncomingCall(
         {
@@ -49,7 +51,8 @@ export const CallModalContainer: React.FC = () => {
           avatar: data.callerAvatar,
         },
         data.callType,
-        data.roomName
+        data.roomName,
+        data.conversationId
       );
     };
 
@@ -74,10 +77,23 @@ export const CallModalContainer: React.FC = () => {
     };
 
     const handleRejected = () => {
+      const { conversationId, isCaller, callType } = useCallStore.getState();
+      if (conversationId && isCaller) {
+        recordCallMessage(conversationId, callType, "declined");
+      }
       endCall();
     };
 
-    const handleEnded = () => {
+    const handleEnded = (data?: { duration?: number }) => {
+      const { conversationId, isCaller, callType, status: currentStatus } = useCallStore.getState();
+      if (conversationId && isCaller) {
+        if (currentStatus === "connected") {
+          const duration = data?.duration ?? (connectedAtRef.current ? Math.max(1, Math.round((Date.now() - connectedAtRef.current) / 1000)) : 0);
+          recordCallMessage(conversationId, callType, "completed", duration);
+        } else {
+          recordCallMessage(conversationId, callType, "missed");
+        }
+      }
       endCall();
     };
 
@@ -99,11 +115,15 @@ export const CallModalContainer: React.FC = () => {
       startCallingSound();
     } else if (status === "ringing") {
       startIncomingRingSound();
+    } else if (status === "connected") {
+      stopCallSounds();
+      connectedAtRef.current = Date.now();
     } else {
       stopCallSounds();
       if (prevStatusRef.current === "connected" || prevStatusRef.current === "calling") {
         playCallEndSound();
       }
+      connectedAtRef.current = null;
     }
     prevStatusRef.current = status;
 
@@ -127,7 +147,8 @@ export const CallModalContainer: React.FC = () => {
           roomName,
           callType,
           callerName: currentUser?.name || "Caller",
-          callerAvatar: (currentUser as any)?.profileImage || (currentUser as any)?.customer_profile?.profile_image || (currentUser as any)?.provider_profile?.profile_image
+          callerAvatar: (currentUser as any)?.profileImage || (currentUser as any)?.customer_profile?.profile_image || (currentUser as any)?.provider_profile?.profile_image,
+          conversationId: useCallStore.getState().conversationId
         });
       })
       .catch(() => {
@@ -165,21 +186,34 @@ export const CallModalContainer: React.FC = () => {
   };
 
   const handleCancelOutgoing = () => {
+    const { conversationId, isCaller, callType, participant, roomName } = useCallStore.getState();
     if (participant && roomName) {
       socket.emit("call:end", {
         targetUserId: participant.id,
         roomName
       });
     }
+    if (conversationId && isCaller) {
+      recordCallMessage(conversationId, callType, "missed");
+    }
     endCall();
   };
 
   const handleEndActiveCall = () => {
+    const { conversationId, isCaller, callType, participant, roomName } = useCallStore.getState();
+    const duration = connectedAtRef.current
+      ? Math.max(1, Math.round((Date.now() - connectedAtRef.current) / 1000))
+      : 0;
+
     if (participant && roomName) {
       socket.emit("call:end", {
         targetUserId: participant.id,
-        roomName
+        roomName,
+        duration
       });
+    }
+    if (conversationId && isCaller) {
+      recordCallMessage(conversationId, callType, "completed", duration);
     }
     endCall();
   };
@@ -224,4 +258,3 @@ export const CallModalContainer: React.FC = () => {
     </>
   );
 };
-
