@@ -578,3 +578,136 @@ input:checked + .slider-round:before {
         justify-content: center;
     }
 }
+
+.settings-verification-box {
+    background: #FF7900 !important;
+    border: 3px solid #FFE642 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(255, 121, 0, 0.3) !important;
+    color: #180D00 !important;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-theme='light'] .settings-verification-box,
+[data-theme='dark'] .settings-verification-box {
+    background: #FF7900 !important;
+    border: 3px solid #FFE642 !important;
+    box-shadow: 0 10px 30px rgba(255, 121, 0, 0.3) !important;
+}
+
+.settings-verification-box .settings-group-header {
+    border-bottom: 2px solid rgba(255, 230, 66, 0.5) !important;
+}
+
+.settings-verification-box .settings-group-icon.verification {
+    background: #FFFFFF !important;
+    color: #FF7900 !important;
+    border: 2px solid #FFE642 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+.settings-verification-box .settings-group-title {
+    color: #FFE642 !important;
+    font-weight: 800 !important;
+    font-size: 1.25rem !important;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.settings-verification-box .settings-group-desc {
+    color: #180D00 !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    opacity: 0.95;
+}
+
+.settings-verification-box .settings-group-badge .badge-warning {
+    background: #FFE642 !important;
+    color: #180D00 !important;
+    border: 1px solid #FFBF00 !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.settings-verification-box .settings-group-badge .badge-success {
+    background: #FFFFFF !important;
+    color: #15803D !important;
+    border: 1px solid #86EFAC !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.settings-verification-box .settings-win-card,
+.settings-verification-box .settings-glass-card {
+    background: #FFFFFF !important;
+    border: 2px solid #FFE642 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme='light'] .settings-verification-box .settings-win-card,
+[data-theme='dark'] .settings-verification-box .settings-win-card,
+[data-theme='light'] .settings-verification-box .settings-glass-card,
+[data-theme='dark'] .settings-verification-box .settings-glass-card {
+    background: #FFFFFF !important;
+    border: 2px solid #FFE642 !important;
+}
+
+.settings-verification-box .settings-win-card:hover,
+.settings-verification-box .settings-glass-card:hover {
+    background: #FFFDF5 !important;
+    border-color: #FF7900 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18) !important;
+}
+
+.settings-verification-box .settings-win-icon,
+.settings-verification-box .settings-glass-icon {
+    background: #FFE642 !important;
+    color: #180D00 !important;
+    border: 1px solid #FFBF00 !important;
+    font-size: 1.15rem;
+}
+
+.settings-verification-box .settings-win-card:hover .settings-win-icon {
+    background: #FF7900 !important;
+    color: #FFFFFF !important;
+    border-color: #FF7900 !important;
+}
+
+.settings-verification-box .settings-win-title {
+    color: #180D00 !important;
+    font-weight: 700 !important;
+    font-size: 1.02rem !important;
+}
+
+.settings-verification-box .settings-win-desc {
+    color: #2A1702 !important;
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+}
+
+.settings-verification-box .settings-win-arrow {
+    color: #180D00 !important;
+}
+
+.settings-verification-box .settings-win-card:hover .settings-win-arrow {
+    color: #FF7900 !important;
+    transform: translateX(3px);
+}
+
+.settings-verification-box .badge-success {
+    background: #DCFCE7 !important;
+    color: #166534 !important;
+    border: 1px solid #86EFAC !important;
+    font-weight: 700 !important;
+}
+
+.settings-verification-box .badge-warning {
+    background: #FFE642 !important;
+    color: #180D00 !important;
+    border: 1px solid #FFBF00 !important;
+    font-weight: 800 !important;
+}

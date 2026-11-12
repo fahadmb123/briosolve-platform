@@ -101,7 +101,7 @@ export default function Settings() {
                 
                 {activeSection === 'grid' && (
                 <div id="settings-grid-view" className="flex flex-col gap-6">
-                    <div className="settings-group-box">
+                    <div className="settings-group-box settings-verification-box">
                         <div className="settings-group-header">
                             <div className="settings-group-title-area">
                                 <div className="settings-group-icon verification">
