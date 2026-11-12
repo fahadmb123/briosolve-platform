@@ -4,10 +4,57 @@ import {
   VideoConference,
   RoomAudioRenderer,
   useLocalParticipant,
+  useTracks,
 } from "@livekit/components-react";
+import { Track } from "livekit-client";
 import "@livekit/components-styles";
 import type { ActiveCallModalProps } from "../types/call-ui.types";
 import "./communication-call.css";
+
+interface ActiveCallStageProps {
+  remoteParticipant: ActiveCallModalProps["remoteParticipant"];
+  defaultAvatar: string;
+  initialCallType: ActiveCallModalProps["callType"];
+}
+
+const ActiveCallStage: React.FC<ActiveCallStageProps> = ({
+  remoteParticipant,
+  defaultAvatar,
+  initialCallType,
+}) => {
+  const { isCameraEnabled } = useLocalParticipant();
+  const cameraTracks = useTracks([Track.Source.Camera]);
+
+  const hasVideo = initialCallType === "video" || isCameraEnabled || cameraTracks.length > 0;
+
+  if (hasVideo) {
+    return <VideoConference />;
+  }
+
+  return (
+    <>
+      <RoomAudioRenderer />
+      <div className="comm-audio-call-stage">
+        <div className="comm-audio-stage-glow" />
+        <div className="comm-audio-avatar-wrap">
+          <div className="comm-audio-speaking-ring" />
+          <img
+            src={remoteParticipant.avatar || defaultAvatar}
+            alt={remoteParticipant.name}
+            className="comm-audio-avatar"
+          />
+        </div>
+        <div className="comm-audio-participant-info">
+          <h4 className="comm-audio-name">{remoteParticipant.name}</h4>
+          <div className="comm-audio-status-chip">
+            <i className="fas fa-volume-up" />
+            <span>HD Audio Connected</span>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 
 interface LiveKitCallControlsProps {
   onEndCall: () => void;
@@ -160,31 +207,11 @@ export const ActiveCallModal: React.FC<ActiveCallModalProps> = ({
             </div>
 
             <div className="comm-active-call-body">
-              {callType === "video" ? (
-                <VideoConference />
-              ) : (
-                <>
-                  <RoomAudioRenderer />
-                  <div className="comm-audio-call-stage">
-                    <div className="comm-audio-stage-glow" />
-                    <div className="comm-audio-avatar-wrap">
-                      <div className="comm-audio-speaking-ring" />
-                      <img
-                        src={remoteParticipant.avatar || defaultAvatar}
-                        alt={remoteParticipant.name}
-                        className="comm-audio-avatar"
-                      />
-                    </div>
-                    <div className="comm-audio-participant-info">
-                      <h4 className="comm-audio-name">{remoteParticipant.name}</h4>
-                      <div className="comm-audio-status-chip">
-                        <i className="fas fa-volume-up" />
-                        <span>HD Audio Connected</span>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
+              <ActiveCallStage
+                remoteParticipant={remoteParticipant}
+                defaultAvatar={defaultAvatar}
+                initialCallType={callType}
+              />
             </div>
 
             <LiveKitCallControls

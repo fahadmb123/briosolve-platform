@@ -79,45 +79,15 @@ export const TopNav: React.FC = () => {
     setOpenDropdown((prev) => (prev === name ? null : name));
   }, []);
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleMouseEnter = useCallback((name: string) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    setOpenDropdown(name);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => {
-      setOpenDropdown(null);
-    }, 150);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   const closeAllMenus = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
     setOpenDropdown(null);
     setMobileMenuOpen(false);
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest(".topnav-dropdown-wrapper")) {
         setOpenDropdown(null);
       }
     };
@@ -196,18 +166,15 @@ export const TopNav: React.FC = () => {
             )}
 
             {isCustomer && (
-              <div
-                className="topnav-dropdown-wrapper"
-                onMouseEnter={() => handleMouseEnter("more")}
-                onMouseLeave={handleMouseLeave}
-              >
+              <div className="topnav-dropdown-wrapper">
                 <button
                   type="button"
                   className={`topnav-link topnav-dropdown-trigger ${
-                    openDropdown === "more" || location.pathname.startsWith("/my-requests") || location.pathname.startsWith("/request-service") ? "active" : ""
+                    openDropdown === "more" || location.pathname.startsWith("/my-requests") ? "active" : ""
                   }`}
                   onClick={() => toggleDropdown("more")}
                   aria-expanded={openDropdown === "more"}
+                  aria-haspopup="menu"
                 >
                   <span>More</span>
                   <i
