@@ -123,78 +123,94 @@ export default function Home() {
           </div>
         </div>
         <section className="home-hero-section">
-        <div className="home-hero-container">
-          <div className="home-badge-pill">
-            <i className="fas fa-check-circle"></i>
-            <span>Verified Local Professionals • Zero Middleman Markup</span>
-          </div>
-
-          <h1 className="home-hero-title">
-            Connect with skilled local specialists for <span>any job</span>
-          </h1>
-
-          <p className="home-hero-subtitle">
-            Post your requirements, receive competitive quotes directly from
-            verified local pros, and choose the right expert on your schedule.
-          </p>
-
-          <div className="home-hero-cta-group">
-            <Link to="/request-service" className="home-btn-primary">
-              <i className="fas fa-plus-circle"></i>
-              <span>Post a Service Request</span>
-            </Link>
-
-            <Link to="/nearby-providers" className="home-btn-secondary">
-              <i className="fas fa-search-location"></i>
-              <span>Find Nearby Providers</span>
-            </Link>
-
-            {isAuthenticated ? (
-              <Link to={dashboardRoute} className="home-btn-secondary">
-                <i className="fas fa-chart-line"></i>
-                <span>Go to Dashboard</span>
-              </Link>
-            ) : (
-              <Link to="/provider/register" className="home-btn-secondary">
-                <i className="fas fa-briefcase"></i>
-                <span>Become a Provider</span>
-              </Link>
-            )}
-          </div>
-
-          <div className="home-trust-strip">
-            <div className="home-trust-item">
-              <div className="home-trust-icon">
-                <i className="fas fa-user-check"></i>
+          <div className="home-hero-layout">
+            <div className="home-hero-content">
+              <div className="home-badge-pill">
+                <i className="fas fa-check-circle"></i>
+                <span>Verified Local Professionals • Zero Middleman Markup</span>
               </div>
-              <div>
-                <div className="home-trust-label">Verified Providers</div>
-                <p className="home-trust-desc">Government ID & KYC screened</p>
+
+              <h1 className="home-hero-title">
+                Connect with skilled local specialists for <span>any job</span>
+              </h1>
+
+              <p className="home-hero-subtitle">
+                Post your requirements, receive competitive quotes directly from
+                verified local pros, and choose the right expert on your schedule.
+              </p>
+
+              <div className="home-hero-cta-group">
+                <Link to="/request-service" className="home-btn-primary">
+                  <i className="fas fa-plus-circle"></i>
+                  <span>Post a Service Request</span>
+                </Link>
+
+                <Link to="/nearby-providers" className="home-btn-secondary">
+                  <i className="fas fa-search-location"></i>
+                  <span>Find Nearby Providers</span>
+                </Link>
+
+                {isAuthenticated ? (
+                  <Link to={dashboardRoute} className="home-btn-secondary">
+                    <i className="fas fa-chart-line"></i>
+                    <span>Go to Dashboard</span>
+                  </Link>
+                ) : (
+                  <Link to="/provider/register" className="home-btn-secondary">
+                    <i className="fas fa-briefcase"></i>
+                    <span>Become a Provider</span>
+                  </Link>
+                )}
+              </div>
+
+              <div className="home-trust-strip">
+                <div className="home-trust-item">
+                  <div className="home-trust-icon">
+                    <i className="fas fa-user-check"></i>
+                  </div>
+                  <div>
+                    <div className="home-trust-label">Verified Providers</div>
+                    <p className="home-trust-desc">Government ID & KYC screened</p>
+                  </div>
+                </div>
+
+                <div className="home-trust-item">
+                  <div className="home-trust-icon">
+                    <i className="fas fa-file-invoice"></i>
+                  </div>
+                  <div>
+                    <div className="home-trust-label">Transparent Bids</div>
+                    <p className="home-trust-desc">Direct upfront pricing</p>
+                  </div>
+                </div>
+
+                <div className="home-trust-item">
+                  <div className="home-trust-icon">
+                    <i className="fas fa-bolt"></i>
+                  </div>
+                  <div>
+                    <div className="home-trust-label">Fast Response</div>
+                    <p className="home-trust-desc">Receive quotes in minutes</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="home-trust-item">
-              <div className="home-trust-icon">
-                <i className="fas fa-file-invoice"></i>
-              </div>
-              <div>
-                <div className="home-trust-label">Transparent Bids</div>
-                <p className="home-trust-desc">Direct upfront pricing</p>
-              </div>
-            </div>
-
-            <div className="home-trust-item">
-              <div className="home-trust-icon">
-                <i className="fas fa-bolt"></i>
-              </div>
-              <div>
-                <div className="home-trust-label">Fast Response</div>
-                <p className="home-trust-desc">Receive quotes in minutes</p>
-              </div>
+            <div className="home-hero-worker-wrapper">
+              <img
+                src="/images/hero-blob.svg"
+                alt=""
+                className="home-hero-worker-blob"
+                aria-hidden="true"
+              />
+              <img
+                src="/images/hero-worker.png"
+                alt="Verified Specialist"
+                className="home-hero-worker-image"
+              />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       <section id="services" className="home-section home-services-section">
         <div className="home-section-container">
