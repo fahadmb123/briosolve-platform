@@ -10,7 +10,7 @@ export const OutgoingCallModal: React.FC<OutgoingCallModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(recipient.name)}&background=05AD98&color=fff`;
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(recipient.name)}&background=FF7900&color=fff`;
   const roleLabel = recipient.role === "PROVIDER" ? "Service Provider" : recipient.role === "CUSTOMER" ? "Customer" : "Marketplace Member";
 
   return (

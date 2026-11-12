@@ -35,7 +35,7 @@ export const ProviderCard: React.FC<ProviderCardProps> = React.memo(({ provider,
         );
 
     const isKycApproved = profile?.kyc_status === 'APPROVED';
-    const avatarUrl = profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(provider.name)}&background=05AD98&color=fff&size=160&bold=true`;
+    const avatarUrl = profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(provider.name)}&background=FF7900&color=fff&size=160&bold=true`;
 
     return (
         <div className="card provider-card fade-in">

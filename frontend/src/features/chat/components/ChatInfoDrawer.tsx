@@ -39,7 +39,7 @@ export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
           <img
             src={
               participant.avatar ||
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(participant.name)}&background=05AD98&color=fff`
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(participant.name)}&background=FF7900&color=fff`
             }
             alt={participant.name}
             className="chat-info-avatar"

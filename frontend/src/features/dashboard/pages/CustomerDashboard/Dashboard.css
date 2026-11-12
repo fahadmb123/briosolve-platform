@@ -164,6 +164,28 @@
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.stat-widget:first-child {
+    background: #FF7900 !important;
+    border: 2px solid #FFE642 !important;
+    box-shadow: 0 6px 20px rgba(255, 121, 0, 0.35) !important;
+}
+
+.stat-widget:first-child .stat-value {
+    color: #FFE642 !important;
+    font-weight: 800;
+}
+
+.stat-widget:first-child .stat-title,
+.stat-widget:first-child .stat-meta {
+    color: #180D00 !important;
+    font-weight: 700;
+}
+
+.stat-widget:first-child .stat-icon-wrapper {
+    background: #FFE642 !important;
+    color: #180D00 !important;
+}
+
 .stat-widget:hover {
     transform: translateY(-2px);
     border-color: var(--border-light);

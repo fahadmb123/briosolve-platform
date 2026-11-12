@@ -32,8 +32,8 @@
     gap: 0.4rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: var(--primary, #05ad98);
-    background: rgba(5, 173, 152, 0.08);
+    color: var(--primary, #FF7900);
+    background: rgba(255, 121, 0, 0.08);
     padding: 0.2rem 0.6rem;
     border-radius: 9999px;
     width: fit-content;
@@ -96,6 +96,26 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.provreq-stat-card:first-child {
+    background: #FF7900;
+    border: 2px solid #FFE642;
+    box-shadow: 0 4px 14px rgba(255, 121, 0, 0.25);
+}
+
+.provreq-stat-card:first-child .provreq-stat-number {
+    color: #FFE642;
+}
+
+.provreq-stat-card:first-child .provreq-stat-name {
+    color: #180D00;
+    font-weight: 700;
+}
+
+.provreq-stat-card:first-child .provreq-stat-hint {
+    color: #180D00;
+    font-weight: 600;
+}
+
 .provreq-stat-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -131,8 +151,8 @@
 
 .provreq-stat-name {
     font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-muted, #71717a);
+    font-weight: 700;
+    color: #180D00;
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
@@ -146,7 +166,7 @@
 
 .provreq-stat-hint {
     font-size: 0.725rem;
-    color: var(--text-secondary, #a1a1aa);
+    color: #180D00;
 }
 
 .provreq-filter-bar {
@@ -199,8 +219,8 @@
 
 .provreq-search-input:focus {
     background: var(--surface, #ffffff);
-    border-color: var(--primary, #05ad98);
-    box-shadow: 0 0 0 3px rgba(5, 173, 152, 0.12);
+    border-color: var(--primary, #FF7900);
+    box-shadow: 0 0 0 3px rgba(255, 121, 0, 0.12);
 }
 
 .provreq-filter-controls {
@@ -248,9 +268,9 @@
 }
 
 .provreq-filter-pill.active {
-    background: var(--primary, #05ad98);
+    background: var(--primary, #FF7900);
     color: var(--primary-content, #ffffff) !important;
-    border-color: var(--primary, #05ad98);
+    border-color: var(--primary, #FF7900);
     font-weight: 600;
 }
 
@@ -279,7 +299,7 @@
 }
 
 .provreq-clean-card:hover {
-    border-color: var(--primary, #05ad98);
+    border-color: var(--primary, #FF7900);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
@@ -302,7 +322,7 @@
 
 .provreq-crumb-icon {
     font-size: 0.75rem;
-    color: var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
 }
 
 .provreq-category-name {
@@ -368,7 +388,7 @@
 }
 
 .provreq-card-headline:hover {
-    color: var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
 }
 
 .provreq-card-description {
@@ -414,7 +434,7 @@
 }
 
 .provreq-meta-chip.budget i {
-    color: var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
 }
 
 .provreq-meta-text-truncate {
@@ -590,8 +610,8 @@
 }
 
 .provreq-btn-details:hover {
-    border-color: var(--primary, #05ad98);
-    color: var(--primary, #05ad98) !important;
+    border-color: var(--primary, #FF7900);
+    color: var(--primary, #FF7900) !important;
     background: var(--surface, #ffffff);
 }
 
@@ -604,16 +624,16 @@
     font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
-    background: var(--primary, #05ad98);
+    background: var(--primary, #FF7900);
     color: var(--primary-content, #ffffff) !important;
-    border: 1px solid var(--primary, #05ad98);
+    border: 1px solid var(--primary, #FF7900);
     transition: all 0.15s ease;
 }
 
 .provreq-btn-quote:hover {
-    background: var(--primary-hover, #048c7a);
+    background: var(--primary-hover, #E06A00);
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(5, 173, 152, 0.25);
+    box-shadow: 0 3px 10px rgba(255, 121, 0, 0.25);
 }
 
 .provreq-btn-quote.disabled,
@@ -638,8 +658,8 @@
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: rgba(5, 173, 152, 0.08);
-    color: var(--primary, #05ad98);
+    background: rgba(255, 121, 0, 0.08);
+    color: var(--primary, #FF7900);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -705,7 +725,7 @@
 }
 
 .provreq-category-badge {
-    color: var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
     font-weight: 600;
 }
 
@@ -737,7 +757,7 @@
 .provreq-btn-copy {
     background: transparent;
     border: none;
-    color: var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
     font-size: 0.725rem;
     cursor: pointer;
     display: flex;
@@ -794,7 +814,7 @@
 }
 
 .provreq-section-heading i {
-    color: var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
 }
 
 .provreq-section-heading-row {
@@ -849,7 +869,7 @@
     align-items: center;
     gap: 0.45rem;
     font-size: 0.775rem;
-    color: var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
     font-weight: 600;
 }
 
@@ -884,7 +904,7 @@
 
 .provreq-info-val.highlight {
     font-weight: 600;
-    color: var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
 }
 
 .provreq-location-box {
@@ -1049,16 +1069,16 @@
     font-weight: 600;
     cursor: pointer;
     background: var(--surface-hover, #f4f4f5);
-    color: var(--primary, #05ad98) !important;
-    border: 1px solid var(--primary, #05ad98);
+    color: var(--primary, #FF7900) !important;
+    border: 1px solid var(--primary, #FF7900);
     transition: all 0.15s ease;
 }
 
 .provreq-btn-chat:hover:not(:disabled) {
-    background: var(--primary, #05ad98);
+    background: var(--primary, #FF7900);
     color: var(--primary-content, #ffffff) !important;
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(5, 173, 152, 0.25);
+    box-shadow: 0 3px 10px rgba(255, 121, 0, 0.25);
 }
 
 .provreq-btn-chat:disabled {
@@ -1076,13 +1096,13 @@
     font-weight: 600;
     cursor: pointer;
     background: var(--surface-hover, #f4f4f5);
-    border: 1px solid var(--primary, #05ad98);
-    color: var(--primary, #05ad98) !important;
+    border: 1px solid var(--primary, #FF7900);
+    color: var(--primary, #FF7900) !important;
     transition: all 0.15s ease;
 }
 
 .provreq-btn-chat-card:hover {
-    background: var(--primary, #05ad98);
+    background: var(--primary, #FF7900);
     color: var(--primary-content, #ffffff) !important;
 }
 
@@ -1111,7 +1131,7 @@
     height: 46px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--primary, #05ad98);
+    border: 2px solid var(--primary, #FF7900);
     flex-shrink: 0;
 }
 
@@ -1119,7 +1139,7 @@
     width: 46px;
     height: 46px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary, #05ad98), #0d9488);
+    background: linear-gradient(135deg, var(--primary, #FF7900), #FFA042);
     color: #ffffff;
     font-weight: 700;
     font-size: 1.15rem;
@@ -1127,7 +1147,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(5, 173, 152, 0.25);
+    box-shadow: 0 2px 8px rgba(255, 121, 0, 0.25);
 }
 
 .provreq-customer-meta {
@@ -1156,8 +1176,8 @@
     gap: 0.25rem;
     font-size: 0.7rem;
     font-weight: 600;
-    color: var(--primary, #05ad98);
-    background: rgba(5, 173, 152, 0.1);
+    color: var(--primary, #FF7900);
+    background: rgba(255, 121, 0, 0.1);
     padding: 0.15rem 0.45rem;
     border-radius: 9999px;
 }
@@ -1180,7 +1200,7 @@
 }
 
 .provreq-customer-contact-chip:hover {
-    color: var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
     text-decoration: underline;
 }
 
@@ -1194,13 +1214,13 @@
     font-weight: 600;
     cursor: pointer;
     background: var(--surface, #ffffff);
-    color: var(--primary, #05ad98);
-    border: 1px solid var(--primary, #05ad98);
+    color: var(--primary, #FF7900);
+    border: 1px solid var(--primary, #FF7900);
     transition: all 0.15s ease;
 }
 
 .provreq-customer-chat-btn:hover:not(:disabled) {
-    background: var(--primary, #05ad98);
+    background: var(--primary, #FF7900);
     color: #ffffff;
     transform: translateY(-1px);
 }
@@ -1222,8 +1242,8 @@
 }
 
 .provreq-distance-banner.in-radius {
-    background: rgba(5, 173, 152, 0.08);
-    border: 1px solid rgba(5, 173, 152, 0.25);
+    background: rgba(255, 121, 0, 0.08);
+    border: 1px solid rgba(255, 121, 0, 0.25);
 }
 
 .provreq-distance-banner.out-radius {
@@ -1250,8 +1270,8 @@
 }
 
 .provreq-distance-banner.in-radius .provreq-distance-icon-wrap {
-    background: rgba(5, 173, 152, 0.16);
-    color: var(--primary, #05ad98);
+    background: rgba(255, 121, 0, 0.16);
+    color: var(--primary, #FF7900);
 }
 
 .provreq-distance-banner.out-radius .provreq-distance-icon-wrap {
@@ -1349,8 +1369,8 @@
 
 .provreq-btn-address-action:hover {
     background: var(--surface-hover, #f4f4f5);
-    border-color: var(--primary, #05ad98);
-    color: var(--primary, #05ad98);
+    border-color: var(--primary, #FF7900);
+    color: var(--primary, #FF7900);
 }
 
 .provreq-btn-address-action.maps {
@@ -1448,8 +1468,8 @@
 }
 
 .provreq-page-btn:hover:not(:disabled) {
-    border-color: var(--primary, #05ad98);
-    color: var(--primary, #05ad98);
+    border-color: var(--primary, #FF7900);
+    color: var(--primary, #FF7900);
 }
 
 .provreq-page-btn:disabled {
@@ -1495,14 +1515,14 @@
 }
 
 .provreq-page-btn:hover:not(:disabled) {
-    border-color: var(--primary, #05ad98);
-    color: var(--primary, #05ad98);
+    border-color: var(--primary, #FF7900);
+    color: var(--primary, #FF7900);
     background: var(--surface-hover, #f8f8f9);
 }
 
 .provreq-page-btn.active {
-    background: var(--primary, #05ad98);
-    border-color: var(--primary, #05ad98);
+    background: var(--primary, #FF7900);
+    border-color: var(--primary, #FF7900);
     color: #ffffff;
 }
 

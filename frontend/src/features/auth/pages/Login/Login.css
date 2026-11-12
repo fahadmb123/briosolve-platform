@@ -50,9 +50,15 @@
     gap: 0.5rem;
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--primary);
+    color: #180D00;
     text-decoration: none;
     margin-bottom: 1rem;
+}
+
+.auth-brand-logo img {
+    filter: none !important;
+    width: 48px !important;
+    height: 48px !important;
 }
 
 .auth-form-header h2 {

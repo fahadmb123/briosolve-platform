@@ -46,19 +46,34 @@
 }
 
 .provider-callout-card {
-    background-color: var(--surface);
-    border: 1px solid rgba(5, 173, 152, 0.35);
+    background: #FF7900;
+    border: 2px solid #FFE642;
     border-radius: var(--radius-lg);
     padding: 0.875rem 1.25rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 16px rgba(255, 121, 0, 0.25);
+    color: #180D00;
+}
+
+.provider-callout-card strong,
+.provider-callout-card b,
+.provider-callout-card h4,
+.provider-callout-card .font-bold {
+    color: #FFE642;
+    font-weight: 800;
+}
+
+.provider-callout-card p,
+.provider-callout-card span {
+    color: #180D00;
+    font-weight: 600;
 }
 
 .provider-badge-icon {
     width: 36px;
     height: 36px;
     border-radius: var(--radius-md);
-    background-color: var(--primary-light);
-    color: var(--primary);
+    background-color: #FFE642;
+    color: #180D00;
     display: flex;
     align-items: center;
     justify-content: center;

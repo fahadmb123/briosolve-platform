@@ -150,7 +150,7 @@ export const ActiveCallModal: React.FC<ActiveCallModalProps> = ({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(remoteParticipant.name)}&background=05AD98&color=fff`;
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(remoteParticipant.name)}&background=FF7900&color=fff`;
   const roleLabel =
     remoteParticipant.role === "PROVIDER"
       ? "Provider"

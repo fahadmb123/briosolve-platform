@@ -1,8 +1,8 @@
 /* Premium Dashboard Styles */
 
 .pro-welcome-banner {
-    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-hover) 100%);
-    border: 1px solid var(--border);
+    background: #FF7900;
+    border: 3px solid #FFE642;
     border-radius: 1.5rem;
     padding: 2.5rem;
     margin-bottom: 2rem;
@@ -11,9 +11,25 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 2rem;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(255, 121, 0, 0.35);
     position: relative;
     overflow: hidden;
+    color: #180D00;
+}
+
+.pro-welcome-banner h1,
+.pro-welcome-banner h2,
+.pro-welcome-banner h3,
+.pro-welcome-banner strong,
+.pro-welcome-banner b {
+    color: #FFE642;
+    font-weight: 800;
+}
+
+.pro-welcome-banner p,
+.pro-welcome-banner span {
+    color: #180D00;
+    font-weight: 600;
 }
 
 .pro-welcome-banner::after {
@@ -23,7 +39,7 @@
     right: 0;
     width: 300px;
     height: 100%;
-    background: radial-gradient(circle at 100% 50%, var(--primary-light) 0%, transparent 70%);
+    background: radial-gradient(circle at 100% 50%, rgba(255, 230, 66, 0.25) 0%, transparent 70%);
     opacity: 0.3;
     pointer-events: none;
 }
@@ -44,6 +60,28 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+}
+
+.stat-widget:first-child {
+    background: #FF7900 !important;
+    border: 2px solid #FFE642 !important;
+    box-shadow: 0 6px 20px rgba(255, 121, 0, 0.35) !important;
+}
+
+.stat-widget:first-child .stat-value {
+    color: #FFE642 !important;
+    font-weight: 800;
+}
+
+.stat-widget:first-child .stat-title,
+.stat-widget:first-child .stat-meta {
+    color: #180D00 !important;
+    font-weight: 700;
+}
+
+.stat-widget:first-child .stat-icon-wrapper {
+    background: #FFE642 !important;
+    color: #180D00 !important;
 }
 
 .stat-widget:hover {

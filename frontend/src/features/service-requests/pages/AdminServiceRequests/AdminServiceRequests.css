@@ -30,8 +30,8 @@
 
 .admin-sr-badge.badge-completed {
     background: rgba(5, 173, 152, 0.12);
-    color: #05ad98;
-    border: 1px solid rgba(5, 173, 152, 0.25);
+    color: #FF7900;
+    border: 1px solid rgba(255, 191, 0, 0.35);
 }
 
 .admin-sr-badge.badge-cancelled,
