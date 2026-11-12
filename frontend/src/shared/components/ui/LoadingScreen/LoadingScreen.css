@@ -2,82 +2,42 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: var(--bg);
+  background: #FF7900;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* Dark mode support */
 :root[data-theme="dark"] .loading-container,
 .dark .loading-container {
-  background: var(--bg);
+  background: #180D00;
 }
 
 .loading-exit {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .loading-content {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
-
-.loading-logo {
-  display: flex;
-  gap: 8px;
-  font-size: 3.5rem;
-  font-weight: 900;
-  margin-bottom: 15px;
-}
-
-.logo-r, .logo-s, .logo-m {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.loading-title {
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: 4px;
-  color: var(--text-color, #1e293b);
-  margin: 0;
-  text-transform: uppercase;
-}
-
-:root[data-theme="dark"] .loading-title,
-.dark .loading-title {
-  color: #f8fafc;
-}
-
-.loading-subtitle {
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 8px;
-  color: var(--text-muted, #64748b);
-  margin: 8px 0 0 0;
-  text-transform: uppercase;
-}
-
-:root[data-theme="dark"] .loading-subtitle,
-.dark .loading-subtitle {
-  color: #94a3b8;
-}
-
 
 .loading-emblem {
-  width: 76px;
-  height: 76px;
+  width: 78px;
+  height: 78px;
   object-fit: contain;
   margin-bottom: 20px;
-  filter: brightness(0) invert(1);
+  filter: drop-shadow(0 4px 14px rgba(24, 13, 0, 0.18));
 }
 
-[data-theme="light"] .loading-emblem {
-  filter: brightness(0);
+:root[data-theme="dark"] .loading-emblem,
+.dark .loading-emblem {
+  filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(255, 121, 0, 0.45));
 }
 
 .loading-text-logo {
@@ -85,9 +45,10 @@
   width: auto;
   max-width: 250px;
   object-fit: contain;
-  filter: brightness(0) invert(1);
+  filter: drop-shadow(0 4px 14px rgba(24, 13, 0, 0.18));
 }
 
-[data-theme="light"] .loading-text-logo {
-  filter: none;
+:root[data-theme="dark"] .loading-text-logo,
+.dark .loading-text-logo {
+  filter: brightness(0) invert(1);
 }
