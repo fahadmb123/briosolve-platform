@@ -66,12 +66,12 @@ body.dark .prov-topnav-header {
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  filter: none;
+  filter: none !important;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 [data-theme="light"] .prov-brand-logo {
-  filter: none;
+  filter: none !important;
 }
 
 .prov-brand-text-logo {
@@ -81,12 +81,12 @@ body.dark .prov-topnav-header {
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  filter: none;
+  filter: none !important;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 [data-theme="light"] .prov-brand-text-logo {
-  filter: none;
+  filter: none !important;
 }
 
 .prov-brand-text-group {

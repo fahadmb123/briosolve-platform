@@ -66,12 +66,12 @@ body.dark .topnav-header {
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  filter: none;
+  filter: none !important;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 [data-theme="light"] .topnav-brand-logo {
-  filter: none;
+  filter: none !important;
 }
 
 .topnav-brand-text-logo {
@@ -81,12 +81,12 @@ body.dark .topnav-header {
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  filter: none;
+  filter: none !important;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 [data-theme="light"] .topnav-brand-text-logo {
-  filter: none;
+  filter: none !important;
 }
 
 .topnav-links {
