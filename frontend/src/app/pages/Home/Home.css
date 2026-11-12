@@ -86,8 +86,9 @@
 
 .home-top-layout .topnav-links,
 .home-top-layout .prov-topnav-links {
-  background: #FFF8EE !important;
-  border: 1px solid #FFBF00 !important;
+  background: #FFFFFF !important;
+  border: 2px solid #FFE642 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
 .home-top-layout .topnav-link,
@@ -114,28 +115,48 @@
 .home-top-layout .topnav-text-link,
 .home-top-layout .prov-topnav-text-link {
   color: #180D00 !important;
+  background: #FFFFFF !important;
+  border: 2px solid #FFE642 !important;
+  border-radius: 9999px !important;
+  padding: 0 1.25rem !important;
+  height: 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
 
 .home-top-layout .topnav-text-link:hover,
 .home-top-layout .prov-topnav-text-link:hover {
   color: #180D00 !important;
-  background: #FFF8EE !important;
+  background: #FFE642 !important;
+  border-color: #FFBF00 !important;
+  transform: translateY(-1px) !important;
 }
 
 .home-top-layout .topnav-cta-btn,
 .home-top-layout .prov-topnav-cta-btn {
-  background: #FF7900 !important;
-  color: #FFFFFF !important;
-  border: 1px solid #FF7900 !important;
-  box-shadow: 0 2px 10px rgba(255, 121, 0, 0.35) !important;
+  background: #180D00 !important;
+  color: #FFE642 !important;
+  border: 2px solid #FFE642 !important;
+  border-radius: 9999px !important;
+  padding: 0 1.35rem !important;
+  height: 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
 }
 
 .home-top-layout .topnav-cta-btn:hover,
 .home-top-layout .prov-topnav-cta-btn:hover {
   background: #FFE642 !important;
   color: #180D00 !important;
-  border-color: #FFBF00 !important;
-  box-shadow: 0 4px 14px rgba(255, 191, 0, 0.4) !important;
+  border-color: #FF7900 !important;
+  box-shadow: 0 6px 16px rgba(255, 191, 0, 0.45) !important;
+  transform: translateY(-1px) !important;
 }
 
 .home-wrapper {
