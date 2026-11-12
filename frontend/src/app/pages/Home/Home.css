@@ -97,7 +97,9 @@
 }
 
 .home-top-layout .topnav-link:hover,
-.home-top-layout .prov-topnav-link:hover {
+.home-top-layout .prov-topnav-link:hover,
+.home-top-layout .topnav-link.active:hover,
+.home-top-layout .prov-topnav-link.active:hover {
   color: #180D00 !important;
   background: #FFE642 !important;
 }

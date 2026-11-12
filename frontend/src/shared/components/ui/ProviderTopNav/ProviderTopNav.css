@@ -165,14 +165,20 @@ body.dark .prov-topnav-header {
   color: #180D00;
 }
 
-.prov-category-btn:hover {
-  color: #180D00;
-  background: #FFE642;
+.prov-category-btn:hover,
+.prov-category-btn.active:hover {
+  color: #180D00 !important;
+  background: #FFE642 !important;
+  border-color: #FFBF00 !important;
 }
 
-[data-theme="light"] .prov-category-btn:hover {
-  color: #180D00;
-  background: #FFE642;
+[data-theme="light"] .prov-category-btn:hover,
+[data-theme="dark"] .prov-category-btn:hover,
+[data-theme="light"] .prov-category-btn.active:hover,
+[data-theme="dark"] .prov-category-btn.active:hover {
+  color: #180D00 !important;
+  background: #FFE642 !important;
+  border-color: #FFBF00 !important;
 }
 
 .prov-category-btn.active,
@@ -406,32 +412,35 @@ body.dark .prov-topnav-header {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #141417;
-  color: #a1a1aa;
-  border: 1px solid #2c2c34;
+  background: #FFFFFF !important;
+  color: #180D00 !important;
+  border: 1px solid #FFE642 !important;
   cursor: pointer;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   font-size: 0.95rem;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
 
 .prov-icon-btn:hover {
-  background: #202024;
-  color: #ffffff;
-  border-color: #3c3c46;
+  background: #FFE642 !important;
+  color: #180D00 !important;
+  border-color: #FFBF00 !important;
   transform: translateY(-1px);
 }
 
-[data-theme="light"] .prov-icon-btn {
-  background: #ebedf2;
-  color: #1f2937;
-  border: 1px solid #dfe2e7;
+[data-theme="light"] .prov-icon-btn,
+[data-theme="dark"] .prov-icon-btn {
+  background: #FFFFFF !important;
+  color: #180D00 !important;
+  border: 1px solid #FFE642 !important;
 }
 
-[data-theme="light"] .prov-icon-btn:hover {
-  background: #e1e4ea;
-  color: #000000;
-  border-color: #cbd0d8;
+[data-theme="light"] .prov-icon-btn:hover,
+[data-theme="dark"] .prov-icon-btn:hover {
+  background: #FFE642 !important;
+  color: #180D00 !important;
+  border-color: #FFBF00 !important;
   transform: translateY(-1px);
 }
 
