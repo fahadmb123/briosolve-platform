@@ -110,6 +110,18 @@ export default function Home() {
         <TopNav />
       )}
       <main className="home-wrapper">
+        <div className="home-top-announcement-bar">
+          <div className="home-top-announcement-content">
+            <div className="home-announcement-brand">
+              <img src="/briosolve-logo.svg" alt="Briosolve" className="home-announcement-logo" />
+              <img src="/briosolve-text-logo.svg" alt="Briosolve" className="home-announcement-text-logo" />
+            </div>
+            <div className="home-announcement-divider" aria-hidden="true" />
+            <span className="home-announcement-message">
+              SMART MARKETPLACE • DIRECT OFFERS IN MINUTES
+            </span>
+          </div>
+        </div>
         <section className="home-hero-section">
         <div className="home-hero-container">
           <div className="home-badge-pill">
