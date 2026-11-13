@@ -264,9 +264,9 @@
 }
 
 .provider-clean-business {
-    font-size: 0.925rem;
-    font-weight: 600;
-    color: #FF7900;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1E293B;
     margin: 0;
     display: inline-flex;
     align-items: center;
@@ -276,6 +276,14 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.provider-clean-business i {
+    color: #FF7900;
+}
+
+[data-theme='dark'] .provider-clean-business {
+    color: #FFE642;
 }
 
 .provider-clean-radius-badge {

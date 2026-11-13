@@ -18,6 +18,7 @@ export function buildCustomerRoute(controller: CustomerRouteDependencies): Route
     router.post("/become-provider", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.becomeProvider);
 
     router.get("/nearby-providers", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.getNearbyProviders);
+    router.get("/providers/:id", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.getProviderPublicProfile);
     router.patch("/profile", validate(profileSchema), authMiddleware, requireRole(["CUSTOMER"]), controller.customer.updateProfile);
     router.delete("/profile/image", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.deleteProfileImage);
 

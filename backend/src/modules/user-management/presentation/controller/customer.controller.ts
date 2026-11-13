@@ -14,6 +14,8 @@ import { RegisterCustomerInput } from "../../application/dtos/request/customer/r
 import { BecomeProviderInput } from "../../application/dtos/request/onboading/become-provider.dto"
 import { GetNearbyProvidersDto } from "../../application/dtos/request/customer/get-nearby-providers.dto";
 import { GetNearbyProvidersOutputDto } from "../../application/dtos/response/customer/get-nearby-providers-output.dto";
+import { GetProviderPublicProfileDto } from "../../application/dtos/request/customer/get-provider-public-profile.dto";
+import { GetProviderPublicProfileOutputDto } from "../../application/dtos/response/customer/get-provider-public-profile-output.dto";
 
 
 
@@ -28,7 +30,8 @@ export class CustomerController extends BaseController{
         private readonly _sendBecomeProviderOtpUseCase: IUseCase<string, { registrationId: string; expiresIn: number }>,
         private readonly _becomeProviderUseCase: IUseCase<BecomeProviderInput, void>,
         private readonly _jwtService: IJwtService,
-        private readonly _getNearbyProvidersUseCase: IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto>
+        private readonly _getNearbyProvidersUseCase: IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto>,
+        private readonly _getProviderPublicProfileUseCase: IUseCase<GetProviderPublicProfileDto, GetProviderPublicProfileOutputDto>
     ) {super()}
 
     register = async (req:Request,res:Response,next:NextFunction) => {
@@ -145,6 +148,21 @@ export class CustomerController extends BaseController{
             });
 
             return this.sendSuccess(res, "Nearby providers fetched successfully", response);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    getProviderPublicProfile = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const user = req.user;
+            const providerId = req.params.id as string;
+            const response = await this._getProviderPublicProfileUseCase.execute({
+                providerId,
+                customerId: user?.userId
+            });
+
+            return this.sendSuccess(res, "Provider profile fetched successfully", response);
         } catch (err) {
             next(err);
         }

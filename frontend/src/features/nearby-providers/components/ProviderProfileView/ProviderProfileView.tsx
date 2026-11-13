@@ -1,26 +1,113 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import type { User } from '../../../../shared/types/Dtos';
 import type { Address } from '../../../addresses';
+import { useGetProviderPublicProfile } from '../../hooks/mutations/useGetProviderPublicProfile';
+import type { ProviderPublicProfileData } from '../../services/nearbyProviders.service';
 import './ProviderProfileView.css';
 
 interface ProviderProfileViewProps {
-    provider: User | null;
-    isLoading?: boolean;
+    providerId?: string;
+    initialProvider?: User | null;
     customerAddress?: Address | null;
     onBack: () => void;
 }
 
+const WEEKDAYS_MAP = [
+    { key: 'MONDAY', label: 'Monday', jsDay: 1 },
+    { key: 'TUESDAY', label: 'Tuesday', jsDay: 2 },
+    { key: 'WEDNESDAY', label: 'Wednesday', jsDay: 3 },
+    { key: 'THURSDAY', label: 'Thursday', jsDay: 4 },
+    { key: 'FRIDAY', label: 'Friday', jsDay: 5 },
+    { key: 'SATURDAY', label: 'Saturday', jsDay: 6 },
+    { key: 'SUNDAY', label: 'Sunday', jsDay: 0 }
+];
+
 export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.memo(({
-    provider,
-    isLoading = false,
+    providerId,
+    initialProvider,
     customerAddress,
     onBack
 }) => {
     const navigate = useNavigate();
 
-    if (isLoading || !provider) {
+    const targetId = providerId || initialProvider?.id;
+    const [profileData, setProfileData] = useState<ProviderPublicProfileData | null>(null);
+    const getProfileMut = useGetProviderPublicProfile();
+
+    useEffect(() => {
+        if (!targetId) return;
+        getProfileMut.mutate(targetId, {
+            onSuccess: (res) => {
+                if (res.data) {
+                    setProfileData(res.data);
+                }
+            }
+        });
+    }, [targetId]);
+
+    const isLoading = getProfileMut.isPending && !profileData;
+
+    const activeProviderName = profileData?.name || initialProvider?.name || 'Provider';
+    const profile = profileData?.provider_profile || initialProvider?.provider_profile;
+    const providerAddress = typeof (profileData?.current_address_id || initialProvider?.current_address_id) === 'object'
+        ? ((profileData?.current_address_id || initialProvider?.current_address_id) as Address | null)
+        : null;
+
+    const isKycApproved = profile?.kyc_status === 'APPROVED';
+    const distance = profileData?.distance != null
+        ? profileData.distance
+        : (initialProvider as User & { distance?: number })?.distance;
+
+    const avatarUrl = profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(activeProviderName)}&background=FF7900&color=fff&size=240&bold=true`;
+
+    const handleStartChat = () => {
+        if (!targetId) return;
+        navigate(`/messages?recipientId=${targetId}`, {
+            state: { recipientId: targetId, providerId: targetId }
+        });
+    };
+
+    const handleRequestService = () => {
+        if (!targetId) return;
+        navigate('/request-service', {
+            state: {
+                preferredProviderId: targetId,
+                preferredProviderName: activeProviderName
+            }
+        });
+    };
+
+    const defaultSkills = [
+        'Diagnostics & Repair',
+        'Installation & Setup',
+        'Preventive Maintenance',
+        'Emergency Service',
+        'Inspection & Testing'
+    ];
+
+    const skillsArray = profile?.skills
+        ? profile.skills.split(',').map((s) => s.trim()).filter(Boolean)
+        : defaultSkills;
+
+    const todayJsDay = new Date().getDay();
+
+    const formattedSchedule = useMemo(() => {
+        const availList = profileData?.availability || [];
+        return WEEKDAYS_MAP.map((dayItem) => {
+            const slot = availList.find((s) => s.day_of_week === dayItem.key);
+            const isToday = dayItem.jsDay === todayJsDay;
+            return {
+                dayName: dayItem.label,
+                isToday,
+                isOpen: Boolean(slot),
+                timeRange: slot ? `${slot.start_time} - ${slot.end_time}` : 'Unavailable'
+            };
+        });
+    }, [profileData?.availability, todayJsDay]);
+
+    if (isLoading && !profileData) {
         return (
             <div className="provider-profile-view fade-in">
                 <div className="provider-profile-nav-bar">
@@ -37,7 +124,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                             <div className="provider-profile-avatar-box">
                                 <Skeleton circle width={140} height={140} />
                             </div>
-                            <div className="provider-profile-hero-meta" style={{ minWidth: 280 }}>
+                            <div className="provider-profile-hero-meta" style={{ minWidth: 280, flex: 1 }}>
                                 <Skeleton width={260} height={36} style={{ marginBottom: 8 }} />
                                 <Skeleton width={180} height={22} style={{ marginBottom: 12 }} />
                                 <Skeleton width={320} height={28} borderRadius={9999} />
@@ -52,36 +139,24 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                     <Skeleton height={90} borderRadius={16} />
                     <Skeleton height={90} borderRadius={16} />
                 </div>
+
+                <div className="provider-profile-layout">
+                    <div className="provider-profile-main-col">
+                        <Skeleton height={180} borderRadius={18} />
+                        <Skeleton height={240} borderRadius={18} />
+                        <Skeleton height={140} borderRadius={18} />
+                    </div>
+                    <div className="provider-profile-side-col">
+                        <Skeleton height={180} borderRadius={18} />
+                        <Skeleton height={320} borderRadius={18} />
+                        <Skeleton height={140} borderRadius={18} />
+                    </div>
+                </div>
             </div>
         );
     }
 
-    const profile = provider.provider_profile;
-    const providerAddress = typeof provider.current_address_id === 'object'
-        ? (provider.current_address_id as Address | null)
-        : null;
-
-    const isKycApproved = profile?.kyc_status === 'APPROVED';
-    const distance = (provider as User & { distance?: number }).distance;
-    const avatarUrl = profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(provider.name)}&background=FF7900&color=fff&size=240&bold=true`;
-
-    const handleStartChat = () => {
-        navigate(`/messages?recipientId=${provider.id}`, {
-            state: { recipientId: provider.id, providerId: provider.id }
-        });
-    };
-
-    const defaultSkills = [
-        'Diagnostics & Repair',
-        'Installation & Setup',
-        'Preventive Maintenance',
-        'Emergency Service',
-        'Inspection & Testing'
-    ];
-
-    const skillsArray = profile?.skills
-        ? profile.skills.split(',').map((s) => s.trim()).filter(Boolean)
-        : defaultSkills;
+    const servicesList = profileData?.services || [];
 
     return (
         <div className="provider-profile-view fade-in">
@@ -94,7 +169,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                 <div className="provider-profile-breadcrumb">
                     <span>Providers</span>
                     <i className="fas fa-chevron-right text-xs" />
-                    <span className="crumb-active">{provider.name}</span>
+                    <span className="crumb-active">{activeProviderName}</span>
                 </div>
             </div>
 
@@ -108,7 +183,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                         <div className="provider-profile-avatar-box">
                             <img
                                 src={avatarUrl}
-                                alt={provider.name}
+                                alt={activeProviderName}
                                 className="provider-profile-avatar-img"
                             />
                             {isKycApproved && (
@@ -119,7 +194,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                         </div>
 
                         <div className="provider-profile-hero-meta">
-                            <h1 className="provider-profile-hero-name">{provider.name}</h1>
+                            <h1 className="provider-profile-hero-name">{activeProviderName}</h1>
                             <div className="provider-profile-hero-business">
                                 <i className="fas fa-briefcase" />
                                 <span>{profile?.business_name || 'Independent Specialist'}</span>
@@ -158,6 +233,14 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                         >
                             <i className="fas fa-comment-dots" />
                             <span>Message</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleRequestService}
+                            className="provider-profile-btn-primary"
+                        >
+                            <i className="fas fa-paper-plane" />
+                            <span>Request Service</span>
                         </button>
                     </div>
                 </div>
@@ -202,7 +285,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                     </div>
                     <div className="provider-stat-data">
                         <span className="provider-stat-num" style={{ fontSize: '1.15rem', color: '#10B981' }}>
-                            {provider.status === 'ACTIVE' ? 'Verified Active' : 'Available'}
+                            {profileData?.status === 'ACTIVE' || initialProvider?.status === 'ACTIVE' ? 'Verified Active' : 'Available'}
                         </span>
                         <span className="provider-stat-lbl">Platform Status</span>
                     </div>
@@ -219,8 +302,47 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                             </div>
                         </div>
                         <p className="provider-bio-paragraph">
-                            {profile?.bio || `${provider.name} is a verified professional specialist offering dependable local services with certified expertise and direct transparent pricing.`}
+                            {profile?.bio || `${activeProviderName} is a verified professional specialist offering dependable local services with certified expertise and direct transparent pricing.`}
                         </p>
+                    </div>
+
+                    <div className="provider-info-card">
+                        <div className="provider-info-header">
+                            <div className="provider-info-header-title">
+                                <i className="fas fa-layer-group" />
+                                <h3>Specialist Offered Services</h3>
+                            </div>
+                            <span className="text-xs font-semibold text-secondary">
+                                {servicesList.length} services available
+                            </span>
+                        </div>
+
+                        {servicesList.length > 0 ? (
+                            <div className="provider-services-grid">
+                                {servicesList.map((item) => (
+                                    <div key={item.id} className="provider-service-card-item">
+                                        <div className="provider-service-top-row">
+                                            {item.service?.category?.name && (
+                                                <span className="provider-service-cat-badge">
+                                                    <i className="fas fa-tag" />
+                                                    <span>{item.service.category.name}</span>
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h4 className="provider-service-item-title">
+                                            {item.service?.name || 'Professional Service'}
+                                        </h4>
+                                        <p className="provider-service-item-desc">
+                                            {item.service?.description || 'Custom quotes and on-demand scheduling provided.'}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-secondary text-sm mb-0">
+                                This specialist is available for custom quote requests across their core trade.
+                            </p>
+                        )}
                     </div>
 
                     <div className="provider-info-card">
@@ -243,33 +365,6 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                     <div className="provider-info-card">
                         <div className="provider-info-header">
                             <div className="provider-info-header-title">
-                                <i className="fas fa-shield-check" />
-                                <h3>Trust & Service Guarantees</h3>
-                            </div>
-                        </div>
-                        <div className="provider-guarantees-list">
-                            <div className="guarantee-badge-box">
-                                <i className="fas fa-id-card" />
-                                <span>Government ID Verified</span>
-                            </div>
-                            <div className="guarantee-badge-box">
-                                <i className="fas fa-handshake" />
-                                <span>Direct Upfront Pricing</span>
-                            </div>
-                            <div className="guarantee-badge-box">
-                                <i className="fas fa-stopwatch" />
-                                <span>Fast Response Times</span>
-                            </div>
-                            <div className="guarantee-badge-box">
-                                <i className="fas fa-award" />
-                                <span>Satisfaction Guaranteed</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="provider-info-card">
-                        <div className="provider-info-header">
-                            <div className="provider-info-header-title">
                                 <i className="fas fa-list-check" />
                                 <h3>How Working Together Works</h3>
                             </div>
@@ -286,7 +381,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                                 <div className="provider-step-num">2</div>
                                 <div className="provider-step-content">
                                     <h4>Get Direct Bid</h4>
-                                    <p>Review quotes and chat directly with {provider.name}.</p>
+                                    <p>Review quotes and chat directly with {activeProviderName}.</p>
                                 </div>
                             </div>
                             <div className="provider-step-item">
@@ -316,9 +411,16 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                             </div>
                         </div>
                         <p className="text-secondary text-sm mb-3">
-                            Directly request a custom quote or schedule service with {provider.name}.
+                            Directly request a custom quote or schedule service with {activeProviderName}.
                         </p>
-                       
+                        <button
+                            type="button"
+                            onClick={handleRequestService}
+                            className="provider-profile-btn-primary w-100 mb-2"
+                        >
+                            <i className="fas fa-paper-plane" />
+                            <span>Request a Service</span>
+                        </button>
                         <button
                             type="button"
                             onClick={handleStartChat}
@@ -327,6 +429,35 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                             <i className="fas fa-comment-dots" />
                             <span>Chat with Provider</span>
                         </button>
+                    </div>
+
+                    <div className="provider-info-card">
+                        <div className="provider-info-header">
+                            <div className="provider-info-header-title">
+                                <i className="fas fa-calendar-week" />
+                                <h3>Weekly Working Hours</h3>
+                            </div>
+                        </div>
+                        <div className="provider-schedule-list">
+                            {formattedSchedule.map((sched, idx) => (
+                                <div key={idx} className={`schedule-day-row ${sched.isToday ? 'is-today' : ''}`}>
+                                    <div className="schedule-day-name-box">
+                                        <span>{sched.dayName}</span>
+                                        {sched.isToday && <span className="schedule-today-tag">Today</span>}
+                                    </div>
+                                    <div className={`schedule-time-badge ${!sched.isOpen ? 'is-closed' : ''}`}>
+                                        {sched.isOpen ? (
+                                            <>
+                                                <i className="fas fa-clock text-xs" style={{ color: '#10B981' }} />
+                                                <span>{sched.timeRange}</span>
+                                            </>
+                                        ) : (
+                                            <span>Unavailable</span>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="provider-info-card">
@@ -378,24 +509,19 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                             </div>
                         </div>
                         <div className="provider-contact-list">
-                            {provider.email && (
-                                <div className="contact-row" title={provider.email}>
+                            {(profileData?.email || initialProvider?.email) && (
+                                <div className="contact-row" title={profileData?.email || initialProvider?.email}>
                                     <i className="fas fa-envelope" />
-                                    <span className="text-truncate">{provider.email}</span>
+                                    <span className="text-truncate">{profileData?.email || initialProvider?.email}</span>
                                 </div>
                             )}
 
-                            {provider.phone && (
+                            {(profileData?.phone || initialProvider?.phone) && (
                                 <div className="contact-row">
                                     <i className="fas fa-phone" />
-                                    <span>{provider.phone}</span>
+                                    <span>{profileData?.phone || initialProvider?.phone}</span>
                                 </div>
                             )}
-
-                            <div className="contact-row">
-                                <i className="fas fa-clock" />
-                                <span>Mon - Sat: 08:00 AM - 07:00 PM</span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -403,7 +529,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
 
             <div className="provider-cta-banner">
                 <div className="provider-cta-info">
-                    <h3>Ready to work with {provider.name}?</h3>
+                    <h3>Ready to work with {activeProviderName}?</h3>
                     <p>Post a service request to receive upfront estimates, or message them right away.</p>
                 </div>
                 <div className="provider-cta-actions">
@@ -414,6 +540,14 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                     >
                         <i className="fas fa-comment-dots" />
                         <span>Send Message</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleRequestService}
+                        className="provider-profile-btn-primary"
+                    >
+                        <i className="fas fa-paper-plane" />
+                        <span>Request Service Now</span>
                     </button>
                 </div>
             </div>

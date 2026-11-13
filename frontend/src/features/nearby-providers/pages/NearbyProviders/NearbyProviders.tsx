@@ -115,8 +115,8 @@ export default function NearbyProviders() {
         return (
             <div className="app-content nearby-providers-container">
                 <ProviderProfileView
-                    provider={activeProvider}
-                    isLoading={getProvidersMut.isPending && !activeProvider}
+                    providerId={providerId || activeProvider?.id}
+                    initialProvider={activeProvider}
                     customerAddress={customerAddress}
                     onBack={handleBackFromProfile}
                 />

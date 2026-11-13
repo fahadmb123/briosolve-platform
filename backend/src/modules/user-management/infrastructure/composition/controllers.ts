@@ -30,6 +30,7 @@ import {
     sendBecomeCustomerOtpUseCase,
     becomeCustomerUseCase,
     getNearbyProvidersUseCase,
+    getProviderPublicProfileUseCase,
     createUpdateUserStatusUseCase
 } from "./useCases";
 import { imageUploadService } from "./services";
@@ -68,7 +69,8 @@ export const customerController = new CustomerController(
     sendBecomeProviderOtpUseCase,
     becomeProviderUseCase,
     jwtService,
-    getNearbyProvidersUseCase
+    getNearbyProvidersUseCase,
+    getProviderPublicProfileUseCase
 );
 export const addressController = new AddressController(
     addAddressUseCase,
