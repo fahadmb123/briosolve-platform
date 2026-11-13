@@ -7,40 +7,106 @@
 }
 
 .error-boundary-topbar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    background-color: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 1rem 2rem;
+    height: 64px;
+    background: #FF7900 !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    color: #180D00 !important;
+    border-bottom: 3px solid #FFE642 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+.error-boundary-topbar-inner {
+    max-width: 1400px;
+    height: 64px;
+    margin: 0 auto;
+    padding: 0 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.error-boundary-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    background: transparent;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    user-select: none;
+}
+
+.error-boundary-brand:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.error-boundary-brand-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+    filter: none !important;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.error-boundary-brand-text-logo {
+    height: 36px;
+    width: auto;
+    max-width: 240px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+    filter: none !important;
+    transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .error-boundary-topbar-actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
-.error-boundary-home-btn {
+.error-boundary-nav-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1.15rem;
-    border-radius: 6px;
+    height: 38px;
+    padding: 0 1.15rem;
+    border-radius: 9999px;
     font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text);
-    background-color: var(--surface-hover);
-    border: 1px solid var(--border);
+    font-weight: 700;
+    border: 1px solid #FFE642 !important;
+    background: #FFFFFF !important;
+    color: #180D00 !important;
     cursor: pointer;
-    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.error-boundary-home-btn:hover {
-    background-color: var(--surface);
-    border-color: var(--primary);
-    color: var(--primary);
+.error-boundary-nav-btn:hover {
+    background: #FFE642 !important;
+    border-color: #FF7900 !important;
+    color: #180D00 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.error-boundary-nav-btn.secondary {
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.error-boundary-nav-btn.primary {
+    background: #FFFFFF !important;
 }
 
 .error-boundary-main {
@@ -325,7 +391,28 @@
 
 @media (max-width: 768px) {
     .error-boundary-topbar {
-        padding: 1rem 1.25rem;
+        height: 60px;
+    }
+
+    .error-boundary-topbar-inner {
+        height: 60px;
+        padding: 0 1rem;
+    }
+
+    .error-boundary-brand-logo {
+        width: 38px;
+        height: 38px;
+    }
+
+    .error-boundary-brand-text-logo {
+        height: 28px;
+        max-width: 140px;
+    }
+
+    .error-boundary-nav-btn {
+        height: 34px;
+        padding: 0 0.85rem;
+        font-size: 0.8rem;
     }
 
     .error-boundary-main {

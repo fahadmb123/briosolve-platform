@@ -94,16 +94,22 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       return (
         <div className="error-boundary-page-wrapper" role="alert">
           <header className="error-boundary-topbar">
-            <a href="/" className="brand-logo-container" aria-label="Briosolve Home">
-              <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
-              <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
-            </a>
+            <div className="error-boundary-topbar-inner">
+              <a href="/" className="error-boundary-brand" aria-label="Briosolve Home">
+                <img src="/briosolve-logo.svg" alt="Briosolve" className="error-boundary-brand-logo" />
+                <img src="/briosolve-text-logo.svg" alt="Briosolve" className="error-boundary-brand-text-logo" />
+              </a>
 
-            <div className="error-boundary-topbar-actions">
-              <button type="button" onClick={this.handleHome} className="error-boundary-home-btn">
-                <i className="fas fa-home"></i>
-                <span>Homepage</span>
-              </button>
+              <div className="error-boundary-topbar-actions">
+                <button type="button" onClick={this.handleReload} className="error-boundary-nav-btn secondary">
+                  <i className="fas fa-redo-alt" />
+                  <span>Reload</span>
+                </button>
+                <button type="button" onClick={this.handleHome} className="error-boundary-nav-btn primary">
+                  <i className="fas fa-home" />
+                  <span>Homepage</span>
+                </button>
+              </div>
             </div>
           </header>
 
