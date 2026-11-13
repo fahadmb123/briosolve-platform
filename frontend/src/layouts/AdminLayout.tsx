@@ -65,15 +65,12 @@ export default function AdminLayout() {
                 <div className="menu-label mt-6">Catalog</div>
                 <ul className="sidebar-menu">
                     <li>
-                        <NavLink to="/admin/categories" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+                        <NavLink 
+                            to="/admin/categories" 
+                            className={() => `sidebar-item ${location.pathname.startsWith('/admin/categories') || location.pathname.startsWith('/admin/services') ? 'active' : ''}`}
+                        >
                             <i className="fas fa-layer-group"></i>
                             <span>Categories</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/admin/services" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-                            <i className="fas fa-tools"></i>
-                            <span>Services</span>
                         </NavLink>
                     </li>
                 </ul>

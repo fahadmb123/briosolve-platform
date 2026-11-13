@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { AdminPageHeader } from "../../../admin/components/AdminPageHeader";
 import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { AddServiceModal } from "../../components/AddServiceModal";
@@ -224,19 +223,9 @@ export default function Services() {
   ], [categoryNameMap]);
 
   return (
-    <div className="app-content">
+    <>
       {addService.isPending || updateService.isPending || deleteService.isPending ? <SpinnerOverlay isLoading={true} /> : null}
       
-      <AdminPageHeader 
-        title="Service Management" 
-        description="Manage individual services offered under each category."
-        actionButton={{
-          label: "Add Service",
-          icon: "fas fa-plus",
-          onClick: handleOpenAddModal
-        }}
-      />
-
       <div className="admin-filter-bar mb-6">
         <div className="admin-search-input">
           <i className="fas fa-search"></i>
@@ -267,6 +256,10 @@ export default function Services() {
 
           <button className="btn btn-secondary text-xs py-2" onClick={handleReset}>
             <i className="fas fa-undo mr-1"></i>Reset
+          </button>
+
+          <button className="btn btn-primary text-xs py-2" onClick={handleOpenAddModal}>
+            <i className="fas fa-plus mr-1"></i>Add Service
           </button>
         </div>
       </div>
@@ -307,6 +300,6 @@ export default function Services() {
           isLoading={deleteService.isPending}
         />
       )}
-    </div>
+    </>
   );
 }
