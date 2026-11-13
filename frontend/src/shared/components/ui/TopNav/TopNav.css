@@ -153,16 +153,14 @@ body.dark .topnav-header {
   color: #180D00;
 }
 
-.topnav-link.active,
-.topnav-dropdown-trigger[aria-expanded="true"] {
+.topnav-link.active {
   background: transparent !important;
   color: #FFFFFF !important;
   font-weight: 700;
   box-shadow: none !important;
 }
 
-[data-theme="light"] .topnav-link.active,
-[data-theme="light"] .topnav-dropdown-trigger[aria-expanded="true"] {
+[data-theme="light"] .topnav-link.active {
   background: transparent !important;
   color: #FFFFFF !important;
   font-weight: 700;
@@ -172,15 +170,21 @@ body.dark .topnav-header {
 .topnav-link:hover,
 .topnav-link.active:hover,
 .topnav-dropdown-trigger:hover,
+.topnav-dropdown-trigger[aria-expanded="true"],
 .topnav-dropdown-trigger[aria-expanded="true"]:hover,
+.topnav-dropdown-wrapper:hover .topnav-dropdown-trigger,
 [data-theme="light"] .topnav-link:hover,
 [data-theme="light"] .topnav-link.active:hover,
 [data-theme="light"] .topnav-dropdown-trigger:hover,
+[data-theme="light"] .topnav-dropdown-trigger[aria-expanded="true"],
 [data-theme="light"] .topnav-dropdown-trigger[aria-expanded="true"]:hover,
+[data-theme="light"] .topnav-dropdown-wrapper:hover .topnav-dropdown-trigger,
 [data-theme="dark"] .topnav-link:hover,
 [data-theme="dark"] .topnav-link.active:hover,
 [data-theme="dark"] .topnav-dropdown-trigger:hover,
-[data-theme="dark"] .topnav-dropdown-trigger[aria-expanded="true"]:hover {
+[data-theme="dark"] .topnav-dropdown-trigger[aria-expanded="true"],
+[data-theme="dark"] .topnav-dropdown-trigger[aria-expanded="true"]:hover,
+[data-theme="dark"] .topnav-dropdown-wrapper:hover .topnav-dropdown-trigger {
   color: #180D00 !important;
   background: #FFE642 !important;
   border-color: #FFBF00 !important;

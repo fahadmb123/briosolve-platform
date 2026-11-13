@@ -187,16 +187,14 @@ body.dark .prov-topnav-header {
   color: #180D00;
 }
 
-.prov-category-btn.active,
-.prov-category-btn[aria-expanded="true"] {
+.prov-category-btn.active {
   background: transparent !important;
   color: #FFFFFF !important;
   font-weight: 700;
   box-shadow: none !important;
 }
 
-[data-theme="light"] .prov-category-btn.active,
-[data-theme="light"] .prov-category-btn[aria-expanded="true"] {
+[data-theme="light"] .prov-category-btn.active {
   background: transparent !important;
   color: #FFFFFF !important;
   font-weight: 700;
@@ -205,13 +203,19 @@ body.dark .prov-topnav-header {
 
 .prov-category-btn:hover,
 .prov-category-btn.active:hover,
+.prov-category-btn[aria-expanded="true"],
 .prov-category-btn[aria-expanded="true"]:hover,
+.prov-category-wrapper:hover .prov-category-btn,
 [data-theme="light"] .prov-category-btn:hover,
 [data-theme="light"] .prov-category-btn.active:hover,
+[data-theme="light"] .prov-category-btn[aria-expanded="true"],
 [data-theme="light"] .prov-category-btn[aria-expanded="true"]:hover,
+[data-theme="light"] .prov-category-wrapper:hover .prov-category-btn,
 [data-theme="dark"] .prov-category-btn:hover,
 [data-theme="dark"] .prov-category-btn.active:hover,
-[data-theme="dark"] .prov-category-btn[aria-expanded="true"]:hover {
+[data-theme="dark"] .prov-category-btn[aria-expanded="true"],
+[data-theme="dark"] .prov-category-btn[aria-expanded="true"]:hover,
+[data-theme="dark"] .prov-category-wrapper:hover .prov-category-btn {
   color: #180D00 !important;
   background: #FFE642 !important;
   border-color: #FFBF00 !important;

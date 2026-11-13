@@ -219,7 +219,6 @@ export const TopNav: React.FC = () => {
                     to="/nearby-providers"
                     className={() =>
                       `topnav-link topnav-dropdown-trigger ${
-                        openDropdown === "workspace" ||
                         location.pathname.startsWith("/nearby-providers") ||
                         location.pathname.startsWith("/messages") ||
                         location.pathname.startsWith("/chat") ||
@@ -306,7 +305,6 @@ export const TopNav: React.FC = () => {
                     className={({ isActive }) =>
                       `topnav-link topnav-dropdown-trigger ${
                         isActive ||
-                        openDropdown === "more" ||
                         location.pathname.startsWith("/my-requests") ||
                         location.pathname.startsWith("/request-service") ||
                         location.pathname.startsWith("/bookings") ||

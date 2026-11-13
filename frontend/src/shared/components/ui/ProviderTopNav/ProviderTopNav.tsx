@@ -223,9 +223,7 @@ export const ProviderTopNav: React.FC = () => {
             <button
               type="button"
               className={`prov-category-btn ${
-                activePanel === "workspace" || isWorkspaceSection
-                  ? "active"
-                  : ""
+                isWorkspaceSection ? "active" : ""
               }`}
               onClick={() => {
                 if (isWorkspaceSection) {
@@ -317,9 +315,7 @@ export const ProviderTopNav: React.FC = () => {
           >
             <button
               type="button"
-              className={`prov-category-btn ${
-                activePanel === "finances" ? "active" : ""
-              }`}
+              className="prov-category-btn"
               onClick={() => togglePanel("finances")}
               aria-expanded={activePanel === "finances"}
             >
@@ -394,9 +390,7 @@ export const ProviderTopNav: React.FC = () => {
           >
             <button
               type="button"
-              className={`prov-category-btn ${
-                activePanel === "performance" ? "active" : ""
-              }`}
+              className="prov-category-btn"
               onClick={() => togglePanel("performance")}
               aria-expanded={activePanel === "performance"}
             >
@@ -474,9 +468,7 @@ export const ProviderTopNav: React.FC = () => {
             <button
               type="button"
               className={`prov-category-btn ${
-                activePanel === "settings" || isSettingsSection
-                  ? "active"
-                  : ""
+                isSettingsSection ? "active" : ""
               }`}
               onClick={() => {
                 if (isSettingsSection) {
