@@ -214,7 +214,7 @@ export default function Customers() {
                                     />
                                 ))
                             ) : (
-                                <tr>
+                                <tr className="admin-empty-row">
                                     <td colSpan={6} className="admin-empty-table-cell">
                                         <AdminNoData />
                                     </td>

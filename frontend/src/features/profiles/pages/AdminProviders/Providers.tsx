@@ -175,7 +175,6 @@ export default function Providers() {
                         </div>
                         <div className="text-xs text-muted"><i className="fas fa-shield-alt mr-1 text-primary"></i>Admin Action Logging Active</div>
                     </div>
-
                     <div className="table-responsive">
                         <table className="admin-table">
                             <thead>
@@ -222,7 +221,7 @@ export default function Providers() {
                                         />
                                     ))
                                 ) : (
-                                    <tr>
+                                    <tr className="admin-empty-row">
                                         <td colSpan={7} className="admin-empty-table-cell">
                                             <AdminNoData />
                                         </td>

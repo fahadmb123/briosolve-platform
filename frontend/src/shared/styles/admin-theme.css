@@ -171,7 +171,7 @@ html[data-theme="light"] body.theme-admin {
 
 /* High-Density Admin Data Tables */
 .admin-table-card {
-    background-color: var(--surface);
+    background-color: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -184,6 +184,7 @@ html[data-theme="light"] body.theme-admin {
 .admin-table-header {
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--border);
+    background-color: var(--surface);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -201,7 +202,9 @@ html[data-theme="light"] body.theme-admin {
 }
 
 .admin-empty-table-cell {
-    border-bottom: none !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
     padding: 0 !important;
     text-align: center;
     vertical-align: middle;
@@ -259,36 +262,106 @@ html[data-theme="light"] body.theme-admin {
 
 .admin-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate !important;
+    border-spacing: 0 10px !important;
     font-size: 0.875rem;
     text-align: left;
     white-space: nowrap;
+    padding: 0.5rem 1.25rem 1.25rem;
 }
 
 .admin-table th {
-    background-color: var(--surface-elevated);
-    color: var(--text-secondary);
-    font-weight: 600;
-    font-size: 0.75rem;
+    background-color: transparent !important;
+    color: var(--text) !important;
+    font-weight: 700 !important;
+    font-size: 0.8125rem !important;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 0.875rem 1.25rem;
-    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.04em;
+    padding: 0.65rem 1.25rem;
+    border: none !important;
 }
 
-.admin-table td {
-    padding: 1rem 1.25rem;
+html[data-theme="light"] body.theme-admin .admin-table th {
+    color: #0F172A !important;
+    font-weight: 700 !important;
+}
+
+body.theme-admin .admin-table th {
+    color: #F8FAFC !important;
+    font-weight: 700 !important;
+}
+
+.admin-table tbody tr {
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)) {
+    filter: drop-shadow(0 2px 5px rgba(15, 23, 42, 0.04));
+}
+
+.admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)):hover {
+    filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.08));
+    transform: translateY(-1px);
+}
+
+.admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)) td {
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
+    padding: 1.15rem 1.25rem;
     color: var(--text);
     vertical-align: middle;
+    transition: background-color 0.18s ease, border-color 0.18s ease;
 }
 
-.admin-table tbody tr:hover {
-    background-color: var(--admin-table-hover);
+.admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)) td:first-child {
+    border-left: 1px solid var(--border);
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
 }
 
-.admin-table tbody tr:last-child td {
-    border-bottom: none;
+.admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)) td:last-child {
+    border-right: 1px solid var(--border);
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)):hover td {
+    background-color: var(--surface-hover);
+    border-color: var(--border-light);
+}
+
+.admin-table tbody tr.admin-empty-row,
+.admin-table tbody tr.admin-empty-row:hover,
+.admin-table tbody tr:has(.admin-empty-table-cell),
+.admin-table tbody tr:has(.admin-empty-table-cell):hover {
+    filter: none !important;
+    transform: none !important;
+    background-color: transparent !important;
+}
+
+.admin-table tbody tr.admin-empty-row td,
+.admin-table tbody tr td.admin-empty-table-cell {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+body.theme-admin .admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)) {
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.45));
+}
+
+body.theme-admin .admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)):hover {
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.65));
+}
+
+html[data-theme="light"] body.theme-admin .admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)) {
+    filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.05));
+}
+
+html[data-theme="light"] body.theme-admin .admin-table tbody tr:not(.admin-empty-row):not(:has(.admin-empty-table-cell)):hover {
+    filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.09));
 }
 
 @keyframes admin-skeleton-shimmer {
@@ -332,22 +405,39 @@ html[data-theme="light"] body.theme-admin .skeleton-shimmer-cell .react-loading-
     border-radius: 6px !important;
 }
 
-.admin-table tbody tr.skeleton-row {
+.admin-table tbody tr.skeleton-row,
+.admin-table tbody tr:not(.admin-empty-row):has(.react-loading-skeleton) {
     background-color: transparent;
+    filter: drop-shadow(0 2px 5px rgba(15, 23, 42, 0.03));
 }
 
-.admin-table tbody tr.skeleton-row:hover {
+.admin-table tbody tr.skeleton-row:hover,
+.admin-table tbody tr:not(.admin-empty-row):has(.react-loading-skeleton):hover {
     background-color: transparent !important;
+    transform: none !important;
 }
 
-.admin-table tbody tr.skeleton-row td {
-    padding: 0.875rem 1.25rem;
+.admin-table tbody tr.skeleton-row td,
+.admin-table tbody tr:not(.admin-empty-row):has(.react-loading-skeleton) td {
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
+    padding: 0.95rem 1.25rem;
     vertical-align: middle;
 }
 
-.admin-table tbody tr.skeleton-row:last-child td {
-    border-bottom: none;
+.admin-table tbody tr.skeleton-row td:first-child,
+.admin-table tbody tr:not(.admin-empty-row):has(.react-loading-skeleton) td:first-child {
+    border-left: 1px solid var(--border);
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.admin-table tbody tr.skeleton-row td:last-child,
+.admin-table tbody tr:not(.admin-empty-row):has(.react-loading-skeleton) td:last-child {
+    border-right: 1px solid var(--border);
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 
 .skeleton-shimmer-cell {
@@ -969,8 +1059,13 @@ body.theme-admin .app-header.admin-app-header {
         gap: 0.5rem;
     }
 
+    .admin-table {
+        border-spacing: 0 8px !important;
+        padding: 0.25rem 0.75rem 0.75rem;
+    }
+
     .admin-table th, .admin-table td {
-        padding: 0.65rem 0.75rem;
+        padding: 0.85rem 0.95rem;
         font-size: 0.8125rem;
     }
 

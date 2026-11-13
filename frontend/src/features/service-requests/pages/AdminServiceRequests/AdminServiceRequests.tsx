@@ -302,7 +302,7 @@ export default function AdminServiceRequests() {
                     </tr>
                   ))
                 ) : (
-                  <tr>
+                  <tr className="admin-empty-row">
                     <td colSpan={7} className="admin-empty-table-cell">
                       <AdminNoData />
                     </td>
