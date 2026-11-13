@@ -19,6 +19,12 @@
   -ms-overflow-style: none;
 }
 
+.prov-subnav-sidebar.has-verification-warning,
+body.has-verification-warning .prov-subnav-sidebar {
+  top: calc(64px + 1cm) !important;
+  height: calc(100vh - 64px - 1cm) !important;
+}
+
 .prov-subnav-sidebar::-webkit-scrollbar {
   display: none;
   width: 0;

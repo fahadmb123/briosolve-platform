@@ -86,7 +86,16 @@ export const TopNav: React.FC = () => {
   const isCustomer = isAuthenticated && user?.role === "CUSTOMER";
   const isProvider = isAuthenticated && user?.role === "PROVIDER";
   const isAdmin = isAuthenticated && user?.role === "ADMIN";
-  const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
+  const isVerified = verifications !== null && Object.values(verifications).every(Boolean);
+  const showVerificationWarning = Boolean(isAuthenticated && !isAdmin && !isVerified);
+  const verificationRoute = isProvider ? "/provider/kyc" : "/settings";
+
+  useEffect(() => {
+    document.body.classList.toggle("has-verification-warning", showVerificationWarning);
+    return () => {
+      document.body.classList.remove("has-verification-warning");
+    };
+  }, [showVerificationWarning]);
 
 
 
@@ -606,6 +615,20 @@ export const TopNav: React.FC = () => {
         </div>
       </div>
     </header>
+
+      {showVerificationWarning && (
+        <div className="app-verification-warning-banner" role="alert">
+          <div className="app-verification-warning-content">
+            <i className="fas fa-exclamation-triangle app-verification-warning-icon"></i>
+            <span className="app-verification-warning-text">
+              Profile verification incomplete. Complete your verifications to unlock full marketplace access.
+            </span>
+            <Link to={verificationRoute} className="app-verification-warning-link">
+              Complete Verification
+            </Link>
+          </div>
+        </div>
+      )}
 
       
 

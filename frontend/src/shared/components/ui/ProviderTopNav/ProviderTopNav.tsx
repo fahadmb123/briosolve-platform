@@ -97,7 +97,16 @@ export const ProviderTopNav: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const navRef = useRef<HTMLDivElement>(null)
   const verifications = useAuthStore(state=>state.verifications)
-  const isVerified = verifications !== null && Object.values(verifications).every(Boolean)
+  const isVerified = verifications !== null && Object.values(verifications).every(Boolean);
+  const showVerificationWarning = Boolean(isAuthenticated && !isVerified);
+  const verificationRoute = "/provider/kyc";
+
+  useEffect(() => {
+    document.body.classList.toggle("has-verification-warning", showVerificationWarning);
+    return () => {
+      document.body.classList.remove("has-verification-warning");
+    };
+  }, [showVerificationWarning]);
 
   const handleLogout = async () => {
     if (!isAuthenticated) {
@@ -738,6 +747,20 @@ export const ProviderTopNav: React.FC = () => {
         </div>
       </div>
     </header>
+
+      {showVerificationWarning && (
+        <div className="app-verification-warning-banner" role="alert">
+          <div className="app-verification-warning-content">
+            <i className="fas fa-exclamation-triangle app-verification-warning-icon"></i>
+            <span className="app-verification-warning-text">
+              Profile verification incomplete. Complete your verifications to unlock full marketplace access.
+            </span>
+            <Link to={verificationRoute} className="app-verification-warning-link">
+              Complete Verification
+            </Link>
+          </div>
+        </div>
+      )}
 
       
 

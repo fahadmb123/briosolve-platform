@@ -65,8 +65,11 @@ export const CustomerSubnavSidebar: React.FC = () => {
   const location = useLocation();
   const unreadMessagesCount = useUnreadChatCount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
   const verifications = useAuthStore((state) => state.verifications);
   const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
+  const isAdmin = isAuthenticated && user?.role === "ADMIN";
+  const showVerificationWarning = Boolean(isAuthenticated && !isAdmin && !isVerified);
 
   const isMoreSection =
     location.pathname.startsWith("/my-requests") ||
@@ -140,7 +143,7 @@ export const CustomerSubnavSidebar: React.FC = () => {
   if (!activeSubnavItems) return null;
 
   return (
-    <aside className="cust-subnav-sidebar" aria-label="Secondary navigation">
+    <aside className={`cust-subnav-sidebar ${showVerificationWarning ? "has-verification-warning" : ""}`} aria-label="Secondary navigation">
       <div className="cust-subnav-sidebar-header">
         <div className="cust-subnav-sidebar-badge">
           <i className={activeSubnavIcon}></i>

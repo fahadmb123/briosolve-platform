@@ -57,6 +57,7 @@ export const ProviderSubnavSidebar: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const verifications = useAuthStore((state) => state.verifications);
   const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
+  const showVerificationWarning = Boolean(isAuthenticated && !isVerified);
 
   const isSettingsSection =
     location.pathname.startsWith("/provider/settings") ||
@@ -128,7 +129,7 @@ export const ProviderSubnavSidebar: React.FC = () => {
   if (!activeSubnavItems) return null;
 
   return (
-    <aside className="prov-subnav-sidebar" aria-label="Secondary navigation">
+    <aside className={`prov-subnav-sidebar ${showVerificationWarning ? "has-verification-warning" : ""}`} aria-label="Secondary navigation">
       <div className="prov-subnav-sidebar-header">
         <div className="prov-subnav-sidebar-badge">
           <i className={activeSubnavIcon}></i>
