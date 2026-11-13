@@ -33,7 +33,6 @@ export default function AdminLayout() {
             </div>
 
             <div className="sidebar-menu-wrapper">
-                <div className="menu-label">Platform Governance</div>
                 <ul className="sidebar-menu">
                     <li>
                         <NavLink to="/admin/dashboard" end className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
@@ -60,10 +59,7 @@ export default function AdminLayout() {
                             <span>Requests</span>
                         </NavLink>
                     </li>
-                    </ul>
 
-                <div className="menu-label mt-6">Catalog</div>
-                <ul className="sidebar-menu">
                     <li>
                         <NavLink 
                             to="/admin/categories" 
@@ -73,10 +69,7 @@ export default function AdminLayout() {
                             <span>Categories</span>
                         </NavLink>
                     </li>
-                </ul>
 
-                <div className="menu-label mt-6">Marketplace Operations</div>
-                <ul className="sidebar-menu">
                     <li>
                         <NavLink to="/admin/service-requests" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
                             <i className="fas fa-file-invoice"></i>
@@ -108,10 +101,7 @@ export default function AdminLayout() {
                             <span>Reviews</span>
                         </Link>
                     </li>
-                </ul>
 
-                <div className="menu-label mt-6">System &amp; Intelligence</div>
-                <ul className="sidebar-menu">
                     <li>
                         <Link to="#" className="sidebar-item">
                             <i className="fas fa-chart-pie"></i>
@@ -124,13 +114,18 @@ export default function AdminLayout() {
                             <span>Audit Logs</span>
                         </Link>
                     </li>
-                    <li className="mt-4 pt-2 border-top">
-                        <NavLink to="/login" className="sidebar-item text-danger">
-                            <i className="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </NavLink>
-                    </li>
                 </ul>
+            </div>
+
+            <div className="sidebar-footer" style={{ borderTop: '1px solid var(--border)', padding: '0.875rem 0.5rem', marginTop: 'auto' }}>
+                <button 
+                    onClick={handleLogout} 
+                    className="sidebar-item text-danger"
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', width: '100%' }}
+                >
+                    <i className="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
             </div>
         </aside>
             <main className="app-main">
