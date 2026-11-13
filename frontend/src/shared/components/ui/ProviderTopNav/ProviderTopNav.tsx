@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../../features/auth/stores/auth.store";
 import { useLogout } from "../../../../features/auth/hooks/use-otp-varify";
@@ -8,11 +8,70 @@ import NotificationDropdown from "../../../../features/notifications/components/
 import "./ProviderTopNav.css";
 import { useUnreadChatCount } from "../../../../features/chat";
 
+let lastKnownProvTopNavPill: { left: number; width: number } | null = null;
+
 export const ProviderTopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const unreadMessagesCount = useUnreadChatCount();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const centerNavRef = useRef<HTMLElement>(null);
+  const isInitialCrossMount = useRef<boolean>(lastKnownProvTopNavPill !== null);
+  const [pillHasMounted, setPillHasMounted] = useState<boolean>(() => lastKnownProvTopNavPill !== null);
+  const [activePillStyle, setActivePillStyle] = useState<{ left: number; width: number; opacity: number }>(() => {
+    if (lastKnownProvTopNavPill) {
+      return { left: lastKnownProvTopNavPill.left, width: lastKnownProvTopNavPill.width, opacity: 1 };
+    }
+    return { left: 0, width: 0, opacity: 0 };
+  });
+
+  useEffect(() => {
+    setPillHasMounted(true);
+  }, []);
+
+  useLayoutEffect(() => {
+    let rafId: number | null = null;
+
+    const updatePill = () => {
+      if (!centerNavRef.current) return;
+      const activeEl = centerNavRef.current.querySelector<HTMLElement>(".prov-category-btn.active");
+      if (activeEl) {
+        const navRect = centerNavRef.current.getBoundingClientRect();
+        const elRect = activeEl.getBoundingClientRect();
+        const targetLeft = elRect.left - navRect.left;
+        const targetWidth = elRect.width;
+
+        if (isInitialCrossMount.current) {
+          isInitialCrossMount.current = false;
+          rafId = requestAnimationFrame(() => {
+            setActivePillStyle({
+              left: targetLeft,
+              width: targetWidth,
+              opacity: 1,
+            });
+            lastKnownProvTopNavPill = { left: targetLeft, width: targetWidth };
+          });
+        } else {
+          setActivePillStyle({
+            left: targetLeft,
+            width: targetWidth,
+            opacity: 1,
+          });
+          lastKnownProvTopNavPill = { left: targetLeft, width: targetWidth };
+        }
+      } else {
+        setActivePillStyle((prev) => ({ ...prev, opacity: 0 }));
+      }
+    };
+
+    updatePill();
+    window.addEventListener("resize", updatePill);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", updatePill);
+    };
+  }, [location.pathname]);
 
   const isSettingsSection =
     location.pathname.startsWith("/provider/settings") ||
@@ -136,7 +195,16 @@ export const ProviderTopNav: React.FC = () => {
           </Link>
         </div>
 
-        <nav className="prov-topnav-center" aria-label="Provider Categories">
+        <nav className="prov-topnav-center" aria-label="Provider Categories" ref={centerNavRef}>
+          <div
+            className={`prov-active-pill ${pillHasMounted ? "is-animated" : ""}`}
+            style={{
+              transform: `translateX(${activePillStyle.left}px)`,
+              width: `${activePillStyle.width}px`,
+              opacity: activePillStyle.opacity,
+            }}
+            aria-hidden="true"
+          />
           <NavLink
             to="/"
             end

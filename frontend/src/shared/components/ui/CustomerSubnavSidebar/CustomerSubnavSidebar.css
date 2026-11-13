@@ -60,6 +60,58 @@
   flex-direction: column;
   gap: 0.25rem;
   flex: 1;
+  position: relative;
+}
+
+.cust-subnav-active-notch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-radius: 28px 0 0 28px;
+  background: var(--bg);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  will-change: transform, height, opacity;
+}
+
+.cust-subnav-active-notch.is-animated {
+  transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.1), height 0.2s ease, opacity 0.2s ease;
+}
+
+[data-theme="light"] .cust-subnav-active-notch {
+  background: #FFFFFF;
+}
+
+.cust-subnav-active-notch::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle 20px at 0 0, transparent 19.5px, var(--bg) 20px);
+  pointer-events: none;
+}
+
+.cust-subnav-active-notch::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle 20px at 0 20px, transparent 19.5px, var(--bg) 20px);
+  pointer-events: none;
+}
+
+[data-theme="light"] .cust-subnav-active-notch::before {
+  background: radial-gradient(circle 20px at 0 0, transparent 19.5px, #FFFFFF 20px);
+}
+
+[data-theme="light"] .cust-subnav-active-notch::after {
+  background: radial-gradient(circle 20px at 0 20px, transparent 19.5px, #FFFFFF 20px);
 }
 
 .cust-subnav-sidebar-item {
@@ -72,11 +124,13 @@
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: color 0.15s ease;
+  transition: color 0.22s ease, background-color 0.15s ease;
   position: relative;
   user-select: none;
   margin-right: 0;
   outline: none;
+  z-index: 2;
+  background: transparent;
 }
 
 .cust-subnav-sidebar-item:focus,
@@ -96,35 +150,60 @@
   color: #FFFFFF;
 }
 
-.cust-subnav-sidebar-item.active {
+.cust-subnav-sidebar-nav .cust-subnav-sidebar-item.active {
+  background: transparent !important;
+  color: #FF7900 !important;
+  font-weight: 700;
+  border: none;
+  box-shadow: none;
+}
+
+.cust-subnav-sidebar-nav .cust-subnav-sidebar-item.active:hover {
+  background: transparent !important;
+  color: #FF7900 !important;
+}
+
+[data-theme="light"] .cust-subnav-sidebar-nav .cust-subnav-sidebar-item.active {
+  background: transparent !important;
+  color: #FF7900 !important;
+}
+
+[data-theme="light"] .cust-subnav-sidebar-nav .cust-subnav-sidebar-item.active:hover {
+  background: transparent !important;
+  color: #FF7900 !important;
+}
+
+.cust-subnav-sidebar-nav .cust-subnav-sidebar-item.active::before,
+.cust-subnav-sidebar-nav .cust-subnav-sidebar-item.active::after {
+  display: none !important;
+}
+
+.cust-subnav-sidebar-footer .cust-subnav-sidebar-item.active {
   background: var(--bg);
   color: #FF7900;
   font-weight: 700;
   border: none;
   box-shadow: none;
-  transform: none;
-  z-index: 2;
-  outline: none;
 }
 
-.cust-subnav-sidebar-item.active:hover {
+.cust-subnav-sidebar-footer .cust-subnav-sidebar-item.active:hover {
   background: var(--bg);
   color: #FF7900;
 }
 
-[data-theme="light"] .cust-subnav-sidebar-item.active {
+[data-theme="light"] .cust-subnav-sidebar-footer .cust-subnav-sidebar-item.active {
   background: #FFFFFF;
   color: #FF7900;
   border: none;
   box-shadow: none;
 }
 
-[data-theme="light"] .cust-subnav-sidebar-item.active:hover {
+[data-theme="light"] .cust-subnav-sidebar-footer .cust-subnav-sidebar-item.active:hover {
   background: #FFFFFF;
   color: #FF7900;
 }
 
-.cust-subnav-sidebar-item.active::before {
+.cust-subnav-sidebar-footer .cust-subnav-sidebar-item.active::before {
   content: "";
   position: absolute;
   top: -20px;
@@ -135,7 +214,7 @@
   pointer-events: none;
 }
 
-.cust-subnav-sidebar-item.active::after {
+.cust-subnav-sidebar-footer .cust-subnav-sidebar-item.active::after {
   content: "";
   position: absolute;
   bottom: -20px;
@@ -146,11 +225,11 @@
   pointer-events: none;
 }
 
-[data-theme="light"] .cust-subnav-sidebar-item.active::before {
+[data-theme="light"] .cust-subnav-sidebar-footer .cust-subnav-sidebar-item.active::before {
   background: radial-gradient(circle 20px at 0 0, transparent 19.5px, #FFFFFF 20px);
 }
 
-[data-theme="light"] .cust-subnav-sidebar-item.active::after {
+[data-theme="light"] .cust-subnav-sidebar-footer .cust-subnav-sidebar-item.active::after {
   background: radial-gradient(circle 20px at 0 20px, transparent 19.5px, #FFFFFF 20px);
 }
 

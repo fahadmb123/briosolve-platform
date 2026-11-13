@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../../features/auth/stores/auth.store";
 import "./CustomerSubnavSidebar.css";
@@ -105,6 +105,38 @@ export const CustomerSubnavSidebar: React.FC = () => {
     location.pathname === "/settings" ||
     location.pathname.startsWith("/settings");
 
+  const navRef = useRef<HTMLElement>(null);
+  const [hasMounted, setHasMounted] = useState<boolean>(false);
+  const [notchStyle, setNotchStyle] = useState<{ top: number; height: number; opacity: number }>({
+    top: 0,
+    height: 48,
+    opacity: 0,
+  });
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useLayoutEffect(() => {
+    const updateNotch = () => {
+      if (!navRef.current) return;
+      const activeEl = navRef.current.querySelector<HTMLElement>(".cust-subnav-sidebar-item.active");
+      if (activeEl) {
+        setNotchStyle({
+          top: activeEl.offsetTop,
+          height: activeEl.offsetHeight,
+          opacity: 1,
+        });
+      } else {
+        setNotchStyle((prev) => ({ ...prev, opacity: 0 }));
+      }
+    };
+
+    updateNotch();
+    window.addEventListener("resize", updateNotch);
+    return () => window.removeEventListener("resize", updateNotch);
+  }, [location.pathname, location.hash, activeSubnavItems]);
+
   if (!activeSubnavItems) return null;
 
   return (
@@ -116,7 +148,16 @@ export const CustomerSubnavSidebar: React.FC = () => {
         </div>
       </div>
 
-      <nav className="cust-subnav-sidebar-nav">
+      <nav className="cust-subnav-sidebar-nav" ref={navRef}>
+        <div
+          className={`cust-subnav-active-notch ${hasMounted ? "is-animated" : ""}`}
+          style={{
+            transform: `translateY(${notchStyle.top}px)`,
+            height: `${notchStyle.height}px`,
+            opacity: notchStyle.opacity,
+          }}
+          aria-hidden="true"
+        />
         {activeSubnavItems.map((item) => {
           const [toPath, toHash] = item.to.split("#");
           const isActive = toHash

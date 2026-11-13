@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../../features/auth/stores/auth.store";
 import { useLogout } from "../../../../features/auth/hooks/use-otp-varify";
@@ -7,6 +7,8 @@ import NotificationDropdown from "../../../../features/notifications/components/
 import type { UserRole } from "../../../../features/notifications/types/notification.types";
 import "./TopNav.css";
 import { useUnreadChatCount } from "../../../../features/chat";
+
+let lastKnownTopNavPill: { left: number; width: number } | null = null;
 
 export const TopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
@@ -24,6 +26,62 @@ export const TopNav: React.FC = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const navRef = useRef<HTMLDivElement>(null);
+  const linksNavRef = useRef<HTMLElement>(null);
+  const isInitialCrossMount = useRef<boolean>(lastKnownTopNavPill !== null);
+  const [pillHasMounted, setPillHasMounted] = useState<boolean>(() => lastKnownTopNavPill !== null);
+  const [activePillStyle, setActivePillStyle] = useState<{ left: number; width: number; opacity: number }>(() => {
+    if (lastKnownTopNavPill) {
+      return { left: lastKnownTopNavPill.left, width: lastKnownTopNavPill.width, opacity: 1 };
+    }
+    return { left: 0, width: 0, opacity: 0 };
+  });
+
+  useEffect(() => {
+    setPillHasMounted(true);
+  }, []);
+
+  useLayoutEffect(() => {
+    let rafId: number | null = null;
+
+    const updatePill = () => {
+      if (!linksNavRef.current) return;
+      const activeEl = linksNavRef.current.querySelector<HTMLElement>(".topnav-link.active");
+      if (activeEl) {
+        const navRect = linksNavRef.current.getBoundingClientRect();
+        const elRect = activeEl.getBoundingClientRect();
+        const targetLeft = elRect.left - navRect.left;
+        const targetWidth = elRect.width;
+
+        if (isInitialCrossMount.current) {
+          isInitialCrossMount.current = false;
+          rafId = requestAnimationFrame(() => {
+            setActivePillStyle({
+              left: targetLeft,
+              width: targetWidth,
+              opacity: 1,
+            });
+            lastKnownTopNavPill = { left: targetLeft, width: targetWidth };
+          });
+        } else {
+          setActivePillStyle({
+            left: targetLeft,
+            width: targetWidth,
+            opacity: 1,
+          });
+          lastKnownTopNavPill = { left: targetLeft, width: targetWidth };
+        }
+      } else {
+        setActivePillStyle((prev) => ({ ...prev, opacity: 0 }));
+      }
+    };
+
+    updatePill();
+    window.addEventListener("resize", updatePill);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", updatePill);
+    };
+  }, [location.pathname]);
 
   const isCustomer = isAuthenticated && user?.role === "CUSTOMER";
   const isProvider = isAuthenticated && user?.role === "PROVIDER";
@@ -121,7 +179,16 @@ export const TopNav: React.FC = () => {
             <img src="/briosolve-text-logo.svg" alt="Briosolve" className="topnav-brand-text-logo" />
           </Link>
 
-          <nav className="topnav-links" aria-label="Primary Navigation">
+          <nav className="topnav-links" aria-label="Primary Navigation" ref={linksNavRef}>
+            <div
+              className={`topnav-active-pill ${pillHasMounted ? "is-animated" : ""}`}
+              style={{
+                transform: `translateX(${activePillStyle.left}px)`,
+                width: `${activePillStyle.width}px`,
+                opacity: activePillStyle.opacity,
+              }}
+              aria-hidden="true"
+            />
             <NavLink
               to="/"
               end
