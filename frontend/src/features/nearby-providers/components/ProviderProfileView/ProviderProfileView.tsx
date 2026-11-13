@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import type { User } from '../../../../shared/types/Dtos';
 import type { Address } from '../../../addresses';
@@ -11,7 +11,8 @@ interface ProviderProfileViewProps {
     providerId?: string;
     initialProvider?: User | null;
     customerAddress?: Address | null;
-    onBack: () => void;
+    backLabel?: string;
+    onBack?: () => void;
 }
 
 const WEEKDAYS_MAP = [
@@ -28,13 +29,35 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
     providerId,
     initialProvider,
     customerAddress,
+    backLabel,
     onBack
 }) => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const targetId = providerId || initialProvider?.id;
     const [profileData, setProfileData] = useState<ProviderPublicProfileData | null>(null);
     const getProfileMut = useGetProviderPublicProfile();
+
+    const state = location.state as { from?: string; returnUrl?: string } | null;
+    const isFromChat = state?.from === 'chat' || Boolean(state?.returnUrl && (state.returnUrl.includes('messages') || state.returnUrl.includes('chat')));
+    const resolvedBackLabel = backLabel || (isFromChat ? 'Back to Chat' : 'Back to Nearby Providers');
+
+    const handleBack = () => {
+        if (onBack) {
+            onBack();
+            return;
+        }
+        if (state?.returnUrl) {
+            navigate(state.returnUrl);
+        } else if (state?.from === 'chat') {
+            navigate('/messages');
+        } else if (window.history.state?.idx > 0) {
+            navigate(-1);
+        } else {
+            navigate('/nearby-providers');
+        }
+    };
 
     useEffect(() => {
         if (!targetId) return;
@@ -66,16 +89,6 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
         if (!targetId) return;
         navigate(`/messages?recipientId=${targetId}`, {
             state: { recipientId: targetId, providerId: targetId }
-        });
-    };
-
-    const handleRequestService = () => {
-        if (!targetId) return;
-        navigate('/request-service', {
-            state: {
-                preferredProviderId: targetId,
-                preferredProviderName: activeProviderName
-            }
         });
     };
 
@@ -111,9 +124,9 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
         return (
             <div className="provider-profile-view fade-in">
                 <div className="provider-profile-nav-bar">
-                    <button type="button" onClick={onBack} className="provider-back-btn">
+                    <button type="button" onClick={handleBack} className="provider-back-btn">
                         <i className="fas fa-arrow-left" />
-                        <span>Back to Nearby Providers</span>
+                        <span>{resolvedBackLabel}</span>
                     </button>
                 </div>
 
@@ -161,13 +174,13 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
     return (
         <div className="provider-profile-view fade-in">
             <div className="provider-profile-nav-bar">
-                <button type="button" onClick={onBack} className="provider-back-btn">
+                <button type="button" onClick={handleBack} className="provider-back-btn">
                     <i className="fas fa-arrow-left" />
-                    <span>Back to Nearby Providers</span>
+                    <span>{resolvedBackLabel}</span>
                 </button>
 
                 <div className="provider-profile-breadcrumb">
-                    <span>Providers</span>
+                    <span>{isFromChat ? 'Chat' : 'Providers'}</span>
                     <i className="fas fa-chevron-right text-xs" />
                     <span className="crumb-active">{activeProviderName}</span>
                 </div>
@@ -229,18 +242,10 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                         <button
                             type="button"
                             onClick={handleStartChat}
-                            className="provider-profile-btn-secondary"
+                            className="provider-profile-btn-primary"
                         >
                             <i className="fas fa-comment-dots" />
                             <span>Message</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleRequestService}
-                            className="provider-profile-btn-primary"
-                        >
-                            <i className="fas fa-paper-plane" />
-                            <span>Request Service</span>
                         </button>
                     </div>
                 </div>
@@ -403,34 +408,6 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                 </div>
 
                 <div className="provider-profile-side-col">
-                    <div className="provider-info-card" style={{ background: 'linear-gradient(135deg, rgba(255, 121, 0, 0.08) 0%, rgba(255, 230, 66, 0.05) 100%)', borderColor: 'rgba(255, 121, 0, 0.3)' }}>
-                        <div className="provider-info-header">
-                            <div className="provider-info-header-title">
-                                <i className="fas fa-bolt" />
-                                <h3>Book Specialist</h3>
-                            </div>
-                        </div>
-                        <p className="text-secondary text-sm mb-3">
-                            Directly request a custom quote or schedule service with {activeProviderName}.
-                        </p>
-                        <button
-                            type="button"
-                            onClick={handleRequestService}
-                            className="provider-profile-btn-primary w-100 mb-2"
-                        >
-                            <i className="fas fa-paper-plane" />
-                            <span>Request a Service</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleStartChat}
-                            className="provider-profile-btn-secondary w-100"
-                        >
-                            <i className="fas fa-comment-dots" />
-                            <span>Chat with Provider</span>
-                        </button>
-                    </div>
-
                     <div className="provider-info-card">
                         <div className="provider-info-header">
                             <div className="provider-info-header-title">
@@ -530,24 +507,16 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
             <div className="provider-cta-banner">
                 <div className="provider-cta-info">
                     <h3>Ready to work with {activeProviderName}?</h3>
-                    <p>Post a service request to receive upfront estimates, or message them right away.</p>
+                    <p>Message {activeProviderName} directly to discuss requirements and schedule service.</p>
                 </div>
                 <div className="provider-cta-actions">
                     <button
                         type="button"
                         onClick={handleStartChat}
-                        className="provider-profile-btn-secondary"
+                        className="provider-profile-btn-primary"
                     >
                         <i className="fas fa-comment-dots" />
                         <span>Send Message</span>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleRequestService}
-                        className="provider-profile-btn-primary"
-                    >
-                        <i className="fas fa-paper-plane" />
-                        <span>Request Service Now</span>
                     </button>
                 </div>
             </div>

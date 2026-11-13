@@ -87,13 +87,24 @@ export default function NearbyProviders() {
 
     const handleViewDetails = useCallback((provider: User) => {
         setSelectedProvider(provider);
-        navigate(`/nearby-providers/${provider.id}`, { state: { provider } });
+        navigate(`/nearby-providers/${provider.id}`, { state: { provider, from: 'nearby-providers' } });
     }, [navigate]);
 
     const handleBackFromProfile = useCallback(() => {
         setSelectedProvider(null);
-        navigate('/nearby-providers');
-    }, [navigate]);
+        const state = location.state as { from?: string; returnUrl?: string } | null;
+        if (state?.returnUrl) {
+            navigate(state.returnUrl);
+        } else if (state?.from === 'chat') {
+            navigate('/messages');
+        } else if (state?.from === 'nearby-providers') {
+            navigate('/nearby-providers');
+        } else if (window.history.state?.idx > 0) {
+            navigate(-1);
+        } else {
+            navigate('/nearby-providers');
+        }
+    }, [navigate, location.state]);
 
     const displayedProviders = useMemo(() => {
         const list = [...providers];
