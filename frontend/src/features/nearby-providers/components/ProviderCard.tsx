@@ -35,109 +35,60 @@ export const ProviderCard: React.FC<ProviderCardProps> = React.memo(({ provider,
         );
 
     const isKycApproved = profile?.kyc_status === 'APPROVED';
-    const avatarUrl = profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(provider.name)}&background=FF7900&color=fff&size=160&bold=true`;
+    const avatarUrl = profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(provider.name)}&background=FF7900&color=fff&size=200&bold=true`;
 
     return (
-        <div className="card provider-card fade-in">
-            <div className="provider-card-cover">
-                <div className="provider-cover-overlay" />
-                <div className="provider-cover-top">
-                    {distance != null ? (
-                        <span className="provider-distance-chip">
-                            <i className="fas fa-location-arrow" />
-                            {distance} km away
-                        </span>
-                    ) : profile?.service_radius_km ? (
-                        <span className="provider-distance-chip">
-                            <i className="fas fa-compass" />
-                            {profile.service_radius_km} km radius
-                        </span>
-                    ) : null}
-                </div>
-            </div>
-
-            <div className="provider-avatar-row">
-                <div className="provider-avatar-wrapper">
-                    <img
-                        src={avatarUrl}
-                        alt={provider.name}
-                        className="provider-avatar-img"
-                    />
-                    {isKycApproved && (
-                        <span className="provider-verified-badge" title="Verified Professional">
-                            <i className="fas fa-check" />
-                        </span>
-                    )}
-                </div>
-
-                <div className="provider-header-meta">
-                    <h3 className="provider-business-name" title={profile?.business_name || provider.name}>
-                        {profile?.business_name || provider.name}
-                    </h3>
-                    <p className="provider-user-name">
-                        <i className="fas fa-user-circle" />
-                        {provider.name}
-                    </p>
-                </div>
-            </div>
-
-            <div className="provider-card-body">
-                <div className="provider-location-meta">
-                    {providerAddress?.city && (
-                        <span className="location-pill">
-                            <i className="fas fa-map-marker-alt" />
-                            {providerAddress.city}{providerAddress.state ? `, ${providerAddress.state}` : ''}
-                        </span>
-                    )}
-                    {profile?.service_radius_km && (
-                        <span className="radius-pill">
-                            <i className="fas fa-crosshairs" />
-                            Serves {profile.service_radius_km} km radius
-                        </span>
-                    )}
-                </div>
-
-                <div className="provider-stats-bar">
-                    <div className="provider-stat-item">
-                        <span className="stat-value">{profile?.completed_jobs ?? 0}</span>
-                        <span className="stat-label">Jobs Done</span>
-                    </div>
-                    <div className="provider-stat-divider" />
-                    <div className="provider-stat-item">
-                        <span className="stat-value">{profile?.experience || '1+ Yrs'}</span>
-                        <span className="stat-label">Experience</span>
-                    </div>
-                    <div className="provider-stat-divider" />
-                    <div className="provider-stat-item">
-                        <span className="stat-value highlight">{isKycApproved ? 'Verified' : 'Active'}</span>
-                        <span className="stat-label">KYC Status</span>
-                    </div>
-                </div>
-
-                {profile?.bio && (
-                    <p className="provider-bio-text">
-                        {profile.bio}
-                    </p>
-                )}
-
-                {profile?.skills && (
-                    <div className="provider-skills-list">
-                        {profile.skills.split(',').slice(0, 3).map((skill, idx) => (
-                            <span key={idx} className="provider-skill-tag">
-                                {skill.trim()}
-                            </span>
-                        ))}
-                    </div>
+        <div 
+            className="card provider-clean-card fade-in"
+            onClick={() => onViewDetails(provider)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onViewDetails(provider);
+                }
+            }}
+        >
+            <div className="provider-clean-avatar-wrap">
+                <img
+                    src={avatarUrl}
+                    alt={provider.name}
+                    className="provider-clean-avatar-img"
+                />
+                {isKycApproved && (
+                    <span className="provider-clean-verified" title="Verified Professional">
+                        <i className="fas fa-check" />
+                    </span>
                 )}
             </div>
 
-            <div className="provider-card-footer">
+            <div className="provider-clean-info">
+                <h3 className="provider-clean-name" title={provider.name}>
+                    {provider.name}
+                </h3>
+
+                <p className="provider-clean-business" title={profile?.business_name || 'Independent Specialist'}>
+                    <i className="fas fa-briefcase" />
+                    <span>{profile?.business_name || 'Independent Specialist'}</span>
+                </p>
+
+                <div className="provider-clean-radius-badge">
+                    <i className="fas fa-location-dot" />
+                    <span>{profile?.service_radius_km ? `${profile.service_radius_km} km Service Radius` : (distance != null ? `${distance} km away` : 'Local Coverage')}</span>
+                </div>
+            </div>
+
+            <div className="provider-clean-footer">
                 <button
                     type="button"
-                    onClick={() => onViewDetails(provider)}
-                    className="btn btn-primary w-100 provider-details-btn"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onViewDetails(provider);
+                    }}
+                    className="provider-clean-btn"
                 >
-                    <span>View Profile & Details</span>
+                    <span>View Profile</span>
                     <i className="fas fa-arrow-right" />
                 </button>
             </div>
