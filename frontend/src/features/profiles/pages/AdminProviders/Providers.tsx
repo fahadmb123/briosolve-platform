@@ -8,6 +8,7 @@ import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/Conf
 import { BlockReasonModal } from "../../../admin/components/BlockReasonModal";
 import ProviderRow from "../../components/admin/ProviderRow";
 import Skeleton from "react-loading-skeleton";
+import { AdminNoData } from "../../../../shared/components/ui/AdminNoData";
 
 export default function Providers() {
     const [providers, setProviders] = useState<User[]>([]);
@@ -222,8 +223,8 @@ export default function Providers() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={7} className="text-center py-8 text-secondary">
-                                            No provider accounts found.
+                                        <td colSpan={7} className="admin-empty-table-cell">
+                                            <AdminNoData />
                                         </td>
                                     </tr>
                                 )}

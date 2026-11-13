@@ -277,7 +277,7 @@ export default function Services() {
         isLoading={getServicesMut.isPending}
         loadingMessage="Searching for services..."
         keyExtractor={keyExtractor}
-        emptyMessage="No services found."
+        emptyMessage="No data found matching this."
       />
 
       <AdminPagination 

@@ -7,6 +7,7 @@ import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/Conf
 import { BlockReasonModal } from "../../../admin/components/BlockReasonModal";
 import CustomerRow from "../../components/admin/CustomerRow";
 import Skeleton from "react-loading-skeleton";
+import { AdminNoData } from "../../../../shared/components/ui/AdminNoData";
 
 
 
@@ -214,8 +215,8 @@ export default function Customers() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="text-center py-8 text-secondary">
-                                        No customer accounts found.
+                                    <td colSpan={6} className="admin-empty-table-cell">
+                                        <AdminNoData />
                                     </td>
                                 </tr>
                             )}

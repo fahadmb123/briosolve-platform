@@ -290,7 +290,7 @@ export default function Reactivations() {
           columns={columns}
           data={requests}
           isLoading={getReactivations.isPending}
-          emptyMessage="No account reactivation requests match your search or filter criteria."
+          emptyMessage="No data found matching this."
           keyExtractor={(item) => item.id}
         />
 

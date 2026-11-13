@@ -1,5 +1,6 @@
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { AdminNoData } from '../../../shared/components/ui/AdminNoData';
 
 export interface TableColumn<T> {
   key: string;
@@ -23,10 +24,10 @@ function AdminTableComponent<T>({
   columns, 
   data, 
   isLoading, 
-  emptyMessage = "No records found.", 
+  emptyMessage = "No data found matching this.", 
   keyExtractor,
   rowStyle,
-  skeletonRowCount = 5
+  skeletonRowCount = 8
 }: AdminTableProps<T>) {
   return (
     <div className="admin-table-card relative">
@@ -54,8 +55,8 @@ function AdminTableComponent<T>({
               ))
             ) : !isLoading && data.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="text-center py-8 text-secondary">
-                  {emptyMessage}
+                <td colSpan={columns.length} className="admin-empty-table-cell">
+                  <AdminNoData description={emptyMessage} />
                 </td>
               </tr>
             ) : (

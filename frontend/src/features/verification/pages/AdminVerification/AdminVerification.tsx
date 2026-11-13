@@ -300,7 +300,7 @@ export default function Verification() {
           columns={columns}
           data={dossiers}
           isLoading={getVerifications.isPending}
-          emptyMessage="No provider verification dossiers match the current filter criteria."
+          emptyMessage="No data found matching this."
           keyExtractor={(item) => item.id}
         />
 

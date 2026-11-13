@@ -235,7 +235,7 @@ export default function Categories() {
         isLoading={getCategories.isPending}
         loadingMessage="Searching for categories..."
         keyExtractor={keyExtractor}
-        emptyMessage="No categories found."
+        emptyMessage="No data found matching this."
       />
 
       <AdminPagination 

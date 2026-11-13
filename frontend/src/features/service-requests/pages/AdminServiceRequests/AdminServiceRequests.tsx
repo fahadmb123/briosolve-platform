@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
+import { AdminNoData } from "../../../../shared/components/ui/AdminNoData";
 import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
@@ -302,8 +303,8 @@ export default function AdminServiceRequests() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="text-center py-8 text-secondary">
-                      No service requests found.
+                    <td colSpan={7} className="admin-empty-table-cell">
+                      <AdminNoData />
                     </td>
                   </tr>
                 )}
