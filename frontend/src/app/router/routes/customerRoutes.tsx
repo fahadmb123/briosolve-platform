@@ -17,6 +17,7 @@ export const customerRoutes = (
         <Route path="profile" element={<CustomerProfile />} />
         <Route path="notifications" element={<CustomerNotifications />} />
         <Route path="nearby-providers" element={<CustomerNearbyProviders />} />
+        <Route path="nearby-providers/:providerId" element={<CustomerNearbyProviders />} />
         <Route path="my-requests" element={<CustomerMyRequests />} />
         <Route path="messages" element={<CustomerChat />} />
         <Route path="chat" element={<CustomerChat />} />
