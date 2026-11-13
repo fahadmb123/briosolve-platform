@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
@@ -149,7 +150,9 @@ export default function AdminLayout() {
                     </button>
                 </div>
             </header>
-                <Outlet />
+                <Suspense fallback={<div className="app-content flex items-center justify-center p-8"><span className="spinner"></span></div>}>
+                    <Outlet />
+                </Suspense>
             </main>
         </div>
     );

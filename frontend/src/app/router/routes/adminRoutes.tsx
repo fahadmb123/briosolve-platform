@@ -12,7 +12,7 @@ import {
 
 export const adminRoutes = (
   <>
-    <Route index element={<Navigate to="dashboard" replace />} />
+    <Route index element={<Navigate to="/admin/dashboard" replace />} />
     <Route path="dashboard" element={<AdminDashboard />} />
     <Route path="users" element={<AdminUsers />} />
     <Route path="customers" element={<Navigate to="/admin/users?tab=customers" replace />} />

@@ -98,7 +98,7 @@ export const useLogin = () => {
                     navigate("/provider/dashboard", { replace: true });
                 }
             } else {
-                navigate(`/${currentUser.role.toLocaleLowerCase()}`, { replace: true });
+                navigate("/admin/dashboard", { replace: true });
             }
             toast.success(response.message);
         },

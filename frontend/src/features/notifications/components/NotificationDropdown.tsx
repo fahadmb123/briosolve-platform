@@ -52,15 +52,22 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   }, [role, user?.role]);
 
   const unreadNotifications = useMemo(() => {
-    const sorted = [...notifications].sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    );
-    return sorted
-      .filter((n) => !n.is_read)
-      .map((notification) =>
-        mapNotificationToHeader(notification, resolvedRole),
-      );
+    if (!Array.isArray(notifications)) return [];
+    try {
+      const sorted = [...notifications].sort((a, b) => {
+        const timeA = a?.created_at ? new Date(a.created_at).getTime() : 0;
+        const timeB = b?.created_at ? new Date(b.created_at).getTime() : 0;
+        return timeB - timeA;
+      });
+      return sorted
+        .filter((n) => n && !n.is_read)
+        .map((notification) =>
+          mapNotificationToHeader(notification, resolvedRole),
+        )
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
   }, [notifications, resolvedRole]);
 
   const unreadCount = unreadNotifications.length;
