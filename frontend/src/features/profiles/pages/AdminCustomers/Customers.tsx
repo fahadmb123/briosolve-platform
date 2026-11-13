@@ -155,21 +155,6 @@ export default function Customers() {
 
         
             <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
-                {getCustomers.isPending && <div className="skeleton-progress-bar" />}
-                <div className="admin-table-header">
-                    <div className="text-sm font-semibold text-text">
-                        {getCustomers.isPending && (
-                            <span className="skeleton-loading-label">
-                                <span className="skeleton-dot" />
-                                <span className="skeleton-dot" />
-                                <span className="skeleton-dot" />
-                                Fetching records
-                            </span>
-                        )}
-                    </div>
-                    <div className="text-xs text-muted"><i className="fas fa-shield-alt mr-1 text-primary"></i>Admin Action Logging Active</div>
-                </div>
-
                 <div className="table-responsive">
                     <table className="admin-table">
                         <thead>

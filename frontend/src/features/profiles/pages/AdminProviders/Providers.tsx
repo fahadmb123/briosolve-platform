@@ -21,7 +21,7 @@ export default function Providers() {
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("");
     const [limit] = useState(10);
-    const [total, setTotal] = useState(0);
+    const [, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
     const getProviders = useGetProviders();
@@ -161,20 +161,7 @@ export default function Providers() {
                 </div>
 
                 <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
-                    {getProviders.isPending && <div className="skeleton-progress-bar" />}
-                    <div className="admin-table-header">
-                        <div className="text-sm font-semibold text-text">
-                            {getProviders.isPending ? (
-                                <span className="skeleton-loading-label">
-                                    <span className="skeleton-dot" />
-                                    <span className="skeleton-dot" />
-                                    <span className="skeleton-dot" />
-                                    Fetching records
-                                </span>
-                            ) : `${total} Providers Listed`}
-                        </div>
-                        <div className="text-xs text-muted"><i className="fas fa-shield-alt mr-1 text-primary"></i>Admin Action Logging Active</div>
-                    </div>
+                    
                     <div className="table-responsive">
                         <table className="admin-table">
                             <thead>
