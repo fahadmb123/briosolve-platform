@@ -8,6 +8,17 @@ import "./Home.css";
 export default function Home() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
+  const verifications = useAuthStore((state) => state.verifications);
+
+  const isVerified = useMemo(() => {
+    return Boolean(verifications !== null && Object.values(verifications).every(Boolean));
+  }, [verifications]);
+
+  const showVerificationWarning = Boolean(isAuthenticated && user?.role !== "ADMIN" && !isVerified);
+
+  const verificationRoute = useMemo(() => {
+    return user?.role === "PROVIDER" ? "/provider/kyc" : "/settings";
+  }, [user?.role]);
 
   const dashboardRoute = useMemo(() => {
     if (!user) return "/login";
@@ -109,7 +120,20 @@ export default function Home() {
       ) : (
         <CustomerNavbar />
       )}
-      <main className="home-wrapper">
+      {showVerificationWarning && (
+        <div className="home-verification-warning-banner" role="alert">
+          <div className="home-verification-warning-content">
+            <i className="fas fa-exclamation-triangle home-verification-warning-icon"></i>
+            <span className="home-verification-warning-text">
+              Profile verification incomplete. Complete your verifications to unlock full marketplace access.
+            </span>
+            <Link to={verificationRoute} className="home-verification-warning-link">
+              Complete Verification
+            </Link>
+          </div>
+        </div>
+      )}
+      <main className={`home-wrapper ${showVerificationWarning ? "has-warning-banner" : ""}`}>
         <div className="home-top-announcement-bar">
           <div className="home-top-announcement-content">
             <div className="home-announcement-brand">

@@ -159,6 +159,96 @@
   transform: translateY(-1px) !important;
 }
 
+.home-verification-warning-banner {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 1cm;
+  min-height: 1cm;
+  max-height: 1cm;
+  background: #FFFBEB;
+  border-bottom: 2px solid #F59E0B;
+  color: #92400E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 998;
+  box-sizing: border-box;
+  padding: 0 1.25rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .home-verification-warning-banner,
+body.dark .home-verification-warning-banner {
+  background: #2D1A00;
+  border-bottom: 2px solid #F59E0B;
+  color: #FDE68A;
+}
+
+.home-verification-warning-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 1400px;
+  width: 100%;
+}
+
+.home-verification-warning-icon {
+  color: #D97706;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.home-verification-warning-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-verification-warning-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.75rem;
+  background: #F59E0B;
+  color: #180D00 !important;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.home-verification-warning-link:hover {
+  background: #D97706;
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .home-verification-warning-banner {
+    font-size: 0.75rem;
+    padding: 0 0.5rem;
+  }
+  .home-verification-warning-text {
+    font-size: 0.75rem;
+  }
+  .home-verification-warning-link {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.55rem;
+  }
+}
+
 .home-wrapper {
   min-height: 100vh;
   background-color: var(--bg);
@@ -169,6 +259,10 @@
   width: 100%;
   margin-left: 0 !important;
   max-width: 100vw !important;
+}
+
+.home-wrapper.has-warning-banner {
+  padding-top: calc(64px + 1cm);
 }
 
 .home-top-announcement-bar {
