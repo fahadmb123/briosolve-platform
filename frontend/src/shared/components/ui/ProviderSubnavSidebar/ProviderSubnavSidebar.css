@@ -15,7 +15,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 40;
-  box-shadow: 4px 0 20px rgba(255, 121, 0, 0.15);
 }
 
 [data-theme="light"] .prov-subnav-sidebar {
