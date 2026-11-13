@@ -16,18 +16,23 @@ body.theme-admin {
     --border: #2c2c34;
     --border-light: #3c3c46;
 
-    --admin-primary: #FFFFFF;
-    --admin-primary-content: #000000;
-    --admin-primary-hover: #E4E4E7;
-    --admin-primary-active: #D4D4D8;
-    --admin-primary-light: rgba(255, 255, 255, 0.12);
+    --admin-primary: #FF7900;
+    --admin-primary-content: #FFFFFF;
+    --admin-primary-hover: #FFA042;
+    --admin-primary-active: #E06A00;
+    --admin-primary-light: rgba(255, 121, 0, 0.16);
 
     --admin-table-hover: rgba(255, 255, 255, 0.05);
     --admin-text-header: #FFFFFF;
+    --navbar-bg: #141417;
+    --sidebar-bg: #141417;
+    --primary: #FF7900;
+    --primary-content: #FFFFFF;
+    --primary-hover: #FFA042;
+    --primary-light: rgba(255, 121, 0, 0.16);
 }
 
 html[data-theme="light"] body.theme-admin {
-    /* LIGHT THEME - Silver & Navy */
     --bg: #F0F2F5;
     --surface: #FFFFFF;
     --surface-elevated: #F8FAFC;
@@ -40,15 +45,20 @@ html[data-theme="light"] body.theme-admin {
     --border: #E2E8F0;
     --border-light: #CBD5E1;
 
-    /* Deep Royal Navy Accents */
-    --admin-primary: #0A2540;
+    --admin-primary: #FF7900;
     --admin-primary-content: #FFFFFF;
-    --admin-primary-hover: #071C33;
-    --admin-primary-active: #041224;
-    --admin-primary-light: rgba(10, 37, 64, 0.1);
+    --admin-primary-hover: #FFA042;
+    --admin-primary-active: #E06A00;
+    --admin-primary-light: rgba(255, 121, 0, 0.12);
     
-    --admin-table-hover: rgba(10, 37, 64, 0.03);
+    --admin-table-hover: rgba(255, 121, 0, 0.03);
     --admin-text-header: #0F172A;
+    --navbar-bg: #FFFFFF;
+    --sidebar-bg: #FFFFFF;
+    --primary: #FF7900;
+    --primary-content: #FFFFFF;
+    --primary-hover: #FFA042;
+    --primary-light: rgba(255, 121, 0, 0.12);
 }
 
 /* Operational Badge Accents */
@@ -545,6 +555,50 @@ body.theme-admin .app-header.admin-app-header {
     border-right: none !important;
     border-bottom: 1px solid var(--border) !important;
     top: 0 !important;
+    background: var(--surface) !important;
+    background-color: var(--surface) !important;
+    color: var(--text) !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+body.theme-admin .admin-app-header .breadcrumbs-trail {
+    color: var(--text) !important;
+}
+
+body.theme-admin .admin-app-header .btn-icon {
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border);
+}
+
+body.theme-admin .admin-app-header .btn-icon:hover {
+    color: var(--text);
+    background: var(--surface-hover);
+    border-color: var(--border-light);
+}
+
+body.theme-admin .btn-primary {
+    background-color: var(--admin-primary) !important;
+    color: var(--admin-primary-content) !important;
+    border: 1px solid var(--admin-primary) !important;
+    box-shadow: none !important;
+}
+
+body.theme-admin .btn-primary:hover:not(:disabled) {
+    background-color: var(--admin-primary-hover) !important;
+    color: var(--admin-primary-content) !important;
+    border-color: var(--admin-primary-hover) !important;
+    box-shadow: none !important;
+}
+
+body.theme-admin .sidebar-item.active {
+    background-color: var(--primary-light) !important;
+    color: var(--primary) !important;
+    font-weight: 600 !important;
+}
+
+body.theme-admin .sidebar-item.active i {
+    color: var(--primary) !important;
 }
 
 .app-main, .app-sidebar {

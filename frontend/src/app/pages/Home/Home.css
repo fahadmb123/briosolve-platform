@@ -461,12 +461,12 @@
 
 .home-hero-worker-blob {
   position: absolute;
-  top: -8%;
+  top: -12%;
   left: 50%;
   transform: translateX(-50%);
-  width: 130%;
+  width: 138%;
   height: auto;
-  max-height: 850px;
+  max-height: 900px;
   object-fit: contain;
   z-index: 1;
   pointer-events: none;
@@ -499,9 +499,9 @@
   }
 
   .home-hero-worker-blob {
-    width: 136%;
-    max-height: 940px;
-    top: -10%;
+    width: 144%;
+    max-height: 980px;
+    top: -14%;
   }
 }
 
