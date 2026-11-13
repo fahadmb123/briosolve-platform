@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { AdminPageHeader } from '../../../admin/components/AdminPageHeader';
 import { AdminTable, type TableColumn } from '../../../admin/components/AdminTable';
 import { AdminPagination } from '../../../admin/components/AdminPagination';
 import { ReactivationReviewModal } from '../../components/ReactivationReviewModal';
@@ -221,17 +220,8 @@ export default function Reactivations() {
     <>
       {updateStatus.isPending && <SpinnerOverlay isLoading={true} />}
 
-      <div className="app-content p-6">
-        {/* Page Header */}
-        <AdminPageHeader
-          title="Reactivation Requests"
-          description="Evaluate and adjudicate formal appeals submitted by suspended customers and providers seeking marketplace reinstatement."
-        />
-
-        {/* Filter Bar matching the other admin pages */}
-        <div className="admin-filter-bar">
-          {/* Left: Search input */}
-          <div className="admin-search-input">
+      <div className="admin-filter-bar">
+        <div className="admin-search-input">
             <i className="fas fa-search"></i>
             <input
               type="text"
@@ -346,7 +336,6 @@ export default function Reactivations() {
           onConfirm={confirmReject}
           onCancel={() => setPendingRejectConfirmation(null)}
         />
-      </div>
     </>
   );
 }

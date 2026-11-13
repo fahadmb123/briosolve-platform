@@ -52,16 +52,12 @@ export default function AdminLayout() {
                     </li>
 
                     <li>
-                        <NavLink to="/admin/verification" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-                            <i className="fas fa-user-check"></i>
-                            <span>Verification</span>
-                        </NavLink>
-                    </li>
-
-                    <li>
-                        <NavLink to="/admin/reactivations" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-                            <i className="fas fa-user-shield"></i>
-                            <span>Reactivations</span>
+                        <NavLink 
+                            to="/admin/requests" 
+                            className={() => `sidebar-item ${location.pathname.startsWith('/admin/requests') || location.pathname.startsWith('/admin/verification') || location.pathname.startsWith('/admin/reactivations') ? 'active' : ''}`}
+                        >
+                            <i className="fas fa-clipboard-check"></i>
+                            <span>Requests</span>
                         </NavLink>
                     </li>
                     </ul>

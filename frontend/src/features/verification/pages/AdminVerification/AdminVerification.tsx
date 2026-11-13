@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from 'react-hot-toast';
-import { AdminPageHeader } from "../../../admin/components/AdminPageHeader";
 import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
@@ -237,13 +236,7 @@ export default function Verification() {
     <>
       {updateKycStatus.isPending && <SpinnerOverlay isLoading={true} />}
 
-      <div className="app-content p-6">
-        <AdminPageHeader
-          title="Provider Verification Queue"
-          description="Evaluate trade diplomas, municipal licenses, and government IDs prior to granting marketplace Verified badges."
-        />
-
-        <div className="admin-filter-bar mb-6">
+      <div className="admin-filter-bar mb-6">
           <div className="admin-search-input">
             <i className="fas fa-search"></i>
             <input
@@ -309,7 +302,6 @@ export default function Verification() {
           totalPages={totalPages}
           onPageChange={setPage}
         />
-      </div>
 
       <VerificationReviewModal
         isOpen={!!selectedDossier}

@@ -24,7 +24,7 @@ export default function Users() {
                 </div>
                 {activeTab === 'providers' && (
                     <div className="flex items-center gap-2">
-                        <Link to="/admin/verification" className="btn btn-warning text-xs">
+                        <Link to="/admin/requests?tab=verifications" className="btn btn-warning text-xs">
                             <i className="fas fa-user-check mr-1"></i>Review Verification Queue
                         </Link>
                     </div>
