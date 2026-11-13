@@ -1923,9 +1923,21 @@ input::-ms-clear {
     min-width: 0;
 }
 
+.customer-body-layout.has-subnav .top-nav-content,
+.provider-body-layout.has-subnav .provider-main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+}
+
 @media (max-width: 1023px) {
     .customer-body-layout.has-subnav {
         flex-direction: column;
+    }
+
+    .customer-body-layout.has-subnav .top-nav-content,
+    .provider-body-layout.has-subnav .provider-main-content {
+        margin-left: 0;
+        width: 100%;
     }
 }
 

@@ -1,8 +1,9 @@
 .cust-subnav-sidebar {
   width: 250px;
   flex-shrink: 0;
-  position: sticky;
+  position: fixed;
   top: 64px;
+  left: 0;
   height: calc(100vh - 64px);
   background: linear-gradient(180deg, #FF7900 0%, #EA580C 100%);
   border-right: none;
@@ -64,16 +65,23 @@
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color 0.15s ease;
   position: relative;
   user-select: none;
   margin-right: 0;
+  outline: none;
+}
+
+.cust-subnav-sidebar-item:focus,
+.cust-subnav-sidebar-item:focus-visible,
+.cust-subnav-sidebar-item:active {
+  outline: none;
+  box-shadow: none;
 }
 
 .cust-subnav-sidebar-item:hover {
   background: rgba(255, 255, 255, 0.15);
   color: #FFFFFF;
-  transform: translateX(2px);
 }
 
 [data-theme="light"] .cust-subnav-sidebar-item:hover {
@@ -89,6 +97,12 @@
   box-shadow: none;
   transform: none;
   z-index: 2;
+  outline: none;
+}
+
+.cust-subnav-sidebar-item.active:hover {
+  background: var(--bg);
+  color: #FF7900;
 }
 
 [data-theme="light"] .cust-subnav-sidebar-item.active {
@@ -96,6 +110,11 @@
   color: #FF7900;
   border: none;
   box-shadow: none;
+}
+
+[data-theme="light"] .cust-subnav-sidebar-item.active:hover {
+  background: var(--bg);
+  color: #FF7900;
 }
 
 .cust-subnav-sidebar-item.active::before {
