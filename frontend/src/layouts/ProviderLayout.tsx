@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { ProviderTopNav } from "../shared/components/ui/ProviderTopNav/ProviderTopNav";
+import { ProviderNavbar } from "../shared/components/ui/ProviderTopNav/ProviderTopNav";
 import { ProviderSubnavSidebar } from "../shared/components/ui/ProviderSubnavSidebar/ProviderSubnavSidebar";
 
 export default function ProviderLayout() {
@@ -31,7 +31,7 @@ export default function ProviderLayout() {
 
   return (
     <div className="provider-top-layout">
-      <ProviderTopNav />
+      <ProviderNavbar />
       <div className={`provider-body-layout ${hasSubnav ? "has-subnav" : ""}`}>
         {hasSubnav && <ProviderSubnavSidebar />}
         <main className={`provider-main-content ${hasSubnav ? "with-sidebar" : ""}`}>

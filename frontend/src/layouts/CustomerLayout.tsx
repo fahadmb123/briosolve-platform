@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { TopNav } from "../shared/components/ui/TopNav/TopNav";
+import { CustomerNavbar } from "../shared/components/ui/TopNav/TopNav";
 import { CustomerSubnavSidebar } from "../shared/components/ui/CustomerSubnavSidebar/CustomerSubnavSidebar";
 
 export default function CustomerLayout() {
@@ -28,7 +28,7 @@ export default function CustomerLayout() {
 
   return (
     <div className="top-nav-layout">
-      <TopNav />
+      <CustomerNavbar />
       <div className={`customer-body-layout ${hasSubnav ? "has-subnav" : ""}`}>
         {hasSubnav && <CustomerSubnavSidebar />}
         <main className={`top-nav-content ${hasSubnav ? "with-sidebar" : ""}`}>

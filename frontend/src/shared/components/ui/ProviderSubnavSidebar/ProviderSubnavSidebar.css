@@ -15,6 +15,14 @@
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 40;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.prov-subnav-sidebar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 [data-theme="light"] .prov-subnav-sidebar {
@@ -105,14 +113,14 @@
 }
 
 [data-theme="light"] .prov-subnav-sidebar-item.active {
-  background: var(--bg);
+  background: #FFFFFF;
   color: #FF7900;
   border: none;
   box-shadow: none;
 }
 
 [data-theme="light"] .prov-subnav-sidebar-item.active:hover {
-  background: var(--bg);
+  background: #FFFFFF;
   color: #FF7900;
 }
 
@@ -136,6 +144,14 @@
   height: 20px;
   background: radial-gradient(circle 20px at 0 20px, transparent 19.5px, var(--bg) 20px);
   pointer-events: none;
+}
+
+[data-theme="light"] .prov-subnav-sidebar-item.active::before {
+  background: radial-gradient(circle 20px at 0 0, transparent 19.5px, #FFFFFF 20px);
+}
+
+[data-theme="light"] .prov-subnav-sidebar-item.active::after {
+  background: radial-gradient(circle 20px at 0 20px, transparent 19.5px, #FFFFFF 20px);
 }
 
 .prov-subnav-sidebar-icon {

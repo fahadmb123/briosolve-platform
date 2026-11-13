@@ -880,3 +880,5 @@ export const ProviderTopNav: React.FC = () => {
   );
 };
 
+export const ProviderNavbar = ProviderTopNav;
+

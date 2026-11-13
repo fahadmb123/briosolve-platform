@@ -165,22 +165,6 @@ body.dark .prov-topnav-header {
   color: #180D00;
 }
 
-.prov-category-btn:hover,
-.prov-category-btn.active:hover {
-  color: #180D00 !important;
-  background: #FFE642 !important;
-  border-color: #FFBF00 !important;
-}
-
-[data-theme="light"] .prov-category-btn:hover,
-[data-theme="dark"] .prov-category-btn:hover,
-[data-theme="light"] .prov-category-btn.active:hover,
-[data-theme="dark"] .prov-category-btn.active:hover {
-  color: #180D00 !important;
-  background: #FFE642 !important;
-  border-color: #FFBF00 !important;
-}
-
 .prov-category-btn.active,
 .prov-category-btn[aria-expanded="true"] {
   background: #FF7900 !important;
@@ -195,6 +179,20 @@ body.dark .prov-topnav-header {
   color: #FFFFFF !important;
   font-weight: 700;
   box-shadow: 0 2px 10px rgba(255, 121, 0, 0.35);
+}
+
+.prov-category-btn:hover,
+.prov-category-btn.active:hover,
+.prov-category-btn[aria-expanded="true"]:hover,
+[data-theme="light"] .prov-category-btn:hover,
+[data-theme="light"] .prov-category-btn.active:hover,
+[data-theme="light"] .prov-category-btn[aria-expanded="true"]:hover,
+[data-theme="dark"] .prov-category-btn:hover,
+[data-theme="dark"] .prov-category-btn.active:hover,
+[data-theme="dark"] .prov-category-btn[aria-expanded="true"]:hover {
+  color: #180D00 !important;
+  background: #FFE642 !important;
+  border-color: #FFBF00 !important;
 }
 
 .prov-caret {
@@ -448,18 +446,18 @@ body.dark .prov-topnav-header {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #141417;
-  color: #a1a1aa;
-  border: 1px solid #2c2c34;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.prov-topnav-right .notif-bell-btn {
   background: #FFFFFF !important;
   color: #180D00 !important;
   border: 1px solid #FFE642 !important;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .prov-topnav-right .notif-bell-btn,
+[data-theme="dark"] .prov-topnav-right .notif-bell-btn {
+  background: #FFFFFF !important;
+  color: #180D00 !important;
+  border: 1px solid #FFE642 !important;
 }
 
 .prov-icon-btn {
@@ -468,22 +466,6 @@ body.dark .prov-topnav-header {
   border: 1px solid #FFE642 !important;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
-}
-
-.prov-topnav-right .notif-bell-btn:hover,
-.prov-topnav-right .notif-bell-btn.active,
-.prov-icon-btn:hover {
-  background: #FFE642 !important;
-  color: #180D00 !important;
-  border-color: #FFBF00 !important;
-  transform: translateY(-1px);
-}
-
-[data-theme="light"] .prov-topnav-right .notif-bell-btn,
-[data-theme="dark"] .prov-topnav-right .notif-bell-btn {
-  background: #FFFFFF !important;
-  color: #180D00 !important;
-  border: 1px solid #FFE642 !important;
 }
 
 .prov-user-btn {
@@ -504,19 +486,38 @@ body.dark .prov-topnav-header {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
 
-.prov-user-btn:hover,
-.prov-user-btn[aria-expanded="true"] {
-  background: #FFE642 !important;
-  border-color: #FFBF00 !important;
-  color: #180D00 !important;
-  transform: translateY(-1px);
-}
-
 [data-theme="light"] .prov-user-btn,
 [data-theme="dark"] .prov-user-btn {
   background: #FFFFFF !important;
   color: #180D00 !important;
   border: 1px solid #FFE642 !important;
+}
+
+.prov-topnav-right .notif-bell-btn:hover,
+.prov-topnav-right .notif-bell-btn.active,
+[data-theme="light"] .prov-topnav-right .notif-bell-btn:hover,
+[data-theme="light"] .prov-topnav-right .notif-bell-btn.active,
+[data-theme="dark"] .prov-topnav-right .notif-bell-btn:hover,
+[data-theme="dark"] .prov-topnav-right .notif-bell-btn.active,
+.prov-icon-btn:hover,
+[data-theme="light"] .prov-icon-btn:hover,
+[data-theme="dark"] .prov-icon-btn:hover {
+  background: #FFE642 !important;
+  color: #180D00 !important;
+  border-color: #FFBF00 !important;
+  transform: translateY(-1px);
+}
+
+.prov-user-btn:hover,
+.prov-user-btn[aria-expanded="true"],
+[data-theme="light"] .prov-user-btn:hover,
+[data-theme="light"] .prov-user-btn[aria-expanded="true"],
+[data-theme="dark"] .prov-user-btn:hover,
+[data-theme="dark"] .prov-user-btn[aria-expanded="true"] {
+  background: #FFE642 !important;
+  border-color: #FFBF00 !important;
+  color: #180D00 !important;
+  transform: translateY(-1px);
 }
 
 .prov-user-avatar {

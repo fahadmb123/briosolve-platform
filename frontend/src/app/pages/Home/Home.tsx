@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../../features/auth/stores/auth.store";
-import { TopNav } from "../../../shared/components/ui/TopNav/TopNav";
-import { ProviderTopNav } from "../../../shared/components/ui/ProviderTopNav/ProviderTopNav";
+import { CustomerNavbar } from "../../../shared/components/ui/TopNav/TopNav";
+import { ProviderNavbar } from "../../../shared/components/ui/ProviderTopNav/ProviderTopNav";
 import "./Home.css";
 
 export default function Home() {
@@ -105,9 +105,9 @@ export default function Home() {
   return (
     <div className="home-top-layout">
       {isAuthenticated && user?.role === "PROVIDER" ? (
-        <ProviderTopNav />
+        <ProviderNavbar />
       ) : (
-        <TopNav />
+        <CustomerNavbar />
       )}
       <main className="home-wrapper">
         <div className="home-top-announcement-bar">
