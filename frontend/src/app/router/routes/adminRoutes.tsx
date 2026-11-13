@@ -3,9 +3,8 @@ import {
   AdminDashboard,
   AdminNotifications,
   AdminProviderDetails,
-  AdminProviders,
   AdminSettings,
-  AdminCustomers,
+  AdminUsers,
   AdminVerification,
   AdminCategories,
   AdminServices,
@@ -17,8 +16,9 @@ export const adminRoutes = (
   <>
     <Route index element={<Navigate to="dashboard" replace />} />
     <Route path="dashboard" element={<AdminDashboard />} />
-    <Route path="customers" element={<AdminCustomers />} />
-    <Route path="providers" element={<AdminProviders />} />
+    <Route path="users" element={<AdminUsers />} />
+    <Route path="customers" element={<Navigate to="/admin/users?tab=customers" replace />} />
+    <Route path="providers" element={<Navigate to="/admin/users?tab=providers" replace />} />
     <Route path="providers/:id" element={<AdminProviderDetails />} />
     <Route path="service-requests" element={<AdminServiceRequests />} />
     <Route path="verification" element={<AdminVerification />} />

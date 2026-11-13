@@ -1,4 +1,4 @@
-import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
 import { useAuthStore } from '../features/auth/stores/auth.store';
@@ -11,6 +11,7 @@ export default function AdminLayout() {
     const clearAuth = useAuthStore((state) => state.clearAuth);
     const logout = useLogout();
     const navigate = useNavigate();
+    const location = useLocation();
     const handleLogout = async () => {
         await logout.mutateAsync();
         clearAuth();
@@ -41,15 +42,12 @@ export default function AdminLayout() {
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/admin/customers" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+                        <NavLink 
+                            to="/admin/users" 
+                            className={() => `sidebar-item ${location.pathname.startsWith('/admin/users') || location.pathname.startsWith('/admin/customers') || location.pathname.startsWith('/admin/providers') ? 'active' : ''}`}
+                        >
                             <i className="fas fa-users"></i>
-                            <span>Customers</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/admin/providers" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-                            <i className="fas fa-user-tie"></i>
-                            <span>Providers</span>
+                            <span>Users</span>
                         </NavLink>
                     </li>
 

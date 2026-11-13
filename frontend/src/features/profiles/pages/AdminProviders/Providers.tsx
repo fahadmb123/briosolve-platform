@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { Link } from "react-router-dom";
 import { useGetProviders, useUpdateProviderStatus as useUpdateStatus } from '../../hooks/admin/useAdminProviders';
 import { toast } from 'react-hot-toast';
 import type { User, response } from '../../types/profile.types';
@@ -111,21 +110,8 @@ export default function Providers() {
         <>
             {updateStatus.isPending ? (<SpinnerOverlay isLoading={true} />) : null}
 
-            <div className="app-content">
-                <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
-                    <div>
-                        <h1 className="font-extrabold tracking-tight mb-1" style={{ fontSize: '2rem' }}>Service Provider Management</h1>
-                        <p className="text-secondary text-sm mb-0">Track credentialed professionals, verification status, service capacities, and account governance.</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Link to="/admin/verification" className="btn btn-warning text-xs">
-                            <i className="fas fa-user-check mr-1"></i>Review Verification Queue
-                        </Link>
-                    </div>
-                </div>
-
-                <div className="admin-filter-bar">
-                    <div className="admin-search-input">
+            <div className="admin-filter-bar">
+                <div className="admin-search-input">
                         <i className="fas fa-search"></i>
                         <input
                             value={search}
@@ -252,7 +238,6 @@ export default function Providers() {
                         </div>
                     </div>
                 </div>
-            </div>
 
             <div className={`admin-modal-overlay ${selectedProvider ? 'active' : ''}`} id="providerDetailsModal">
                 <div className="admin-modal">

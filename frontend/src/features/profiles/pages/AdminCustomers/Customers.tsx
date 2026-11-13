@@ -111,52 +111,43 @@ export default function Customers() {
         <>
         {updateStatus.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
         
-        <div className="app-content">
-                
-            <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
-                <div>
-                    <h1 className="font-extrabold tracking-tight mb-1" style={{ fontSize: '2rem' }}>Customer Management</h1>
-                    <p className="text-secondary text-sm mb-0">Total platform accounts registered across Customer roles.</p>
-                </div>
-            </div>
-            
-            <div className="admin-filter-bar">
-                <div className="admin-search-input">
-                    <i className="fas fa-search"></i>
-                    <input 
-                        onChange={(e)=>{
-                            setSearch(e.target.value)
-                            setPage(1)
-                        }}
-                        type="text" placeholder="Search for email..." id="userSearchInput" 
-                     />
-                </div>
-
-                <div className="admin-filters-group">
-
-
-                    <select
-                        value={filter}
-                        onChange={(e)=>{
-                            setFilter(e.target.value)
-                            setPage(1)
-                        }}
-                         className="admin-select" id="statusFilter">
-                        <option value="">All Statuses</option>
-                        <option value="ACTIVE">Active</option>
-                        <option value="BLOCKED">Suspended</option>
-                    </select>
-
-                    <button  className="btn btn-secondary text-xs py-2" onClick={() => handleReset()}>
-                        <i className="fas fa-undo mr-1"></i>Reset
-                    </button>
-                </div>
+        <div className="admin-filter-bar">
+            <div className="admin-search-input">
+                <i className="fas fa-search"></i>
+                <input 
+                    onChange={(e)=>{
+                        setSearch(e.target.value)
+                        setPage(1)
+                    }}
+                    type="text" placeholder="Search for email..." id="userSearchInput" 
+                 />
             </div>
 
-        
-            <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
-                <div className="table-responsive">
-                    <table className="admin-table">
+            <div className="admin-filters-group">
+
+
+                <select
+                    value={filter}
+                    onChange={(e)=>{
+                        setFilter(e.target.value)
+                        setPage(1)
+                    }}
+                     className="admin-select" id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="BLOCKED">Suspended</option>
+                </select>
+
+                <button  className="btn btn-secondary text-xs py-2" onClick={() => handleReset()}>
+                    <i className="fas fa-undo mr-1"></i>Reset
+                </button>
+            </div>
+        </div>
+
+    
+        <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
+            <div className="table-responsive">
+                <table className="admin-table">
                         <thead>
                             <tr>
                                 <th style={{ width: '20%' }}>Customer Name</th>
@@ -252,7 +243,6 @@ export default function Customers() {
                 </div>
                 </div>
             </div>
-        </div>
             
         
 

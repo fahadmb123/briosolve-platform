@@ -1,6 +1,7 @@
 import React from 'react';
 
 export const AdminDashboard = React.lazy(() => import('../../../features/dashboard/pages/AdminDashboard/Dashboard'));
+export const AdminUsers = React.lazy(() => import('../../../features/profiles/pages/AdminUsers/Users'));
 export const AdminCustomers = React.lazy(() => import('../../../features/profiles/pages/AdminCustomers/Customers'));
 export const AdminProviders = React.lazy(() => import('../../../features/profiles/pages/AdminProviders/Providers'));
 export const AdminProviderDetails = React.lazy(() => import('../../../features/profiles/pages/AdminProviderDetails/ProviderDetails'));
