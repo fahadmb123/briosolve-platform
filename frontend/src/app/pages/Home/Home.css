@@ -486,6 +486,7 @@
   -webkit-user-select: none;
   position: relative;
   z-index: 2;
+  transform: translateY(22px);
 }
 
 @media (min-width: 1280px) {
@@ -496,6 +497,7 @@
 
   .home-hero-worker-image {
     max-height: 780px;
+    transform: translateY(26px);
   }
 
   .home-hero-worker-blob {
@@ -544,6 +546,10 @@
   .home-hero-worker-wrapper {
     width: 340px;
     max-width: 90vw;
+  }
+
+  .home-hero-worker-image {
+    transform: translateY(14px);
   }
 
   .home-hero-worker-blob {
