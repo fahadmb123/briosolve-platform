@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { ImageCropModal } from '../../../../shared/components/ui/ImageCropModal/ImageCropModal';
 import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
@@ -19,6 +21,96 @@ const formatDocType = (type: string): string =>
     .split('_')
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(' ');
+
+const getServiceImageUrl = (image?: string | null, catImage?: string | null): string | null => {
+  const target = image || catImage;
+  if (!target) return null;
+  if (target.startsWith('http://') || target.startsWith('https://') || target.startsWith('blob:')) {
+    return target;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  return `${apiBase.replace(/\/$/, '')}/${target.replace(/^\//, '')}`;
+};
+
+const getCategoryIcon = (categoryName?: string): string => {
+  const name = (categoryName || '').toLowerCase();
+  if (name.includes('plumb')) return 'fa-faucet';
+  if (name.includes('electr')) return 'fa-bolt';
+  if (name.includes('clean')) return 'fa-broom';
+  if (name.includes('paint')) return 'fa-paint-roller';
+  if (name.includes('carpenter') || name.includes('wood')) return 'fa-hammer';
+  if (name.includes('appliance') || name.includes('ac') || name.includes('repair')) return 'fa-tools';
+  if (name.includes('garden') || name.includes('lawn')) return 'fa-leaf';
+  if (name.includes('pest')) return 'fa-bug';
+  if (name.includes('auto') || name.includes('mechanic')) return 'fa-car';
+  return 'fa-wrench';
+};
+
+function ProfileServiceCard({ item }: { item: PopulatedProviderService }) {
+  const [imgError, setImgError] = useState(false);
+  const serviceName = item.service?.name || 'Service';
+  const categoryName = item.service?.category?.name || 'Trade Category';
+  const description = item.service?.description || 'Professional service delivered by verified trade specialist.';
+  const rawImageUrl = item.service?.image || item.service?.category?.image;
+  const imageUrl = useMemo(() => getServiceImageUrl(rawImageUrl), [rawImageUrl]);
+  const iconClass = useMemo(() => getCategoryIcon(categoryName), [categoryName]);
+  const hasValidImage = Boolean(imageUrl && !imgError);
+
+  return (
+    <div className="profile-service-card">
+      <div className="profile-service-card-media">
+        {hasValidImage ? (
+          <img
+            src={imageUrl!}
+            alt={serviceName}
+            onError={() => setImgError(true)}
+            className="profile-service-card-img"
+            loading="lazy"
+          />
+        ) : (
+          <div className="profile-service-card-placeholder">
+            <div className="profile-service-placeholder-icon">
+              <i className={`fas ${iconClass}`}></i>
+            </div>
+          </div>
+        )}
+        <div className="profile-service-media-overlay" />
+        <span className="profile-service-category-badge" title={categoryName}>
+          {categoryName}
+        </span>
+        <span className="profile-service-status-pill">
+          <i className="fas fa-check-circle mr-1"></i> Active
+        </span>
+      </div>
+
+      <div className="profile-service-card-body">
+        <h4 className="profile-service-card-title" title={serviceName}>
+          {serviceName}
+        </h4>
+        <p className="profile-service-card-desc" title={description}>
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ProfileServiceCardSkeleton() {
+  return (
+    <div className="profile-service-card" aria-hidden="true">
+      <div className="profile-service-card-media profile-service-skeleton-media">
+        <Skeleton width="100%" height="100%" borderRadius={0} />
+      </div>
+      <div className="profile-service-card-body">
+        <Skeleton width="65%" height={18} borderRadius={4} />
+        <div className="w-full flex flex-col items-center gap-1.5 mt-1">
+          <Skeleton width="90%" height={12} borderRadius={4} />
+          <Skeleton width="70%" height={12} borderRadius={4} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Profile() {
   const user = useAuthStore((state) => state.user);
@@ -452,15 +544,81 @@ export default function Profile() {
             </div>
 
             <div className="form-card-modern">
-              <div className="flex justify-between items-center mb-4 pb-4 border-bottom">
+              <div className="flex justify-between items-center mb-6 pb-4 border-bottom flex-wrap gap-2">
                 <div>
-                  <h3 className="h4 mb-0">About &amp; Trade Background</h3>
-                  <span className="badge badge-primary text-xs mt-2">{experienceText}</span>
+                  <h3 className="h4 mb-0">Business &amp; Profile Details</h3>
+                </div>
+                <span className="badge badge-primary text-xs font-semibold px-2.5 py-1">
+                  {experienceText}
+                </span>
+              </div>
+
+              <div className="profile-fields-grid">
+                <div className="modern-input-group">
+                  <label>Business Name</label>
+                  <div className="form-control-static">
+                    <span className="flex items-center gap-2 truncate font-medium">
+                      <i className="fas fa-store text-primary text-sm"></i>
+                      <span className="truncate">{businessName}</span>
+                    </span>
+                    <i className="fas fa-lock text-secondary text-xs opacity-50" title="Non-editable"></i>
+                  </div>
+                </div>
+
+                <div className="modern-input-group">
+                  <label>Email Address</label>
+                  <div className="form-control-static">
+                    <span className="flex items-center gap-2 truncate font-medium">
+                      <i className="fas fa-envelope text-primary text-sm"></i>
+                      <span className="truncate">{user?.email || "Not provided"}</span>
+                    </span>
+                    {user?.email_verified ? (
+                      <span className="badge badge-success text-2xs uppercase px-2 py-0.5">Verified</span>
+                    ) : (
+                      <i className="fas fa-lock text-secondary text-xs opacity-50" title="Non-editable"></i>
+                    )}
+                  </div>
+                </div>
+
+                <div className="modern-input-group">
+                  <label>Mobile Number</label>
+                  <div className="form-control-static">
+                    <span className="flex items-center gap-2 truncate font-medium">
+                      <i className="fas fa-phone-alt text-primary text-sm"></i>
+                      <span className="truncate">{user?.phone || "Not provided"}</span>
+                    </span>
+                    {user?.phone_verified ? (
+                      <span className="badge badge-success text-2xs uppercase px-2 py-0.5">Verified</span>
+                    ) : (
+                      <i className="fas fa-lock text-secondary text-xs opacity-50" title="Non-editable"></i>
+                    )}
+                  </div>
+                </div>
+
+                <div className="modern-input-group">
+                  <label>Service Region</label>
+                  <div className="form-control-static">
+                    <span className="flex items-center gap-2 truncate font-medium">
+                      <i className="fas fa-map-marker-alt text-primary text-sm"></i>
+                      <span className="truncate">{address?.city ? `${address.city}, ${address.state || ""}` : (address?.area || "Operational Region")}</span>
+                    </span>
+                    {providerProfile?.service_radius_km ? (
+                      <span className="badge badge-primary text-2xs px-2 py-0.5">{providerProfile.service_radius_km} km</span>
+                    ) : (
+                      <i className="fas fa-lock text-secondary text-xs opacity-50" title="Non-editable"></i>
+                    )}
+                  </div>
                 </div>
               </div>
-              <p className="text-sm text-secondary leading-relaxed m-0 mt-2">{bioText}</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <div className="modern-input-group mb-0">
+                <label>Description &amp; About</label>
+                <div className="form-control-static form-control-static-bio">
+                  <p className="text-sm text-text leading-relaxed m-0">{bioText}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-5 border-t border-border">
                 <div className="flex items-center gap-4 bg-surface-hover p-4 rounded-xl border border-border">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0">
                     <i className="fas fa-certificate"></i>
@@ -489,32 +647,52 @@ export default function Profile() {
             </div>
 
             <div className="form-card-modern">
-              <div className="flex justify-between items-center mb-6 pb-4 border-bottom">
-                <h3 className="h4 mb-0">Active Service Categories</h3>
+              <div className="flex justify-between items-center mb-6 pb-4 border-bottom flex-wrap gap-2">
+                <div>
+                  <h3 className="h4 mb-0">Services Offered</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  {getProviderServices.isPending ? (
+                    <Skeleton width={80} height={24} borderRadius={9999} />
+                  ) : (
+                    <>
+                      <span className="badge badge-primary text-xs font-semibold px-2.5 py-1">
+                        {services.length} {services.length === 1 ? 'Service' : 'Services'}
+                      </span>
+                      <Link to="/provider/settings" state={{ activeSection: 'services' }} className="btn btn-outline btn-xs">
+                        <i className="fas fa-sliders-h mr-1"></i> Manage
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="flex flex-col gap-3">
-                {services.length > 0 ? (
-                  services.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-4 rounded-xl border border-border bg-surface-hover flex items-center justify-between transition-all hover:border-primary"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0">
-                          <i className="fas fa-tools"></i>
-                        </div>
-                        <div className="font-bold text-text">
-                          {item.service?.name || 'Service'}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-secondary text-sm py-4 text-center">
-                    No active services found
+
+              {getProviderServices.isPending ? (
+                <div className="profile-services-grid">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <ProfileServiceCardSkeleton key={`service-skeleton-${index}`} />
+                  ))}
+                </div>
+              ) : services.length > 0 ? (
+                <div className="profile-services-grid">
+                  {services.map((item) => (
+                    <ProfileServiceCard key={item.id} item={item} />
+                  ))}
+                </div>
+              ) : (
+                <div className="profile-services-empty-state">
+                  <div className="profile-services-empty-icon">
+                    <i className="fas fa-layer-group"></i>
                   </div>
-                )}
-              </div>
+                  <h4 className="profile-services-empty-title">No Active Services Added</h4>
+                  <p className="profile-services-empty-desc">
+                    Add the trade services and skill categories you specialize in to start receiving leads from customers.
+                  </p>
+                  <Link to="/provider/settings" state={{ activeSection: 'services' }} className="btn btn-primary btn-sm">
+                    <i className="fas fa-plus mr-1.5"></i> Manage Services in Settings
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
