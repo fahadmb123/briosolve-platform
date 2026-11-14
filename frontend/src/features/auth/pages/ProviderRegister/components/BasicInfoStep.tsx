@@ -63,11 +63,11 @@ export function BasicInfoStep({ isActive, onNext, onError }: BasicInfoStepProps)
                 <input 
                     type="text" 
                     id="fullName" 
-                    className={`login-input ${errors.fullName ? 'login-input-error' : ''}`} 
+                    className={`login-input ${errors.fullName ? 'is-invalid' : ''}`} 
                     placeholder="e.g. Arjun Menon" 
                     {...register("fullName")}
                 />
-                {errors.fullName && <span className="login-error-text">{errors.fullName.message}</span>}
+                {errors.fullName && <div className="login-error-msg">{errors.fullName.message}</div>}
             </div>
 
             <div className="login-input-group">
@@ -75,11 +75,11 @@ export function BasicInfoStep({ isActive, onNext, onError }: BasicInfoStepProps)
                 <input 
                     type="email" 
                     id="email" 
-                    className={`login-input ${errors.email ? 'login-input-error' : ''}`} 
+                    className={`login-input ${errors.email ? 'is-invalid' : ''}`} 
                     placeholder="arjun.menon@example.com" 
                     {...register("email")}
                 />
-                {errors.email && <span className="login-error-text">{errors.email.message}</span>}
+                {errors.email && <div className="login-error-msg">{errors.email.message}</div>}
             </div>
 
             <div className="login-input-group">
@@ -87,23 +87,23 @@ export function BasicInfoStep({ isActive, onNext, onError }: BasicInfoStepProps)
                 <input 
                     type="text" 
                     id="businessName" 
-                    className={`login-input ${errors.businessName ? 'login-input-error' : ''}`} 
+                    className={`login-input ${errors.businessName ? 'is-invalid' : ''}`} 
                     placeholder="e.g. Apex Electrical Works" 
                     {...register("businessName")}
                 />
-                {errors.businessName && <span className="login-error-text">{errors.businessName.message}</span>}
+                {errors.businessName && <div className="login-error-msg">{errors.businessName.message}</div>}
             </div>
 
             <div className="login-input-group">
                 <label className="login-label" htmlFor="password">Password</label>
                 <PasswordInput 
                     id="password" 
-                    placeholder="••••••••" 
+                    placeholder="Password" 
                     icon=""
                     error={errors.password?.message}
                     wrapperClassName="login-password-wrapper"
                     className="login-input"
-                    {...register("password")}
+                    {...register("password", { deps: ["confirmPassword"] })}
                 />
             </div>
 
@@ -111,7 +111,7 @@ export function BasicInfoStep({ isActive, onNext, onError }: BasicInfoStepProps)
                 <label className="login-label" htmlFor="confirmPassword">Confirm Password</label>
                 <PasswordInput 
                     id="confirmPassword" 
-                    placeholder="••••••••" 
+                    placeholder="Confirm Password" 
                     icon=""
                     error={errors.confirmPassword?.message}
                     wrapperClassName="login-password-wrapper"

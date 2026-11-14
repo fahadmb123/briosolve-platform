@@ -16,7 +16,7 @@ export default function ProviderRegister() {
 
   const methods = useForm<ProviderRegistrationInputType>({
     resolver: zodResolver(providerRegistrationSchema),
-    mode: "onTouched",
+    mode: "onChange",
     defaultValues: {
       services: [],
     }

@@ -72,7 +72,7 @@ export function ServicesStep({ isActive, onNext, onBack }: ServicesStepProps) {
                     <span className="pro-step-subtitle">Select Services</span>
                     <span className="pro-selected-count">{selectedServices.length} Selected</span>
                 </div>
-                {errors.services && <span className="login-error-text">{errors.services.message}</span>}
+                {errors.services && <div className="login-error-msg">{errors.services.message}</div>}
             </div>
 
             <div className="login-input-group" style={{ marginBottom: '0.85rem' }}>

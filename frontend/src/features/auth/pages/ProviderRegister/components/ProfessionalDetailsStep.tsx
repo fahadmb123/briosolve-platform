@@ -25,7 +25,7 @@ export function ProfessionalDetailsStep({ isActive, onNext, onBack }: Profession
                 <label className="login-label" htmlFor="experience-years">Years of Professional Experience</label>
                 <select 
                     id="experience-years" 
-                    className={`login-input login-select ${errors.experience ? 'login-input-error' : ''}`} 
+                    className={`login-input login-select ${errors.experience ? 'is-invalid' : ''}`} 
                     {...register("experience")}
                 >
                     <option value="">Select your experience level</option>
@@ -34,19 +34,19 @@ export function ProfessionalDetailsStep({ isActive, onNext, onBack }: Profession
                     <option value="8-12">8 - 12 Years (Master Tech)</option>
                     <option value="12+">12+ Years (Industry Veteran)</option>
                 </select>
-                {errors.experience && <span className="login-error-text">{errors.experience.message}</span>}
+                {errors.experience && <div className="login-error-msg">{errors.experience.message}</div>}
             </div>
 
             <div className="login-input-group">
                 <label className="login-label" htmlFor="pro-bio">Professional Overview / Client Pitch</label>
                 <textarea 
                     id="pro-bio" 
-                    className={`login-input login-textarea ${errors.bio ? 'login-input-error' : ''}`} 
+                    className={`login-input login-textarea ${errors.bio ? 'is-invalid' : ''}`} 
                     rows={4} 
                     placeholder="Tell prospective clients about your expertise, background, and why they should choose your services..." 
                     {...register("bio")}
                 ></textarea>
-                {errors.bio && <span className="login-error-text">{errors.bio.message}</span>}
+                {errors.bio && <div className="login-error-msg">{errors.bio.message}</div>}
             </div>
             
             <div className="pro-step-nav-buttons">
