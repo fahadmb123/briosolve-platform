@@ -27,7 +27,7 @@ export default function AuthLayout() {
   const location = useLocation();
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
-  const isRegister = location.pathname.includes('/register');
+  const isLogin = location.pathname === '/login' || location.pathname === '/login/';
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -76,10 +76,10 @@ export default function AuthLayout() {
           <div className="login-hero-top-bar">
             <span className="login-hero-tag">Selected Works</span>
             <div className="login-hero-top-actions">
-              {isRegister ? (
-                <Link to="/login" className="login-hero-link">Sign In</Link>
-              ) : (
+              {isLogin ? (
                 <Link to="/register" className="login-hero-link">Sign Up</Link>
+              ) : (
+                <Link to="/login" className="login-hero-link">Sign In</Link>
               )}
               <Link to="/provider/register" className="login-hero-join-btn">Join As Provider</Link>
             </div>
@@ -148,4 +148,3 @@ export default function AuthLayout() {
     </div>
   );
 }
-

@@ -12,12 +12,12 @@ export const publicRoutes = (
         <Route element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<CustomerRegister />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route element={<ResetPasswordRoute />}>
+                <Route path="reset-password" element={<ResetPassword />} />
+            </Route>
         </Route>
-        <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="account/request" element={<AccountRequest />} />
-        <Route element={<ResetPasswordRoute />}>
-            <Route path="reset-password" element={<ResetPassword />} />
-        </Route>
     </>
 );
 
@@ -25,7 +25,9 @@ export const verificationRoutes = (
     <>
         <Route path="email-verification" element={<EmailVerification />} />
         <Route element={<OtpFlowRoute />}>
-            <Route path="otp-verification" element={<OtpVerification />} />
+            <Route element={<AuthLayout />}>
+                <Route path="otp-verification" element={<OtpVerification />} />
+            </Route>
         </Route>
     </>
 );
