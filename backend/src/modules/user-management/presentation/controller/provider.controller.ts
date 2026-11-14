@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../../../../shared/base/controller/baseController";
-import { accessTokenCookie, refreshTokenCookie, registrationCookie } from "../../../../shared/utils/cookieConfig";
+import { accessTokenCookie, registrationCookie } from "../../../../shared/utils/cookieConfig";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IGetProvidersUseCase } from "../../application/interfaces/use-cases/providers/get-providers.interface";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
@@ -90,15 +90,9 @@ export class ProviderController extends BaseController {
 
             const user = await this._registerProviderUseCase.execute(payload);
 
-            const accessToken = this._jwtService.generate({ userId: user.id, role: user.role });
-            const refreshToken = this._jwtService.generateRefreshToken({ userId: user.id, role: user.role });
-
-            res.cookie("access_token", accessToken, accessTokenCookie);
-            res.cookie("refresh_token", refreshToken, refreshTokenCookie);
             res.clearCookie("registration_id");
 
-            return this.sendSuccess(res, "Provider account created successfully", {
-                accessToken,
+            return this.sendSuccess(res, "Provider account created successfully. Please sign in to continue.", {
                 user: UserMapper.toDto(user)
             });
         } catch (err) {
