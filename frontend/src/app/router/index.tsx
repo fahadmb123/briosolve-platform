@@ -14,7 +14,6 @@ import { customerRoutes } from './routes/customerRoutes';
 import { publicRoutes, verificationRoutes } from './routes/publicRoutes';
 import PublicRoute from './guards/PublicRoute';
 import RoleRoute from './guards/RoleRoute';
-import { ProviderRegister } from './lazy/provider.lazy';
 
 
 
@@ -43,7 +42,6 @@ export function AppRouter() {
 
           <Route element={<PublicRoute />}>
               {publicRoutes}
-              <Route path="provider/register" element={<ProviderRegister />} />
           </Route>
 
           {verificationRoutes}

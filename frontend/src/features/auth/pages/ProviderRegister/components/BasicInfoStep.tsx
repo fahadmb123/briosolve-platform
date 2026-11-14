@@ -8,9 +8,10 @@ import { PasswordInput } from '../../../../../shared/components/ui/PasswordInput
 interface BasicInfoStepProps {
     isActive: boolean;
     onNext: () => void;
+    onError?: (msg: string) => void;
 }
 
-export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
+export function BasicInfoStep({ isActive, onNext, onError }: BasicInfoStepProps) {
     const { register, formState: { errors }, trigger, getValues } = useFormContext<ProviderRegistrationInputType>();
     const [showOtpModal, setShowOtpModal] = useState(false);
     const preRegisterMutation = usePreRegisterProvider();
@@ -35,6 +36,11 @@ export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
                     {
                         onSuccess: () => {
                             setShowOtpModal(true);
+                        },
+                        onError: (err: any) => {
+                            if (onError) {
+                                onError(err?.message || "Failed to initiate registration");
+                            }
                         }
                     }
                 );
@@ -51,89 +57,88 @@ export function BasicInfoStep({ isActive, onNext }: BasicInfoStepProps) {
     };
 
     return (
-        <div className="form-step-card step-content active" id="step-1">
-            <div className="step-heading-row">
-                <div className="step-num-pill">1</div>
-                <div>
-                    <h2 className="h5 mb-0">Account Information</h2>
-                    <p className="text-xs text-secondary mb-0">Your primary login and operational contact credentials</p>
-                </div>
+        <div className="pro-step-pane">
+            <div className="login-input-group">
+                <label className="login-label" htmlFor="fullName">Full Name</label>
+                <input 
+                    type="text" 
+                    id="fullName" 
+                    className={`login-input ${errors.fullName ? 'login-input-error' : ''}`} 
+                    placeholder="e.g. Arjun Menon" 
+                    {...register("fullName")}
+                />
+                {errors.fullName && <span className="login-error-text">{errors.fullName.message}</span>}
             </div>
 
-            <div className="grid-2 gap-4 mb-4">
-                <div className="form-group">
-                    <label className="form-label" htmlFor="fullName">Full Name <span className="text-danger">*</span></label>
-                    <div className="input-with-icon">
-                        <i className="fas fa-user input-icon"></i>
-                        <input 
-                            type="text" 
-                            id="fullName" 
-                            className={`form-control ${errors.fullName ? 'border-danger' : ''}`} 
-                            placeholder="e.g. Arjun Menon" 
-                            {...register("fullName")}
-                        />
-                    </div>
-                    {errors.fullName && <span className="text-danger text-xs mt-1 block">{errors.fullName.message}</span>}
-                </div>
-
-                <div className="form-group">
-                    <label className="form-label" htmlFor="email">Business / Personal Email <span className="text-danger">*</span></label>
-                    <div className="input-with-icon">
-                        <i className="fas fa-envelope input-icon"></i>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            className={`form-control ${errors.email ? 'border-danger' : ''}`} 
-                            placeholder="arjun.menon@example.com" 
-                            {...register("email")}
-                        />
-                    </div>
-                    {errors.email && <span className="text-danger text-xs mt-1 block">{errors.email.message}</span>}
-                </div>
+            <div className="login-input-group">
+                <label className="login-label" htmlFor="email">Business or Personal Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    className={`login-input ${errors.email ? 'login-input-error' : ''}`} 
+                    placeholder="arjun.menon@example.com" 
+                    {...register("email")}
+                />
+                {errors.email && <span className="login-error-text">{errors.email.message}</span>}
             </div>
 
-            <div className="grid-2 gap-4 mb-4">
-                <div className="form-group">
-                    <label className="form-label" htmlFor="password">Password <span className="text-danger">*</span></label>
-                    <PasswordInput 
-                        id="password" 
-                        placeholder="••••••••" 
-                        error={errors.password?.message}
-                        {...register("password")}
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label className="form-label" htmlFor="confirmPassword">Confirm Password <span className="text-danger">*</span></label>
-                    <PasswordInput 
-                        id="confirmPassword" 
-                        placeholder="••••••••" 
-                        error={errors.confirmPassword?.message}
-                        {...register("confirmPassword")}
-                    />
-                </div>
+            <div className="login-input-group">
+                <label className="login-label" htmlFor="businessName">Business / Trade Name</label>
+                <input 
+                    type="text" 
+                    id="businessName" 
+                    className={`login-input ${errors.businessName ? 'login-input-error' : ''}`} 
+                    placeholder="e.g. Apex Electrical Works" 
+                    {...register("businessName")}
+                />
+                {errors.businessName && <span className="login-error-text">{errors.businessName.message}</span>}
             </div>
 
-            <div className="form-group mb-4">
-                <label className="form-label" htmlFor="businessName">Business / Professional Name <span className="text-danger">*</span></label>
-                <div className="input-with-icon">
-                    <i className="fas fa-briefcase input-icon"></i>
-                    <input 
-                        type="text" 
-                        id="businessName" 
-                        className={`form-control ${errors.businessName ? 'border-danger' : ''}`} 
-                        placeholder="e.g. Apex Plumbing Works" 
-                        {...register("businessName")}
-                    />
-                </div>
-                {errors.businessName && <span className="text-danger text-xs mt-1 block">{errors.businessName.message}</span>}
+            <div className="login-input-group">
+                <label className="login-label" htmlFor="password">Password</label>
+                <PasswordInput 
+                    id="password" 
+                    placeholder="••••••••" 
+                    icon=""
+                    error={errors.password?.message}
+                    wrapperClassName="login-password-wrapper"
+                    className="login-input"
+                    {...register("password")}
+                />
             </div>
-            
-            <div className="flex justify-end mt-6 border-top" style={{ paddingTop: "1.25rem" }}>
-                <button type="button" className="btn btn-primary" onClick={handleNext} disabled={preRegisterMutation.isPending}>
-                    {preRegisterMutation.isPending ? "Sending OTP..." : "Next Step"} <i className="fas fa-arrow-right ml-1"></i>
-                </button>
+
+            <div className="login-input-group">
+                <label className="login-label" htmlFor="confirmPassword">Confirm Password</label>
+                <PasswordInput 
+                    id="confirmPassword" 
+                    placeholder="••••••••" 
+                    icon=""
+                    error={errors.confirmPassword?.message}
+                    wrapperClassName="login-password-wrapper"
+                    className="login-input"
+                    {...register("confirmPassword")}
+                />
             </div>
+
+            <button 
+                type="button" 
+                className="login-submit-btn" 
+                onClick={handleNext} 
+                disabled={preRegisterMutation.isPending}
+                style={{ marginTop: '1rem' }}
+            >
+                {preRegisterMutation.isPending ? (
+                    <>
+                        <i className="fas fa-spinner fa-spin"></i>
+                        <span>Sending OTP...</span>
+                    </>
+                ) : (
+                    <>
+                        <span>Continue to Services</span>
+                        <i className="fas fa-arrow-right" style={{ marginLeft: '0.5rem' }}></i>
+                    </>
+                )}
+            </button>
 
             <OtpModal 
                 isOpen={showOtpModal} 

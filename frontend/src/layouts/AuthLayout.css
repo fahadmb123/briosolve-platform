@@ -281,6 +281,10 @@
   animation: loginFormFadeIn 0.2s ease;
 }
 
+.login-form-content:has(.provider-register-container) {
+  max-width: 480px;
+}
+
 @keyframes loginFormFadeIn {
   from {
     opacity: 0;

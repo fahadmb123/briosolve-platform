@@ -283,17 +283,21 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
         )}
       </div>
 
-      <div className="login-divider-row">
-        <span className="login-divider-line"></span>
-        <span className="login-divider-text">or</span>
-        <span className="login-divider-line"></span>
-      </div>
+      {!isInline && (
+        <>
+          <div className="login-divider-row">
+            <span className="login-divider-line"></span>
+            <span className="login-divider-text">or</span>
+            <span className="login-divider-line"></span>
+          </div>
 
-      <div className="login-register-actions" style={{ gridTemplateColumns: '1fr' }}>
-        <Link to={backDestination} className="login-secondary-action-btn">
-          Back
-        </Link>
-      </div>
+          <div className="login-register-actions" style={{ gridTemplateColumns: '1fr' }}>
+            <Link to={backDestination} className="login-secondary-action-btn">
+              Back
+            </Link>
+          </div>
+        </>
+      )}
     </>
   );
 }

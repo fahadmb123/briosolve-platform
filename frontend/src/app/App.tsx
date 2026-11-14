@@ -46,7 +46,7 @@ function App() {
           <LoadingScreen isLoading={true} />
         ) : (
           <>
-            <Toaster position="top-center" />
+            <Toaster position="top-center" containerStyle={{ zIndex: 99999 }} />
             <CallModalContainer />
             <AppRouter />
           </>
