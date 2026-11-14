@@ -628,9 +628,11 @@
 }
 
 .home-services-section {
+  position: relative;
   background: #FFFFFF;
   border-top: 3px solid #FF7900;
   border-bottom: 2px solid #FFBF00;
+  overflow: hidden;
 }
 
 [data-theme="light"] .home-services-section {
@@ -781,6 +783,28 @@
   margin: 0;
 }
 
+.home-services-worker-wrapper {
+  position: absolute;
+  top: -70px;
+  left: -220px;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  transform-origin: 88% 28%;
+}
+
+.home-services-worker-img {
+  height: 600px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 20px 40px rgba(24, 13, 0, 0.24));
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
 .home-folder-wrapper {
   position: relative;
   width: 100%;
@@ -895,6 +919,7 @@
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1038,13 +1063,11 @@
 .home-folder-card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.25) 0%,
-    rgba(0, 0, 0, 0.05) 35%,
-    rgba(0, 0, 0, 0.75) 85%,
-    rgba(0, 0, 0, 0.9) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(0, 0, 0, 0.25) 0%,
+      rgba(0, 0, 0, 0.05) 35%,
+      rgba(0, 0, 0, 0.75) 85%,
+      rgba(0, 0, 0, 0.9) 100%);
   z-index: 2;
   pointer-events: none;
 }
@@ -1131,12 +1154,10 @@
 }
 
 .home-folder-box-icon.is-skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.15) 25%,
-    rgba(255, 255, 255, 0.35) 50%,
-    rgba(255, 255, 255, 0.15) 75%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.15) 25%,
+      rgba(255, 255, 255, 0.35) 50%,
+      rgba(255, 255, 255, 0.15) 75%);
   background-size: 200% 100%;
   animation: folderShimmerSweep 1.8s infinite ease-in-out;
 }
@@ -1145,12 +1166,10 @@
   width: 240px;
   height: 32px;
   border-radius: 10px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.2) 25%,
-    rgba(255, 255, 255, 0.45) 50%,
-    rgba(255, 255, 255, 0.2) 75%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.2) 25%,
+      rgba(255, 255, 255, 0.45) 50%,
+      rgba(255, 255, 255, 0.2) 75%);
   background-size: 200% 100%;
   animation: folderShimmerSweep 1.8s infinite ease-in-out;
   margin-bottom: 0.6rem;
@@ -1161,23 +1180,19 @@
   max-width: 90%;
   height: 16px;
   border-radius: 6px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.15) 25%,
-    rgba(255, 255, 255, 0.35) 50%,
-    rgba(255, 255, 255, 0.15) 75%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.15) 25%,
+      rgba(255, 255, 255, 0.35) 50%,
+      rgba(255, 255, 255, 0.15) 75%);
   background-size: 200% 100%;
   animation: folderShimmerSweep 1.8s infinite ease-in-out;
 }
 
 .home-folder-card.is-skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.12) 25%,
-    rgba(255, 255, 255, 0.26) 50%,
-    rgba(255, 255, 255, 0.12) 75%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.12) 25%,
+      rgba(255, 255, 255, 0.26) 50%,
+      rgba(255, 255, 255, 0.12) 75%);
   background-size: 200% 100%;
   animation: folderShimmerSweep 1.8s infinite ease-in-out;
   border: 1.5px solid rgba(255, 255, 255, 0.22);
@@ -1196,17 +1211,71 @@
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
 }
 
 @keyframes folderPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.5;
   }
+
   50% {
     opacity: 0.9;
+  }
+}
+
+@media (max-width: 1536px) and (min-width: 1025px) {
+  .home-services-section .home-section-container {
+    padding-left: clamp(180px, 15vw, 230px);
+    padding-right: clamp(1.5rem, 3vw, 3rem);
+    max-width: 1480px;
+  }
+
+  .home-folder-box {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .home-folder-grid {
+    gap: 1rem;
+  }
+
+  .home-folder-card {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 1536px) {
+  .home-services-worker-wrapper {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 1440px) {
+  .home-services-worker-wrapper {
+    transform: scale(0.84);
+  }
+}
+
+@media (max-width: 1366px) {
+  .home-services-worker-wrapper {
+    transform: scale(0.78);
+  }
+}
+
+@media (max-width: 1280px) {
+  .home-services-worker-wrapper {
+    transform: scale(0.72);
+  }
+}
+
+@media (max-width: 1024px) {
+  .home-services-worker-wrapper {
+    display: none;
   }
 }
 

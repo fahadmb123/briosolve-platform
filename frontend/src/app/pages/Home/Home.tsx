@@ -60,13 +60,13 @@ export default function Home() {
         subservices:
           cat.services && cat.services.length > 0
             ? cat.services
-                .filter((s) => s.status === "ACTIVE" || !s.status)
-                .map((sub) => ({
-                  title: sub.name.replace(/\b\w/g, (c) => c.toUpperCase()),
-                  desc: sub.description || "Qualified and verified local specialists ready to assist.",
-                  icon: "fa-check-circle",
-                  image: sub.image,
-                }))
+              .filter((s) => s.status === "ACTIVE" || !s.status)
+              .map((sub) => ({
+                title: sub.name.replace(/\b\w/g, (c) => c.toUpperCase()),
+                desc: sub.description || "Qualified and verified local specialists ready to assist.",
+                icon: "fa-check-circle",
+                image: sub.image,
+              }))
             : [],
       };
     });
@@ -183,7 +183,7 @@ export default function Home() {
               </div>
 
               <h1 className="home-hero-title">
-                Connect with skilled local specialists for <span>any job</span>
+                Connect Your Servicer  <span>any job</span>
               </h1>
 
               <p className="home-hero-subtitle">
@@ -277,6 +277,13 @@ export default function Home() {
 
           {categories.length === 0 ? (
             <div className="home-folder-wrapper home-folder-skeleton-wrapper" aria-hidden="true">
+              <div className="home-services-worker-wrapper" aria-hidden="true">
+                <img
+                  src="https://res.cloudinary.com/zjhxcdmi/image/upload/e_trim,f_auto,q_auto:good/v1794656365/worker-man-standing-background-removed.png"
+                  alt="Service Professional"
+                  className="home-services-worker-img"
+                />
+              </div>
               <div className="home-folder-tabs">
                 <div className="home-folder-tab-skeleton is-active">
                   <div className="home-folder-skel-bar is-active-bar" />
@@ -320,264 +327,271 @@ export default function Home() {
           ) : (
             currentCategory && (
               <div className="home-folder-wrapper">
+                <div className="home-services-worker-wrapper" aria-hidden="true">
+                  <img
+                    src="https://res.cloudinary.com/zjhxcdmi/image/upload/e_trim,f_auto,q_auto:good/v1794656365/worker-man-standing-background-removed.png"
+                    alt="Service Professional"
+                    className="home-services-worker-img"
+                  />
+                </div>
                 <div
                   className="home-folder-tabs"
                   role="tablist"
                   aria-label="Service Categories"
                   ref={tabsNavRef}
                 >
+                    <div
+                      className={`home-folder-active-indicator ${hasMounted ? "is-animated" : ""}`}
+                      style={{
+                        transform: `translateX(${activeTabStyle.left}px)`,
+                        width: `${activeTabStyle.width}px`,
+                        opacity: activeTabStyle.opacity,
+                      }}
+                      aria-hidden="true"
+                    />
+
+                    {categories.map((cat) => {
+                      const isActive = activeCategoryId === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          role="tab"
+                          id={`tab-${cat.id}`}
+                          aria-selected={isActive}
+                          aria-controls={`panel-${cat.id}`}
+                          className={`home-folder-tab ${isActive ? "active" : ""}`}
+                          onClick={() => setActiveCategoryId(cat.id)}
+                        >
+                          <span>{cat.shortName}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   <div
-                    className={`home-folder-active-indicator ${hasMounted ? "is-animated" : ""}`}
-                    style={{
-                      transform: `translateX(${activeTabStyle.left}px)`,
-                      width: `${activeTabStyle.width}px`,
-                      opacity: activeTabStyle.opacity,
-                    }}
-                    aria-hidden="true"
-                  />
-
-                  {categories.map((cat) => {
-                    const isActive = activeCategoryId === cat.id;
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        role="tab"
-                        id={`tab-${cat.id}`}
-                        aria-selected={isActive}
-                        aria-controls={`panel-${cat.id}`}
-                        className={`home-folder-tab ${isActive ? "active" : ""}`}
-                        onClick={() => setActiveCategoryId(cat.id)}
-                      >
-                        <span>{cat.shortName}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div
-                  id={`panel-${currentCategory.id}`}
-                  role="tabpanel"
-                  aria-labelledby={`tab-${currentCategory.id}`}
-                  className="home-folder-box"
-                >
-                  <div key={currentCategory.id} className="home-folder-content-animated">
-                    <div className="home-folder-box-header">
-                      <div className="home-folder-box-info">
-                        <div className="home-folder-box-icon">
-                          {currentCategory.image ? (
-                            <img
-                              src={currentCategory.image}
-                              alt={currentCategory.name}
-                              className="home-folder-box-img"
-                            />
-                          ) : (
-                            <i className={`fas ${currentCategory.icon || "fa-tools"}`}></i>
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="home-folder-box-title">{currentCategory.name}</h3>
-                          <p className="home-folder-box-desc">{currentCategory.desc}</p>
+                    id={`panel-${currentCategory.id}`}
+                    role="tabpanel"
+                    aria-labelledby={`tab-${currentCategory.id}`}
+                    className="home-folder-box"
+                  >
+                    <div key={currentCategory.id} className="home-folder-content-animated">
+                      <div className="home-folder-box-header">
+                        <div className="home-folder-box-info">
+                          <div className="home-folder-box-icon">
+                            {currentCategory.image ? (
+                              <img
+                                src={currentCategory.image}
+                                alt={currentCategory.name}
+                                className="home-folder-box-img"
+                              />
+                            ) : (
+                              <i className={`fas ${currentCategory.icon || "fa-tools"}`}></i>
+                            )}
+                          </div>
+                          <div>
+                            <h3 className="home-folder-box-title">{currentCategory.name}</h3>
+                            <p className="home-folder-box-desc">{currentCategory.desc}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="home-folder-grid">
-                      {currentCategory.subservices.map((sub, idx) => (
-                        <Link
-                          key={idx}
-                          to={currentCategory.link}
-                          className="home-folder-card"
-                        >
-                          {sub.image ? (
-                            <img
-                              src={sub.image}
-                              alt={sub.title}
-                              className="home-folder-card-bg-img"
-                            />
-                          ) : (
-                            <div className="home-folder-card-bg-fallback">
-                              <i className={`fas ${sub.icon || "fa-tools"}`}></i>
+                      <div className="home-folder-grid">
+                        {currentCategory.subservices.map((sub, idx) => (
+                          <Link
+                            key={idx}
+                            to={currentCategory.link}
+                            className="home-folder-card"
+                          >
+                            {sub.image ? (
+                              <img
+                                src={sub.image}
+                                alt={sub.title}
+                                className="home-folder-card-bg-img"
+                              />
+                            ) : (
+                              <div className="home-folder-card-bg-fallback">
+                                <i className={`fas ${sub.icon || "fa-tools"}`}></i>
+                              </div>
+                            )}
+                            <div className="home-folder-card-overlay" />
+                            <div className="home-folder-card-content">
+                              <h4 className="home-folder-card-title">{sub.title}</h4>
                             </div>
-                          )}
-                          <div className="home-folder-card-overlay" />
-                          <div className="home-folder-card-content">
-                            <h4 className="home-folder-card-title">{sub.title}</h4>
-                          </div>
-                        </Link>
-                      ))}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )
-          )}
-        </div>
-      </section>
-
-      <section id="how-it-works" className="home-section home-how-it-works-section">
-        <div className="home-section-container">
-          <div className="home-section-header">
-            <span className="home-section-label">How It Works</span>
-            <h2 className="home-section-title">Simple, transparent hiring</h2>
-            <p className="home-section-desc">
-              Three straightforward steps from specifying your project to
-              satisfactory completion.
-            </p>
+              )
+            )}
           </div>
+        </section>
 
-          <div className="home-steps-grid">
-            {steps.map((step) => (
-              <div key={step.num} className="home-step-card">
-                <div className="home-step-num">{step.num}</div>
-                <h3 className="home-step-title">{step.title}</h3>
-                <p className="home-step-desc">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="home-section home-benefits-section">
-        <div className="home-section-container">
-          <div className="home-section-header">
-            <span className="home-section-label">Why Briosolve</span>
-            <h2 className="home-section-title">A marketplace designed for trust</h2>
-            <p className="home-section-desc">
-              Built to eliminate aggressive sales calls, hidden fees, and
-              opaque contractor estimates.
-            </p>
-          </div>
-
-          <div className="home-benefits-grid">
-            {benefits.map((benefit) => (
-              <div key={benefit.title} className="home-benefit-card">
-                <div className="home-benefit-icon">
-                  <i className={`fas ${benefit.icon}`}></i>
-                </div>
-                <h3 className="home-benefit-title">{benefit.title}</h3>
-                <p className="home-benefit-desc">{benefit.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="home-section home-cta-section">
-        <div className="home-section-container">
-          <div className="home-cta-card">
-            <h2 className="home-cta-title">Ready to hire or offer services?</h2>
-            <p className="home-cta-desc">
-              Connect with vetted local pros in your neighborhood, or register
-              as an independent service provider to expand your business.
-            </p>
-            <div className="home-cta-actions">
-              <Link to="/request-service" className="home-btn-primary">
-              <i className="fas fa-plus-circle"></i>
-              <span>Post a Service Request</span>
-            </Link>
-
-            <Link to="/nearby-providers" className="home-btn-secondary">
-                <i className="fas fa-map-marker-alt"></i>
-                <span>Find Providers</span>
-              </Link>
-              {!isAuthenticated && (
-                <Link to="/provider/register" className="home-btn-secondary">
-                  <i className="fas fa-user-tie"></i>
-                  <span>Register as a Provider</span>
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <footer className="home-footer">
-        <div className="home-footer-container">
-          <div className="home-footer-top">
-            <div className="home-footer-brand">
-              <Link to="/" className="brand-logo-container mb-3" aria-label="Briosolve Home">
-                <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
-                <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
-              </Link>
-              <p>
-                A modern service marketplace connecting homeowners and
-                businesses with verified local specialists.
+        <section id="how-it-works" className="home-section home-how-it-works-section">
+          <div className="home-section-container">
+            <div className="home-section-header">
+              <span className="home-section-label">How It Works</span>
+              <h2 className="home-section-title">Simple, transparent hiring</h2>
+              <p className="home-section-desc">
+                Three straightforward steps from specifying your project to
+                satisfactory completion.
               </p>
             </div>
 
-            <div className="home-footer-col">
-              <h4>Platform</h4>
-              <div className="home-footer-links">
-                <Link to="/nearby-providers" className="home-footer-link">
-                  Nearby Providers
-                </Link>
-                <a href="#services" className="home-footer-link">
-                  Categories
-                </a>
-                <a href="#how-it-works" className="home-footer-link">
-                  How It Works
-                </a>
-              </div>
+            <div className="home-steps-grid">
+              {steps.map((step) => (
+                <div key={step.num} className="home-step-card">
+                  <div className="home-step-num">{step.num}</div>
+                  <h3 className="home-step-title">{step.title}</h3>
+                  <p className="home-step-desc">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="home-section home-benefits-section">
+          <div className="home-section-container">
+            <div className="home-section-header">
+              <span className="home-section-label">Why Briosolve</span>
+              <h2 className="home-section-title">A marketplace designed for trust</h2>
+              <p className="home-section-desc">
+                Built to eliminate aggressive sales calls, hidden fees, and
+                opaque contractor estimates.
+              </p>
             </div>
 
-            <div className="home-footer-col">
-              <h4>Account</h4>
-              <div className="home-footer-links">
-                {isAuthenticated ? (
-                  <>
-                    <Link to={dashboardRoute} className="home-footer-link">
-                      Dashboard
-                    </Link>
-                    <Link to="/profile" className="home-footer-link">
-                      Profile
-                    </Link>
-                    <Link to="/settings" className="home-footer-link">
-                      Settings
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link to="/login" className="home-footer-link">
-                      Sign In
-                    </Link>
-                    <Link to="/register" className="home-footer-link">
-                      Customer Sign Up
-                    </Link>
-                    <Link to="/provider/register" className="home-footer-link">
-                      Provider Registration
-                    </Link>
-                  </>
+            <div className="home-benefits-grid">
+              {benefits.map((benefit) => (
+                <div key={benefit.title} className="home-benefit-card">
+                  <div className="home-benefit-icon">
+                    <i className={`fas ${benefit.icon}`}></i>
+                  </div>
+                  <h3 className="home-benefit-title">{benefit.title}</h3>
+                  <p className="home-benefit-desc">{benefit.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="home-section home-cta-section">
+          <div className="home-section-container">
+            <div className="home-cta-card">
+              <h2 className="home-cta-title">Ready to hire or offer services?</h2>
+              <p className="home-cta-desc">
+                Connect with vetted local pros in your neighborhood, or register
+                as an independent service provider to expand your business.
+              </p>
+              <div className="home-cta-actions">
+                <Link to="/request-service" className="home-btn-primary">
+                  <i className="fas fa-plus-circle"></i>
+                  <span>Post a Service Request</span>
+                </Link>
+
+                <Link to="/nearby-providers" className="home-btn-secondary">
+                  <i className="fas fa-map-marker-alt"></i>
+                  <span>Find Providers</span>
+                </Link>
+                {!isAuthenticated && (
+                  <Link to="/provider/register" className="home-btn-secondary">
+                    <i className="fas fa-user-tie"></i>
+                    <span>Register as a Provider</span>
+                  </Link>
                 )}
               </div>
             </div>
+          </div>
+        </section>
 
-            <div className="home-footer-col">
-              <h4>Support</h4>
-              <div className="home-footer-links">
+        <footer className="home-footer">
+          <div className="home-footer-container">
+            <div className="home-footer-top">
+              <div className="home-footer-brand">
+                <Link to="/" className="brand-logo-container mb-3" aria-label="Briosolve Home">
+                  <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
+                  <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
+                </Link>
+                <p>
+                  A modern service marketplace connecting homeowners and
+                  businesses with verified local specialists.
+                </p>
+              </div>
+
+              <div className="home-footer-col">
+                <h4>Platform</h4>
+                <div className="home-footer-links">
+                  <Link to="/nearby-providers" className="home-footer-link">
+                    Nearby Providers
+                  </Link>
+                  <a href="#services" className="home-footer-link">
+                    Categories
+                  </a>
+                  <a href="#how-it-works" className="home-footer-link">
+                    How It Works
+                  </a>
+                </div>
+              </div>
+
+              <div className="home-footer-col">
+                <h4>Account</h4>
+                <div className="home-footer-links">
+                  {isAuthenticated ? (
+                    <>
+                      <Link to={dashboardRoute} className="home-footer-link">
+                        Dashboard
+                      </Link>
+                      <Link to="/profile" className="home-footer-link">
+                        Profile
+                      </Link>
+                      <Link to="/settings" className="home-footer-link">
+                        Settings
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login" className="home-footer-link">
+                        Sign In
+                      </Link>
+                      <Link to="/register" className="home-footer-link">
+                        Customer Sign Up
+                      </Link>
+                      <Link to="/provider/register" className="home-footer-link">
+                        Provider Registration
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="home-footer-col">
+                <h4>Support</h4>
+                <div className="home-footer-links">
+                  <Link to="/settings" className="home-footer-link">
+                    Help Center
+                  </Link>
+                  <Link to="/settings" className="home-footer-link">
+                    Contact
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            <div className="home-footer-bottom">
+              <span>&copy; {new Date().getFullYear()} Briosolve. All rights reserved.</span>
+              <div className="home-footer-legal-links">
                 <Link to="/settings" className="home-footer-link">
-                  Help Center
+                  Privacy
                 </Link>
                 <Link to="/settings" className="home-footer-link">
-                  Contact
+                  Terms
                 </Link>
               </div>
             </div>
           </div>
-
-          <div className="home-footer-bottom">
-            <span>&copy; {new Date().getFullYear()} Briosolve. All rights reserved.</span>
-            <div className="home-footer-legal-links">
-              <Link to="/settings" className="home-footer-link">
-                Privacy
-              </Link>
-              <Link to="/settings" className="home-footer-link">
-                Terms
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+        </footer>
       </main>
     </div>
   );
