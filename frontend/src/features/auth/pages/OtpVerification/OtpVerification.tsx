@@ -39,6 +39,12 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
   const resendOtp = useResendOtp();
   const [endTime, setEndTime] = useState<number | null>(null);
 
+  const otpError = otpVarify.error?.message || resendOtp.error?.message;
+  const handleClearError = () => {
+    otpVarify.reset();
+    resendOtp.reset();
+  };
+
   useEffect(() => {
     getOtpStatus.mutate(undefined, {
       onSuccess: (response) => {
@@ -100,6 +106,21 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
             {forTo === 'UPDATE_PHONE' ? maskPhoneNumber(phone) : maskEmail(email)}
           </span>
         </p>
+
+        {otpError ? (
+          <div className="login-error-alert" role="alert">
+            <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+            <span className="login-error-alert-text">{otpError}</span>
+            <button
+              type="button"
+              className="login-error-alert-close"
+              onClick={handleClearError}
+              aria-label="Dismiss error"
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+        ) : null}
 
         <div onKeyDown={(e) => {
           if (e.key === 'Enter') {
@@ -179,6 +200,21 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
           Code sent to {forTo === 'UPDATE_PHONE' ? maskPhoneNumber(phone) : maskEmail(email)}
         </p>
       </div>
+
+      {otpError ? (
+        <div className="login-error-alert" role="alert">
+          <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+          <span className="login-error-alert-text">{otpError}</span>
+          <button
+            type="button"
+            className="login-error-alert-close"
+            onClick={handleClearError}
+            aria-label="Dismiss error"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+      ) : null}
 
       <div onKeyDown={(e) => {
         if (e.key === 'Enter') {

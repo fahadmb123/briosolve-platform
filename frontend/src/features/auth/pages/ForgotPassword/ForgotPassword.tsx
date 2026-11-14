@@ -23,6 +23,21 @@ export default function ForgotPassword() {
         <p className="login-subtitle">Enter your email to receive recovery instructions</p>
       </div>
 
+      {emailVerify.error?.message ? (
+        <div className="login-error-alert" role="alert">
+          <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+          <span className="login-error-alert-text">{emailVerify.error.message}</span>
+          <button
+            type="button"
+            className="login-error-alert-close"
+            onClick={() => emailVerify.reset()}
+            aria-label="Dismiss error"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+      ) : null}
+
       <form onSubmit={handleSubmit(handle)} className="login-form" noValidate>
         <div className="login-input-group">
           <label className="login-label" htmlFor="recovery-email">Email</label>

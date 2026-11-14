@@ -25,6 +25,21 @@ export default function ResetPassword() {
         <p className="login-subtitle">Choose a strong, unique password</p>
       </div>
 
+      {resetPassword.error?.message ? (
+        <div className="login-error-alert" role="alert">
+          <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+          <span className="login-error-alert-text">{resetPassword.error.message}</span>
+          <button
+            type="button"
+            className="login-error-alert-close"
+            onClick={() => resetPassword.reset()}
+            aria-label="Dismiss error"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+      ) : null}
+
       <form onSubmit={handleSubmit(onSubmit)} className="login-form" noValidate>
         <div className="login-input-group">
           <label className="login-label" htmlFor="new-password">New Password</label>

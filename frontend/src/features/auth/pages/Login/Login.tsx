@@ -28,6 +28,21 @@ export default function Login() {
         <p className="login-subtitle">Welcome to Briosolve</p>
       </div>
 
+      {login.error?.message ? (
+        <div className="login-error-alert" role="alert">
+          <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+          <span className="login-error-alert-text">{login.error.message}</span>
+          <button
+            type="button"
+            className="login-error-alert-close"
+            onClick={() => login.reset()}
+            aria-label="Dismiss error"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+      ) : null}
+
       <form onSubmit={handleSubmit(handleLogin)} className="login-form" noValidate>
         <div className="login-input-group">
           <label className="login-label" htmlFor="email">Email</label>

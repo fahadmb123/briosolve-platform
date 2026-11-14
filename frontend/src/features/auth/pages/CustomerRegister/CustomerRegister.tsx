@@ -43,6 +43,21 @@ export default function CustomerRegister() {
         <p className="login-subtitle">Create your account to get started</p>
       </div>
 
+      {registerMutation.error?.message ? (
+        <div className="login-error-alert" role="alert">
+          <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+          <span className="login-error-alert-text">{registerMutation.error.message}</span>
+          <button
+            type="button"
+            className="login-error-alert-close"
+            onClick={() => registerMutation.reset()}
+            aria-label="Dismiss error"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+      ) : null}
+
       <form onSubmit={handleSubmit(handleRegister)} className="login-form register-form" noValidate>
         <div className="login-input-group">
           <label className="login-label" htmlFor="name">Full Name</label>
