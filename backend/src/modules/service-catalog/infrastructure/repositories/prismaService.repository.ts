@@ -18,12 +18,19 @@ export class ServiceRepository implements IServiceRepository{
     }
 
     async findByName(name:string):Promise<Service | null> {
-        const service = await db.orm.public.services
+        const trimmed = name.trim().toLowerCase();
+        let service = await db.orm.public.services
             .include("category")
-            .where({ name: name.toLowerCase() as Varchar<150> })
-            .first()
-        if (!service) return null
-        return ServiceMapper.toDomain(service)
+            .where({ name: trimmed as Varchar<150> })
+            .first();
+        if (!service) {
+            service = await db.orm.public.services
+                .include("category")
+                .where((s) => s.name.ilike(trimmed))
+                .first();
+        }
+        if (!service) return null;
+        return ServiceMapper.toDomain(service);
     }
 
     async get(input: GetServicesDto):Promise<{services:Service[], total: number}> {
