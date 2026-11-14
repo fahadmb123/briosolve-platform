@@ -9,9 +9,10 @@ interface AddServiceModalProps {
   categories: { id: string; name: string }[];
   onClose: () => void;
   onAdd: (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => void;
+  isLoading?: boolean;
 }
 
-export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initialData, categories, onClose, onAdd }) => {
+export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initialData, categories, onClose, onAdd, isLoading = false }) => {
   const {
     register,
     errors,
@@ -37,8 +38,14 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({ isOpen, initia
       <button className="btn btn-secondary text-sm" onClick={onClose} type="button">
         Cancel
       </button>
-      <button className="btn btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed" onClick={onSubmit} type="button" disabled={!isValid || (!isEditing && !selectedRawFile) || !hasChanges}>
-        {isEditing ? 'Save Changes' : 'Add Service'}
+      <button className="btn btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed" onClick={onSubmit} type="button" disabled={isLoading || !isValid || (!isEditing && !selectedRawFile) || !hasChanges}>
+        {isLoading ? (
+          <>
+            <i className="fas fa-spinner fa-spin mr-1"></i> Saving...
+          </>
+        ) : (
+          isEditing ? 'Save Changes' : 'Add Service'
+        )}
       </button>
     </>
   );

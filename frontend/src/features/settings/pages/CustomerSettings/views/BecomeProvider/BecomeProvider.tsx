@@ -8,7 +8,6 @@ import { OtpModal } from '../../../../../auth/components/OtpModal';
 import ServiceSelection, { type Category } from '../../../../components/customer/ServiceSelection';
 import { useGetCategoriesService } from '../../../../../service-catalog';
 import type { ApiError } from '../../../../../../shared/api/ApiError';
-import { SpinnerOverlay } from '../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 
 
 type FormData = {
@@ -92,7 +91,6 @@ export function BecomeProvider() {
 
     return (
         <div className="card p-6 fade-in">
-            {isLoading && <SpinnerOverlay isLoading={true} />}
 
             <div className="mb-6">
                 <div className="flex items-center gap-3 mb-2">
@@ -200,8 +198,17 @@ export function BecomeProvider() {
                         disabled={isLoading}
                         className="btn btn-primary"
                     >
-                        {sendOtpMut.isPending ? 'Sending OTP...' : 'Verify & Become Provider'}
-                        {!isLoading && <i className="fas fa-arrow-right ml-2" />}
+                        {isLoading ? (
+                            <>
+                                <i className="fas fa-spinner fa-spin mr-2" />
+                                <span>{sendOtpMut.isPending ? 'Sending OTP...' : 'Processing...'}</span>
+                            </>
+                        ) : (
+                            <>
+                                <span>Verify & Become Provider</span>
+                                <i className="fas fa-arrow-right ml-2" />
+                            </>
+                        )}
                     </button>
                 </div>
             </form>

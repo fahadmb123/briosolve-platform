@@ -4,7 +4,6 @@ import { useAuthStore } from '../../../auth/stores/auth.store';
 import { OtpModal } from '../../../auth/components/OtpModal';
 import { useBecomeCustomer, useSendBecomeCustomerOtp } from '../../hooks/provider/useBecomeCustomer';
 import type { ApiError } from '../../../../shared/api/ApiError';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 
 export function BecomeCustomer() {
     const [showOtpModal, setShowOtpModal] = useState(false);
@@ -36,7 +35,6 @@ export function BecomeCustomer() {
 
     return (
         <div className="card p-6 fade-in">
-            {isLoading && <SpinnerOverlay isLoading={true} />}
 
             {/* Header */}
             <div className="mb-6">

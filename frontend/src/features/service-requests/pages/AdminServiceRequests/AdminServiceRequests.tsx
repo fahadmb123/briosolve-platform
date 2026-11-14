@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
 import { AdminNoData } from "../../../../shared/components/ui/AdminNoData";
-import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
 import {
@@ -112,8 +111,6 @@ export default function AdminServiceRequests() {
 
   return (
     <>
-      {cancelMutation.isPending && <SpinnerOverlay isLoading={true} />}
-
       <div className="app-content">
         <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
           <div>

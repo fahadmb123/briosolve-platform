@@ -5,7 +5,6 @@ import { toast } from 'react-hot-toast';
 import { businessProfileSchema, type BusinessProfileInputType } from '../../schemas/providerSettings.schema';
 import { useUpdateBusinessProfile } from '../../hooks/provider/useUpdateBusinessProfile';
 import { useAuthStore } from '../../../auth/stores/auth.store';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import type { ProviderProfile } from '../../../profiles';
 
 export const BusinessProfileForm: React.FC = () => {
@@ -59,9 +58,7 @@ export const BusinessProfileForm: React.FC = () => {
     };
 
     return (
-        <>
-            <SpinnerOverlay isLoading={updateProfile.isPending} />
-            <form onSubmit={handleSubmit(onSubmit)} className="fade-in">
+        <form onSubmit={handleSubmit(onSubmit)} className="fade-in">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div className="card p-6 flex flex-col h-full">
                         <div className="mb-4 border-bottom" style={{ paddingBottom: '16px' }}>
@@ -180,6 +177,5 @@ export const BusinessProfileForm: React.FC = () => {
                     </button>
                 </div>
             </form>
-        </>
     );
 };

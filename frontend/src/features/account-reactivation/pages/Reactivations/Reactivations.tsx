@@ -4,7 +4,6 @@ import { AdminPagination } from '../../../admin/components/AdminPagination';
 import { ReactivationReviewModal } from '../../components/ReactivationReviewModal';
 import { useGetReactivations } from '../../hooks/useReactivations';
 import { useUpdateCustomerStatus as useUpdateStatus } from '../../../profiles';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from '../../../../shared/components/ui/ConfirmModal/ConfirmModal';
 import { BlockReasonModal } from '../../../admin/components/BlockReasonModal';
 import type { ReactivationRequestItem } from '../../types/reactivation.types';
@@ -218,8 +217,6 @@ export default function Reactivations() {
 
   return (
     <>
-      {updateStatus.isPending && <SpinnerOverlay isLoading={true} />}
-
       <div className="admin-filter-bar">
         <div className="admin-search-input">
             <i className="fas fa-search"></i>

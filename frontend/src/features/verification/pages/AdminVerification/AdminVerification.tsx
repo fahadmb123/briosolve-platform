@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from 'react-hot-toast';
 import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
-import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { VerificationReviewModal } from "../../components/admin/VerificationReviewModal";
 import { RejectKycModal } from "../../components/admin/RejectKycModal";
@@ -234,8 +233,6 @@ export default function Verification() {
 
   return (
     <>
-      {updateKycStatus.isPending && <SpinnerOverlay isLoading={true} />}
-
       <div className="admin-filter-bar mb-6">
           <div className="admin-search-input">
             <i className="fas fa-search"></i>

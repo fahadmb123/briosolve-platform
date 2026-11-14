@@ -8,9 +8,10 @@ interface AddCategoryModalProps {
   initialData?: { id?: string; name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; image?: string | null } | null;
   onClose: () => void;
   onAdd: (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => void;
+  isLoading?: boolean;
 }
 
-export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, initialData, onClose, onAdd }) => {
+export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, initialData, onClose, onAdd, isLoading = false }) => {
   const {
     register,
     errors,
@@ -35,8 +36,14 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, init
       <button className="btn btn-secondary text-sm" onClick={onClose} type="button">
         Cancel
       </button>
-      <button className="btn btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed" onClick={onSubmit} type="button" disabled={!isValid || (!isEditing && !selectedRawFile) || !hasChanges}>
-        {isEditing ? 'Save Changes' : 'Add Category'}
+      <button className="btn btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed" onClick={onSubmit} type="button" disabled={isLoading || !isValid || (!isEditing && !selectedRawFile) || !hasChanges}>
+        {isLoading ? (
+          <>
+            <i className="fas fa-spinner fa-spin mr-1"></i> Saving...
+          </>
+        ) : (
+          isEditing ? 'Save Changes' : 'Add Category'
+        )}
       </button>
     </>
   );

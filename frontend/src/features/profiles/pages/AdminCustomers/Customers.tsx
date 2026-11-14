@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useGetCustomers, useUpdateCustomerStatus as useUpdateStatus } from '../../hooks/admin/useAdminCustomers';
 import { toast } from 'react-hot-toast';
 import type { User, response } from '../../types/profile.types';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { BlockReasonModal } from "../../../admin/components/BlockReasonModal";
 import CustomerRow from "../../components/admin/CustomerRow";
@@ -109,8 +108,6 @@ export default function Customers() {
     }, [totalPages]);
     return (
         <>
-        {updateStatus.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
-        
         <div className="admin-filter-bar">
             <div className="admin-search-input">
                 <i className="fas fa-search"></i>

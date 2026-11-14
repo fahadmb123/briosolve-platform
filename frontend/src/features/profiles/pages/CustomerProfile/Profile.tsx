@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
 import { useUpdateProfile } from '../../hooks/customer/useUpdateProfile';
 import { useGetProfile } from '../../hooks/customer/useGetProfile';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { ImageCropModal } from '../../../../shared/components/ui/ImageCropModal/ImageCropModal';
 import { useUpdateProfileImage } from '../../hooks/customer/useUpdateProfileImage';
@@ -40,7 +39,7 @@ export default function Profile() {
   });
 
   const { mutate: updateProfile, isPending } = useUpdateProfile();
-  const getProfile = useGetProfile();
+  useGetProfile();
 
   useEffect(() => {
     (()=>{
@@ -94,8 +93,6 @@ export default function Profile() {
 
   return (
     <>
-
-    {getProfile.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
       <div className="profile-premium-wrapper">
         {/* Top Gradient/Image Banner */}
         <div className="profile-banner"></div>
@@ -350,7 +347,15 @@ export default function Profile() {
 
               <div className="flex justify-end items-center gap-3 pt-5 mt-4 border-top border-border">
                 <button type="submit" disabled={isPending} className="btn btn-primary px-8 shadow-sm">
-                  <i className="fas fa-check mr-2"></i> {isPending ? "Saving..." : "Save Changes"}
+                  {isPending ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin mr-2"></i> Saving...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-check mr-2"></i> Save Changes
+                    </>
+                  )}
                 </button>
               </div>
             </form>

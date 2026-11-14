@@ -5,7 +5,6 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { ImageCropModal } from '../../../../shared/components/ui/ImageCropModal/ImageCropModal';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useUpdateProfileImage } from '../../hooks/provider/useUpdateProfileImage';
 import { useDeleteProfileImage } from '../../hooks/provider/useDeleteProfileImage';
 import { useGetProviderServices } from '../../../service-catalog';
@@ -271,8 +270,6 @@ export default function Profile() {
 
   return (
     <>
-      <SpinnerOverlay isLoading={isImageUploading || isImageDeleting} />
-
       <div className="profile-premium-wrapper">
         <div className="profile-banner flex items-start justify-end p-4">
           

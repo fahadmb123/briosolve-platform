@@ -4,7 +4,6 @@ import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { AddCategoryModal } from "../../components/AddCategoryModal";
 import { useAddCategoryService, useGetCategoriesService, useUpdateCategoryService, useDeleteCategoryService } from "../../hooks/useCategory";
 import { toast } from 'react-hot-toast';
-import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { useCategoryFormData } from "../../hooks/useCategoryFormData";
 import type { Category } from "../../services/category.service";
@@ -179,10 +178,6 @@ export default function CategoriesTab() {
 
   return (
     <>
-      {addCategory.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
-      {updateCategory.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
-      {deleteCategory.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
-
       <div className="admin-filter-bar mb-6">
         <div className="admin-search-input">
           <i className="fas fa-search"></i>
@@ -241,6 +236,7 @@ export default function CategoriesTab() {
         initialData={editingCategory}
         onClose={handleCloseAddModal} 
         onAdd={editingCategory ? handleEditCategory : handleAddCategory} 
+        isLoading={addCategory.isPending || updateCategory.isPending}
       />
 
       {categoryToDelete && (

@@ -6,7 +6,6 @@ import { useGetCategoriesService } from "../../hooks/useCategory";
 import { useGetServices, useAddServiceMut, useUpdateServiceMut, useDeleteServiceMut } from "../../hooks/useService";
 import { useServiceFormData } from "../../hooks/useServiceFormData";
 import { toast } from 'react-hot-toast';
-import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 
 interface Service {
@@ -224,8 +223,6 @@ export default function Services() {
 
   return (
     <>
-      {addService.isPending || updateService.isPending || deleteService.isPending ? <SpinnerOverlay isLoading={true} /> : null}
-      
       <div className="admin-filter-bar mb-6">
         <div className="admin-search-input">
           <i className="fas fa-search"></i>
@@ -285,6 +282,7 @@ export default function Services() {
         onClose={handleCloseAddModal} 
         onAdd={editingService ? handleEditService : handleAddService} 
         categories={categories}
+        isLoading={addService.isPending || updateService.isPending}
       />
       
       {serviceToDelete && (

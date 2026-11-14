@@ -12,7 +12,6 @@ import {
 } from '../hooks/useAvailability';
 import type { ProviderProfile } from '../../../shared/types/Dtos';
 import type { Weekday, ProviderAvailabilityOverrideItem } from '../types/availability.types';
-import { SpinnerOverlay } from '../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from '../../../shared/components/ui/ConfirmModal/ConfirmModal';
 import '../../../shared/components/ui/ConfirmModal/ConfirmModal.css';
 
@@ -281,7 +280,6 @@ const AvailabilitySettingsComponent: React.FC = () => {
 
     return (
         <div className="flex flex-col gap-6">
-            {(getAvailability.isPending || getOverrides.isPending) ? (<SpinnerOverlay isLoading={true}/>):null}
             <div className="settings-card-panel fade-in" id="sec-working-availability">
                 <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
                     <div>
