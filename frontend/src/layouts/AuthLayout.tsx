@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../shared/hooks/useTheme';
 import './AuthLayout.css';
@@ -129,7 +129,9 @@ export default function AuthLayout() {
           </div>
 
           <div className="login-form-content">
-            <Outlet />
+            <React.Suspense fallback={null}>
+              <Outlet />
+            </React.Suspense>
           </div>
 
           <div className="login-social-footer">

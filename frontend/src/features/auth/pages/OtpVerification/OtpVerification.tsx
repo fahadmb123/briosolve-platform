@@ -146,24 +146,26 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
           <p className="text-secondary mb-2">
             {timer > 0 ? `Resend code in ${timer}s` : (attempts >= 5 ? "Maximum attempts reached" : "Didn't receive the code?")}
           </p>
-          <button 
-            type="button" 
-            className="btn btn-outline w-full mb-5" 
-            disabled={timer > 0 || attempts >= 5 || resendOtp.isPending}
-            onClick={handleResend}
-          >
-            {resendOtp.isPending ? (
-              <>
-                <i className="fas fa-spinner fa-spin mr-2"></i>
-                <span>Resending...</span>
-              </>
-            ) : (
-              <>
-                <i className="fas fa-redo-alt mr-1"></i>
-                <span>Resend OTP</span>
-              </>
-            )}
-          </button>
+          {timer <= 0 && attempts < 5 && (
+            <button 
+              type="button" 
+              className="btn btn-outline w-full mb-5" 
+              disabled={resendOtp.isPending}
+              onClick={handleResend}
+            >
+              {resendOtp.isPending ? (
+                <>
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                  <span>Resending...</span>
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-redo-alt mr-1"></i>
+                  <span>Resend OTP</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     );
@@ -219,28 +221,30 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
       </div>
 
       <div style={{ textAlign: 'center', marginTop: '1.25rem' }}>
-        <p className="login-subtitle" style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+        <p className="login-subtitle" style={{ fontSize: '0.85rem', margin: 0 }}>
           {timer > 0 ? `Resend code in ${timer}s` : (attempts >= 5 ? "Maximum attempts reached" : "Didn't receive code?")}
         </p>
-        <button 
-          type="button" 
-          className="login-secondary-action-btn"
-          style={{ width: '100%', gap: '0.5rem' }}
-          disabled={timer > 0 || attempts >= 5 || resendOtp.isPending}
-          onClick={handleResend}
-        >
-          {resendOtp.isPending ? (
-            <>
-              <i className="fas fa-spinner fa-spin"></i>
-              <span>Resending...</span>
-            </>
-          ) : (
-            <>
-              <i className="fas fa-redo-alt"></i>
-              <span>Resend OTP</span>
-            </>
-          )}
-        </button>
+        {timer <= 0 && attempts < 5 && (
+          <button 
+            type="button" 
+            className="login-secondary-action-btn"
+            style={{ width: '100%', gap: '0.5rem', marginTop: '0.75rem' }}
+            disabled={resendOtp.isPending}
+            onClick={handleResend}
+          >
+            {resendOtp.isPending ? (
+              <>
+                <i className="fas fa-spinner fa-spin"></i>
+                <span>Resending...</span>
+              </>
+            ) : (
+              <>
+                <i className="fas fa-redo-alt"></i>
+                <span>Resend OTP</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       <div className="login-divider-row">
