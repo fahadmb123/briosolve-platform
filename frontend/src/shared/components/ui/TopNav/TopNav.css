@@ -948,7 +948,8 @@ body.dark .topnav-header {
     display: none !important;
   }
 
-  .topnav-cta-btn {
+  .topnav-cta-btn,
+  .hide-mobile {
     display: none !important;
   }
 
