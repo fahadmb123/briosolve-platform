@@ -275,103 +275,142 @@ export default function Home() {
             </p>
           </div>
 
-          {categories.length > 0 && currentCategory && (
-            <div className="home-folder-wrapper">
-              <div
-                className="home-folder-tabs"
-                role="tablist"
-                aria-label="Service Categories"
-                ref={tabsNavRef}
-              >
-                <div
-                  className={`home-folder-active-indicator ${hasMounted ? "is-animated" : ""}`}
-                  style={{
-                    transform: `translateX(${activeTabStyle.left}px)`,
-                    width: `${activeTabStyle.width}px`,
-                    opacity: activeTabStyle.opacity,
-                  }}
-                  aria-hidden="true"
-                />
-
-                {categories.map((cat) => {
-                  const isActive = activeCategoryId === cat.id;
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      role="tab"
-                      id={`tab-${cat.id}`}
-                      aria-selected={isActive}
-                      aria-controls={`panel-${cat.id}`}
-                      className={`home-folder-tab ${isActive ? "active" : ""}`}
-                      onClick={() => setActiveCategoryId(cat.id)}
-                    >
-                      <span>{cat.shortName}</span>
-                    </button>
-                  );
-                })}
+          {categories.length === 0 ? (
+            <div className="home-folder-wrapper home-folder-skeleton-wrapper" aria-hidden="true">
+              <div className="home-folder-tabs">
+                <div className="home-folder-tab-skeleton is-active">
+                  <div className="home-folder-skel-bar is-active-bar" />
+                </div>
+                <div className="home-folder-tab-skeleton">
+                  <div className="home-folder-skel-bar" />
+                </div>
+                <div className="home-folder-tab-skeleton">
+                  <div className="home-folder-skel-bar" />
+                </div>
+                <div className="home-folder-tab-skeleton">
+                  <div className="home-folder-skel-bar" />
+                </div>
+                <div className="home-folder-tab-skeleton">
+                  <div className="home-folder-skel-bar" />
+                </div>
               </div>
 
-              <div
-                id={`panel-${currentCategory.id}`}
-                role="tabpanel"
-                aria-labelledby={`tab-${currentCategory.id}`}
-                className="home-folder-box"
-              >
-                <div key={currentCategory.id} className="home-folder-content-animated">
-                  <div className="home-folder-box-header">
-                    <div className="home-folder-box-info">
-                      <div className="home-folder-box-icon">
-                        {currentCategory.image ? (
-                          <img
-                            src={currentCategory.image}
-                            alt={currentCategory.name}
-                            className="home-folder-box-img"
-                          />
-                        ) : (
-                          <i className={`fas ${currentCategory.icon || "fa-tools"}`}></i>
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="home-folder-box-title">{currentCategory.name}</h3>
-                        <p className="home-folder-box-desc">{currentCategory.desc}</p>
-                      </div>
+              <div className="home-folder-box is-skeleton">
+                <div className="home-folder-box-header">
+                  <div className="home-folder-box-info">
+                    <div className="home-folder-box-icon is-skeleton" />
+                    <div>
+                      <div className="home-folder-skel-title" />
+                      <div className="home-folder-skel-desc" />
                     </div>
                   </div>
+                </div>
 
-                  <div className="home-folder-grid">
-                    {currentCategory.subservices.map((sub, idx) => (
-                      <Link
-                        key={idx}
-                        to={currentCategory.link}
-                        className="home-folder-card"
-                      >
-                        <div className="home-folder-card-top">
-                          <div className="home-folder-card-icon">
-                            {sub.image ? (
-                              <img
-                                src={sub.image}
-                                alt={sub.title}
-                                className="home-folder-card-img"
-                              />
-                            ) : (
-                              <i className={`fas ${sub.icon || "fa-check-circle"}`}></i>
-                            )}
-                          </div>
-                          <span className="home-folder-card-tag">Verified Pros</span>
-                        </div>
-                        <h4 className="home-folder-card-title">{sub.title}</h4>
-                        <p className="home-folder-card-desc">{sub.desc}</p>
-                        <div className="home-folder-card-action">
-                          <span>Find local experts</span>
-                          <i className="fas fa-chevron-right"></i>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+                <div className="home-folder-grid">
+                  {[0, 1, 2, 3].map((i) => (
+                    <div key={i} className="home-folder-card is-skeleton">
+                      <div className="home-folder-card-content">
+                        <div className="home-folder-skel-card-title" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
+          ) : (
+            currentCategory && (
+              <div className="home-folder-wrapper">
+                <div
+                  className="home-folder-tabs"
+                  role="tablist"
+                  aria-label="Service Categories"
+                  ref={tabsNavRef}
+                >
+                  <div
+                    className={`home-folder-active-indicator ${hasMounted ? "is-animated" : ""}`}
+                    style={{
+                      transform: `translateX(${activeTabStyle.left}px)`,
+                      width: `${activeTabStyle.width}px`,
+                      opacity: activeTabStyle.opacity,
+                    }}
+                    aria-hidden="true"
+                  />
+
+                  {categories.map((cat) => {
+                    const isActive = activeCategoryId === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        role="tab"
+                        id={`tab-${cat.id}`}
+                        aria-selected={isActive}
+                        aria-controls={`panel-${cat.id}`}
+                        className={`home-folder-tab ${isActive ? "active" : ""}`}
+                        onClick={() => setActiveCategoryId(cat.id)}
+                      >
+                        <span>{cat.shortName}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div
+                  id={`panel-${currentCategory.id}`}
+                  role="tabpanel"
+                  aria-labelledby={`tab-${currentCategory.id}`}
+                  className="home-folder-box"
+                >
+                  <div key={currentCategory.id} className="home-folder-content-animated">
+                    <div className="home-folder-box-header">
+                      <div className="home-folder-box-info">
+                        <div className="home-folder-box-icon">
+                          {currentCategory.image ? (
+                            <img
+                              src={currentCategory.image}
+                              alt={currentCategory.name}
+                              className="home-folder-box-img"
+                            />
+                          ) : (
+                            <i className={`fas ${currentCategory.icon || "fa-tools"}`}></i>
+                          )}
+                        </div>
+                        <div>
+                          <h3 className="home-folder-box-title">{currentCategory.name}</h3>
+                          <p className="home-folder-box-desc">{currentCategory.desc}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="home-folder-grid">
+                      {currentCategory.subservices.map((sub, idx) => (
+                        <Link
+                          key={idx}
+                          to={currentCategory.link}
+                          className="home-folder-card"
+                        >
+                          {sub.image ? (
+                            <img
+                              src={sub.image}
+                              alt={sub.title}
+                              className="home-folder-card-bg-img"
+                            />
+                          ) : (
+                            <div className="home-folder-card-bg-fallback">
+                              <i className={`fas ${sub.icon || "fa-tools"}`}></i>
+                            </div>
+                          )}
+                          <div className="home-folder-card-overlay" />
+                          <div className="home-folder-card-content">
+                            <h4 className="home-folder-card-title">{sub.title}</h4>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
           )}
         </div>
       </section>
