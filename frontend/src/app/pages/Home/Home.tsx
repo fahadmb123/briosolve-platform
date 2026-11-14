@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useLayoutEffect, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../../features/auth/stores/auth.store";
 import { CustomerNavbar } from "../../../shared/components/ui/TopNav/TopNav";
@@ -8,6 +8,14 @@ import "./Home.css";
 export default function Home() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
+  const [activeCategoryId, setActiveCategoryId] = useState<string>("ac");
+  const tabsNavRef = useRef<HTMLDivElement>(null);
+  const [hasMounted, setHasMounted] = useState<boolean>(false);
+  const [activeTabStyle, setActiveTabStyle] = useState<{ left: number; width: number; opacity: number }>({
+    left: 0,
+    width: 0,
+    opacity: 0,
+  });
 
   const dashboardRoute = useMemo(() => {
     if (!user) return "/login";
@@ -16,50 +24,192 @@ export default function Home() {
     return "/dashboard";
   }, [user]);
 
-  const services = [
+  const categories = [
     {
       id: "plumbing",
+      shortName: "Plumbing",
       icon: "fa-tools",
       name: "Plumbing & Piping",
-      desc: "Leak repairs, pipe fittings, tap installations, and drainage solutions.",
+      desc: "Leak repairs, pipe fittings, tap installations, and advanced drainage solutions.",
       link: "/nearby-providers",
+      subservices: [
+        {
+          title: "Leak Detection & Repair",
+          desc: "Pinpoint hidden pipe leaks, burst line fixing, and seepage resolution.",
+          icon: "fa-tint",
+        },
+        {
+          title: "Bathroom & Kitchen Taps",
+          desc: "Install and repair faucets, sinks, showers, mixers, and diverters.",
+          icon: "fa-faucet",
+        },
+        {
+          title: "Drain Unclogging & Jetting",
+          desc: "High-pressure clearing for blocked drains, sewer lines, and gully traps.",
+          icon: "fa-soap",
+        },
+        {
+          title: "Water Tank & Geyser Setup",
+          desc: "Inlet and outlet valve plumbing, pressure tests, and overhead connections.",
+          icon: "fa-water",
+        },
+      ],
+    },
+    {
+      id: "ac",
+      shortName: "AC",
+      icon: "fa-snowflake",
+      name: "AC Repair & Servicing",
+      desc: "Refrigerant refills, jet servicing, breakdown maintenance, and installations.",
+      link: "/nearby-providers",
+      subservices: [
+        {
+          title: "Deep Jet Clean Servicing",
+          desc: "High-pressure indoor coil cleaning, filter sanitization, and drain flush.",
+          icon: "fa-wind",
+        },
+        {
+          title: "Gas Refill & Leak Sealing",
+          desc: "Pressure testing, nitrogen leak checks, and certified refrigerant recharges.",
+          icon: "fa-fire-extinguisher",
+        },
+        {
+          title: "Compressor & PCB Repair",
+          desc: "Diagnostics for inverter boards, capacitors, sensor faults, and motor issues.",
+          icon: "fa-microchip",
+        },
+        {
+          title: "Installation & Unmounting",
+          desc: "Safe wall mounting, copper pipe insulation, wiring, and balance setup.",
+          icon: "fa-wrench",
+        },
+      ],
+    },
+    {
+      id: "carpentry",
+      shortName: "Carpentry",
+      icon: "fa-hammer",
+      name: "Carpentry & Woodwork",
+      desc: "Custom furniture repair, door and lock assemblies, and precision renovations.",
+      link: "/nearby-providers",
+      subservices: [
+        {
+          title: "Furniture Repair & Assembly",
+          desc: "Repair broken frames, assemble flatpack units, and reinforce chairs & tables.",
+          icon: "fa-couch",
+        },
+        {
+          title: "Door Locks & Latches",
+          desc: "Modern digital lock installation, deadbolts, hinges, and alignment tweaks.",
+          icon: "fa-key",
+        },
+        {
+          title: "Modular Cabinet Fitting",
+          desc: "Kitchen hydraulic hinge adjustments, drawer runners, and shelf expansions.",
+          icon: "fa-th-large",
+        },
+        {
+          title: "Custom Wooden Partitions",
+          desc: "Architraves, skirting boards, wall paneling, and tailored woodwork.",
+          icon: "fa-vector-square",
+        },
+      ],
     },
     {
       id: "electrical",
+      shortName: "Electrical",
       icon: "fa-bolt",
       name: "Electrical & Wiring",
       desc: "Short circuits, fuse boxes, switchboard setups, and appliance wiring.",
       link: "/nearby-providers",
-    },
-    {
-      id: "ac",
-      icon: "fa-snowflake",
-      name: "AC Repair & Servicing",
-      desc: "Refrigerant refills, jet servicing, breakdown maintenance, and installs.",
-      link: "/nearby-providers",
+      subservices: [
+        {
+          title: "Circuit Breaker & MCB Repair",
+          desc: "Diagnose frequent tripping, fuse burns, and upgrade electrical distribution boxes.",
+          icon: "fa-shield-virus",
+        },
+        {
+          title: "Switchboard & Wiring",
+          desc: "Install modular switches, internal conduit re-wiring, and earthing checks.",
+          icon: "fa-plug",
+        },
+        {
+          title: "Lighting & Ceiling Fans",
+          desc: "Mount chandeliers, heavy ceiling fans, profile LED strips, and spotlights.",
+          icon: "fa-lightbulb",
+        },
+        {
+          title: "Appliance Line Safety",
+          desc: "Dedicated power cables, voltage stabilizer checks, and heavy-load outlets.",
+          icon: "fa-charging-station",
+        },
+      ],
     },
     {
       id: "cleaning",
+      shortName: "Cleaning",
       icon: "fa-broom",
       name: "Deep Cleaning",
       desc: "Full home sanitization, kitchen degreasing, and upholstery care.",
       link: "/nearby-providers",
-    },
-    {
-      id: "carpentry",
-      icon: "fa-hammer",
-      name: "Carpentry & Woodwork",
-      desc: "Custom furniture repair, door and lock assemblies, and renovations.",
-      link: "/nearby-providers",
+      subservices: [
+        {
+          title: "Full Home Deep Clean",
+          desc: "Corner-to-corner sanitization, floor scrubbing, and dust-free polishing.",
+          icon: "fa-home",
+        },
+        {
+          title: "Kitchen & Chimney Degreasing",
+          desc: "Heavy grease removal from range hoods, gas stoves, and tiled splashbacks.",
+          icon: "fa-utensils",
+        },
+        {
+          title: "Sofa & Carpet Shampooing",
+          desc: "Deep steam extraction, stain treatment, and fabric deodorization.",
+          icon: "fa-hand-sparkles",
+        },
+        {
+          title: "Bathroom Descaling",
+          desc: "Remove hard water scale, deep clean grout, and polish sanitary fittings.",
+          icon: "fa-shower",
+        },
+      ],
     },
     {
       id: "painting",
+      shortName: "Painting",
       icon: "fa-paint-roller",
       name: "Painting & Waterproofing",
       desc: "Interior repainting, moisture wall treatment, and texture coating.",
       link: "/nearby-providers",
+      subservices: [
+        {
+          title: "Interior Wall Emulsion",
+          desc: "Smooth putty priming, crack filling, and high-coverage color finishing.",
+          icon: "fa-palette",
+        },
+        {
+          title: "Dampness Waterproofing",
+          desc: "Apply polymer barriers and chemical waterproofing to eliminate wall seepage.",
+          icon: "fa-umbrella",
+        },
+        {
+          title: "Exterior Weather Coating",
+          desc: "Long-lasting UV and rain-resistant coats for building facades and balconies.",
+          icon: "fa-sun",
+        },
+        {
+          title: "Enamel & Wood Polish",
+          desc: "Protective polyurethane, melamine wood varnish, and metal gate enamels.",
+          icon: "fa-brush",
+        },
+      ],
     },
   ];
+
+  const currentCategory = useMemo(() => {
+    return categories.find((c) => c.id === activeCategoryId) || categories[0];
+  }, [activeCategoryId, categories]);
 
   const steps = [
     {
@@ -101,6 +251,43 @@ export default function Home() {
       desc: "Get instant notification alerts as soon as quotes, schedule changes, or messages arrive.",
     },
   ];
+
+  useEffect(() => {
+    setHasMounted(true);
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(() => {
+        if (!tabsNavRef.current) return;
+        const activeEl = tabsNavRef.current.querySelector<HTMLElement>(".home-folder-tab.active");
+        if (activeEl) {
+          setActiveTabStyle({
+            left: activeEl.offsetLeft,
+            width: activeEl.offsetWidth,
+            opacity: 1,
+          });
+        }
+      });
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    const updateIndicator = () => {
+      if (!tabsNavRef.current) return;
+      const activeEl = tabsNavRef.current.querySelector<HTMLElement>(".home-folder-tab.active");
+      if (activeEl) {
+        setActiveTabStyle({
+          left: activeEl.offsetLeft,
+          width: activeEl.offsetWidth,
+          opacity: 1,
+        });
+      } else {
+        setActiveTabStyle((prev) => ({ ...prev, opacity: 0 }));
+      }
+    };
+
+    updateIndicator();
+    window.addEventListener("resize", updateIndicator);
+    return () => window.removeEventListener("resize", updateIndicator);
+  }, [activeCategoryId]);
 
   return (
     <div className="home-top-layout">
@@ -214,7 +401,7 @@ export default function Home() {
 
       <section id="services" className="home-section home-services-section">
         <div className="home-section-container">
-          <div className="home-section-header">
+          <div className="home-services-intro">
             <span className="home-section-label">Service Directory</span>
             <h2 className="home-section-title">Popular Service Categories</h2>
             <p className="home-section-desc">
@@ -223,24 +410,85 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="home-services-grid">
-            {services.map((service) => (
-              <Link
-                key={service.id}
-                to={service.link}
-                className="home-service-card"
-              >
-                <div className="home-service-icon">
-                  <i className={`fas ${service.icon}`}></i>
+          <div className="home-folder-wrapper">
+            <div
+              className="home-folder-tabs"
+              role="tablist"
+              aria-label="Service Categories"
+              ref={tabsNavRef}
+            >
+              <div
+                className={`home-folder-active-indicator ${hasMounted ? "is-animated" : ""}`}
+                style={{
+                  transform: `translateX(${activeTabStyle.left}px)`,
+                  width: `${activeTabStyle.width}px`,
+                  opacity: activeTabStyle.opacity,
+                }}
+                aria-hidden="true"
+              />
+
+              {categories.map((cat) => {
+                const isActive = activeCategoryId === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    role="tab"
+                    id={`tab-${cat.id}`}
+                    aria-selected={isActive}
+                    aria-controls={`panel-${cat.id}`}
+                    className={`home-folder-tab ${isActive ? "active" : ""}`}
+                    onClick={() => setActiveCategoryId(cat.id)}
+                  >
+                    <span>{cat.shortName}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div
+              id={`panel-${currentCategory.id}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${currentCategory.id}`}
+              className="home-folder-box"
+            >
+              <div key={currentCategory.id} className="home-folder-content-animated">
+                <div className="home-folder-box-header">
+                  <div className="home-folder-box-info">
+                    <div className="home-folder-box-icon">
+                      <i className={`fas ${currentCategory.icon}`}></i>
+                    </div>
+                    <div>
+                      <h3 className="home-folder-box-title">{currentCategory.name}</h3>
+                      <p className="home-folder-box-desc">{currentCategory.desc}</p>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="home-service-name">{service.name}</h3>
-                <p className="home-service-desc">{service.desc}</p>
-                <span className="home-service-link">
-                  <span>Explore specialists</span>
-                  <i className="fas fa-arrow-right text-xs"></i>
-                </span>
-              </Link>
-            ))}
+
+                <div className="home-folder-grid">
+                  {currentCategory.subservices.map((sub, idx) => (
+                    <Link
+                      key={idx}
+                      to={currentCategory.link}
+                      className="home-folder-card"
+                    >
+                      <div className="home-folder-card-top">
+                        <div className="home-folder-card-icon">
+                          <i className={`fas ${sub.icon}`}></i>
+                        </div>
+                        <span className="home-folder-card-tag">Verified Pros</span>
+                      </div>
+                      <h4 className="home-folder-card-title">{sub.title}</h4>
+                      <p className="home-folder-card-desc">{sub.desc}</p>
+                      <div className="home-folder-card-action">
+                        <span>Find local experts</span>
+                        <i className="fas fa-chevron-right"></i>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
