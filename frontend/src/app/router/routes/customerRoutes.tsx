@@ -1,14 +1,10 @@
 import { Route } from 'react-router-dom';
-import { CustomerDashboard, CustomerNotifications, CustomerProfile, CustomerRegister, CustomerSettings, CustomerNearbyProviders, CustomerRequestService, CustomerMyRequests, CustomerChat } from '../lazy/customer.lazy';
+import { CustomerDashboard, CustomerNotifications, CustomerProfile, CustomerSettings, CustomerNearbyProviders, CustomerRequestService, CustomerMyRequests, CustomerChat } from '../lazy/customer.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
 import RoleRoute from '../guards/RoleRoute';
-import PublicRoute from '../guards/PublicRoute';
 
 export const customerRoutes = (
   <>
-    <Route element={<PublicRoute/>}>
-        <Route path="register" element={<CustomerRegister />} />
-    </Route>
     <Route path="request-service" element={<CustomerRequestService />} />
     <Route element={<ProtectedRoute />}>
       <Route element={<RoleRoute allowedRoles={["CUSTOMER"]} />}>
