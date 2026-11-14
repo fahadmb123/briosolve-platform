@@ -76,15 +76,10 @@ export const useLogin = () => {
 
     return useMutation({
         mutationFn: login,
-        onSuccess: async (response) => {
+        onSuccess: (response) => {
             const user = response.data.user;
             useAuthStore.getState().setUser(user);
             useAuthStore.getState().setProfile(user.customer_profile || user.provider_profile || null);
-
-            try {
-                await useAuthStore.getState().fetchUser();
-            } catch {
-            }
 
             const currentUser = useAuthStore.getState().user || user;
             if (currentUser.role === "CUSTOMER") {

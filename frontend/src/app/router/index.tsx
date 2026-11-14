@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { LoadingScreen } from '../../shared/components/ui/LoadingScreen/LoadingScreen';
 
-const Home = React.lazy(() => import('../pages/Home/Home'));
+import Home from '../pages/Home/Home';
 const NotFound = React.lazy(() => import('../pages/NotFound/NotFound'));
 const AdminLayout = React.lazy(() => import('../../layouts/AdminLayout'));
 const ProviderLayout = React.lazy(() => import('../../layouts/ProviderLayout'));

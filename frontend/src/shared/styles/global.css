@@ -121,6 +121,7 @@
 
 html {
     scrollbar-gutter: stable;
+    background-color: var(--bg);
 }
 
 html, body {
