@@ -106,7 +106,7 @@ export const ProviderTopNav: React.FC = () => {
     return () => {
       document.body.classList.remove("has-verification-warning");
     };
-  }, [showVerificationWarning]);
+  }, [showVerificationWarning, location.pathname]);
 
   const handleLogout = async () => {
     if (!isAuthenticated) {

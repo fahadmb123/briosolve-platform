@@ -2148,7 +2148,11 @@ body.has-verification-warning .home-wrapper {
 }
 
 body.has-verification-warning .customer-body-layout,
-body.has-verification-warning .provider-body-layout {
+body.has-verification-warning .provider-body-layout,
+.customer-body-layout.has-verification-warning,
+.provider-body-layout.has-verification-warning,
+.top-nav-layout.has-verification-warning .customer-body-layout,
+.provider-top-layout.has-verification-warning .provider-body-layout {
   margin-top: calc(64px + 1cm) !important;
   min-height: calc(100vh - 64px - 1cm) !important;
 }
@@ -2156,16 +2160,36 @@ body.has-verification-warning .provider-body-layout {
 body.has-verification-warning .cust-subnav-sidebar,
 body.has-verification-warning .prov-subnav-sidebar,
 .cust-subnav-sidebar.has-verification-warning,
-.prov-subnav-sidebar.has-verification-warning {
+.prov-subnav-sidebar.has-verification-warning,
+.top-nav-layout.has-verification-warning .cust-subnav-sidebar,
+.provider-top-layout.has-verification-warning .prov-subnav-sidebar {
   top: calc(64px + 1cm) !important;
   height: calc(100vh - 64px - 1cm) !important;
 }
 
+body.has-verification-warning .chat-layout-root,
+.provider-body-layout.has-verification-warning .chat-layout-root,
+.customer-body-layout.has-verification-warning .chat-layout-root {
+  height: calc(100vh - 64px - 1cm) !important;
+  max-height: calc(100vh - 64px - 1cm) !important;
+}
+
 @media (max-width: 768px) {
   body.has-verification-warning .customer-body-layout,
-  body.has-verification-warning .provider-body-layout {
+  body.has-verification-warning .provider-body-layout,
+  .customer-body-layout.has-verification-warning,
+  .provider-body-layout.has-verification-warning,
+  .top-nav-layout.has-verification-warning .customer-body-layout,
+  .provider-top-layout.has-verification-warning .provider-body-layout {
     margin-top: calc(52px + 1cm) !important;
     min-height: calc(100vh - 52px - 1cm) !important;
+  }
+
+  body.has-verification-warning .chat-layout-root,
+  .provider-body-layout.has-verification-warning .chat-layout-root,
+  .customer-body-layout.has-verification-warning .chat-layout-root {
+    height: calc(100dvh - 52px - 1cm - 52px) !important;
+    max-height: calc(100dvh - 52px - 1cm - 52px) !important;
   }
 }
 

@@ -95,7 +95,7 @@ export const TopNav: React.FC = () => {
     return () => {
       document.body.classList.remove("has-verification-warning");
     };
-  }, [showVerificationWarning]);
+  }, [showVerificationWarning, location.pathname]);
 
 
 

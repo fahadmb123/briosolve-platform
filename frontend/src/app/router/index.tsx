@@ -20,13 +20,20 @@ import RoleRoute from './guards/RoleRoute';
 function ThemeManager() {
   const location = useLocation();
   useEffect(() => {
-    let themeClass = 'theme-user';
+    const themeClasses = ['theme-user', 'theme-admin', 'theme-provider'];
+    let targetClass = 'theme-user';
     if (location.pathname.startsWith('/admin')) {
-      themeClass = 'theme-admin';
+      targetClass = 'theme-admin';
     } else if (location.pathname.startsWith('/provider')) {
-      themeClass = 'theme-provider';
+      targetClass = 'theme-provider';
     }
-    document.body.className = themeClass;
+    themeClasses.forEach((cls) => {
+      if (cls === targetClass) {
+        document.body.classList.add(cls);
+      } else {
+        document.body.classList.remove(cls);
+      }
+    });
   }, [location.pathname]);
   return null;
 }
