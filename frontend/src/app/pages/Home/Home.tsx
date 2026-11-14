@@ -3,12 +3,228 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "../../../features/auth/stores/auth.store";
 import { CustomerNavbar } from "../../../shared/components/ui/TopNav/TopNav";
 import { ProviderNavbar } from "../../../shared/components/ui/ProviderTopNav/ProviderTopNav";
+import { useGetCategoriesService, type Category } from "../../../features/service-catalog";
 import "./Home.css";
+
+const FALLBACK_CATEGORIES = [
+  {
+    id: "plumbing",
+    shortName: "Plumbing",
+    icon: "fa-tools",
+    name: "Plumbing & Piping",
+    desc: "Leak repairs, pipe fittings, tap installations, and advanced drainage solutions.",
+    link: "/nearby-providers",
+    image: null,
+    subservices: [
+      {
+        title: "Leak Detection & Repair",
+        desc: "Pinpoint hidden pipe leaks, burst line fixing, and seepage resolution.",
+        icon: "fa-tint",
+        image: null,
+      },
+      {
+        title: "Bathroom & Kitchen Taps",
+        desc: "Install and repair faucets, sinks, showers, mixers, and diverters.",
+        icon: "fa-faucet",
+        image: null,
+      },
+      {
+        title: "Drain Unclogging & Jetting",
+        desc: "High-pressure clearing for blocked drains, sewer lines, and gully traps.",
+        icon: "fa-soap",
+        image: null,
+      },
+      {
+        title: "Water Tank & Geyser Setup",
+        desc: "Inlet and outlet valve plumbing, pressure tests, and overhead connections.",
+        icon: "fa-water",
+        image: null,
+      },
+    ],
+  },
+  {
+    id: "ac",
+    shortName: "AC",
+    icon: "fa-snowflake",
+    name: "AC Repair & Servicing",
+    desc: "Refrigerant refills, jet servicing, breakdown maintenance, and installations.",
+    link: "/nearby-providers",
+    image: null,
+    subservices: [
+      {
+        title: "Deep Jet Clean Servicing",
+        desc: "High-pressure indoor coil cleaning, filter sanitization, and drain flush.",
+        icon: "fa-wind",
+        image: null,
+      },
+      {
+        title: "Gas Refill & Leak Sealing",
+        desc: "Pressure testing, nitrogen leak checks, and certified refrigerant recharges.",
+        icon: "fa-fire-extinguisher",
+        image: null,
+      },
+      {
+        title: "Compressor & PCB Repair",
+        desc: "Diagnostics for inverter boards, capacitors, sensor faults, and motor issues.",
+        icon: "fa-microchip",
+        image: null,
+      },
+      {
+        title: "Installation & Unmounting",
+        desc: "Safe wall mounting, copper pipe insulation, wiring, and balance setup.",
+        icon: "fa-wrench",
+        image: null,
+      },
+    ],
+  },
+  {
+    id: "carpentry",
+    shortName: "Carpentry",
+    icon: "fa-hammer",
+    name: "Carpentry & Woodwork",
+    desc: "Custom furniture repair, door and lock assemblies, and precision renovations.",
+    link: "/nearby-providers",
+    image: null,
+    subservices: [
+      {
+        title: "Furniture Repair & Assembly",
+        desc: "Repair broken frames, assemble flatpack units, and reinforce chairs & tables.",
+        icon: "fa-couch",
+        image: null,
+      },
+      {
+        title: "Door Locks & Latches",
+        desc: "Modern digital lock installation, deadbolts, hinges, and alignment tweaks.",
+        icon: "fa-key",
+        image: null,
+      },
+      {
+        title: "Modular Cabinet Fitting",
+        desc: "Kitchen hydraulic hinge adjustments, drawer runners, and shelf expansions.",
+        icon: "fa-th-large",
+        image: null,
+      },
+      {
+        title: "Custom Wooden Partitions",
+        desc: "Architraves, skirting boards, wall paneling, and tailored woodwork.",
+        icon: "fa-vector-square",
+        image: null,
+      },
+    ],
+  },
+  {
+    id: "electrical",
+    shortName: "Electrical",
+    icon: "fa-bolt",
+    name: "Electrical & Wiring",
+    desc: "Short circuits, fuse boxes, switchboard setups, and appliance wiring.",
+    link: "/nearby-providers",
+    image: null,
+    subservices: [
+      {
+        title: "Circuit Breaker & MCB Repair",
+        desc: "Diagnose frequent tripping, fuse burns, and upgrade electrical distribution boxes.",
+        icon: "fa-shield-virus",
+        image: null,
+      },
+      {
+        title: "Switchboard & Wiring",
+        desc: "Install modular switches, internal conduit re-wiring, and earthing checks.",
+        icon: "fa-plug",
+        image: null,
+      },
+      {
+        title: "Lighting & Ceiling Fans",
+        desc: "Mount chandeliers, heavy ceiling fans, profile LED strips, and spotlights.",
+        icon: "fa-lightbulb",
+        image: null,
+      },
+      {
+        title: "Appliance Line Safety",
+        desc: "Dedicated power cables, voltage stabilizer checks, and heavy-load outlets.",
+        icon: "fa-charging-station",
+        image: null,
+      },
+    ],
+  },
+  {
+    id: "cleaning",
+    shortName: "Cleaning",
+    icon: "fa-broom",
+    name: "Deep Cleaning",
+    desc: "Full home sanitization, kitchen degreasing, and upholstery care.",
+    link: "/nearby-providers",
+    image: null,
+    subservices: [
+      {
+        title: "Full Home Deep Clean",
+        desc: "Corner-to-corner sanitization, floor scrubbing, and dust-free polishing.",
+        icon: "fa-home",
+        image: null,
+      },
+      {
+        title: "Kitchen & Chimney Degreasing",
+        desc: "Heavy grease removal from range hoods, gas stoves, and tiled splashbacks.",
+        icon: "fa-utensils",
+        image: null,
+      },
+      {
+        title: "Sofa & Carpet Shampooing",
+        desc: "Deep steam extraction, stain treatment, and fabric deodorization.",
+        icon: "fa-hand-sparkles",
+        image: null,
+      },
+      {
+        title: "Bathroom Descaling",
+        desc: "Remove hard water scale, deep clean grout, and polish sanitary fittings.",
+        icon: "fa-shower",
+        image: null,
+      },
+    ],
+  },
+  {
+    id: "painting",
+    shortName: "Painting",
+    icon: "fa-paint-roller",
+    name: "Painting & Waterproofing",
+    desc: "Interior repainting, moisture wall treatment, and texture coating.",
+    link: "/nearby-providers",
+    image: null,
+    subservices: [
+      {
+        title: "Interior Wall Emulsion",
+        desc: "Smooth putty priming, crack filling, and high-coverage color finishing.",
+        icon: "fa-palette",
+        image: null,
+      },
+      {
+        title: "Dampness Waterproofing",
+        desc: "Apply polymer barriers and chemical waterproofing to eliminate wall seepage.",
+        icon: "fa-umbrella",
+        image: null,
+      },
+      {
+        title: "Exterior Weather Coating",
+        desc: "Long-lasting UV and rain-resistant coats for building facades and balconies.",
+        icon: "fa-sun",
+        image: null,
+      },
+      {
+        title: "Enamel & Wood Polish",
+        desc: "Protective polyurethane, melamine wood varnish, and metal gate enamels.",
+        icon: "fa-brush",
+        image: null,
+      },
+    ],
+  },
+];
 
 export default function Home() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
-  const [activeCategoryId, setActiveCategoryId] = useState<string>("ac");
+  const getCategories = useGetCategoriesService();
+  const [catalogCategories, setCatalogCategories] = useState<Category[]>([]);
+  const [activeCategoryId, setActiveCategoryId] = useState<string>("plumbing");
   const tabsNavRef = useRef<HTMLDivElement>(null);
   const [hasMounted, setHasMounted] = useState<boolean>(false);
   const [activeTabStyle, setActiveTabStyle] = useState<{ left: number; width: number; opacity: number }>({
@@ -24,188 +240,57 @@ export default function Home() {
     return "/dashboard";
   }, [user]);
 
-  const categories = [
-    {
-      id: "plumbing",
-      shortName: "Plumbing",
-      icon: "fa-tools",
-      name: "Plumbing & Piping",
-      desc: "Leak repairs, pipe fittings, tap installations, and advanced drainage solutions.",
-      link: "/nearby-providers",
-      subservices: [
-        {
-          title: "Leak Detection & Repair",
-          desc: "Pinpoint hidden pipe leaks, burst line fixing, and seepage resolution.",
-          icon: "fa-tint",
+  useEffect(() => {
+    getCategories.mutate(
+      { page: 1, limit: 100, filter: "ACTIVE" },
+      {
+        onSuccess: (res) => {
+          if (res?.data?.categories && res.data.categories.length > 0) {
+            setCatalogCategories(res.data.categories);
+            setActiveCategoryId((prev) => {
+              const matched = res.data.categories.find(
+                (c) => c.id === prev || c.name.toLowerCase().includes(prev.toLowerCase())
+              );
+              return matched ? matched.id : res.data.categories[0].id;
+            });
+          }
         },
-        {
-          title: "Bathroom & Kitchen Taps",
-          desc: "Install and repair faucets, sinks, showers, mixers, and diverters.",
-          icon: "fa-faucet",
-        },
-        {
-          title: "Drain Unclogging & Jetting",
-          desc: "High-pressure clearing for blocked drains, sewer lines, and gully traps.",
-          icon: "fa-soap",
-        },
-        {
-          title: "Water Tank & Geyser Setup",
-          desc: "Inlet and outlet valve plumbing, pressure tests, and overhead connections.",
-          icon: "fa-water",
-        },
-      ],
-    },
-    {
-      id: "ac",
-      shortName: "AC",
-      icon: "fa-snowflake",
-      name: "AC Repair & Servicing",
-      desc: "Refrigerant refills, jet servicing, breakdown maintenance, and installations.",
-      link: "/nearby-providers",
-      subservices: [
-        {
-          title: "Deep Jet Clean Servicing",
-          desc: "High-pressure indoor coil cleaning, filter sanitization, and drain flush.",
-          icon: "fa-wind",
-        },
-        {
-          title: "Gas Refill & Leak Sealing",
-          desc: "Pressure testing, nitrogen leak checks, and certified refrigerant recharges.",
-          icon: "fa-fire-extinguisher",
-        },
-        {
-          title: "Compressor & PCB Repair",
-          desc: "Diagnostics for inverter boards, capacitors, sensor faults, and motor issues.",
-          icon: "fa-microchip",
-        },
-        {
-          title: "Installation & Unmounting",
-          desc: "Safe wall mounting, copper pipe insulation, wiring, and balance setup.",
-          icon: "fa-wrench",
-        },
-      ],
-    },
-    {
-      id: "carpentry",
-      shortName: "Carpentry",
-      icon: "fa-hammer",
-      name: "Carpentry & Woodwork",
-      desc: "Custom furniture repair, door and lock assemblies, and precision renovations.",
-      link: "/nearby-providers",
-      subservices: [
-        {
-          title: "Furniture Repair & Assembly",
-          desc: "Repair broken frames, assemble flatpack units, and reinforce chairs & tables.",
-          icon: "fa-couch",
-        },
-        {
-          title: "Door Locks & Latches",
-          desc: "Modern digital lock installation, deadbolts, hinges, and alignment tweaks.",
-          icon: "fa-key",
-        },
-        {
-          title: "Modular Cabinet Fitting",
-          desc: "Kitchen hydraulic hinge adjustments, drawer runners, and shelf expansions.",
-          icon: "fa-th-large",
-        },
-        {
-          title: "Custom Wooden Partitions",
-          desc: "Architraves, skirting boards, wall paneling, and tailored woodwork.",
-          icon: "fa-vector-square",
-        },
-      ],
-    },
-    {
-      id: "electrical",
-      shortName: "Electrical",
-      icon: "fa-bolt",
-      name: "Electrical & Wiring",
-      desc: "Short circuits, fuse boxes, switchboard setups, and appliance wiring.",
-      link: "/nearby-providers",
-      subservices: [
-        {
-          title: "Circuit Breaker & MCB Repair",
-          desc: "Diagnose frequent tripping, fuse burns, and upgrade electrical distribution boxes.",
-          icon: "fa-shield-virus",
-        },
-        {
-          title: "Switchboard & Wiring",
-          desc: "Install modular switches, internal conduit re-wiring, and earthing checks.",
-          icon: "fa-plug",
-        },
-        {
-          title: "Lighting & Ceiling Fans",
-          desc: "Mount chandeliers, heavy ceiling fans, profile LED strips, and spotlights.",
-          icon: "fa-lightbulb",
-        },
-        {
-          title: "Appliance Line Safety",
-          desc: "Dedicated power cables, voltage stabilizer checks, and heavy-load outlets.",
-          icon: "fa-charging-station",
-        },
-      ],
-    },
-    {
-      id: "cleaning",
-      shortName: "Cleaning",
-      icon: "fa-broom",
-      name: "Deep Cleaning",
-      desc: "Full home sanitization, kitchen degreasing, and upholstery care.",
-      link: "/nearby-providers",
-      subservices: [
-        {
-          title: "Full Home Deep Clean",
-          desc: "Corner-to-corner sanitization, floor scrubbing, and dust-free polishing.",
-          icon: "fa-home",
-        },
-        {
-          title: "Kitchen & Chimney Degreasing",
-          desc: "Heavy grease removal from range hoods, gas stoves, and tiled splashbacks.",
-          icon: "fa-utensils",
-        },
-        {
-          title: "Sofa & Carpet Shampooing",
-          desc: "Deep steam extraction, stain treatment, and fabric deodorization.",
-          icon: "fa-hand-sparkles",
-        },
-        {
-          title: "Bathroom Descaling",
-          desc: "Remove hard water scale, deep clean grout, and polish sanitary fittings.",
-          icon: "fa-shower",
-        },
-      ],
-    },
-    {
-      id: "painting",
-      shortName: "Painting",
-      icon: "fa-paint-roller",
-      name: "Painting & Waterproofing",
-      desc: "Interior repainting, moisture wall treatment, and texture coating.",
-      link: "/nearby-providers",
-      subservices: [
-        {
-          title: "Interior Wall Emulsion",
-          desc: "Smooth putty priming, crack filling, and high-coverage color finishing.",
-          icon: "fa-palette",
-        },
-        {
-          title: "Dampness Waterproofing",
-          desc: "Apply polymer barriers and chemical waterproofing to eliminate wall seepage.",
-          icon: "fa-umbrella",
-        },
-        {
-          title: "Exterior Weather Coating",
-          desc: "Long-lasting UV and rain-resistant coats for building facades and balconies.",
-          icon: "fa-sun",
-        },
-        {
-          title: "Enamel & Wood Polish",
-          desc: "Protective polyurethane, melamine wood varnish, and metal gate enamels.",
-          icon: "fa-brush",
-        },
-      ],
-    },
-  ];
+      }
+    );
+  }, []);
+
+  const categories = useMemo(() => {
+    if (catalogCategories.length > 0) {
+      return catalogCategories.map((cat) => ({
+        id: cat.id,
+        shortName: cat.name,
+        name: cat.name,
+        desc: cat.description || "Browse qualified professionals ready to assist with your requirements.",
+        image: cat.image,
+        icon: "fa-tools",
+        link: `/nearby-providers?category=${encodeURIComponent(cat.id)}`,
+        subservices:
+          cat.services && cat.services.length > 0
+            ? cat.services
+                .filter((s) => s.status === "ACTIVE" || !s.status)
+                .map((sub) => ({
+                  title: sub.name,
+                  desc: sub.description || "Qualified and verified local specialists ready to assist.",
+                  icon: "fa-check-circle",
+                  image: sub.image,
+                }))
+            : [
+                {
+                  title: `${cat.name} Service`,
+                  desc: "Verified local specialists ready for service requests and bookings.",
+                  icon: "fa-check-circle",
+                  image: cat.image,
+                },
+              ],
+      }));
+    }
+    return FALLBACK_CATEGORIES;
+  }, [catalogCategories]);
 
   const currentCategory = useMemo(() => {
     return categories.find((c) => c.id === activeCategoryId) || categories[0];
@@ -287,7 +372,7 @@ export default function Home() {
     updateIndicator();
     window.addEventListener("resize", updateIndicator);
     return () => window.removeEventListener("resize", updateIndicator);
-  }, [activeCategoryId]);
+  }, [activeCategoryId, categories]);
 
   return (
     <div className="home-top-layout">
@@ -456,7 +541,15 @@ export default function Home() {
                 <div className="home-folder-box-header">
                   <div className="home-folder-box-info">
                     <div className="home-folder-box-icon">
-                      <i className={`fas ${currentCategory.icon}`}></i>
+                      {currentCategory.image ? (
+                        <img
+                          src={currentCategory.image}
+                          alt={currentCategory.name}
+                          className="home-folder-box-img"
+                        />
+                      ) : (
+                        <i className={`fas ${currentCategory.icon || "fa-tools"}`}></i>
+                      )}
                     </div>
                     <div>
                       <h3 className="home-folder-box-title">{currentCategory.name}</h3>
@@ -474,7 +567,15 @@ export default function Home() {
                     >
                       <div className="home-folder-card-top">
                         <div className="home-folder-card-icon">
-                          <i className={`fas ${sub.icon}`}></i>
+                          {sub.image ? (
+                            <img
+                              src={sub.image}
+                              alt={sub.title}
+                              className="home-folder-card-img"
+                            />
+                          ) : (
+                            <i className={`fas ${sub.icon || "fa-check-circle"}`}></i>
+                          )}
                         </div>
                         <span className="home-folder-card-tag">Verified Pros</span>
                       </div>
