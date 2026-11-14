@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginInputType } from '../../schemas/validation';
 import { useLogin } from '../../hooks/use-otp-varify';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { PasswordInput } from '../../../../shared/components/ui/PasswordInput/PasswordInput';
 
 export default function Login() {
@@ -24,8 +23,6 @@ export default function Login() {
 
   return (
     <>
-      {login.isPending ? <SpinnerOverlay isLoading={true} /> : null}
-
       <div className="login-form-header">
         <h1 className="login-title">Hi Customer</h1>
         <p className="login-subtitle">Welcome to Briosolve</p>
@@ -63,7 +60,16 @@ export default function Login() {
           <Link to="/forgot-password" className="login-forgot-link">Forgot password ?</Link>
         </div>
 
-        <button type="submit" className="login-submit-btn">Login</button>
+        <button type="submit" className="login-submit-btn" disabled={login.isPending}>
+          {login.isPending ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Logging in...</span>
+            </>
+          ) : (
+            <span>Login</span>
+          )}
+        </button>
 
         <div className="login-divider-row">
           <span className="login-divider-line"></span>

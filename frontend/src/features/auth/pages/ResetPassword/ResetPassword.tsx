@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { resetPasswordSchema, type ResetPasswordInputType } from '../../schemas/validation';
 import { useResetPassword } from '../../hooks/use-otp-varify';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { PasswordInput } from '../../../../shared/components/ui/PasswordInput/PasswordInput';
 import './ResetPassword.css';
 
@@ -21,8 +20,6 @@ export default function ResetPassword() {
 
   return (
     <>
-      {resetPassword.isPending ? <SpinnerOverlay isLoading={true} /> : null}
-
       <div className="login-form-header">
         <h1 className="login-title">New Password</h1>
         <p className="login-subtitle">Choose a strong, unique password</p>
@@ -56,7 +53,14 @@ export default function ResetPassword() {
         </div>
 
         <button type="submit" disabled={resetPassword.isPending} className="login-submit-btn" style={{ marginTop: '0.4rem' }}>
-          {resetPassword.isPending ? "Updating..." : "Reset Password"}
+          {resetPassword.isPending ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Updating...</span>
+            </>
+          ) : (
+            <span>Reset Password</span>
+          )}
         </button>
 
         <div className="login-divider-row">

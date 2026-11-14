@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, type RegisterInputType } from '../../schemas/customer/customerRegistration.schema';
 import { toast } from 'react-hot-toast';
 import { useRegisterCustomer } from '../../hooks/customer/useRegisterCustomer';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useResetFlowStore } from '../../stores/reset-flow.store';
 import { PasswordInput } from '../../../../shared/components/ui/PasswordInput/PasswordInput';
 import './CustomerRegister.css';
@@ -39,8 +38,6 @@ export default function CustomerRegister() {
 
   return (
     <>
-      {registerMutation.isPending ? <SpinnerOverlay isLoading={true} /> : null}
-
       <div className="login-form-header">
         <h1 className="login-title">Join as Customer</h1>
         <p className="login-subtitle">Create your account to get started</p>
@@ -102,7 +99,14 @@ export default function CustomerRegister() {
         </div>
 
         <button type="submit" className="login-submit-btn" disabled={registerMutation.isPending} style={{ marginTop: '0.4rem' }}>
-          {registerMutation.isPending ? 'Creating Account...' : 'Register'}
+          {registerMutation.isPending ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Creating Account...</span>
+            </>
+          ) : (
+            <span>Register</span>
+          )}
         </button>
 
         <div className="login-divider-row">

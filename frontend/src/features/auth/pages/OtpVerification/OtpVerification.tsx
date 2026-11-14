@@ -128,8 +128,17 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
             className="btn btn-primary w-full btn-lg mb-5" 
             disabled={otp.length !== 6 || otpVarify.isPending}
           >
-            <span>{otpVarify.isPending ? "Verifying..." : "Verify Account"}</span>
-            {!otpVarify.isPending && <i className="fas fa-check-circle ml-2"></i>}
+            {otpVarify.isPending ? (
+              <>
+                <i className="fas fa-spinner fa-spin mr-2"></i>
+                <span>Verifying...</span>
+              </>
+            ) : (
+              <>
+                <span>Verify Account</span>
+                <i className="fas fa-check-circle ml-2"></i>
+              </>
+            )}
           </button>
         </div>
 
@@ -143,7 +152,17 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
             disabled={timer > 0 || attempts >= 5 || resendOtp.isPending}
             onClick={handleResend}
           >
-            <i className="fas fa-redo-alt mr-1"></i> {resendOtp.isPending ? "Resending..." : "Resend OTP"}
+            {resendOtp.isPending ? (
+              <>
+                <i className="fas fa-spinner fa-spin mr-2"></i>
+                <span>Resending...</span>
+              </>
+            ) : (
+              <>
+                <i className="fas fa-redo-alt mr-1"></i>
+                <span>Resend OTP</span>
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -188,7 +207,14 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
           disabled={otp.length !== 6 || otpVarify.isPending}
           style={{ marginTop: '0.4rem' }}
         >
-          {otpVarify.isPending ? "Verifying..." : "Verify Code"}
+          {otpVarify.isPending ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Verifying...</span>
+            </>
+          ) : (
+            <span>Verify Code</span>
+          )}
         </button>
       </div>
 
@@ -199,11 +225,21 @@ export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerifi
         <button 
           type="button" 
           className="login-secondary-action-btn"
-          style={{ width: '100%' }}
+          style={{ width: '100%', gap: '0.5rem' }}
           disabled={timer > 0 || attempts >= 5 || resendOtp.isPending}
           onClick={handleResend}
         >
-          <i className="fas fa-redo-alt" style={{ marginRight: '0.5rem' }}></i> {resendOtp.isPending ? "Resending..." : "Resend OTP"}
+          {resendOtp.isPending ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Resending...</span>
+            </>
+          ) : (
+            <>
+              <i className="fas fa-redo-alt"></i>
+              <span>Resend OTP</span>
+            </>
+          )}
         </button>
       </div>
 

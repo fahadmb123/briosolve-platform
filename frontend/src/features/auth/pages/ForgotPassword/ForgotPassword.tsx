@@ -3,7 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { emailSchema, type EmailInputType } from '../../schemas/validation';
 import { useForm } from 'react-hook-form';
 import { useEmailVerify } from '../../hooks/use-otp-varify';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import './ForgotPassword.css';
 
 export default function ForgotPassword() {
@@ -19,8 +18,6 @@ export default function ForgotPassword() {
 
   return (
     <>
-      {emailVerify.isPending ? <SpinnerOverlay isLoading={true} /> : null}
-
       <div className="login-form-header">
         <h1 className="login-title">Reset Password</h1>
         <p className="login-subtitle">Enter your email to receive recovery instructions</p>
@@ -42,7 +39,14 @@ export default function ForgotPassword() {
         </div>
 
         <button type="submit" disabled={emailVerify.isPending} className="login-submit-btn" style={{ marginTop: '0.4rem' }}>
-          {emailVerify.isPending ? "Sending..." : "Send Verification Code"}
+          {emailVerify.isPending ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Sending...</span>
+            </>
+          ) : (
+            <span>Send Verification Code</span>
+          )}
         </button>
 
         <div className="login-divider-row">
