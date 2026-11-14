@@ -22,28 +22,59 @@ const heroSlides = [
   }
 ];
 
+const extendedSlides = [
+  heroSlides[heroSlides.length - 1],
+  ...heroSlides,
+  heroSlides[0]
+];
+
 export default function AuthLayout() {
   const { toggleTheme } = useTheme();
   const location = useLocation();
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
 
   const isLogin = location.pathname === '/login' || location.pathname === '/login/';
   const isProviderRegister = location.pathname.startsWith('/provider/register');
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlideIndex((prev) => (prev === heroSlides.length - 1 ? 0 : prev + 1));
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [currentSlideIndex]);
+  const handleNextSlide = () => {
+    setIsTransitioning(true);
+    setCurrentSlideIndex((prev) => prev + 1);
+  };
 
   const handlePrevSlide = () => {
-    setCurrentSlideIndex((prev) => (prev === 0 ? heroSlides.length - 1 : prev - 1));
+    setIsTransitioning(true);
+    setCurrentSlideIndex((prev) => prev - 1);
   };
 
-  const handleNextSlide = () => {
-    setCurrentSlideIndex((prev) => (prev === heroSlides.length - 1 ? 0 : prev + 1));
+  const handleTransitionEnd = () => {
+    if (currentSlideIndex >= heroSlides.length) {
+      setIsTransitioning(false);
+      setCurrentSlideIndex(0);
+    } else if (currentSlideIndex < 0) {
+      setIsTransitioning(false);
+      setCurrentSlideIndex(heroSlides.length - 1);
+    }
   };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      handleNextSlide();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isTransitioning) {
+      const raf = requestAnimationFrame(() => {
+        setIsTransitioning(true);
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isTransitioning]);
+
+  const activeSlide =
+    heroSlides[((currentSlideIndex % heroSlides.length) + heroSlides.length) % heroSlides.length];
 
   return (
     <div className="login-split-page">
@@ -65,13 +96,19 @@ export default function AuthLayout() {
 
       <div className="login-split-card">
         <div className="login-hero-showcase">
-          {heroSlides.map((slide, index) => (
-            <div
-              key={slide.title}
-              className={`login-hero-bg-slide ${index === currentSlideIndex ? 'active' : ''}`}
-              style={{ backgroundImage: `url("${slide.image}")` }}
-            />
-          ))}
+          <div
+            className={`login-hero-slider-track ${isTransitioning ? 'transitioning' : ''}`}
+            style={{ transform: `translateX(-${(currentSlideIndex + 1) * 100}%)` }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {extendedSlides.map((slide, index) => (
+              <div
+                key={`${slide.title}-${index}`}
+                className="login-hero-bg-slide"
+                style={{ backgroundImage: `url("${slide.image}")` }}
+              />
+            ))}
+          </div>
           <div className="login-hero-bg-overlay"></div>
 
           <div className="login-hero-top-bar">
@@ -92,7 +129,9 @@ export default function AuthLayout() {
 
           <div className="login-hero-bottom-bar">
             <div className="login-hero-creator-badge">
-              <span className="login-hero-creator-name">{heroSlides[currentSlideIndex].title}</span>
+              <span key={activeSlide.title} className="login-hero-creator-name">
+                {activeSlide.title}
+              </span>
             </div>
 
             <div className="login-hero-nav-arrows">
