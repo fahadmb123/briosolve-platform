@@ -196,9 +196,11 @@ export default function MyRequests() {
         </div>
       ) : requests.length === 0 ? (
         <div className="myreq-empty-panel">
-          <div className="myreq-empty-symbol">
-            <i className="fas fa-clipboard-list"></i>
-          </div>
+          <img
+            src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+            alt="No data found"
+            className="myreq-empty-img"
+          />
           {searchQuery === "" && selectedStatus === "ALL" ? (
             <>
               <h3 className="myreq-empty-title">No service requests yet</h3>

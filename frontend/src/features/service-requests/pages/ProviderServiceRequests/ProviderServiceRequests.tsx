@@ -239,9 +239,11 @@ export default function ProviderServiceRequests() {
         </div>
       ) : requests.length === 0 ? (
         <div className="provreq-empty-state">
-          <div className="provreq-empty-icon">
-            <i className="fas fa-inbox"></i>
-          </div>
+          <img
+            src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+            alt="No data found"
+            className="provreq-empty-img"
+          />
           <h3>No Matching Service Requests Found</h3>
           <p>
             Try adjusting your search terms or filter selections to view more opportunities.

@@ -268,6 +268,18 @@ export const Addresses = () => {
             </div>
               )})}
 
+              {addresses.length === 0 && search !== '' && (
+                <div className="text-center py-10 px-4 bg-surface-container rounded-xl border border-surface-variant flex flex-col items-center justify-center">
+                  <img
+                    src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                    alt="No data found"
+                    style={{ width: '100%', maxWidth: '220px', maxHeight: '150px', objectFit: 'contain', marginBottom: '1rem', filter: 'drop-shadow(0 10px 24px rgba(0, 0, 0, 0.1))' }}
+                  />
+                  <h4 className="font-title-md text-on-surface font-semibold m-0">No matching addresses found</h4>
+                  <p className="font-body-sm text-on-surface-variant mt-1 mb-0 max-w-sm">No saved locations match &ldquo;{search}&rdquo;. Try another search term.</p>
+                </div>
+              )}
+
           {/* Dashed Interactive Add Slot */}
           <div 
             onClick={() => {

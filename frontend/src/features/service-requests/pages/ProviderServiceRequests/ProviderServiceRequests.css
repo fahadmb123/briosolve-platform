@@ -663,6 +663,17 @@
     border-radius: 12px;
 }
 
+.provreq-empty-img {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    max-height: 180px;
+    object-fit: contain;
+    margin: 0 auto 1.25rem auto;
+    display: block;
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.1));
+}
+
 .provreq-empty-icon {
     width: 64px;
     height: 64px;

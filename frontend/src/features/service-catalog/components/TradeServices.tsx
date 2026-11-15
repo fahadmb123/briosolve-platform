@@ -278,8 +278,12 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                 {getProviderServices.isPending ? (
                     <TradeServicesSkeleton count={2} />
                 ) : groupedCategories.length === 0 ? (
-                    <div className="text-center py-12 border border-dashed rounded-xl my-4" style={{ borderColor: 'var(--border)' }}>
-                        <i className="fas fa-tools text-2xl text-secondary mb-2 opacity-50 block"></i>
+                    <div className="text-center py-10 px-4 border border-dashed rounded-xl my-4" style={{ borderColor: 'var(--border)' }}>
+                        <img
+                            src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                            alt="No data found"
+                            style={{ width: '100%', maxWidth: '230px', maxHeight: '160px', objectFit: 'contain', margin: '0 auto 1.25rem', display: 'block', filter: 'drop-shadow(0 10px 24px rgba(0, 0, 0, 0.1))' }}
+                        />
                         <p className="font-semibold text-text text-sm mb-1">No Trade Categories Added</p>
                         <p className="text-xs text-secondary mb-4">
                             You have not selected any trade categories yet.

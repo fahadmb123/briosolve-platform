@@ -116,9 +116,13 @@ export function ServicesStep({ isActive, onNext, onBack }: ServicesStepProps) {
                         ))}
                     </div>
                 ) : (
-                    <div className="pro-services-empty">
-                        <i className="fas fa-search"></i>
-                        <span>No services found matching your search.</span>
+                    <div className="pro-services-empty" style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+                        <img
+                            src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                            alt="No data found"
+                            style={{ width: '100%', maxWidth: '200px', maxHeight: '140px', objectFit: 'contain', margin: '0 auto 1rem', display: 'block', filter: 'drop-shadow(0 8px 20px rgba(0, 0, 0, 0.1))' }}
+                        />
+                        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>No services found matching your search.</span>
                     </div>
                 )}
             </div>

@@ -344,6 +344,17 @@
     border: 1px dashed var(--border);
 }
 
+.empty-providers-img {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    max-height: 180px;
+    object-fit: contain;
+    margin: 0 auto 1.25rem auto;
+    display: block;
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.1));
+}
+
 /* ==========================================================================
    react-loading-skeleton Theme Integration & Styles
    ========================================================================== */

@@ -676,9 +676,11 @@ export default function Profile() {
                 </div>
               ) : (
                 <div className="profile-services-empty-state">
-                  <div className="profile-services-empty-icon">
-                    <i className="fas fa-layer-group"></i>
-                  </div>
+                  <img
+                    src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                    alt="No data found"
+                    className="profile-services-empty-img"
+                  />
                   <h4 className="profile-services-empty-title">No Active Services Added</h4>
                   <p className="profile-services-empty-desc">
                     Add the trade services and skill categories you specialize in to start receiving leads from customers.

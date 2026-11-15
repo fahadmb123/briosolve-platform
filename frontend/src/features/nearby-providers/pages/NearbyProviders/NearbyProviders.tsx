@@ -260,18 +260,11 @@ export default function NearbyProviders() {
                         </>
                     ) : (
                         <div className="empty-providers-state">
-                            <div style={{
-                                width: '64px',
-                                height: '64px',
-                                borderRadius: '50%',
-                                background: 'rgba(99,102,241,0.1)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 1.25rem'
-                            }}>
-                                <i className="fas fa-user-slash text-primary" style={{ fontSize: '1.75rem' }} />
-                            </div>
+                            <img
+                                src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                                alt="No data found"
+                                className="empty-providers-img"
+                            />
                             <h3 className="h5 mb-2">No Providers In Range</h3>
                             <p className="text-secondary text-sm max-w-md mx-auto mb-4">
                                 No active service providers match your current radius ({activeRadiusKm} km) and search criteria. Try expanding your search radius.

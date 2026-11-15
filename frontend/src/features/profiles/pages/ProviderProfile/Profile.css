@@ -626,6 +626,17 @@
     border-color: #CBD5E1;
 }
 
+.profile-services-empty-img {
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+    max-height: 170px;
+    object-fit: contain;
+    margin: 0 auto 1.25rem auto;
+    display: block;
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.1));
+}
+
 .profile-services-empty-icon {
     width: 60px;
     height: 60px;
