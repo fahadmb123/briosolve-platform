@@ -603,10 +603,10 @@ export default function Home() {
               </div>
 
               <div className="home-footer-legal-links">
-                <Link to="/settings" className="home-footer-link">
+                <Link to="/privacy" className="home-footer-link">
                   Privacy
                 </Link>
-                <Link to="/settings" className="home-footer-link">
+                <Link to="/terms" className="home-footer-link">
                   Terms
                 </Link>
               </div>

@@ -3,6 +3,9 @@ import React, { useEffect } from 'react';
 import { LoadingScreen } from '../../shared/components/ui/LoadingScreen/LoadingScreen';
 
 import Home from '../pages/Home/Home';
+const Terms = React.lazy(() => import('../pages/Legal/Terms'));
+const Privacy = React.lazy(() => import('../pages/Legal/Privacy'));
+const LegalLayout = React.lazy(() => import('../../layouts/LegalLayout'));
 const NotFound = React.lazy(() => import('../pages/NotFound/NotFound'));
 const AdminLayout = React.lazy(() => import('../../layouts/AdminLayout'));
 const ProviderLayout = React.lazy(() => import('../../layouts/ProviderLayout'));
@@ -46,6 +49,10 @@ export function AppRouter() {
         <Routes>
          <Route path="/">
           <Route index element={<Home />} />
+          <Route element={<LegalLayout />}>
+            <Route path="terms" element={<Terms />} />
+            <Route path="privacy" element={<Privacy />} />
+          </Route>
 
           <Route element={<PublicRoute />}>
               {publicRoutes}

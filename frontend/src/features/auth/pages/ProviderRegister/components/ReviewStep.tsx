@@ -47,7 +47,7 @@ export function ReviewStep({ isActive, isPending, onBack, onSubmit }: ReviewStep
 
             <label className="pro-terms-row">
                 <input type="checkbox" id="accept-terms" required defaultChecked className="pro-terms-checkbox" />
-                <span>I agree to Briosolve's <Link to="#" className="pro-terms-link">Provider Terms & Conditions</Link></span>
+                <span>I agree to Briosolve's <Link to="/terms" target="_blank" rel="noopener noreferrer" className="pro-terms-link">Provider Terms & Conditions</Link></span>
             </label>
 
             <div className="pro-step-nav-buttons">
