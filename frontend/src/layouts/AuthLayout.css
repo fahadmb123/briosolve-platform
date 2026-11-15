@@ -81,12 +81,10 @@
 .login-hero-bg-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(15, 8, 2, 0.35) 0%,
-    rgba(255, 121, 0, 0.08) 45%,
-    rgba(15, 8, 2, 0.88) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(15, 8, 2, 0.35) 0%,
+      rgba(255, 121, 0, 0.08) 45%,
+      rgba(15, 8, 2, 0.88) 100%);
   z-index: 1;
   pointer-events: none;
 }
@@ -137,7 +135,7 @@
 
 .login-hero-link:hover {
   opacity: 1;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .login-hero-join-btn {
@@ -186,6 +184,7 @@
     transform: translateY(8px);
     filter: blur(2px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -321,6 +320,7 @@
     opacity: 0;
     transform: translateY(4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -398,6 +398,7 @@
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -574,7 +575,7 @@
 }
 
 .login-forgot-link:hover {
-  text-decoration: underline;
+  text-decoration: none;
   opacity: 0.85;
 }
 
@@ -673,12 +674,14 @@
   color: #FF7900;
   background: rgba(255, 121, 0, 0.06);
   transform: translateY(-1px);
+  text-decoration: none !important;
 }
 
 [data-theme="dark"] .login-secondary-action-btn:hover {
   background: #2E1B05;
   border-color: #FF7900;
   color: #FF7900;
+  text-decoration: none !important;
 }
 
 .login-secondary-action-btn.provider {
@@ -690,6 +693,7 @@
   background: #FF7900;
   color: #FFFFFF;
   box-shadow: 0 4px 14px rgba(255, 121, 0, 0.32);
+  text-decoration: none !important;
 }
 
 .login-form-bottom-bar {
@@ -817,4 +821,14 @@
   .login-title {
     font-size: 1.95rem;
   }
+}
+
+.login-split-page a,
+.login-split-page a:hover,
+.login-split-page a:focus,
+.login-split-page a:active,
+.login-split-page button,
+.login-split-page button:hover,
+.login-split-page button:focus {
+  text-decoration: none !important;
 }

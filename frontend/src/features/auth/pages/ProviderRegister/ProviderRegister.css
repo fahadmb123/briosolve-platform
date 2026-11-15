@@ -248,14 +248,19 @@
   margin-top: 1rem;
 }
 
+.pro-step-nav-buttons .login-submit-btn {
+  flex: 1;
+}
+
 .login-secondary-back-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  height: 50px;
   gap: 0.5rem;
-  padding: 0.85rem 1.25rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 121, 0, 0.35);
+  padding: 0 1.25rem;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(255, 121, 0, 0.35);
   background: transparent;
   color: #180D00;
   font-size: 0.92rem;
@@ -263,6 +268,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  text-decoration: none !important;
+  box-sizing: border-box;
 }
 
 [data-theme="dark"] .login-secondary-back-btn {
@@ -273,6 +280,7 @@
 .login-secondary-back-btn:hover {
   background: rgba(255, 121, 0, 0.1);
   border-color: #FF7900;
+  text-decoration: none !important;
 }
 
 .pro-review-card {
@@ -355,8 +363,13 @@
 
 .pro-terms-link {
   color: #FF7900;
-  text-decoration: underline;
+  text-decoration: none;
   font-weight: 600;
+}
+
+.pro-terms-link:hover {
+  color: #FFA042;
+  text-decoration: none;
 }
 
 .pro-otp-modal-overlay {

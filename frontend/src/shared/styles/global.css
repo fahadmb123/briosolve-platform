@@ -149,6 +149,7 @@ a {
 
 a:hover {
     color: var(--primary-hover);
+    text-decoration: none;
 }
 
 ul {
@@ -640,6 +641,11 @@ footer .brand-logo-container img {
     transition: all var(--transition-fast);
     font-family: var(--font-family);
     white-space: nowrap;
+    text-decoration: none;
+}
+
+.btn:hover {
+    text-decoration: none;
 }
 
 .btn-lg {
