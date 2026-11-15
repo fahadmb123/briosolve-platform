@@ -675,6 +675,18 @@
   box-shadow: var(--shadow-sm);
 }
 
+.notif-center-empty-img {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  max-height: 250px;
+  object-fit: contain;
+  margin-bottom: 1.5rem;
+  user-select: none;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.1));
+}
+
 .notif-empty-icon {
   width: 64px;
   height: 64px;
