@@ -10,14 +10,18 @@ import { AdminNoData } from "../../../../shared/components/ui/AdminNoData";
 
 
 
-export default function Customers() {
+interface CustomersProps {
+    onTotalChange?: (total: number) => void;
+}
+
+export default function Customers({ onTotalChange }: CustomersProps) {
     const [customers, setCustomers] = useState<User[]>([]);
     const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null);
     const [customerToBlock, setCustomerToBlock] = useState<{ id: string; name: string } | null>(null);
     const [pendingBlockConfirmation, setPendingBlockConfirmation] = useState<{ id: string; name: string; reason: string } | null>(null);
     const [customerToActivate, setCustomerToActivate] = useState<{ id: string; name: string } | null>(null);
 
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("");
     const [limit] = useState(10);
@@ -33,6 +37,9 @@ export default function Customers() {
                 setCustomers(res.data.users);
                 setTotal(res.data.total);
                 setTotalPages(res.data.totalPages);
+                if (onTotalChange && !search && !filter) {
+                    onTotalChange(res.data.total);
+                }
             }
         });
     }, [filter, search, page]);
@@ -200,18 +207,14 @@ export default function Customers() {
                 
                 <div className="admin-pagination">
                     <div>
-                        Showing{" "}
-                        <strong>
-                            {` ${page} of ${totalPages} pages`}
-                        </strong>{" "}
-                        
+                        Showing <strong>{` ${page} of ${totalPages || 1} pages`}</strong>
                     </div>
 
                     <div className="pagination-controls">
 
                         <button
                             className="page-btn"
-                            disabled={page === 1}
+                            disabled={page <= 1}
                             onClick={() => setPage(page - 1)}
                         >
                             <i className="fas fa-chevron-left"></i>
@@ -231,7 +234,7 @@ export default function Customers() {
 
                         <button
                             className="page-btn"
-                            disabled={page === totalPages}
+                            disabled={page >= totalPages}
                             onClick={() => setPage(page + 1)}
                         >
                             <i className="fas fa-chevron-right"></i>

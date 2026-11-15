@@ -8,7 +8,11 @@ import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/Conf
 import { useCategoryFormData } from "../../hooks/useCategoryFormData";
 import type { Category } from "../../services/category.service";
 
-export default function CategoriesTab() {
+interface CategoriesTabProps {
+  onTotalChange?: (total: number) => void;
+}
+
+export default function CategoriesTab({ onTotalChange }: CategoriesTabProps) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
@@ -30,6 +34,9 @@ export default function CategoriesTab() {
         if (res?.data?.categories) {
           setCategories(res.data.categories);
           setTotalPages(res.data.totalPages || 1);
+          if (onTotalChange && !search && !filter && typeof res.data.total === 'number') {
+            onTotalChange(res.data.total);
+          }
         }
       }
     });

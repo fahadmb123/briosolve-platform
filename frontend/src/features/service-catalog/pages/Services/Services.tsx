@@ -19,7 +19,11 @@ interface Service {
   category?: { id: string; name: string };
 }
 
-export default function Services() {
+interface ServicesProps {
+  onTotalChange?: (total: number) => void;
+}
+
+export default function Services({ onTotalChange }: ServicesProps) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
@@ -55,6 +59,9 @@ export default function Services() {
         if (res?.data?.services) {
           setServices(res.data.services);
           setTotalPages(res.data.totalPages || 1);
+          if (onTotalChange && !search && !filter && typeof res.data.total === 'number') {
+            onTotalChange(res.data.total);
+          }
         }
       }
     });

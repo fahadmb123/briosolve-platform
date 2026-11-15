@@ -1,11 +1,42 @@
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AdminVerification from '../../../verification/pages/AdminVerification/AdminVerification';
 import Reactivations from '../../../account-reactivation/pages/Reactivations/Reactivations';
 import AdminRequestsSubnav from '../../components/AdminRequestsSubnav';
+import { useGetAdminVerifications } from '../../../verification/hooks/useAdminVerifications';
+import { useGetReactivations } from '../../../account-reactivation/hooks/useReactivations';
 
 export default function AdminRequests() {
     const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = searchParams.get('tab') === 'reactivations' ? 'reactivations' : 'verifications';
+    const [verificationsCount, setVerificationsCount] = useState<number | undefined>(undefined);
+    const [reactivationsCount, setReactivationsCount] = useState<number | undefined>(undefined);
+
+    const getVerifications = useGetAdminVerifications();
+    const getReactivations = useGetReactivations();
+
+    useEffect(() => {
+        getVerifications.mutate(
+            { page: 1, limit: 1 },
+            {
+                onSuccess: (res) => {
+                    if (typeof res?.data?.stats?.total === 'number') {
+                        setVerificationsCount(res.data.stats.total);
+                    }
+                }
+            }
+        );
+        getReactivations.mutate(
+            { page: 1, limit: 1 },
+            {
+                onSuccess: (res) => {
+                    if (typeof res?.data?.total === 'number') {
+                        setReactivationsCount(res.data.total);
+                    }
+                }
+            }
+        );
+    }, []);
 
     const handleTabChange = (tab: 'verifications' | 'reactivations') => {
         setSearchParams({ tab });
@@ -24,9 +55,18 @@ export default function AdminRequests() {
                 </div>
             </div>
 
-            <AdminRequestsSubnav activeTab={activeTab} onTabChange={handleTabChange} />
+            <AdminRequestsSubnav
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+                verificationsCount={verificationsCount}
+                reactivationsCount={reactivationsCount}
+            />
 
-            {activeTab === 'verifications' ? <AdminVerification /> : <Reactivations />}
+            {activeTab === 'verifications' ? (
+                <AdminVerification onTotalChange={setVerificationsCount} />
+            ) : (
+                <Reactivations onTotalChange={setReactivationsCount} />
+            )}
         </div>
     );
 }

@@ -9,7 +9,11 @@ import { BlockReasonModal } from '../../../admin/components/BlockReasonModal';
 import type { ReactivationRequestItem } from '../../types/reactivation.types';
 import { toast } from 'react-hot-toast';
 
-export default function Reactivations() {
+interface ReactivationsProps {
+  onTotalChange?: (total: number) => void;
+}
+
+export default function Reactivations({ onTotalChange }: ReactivationsProps = {}) {
   const [requests, setRequests] = useState<ReactivationRequestItem[]>([]);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
@@ -38,6 +42,9 @@ export default function Reactivations() {
           if (res?.data) {
             setRequests(res.data.requests || []);
             setTotalPages(res.data.totalPages || 1);
+            if (onTotalChange && !search && roleFilter === 'ALL' && typeof res.data.total === 'number') {
+              onTotalChange(res.data.total);
+            }
           }
         },
       }

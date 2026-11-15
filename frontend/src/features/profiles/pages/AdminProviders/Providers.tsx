@@ -8,7 +8,11 @@ import ProviderRow from "../../components/admin/ProviderRow";
 import Skeleton from "react-loading-skeleton";
 import { AdminNoData } from "../../../../shared/components/ui/AdminNoData";
 
-export default function Providers() {
+interface ProvidersProps {
+    onTotalChange?: (total: number) => void;
+}
+
+export default function Providers({ onTotalChange }: ProvidersProps) {
     const [providers, setProviders] = useState<User[]>([]);
     const [selectedProvider, setSelectedProvider] = useState<User | null>(null);
     const [providerToBlock, setProviderToBlock] = useState<{ id: string; name: string } | null>(null);
@@ -31,6 +35,9 @@ export default function Providers() {
                 setProviders(res.data.users);
                 setTotal(res.data.total);
                 setTotalPages(res.data.totalPages);
+                if (onTotalChange && !search && !filter) {
+                    onTotalChange(res.data.total);
+                }
             }
         });
     }, [filter, search, page]);

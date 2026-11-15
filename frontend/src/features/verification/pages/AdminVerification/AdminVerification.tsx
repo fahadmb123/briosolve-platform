@@ -15,7 +15,11 @@ import type {
   AdminKycStats,
 } from "../../types/adminVerification.types";
 
-export default function Verification() {
+interface AdminVerificationProps {
+  onTotalChange?: (total: number) => void;
+}
+
+export default function Verification({ onTotalChange }: AdminVerificationProps = {}) {
   const [dossiers, setDossiers] = useState<AdminKycDossier[]>([]);
   const [, setStats] = useState<AdminKycStats>({
     pending: 0,
@@ -59,6 +63,9 @@ export default function Verification() {
             setTotalPages(res.data.totalPages || 1);
             if (res.data.stats) {
               setStats(res.data.stats);
+              if (onTotalChange && typeof res.data.stats.total === 'number') {
+                onTotalChange(res.data.stats.total);
+              }
             }
           }
         },

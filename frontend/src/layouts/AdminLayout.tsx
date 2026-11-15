@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
@@ -10,10 +10,39 @@ export default function AdminLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
     const { theme, toggleTheme } = useTheme();
     const clearAuth = useAuthStore((state) => state.clearAuth);
+    const user = useAuthStore((state) => state.user);
     const logout = useLogout();
     const navigate = useNavigate();
     const location = useLocation();
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+                setIsProfileOpen(false);
+            }
+        };
+
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsProfileOpen(false);
+            }
+        };
+
+        if (isProfileOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('keydown', handleEscape);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [isProfileOpen]);
+
     const handleLogout = async () => {
+        setIsProfileOpen(false);
         await logout.mutateAsync();
         clearAuth();
         navigate('/login');
@@ -66,7 +95,12 @@ export default function AdminLayout() {
                             to="/admin/categories" 
                             className={() => `sidebar-item ${location.pathname.startsWith('/admin/categories') || location.pathname.startsWith('/admin/services') ? 'active' : ''}`}
                         >
-                            <i className="fas fa-layer-group"></i>
+                            <svg className="sidebar-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="7" rx="2" />
+                                <rect x="14" y="3" width="7" height="7" rx="2" />
+                                <rect x="3" y="14" width="7" height="7" rx="2" />
+                                <rect x="14" y="14" width="7" height="7" rx="2" />
+                            </svg>
                             <span>Categories</span>
                         </NavLink>
                     </li>
@@ -118,14 +152,15 @@ export default function AdminLayout() {
                 </ul>
             </div>
 
-            <div className="sidebar-footer" style={{ borderTop: '1px solid var(--border)', padding: '0.875rem 0.5rem', marginTop: 'auto' }}>
-                <button 
-                    onClick={handleLogout} 
-                    className="sidebar-item text-danger"
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', width: '100%' }}
+            <div className="sidebar-footer admin-sidebar-footer">
+                <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="admin-sidebar-signout-btn"
+                    title="Sign Out"
                 >
                     <i className="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
+                    <span>Sign Out</span>
                 </button>
             </div>
         </aside>
@@ -145,9 +180,77 @@ export default function AdminLayout() {
                         <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
                     </button>
                     <NotificationDropdown role="ADMIN" viewAllLink="/admin/notifications" />
-                    <button onClick={handleLogout} className="btn btn-primary btn-sm hide-mobile">
-                        Logout
-                    </button>
+
+                    <div className="admin-nav-profile-wrapper" ref={profileDropdownRef}>
+                        <button
+                            type="button"
+                            className={`admin-nav-profile-btn ${isProfileOpen ? 'active' : ''}`}
+                            onClick={() => setIsProfileOpen((prev) => !prev)}
+                            aria-expanded={isProfileOpen}
+                            aria-haspopup="menu"
+                        >
+                            <div className="admin-profile-avatar">
+                                <span>{user?.name?.charAt(0).toUpperCase() || 'A'}</span>
+                                <span className="admin-status-dot"></span>
+                            </div>
+                            <div className="admin-profile-btn-info hide-mobile">
+                                <span className="admin-profile-btn-name">{user?.name || 'Administrator'}</span>
+                                <span className="admin-profile-btn-role">Admin</span>
+                            </div>
+                            <i className={`fas fa-chevron-down admin-profile-chevron ${isProfileOpen ? 'rotate' : ''}`}></i>
+                        </button>
+
+                        {isProfileOpen && (
+                            <div className="admin-profile-dropdown" role="menu">
+                                <div className="admin-profile-dropdown-header">
+                                    <div className="admin-profile-avatar-lg">
+                                        {user?.name?.charAt(0).toUpperCase() || 'A'}
+                                    </div>
+                                    <div className="admin-profile-dropdown-info">
+                                        <div className="admin-profile-name">{user?.name || 'Administrator'}</div>
+                                        <div className="admin-profile-email">{user?.email || 'admin@briosolve.com'}</div>
+                                        <span className="admin-role-badge">SUPER ADMIN</span>
+                                    </div>
+                                </div>
+
+                                <div className="admin-dropdown-divider"></div>
+
+                                <NavLink
+                                    to="/admin/dashboard"
+                                    className="admin-dropdown-item"
+                                    role="menuitem"
+                                    onClick={() => setIsProfileOpen(false)}
+                                >
+                                    <i className="fas fa-chart-line"></i>
+                                    <span>Dashboard</span>
+                                </NavLink>
+
+                                <button
+                                    type="button"
+                                    className="admin-dropdown-item"
+                                    role="menuitem"
+                                    onClick={() => {
+                                        toggleTheme();
+                                    }}
+                                >
+                                    <i className={theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'}></i>
+                                    <span>{theme === 'dark' ? 'Light Theme' : 'Dark Theme'}</span>
+                                </button>
+
+                                <div className="admin-dropdown-divider"></div>
+
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                    className="admin-dropdown-item admin-dropdown-logout"
+                                    role="menuitem"
+                                >
+                                    <i className="fas fa-sign-out-alt"></i>
+                                    <span>Sign Out</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
                 <Suspense fallback={<div className="app-content flex items-center justify-center p-8"><span className="spinner"></span></div>}>
