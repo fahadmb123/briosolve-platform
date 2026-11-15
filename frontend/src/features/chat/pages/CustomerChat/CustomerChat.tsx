@@ -796,7 +796,7 @@ export default function CustomerChat() {
               <ChatInputBar onSendMessage={handleSendMessage} />
             </div>
           ) : (
-            <EmptyChatState currentRole="CUSTOMER" />
+            <EmptyChatState currentRole="CUSTOMER" hasConversations={conversations.length > 0} />
           )}
         </div>
 
