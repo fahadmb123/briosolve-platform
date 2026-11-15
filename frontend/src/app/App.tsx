@@ -1,4 +1,5 @@
 import { AppRouter } from './router/index';
+import { BrowserRouter } from 'react-router-dom';
 import '../App.css';
 import '../shared/styles/global.css';
 import '../shared/styles/user-theme.css';
@@ -35,7 +36,13 @@ function App() {
     window.location.pathname === '/login';
 
   if (suspended && !isVisitingAllowedPage) {
-    return <AccountSuspended />;
+    return (
+      <ThemeProvider>
+        <BrowserRouter>
+          <AccountSuspended />
+        </BrowserRouter>
+      </ThemeProvider>
+    );
   }
 
   return (

@@ -12,7 +12,7 @@
 }
 
 .error-boundary-header {
-  position: absolute;
+  position: fixed;
   top: 1.75rem;
   left: 0;
   right: 0;

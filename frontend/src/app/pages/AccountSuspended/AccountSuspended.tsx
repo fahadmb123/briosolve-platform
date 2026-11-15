@@ -1,4 +1,5 @@
 import React from "react";
+import { useTheme } from "../../../shared/hooks/useTheme";
 import "./AccountSuspended.css";
 
 export interface AccountSuspendedProps {
@@ -14,7 +15,7 @@ export interface AccountSuspendedProps {
 
 export const AccountSuspended: React.FC<AccountSuspendedProps> = ({
   title = "Account Suspension Notice",
-  description = "Your account access has been suspended due to policy violations, verification anomalies, or safety restrictions.",
+  description = "Your account access has been restricted due to policy violations, verification anomalies, or safety guidelines.",
   reason = "Policy violation or security review",
   referenceId,
   reactivationLink = "/account/request",
@@ -22,6 +23,8 @@ export const AccountSuspended: React.FC<AccountSuspendedProps> = ({
   onRequestReactivation,
   onLogin,
 }) => {
+  const { toggleTheme } = useTheme();
+
   const handleReactivation = () => {
     if (onRequestReactivation) {
       onRequestReactivation();
@@ -39,110 +42,115 @@ export const AccountSuspended: React.FC<AccountSuspendedProps> = ({
   };
 
   return (
-    <div className="account-suspended-page-wrapper">
-      <header className="account-suspended-topbar">
-        <a href="/" className="brand-logo-container" aria-label="Briosolve Home">
-          <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
-          <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
+    <div className="account-suspended-wrapper">
+      <header className="account-suspended-header">
+        <a href="/" className="account-suspended-brand-link" aria-label="Briosolve Home">
+          <img src="/briosolve-text-logo.svg" alt="Briosolve" className="account-suspended-brand-text" />
         </a>
 
-        <div className="account-suspended-topbar-actions">
-          <button type="button" onClick={handleLogin} className="account-suspended-signin-btn">
-            <span>Sign In</span>
+        <div className="account-suspended-header-actions">
+          <button
+            onClick={toggleTheme}
+            className="account-suspended-theme-btn"
+            aria-label="Toggle Theme"
+            title="Toggle Theme"
+            type="button"
+          >
+            <img src="/briosolve-logo.svg" alt="Briosolve" className="account-suspended-brand-logo-img" />
           </button>
         </div>
       </header>
 
-      <main className="account-suspended-main">
-        <nav className="account-suspended-breadcrumb" aria-label="Breadcrumb">
-          <a href="/">Home</a>
-          <i className="fas fa-chevron-right"></i>
-          <span>Support</span>
-          <i className="fas fa-chevron-right"></i>
-          <span>Account Suspension</span>
-        </nav>
-
-        <div className="account-suspended-page-header">
-          <div className="account-suspended-badge-row">
-            <span className="account-suspended-status-badge">
-              <i className="fas fa-ban"></i>
-              <span>Account Suspended</span>
-            </span>
-          </div>
-          <h1 className="account-suspended-page-title">{title}</h1>
-          <p className="account-suspended-page-desc">{description}</p>
-        </div>
-
-        <div className="account-suspended-section">
-          <h2 className="account-suspended-section-title">1. Suspension Details</h2>
-          <p className="account-suspended-section-hint">
-            Review the status and justification recorded on your account.
-          </p>
-          <div className="account-suspended-details-panel">
-            <div className="account-suspended-detail-row">
-              <span className="account-suspended-detail-label">Current Status</span>
-              <span className="account-suspended-detail-value danger">Suspended / Restricted</span>
+      <main className="account-suspended-content">
+        <div className="account-suspended-grid">
+          <div className="account-suspended-left-col">
+            <div className="account-suspended-badge">
+              <span className="material-symbols-outlined text-[16px]">block</span>
+              <span>Access Restricted</span>
             </div>
-            <div className="account-suspended-detail-row">
-              <span className="account-suspended-detail-label">Stated Reason</span>
-              <span className="account-suspended-detail-value">{reason}</span>
-            </div>
-            {referenceId && (
-              <div className="account-suspended-detail-row">
-                <span className="account-suspended-detail-label">Reference ID</span>
-                <span className="account-suspended-detail-value code">{referenceId}</span>
+
+            <h1 className="account-suspended-title">{title}</h1>
+            <p className="account-suspended-subtitle">{description}</p>
+
+            <div className="account-suspended-card">
+              <div className="account-suspended-card-header">
+                <span className="material-symbols-outlined">assignment</span>
+                <h3>Suspension Overview</h3>
               </div>
-            )}
-            <div className="account-suspended-detail-row">
-              <span className="account-suspended-detail-label">Restrictions Applied</span>
-              <span className="account-suspended-detail-value">
-                Bidding, booking dispatch, direct messaging, and payout processing disabled.
-              </span>
+
+              <div className="account-suspended-card-body">
+                <div className="account-suspended-info-row">
+                  <span className="info-label">Current Status</span>
+                  <span className="info-value status-danger">
+                    <span className="status-dot"></span>
+                    Suspended / Restricted
+                  </span>
+                </div>
+
+                <div className="account-suspended-info-row">
+                  <span className="info-label">Stated Reason</span>
+                  <span className="info-value">{reason}</span>
+                </div>
+
+                {referenceId && (
+                  <div className="account-suspended-info-row">
+                    <span className="info-label">Reference ID</span>
+                    <span className="info-value info-code">{referenceId}</span>
+                  </div>
+                )}
+
+                <div className="account-suspended-info-row">
+                  <span className="info-label">Restrictions</span>
+                  <span className="info-value text-muted">
+                    Bidding, dispatch, direct messaging, and payout processing disabled.
+                  </span>
+                </div>
+              </div>
+
+              <div className="account-suspended-callout">
+                <span className="material-symbols-outlined callout-icon">info</span>
+                <div className="callout-text">
+                  <strong>Administrative Review:</strong> Reactivation requests are evaluated by our compliance team within 24 to 48 business hours. You will receive email notifications with status updates.
+                </div>
+              </div>
+            </div>
+
+            <div className="account-suspended-actions">
+              <button
+                type="button"
+                className="account-suspended-primary-btn"
+                onClick={handleReactivation}
+              >
+                <span>Request for Reactivation</span>
+                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+              </button>
+              <button
+                type="button"
+                className="account-suspended-secondary-btn"
+                onClick={handleLogin}
+              >
+                Back to Sign In
+              </button>
+            </div>
+          </div>
+
+          <div className="account-suspended-right-col">
+            <div className="account-suspended-illustration-wrapper">
+              <img
+                src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794772354/blocked-logo.png"
+                alt="Account Suspended"
+                className="account-suspended-illustration"
+              />
             </div>
           </div>
         </div>
 
-        <div className="account-suspended-section">
-          <h2 className="account-suspended-section-title">2. Appeal & Reactivation Options</h2>
-          <p className="account-suspended-section-hint">
-            If you believe this action was made in error or have addressed the underlying concern, you may submit a formal request for reactivation with supporting details.
-          </p>
-
-          <div className="account-suspended-notice-box">
-            <i className="fas fa-info-circle"></i>
-            <div>
-              <strong>Administrative Review Process:</strong> Reactivation requests are handled by our compliance team within 24 to 48 business hours. You will receive email notifications regarding any status updates.
-            </div>
-          </div>
-        </div>
-
-        <div className="account-suspended-section">
-          <div className="account-suspended-actions-bar">
-            <button
-              type="button"
-              className="account-suspended-submit-btn"
-              onClick={handleReactivation}
-            >
-              <span>Request for Reactivation</span>
-              <i className="fas fa-arrow-right"></i>
-            </button>
-            <button
-              type="button"
-              className="account-suspended-cancel-btn"
-              onClick={handleLogin}
-            >
-              Back to Sign In
-            </button>
-          </div>
-        </div>
-
-        <div className="account-suspended-footer-help">
+        <div className="account-suspended-footer">
           <span>
             Need urgent assistance? Contact compliance support at{" "}
             <a href="mailto:support@briosolve.com" className="account-suspended-footer-link">
               support@briosolve.com
             </a>
-            .
           </span>
         </div>
       </main>
