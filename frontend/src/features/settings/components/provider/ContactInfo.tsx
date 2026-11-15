@@ -2,20 +2,20 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import { emailSchema, phoneSchema, type EmailInputType, type PhoneInputType } from '../../schemas/providerSettings.schema';
 import { useUpdateEmail, useUpdatePhone, useDeletePhone } from '../../hooks/customer/contact';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { useResetFlowStore } from '../../../auth/stores/reset-flow.store';
 import { ConfirmModal } from '../../../../shared/components/ui/ConfirmModal/ConfirmModal';
+import { OtpModal } from '../../../auth/components/OtpModal';
 
 export const ContactInfo: React.FC = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [showOtpModal, setShowOtpModal] = useState(false);
     const user = useAuthStore((state) => state.user);
     const updateEmail = useUpdateEmail();
     const updatePhone = useUpdatePhone();
     const deletePhone = useDeletePhone();
-    const navigate = useNavigate();
     const { setOtpFlowStarted } = useResetFlowStore();
 
     const {
@@ -44,8 +44,8 @@ export const ContactInfo: React.FC = () => {
     const onEmailSubmit = (formData: EmailInputType) => {
         updateEmail.mutate(formData, {
             onSuccess: (res) => {
-                useResetFlowStore.getState().setOtpFlowStarted(true);
-                navigate("/otp-verification", { replace: true });
+                setOtpFlowStarted(true);
+                setShowOtpModal(true);
                 if (res.message) toast.success(res.message);
             }
         });
@@ -56,10 +56,15 @@ export const ContactInfo: React.FC = () => {
         updatePhone.mutate({ phone: fullPhone }, {
             onSuccess: (response) => {
                 setOtpFlowStarted(true);
-                navigate("/otp-verification", { replace: true });
+                setShowOtpModal(true);
                 toast.success(response.message);
             }
         });
+    };
+
+    const handleOtpSuccess = () => {
+        setShowOtpModal(false);
+        useAuthStore.getState().fetchUser();
     };
 
     const handleDeletePhone = () => {
@@ -73,24 +78,25 @@ export const ContactInfo: React.FC = () => {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* Email Box */}
             <form onSubmit={handleEmailSubmit(onEmailSubmit)} className="card p-6 fade-in flex flex-col h-full">
                 <div className="flex justify-between items-center mb-4 border-bottom" style={{ paddingBottom: '16px' }}>
                     <h2 className="h5 mb-0 font-bold">Email Address</h2>
                     {user?.email_verified ? (
-                        <span className="badge badge-success text-xs px-2 py-1 mb-1"><i className="fas fa-check-circle mr-1"></i>Verified</span>
+                        <span className="badge badge-success text-xs px-2 py-1 mb-1">
+                            <i className="fas fa-check-circle mr-1"></i>Verified
+                        </span>
                     ) : (
                         <span className="badge badge-warning text-xs px-2 py-1 mb-1">Not Verified</span>
                     )}
                 </div>
-                <p className="text-xs text-secondary mb-4">Update your sign-in email address.</p>
+                <p className="text-xs text-secondary mb-4">Update your business login and contact email.</p>
                 <div className="form-group mb-4 flex-grow">
-                    <label className="form-label text-xs block mb-2" htmlFor="prof-email">Email Address</label>
+                    <label className="form-label text-xs block mb-2" htmlFor="prov-email">Email Address</label>
                     <div className="input-icon-wrapper">
                         <i className="fas fa-envelope"></i>
                         <input
                             type="email"
-                            id="prof-email"
+                            id="prov-email"
                             className={`form-control ${emailErrors.email ? 'border-danger' : ''}`}
                             style={emailErrors.email ? { borderColor: 'red' } : {}}
                             {...registerEmail("email")}
@@ -100,7 +106,7 @@ export const ContactInfo: React.FC = () => {
                         <span className="text-danger text-red-500 text-xs mt-1 block">{emailErrors.email.message}</span>
                     )}
                     <p className="text-xs text-secondary mt-2">
-                        <i className="fas fa-info-circle mr-1"></i>A verification link will be sent to new emails.
+                        <i className="fas fa-info-circle mr-1"></i>A verification link will be sent to the new email address.
                     </p>
                 </div>
                 <div className="flex justify-end mt-auto pt-2">
@@ -110,19 +116,20 @@ export const ContactInfo: React.FC = () => {
                 </div>
             </form>
 
-            {/* Mobile Number Box */}
             <form onSubmit={handlePhoneSubmit(onPhoneSubmit)} className="card p-6 fade-in flex flex-col h-full">
                 <div className="flex justify-between items-center mb-4 border-bottom" style={{ paddingBottom: '16px' }}>
                     <h2 className="h5 mb-0 font-bold">Mobile Number</h2>
                     {user?.phone_verified ? (
-                        <span className="badge badge-success text-xs px-2 py-1 mb-1"><i className="fas fa-check-circle mr-1"></i>Verified</span>
+                        <span className="badge badge-success text-xs px-2 py-1 mb-1">
+                            <i className="fas fa-check-circle mr-1"></i>Verified
+                        </span>
                     ) : (
                         <span className="badge badge-warning text-xs px-2 py-1 mb-1">Not Verified</span>
                     )}
                 </div>
-                <p className="text-xs text-secondary mb-4">Update and verify your mobile number.</p>
+                <p className="text-xs text-secondary mb-4">Update your mobile number for project communications and alerts.</p>
                 <div className="form-group mb-4 flex-grow">
-                    <label className="form-label text-xs block mb-2" htmlFor="prof-phone">Mobile Number</label>
+                    <label className="form-label text-xs block mb-2" htmlFor="prov-phone">Mobile Number</label>
                     <div className="flex gap-2">
                         <select
                             className={`form-control ${phoneErrors.countryCode ? 'border-danger' : ''}`}
@@ -139,10 +146,10 @@ export const ContactInfo: React.FC = () => {
                             <i className="fas fa-phone"></i>
                             <input
                                 type="tel"
-                                id="prof-phone"
+                                id="prov-phone"
                                 className={`form-control ${phoneErrors.phoneNumber ? 'border-danger' : ''}`}
                                 style={phoneErrors.phoneNumber ? { borderColor: 'red' } : {}}
-                                placeholder="9876543210"
+                                placeholder="e.g. 9876543210"
                                 {...registerPhone("phoneNumber")}
                             />
                         </div>
@@ -184,6 +191,12 @@ export const ContactInfo: React.FC = () => {
                 isLoading={deletePhone.isPending}
                 onConfirm={handleDeletePhone}
                 onCancel={() => setIsDeleteModalOpen(false)}
+            />
+
+            <OtpModal
+                isOpen={showOtpModal}
+                onClose={() => setShowOtpModal(false)}
+                onSuccess={handleOtpSuccess}
             />
         </div>
     );

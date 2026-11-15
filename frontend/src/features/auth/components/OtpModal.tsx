@@ -1,4 +1,5 @@
 import OtpVerification from '../pages/OtpVerification/OtpVerification';
+import './OtpModal.css';
 
 interface OtpModalProps {
     isOpen: boolean;
