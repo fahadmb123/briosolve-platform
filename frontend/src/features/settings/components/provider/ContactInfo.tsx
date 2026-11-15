@@ -46,6 +46,10 @@ export const ContactInfo: React.FC = () => {
     const selectedCountry = watchPhone("countryCode") || "+91";
 
     const onEmailSubmit = (formData: EmailInputType) => {
+        if (user?.email === formData.email) {
+            toast.error("This is already your current registered email address");
+            return;
+        }
         updateEmail.mutate(formData, {
             onSuccess: (res) => {
                 setOtpFlowStarted(true);
