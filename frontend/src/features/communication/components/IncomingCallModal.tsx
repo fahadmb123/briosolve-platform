@@ -11,7 +11,7 @@ export const IncomingCallModal: React.FC<IncomingCallModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(caller.name)}&background=05AD98&color=fff`;
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(caller.name)}&background=FF7900&color=fff`;
   const roleLabel = caller.role === "PROVIDER" ? "Service Provider" : caller.role === "CUSTOMER" ? "Customer" : "Marketplace Member";
 
   return (

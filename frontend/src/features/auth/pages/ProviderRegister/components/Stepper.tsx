@@ -4,24 +4,33 @@ interface StepperProps {
     activeStep: number;
 }
 
+const steps = [
+    { step: 1, label: "Account Info" },
+    { step: 2, label: "Services" },
+    { step: 3, label: "Details" },
+    { step: 4, label: "Review" },
+];
+
 export function Stepper({ activeStep }: StepperProps) {
     return (
-        <div className="stepper-wrapper mb-6">
-            <div className={`stepper-item ${activeStep >= 1 ? 'active' : ''}`} id="step-1-indicator">
-                <div className="stepper-circle">1</div>
-                <div className="stepper-label text-xs">Basic Info</div>
+        <div className="pro-stepper">
+            <div className="pro-stepper-header">
+                <span className="pro-stepper-badge">Step {activeStep} of 4</span>
+                <span className="pro-stepper-title">{steps[activeStep - 1]?.label}</span>
             </div>
-            <div className={`stepper-item ${activeStep >= 2 ? 'active' : ''}`} id="step-2-indicator">
-                <div className="stepper-circle">2</div>
-                <div className="stepper-label text-xs">Services</div>
-            </div>
-            <div className={`stepper-item ${activeStep >= 3 ? 'active' : ''}`} id="step-3-indicator">
-                <div className="stepper-circle">3</div>
-                <div className="stepper-label text-xs">Details</div>
-            </div>
-            <div className={`stepper-item ${activeStep >= 4 ? 'active' : ''}`} id="step-4-indicator">
-                <div className="stepper-circle">4</div>
-                <div className="stepper-label text-xs">Review</div>
+            <div className="pro-stepper-bars">
+                {steps.map((s) => (
+                    <div
+                        key={s.step}
+                        className={`pro-stepper-bar-segment ${
+                            s.step < activeStep
+                                ? "completed"
+                                : s.step === activeStep
+                                ? "active"
+                                : ""
+                        }`}
+                    />
+                ))}
             </div>
         </div>
     );

@@ -11,6 +11,7 @@ import type { PopulatedProviderService } from '../../settings';
 import { useAuthStore } from '../../auth/stores/auth.store';
 import { TradeServicesSkeleton } from './TradeServicesSkeleton';
 import Skeleton from 'react-loading-skeleton';
+import './TradeServices.css';
 
 interface CatalogService {
     id: string;
@@ -278,8 +279,12 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                 {getProviderServices.isPending ? (
                     <TradeServicesSkeleton count={2} />
                 ) : groupedCategories.length === 0 ? (
-                    <div className="text-center py-12 border border-dashed rounded-xl my-4" style={{ borderColor: 'var(--border)' }}>
-                        <i className="fas fa-tools text-2xl text-secondary mb-2 opacity-50 block"></i>
+                    <div className="text-center py-10 px-4 border border-dashed rounded-xl my-4" style={{ borderColor: 'var(--border)' }}>
+                        <img
+                            src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                            alt="No data found"
+                            style={{ width: '100%', maxWidth: '230px', maxHeight: '160px', objectFit: 'contain', margin: '0 auto 1.25rem', display: 'block', filter: 'drop-shadow(0 10px 24px rgba(0, 0, 0, 0.1))' }}
+                        />
                         <p className="font-semibold text-text text-sm mb-1">No Trade Categories Added</p>
                         <p className="text-xs text-secondary mb-4">
                             You have not selected any trade categories yet.
@@ -401,31 +406,29 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
 
             {isAddCategoryModalOpen && (
                 <div className="confirm-modal-overlay">
-                    <div
-                        className="confirm-modal-content"
-                        style={{ maxWidth: '640px', width: '92%', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}
-                    >
-                        <div className="flex justify-between items-center mb-3 pb-3 border-bottom">
+                    <div className="trade-modal-dialog">
+                        <div className="trade-modal-header">
                             <div>
-                                <h3 className="h6 mb-1 font-bold">Add Trade Categories</h3>
-                                <p className="text-xs text-secondary mb-0">
+                                <h3 className="trade-modal-title">Add Trade Categories</h3>
+                                <p className="trade-modal-subtitle">
                                     Select the trade categories and specific services you want to offer
                                 </p>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setIsAddCategoryModalOpen(false)}
-                                className="text-secondary hover:text-text cursor-pointer bg-transparent border-0 p-1"
+                                className="trade-modal-close-btn"
+                                aria-label="Close"
                             >
                                 <i className="fas fa-times"></i>
                             </button>
                         </div>
 
-                        <div className="overflow-y-auto flex-1 pr-1 flex flex-col gap-4 mb-3" style={{ maxHeight: '55vh' }}>
+                        <div className="trade-modal-scroll-area">
                             {getCategories.isPending ? (
                                 <div className="flex flex-col gap-3 py-2">
                                     {Array.from({ length: 3 }).map((_, i) => (
-                                        <div key={`modal-skel-${i}`} className="border rounded-xl p-3.5 flex flex-col gap-2.5" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface)' }}>
+                                        <div key={`modal-skel-${i}`} className="border rounded-xl p-3.5 flex flex-col gap-2.5" style={{ borderColor: 'rgba(255, 121, 0, 0.15)', backgroundColor: 'var(--surface)' }}>
                                             <div className="flex justify-between items-center">
                                                 <Skeleton width={140} height={18} borderRadius={4} />
                                                 <Skeleton width={75} height={16} borderRadius={4} />
@@ -448,56 +451,53 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                                     const isAllSelected =
                                         category.services.length > 0 &&
                                         category.services.every((s) => selectedServiceIds.includes(s.id));
+                                    const selectedCount = category.services.filter((s) => selectedServiceIds.includes(s.id)).length;
 
                                     return (
                                         <div
                                             key={category.id}
-                                            className="border rounded-xl overflow-hidden shadow-sm"
-                                            style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface-elevated)' }}
+                                            className="trade-modal-category-card"
                                         >
-                                            <div
-                                                className="px-4 py-3 border-bottom flex items-center justify-between"
-                                                style={{ backgroundColor: 'var(--surface)' }}
-                                            >
-                                                <div className="flex items-center gap-2.5">
-                                                    <div
-                                                        className="w-7 h-7 rounded-full flex items-center justify-center text-primary"
-                                                        style={{ backgroundColor: 'rgba(212, 172, 119, 0.15)' }}
-                                                    >
-                                                        <i className="fas fa-layer-group text-xs"></i>
+                                            <div className="trade-modal-category-header">
+                                                <div className="trade-modal-cat-info">
+                                                    <div className="trade-modal-cat-icon">
+                                                        <i className="fas fa-layer-group"></i>
                                                     </div>
-                                                    <span className="text-sm font-bold capitalize text-text">
-                                                        {category.name}
-                                                    </span>
+                                                    <div className="flex items-center">
+                                                        <span className="trade-modal-cat-title">
+                                                            {category.name}
+                                                        </span>
+                                                        <span className="trade-modal-cat-count">
+                                                            {selectedCount > 0 ? `(${selectedCount}/${category.services.length} selected)` : `(${category.services.length} services)`}
+                                                        </span>
+                                                    </div>
                                                 </div>
 
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleAllForCategory(category.services)}
-                                                    className="text-xs text-primary hover:underline cursor-pointer bg-transparent border-0 p-0 font-medium"
+                                                    className="trade-modal-select-all-btn"
                                                 >
                                                     {isAllSelected ? 'Deselect All' : 'Select All'}
                                                 </button>
                                             </div>
 
-                                            <div className="p-4" style={{ backgroundColor: 'var(--surface-elevated)' }}>
-                                                <div className="modern-chips-wrapper" style={{ justifyContent: 'flex-start' }}>
+                                            <div className="trade-modal-category-body">
+                                                <div className="trade-modal-chips-grid">
                                                     {category.services.map((service) => {
                                                         const isChecked = selectedServiceIds.includes(service.id);
                                                         return (
-                                                            <label key={service.id} className="modern-service-chip">
+                                                            <label key={service.id} className={`trade-modal-chip ${isChecked ? 'active' : ''}`}>
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={isChecked}
                                                                     onChange={() => toggleService(service.id)}
-                                                                    className="hidden-checkbox"
+                                                                    className="trade-modal-chip-input"
                                                                 />
-                                                                <span className="chip-content">
-                                                                    <span className="check-box-icon">
-                                                                        <i className="fas fa-check"></i>
-                                                                    </span>
-                                                                    <span className="service-name">{service.name}</span>
+                                                                <span className="trade-modal-chip-box">
+                                                                    <i className="fas fa-check"></i>
                                                                 </span>
+                                                                <span className="trade-modal-chip-label">{service.name}</span>
                                                             </label>
                                                         );
                                                     })}
@@ -509,15 +509,16 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                             )}
                         </div>
 
-                        <div className="flex justify-between items-center pt-3 border-top gap-2">
-                            <span className="text-xs text-secondary">
-                                {selectedServiceIds.length} service{selectedServiceIds.length !== 1 ? 's' : ''} selected
-                            </span>
-                            <div className="flex items-center gap-2">
+                        <div className="trade-modal-footer">
+                            <div className="trade-modal-counter-badge">
+                                <span className="trade-modal-counter-num">{selectedServiceIds.length}</span>
+                                <span>service{selectedServiceIds.length !== 1 ? 's' : ''} selected</span>
+                            </div>
+                            <div className="trade-modal-actions">
                                 <button
                                     type="button"
                                     onClick={() => setIsAddCategoryModalOpen(false)}
-                                    className="btn btn-outline btn-sm"
+                                    className="trade-modal-cancel-btn"
                                 >
                                     Cancel
                                 </button>
@@ -525,7 +526,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                                     type="button"
                                     onClick={handleConfirmAddCategories}
                                     disabled={selectedServiceIds.length === 0 || addProviderServices.isPending}
-                                    className="btn btn-primary btn-sm flex items-center gap-1.5"
+                                    className="trade-modal-submit-btn"
                                 >
                                     {addProviderServices.isPending && (
                                         <i className="fas fa-spinner fa-spin text-xs"></i>
@@ -540,80 +541,88 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
 
             {serviceModalCategory && (
                 <div className="confirm-modal-overlay">
-                    <div className="confirm-modal-content" style={{ maxWidth: '520px', width: '92%' }}>
-                        <div className="flex justify-between items-center mb-4 pb-2 border-bottom">
-                            <div className="flex items-center gap-2.5">
-                                <div
-                                    className="w-7 h-7 rounded-full flex items-center justify-center text-primary"
-                                    style={{ backgroundColor: 'rgba(212, 172, 119, 0.15)' }}
-                                >
-                                    <i className="fas fa-layer-group text-xs"></i>
+                    <div className="trade-modal-dialog" style={{ maxWidth: '560px' }}>
+                        <div className="trade-modal-header">
+                            <div className="trade-modal-cat-info">
+                                <div className="trade-modal-cat-icon">
+                                    <i className="fas fa-layer-group"></i>
                                 </div>
-                                <h3 className="h6 mb-0 font-bold capitalize">
-                                    Add Services to {serviceModalCategory.name}
-                                </h3>
+                                <div>
+                                    <h3 className="trade-modal-title capitalize">
+                                        Add Services to {serviceModalCategory.name}
+                                    </h3>
+                                    <p className="trade-modal-subtitle">
+                                        Select the specific services you want to offer in this category
+                                    </p>
+                                </div>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setServiceModalCategory(null)}
-                                className="text-secondary hover:text-text cursor-pointer bg-transparent border-0"
+                                className="trade-modal-close-btn"
+                                aria-label="Close"
                             >
                                 <i className="fas fa-times"></i>
                             </button>
                         </div>
 
-                        {availableServicesForCurrentCat.length === 0 ? (
-                            <div className="text-center py-6 text-xs text-secondary">
-                                All available services in this category are already added.
-                            </div>
-                        ) : (
-                            <div className="form-group mb-5">
-                                <label className="form-label text-xs block mb-3 font-semibold text-secondary">
-                                    Choose from Available Services
-                                </label>
-                                <div className="modern-chips-wrapper" style={{ justifyContent: 'flex-start' }}>
-                                    {availableServicesForCurrentCat.map((s) => {
-                                        const isChecked = selectedServiceIdsToAdd.includes(s.id);
-                                        return (
-                                            <label key={s.id} className="modern-service-chip">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={isChecked}
-                                                    onChange={() => toggleServiceCheckboxToAdd(s.id)}
-                                                    className="hidden-checkbox"
-                                                />
-                                                <span className="chip-content">
-                                                    <span className="check-box-icon">
-                                                        <i className="fas fa-check"></i>
-                                                    </span>
-                                                    <span className="service-name">{s.name}</span>
-                                                </span>
-                                            </label>
-                                        );
-                                    })}
+                        <div className="trade-modal-scroll-area">
+                            {availableServicesForCurrentCat.length === 0 ? (
+                                <div className="text-center py-6 text-xs text-secondary">
+                                    All available services in this category are already added.
                                 </div>
-                            </div>
-                        )}
+                            ) : (
+                                <div className="trade-modal-category-card">
+                                    <div className="trade-modal-category-body">
+                                        <div className="trade-modal-chips-grid">
+                                            {availableServicesForCurrentCat.map((s) => {
+                                                const isChecked = selectedServiceIdsToAdd.includes(s.id);
+                                                return (
+                                                    <label key={s.id} className={`trade-modal-chip ${isChecked ? 'active' : ''}`}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isChecked}
+                                                            onChange={() => toggleServiceCheckboxToAdd(s.id)}
+                                                            className="trade-modal-chip-input"
+                                                        />
+                                                        <span className="trade-modal-chip-box">
+                                                            <i className="fas fa-check"></i>
+                                                        </span>
+                                                        <span className="trade-modal-chip-label">{s.name}</span>
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
-                        <div className="flex justify-end gap-2 pt-3 border-top">
-                            <button
-                                type="button"
-                                onClick={() => setServiceModalCategory(null)}
-                                className="btn btn-outline btn-sm"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleConfirmAddServices}
-                                disabled={selectedServiceIdsToAdd.length === 0 || addProviderServices.isPending}
-                                className="btn btn-primary btn-sm flex items-center gap-1.5"
-                            >
-                                {addProviderServices.isPending && (
-                                    <i className="fas fa-spinner fa-spin text-xs"></i>
-                                )}
-                                <span>Add Services</span>
-                            </button>
+                        <div className="trade-modal-footer">
+                            <div className="trade-modal-counter-badge">
+                                <span className="trade-modal-counter-num">{selectedServiceIdsToAdd.length}</span>
+                                <span>service{selectedServiceIdsToAdd.length !== 1 ? 's' : ''} selected</span>
+                            </div>
+                            <div className="trade-modal-actions">
+                                <button
+                                    type="button"
+                                    onClick={() => setServiceModalCategory(null)}
+                                    className="trade-modal-cancel-btn"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleConfirmAddServices}
+                                    disabled={selectedServiceIdsToAdd.length === 0 || addProviderServices.isPending}
+                                    className="trade-modal-submit-btn"
+                                >
+                                    {addProviderServices.isPending && (
+                                        <i className="fas fa-spinner fa-spin text-xs"></i>
+                                    )}
+                                    <span>Add Services</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

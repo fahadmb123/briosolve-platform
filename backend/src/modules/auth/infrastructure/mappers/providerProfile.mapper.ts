@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { ProviderProfile, KycStatus } from "../../domain/entities/providerProfile.entity";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export type ProviderProfileRecord = Prisma.ProviderProfileGetPayload<{}>;
 export type ProviderProfileRaw = ProviderProfileRecord;
@@ -15,7 +16,7 @@ export class ProviderProfileMapper {
             record.business_name,
             record.experience,
             record.bio,
-            record.profile_image ?? null,
+            StorageUtil.getPublicUrl(record.profile_image),
             createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
             updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw),
             record.service_radius_km !== undefined && record.service_radius_km !== null ? Number(record.service_radius_km) : 20,

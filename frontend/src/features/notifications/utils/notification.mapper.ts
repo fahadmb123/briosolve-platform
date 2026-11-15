@@ -65,11 +65,12 @@ export function mapNotificationToHeader(
     notification: NotificationResponseDto,
     role: UserRole,
 ): HeaderNotification {
-    const createdAt = new Date(notification.created_at);
-    const theme = NOTIFICATION_ICON_THEMES[notification.type];
-    const content = `${notification.title} ${notification.message}`.toLowerCase();
+    const createdAt = notification?.created_at ? new Date(notification.created_at) : new Date();
+    const typeKey = (notification?.type || "").toUpperCase() as keyof typeof NOTIFICATION_ICON_THEMES;
+    const theme = NOTIFICATION_ICON_THEMES[typeKey] || NOTIFICATION_ICON_THEMES.INFO;
+    const content = `${notification?.title || ""} ${notification?.message || ""}`.toLowerCase();
 
-    let link: string = NOTIFICATION_ROUTES[role] || NOTIFICATION_ROUTES.CUSTOMER;
+    let link: string = (role && NOTIFICATION_ROUTES[role]) || NOTIFICATION_ROUTES.CUSTOMER;
     if (role === "PROVIDER") {
         if (
             content.includes("lead") ||
@@ -92,14 +93,16 @@ export function mapNotificationToHeader(
         ) {
             link = "/my-requests";
         }
+    } else if (role === "ADMIN") {
+        link = "/admin/notifications";
     }
 
     return {
-        id: notification.id,
-        title: notification.title,
-        message: notification.message,
+        id: notification?.id || "",
+        title: notification?.title || "Notification",
+        message: notification?.message || "",
         time: formatRelativeTime(createdAt),
-        unread: !notification.is_read,
+        unread: !notification?.is_read,
         icon: theme.icon,
         iconColor: theme.iconColor,
         iconBg: theme.iconBg,
@@ -111,7 +114,7 @@ export function mapNotificationToUnified(
     notification: NotificationResponseDto,
     role: UserRole,
 ): UnifiedNotificationItem {
-    const createdAt = new Date(notification.created_at);
+    const createdAt = notification?.created_at ? new Date(notification.created_at) : new Date();
     const now = new Date();
 
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -134,7 +137,8 @@ export function mapNotificationToUnified(
         group = "Earlier this month";
     }
 
-    const theme = NOTIFICATION_ICON_THEMES[notification.type];
+    const typeKey = (notification?.type || "").toUpperCase() as keyof typeof NOTIFICATION_ICON_THEMES;
+    const theme = NOTIFICATION_ICON_THEMES[typeKey] || NOTIFICATION_ICON_THEMES.INFO;
     const content = `${notification.title} ${notification.message}`.toLowerCase();
     let category = "system";
     let primaryAction: NotificationAction | undefined;

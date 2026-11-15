@@ -37,8 +37,13 @@ export function useNotificationSocket(): void {
                 notification.title === "ACCOUNT_SUSPENDED" ||
                 notification.title === "Account Suspended"
             ) {
-                useAuthStore.getState().clearAuth();
-                useAuthStore.getState().setSuspended(true);
+                useAuthStore.setState({
+                    user: null,
+                    profile: null,
+                    verifications: null,
+                    isAuthenticated: false,
+                    isSuspended: true,
+                });
                 return;
             }
             addNotification(notification);

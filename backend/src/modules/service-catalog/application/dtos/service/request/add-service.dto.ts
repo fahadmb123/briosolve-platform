@@ -2,6 +2,7 @@ export interface AddServiceUseCaseInputDto {
     name: string;
     category_id: string;
     description: string;
-    image: string | null;
+    image?: string | null;
     status: 'ACTIVE' | 'INACTIVE';
+    imageBuffer?: Buffer;
 }

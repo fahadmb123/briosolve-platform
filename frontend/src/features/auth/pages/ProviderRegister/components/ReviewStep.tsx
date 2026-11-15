@@ -17,68 +17,54 @@ export function ReviewStep({ isActive, isPending, onBack, onSubmit }: ReviewStep
     const values = getValues();
 
     return (
-        <div className="form-step-card step-content active" id="step-4">
-            <div className="step-heading-row">
-                <div className="step-num-pill">4</div>
-                <div>
-                    <h2 className="h5 mb-0">Review & Submit</h2>
-                    <p className="text-xs text-secondary mb-0">Ensure all details are correct before submitting your application.</p>
+        <div className="pro-step-pane">
+            <div className="pro-review-card">
+                <div className="pro-review-row">
+                    <span className="pro-review-label">Full Name</span>
+                    <span className="pro-review-value">{values.fullName || 'Not provided'}</span>
                 </div>
-            </div>
-            
-            <div className="bg-surface rounded border p-4 mb-4 text-sm" style={{ backgroundColor: 'var(--surface-elevated)', borderColor: 'var(--border)' }}>
-                <div className="grid grid-cols-2" style={{ display: 'grid', rowGap: '1.5rem', columnGap: '2rem' }}>
-                    <div>
-                        <div className="text-xs text-secondary mb-1">Full Name</div>
-                        <div className="font-medium">{values.fullName || 'Not provided'}</div>
-                    </div>
-                    <div>
-                        <div className="text-xs text-secondary mb-1">Contact</div>
-                        <div className="font-medium">{values.email || 'Not provided'}</div>
-                    </div>
-                    <div>
-                        <div className="text-xs text-secondary mb-1">Business Name</div>
-                        <div className="font-medium">{values.businessName || 'Not provided'}</div>
-                    </div>
-                    <div>
-                        <div className="text-xs text-secondary mb-1">Experience</div>
-                        <div className="font-medium">{values.experience || 'Not provided'}</div>
-                    </div>
-                    <div className="col-span-2">
-                        <div className="text-xs text-secondary mb-1">Selected Services</div>
-                        <div className="font-medium">{values.services?.length || 0} services selected</div>
-                    </div>
-                    <div className="col-span-2">
-                        <div className="text-xs text-secondary mb-1">KYC Status</div>
-                        <div className="font-medium text-warning"><i className="fas fa-clock mr-1"></i> Will be completed immediately after registration in KYC Verification</div>
-                    </div>
+                <div className="pro-review-row">
+                    <span className="pro-review-label">Email</span>
+                    <span className="pro-review-value">{values.email || 'Not provided'}</span>
+                </div>
+                <div className="pro-review-row">
+                    <span className="pro-review-label">Business Name</span>
+                    <span className="pro-review-value">{values.businessName || 'Not provided'}</span>
+                </div>
+                <div className="pro-review-row">
+                    <span className="pro-review-label">Experience</span>
+                    <span className="pro-review-value">{values.experience ? `${values.experience} Years` : 'Not provided'}</span>
+                </div>
+                <div className="pro-review-row">
+                    <span className="pro-review-label">Services</span>
+                    <span className="pro-review-value">{values.services?.length || 0} services selected</span>
+                </div>
+                <div className="pro-review-row notice">
+                    <span className="pro-review-label">KYC Verification</span>
+                    <span className="pro-review-value notice">Completed immediately after account registration</span>
                 </div>
             </div>
 
-            
-            <div className="register-actions-footer bg-transparent p-0 border-0">
-                <label className="flex items-center gap-2 cursor-pointer text-xs text-secondary w-full justify-center mb-4">
-                    <input type="checkbox" id="accept-terms" required defaultChecked className="w-4 h-4 accent-primary" />
-                    <span>I accept the Briosolve <Link to="#" className="underline text-primary">Provider Service Terms</Link></span>
-                </label>
+            <label className="pro-terms-row">
+                <input type="checkbox" id="accept-terms" required defaultChecked className="pro-terms-checkbox" />
+                <span>I agree to Briosolve's <Link to="/terms" target="_blank" rel="noopener noreferrer" className="pro-terms-link">Provider Terms & Conditions</Link></span>
+            </label>
 
-                <div className="flex gap-3 w-full max-w-md mx-auto">
-                    <button type="button" className="btn btn-secondary w-full" onClick={onBack} disabled={isPending}>
-                        <i className="fas fa-arrow-left mr-2"></i> Back
-                    </button>
-                    <button type="button" className="btn btn-primary w-full" onClick={onSubmit} disabled={isPending}>
-                        {isPending ? (
-                            <><i className="fas fa-spinner fa-spin mr-2"></i> Submitting...</>
-                        ) : (
-                            <><i className="fas fa-check-circle mr-2"></i> Submit Application</>
-                        )}
-                    </button>
-                </div>
-
-                <div className="text-xs text-secondary text-center mt-4 w-full">
-                    Already have an account?
-                    <Link to="/login" className="font-bold text-primary ml-1">Login to Portal</Link>
-                </div>
+            <div className="pro-step-nav-buttons">
+                <button type="button" className="login-secondary-back-btn" onClick={onBack} disabled={isPending}>
+                    <i className="fas fa-arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <button type="button" className="login-submit-btn" onClick={onSubmit} disabled={isPending}>
+                    {isPending ? (
+                        <>
+                            <i className="fas fa-spinner fa-spin"></i>
+                            <span>Registering...</span>
+                        </>
+                    ) : (
+                        <span>Complete Registration</span>
+                    )}
+                </button>
             </div>
         </div>
     );

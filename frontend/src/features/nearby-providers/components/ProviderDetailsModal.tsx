@@ -43,7 +43,7 @@ export const ProviderDetailsModal: React.FC<ProviderDetailsModalProps> = React.m
 
                 <div className="flex items-center gap-4 mb-5">
                     <img
-                        src={profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(provider.name)}&background=05AD98&color=fff&size=160&bold=true`}
+                        src={profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(provider.name)}&background=FF7900&color=fff&size=160&bold=true`}
                         alt={provider.name}
                         className="rounded-full object-cover"
                         style={{ width: '68px', height: '68px', border: '3px solid var(--border)' }}

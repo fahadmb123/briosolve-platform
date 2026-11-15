@@ -3,7 +3,6 @@ import { AddAddressModal, AddressCardSkeletonGrid, type AddressPayload, useAddAd
 import Skeleton from 'react-loading-skeleton';
 import { toast } from 'react-hot-toast';
 import { useAuthStore } from '../../../../../auth/stores/auth.store';
-import { SpinnerOverlay } from '../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from '../../../../../../shared/components/ui/ConfirmModal/ConfirmModal';
 
 
@@ -71,7 +70,9 @@ export const Addresses = () => {
               address.id === res.data.id ? res.data as unknown as AddressPayload : address as unknown as AddressPayload
             )
           )
-          toast.success(res.message)
+          toast.success(res.message);
+          setIsAddModalOpen(false);
+          setAddressToEdit(null);
         }
       })
     } else {
@@ -79,7 +80,9 @@ export const Addresses = () => {
         onSuccess:(response)=>{
           setAddresses((prev)=>[response.data as unknown as AddressPayload, ...prev])
           fetchUser()
-          toast.success(response.message)
+          toast.success(response.message);
+          setIsAddModalOpen(false);
+          setAddressToEdit(null);
         }
       })
     }
@@ -115,9 +118,6 @@ export const Addresses = () => {
 
   return (
     <>
-    {editAddress.isPending ? (<SpinnerOverlay isLoading={true}/>):null}
-    {addAddress.isPending ? (<SpinnerOverlay isLoading={true}/>):null}
-    {setDefaultAddress.isPending ? (<SpinnerOverlay isLoading={true}/>):null}
       <div className="bg-surface-container-low border border-surface-variant rounded-xl p-6 md:p-8 flex flex-col gap-6 shadow-xl">
         {/* Header & Top Action */}
         <div className="flex flex-row items-center justify-between w-full text-left border-b border-surface-variant pb-6">
@@ -251,9 +251,17 @@ export const Addresses = () => {
                 {!isDefault ? (
                   <button 
                     onClick={() => handleSetDefault(address.id!)}
-                    className="px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-sm text-label-sm transition-colors cursor-pointer bg-transparent"
+                    disabled={setDefaultAddress.isPending}
+                    className="px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-sm text-label-sm transition-colors cursor-pointer bg-transparent disabled:opacity-50"
                   >
-                    Set as Default
+                    {setDefaultAddress.isPending ? (
+                      <span className="flex items-center gap-1.5">
+                        <i className="fas fa-spinner fa-spin text-xs"></i>
+                        <span>Setting...</span>
+                      </span>
+                    ) : (
+                      'Set as Default'
+                    )}
                   </button>
                 ) : (
                   <button className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-highest border border-surface-variant text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-colors cursor-pointer">
@@ -263,6 +271,18 @@ export const Addresses = () => {
               </div>
             </div>
               )})}
+
+              {addresses.length === 0 && search !== '' && (
+                <div className="text-center py-10 px-4 bg-surface-container rounded-xl border border-surface-variant flex flex-col items-center justify-center">
+                  <img
+                    src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                    alt="No data found"
+                    style={{ width: '100%', maxWidth: '220px', maxHeight: '150px', objectFit: 'contain', marginBottom: '1rem', filter: 'drop-shadow(0 10px 24px rgba(0, 0, 0, 0.1))' }}
+                  />
+                  <h4 className="font-title-md text-on-surface font-semibold m-0">No matching addresses found</h4>
+                  <p className="font-body-sm text-on-surface-variant mt-1 mb-0 max-w-sm">No saved locations match &ldquo;{search}&rdquo;. Try another search term.</p>
+                </div>
+              )}
 
           {/* Dashed Interactive Add Slot */}
           <div 
@@ -328,6 +348,7 @@ export const Addresses = () => {
         }} 
         onSave={handleSaveAddress}
         initialData={addressToEdit}
+        isLoading={addAddress.isPending || editAddress.isPending}
       />
       <ConfirmModal 
         isOpen={!!addressToDelete} 

@@ -4,7 +4,7 @@ import { IncomingCallModal } from "./IncomingCallModal";
 import { OutgoingCallModal } from "./OutgoingCallModal";
 import { ActiveCallModal } from "./ActiveCallModal";
 import { socket } from "../../../shared/api/socket-client";
-import { fetchCallToken, recordCallMessage } from "../api/call.api";
+import { fetchCallToken, recordCallMessage } from "../services/call.service";
 import { useAuthStore } from "../../auth/stores/auth.store";
 import {
   startCallingSound,

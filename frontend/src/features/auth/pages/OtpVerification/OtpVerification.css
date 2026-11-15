@@ -1,154 +1,148 @@
-/* ==========================================================================
-   OTP Verification Styles
-   ========================================================================== */
-
 .auth-page-wrapper {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1.5rem;
-    position: relative;
-    background: radial-gradient(circle at 50% 20%, rgba(5, 173, 152, 0.08) 0%, transparent 60%), var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+  background: radial-gradient(circle at 50% 20%, rgba(5, 173, 152, 0.08) 0%, transparent 60%), var(--bg);
 }
 
 .auth-theme-toggle {
-    position: absolute;
-    top: 1.75rem;
-    right: 1.75rem;
-    z-index: 50;
+  position: absolute;
+  top: 1.75rem;
+  right: 1.75rem;
+  z-index: 50;
 }
 
 .auth-card-container {
-    width: 100%;
-    max-width: 440px;
-    animation: authFadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  max-width: 440px;
+  animation: authFadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes authFadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .auth-card {
-    padding: 2.5rem;
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl);
+  padding: 2.5rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
 }
 
 .otp-card {
-    max-width: 440px;
-    margin: 0 auto;
+  max-width: 440px;
+  margin: 0 auto;
 }
 
-/* Modern Single Input OTP Style */
 .otp-single-input {
-    font-size: 2rem;
-    letter-spacing: 1rem;
-    font-weight: 700;
-    padding: 1rem;
-    height: auto;
-    border: 2px dashed var(--border);
-    background-color: var(--bg);
-    color: var(--text);
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 320px;
+  font-size: 2rem;
+  letter-spacing: 1rem;
+  font-weight: 700;
+  padding: 1rem;
+  height: auto;
+  border: 2px dashed var(--border);
+  background-color: var(--bg);
+  color: var(--text);
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 320px;
 }
 
 .otp-single-input:focus {
-    border-color: var(--primary);
-    border-style: solid;
-    box-shadow: 0 4px 12px rgba(5, 173, 152, 0.15);
-    outline: none;
-    transform: translateY(-2px);
+  border-color: var(--primary);
+  border-style: solid;
+  box-shadow: 0 4px 12px rgba(5, 173, 152, 0.15);
+  outline: none;
+  transform: translateY(-2px);
 }
 
 .otp-single-input::placeholder {
-    letter-spacing: 1rem;
-    color: var(--muted);
-    font-weight: 400;
+  letter-spacing: 1rem;
+  color: var(--muted);
+  font-weight: 400;
 }
 
 .verify-icon-wrapper {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .verify-icon-circle {
-    width: 64px;
-    height: 64px;
-    background-color: var(--primary);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-content);
-    font-size: 1.75rem;
-    z-index: 2;
-    box-shadow: 0 4px 12px rgba(5, 173, 152, 0.3);
+  width: 64px;
+  height: 64px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-content);
+  font-size: 1.75rem;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(5, 173, 152, 0.3);
 }
 
 .verify-icon-pulse {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    background-color: rgba(5, 173, 152, 0.2);
-    border-radius: 50%;
-    z-index: 1;
-    animation: pulse 2s infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(5, 173, 152, 0.2);
+  border-radius: 50%;
+  z-index: 1;
+  animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-    0% {
-        transform: translate(-50%, -50%) scale(0.8);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1.5);
-        opacity: 0;
-    }
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
 }
 
 @media (max-width: 480px) {
-    .auth-page-wrapper {
-        padding: 1.25rem 0.875rem;
-    }
-    .auth-card {
-        padding: 1.35rem 1rem;
-        border-radius: var(--radius-lg, 12px);
-    }
-    .verify-icon-wrapper {
-        width: 64px;
-        height: 64px;
-    }
-    .verify-icon-circle {
-        width: 52px;
-        height: 52px;
-        font-size: 1.35rem;
-    }
-    .otp-single-input {
-        font-size: 1.35rem;
-        letter-spacing: 0.4rem;
-        padding: 0.65rem 0.5rem;
-        max-width: 250px;
-    }
-    .otp-single-input::placeholder {
-        letter-spacing: 0.4rem;
-    }
-    .btn {
-        min-height: 42px;
-        font-size: 0.8125rem;
-    }
+  .auth-page-wrapper {
+    padding: 1.25rem 0.875rem;
+  }
+  .auth-card {
+    padding: 1.35rem 1rem;
+    border-radius: var(--radius-lg, 12px);
+  }
+  .verify-icon-wrapper {
+    width: 64px;
+    height: 64px;
+  }
+  .verify-icon-circle {
+    width: 52px;
+    height: 52px;
+    font-size: 1.35rem;
+  }
+  .otp-single-input {
+    font-size: 1.35rem;
+    letter-spacing: 0.4rem;
+    padding: 0.65rem 0.5rem;
+    max-width: 250px;
+  }
+  .otp-single-input::placeholder {
+    letter-spacing: 0.4rem;
+  }
+  .btn {
+    min-height: 42px;
+    font-size: 0.8125rem;
+  }
 }
-

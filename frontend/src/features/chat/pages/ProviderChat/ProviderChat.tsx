@@ -785,7 +785,7 @@ export default function ProviderChat() {
               <ChatInputBar onSendMessage={handleSendMessage} />
             </div>
           ) : (
-            <EmptyChatState currentRole="PROVIDER" />
+            <EmptyChatState currentRole="PROVIDER" hasConversations={conversations.length > 0} />
           )}
         </div>
 

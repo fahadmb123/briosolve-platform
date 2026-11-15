@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import './NearbyProviders.css';
 import { useGetNearbyProviders } from '../../hooks/mutations/useNearbyProviders';
 import Skeleton from 'react-loading-skeleton';
 import { ProviderCard } from '../../components/ProviderCard';
 import { ProviderCardSkeletonGrid } from '../../components/ProviderCardSkeleton';
-import { ProviderDetailsModal } from '../../components/ProviderDetailsModal';
+import { ProviderProfileView } from '../../components/ProviderProfileView/ProviderProfileView';
 import { AdminPagination } from '../../../admin/components/AdminPagination';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import type { User, response } from '../../../../shared/types/Dtos';
@@ -13,6 +13,10 @@ import type { Address } from '../../../addresses';
 import type { NearbyProvidersResponseData } from '../../services/nearbyProviders.service';
 
 export default function NearbyProviders() {
+    const navigate = useNavigate();
+    const { providerId } = useParams<{ providerId?: string }>();
+    const location = useLocation();
+
     const user = useAuthStore((s) => s.user);
     const customerAddress = typeof user?.current_address_id === 'object' ? (user.current_address_id as Address | null) : null;
 
@@ -51,6 +55,20 @@ export default function NearbyProviders() {
         fetchProviders(page, search, appliedRadius);
     }, [page, search, appliedRadius, fetchProviders]);
 
+    const activeProvider = useMemo(() => {
+        if (selectedProvider && (!providerId || selectedProvider.id === providerId)) {
+            return selectedProvider;
+        }
+        const stateProvider = (location.state as { provider?: User } | null)?.provider;
+        if (stateProvider && (!providerId || stateProvider.id === providerId)) {
+            return stateProvider;
+        }
+        if (providerId) {
+            return providers.find((p) => p.id === providerId) || null;
+        }
+        return selectedProvider;
+    }, [providerId, selectedProvider, location.state, providers]);
+
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setPage(1);
@@ -69,11 +87,24 @@ export default function NearbyProviders() {
 
     const handleViewDetails = useCallback((provider: User) => {
         setSelectedProvider(provider);
-    }, []);
+        navigate(`/nearby-providers/${provider.id}`, { state: { provider, from: 'nearby-providers' } });
+    }, [navigate]);
 
-    const handleCloseModal = useCallback(() => {
+    const handleBackFromProfile = useCallback(() => {
         setSelectedProvider(null);
-    }, []);
+        const state = location.state as { from?: string; returnUrl?: string } | null;
+        if (state?.returnUrl) {
+            navigate(state.returnUrl);
+        } else if (state?.from === 'chat') {
+            navigate('/messages');
+        } else if (state?.from === 'nearby-providers') {
+            navigate('/nearby-providers');
+        } else if (window.history.state?.idx > 0) {
+            navigate(-1);
+        } else {
+            navigate('/nearby-providers');
+        }
+    }, [navigate, location.state]);
 
     const displayedProviders = useMemo(() => {
         const list = [...providers];
@@ -91,10 +122,21 @@ export default function NearbyProviders() {
         return list;
     }, [providers, sortBy]);
 
+    if (activeProvider || providerId) {
+        return (
+            <div className="app-content nearby-providers-container">
+                <ProviderProfileView
+                    providerId={providerId || activeProvider?.id}
+                    initialProvider={activeProvider}
+                    customerAddress={customerAddress}
+                    onBack={handleBackFromProfile}
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="app-content nearby-providers-container">
-
-
             <div className="nearby-header-section">
                 <div>
                     <h1 className="h2 mb-1">Nearby Providers</h1>
@@ -218,18 +260,11 @@ export default function NearbyProviders() {
                         </>
                     ) : (
                         <div className="empty-providers-state">
-                            <div style={{
-                                width: '64px',
-                                height: '64px',
-                                borderRadius: '50%',
-                                background: 'rgba(99,102,241,0.1)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 1.25rem'
-                            }}>
-                                <i className="fas fa-user-slash text-primary" style={{ fontSize: '1.75rem' }} />
-                            </div>
+                            <img
+                                src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                                alt="No data found"
+                                className="empty-providers-img"
+                            />
                             <h3 className="h5 mb-2">No Providers In Range</h3>
                             <p className="text-secondary text-sm max-w-md mx-auto mb-4">
                                 No active service providers match your current radius ({activeRadiusKm} km) and search criteria. Try expanding your search radius.
@@ -241,11 +276,6 @@ export default function NearbyProviders() {
                     )}
                 </>
             )}
-
-            <ProviderDetailsModal
-                provider={selectedProvider}
-                onClose={handleCloseModal}
-            />
         </div>
     );
 }

@@ -4,6 +4,7 @@ import { IConversationRepository } from "../../domain/repositories/IConversation
 import { ConversationMapper } from "../mappers/conversation.mapper";
 import { ConversationResponseDto } from "../../application/dtos/response/conversation/conversation-response.dto";
 import { PresenceTracker } from "../../../../shared/realtime/services/presence.tracker";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 function parseDate(val: unknown): Date {
     if (!val) return new Date();
@@ -128,7 +129,7 @@ export class ConversationRepository implements IConversationRepository {
                     .first();
                 if (providerProfile) {
                     businessName = providerProfile.business_name || null;
-                    avatar = providerProfile.profile_image || null;
+                    avatar = StorageUtil.getPublicUrl(providerProfile.profile_image);
                     isVerified = providerProfile.kyc_status === "APPROVED";
                 }
                 customerId = userId;
@@ -137,7 +138,7 @@ export class ConversationRepository implements IConversationRepository {
                     .where({ user_id: otherUser.id as never })
                     .first();
                 if (customerProfile) {
-                    avatar = customerProfile.profile_image || null;
+                    avatar = StorageUtil.getPublicUrl(customerProfile.profile_image);
                 }
                 customerId = otherUser.id;
                 providerProfile = await db.orm.public.provider_profiles

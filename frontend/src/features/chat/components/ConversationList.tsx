@@ -82,8 +82,14 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           <ConversationListSkeleton count={5} />
         ) : conversations.length === 0 ? (
           <div className="chat-empty-conversations">
-            <i className="far fa-comment-dots chat-empty-icon" />
-            <p className="chat-empty-title">No conversations found</p>
+            <img
+              src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794746653/conversation-logo.png"
+              alt="No conversations"
+              className="chat-empty-conversations-logo"
+            />
+            <p className="chat-empty-title">
+              {searchQuery ? "No conversations found" : "No conversations"}
+            </p>
             <p className="chat-empty-subtitle">
               {searchQuery
                 ? "Try searching with different keywords"

@@ -21,12 +21,19 @@ export class CategoryRepository implements ICategoryRepository{
     }
 
     async findByName(name:string):Promise<Category | null> {
-        const category = await db.orm.public.categories
+        const trimmed = name.trim().toLowerCase();
+        let category = await db.orm.public.categories
             .include("services")
-            .where({ name: name.toLowerCase() as Varchar<100> })
-            .first()
-        if (!category) return null
-        return CategoryMapper.toDomain(category as CategoryRecord)
+            .where({ name: trimmed as Varchar<100> })
+            .first();
+        if (!category) {
+            category = await db.orm.public.categories
+                .include("services")
+                .where((c) => c.name.ilike(trimmed))
+                .first();
+        }
+        if (!category) return null;
+        return CategoryMapper.toDomain(category as CategoryRecord);
     }
 
     async get(input: GetCategoriesDto):Promise<{categories:Category[], total: number}> {

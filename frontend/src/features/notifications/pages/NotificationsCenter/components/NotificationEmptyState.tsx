@@ -11,9 +11,11 @@ export const NotificationEmptyState: React.FC<NotificationEmptyStateProps> = ({
 }) => {
   return (
     <div className="notif-empty-state">
-      <div className="notif-empty-icon">
-        <i className="fas fa-bell-slash"></i>
-      </div>
+      <img
+        src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794747453/notificastion-logo.png"
+        alt="No notifications"
+        className="notif-center-empty-img"
+      />
       <h3>No notifications found</h3>
       <p>
         {isFiltered
@@ -28,4 +30,3 @@ export const NotificationEmptyState: React.FC<NotificationEmptyStateProps> = ({
     </div>
   );
 };
-

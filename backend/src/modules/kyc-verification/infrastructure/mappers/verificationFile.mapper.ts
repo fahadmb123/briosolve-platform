@@ -1,6 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import type { Prisma } from "@prisma/client";
 import { VerificationFile } from "../../domain/entities/verificationFile.entity";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export type VerificationFileRecord = Prisma.VerificationFileGetPayload<{}>;
 export type VerificationFileRaw = VerificationFileRecord;
@@ -12,7 +13,7 @@ export class VerificationFileMapper {
         return new VerificationFile(
             record.id,
             record.document_id,
-            record.file_url,
+            StorageUtil.getPublicUrl(record.file_url) ?? record.file_url,
             createdAtRaw && typeof createdAtRaw === "object" && "epochMilliseconds" in createdAtRaw
                 ? new Date(Number(createdAtRaw.epochMilliseconds))
                 : new Date(createdAtRaw)

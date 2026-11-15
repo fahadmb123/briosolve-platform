@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { Temporal } from "@js-temporal/polyfill";
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity";
 import { UpdateCustomerProfileInputDataDto } from "../../application/dtos/request/customer/update-customer-profile.dto";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export type CustomerProfileRecord = Prisma.CustomerProfileGetPayload<{}>;
 
@@ -14,7 +15,7 @@ export class CustomerProfileMapper {
             record.id,
             record.user_id,
             (record as any).current_address_id ?? null,
-            record.profile_image ?? null,
+            StorageUtil.getPublicUrl(record.profile_image),
             record.about,
             createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
             updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw),

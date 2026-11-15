@@ -10,7 +10,6 @@ import { useAuthStore } from "../../auth/stores/auth.store";
 import "./NotificationDropdown.css";
 import { useNotificationStore } from "../stores/notification.store";
 import {
-  useMarkAllNotificationsRead,
   useUpdateNotificationStatus,
 } from "../hooks/useNotifications";
 import { mapNotificationToHeader } from "../utils/notification.mapper";
@@ -41,7 +40,6 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     (state) => state.updateNotification,
   );
 
-  const markAllMutation = useMarkAllNotificationsRead();
   const updateStatusMutation = useUpdateNotificationStatus();
 
   const resolvedRole = useMemo<UserRole>(() => {
@@ -52,18 +50,27 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   }, [role, user?.role]);
 
   const unreadNotifications = useMemo(() => {
-    const sorted = [...notifications].sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    );
-    return sorted
-      .filter((n) => !n.is_read)
-      .map((notification) =>
-        mapNotificationToHeader(notification, resolvedRole),
-      );
+    if (!Array.isArray(notifications)) return [];
+    try {
+      const sorted = [...notifications].sort((a, b) => {
+        const timeA = a?.created_at ? new Date(a.created_at).getTime() : 0;
+        const timeB = b?.created_at ? new Date(b.created_at).getTime() : 0;
+        return timeB - timeA;
+      });
+      return sorted
+        .filter((n) => n && !n.is_read)
+        .map((notification) =>
+          mapNotificationToHeader(notification, resolvedRole),
+        )
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
   }, [notifications, resolvedRole]);
 
   const unreadCount = unreadNotifications.length;
+
+  const displayedNotifications = unreadNotifications;
 
   const targetViewAll = useMemo(() => {
     if (viewAllLink) return viewAllLink;
@@ -75,26 +82,6 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     e.stopPropagation();
     setIsOpen((prev) => !prev);
   }, []);
-
-  const handleMarkAllRead = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const readAt = new Date();
-      notifications.forEach((notification) => {
-        if (!notification.is_read) {
-          updateNotification(notification.id, {
-            is_read: true,
-            read_at: readAt,
-          });
-        }
-      });
-
-      markAllMutation.mutate();
-    },
-    [notifications, updateNotification, markAllMutation],
-  );
 
   const handleToggleRead = useCallback(
     (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
@@ -208,31 +195,35 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           aria-label="Notifications dropdown"
         >
           <div className="notif-dropdown-header">
-            <div className="flex items-center gap-2.5">
-              <h3 className="notif-header-title">Notifications</h3>
-              {unreadCount > 0 && (
-                <span className="notif-unread-pill">{unreadCount} new</span>
-              )}
+            <div className="notif-header-left">
+              <div className="notif-header-bell-box">
+                <i className="fas fa-bell"></i>
+              </div>
+              <div className="notif-header-info">
+                <h3 className="notif-header-title">Notification</h3>
+                <p className="notif-header-subtitle">
+                  {unreadCount === 0
+                    ? "No unread notifications"
+                    : `${unreadCount} unread notification${unreadCount > 1 ? "s" : ""}`}
+                </p>
+              </div>
             </div>
 
-            {unreadCount > 0 && (
-              <button
-                type="button"
-                className="btn-mark-all-read"
-                onClick={handleMarkAllRead}
-                title="Mark all notifications as read"
-              >
-                <i className="fas fa-check-double text-xs"></i>
-                <span>Mark all read</span>
-              </button>
-            )}
+            <button
+              type="button"
+              className="notif-header-close-btn"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close notifications"
+            >
+              <i className="fas fa-times"></i>
+            </button>
           </div>
 
           <div className="notif-dropdown-body">
-            {unreadNotifications.length === 0 ? (
-              <NotificationDropdownEmpty activeTab="unread" />
+            {displayedNotifications.length === 0 ? (
+              <NotificationDropdownEmpty />
             ) : (
-              unreadNotifications.map((item) => (
+              displayedNotifications.map((item) => (
                 <NotificationDropdownItem
                   key={item.id}
                   item={item}
@@ -249,7 +240,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
               className="notif-view-all-link"
               onClick={() => setIsOpen(false)}
             >
-              <span>View all activity alerts</span>
+              <span>View all notifications</span>
               <i className="fas fa-arrow-right text-xs notif-arrow-icon"></i>
             </Link>
           </div>

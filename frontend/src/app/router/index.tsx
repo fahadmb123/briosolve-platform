@@ -2,7 +2,10 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { LoadingScreen } from '../../shared/components/ui/LoadingScreen/LoadingScreen';
 
-const Home = React.lazy(() => import('../pages/Home/Home'));
+import Home from '../pages/Home/Home';
+const Terms = React.lazy(() => import('../pages/Legal/Terms'));
+const Privacy = React.lazy(() => import('../pages/Legal/Privacy'));
+const LegalLayout = React.lazy(() => import('../../layouts/LegalLayout'));
 const NotFound = React.lazy(() => import('../pages/NotFound/NotFound'));
 const AdminLayout = React.lazy(() => import('../../layouts/AdminLayout'));
 const ProviderLayout = React.lazy(() => import('../../layouts/ProviderLayout'));
@@ -14,20 +17,40 @@ import { customerRoutes } from './routes/customerRoutes';
 import { publicRoutes, verificationRoutes } from './routes/publicRoutes';
 import PublicRoute from './guards/PublicRoute';
 import RoleRoute from './guards/RoleRoute';
-import { ProviderRegister } from './lazy/provider.lazy';
 
 
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, [pathname, hash]);
+
+  return null;
+}
 
 function ThemeManager() {
   const location = useLocation();
   useEffect(() => {
-    let themeClass = 'theme-user';
+    const themeClasses = ['theme-user', 'theme-admin', 'theme-provider'];
+    let targetClass = 'theme-user';
     if (location.pathname.startsWith('/admin')) {
-      themeClass = 'theme-admin';
+      targetClass = 'theme-admin';
     } else if (location.pathname.startsWith('/provider')) {
-      themeClass = 'theme-provider';
+      targetClass = 'theme-provider';
     }
-    document.body.className = themeClass;
+    themeClasses.forEach((cls) => {
+      if (cls === targetClass) {
+        document.body.classList.add(cls);
+      } else {
+        document.body.classList.remove(cls);
+      }
+    });
   }, [location.pathname]);
   return null;
 }
@@ -35,15 +58,19 @@ function ThemeManager() {
 export function AppRouter() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <React.Suspense fallback={<LoadingScreen isLoading={true} />}>
         <ThemeManager />
         <Routes>
          <Route path="/">
           <Route index element={<Home />} />
+          <Route element={<LegalLayout />}>
+            <Route path="terms" element={<Terms />} />
+            <Route path="privacy" element={<Privacy />} />
+          </Route>
 
           <Route element={<PublicRoute />}>
               {publicRoutes}
-              <Route path="provider/register" element={<ProviderRegister />} />
           </Route>
 
           {verificationRoutes}

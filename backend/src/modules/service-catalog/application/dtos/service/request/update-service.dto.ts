@@ -6,5 +6,6 @@ export interface UpdateServiceUseCaseDto {
         description?: string;
         image?: string | null;
         status?: 'ACTIVE' | 'INACTIVE';
-    }
+    };
+    imageBuffer?: Buffer;
 }

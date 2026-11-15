@@ -1,142 +1,144 @@
-import './CustomerRegister.css';
-import { Link } from 'react-router-dom';
-import { useTheme } from '../../../../shared/hooks/useTheme';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, type RegisterInputType } from '../../schemas/customer/customerRegistration.schema';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import { useRegisterCustomer } from '../../hooks/customer/useRegisterCustomer';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useResetFlowStore } from '../../stores/reset-flow.store';
 import { PasswordInput } from '../../../../shared/components/ui/PasswordInput/PasswordInput';
+import './CustomerRegister.css';
 
 export default function CustomerRegister() {
-    const { toggleTheme } = useTheme();
-    const navigate = useNavigate();
-    const setOtpFlowStarted = useResetFlowStore((state) => state.setOtpFlowStarted);
-    const registerMutation = useRegisterCustomer();
-    const { register, handleSubmit, formState: { errors } } = useForm<RegisterInputType>({
-        resolver: zodResolver(registerSchema),
-        mode: "onChange"
+  const navigate = useNavigate();
+  const setOtpFlowStarted = useResetFlowStore((state) => state.setOtpFlowStarted);
+  const registerMutation = useRegisterCustomer();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<RegisterInputType>({
+    resolver: zodResolver(registerSchema),
+    mode: "onChange"
+  });
+
+  const handleRegister = (data: RegisterInputType) => {
+    registerMutation.mutate({
+      name: data.name,
+      email: data.email,
+      password: data.password
+    }, {
+      onSuccess: (response) => {
+        setOtpFlowStarted(true);
+        navigate("/otp-verification", { replace: true });
+        toast.success(response.message);
+      }
     });
+  };
 
-    const handleRegister = (data: RegisterInputType) => {
-        registerMutation.mutate({
-            name: data.name,
-            email: data.email,
-            password: data.password 
-        }, {
-            onSuccess: (response) => {
-                setOtpFlowStarted(true);
-                navigate("/otp-verification", { replace: true });
-                toast.success(response.message);
-            }
-        });
-    };
+  return (
+    <>
+      <div className="login-form-header">
+        <h1 className="login-title">Join as Customer</h1>
+        <p className="login-subtitle">Create your account to get started</p>
+      </div>
 
-    return ( 
-        <>
-        {registerMutation.isPending ? (<SpinnerOverlay isLoading={true}/>) : null}
-        <div className="auth-page-wrapper">
-            <button id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme" onClick={toggleTheme}>
-                <i className="fas fa-sun"></i>
-            </button>
-
-            <div className="auth-card-container register-container">
-                <div className="provider-callout-card mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="provider-badge-icon"><i className="fas fa-briefcase"></i></div>
-                        <div>
-                            <div className="font-semibold text-xs text-text">Are you a service professional?</div>
-                            <div className="text-xs text-secondary">Join as a verified contractor and receive customer jobs</div>
-                        </div>
-                    </div>
-                    <Link to="/provider/register" replace className="btn btn-outline text-xs py-1">
-                        Become a Provider <i className="fas fa-arrow-right ml-1"></i>
-                    </Link>
-                </div>
-
-                <div className="auth-card card">
-                    <div className="text-center mb-6">
-                        <Link to="/" className="brand-logo-container justify-center mb-4" aria-label="Briosolve Home">
-                            <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
-                            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
-                        </Link>
-                        <h1 className="h3 mb-1">Create Customer Account</h1>
-                        <p className="text-secondary text-sm">Post requirements and receive competitive quotations for free</p>
-                    </div>
-
-                    <form onSubmit={handleSubmit(handleRegister)}>
-                        <div className="form-group">
-                            <label className="form-label" htmlFor="full-name">Full Name</label>
-                            <div className="input-icon-wrapper">
-                                <i className="fas fa-user"></i>
-                                <input {...register("name")} type="text" id="full-name" className={`form-control ${errors.name ? 'border-danger' : ''}`} placeholder="Aarav Sharma" />
-                            </div>
-                            {errors.name && <span className="text-danger text-xs mt-1 block">{errors.name.message}</span>}
-                        </div>
-
-                        <div className="form-group mb-4">
-                            <label className="form-label" htmlFor="email">Email Address</label>
-                            <div className="input-icon-wrapper">
-                                <i className="fas fa-envelope"></i>
-                                <input {...register("email")} type="email" id="email" className={`form-control ${errors.email ? 'border-danger' : ''}`} placeholder="aarav@example.com" />
-                            </div>
-                            {errors.email && <span className="text-danger text-xs mt-1 block">{errors.email.message}</span>}
-                        </div>
-
-                        <div className="form-row-2">
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="password">Password</label>
-                                <PasswordInput
-                                    id="password"
-                                    placeholder="At least 8 chars"
-                                    error={errors.password?.message}
-                                    {...register("password")}
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="confirm-password">Confirm Password</label>
-                                <PasswordInput
-                                    id="confirm-password"
-                                    icon="fas fa-check-double"
-                                    placeholder="Repeat password"
-                                    error={errors.confirmPassword?.message}
-                                    {...register("confirmPassword")}
-                                />
-                            </div>
-                        </div>
-
-                        <button type="submit" className="btn btn-primary w-full btn-lg mb-4" disabled={registerMutation.isPending}>
-                            {registerMutation.isPending ? (
-                                <>
-                                    <i className="fas fa-spinner fa-spin mr-2"></i>
-                                    <span>Creating Account...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>Complete Registration</span>
-                                    <i className="fas fa-arrow-right ml-2"></i>
-                                </>
-                            )}
-                        </button>
-
-                        <div className="text-center text-sm text-secondary pt-4 border-top">
-                            Already have an account? 
-                            <Link to="/login" className="text-primary font-semibold">Sign In</Link>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <div className="navbar-action-box always-visible" style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 100 }}>
-                <Link to="/" className="btn btn-outline btn-sm" style={{ borderRadius: '2rem' }}>
-                    <i className="fas fa-home mr-1"></i> Home
-                </Link>
-            </div>
+      {registerMutation.error?.message ? (
+        <div className="login-error-alert" role="alert">
+          <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+          <span className="login-error-alert-text">{registerMutation.error.message}</span>
+          <button
+            type="button"
+            className="login-error-alert-close"
+            onClick={() => registerMutation.reset()}
+            aria-label="Dismiss error"
+          >
+            <i className="fas fa-times"></i>
+          </button>
         </div>
-        </>
-    );
+      ) : null}
+
+      <form onSubmit={handleSubmit(handleRegister)} className="login-form register-form" noValidate>
+        <div className="login-input-group">
+          <label className="login-label" htmlFor="name">Full Name</label>
+          <div className="login-input-wrapper">
+            <input
+              type="text"
+              id="name"
+              className={`login-input ${errors.name ? 'is-invalid' : ''}`}
+              placeholder="Full Name"
+              {...register("name")}
+            />
+          </div>
+          {errors.name && <div className="login-error-msg">{errors.name.message}</div>}
+        </div>
+
+        <div className="login-input-group">
+          <label className="login-label" htmlFor="email">Email</label>
+          <div className="login-input-wrapper">
+            <input
+              type="email"
+              id="email"
+              className={`login-input ${errors.email ? 'is-invalid' : ''}`}
+              placeholder="Email"
+              {...register("email")}
+            />
+          </div>
+          {errors.email && <div className="login-error-msg">{errors.email.message}</div>}
+        </div>
+
+        <div className="login-input-group">
+          <label className="login-label" htmlFor="password">Password</label>
+          <PasswordInput
+            id="password"
+            placeholder="Password"
+            icon=""
+            error={errors.password?.message}
+            wrapperClassName="login-password-wrapper"
+            className="login-input"
+            {...register("password")}
+          />
+        </div>
+
+        <div className="login-input-group">
+          <label className="login-label" htmlFor="confirmPassword">Confirm Password</label>
+          <PasswordInput
+            id="confirmPassword"
+            placeholder="Confirm Password"
+            icon=""
+            error={errors.confirmPassword?.message}
+            wrapperClassName="login-password-wrapper"
+            className="login-input"
+            {...register("confirmPassword")}
+          />
+        </div>
+
+        <button type="submit" className="login-submit-btn" disabled={registerMutation.isPending} style={{ marginTop: '0.4rem' }}>
+          {registerMutation.isPending ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Creating Account...</span>
+            </>
+          ) : (
+            <span>Register</span>
+          )}
+        </button>
+
+        <div className="login-divider-row">
+          <span className="login-divider-line"></span>
+          <span className="login-divider-text">or</span>
+          <span className="login-divider-line"></span>
+        </div>
+
+        <div className="login-register-actions">
+          <Link to="/login" className="login-secondary-action-btn">
+            Sign In
+          </Link>
+          <Link to="/provider/register" className="login-secondary-action-btn provider">
+            Join as a Provider
+          </Link>
+        </div>
+      </form>
+    </>
+  );
 }

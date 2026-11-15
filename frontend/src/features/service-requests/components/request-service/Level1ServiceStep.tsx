@@ -131,8 +131,13 @@ export function Level1ServiceStep({
               })}
             </div>
           ) : (
-            <div className="p-4 text-center text-sm text-secondary">
-              No services available in this category yet.
+            <div className="p-6 text-center text-sm text-secondary flex flex-col items-center justify-center">
+              <img
+                src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                alt="No data found"
+                style={{ width: '100%', maxWidth: '200px', maxHeight: '140px', objectFit: 'contain', margin: '0 auto 1rem', display: 'block', filter: 'drop-shadow(0 8px 20px rgba(0, 0, 0, 0.1))' }}
+              />
+              <span>No services available in this category yet.</span>
             </div>
           )}
 

@@ -71,8 +71,6 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
       const container = bottomRef.current?.closest(".chat-thread-body") as HTMLElement | null;
       if (container) {
         container.scrollTop = container.scrollHeight;
-      } else {
-        bottomRef.current?.scrollIntoView({ behavior: "instant" as ScrollBehavior });
       }
     };
 
@@ -88,7 +86,10 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
         clearTimeout(timerId);
       };
     } else {
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      const container = bottomRef.current?.closest(".chat-thread-body") as HTMLElement | null;
+      if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+      }
     }
   }, [messages]);
 

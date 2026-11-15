@@ -1,6 +1,4 @@
-import './OtpVerification.css';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { otpSchema, type OtpInputType } from '../../schemas/validation';
@@ -10,174 +8,296 @@ import { useGetOtpStatus, useOtpVarify, useResendOtp } from '../../hooks/use-otp
 import { useResetFlowStore } from '../../stores/reset-flow.store';
 import { useAuthStore } from '../../stores/auth.store';
 import { maskEmail, maskPhoneNumber } from '../../../../shared/utils/masking';
+import './OtpVerification.css';
 
 interface OtpVerificationProps {
-    isInline?: boolean;
-    onInlineSuccess?: () => void;
+  isInline?: boolean;
+  onInlineSuccess?: () => void;
 }
 
 export default function OtpVerification({ isInline, onInlineSuccess }: OtpVerificationProps = {}) {
-    const { toggleTheme } = useTheme()
-    const [otp, setOtp] = useState('')
-    const [timer, setTimer] = useState(60)
-    const [email,setEmail] = useState("")
-    const [attempts, setAttempts] = useState(0)
-    const [forTo,setForTo] = useState("")
-    const [phone,setPhone] = useState("")
-    const currentUser = useAuthStore((state) => state.user);
-    const backDestination = currentUser?.role === "PROVIDER" 
-        ? "/provider/settings" 
-        : currentUser?.role === "CUSTOMER" 
-            ? "/settings" 
-            : "/login";
+  const [otp, setOtp] = useState('');
+  const [timer, setTimer] = useState(60);
+  const [email, setEmail] = useState('');
+  const [attempts, setAttempts] = useState(0);
+  const [forTo, setForTo] = useState('');
+  const [phone, setPhone] = useState('');
+  const currentUser = useAuthStore((state) => state.user);
+  const backDestination = currentUser?.role === "PROVIDER" 
+    ? "/provider/settings" 
+    : currentUser?.role === "CUSTOMER" 
+      ? "/settings" 
+      : "/login";
 
-    const {register,handleSubmit,formState:{errors}} = useForm<OtpInputType>({
-        resolver : zodResolver(otpSchema),mode : "onChange"
-    })
-    const otpVarify = useOtpVarify(isInline)
-    const getOtpStatus = useGetOtpStatus()
-    const resendOtp = useResendOtp()
+  const { register, handleSubmit, formState: { errors } } = useForm<OtpInputType>({
+    resolver: zodResolver(otpSchema),
+    mode: "onChange"
+  });
 
-    const [endTime, setEndTime] = useState<number | null>(null)
+  const otpVarify = useOtpVarify(isInline);
+  const getOtpStatus = useGetOtpStatus();
+  const resendOtp = useResendOtp();
+  const [endTime, setEndTime] = useState<number | null>(null);
 
-    useEffect(() => {
-        getOtpStatus.mutate(undefined, {
-            onSuccess: (response) => {
-                if (response.data.expiresIn === 0) {
-                    useResetFlowStore.getState().setOtpFlowStarted(false);
-                    return;
-                }
-                setEndTime(Date.now() + response.data.expiresIn * 1000)
-                setTimer(response.data.expiresIn)
-                setAttempts(response.data.attempts)
-                setEmail(response.data.email)
-                setForTo(response.data.for)
-                setPhone(response.data.phone as string)
-            }
-        })
-    }, [])
+  const otpError = otpVarify.error?.message || resendOtp.error?.message;
+  const handleClearError = () => {
+    otpVarify.reset();
+    resendOtp.reset();
+  };
 
-    useEffect(() => {
-        if (!endTime) return;
-        
-        const interval = setInterval(() => {
-            const now = Date.now()
-            const remaining = Math.max(0, Math.floor((endTime - now) / 1000))
-            
-            setTimer(remaining)
-            
-            if (remaining <= 0) {
-                clearInterval(interval)
-            }
-        }, 1000)
+  useEffect(() => {
+    getOtpStatus.mutate(undefined, {
+      onSuccess: (response) => {
+        if (response.data.expiresIn === 0) {
+          useResetFlowStore.getState().setOtpFlowStarted(false);
+          return;
+        }
+        setEndTime(Date.now() + response.data.expiresIn * 1000);
+        setTimer(response.data.expiresIn);
+        setAttempts(response.data.attempts);
+        setEmail(response.data.email);
+        setForTo(response.data.for);
+        setPhone(response.data.phone as string);
+      }
+    });
+  }, []);
 
-        return () => clearInterval(interval)
-    }, [endTime])
+  useEffect(() => {
+    if (!endTime) return;
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
+      setTimer(remaining);
+      if (remaining <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [endTime]);
 
-    const handleOtp = (data:OtpInputType) => {
-        otpVarify.mutate(data, {
-            onSuccess: () => {
-                if (isInline && onInlineSuccess) {
-                    onInlineSuccess();
-                }
-            }
-        });
-    }
+  const handleOtp = (data: OtpInputType) => {
+    otpVarify.mutate(data, {
+      onSuccess: () => {
+        if (isInline && onInlineSuccess) {
+          onInlineSuccess();
+        }
+      }
+    });
+  };
 
-    const handleResend = () => {
-        resendOtp.mutate(undefined, {
-            onSuccess: (response) => {
-                toast.success(response.message)
-                setEndTime(Date.now() + response?.data.expiresIn * 1000)
-                setTimer(response?.data.expiresIn)
-                setAttempts(prev => prev + 1)
-            }
-        })
-    }
+  const handleResend = () => {
+    resendOtp.mutate(undefined, {
+      onSuccess: (response) => {
+        toast.success(response.message);
+        setEndTime(Date.now() + response?.data.expiresIn * 1000);
+        setTimer(response?.data.expiresIn);
+        setAttempts(prev => prev + 1);
+      }
+    });
+  };
 
-
+  if (isInline) {
     return (
-        <div className={isInline ? "" : "auth-page-wrapper"}>
-            {!isInline && (
-                <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
-                    <i className="fas fa-sun"></i>
-                </button>
+      <div className="auth-card otp-card text-center w-full">
+        <h1 className="h3 mb-2">Two-Step Verification</h1>
+        <p className="text-secondary text-sm mb-6">
+          Enter the 6-digit verification code sent to your {forTo === 'UPDATE_PHONE' ? 'mobile device' : 'email'} to{' '}
+          <span className="font-medium">
+            {forTo === 'UPDATE_PHONE' ? maskPhoneNumber(phone) : maskEmail(email)}
+          </span>
+        </p>
+
+        {otpError ? (
+          <div className="login-error-alert" role="alert">
+            <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+            <span className="login-error-alert-text">{otpError}</span>
+            <button
+              type="button"
+              className="login-error-alert-close"
+              onClick={handleClearError}
+              aria-label="Dismiss error"
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+        ) : null}
+
+        <div onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSubmit(handleOtp)();
+          }
+        }}>
+          <div className="form-group mb-6">
+            <input
+              {...register("otp", {
+                onChange: (e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))
+              })}
+              type="text"
+              className={`otp-single-input form-control text-center mx-auto ${errors.otp ? 'border-danger' : ''}`}
+              maxLength={6}
+              placeholder="------"
+              value={otp}
+              required
+            />
+            {errors.otp && <div className="text-danger text-xs mt-2">{errors.otp.message}</div>}
+          </div>
+
+          <button 
+            type="button" 
+            onClick={handleSubmit(handleOtp)} 
+            className="btn btn-primary w-full btn-lg mb-5" 
+            disabled={otp.length !== 6 || otpVarify.isPending}
+          >
+            {otpVarify.isPending ? (
+              <>
+                <i className="fas fa-spinner fa-spin mr-2"></i>
+                <span>Verifying...</span>
+              </>
+            ) : (
+              <>
+                <span>Verify Account</span>
+                <i className="fas fa-check-circle ml-2"></i>
+              </>
             )}
-            
-            <div className={isInline ? "" : "auth-card-container"}>
-                <div className={`auth-card otp-card text-center ${isInline ? "w-full" : ""}`}>
-                    {!isInline && (
-                        <Link to="/" className="brand-logo-container justify-center mb-4" aria-label="Briosolve Home">
-                            <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
-                            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
-                        </Link>
-                    )}
-
-                   
-
-                    <h1 className="h3 mb-2">Two-Step Verification</h1>
-                    <p className="text-secondary text-sm mb-6">
-                        Enter the 6-digit verification code sent to your {forTo === 'UPDATE_PHONE' ? 'mobile device' : 'email'} to{' '}
-                        <span className="font-medium">
-                            {forTo === 'UPDATE_PHONE' ? maskPhoneNumber(phone) : maskEmail(email)}
-                        </span>
-                    </p>
-
-                    <div onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleSubmit(handleOtp)();
-                        }
-                    }}>
-                        <div className="form-group mb-6">
-                            <input
-                                {...register("otp", {
-                                    onChange: (e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))
-                                })}
-                                type="text"
-                                className={`otp-single-input form-control text-center mx-auto ${errors.otp ? 'border-danger' : ''}`}
-                                maxLength={6}
-                                placeholder="------"
-                                value={otp}
-                                required
-                            />
-                            {errors.otp && <div className="text-danger text-xs mt-2">{errors.otp.message}</div>}
-                        </div>
-
-                        <button 
-                            type="button" 
-                            onClick={handleSubmit(handleOtp)} 
-                            className="btn btn-primary w-full btn-lg mb-5" 
-                            disabled={otp.length !== 6 || otpVarify.isPending}
-                        >
-                            <span>{otpVarify.isPending ? "Verifying..." : "Verify Account"}</span>
-                            {!otpVarify.isPending && <i className="fas fa-check-circle ml-2"></i>}
-                        </button>
-                    </div>
-
-                    <div className="text-center text-sm">
-                        <p className="text-secondary mb-2">
-                            {timer > 0 ? `Resend code in ${timer}s` : (attempts >= 5 ? "Maximum attempts reached" : "Didn't receive the code?")}
-                        </p>
-                        <button 
-                            type="button" 
-                            className="btn btn-outline w-full mb-5" 
-                            disabled={timer > 0 || attempts >= 5 || resendOtp.isPending}
-                            onClick={handleResend}
-                        >
-                            <i className="fas fa-redo-alt mr-1"></i> {resendOtp.isPending ? "Resending..." : "Resend OTP"}
-                        </button>
-                    </div>
-
-                    {!isInline && (
-                        <div className="text-center text-sm border-top pt-5">
-                            <Link to={backDestination} className="back-link">
-                                <i className="fas fa-arrow-left mr-1"></i> Back
-                            </Link>
-                        </div>
-                    )}
-                </div>
-            </div>
+          </button>
         </div>
+
+        <div className="text-center text-sm">
+          <p className="text-secondary mb-2">
+            {timer > 0 ? `Resend code in ${timer}s` : (attempts >= 5 ? "Maximum attempts reached" : "Didn't receive the code?")}
+          </p>
+          {timer <= 0 && attempts < 5 && (
+            <button 
+              type="button" 
+              className="btn btn-outline w-full mb-5" 
+              disabled={resendOtp.isPending}
+              onClick={handleResend}
+            >
+              {resendOtp.isPending ? (
+                <>
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                  <span>Resending...</span>
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-redo-alt mr-1"></i>
+                  <span>Resend OTP</span>
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      </div>
     );
+  }
+
+  return (
+    <>
+      <div className="login-form-header">
+        <h1 className="login-title">Verify Code</h1>
+        <p className="login-subtitle">
+          Code sent to {forTo === 'UPDATE_PHONE' ? maskPhoneNumber(phone) : maskEmail(email)}
+        </p>
+      </div>
+
+      {otpError ? (
+        <div className="login-error-alert" role="alert">
+          <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+          <span className="login-error-alert-text">{otpError}</span>
+          <button
+            type="button"
+            className="login-error-alert-close"
+            onClick={handleClearError}
+            aria-label="Dismiss error"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+      ) : null}
+
+      <div onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleSubmit(handleOtp)();
+        }
+      }}>
+        <div className="login-input-group">
+          <input
+            {...register("otp", {
+              onChange: (e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))
+            })}
+            type="text"
+            className={`login-input ${errors.otp ? 'is-invalid' : ''}`}
+            style={{ letterSpacing: '0.45em', fontSize: '1.4rem', fontWeight: '700', textAlign: 'center' }}
+            maxLength={6}
+            placeholder="------"
+            value={otp}
+            required
+          />
+          {errors.otp && <div className="login-error-msg">{errors.otp.message}</div>}
+        </div>
+
+        <button 
+          type="button" 
+          onClick={handleSubmit(handleOtp)} 
+          className="login-submit-btn" 
+          disabled={otp.length !== 6 || otpVarify.isPending}
+          style={{ marginTop: '0.4rem' }}
+        >
+          {otpVarify.isPending ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Verifying...</span>
+            </>
+          ) : (
+            <span>Verify Code</span>
+          )}
+        </button>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: '1.25rem' }}>
+        <p className="login-subtitle" style={{ fontSize: '0.85rem', margin: 0 }}>
+          {timer > 0 ? `Resend code in ${timer}s` : (attempts >= 5 ? "Maximum attempts reached" : "Didn't receive code?")}
+        </p>
+        {timer <= 0 && attempts < 5 && (
+          <button 
+            type="button" 
+            className="login-secondary-action-btn"
+            style={{ width: '100%', gap: '0.5rem', marginTop: '0.75rem' }}
+            disabled={resendOtp.isPending}
+            onClick={handleResend}
+          >
+            {resendOtp.isPending ? (
+              <>
+                <i className="fas fa-spinner fa-spin"></i>
+                <span>Resending...</span>
+              </>
+            ) : (
+              <>
+                <i className="fas fa-redo-alt"></i>
+                <span>Resend OTP</span>
+              </>
+            )}
+          </button>
+        )}
+      </div>
+
+      {!isInline && (
+        <>
+          <div className="login-divider-row">
+            <span className="login-divider-line"></span>
+            <span className="login-divider-text">or</span>
+            <span className="login-divider-line"></span>
+          </div>
+
+          <div className="login-register-actions" style={{ gridTemplateColumns: '1fr' }}>
+            <Link to={backDestination} className="login-secondary-action-btn">
+              Back
+            </Link>
+          </div>
+        </>
+      )}
+    </>
+  );
 }

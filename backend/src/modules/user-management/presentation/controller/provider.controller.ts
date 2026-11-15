@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../../../../shared/base/controller/baseController";
-import { accessTokenCookie, refreshTokenCookie, registrationCookie } from "../../../../shared/utils/cookieConfig";
+import { accessTokenCookie, registrationCookie } from "../../../../shared/utils/cookieConfig";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IGetProvidersUseCase } from "../../application/interfaces/use-cases/providers/get-providers.interface";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
@@ -20,8 +20,7 @@ import { ProviderAvailabilityOverrideResponseDto } from "../../application/dtos/
 import { CompleteProviderRegistrationInput } from "../../application/dtos/request/provider/complete-provider-registration.dto";
 import { BecomeCustomerInputDto } from "../../application/dtos/request/onboading/become-customer.dto";
 import { IJwtService } from "../../../../shared/interfaces/jwtDto.service";
-
-
+import { IProviderRepository } from "../../domain/repositories/IProviderRepository";
 
 export class ProviderController extends BaseController {
     constructor(
@@ -37,7 +36,8 @@ export class ProviderController extends BaseController {
         private readonly _imageUploadService: ImageUploadService,
         private readonly _getProvidersUseCase: IGetProvidersUseCase,
         private readonly _becomeCustomerUseCase: IUseCase<BecomeCustomerInputDto, void>,
-        private readonly _jwtService: IJwtService
+        private readonly _jwtService: IJwtService,
+        private readonly _providerRepository?: IProviderRepository
     ) { super(); }
 
     getProviders = async (req: Request, res: Response, next: NextFunction) => {
@@ -90,15 +90,9 @@ export class ProviderController extends BaseController {
 
             const user = await this._registerProviderUseCase.execute(payload);
 
-            const accessToken = this._jwtService.generate({ userId: user.id, role: user.role });
-            const refreshToken = this._jwtService.generateRefreshToken({ userId: user.id, role: user.role });
-
-            res.cookie("access_token", accessToken, accessTokenCookie);
-            res.cookie("refresh_token", refreshToken, refreshTokenCookie);
             res.clearCookie("registration_id");
 
-            return this.sendSuccess(res, "Provider account created successfully", {
-                accessToken,
+            return this.sendSuccess(res, "Provider account created successfully. Please sign in to continue.", {
                 user: UserMapper.toDto(user)
             });
         } catch (err) {
@@ -175,16 +169,23 @@ export class ProviderController extends BaseController {
 
     uploadProfileImage = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            if (!req.file) throw new ApplicationError("NO_DATA", "No image uploaded", "NOT_FOUND")
+            if (!req.file) throw new ApplicationError("NO_DATA", "No image uploaded", "NOT_FOUND");
+
+            if (this._providerRepository) {
+                const existing = await this._providerRepository.findById(req.user?.userId!);
+                if (existing?.profile_image) {
+                    await this._imageUploadService!.deleteImageByUrl(existing.profile_image);
+                }
+            }
     
-            const imageUrl = await this._imageUploadService!.uploadImage(req.file.buffer, 'profiles')
+            const key = await this._imageUploadService!.uploadImage(req.file.buffer, 'profiles');
 
             await this._updateProviderProfileUseCase.execute({
                 id: req.user?.userId!,
-                data: { profile_image: imageUrl }
+                data: { profile_image: key }
             });
 
-            return this.sendSuccess(res, "Updated!", { profile_image: imageUrl });
+            return this.sendSuccess(res, "Updated!", { profile_image: key });
         } catch (err) {
             next(err);
         }
@@ -192,6 +193,13 @@ export class ProviderController extends BaseController {
 
     deleteProfileImage = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            if (this._providerRepository) {
+                const existing = await this._providerRepository.findById(req.user?.userId!);
+                if (existing?.profile_image) {
+                    await this._imageUploadService!.deleteImageByUrl(existing.profile_image);
+                }
+            }
+
             await this._updateProviderProfileUseCase.execute({
                 id: req.user?.userId!,
                 data: { profile_image: "" }

@@ -1,15 +1,18 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { Link } from "react-router-dom";
 import { useGetProviders, useUpdateProviderStatus as useUpdateStatus } from '../../hooks/admin/useAdminProviders';
 import { toast } from 'react-hot-toast';
 import type { User, response } from '../../types/profile.types';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { BlockReasonModal } from "../../../admin/components/BlockReasonModal";
 import ProviderRow from "../../components/admin/ProviderRow";
 import Skeleton from "react-loading-skeleton";
+import { AdminNoData } from "../../../../shared/components/ui/AdminNoData";
 
-export default function Providers() {
+interface ProvidersProps {
+    onTotalChange?: (total: number) => void;
+}
+
+export default function Providers({ onTotalChange }: ProvidersProps) {
     const [providers, setProviders] = useState<User[]>([]);
     const [selectedProvider, setSelectedProvider] = useState<User | null>(null);
     const [providerToBlock, setProviderToBlock] = useState<{ id: string; name: string } | null>(null);
@@ -20,7 +23,7 @@ export default function Providers() {
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("");
     const [limit] = useState(10);
-    const [total, setTotal] = useState(0);
+    const [, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
     const getProviders = useGetProviders();
@@ -32,6 +35,9 @@ export default function Providers() {
                 setProviders(res.data.users);
                 setTotal(res.data.total);
                 setTotalPages(res.data.totalPages);
+                if (onTotalChange && !search && !filter) {
+                    onTotalChange(res.data.total);
+                }
             }
         });
     }, [filter, search, page]);
@@ -108,23 +114,8 @@ export default function Providers() {
 
     return (
         <>
-            {updateStatus.isPending ? (<SpinnerOverlay isLoading={true} />) : null}
-
-            <div className="app-content">
-                <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
-                    <div>
-                        <h1 className="font-extrabold tracking-tight mb-1" style={{ fontSize: '2rem' }}>Service Provider Management</h1>
-                        <p className="text-secondary text-sm mb-0">Track credentialed professionals, verification status, service capacities, and account governance.</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Link to="/admin/verification" className="btn btn-warning text-xs">
-                            <i className="fas fa-user-check mr-1"></i>Review Verification Queue
-                        </Link>
-                    </div>
-                </div>
-
-                <div className="admin-filter-bar">
-                    <div className="admin-search-input">
+            <div className="admin-filter-bar">
+                <div className="admin-search-input">
                         <i className="fas fa-search"></i>
                         <input
                             value={search}
@@ -160,21 +151,7 @@ export default function Providers() {
                 </div>
 
                 <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
-                    {getProviders.isPending && <div className="skeleton-progress-bar" />}
-                    <div className="admin-table-header">
-                        <div className="text-sm font-semibold text-text">
-                            {getProviders.isPending ? (
-                                <span className="skeleton-loading-label">
-                                    <span className="skeleton-dot" />
-                                    <span className="skeleton-dot" />
-                                    <span className="skeleton-dot" />
-                                    Fetching records
-                                </span>
-                            ) : `${total} Providers Listed`}
-                        </div>
-                        <div className="text-xs text-muted"><i className="fas fa-shield-alt mr-1 text-primary"></i>Admin Action Logging Active</div>
-                    </div>
-
+                    
                     <div className="table-responsive">
                         <table className="admin-table">
                             <thead>
@@ -221,9 +198,9 @@ export default function Providers() {
                                         />
                                     ))
                                 ) : (
-                                    <tr>
-                                        <td colSpan={7} className="text-center py-8 text-secondary">
-                                            No provider accounts found.
+                                    <tr className="admin-empty-row">
+                                        <td colSpan={7} className="admin-empty-table-cell">
+                                            <AdminNoData />
                                         </td>
                                     </tr>
                                 )}
@@ -265,7 +242,6 @@ export default function Providers() {
                         </div>
                     </div>
                 </div>
-            </div>
 
             <div className={`admin-modal-overlay ${selectedProvider ? 'active' : ''}`} id="providerDetailsModal">
                 <div className="admin-modal">

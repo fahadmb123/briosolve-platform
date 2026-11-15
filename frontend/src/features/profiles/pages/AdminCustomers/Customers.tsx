@@ -2,22 +2,26 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useGetCustomers, useUpdateCustomerStatus as useUpdateStatus } from '../../hooks/admin/useAdminCustomers';
 import { toast } from 'react-hot-toast';
 import type { User, response } from '../../types/profile.types';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { BlockReasonModal } from "../../../admin/components/BlockReasonModal";
 import CustomerRow from "../../components/admin/CustomerRow";
 import Skeleton from "react-loading-skeleton";
+import { AdminNoData } from "../../../../shared/components/ui/AdminNoData";
 
 
 
-export default function Customers() {
+interface CustomersProps {
+    onTotalChange?: (total: number) => void;
+}
+
+export default function Customers({ onTotalChange }: CustomersProps) {
     const [customers, setCustomers] = useState<User[]>([]);
     const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null);
     const [customerToBlock, setCustomerToBlock] = useState<{ id: string; name: string } | null>(null);
     const [pendingBlockConfirmation, setPendingBlockConfirmation] = useState<{ id: string; name: string; reason: string } | null>(null);
     const [customerToActivate, setCustomerToActivate] = useState<{ id: string; name: string } | null>(null);
 
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("");
     const [limit] = useState(10);
@@ -33,6 +37,9 @@ export default function Customers() {
                 setCustomers(res.data.users);
                 setTotal(res.data.total);
                 setTotalPages(res.data.totalPages);
+                if (onTotalChange && !search && !filter) {
+                    onTotalChange(res.data.total);
+                }
             }
         });
     }, [filter, search, page]);
@@ -108,69 +115,43 @@ export default function Customers() {
     }, [totalPages]);
     return (
         <>
-        {updateStatus.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
-        
-        <div className="app-content">
-                
-            <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
-                <div>
-                    <h1 className="font-extrabold tracking-tight mb-1" style={{ fontSize: '2rem' }}>Customer Management</h1>
-                    <p className="text-secondary text-sm mb-0">Total platform accounts registered across Customer roles.</p>
-                </div>
-            </div>
-            
-            <div className="admin-filter-bar">
-                <div className="admin-search-input">
-                    <i className="fas fa-search"></i>
-                    <input 
-                        onChange={(e)=>{
-                            setSearch(e.target.value)
-                            setPage(1)
-                        }}
-                        type="text" placeholder="Search for email..." id="userSearchInput" 
-                     />
-                </div>
-
-                <div className="admin-filters-group">
-
-
-                    <select
-                        value={filter}
-                        onChange={(e)=>{
-                            setFilter(e.target.value)
-                            setPage(1)
-                        }}
-                         className="admin-select" id="statusFilter">
-                        <option value="">All Statuses</option>
-                        <option value="ACTIVE">Active</option>
-                        <option value="BLOCKED">Suspended</option>
-                    </select>
-
-                    <button  className="btn btn-secondary text-xs py-2" onClick={() => handleReset()}>
-                        <i className="fas fa-undo mr-1"></i>Reset
-                    </button>
-                </div>
+        <div className="admin-filter-bar">
+            <div className="admin-search-input">
+                <i className="fas fa-search"></i>
+                <input 
+                    onChange={(e)=>{
+                        setSearch(e.target.value)
+                        setPage(1)
+                    }}
+                    type="text" placeholder="Search for email..." id="userSearchInput" 
+                 />
             </div>
 
-        
-            <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
-                {getCustomers.isPending && <div className="skeleton-progress-bar" />}
-                <div className="admin-table-header">
-                    <div className="text-sm font-semibold text-text">
-                        {getCustomers.isPending && (
-                            <span className="skeleton-loading-label">
-                                <span className="skeleton-dot" />
-                                <span className="skeleton-dot" />
-                                <span className="skeleton-dot" />
-                                Fetching records
-                            </span>
-                        )}
-                    </div>
-                    <div className="text-xs text-muted"><i className="fas fa-shield-alt mr-1 text-primary"></i>Admin Action Logging Active</div>
-                </div>
+            <div className="admin-filters-group">
 
-                <div className="table-responsive">
-                    <table className="admin-table">
+
+                <select
+                    value={filter}
+                    onChange={(e)=>{
+                        setFilter(e.target.value)
+                        setPage(1)
+                    }}
+                     className="admin-select" id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="BLOCKED">Suspended</option>
+                </select>
+
+                <button  className="btn btn-secondary text-xs py-2" onClick={() => handleReset()}>
+                    <i className="fas fa-undo mr-1"></i>Reset
+                </button>
+            </div>
+        </div>
+
+    
+        <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
+            <div className="table-responsive">
+                <table className="admin-table">
                         <thead>
                             <tr>
                                 <th style={{ width: '20%' }}>Customer Name</th>
@@ -213,9 +194,9 @@ export default function Customers() {
                                     />
                                 ))
                             ) : (
-                                <tr>
-                                    <td colSpan={6} className="text-center py-8 text-secondary">
-                                        No customer accounts found.
+                                <tr className="admin-empty-row">
+                                    <td colSpan={6} className="admin-empty-table-cell">
+                                        <AdminNoData />
                                     </td>
                                 </tr>
                             )}
@@ -226,18 +207,14 @@ export default function Customers() {
                 
                 <div className="admin-pagination">
                     <div>
-                        Showing{" "}
-                        <strong>
-                            {` ${page} of ${totalPages} pages`}
-                        </strong>{" "}
-                        
+                        Showing <strong>{` ${page} of ${totalPages || 1} pages`}</strong>
                     </div>
 
                     <div className="pagination-controls">
 
                         <button
                             className="page-btn"
-                            disabled={page === 1}
+                            disabled={page <= 1}
                             onClick={() => setPage(page - 1)}
                         >
                             <i className="fas fa-chevron-left"></i>
@@ -257,7 +234,7 @@ export default function Customers() {
 
                         <button
                             className="page-btn"
-                            disabled={page === totalPages}
+                            disabled={page >= totalPages}
                             onClick={() => setPage(page + 1)}
                         >
                             <i className="fas fa-chevron-right"></i>
@@ -266,7 +243,6 @@ export default function Customers() {
                 </div>
                 </div>
             </div>
-        </div>
             
         
 
