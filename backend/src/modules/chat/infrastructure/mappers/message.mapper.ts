@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { Message, MessageStatus, MessageType } from "../../domain/entities/message.entity";
 import { MessageResponseDto } from "../../application/dtos/response/message/message-response.dto";
 import { CreateMessageData } from "../../domain/repositories/IMessageRepository";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export type MessageRecord = Prisma.MessageGetPayload<{}>;
 
@@ -20,11 +21,15 @@ export class MessageMapper {
             return new Date(val);
         };
 
+        const messageContent = record.message_type === "IMAGE"
+            ? (StorageUtil.getPublicUrl(record.content) ?? record.content)
+            : record.content;
+
         return new Message(
             record.id,
             record.conversation_id,
             record.sender_id,
-            record.content,
+            messageContent,
             record.message_type as MessageType,
             parseDate(createdAtRaw) ?? new Date(),
             parseDate(updatedAtRaw),

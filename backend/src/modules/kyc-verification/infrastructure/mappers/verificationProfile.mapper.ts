@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { VerificationProfile } from "../../domain/entities/verificationProfile.entity";
 import { VerificationDocumentMapper, VerificationDocumentRecord } from "./verificationDocument.mapper";
 import { AdminKycDossier } from "../../application/dtos/admin/response/get-admin-kyc.dto";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export type VerificationProfileRecord = Prisma.ProviderProfileGetPayload<{}>;
 
@@ -28,7 +29,7 @@ export class VerificationProfileMapper {
             record.business_name || "",
             record.experience || "",
             record.bio || "",
-            record.profile_image ?? null,
+            StorageUtil.getPublicUrl(record.profile_image),
             record.kyc_status || "NOT_SUBMITTED",
             createdAt,
             updatedAt,

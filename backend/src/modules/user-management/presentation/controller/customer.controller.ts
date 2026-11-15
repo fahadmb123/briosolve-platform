@@ -78,14 +78,14 @@ export class CustomerController extends BaseController{
     uploadProfileImage = async (req:Request,res:Response,next:NextFunction) => {
         try {
             if (!req.file) throw new ApplicationError("NO_DATA","No image uploaded","NOT_FOUND")
-            const imageUrl = await this._imageUploadService.uploadImage(req.file.buffer, 'profiles')
+            const key = await this._imageUploadService.uploadImage(req.file.buffer, 'profiles')
             
             await this._updateCustomerProfileUseCase.execute({
                 id: req.user?.userId!, 
-                data: { profile_image: imageUrl }
+                data: { profile_image: key }
             })
 
-            return this.sendSuccess(res,"Updated!", { profile_image: imageUrl })
+            return this.sendSuccess(res,"Updated!", { profile_image: key })
         } catch (err) {
             next(err)
         }

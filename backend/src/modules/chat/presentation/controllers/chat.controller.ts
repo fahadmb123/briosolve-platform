@@ -114,8 +114,8 @@ export class ChatController extends BaseController {
                 throw new ApplicationError("UPLOAD_SERVICE_UNAVAILABLE", "Image upload service not available", "INTERNAL");
             }
 
-            const imageUrl = await this._imageUploadService.uploadImage(req.file.buffer, "chat");
-            this.sendSuccess(res, "Image uploaded successfully", { imageUrl });
+            const key = await this._imageUploadService.uploadImage(req.file.buffer, "chat");
+            this.sendSuccess(res, "Image uploaded successfully", { imageUrl: key, key });
         } catch (error) {
             next(error);
         }

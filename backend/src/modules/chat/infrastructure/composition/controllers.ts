@@ -1,6 +1,6 @@
 import type { Server } from "socket.io";
 import { ChatController } from "../../presentation/controllers/chat.controller";
-import { CloudinaryService } from "../../../../shared/services/cloudinary.service";
+import { S3Service } from "../../../../shared/services/s3.service";
 import {
     startConversationUseCase,
     getConversationsUseCase,
@@ -12,7 +12,7 @@ import {
 export function createChatController(io: Server): ChatController {
     const sendMessageUseCase = createSendMessageUseCase(io);
     const markMessagesAsReadUseCase = createMarkMessagesAsReadUseCase(io);
-    const imageUploadService = new CloudinaryService();
+    const imageUploadService = new S3Service();
     return new ChatController(
         startConversationUseCase,
         getConversationsUseCase,
@@ -22,4 +22,3 @@ export function createChatController(io: Server): ChatController {
         imageUploadService
     );
 }
-
