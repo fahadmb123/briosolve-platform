@@ -80,6 +80,36 @@ export default function LegalPageView({
 
   return (
     <>
+      <div className="legal-doc-print-header">
+        <div className="legal-doc-header-brand">
+          <div className="legal-doc-brand-logos">
+            <img
+              src="/briosolve-logo.svg"
+              alt="Briosolve"
+              className="legal-doc-logo-icon"
+            />
+            <img
+              src="/briosolve-text-logo.svg"
+              alt="Briosolve"
+              className="legal-doc-logo-text"
+            />
+          </div>
+          <span className="legal-doc-classification">
+            Official Platform Governance &bull; Ratified Policy Document
+          </span>
+        </div>
+
+        {illustrationSrc && (
+          <div className="legal-doc-header-emblem">
+            <img
+              src={illustrationSrc}
+              alt={illustrationAlt}
+              className="legal-doc-emblem-img"
+            />
+          </div>
+        )}
+      </div>
+
       <header className="legal-hero-section">
         <div className="legal-hero-left">
           <h1 className="legal-hero-title">{title}</h1>
@@ -177,6 +207,41 @@ export default function LegalPageView({
             </section>
           ))
         )}
+
+        <div className="legal-signature-card">
+          <div className="legal-signature-header">
+            <span className="legal-signature-tag">
+              <i className="fas fa-file-signature"></i> Official Ratification & Sign-off
+            </span>
+            <span className="legal-signature-ref">
+              Doc Ref: BS-{effectiveDate.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase()}-V2
+            </span>
+          </div>
+
+          <div className="legal-signature-body">
+            <div className="legal-signature-col">
+              <div className="legal-signature-written">
+                Briosolve Compliance Directorate
+              </div>
+              <div className="legal-signature-meta">
+                <strong>Authorized Governance Signatory</strong>
+                <span>Office of the General Counsel & Risk Operations</span>
+                <span>Ratified & Effective: {effectiveDate}</span>
+              </div>
+            </div>
+
+            <div className="legal-signature-seal-col">
+              <div className="legal-signature-seal">
+                <i className="fas fa-shield-alt"></i>
+                <div className="legal-seal-details">
+                  <span className="legal-seal-title">DIGITALLY VERIFIED</span>
+                  <span className="legal-seal-sub">Platform Standard</span>
+                  <span className="legal-seal-date">Status: Active & Enforced</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="legal-contact-card">
           <div>
