@@ -178,16 +178,23 @@ export default function AuthLayout() {
             </React.Suspense>
           </div>
 
-          <div className="login-social-footer">
-            <span className="login-social-icon"><i className="fab fa-facebook-f"></i></span>
-            <span className="login-social-icon"><i className="fab fa-twitter"></i></span>
-            <span className="login-social-icon">
-              <svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </span>
-            <span className="login-social-icon"><i className="fab fa-linkedin-in"></i></span>
-            <span className="login-social-icon"><i className="fab fa-instagram"></i></span>
+          <div className="login-form-bottom-bar">
+            <div className="login-social-footer">
+              <span className="login-social-icon"><i className="fab fa-facebook-f"></i></span>
+              <span className="login-social-icon"><i className="fab fa-twitter"></i></span>
+              <span className="login-social-icon">
+                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </span>
+              <span className="login-social-icon"><i className="fab fa-linkedin-in"></i></span>
+              <span className="login-social-icon"><i className="fab fa-instagram"></i></span>
+            </div>
+
+            <Link to="/" className="login-footer-home-btn" title="Back to Home">
+              <i className="fas fa-home"></i>
+              <span>Home</span>
+            </Link>
           </div>
         </div>
       </div>

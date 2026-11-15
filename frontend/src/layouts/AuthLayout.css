@@ -274,6 +274,8 @@
   filter: brightness(0) invert(1);
 }
 
+
+
 .login-brand-logo-btn {
   background: transparent;
   border: none;
@@ -690,13 +692,78 @@
   box-shadow: 0 4px 14px rgba(255, 121, 0, 0.32);
 }
 
+.login-form-bottom-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
 .login-social-footer {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
   margin: 0 auto;
-  padding-bottom: 0.5rem;
+}
+
+.login-footer-home-btn {
+  position: absolute;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.95rem;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid #E5E7EB;
+  color: #180D00;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  margin-left: auto;
+}
+
+[data-theme="dark"] .login-footer-home-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+.login-footer-home-btn i {
+  font-size: 0.8rem;
+  color: #9CA3AF;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+[data-theme="dark"] .login-footer-home-btn i {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.login-footer-home-btn:hover {
+  background: #000000;
+  border-color: #000000;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.login-footer-home-btn:hover i {
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .login-footer-home-btn:hover {
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #000000;
+}
+
+[data-theme="dark"] .login-footer-home-btn:hover i {
+  color: #000000;
 }
 
 .login-social-icon {

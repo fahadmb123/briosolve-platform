@@ -581,6 +581,27 @@ export default function Home() {
 
             <div className="home-footer-bottom">
               <span>&copy; {new Date().getFullYear()} Briosolve. All rights reserved.</span>
+
+              <div className="home-footer-social">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="home-footer-social-icon" aria-label="Facebook">
+                  <i className="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="home-footer-social-icon" aria-label="Twitter">
+                  <i className="fab fa-twitter"></i>
+                </a>
+                <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="home-footer-social-icon" aria-label="X (Twitter)">
+                  <svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="home-footer-social-icon" aria-label="LinkedIn">
+                  <i className="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="home-footer-social-icon" aria-label="Instagram">
+                  <i className="fab fa-instagram"></i>
+                </a>
+              </div>
+
               <div className="home-footer-legal-links">
                 <Link to="/settings" className="home-footer-link">
                   Privacy
