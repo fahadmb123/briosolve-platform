@@ -36,10 +36,10 @@ export class UpdateServiceUseCase implements IUseCase<UpdateServiceUseCaseDto, S
         }
 
         if (input.imageBuffer) {
-            const imageUrl = await this._imageUploadService.uploadImage(input.imageBuffer, "services");
             if (existingService.image) {
                 await this._imageUploadService.deleteImageByUrl(existingService.image);
             }
+            const imageUrl = await this._imageUploadService.uploadImage(input.imageBuffer, "services");
             input.input.image = imageUrl;
         } else if (input.input.image && input.input.image !== existingService.image && existingService.image) {
             await this._imageUploadService.deleteImageByUrl(existingService.image);

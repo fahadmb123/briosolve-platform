@@ -35,6 +35,7 @@ import {
 } from "./useCases";
 import { imageUploadService } from "./services";
 import { jwtService } from "../../../auth/infrastructure/composition/services";
+import { customerRepository, providerRepository } from "./repositories";
 import type { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import type { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import type { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
@@ -70,7 +71,8 @@ export const customerController = new CustomerController(
     becomeProviderUseCase,
     jwtService,
     getNearbyProvidersUseCase,
-    getProviderPublicProfileUseCase
+    getProviderPublicProfileUseCase,
+    customerRepository
 );
 export const addressController = new AddressController(
     addAddressUseCase,
@@ -93,5 +95,6 @@ export const providerController = new ProviderController(
     imageUploadService,
     getProvidersUseCase,
     becomeCustomerUseCase,
-    jwtService
+    jwtService,
+    providerRepository
 );

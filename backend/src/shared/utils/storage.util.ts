@@ -20,7 +20,11 @@ export class StorageUtil {
         }
         try {
             const parsed = new URL(keyOrUrl);
-            const pathname = parsed.pathname.startsWith("/") ? parsed.pathname.slice(1) : parsed.pathname;
+            let pathname = parsed.pathname.startsWith("/") ? parsed.pathname.slice(1) : parsed.pathname;
+            const bucketName = process.env.AWS_S3_BUCKET_NAME;
+            if (bucketName && pathname.startsWith(`${bucketName}/`)) {
+                pathname = pathname.slice(bucketName.length + 1);
+            }
             return decodeURIComponent(pathname);
         } catch {
             return keyOrUrl;

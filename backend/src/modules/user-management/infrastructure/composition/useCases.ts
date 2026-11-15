@@ -106,7 +106,8 @@ export const getProfileUseCase = new GetProfileUseCase(
 );
 export const updateCustomerProfileUseCase = new UpdateCustomerProfileUseCase(
     userRepository,
-    customerRepository
+    customerRepository,
+    imageUploadService
 )
 export const updateProviderProfileUseCase = new UpdateProviderProfileUseCase(
     userRepository,

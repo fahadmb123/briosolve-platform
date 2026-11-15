@@ -27,10 +27,10 @@ export class UpdateCategoryUseCase implements IUseCase<UpdateCategoryUseCaseDto,
         }
 
         if (data.imageBuffer) {
-            const imageUrl = await this._imageUploadService.uploadImage(data.imageBuffer, "categories");
             if (existingCategory.image) {
                 await this._imageUploadService.deleteImageByUrl(existingCategory.image);
             }
+            const imageUrl = await this._imageUploadService.uploadImage(data.imageBuffer, "categories");
             data.input.image = imageUrl;
         } else if (data.input.image && data.input.image !== existingCategory.image && existingCategory.image) {
             await this._imageUploadService.deleteImageByUrl(existingCategory.image);
