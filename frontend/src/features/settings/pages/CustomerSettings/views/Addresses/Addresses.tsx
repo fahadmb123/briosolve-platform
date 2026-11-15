@@ -70,7 +70,9 @@ export const Addresses = () => {
               address.id === res.data.id ? res.data as unknown as AddressPayload : address as unknown as AddressPayload
             )
           )
-          toast.success(res.message)
+          toast.success(res.message);
+          setIsAddModalOpen(false);
+          setAddressToEdit(null);
         }
       })
     } else {
@@ -78,7 +80,9 @@ export const Addresses = () => {
         onSuccess:(response)=>{
           setAddresses((prev)=>[response.data as unknown as AddressPayload, ...prev])
           fetchUser()
-          toast.success(response.message)
+          toast.success(response.message);
+          setIsAddModalOpen(false);
+          setAddressToEdit(null);
         }
       })
     }

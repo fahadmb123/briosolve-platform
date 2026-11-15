@@ -41,7 +41,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
     handleSelectLocation,
     isGeocoding,
     hasChanges,
-  } = useLocationPicker(onSave, onClose, initialData, isOpen);
+  } = useLocationPicker(onSave, initialData, isOpen);
 
   const { register, formState: { errors }, watch } = form;
   const { area, city, pincode } = watch();
