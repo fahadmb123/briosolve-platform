@@ -4,10 +4,71 @@ export const emailSchema = z.object({
   email: z.string().min(1, "Email address is required").email({ message: "Please enter a valid email address" })
 });
 
-export const phoneSchema = z.object({
-  countryCode: z.string().min(1, "Country code required"),
-  phoneNumber: z.string().min(1, "Phone number is required").regex(/^[0-9]{4,14}$/, { message: "Please enter a valid phone number" })
-});
+export const phoneSchema = z
+  .object({
+    countryCode: z.string().min(1, "Country code is required"),
+    phoneNumber: z
+      .string()
+      .min(1, "Phone number is required")
+      .regex(/^\d+$/, { message: "Phone number must contain digits only" }),
+  })
+  .superRefine((data, ctx) => {
+    const digits = data.phoneNumber.replace(/\D/g, "");
+
+    if (data.countryCode === "+91") {
+      if (digits.length !== 10) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Indian mobile number must be exactly 10 digits",
+          path: ["phoneNumber"],
+        });
+      } else if (!/^[6-9]/.test(digits)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Indian mobile number must start with 6, 7, 8, or 9",
+          path: ["phoneNumber"],
+        });
+      }
+    } else if (data.countryCode === "+1") {
+      if (digits.length !== 10) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "US phone number must be exactly 10 digits",
+          path: ["phoneNumber"],
+        });
+      } else if (!/^[2-9]/.test(digits)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "US phone number must start with 2-9",
+          path: ["phoneNumber"],
+        });
+      }
+    } else if (data.countryCode === "+44") {
+      if (digits.length < 10 || digits.length > 11) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "UK phone number must be 10 or 11 digits",
+          path: ["phoneNumber"],
+        });
+      }
+    } else if (data.countryCode === "+61") {
+      if (digits.length !== 9 && digits.length !== 10) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Australian phone number must be 9 or 10 digits",
+          path: ["phoneNumber"],
+        });
+      }
+    } else {
+      if (digits.length < 7 || digits.length > 14) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Phone number must be between 7 and 14 digits",
+          path: ["phoneNumber"],
+        });
+      }
+    }
+  });
 
 export const updatePasswordSchema = z.object({
   currentPassword: z

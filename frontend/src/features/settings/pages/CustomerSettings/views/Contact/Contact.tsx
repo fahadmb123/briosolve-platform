@@ -24,7 +24,13 @@ export const Contact = () => {
         values: { email: user?.email || "" }
     });
 
-    const { register: registerPhone, handleSubmit: handlePhoneSubmit, formState: { errors: phoneErrors } } = useForm<PhoneInputType>({
+    const { 
+        register: registerPhone, 
+        handleSubmit: handlePhoneSubmit, 
+        watch: watchPhone,
+        setValue: setPhoneValue,
+        formState: { errors: phoneErrors } 
+    } = useForm<PhoneInputType>({
         resolver: zodResolver(phoneSchema),
         mode: "onChange",
         values: { 
@@ -32,6 +38,8 @@ export const Contact = () => {
             phoneNumber: user?.phone ? user.phone.replace(/^\+91|^\+1|^\+44|^\+61|^\+81/, '') : "" 
         }
     });
+
+    const selectedCountry = watchPhone("countryCode") || "+91";
 
     const onEmailSubmit = (formData: EmailInputType) => {
         updateEmail.mutate(formData, {
@@ -44,7 +52,12 @@ export const Contact = () => {
     };
 
     const onPhoneSubmit = (formData: PhoneInputType) => {
-        const fullPhone = `${formData.countryCode}${formData.phoneNumber}`;
+        const cleanDigits = formData.phoneNumber.replace(/\D/g, "");
+        const fullPhone = `${formData.countryCode}${cleanDigits}`;
+        if (user?.phone === fullPhone) {
+            toast.error("This is already your current registered mobile number");
+            return;
+        }
         updatePhone.mutate({ phone: fullPhone }, {
             onSuccess: (response) => {
                 setOtpFlowStarted(true);
@@ -120,7 +133,20 @@ export const Contact = () => {
                         </select>
                         <div className="input-icon-wrapper flex-grow">
                             <i className="fas fa-phone"></i>
-                            <input type="tel" id="prof-phone" className={`form-control ${phoneErrors.phoneNumber ? 'border-danger' : ''}`} style={phoneErrors.phoneNumber ? { borderColor: 'red' } : {}} placeholder="e.g. 9876543210" {...registerPhone("phoneNumber")} />
+                            <input 
+                                type="tel" 
+                                id="prof-phone" 
+                                className={`form-control ${phoneErrors.phoneNumber ? 'border-danger' : ''}`} 
+                                style={phoneErrors.phoneNumber ? { borderColor: 'red' } : {}} 
+                                placeholder={selectedCountry === '+91' ? 'e.g. 9876543210 (10 digits)' : 'Enter phone number'} 
+                                maxLength={selectedCountry === '+91' || selectedCountry === '+1' ? 10 : 14}
+                                {...registerPhone("phoneNumber", {
+                                    onChange: (e) => {
+                                        const sanitized = e.target.value.replace(/\D/g, '');
+                                        setPhoneValue("phoneNumber", sanitized, { shouldValidate: true });
+                                    }
+                                })} 
+                            />
                         </div>
                     </div>
                     {phoneErrors.phoneNumber && (
@@ -137,7 +163,7 @@ export const Contact = () => {
                             {deletePhone.isPending ? 'Deleting...' : 'Delete Phone'}
                         </button>
                     )}
-                    <button type="submit" disabled={updatePhone.isPending} className="btn btn-primary btn-sm">
+                    <button type="submit" disabled={updatePhone.isPending || !!phoneErrors.phoneNumber} className="btn btn-primary btn-sm">
                         {updatePhone.isPending ? 'Sending...' : 'Update Mobile Number'}
                     </button>
                 </div>
