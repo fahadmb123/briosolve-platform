@@ -20,6 +20,20 @@ import RoleRoute from './guards/RoleRoute';
 
 
 
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, [pathname, hash]);
+
+  return null;
+}
+
 function ThemeManager() {
   const location = useLocation();
   useEffect(() => {
@@ -44,6 +58,7 @@ function ThemeManager() {
 export function AppRouter() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <React.Suspense fallback={<LoadingScreen isLoading={true} />}>
         <ThemeManager />
         <Routes>
