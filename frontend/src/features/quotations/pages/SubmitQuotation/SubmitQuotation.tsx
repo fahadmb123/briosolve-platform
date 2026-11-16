@@ -30,10 +30,10 @@ export default function SubmitQuotation() {
     quotationType: "FIXED",
     workDescription: "AC gas refill and basic service. Complete vacuuming, leak check, high-grade refrigerant refilling and filter cleaning.",
     includedItems: ["Labour charges", "Basic service inspection", "Gas check"],
-    excludedItems: ["Spare parts & materials", "Major electrical repairs"],
+    excludedItems: ["Spare parts & materials", "Major repair"],
     estimatedDuration: "1–2 hours",
     availableDateTime: "Today 6:00 PM",
-    messageToCustomer: "I can come today evening with all necessary equipment.",
+    messageToCustomer: "I can come today evening.",
     validUntil: "24_HOURS",
     extraChargePolicy: "Spare parts at actual cost"
   });
@@ -79,6 +79,19 @@ export default function SubmitQuotation() {
   const handleBack = () => {
     navigate("/provider/service-requests");
   };
+
+  const readinessScore = [
+    Boolean(livePreviewData.amount && Number(livePreviewData.amount) >= 50),
+    Boolean(livePreviewData.quotationType),
+    Boolean((livePreviewData.workDescription || "").trim().length >= 15),
+    Boolean((livePreviewData.includedItems || []).length > 0),
+    Boolean((livePreviewData.excludedItems || []).length > 0),
+    Boolean(livePreviewData.validUntil),
+    Boolean((livePreviewData.extraChargePolicy || "").trim().length >= 5),
+    Boolean(livePreviewData.estimatedDuration),
+    Boolean(livePreviewData.availableDateTime),
+    Boolean(livePreviewData.messageToCustomer)
+  ].filter(Boolean).length * 10;
 
   return (
     <div className="quote-page-container">
@@ -139,6 +152,29 @@ export default function SubmitQuotation() {
         </div>
 
         <div className="quote-side-column">
+          <div className="quote-card quote-readiness-card">
+            <div className="quote-readiness-header">
+              <div className="quote-readiness-left">
+                <i className="fas fa-chart-pie quote-readiness-icon"></i>
+                <span className="quote-readiness-title">Quote Quality Score</span>
+              </div>
+              <span className={`quote-readiness-percent ${readinessScore === 100 ? "perfect" : ""}`}>
+                {readinessScore}%
+              </span>
+            </div>
+            <div className="quote-progress-bar-track">
+              <div
+                className="quote-progress-bar-fill"
+                style={{ width: `${readinessScore}%` }}
+              />
+            </div>
+            <span className="quote-readiness-hint">
+              {readinessScore === 100
+                ? "Perfect! Your quotation covers all essential and recommended fields."
+                : "Complete all recommended fields to improve customer response rate."}
+            </span>
+          </div>
+
           <RequestBriefCard
             request={request}
             onSelectPhoto={setLightboxPhoto}
