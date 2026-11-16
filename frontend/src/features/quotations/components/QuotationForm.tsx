@@ -35,7 +35,7 @@ export const QuotationForm: FC<QuotationFormProps> = ({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isValid }
+    formState: { errors }
   } = useForm<QuotationInputType>({
     resolver: zodResolver(quotationSchema),
     mode: "onChange",
@@ -44,7 +44,7 @@ export const QuotationForm: FC<QuotationFormProps> = ({
       quotationType: initialValues?.quotationType || "FIXED",
       workDescription:
         initialValues?.workDescription ||
-        "AC gas refill and basic service. Complete vacuuming, leak check, high-grade refrigerant refilling and filter cleaning.",
+        "AC gas refill and basic service. Complete vacuuming, leak check, refrigerant top-up and filter cleaning.",
       includedItems: initialValues?.includedItems || [
         "Labour charges",
         "Basic service inspection",
@@ -175,87 +175,34 @@ export const QuotationForm: FC<QuotationFormProps> = ({
   const quotationTypes: {
     type: QuotationType;
     label: string;
-    icon: string;
-    badge: string;
     desc: string;
   }[] = [
     {
       type: "FIXED",
       label: "Fixed Price",
-      icon: "fa-tag",
-      badge: "Guaranteed",
-      desc: "Final guaranteed price for the defined job scope."
+      desc: "Guaranteed total cost for the defined scope."
     },
     {
       type: "ESTIMATED",
       label: "Estimated Price",
-      icon: "fa-sliders-h",
-      badge: "Flexible",
-      desc: "Approximate price subject to minor on-site variation."
+      desc: "Approximate cost, subject to on-site scope review."
     },
     {
       type: "INSPECTION_REQUIRED",
       label: "Inspection Required",
-      icon: "fa-search-location",
-      badge: "Assessment",
-      desc: "Requires visiting the site before finalizing the total."
+      desc: "Final price confirmed after in-person inspection."
     }
   ];
 
   const validityOptions: {
     value: QuotationValidity;
     label: string;
-    hint: string;
   }[] = [
-    { value: "24_HOURS", label: "24 Hours", hint: "Recommended for fast response" },
-    { value: "48_HOURS", label: "48 Hours", hint: "Gives customer 2 days" },
-    { value: "3_DAYS", label: "3 Days", hint: "Good for large scope" },
-    { value: "7_DAYS", label: "7 Days", hint: "Maximum validity" }
+    { value: "24_HOURS", label: "24 Hours" },
+    { value: "48_HOURS", label: "48 Hours" },
+    { value: "3_DAYS", label: "3 Days" },
+    { value: "7_DAYS", label: "7 Days" }
   ];
-
-  const durationSuggestions = [
-    "30–45 mins",
-    "1–2 hours",
-    "2–4 hours",
-    "Half day (4–5 hrs)",
-    "1 full day",
-    "2–3 days"
-  ];
-
-  const timeSlotSuggestions = [
-    "Today 6:00 PM",
-    "Tomorrow morning (9 AM–12 PM)",
-    "Tomorrow afternoon (2 PM–5 PM)",
-    "Tomorrow evening (6 PM–8 PM)",
-    "This Saturday morning",
-    "Immediate / Within 2 hours"
-  ];
-
-  const includedSuggestions = [
-    "Labour charges",
-    "Basic service inspection",
-    "Gas check & top-up",
-    "Required equipment & tools",
-    "Post-service cleanup",
-    "30-day service warranty"
-  ];
-
-  const excludedSuggestions = [
-    "Spare parts & materials",
-    "Major component repair",
-    "Transportation beyond 10km",
-    "Structural & civil work",
-    "High-voltage wiring changes"
-  ];
-
-  const policySuggestions = [
-    "Spare parts at actual cost",
-    "No extra charges unless scope changes",
-    "Material bill with GST provided to customer",
-    "Additional labor charged at ₹250/hour"
-  ];
-
-  const presetAmounts = [1500, 2500, 3500, 5000];
 
   const onFormSubmit = (data: QuotationInputType) => {
     onSubmit({
@@ -272,731 +219,390 @@ export const QuotationForm: FC<QuotationFormProps> = ({
     });
   };
 
-  const isSection1Complete = Boolean(
-    !errors.amount &&
-    !errors.quotationType &&
-    !errors.validUntil &&
-    formValues.amount &&
-    Number(formValues.amount) >= 50
-  );
-
-  const isSection2Complete = Boolean(
-    !errors.workDescription &&
-    !errors.includedItems &&
-    !errors.excludedItems &&
-    (formValues.workDescription || "").trim().length >= 15 &&
-    (formValues.includedItems || []).length > 0 &&
-    (formValues.excludedItems || []).length > 0
-  );
-
-  const isSection3Complete = Boolean(
-    !errors.estimatedDuration &&
-    !errors.availableDateTime &&
-    (formValues.estimatedDuration || formValues.availableDateTime)
-  );
-
-  const isSection4Complete = Boolean(
-    !errors.extraChargePolicy &&
-    !errors.messageToCustomer &&
-    (formValues.extraChargePolicy || "").trim().length >= 5
-  );
-
   return (
-    <form className="quote-form" onSubmit={handleSubmit(onFormSubmit)} noValidate>
-      <div className={`quote-form-section ${isSection1Complete ? "section-complete" : ""}`}>
-        <div className="quote-section-title-row">
-          <div className="quote-section-number">
-            {isSection1Complete ? <i className="fas fa-check"></i> : "1"}
-          </div>
-          <div className="quote-section-meta">
-            <div className="quote-section-badge-row">
-              <span className="quote-section-pill">Step 1 of 4</span>
-              {isSection1Complete ? (
-                <span className="quote-status-pill ready">Completed</span>
-              ) : (
-                <span className="quote-status-pill pending">Required Fields</span>
-              )}
-            </div>
-            <h4 className="quote-section-title">Quotation Pricing & Type</h4>
-            <p className="quote-section-subtitle">
-              Define your quotation type, amount, and how long this offer stays valid
-            </p>
-          </div>
+    <form className="quote-form-container" onSubmit={handleSubmit(onFormSubmit)} noValidate>
+      <div className="quote-section-card">
+        <div className="quote-card-header">
+          <h2 className="quote-card-title">Pricing & Terms</h2>
+          <p className="quote-card-subtitle">
+            Specify the quotation amount, billing type, and validity period.
+          </p>
         </div>
 
-        <div className="quote-field-group">
-          <div className="quote-label-with-tag">
-            <label className="quote-field-label">
-              Quotation Type <span className="quote-required-star">*</span>
-            </label>
-            <span className="quote-field-help">Choose the billing model</span>
-          </div>
-
-          <div className="quote-type-grid">
-            {quotationTypes.map((item) => {
-              const isSelected = formValues.quotationType === item.type;
-              return (
-                <div
-                  key={item.type}
-                  className={`quote-type-card ${isSelected ? "selected" : ""}`}
-                  onClick={() => {
-                    setValue("quotationType", item.type, {
-                      shouldValidate: true,
-                      shouldDirty: true
-                    });
-                  }}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className="quote-type-card-top">
-                    <div className="quote-type-icon-name">
-                      <i className={`fas ${item.icon} quote-type-main-icon`}></i>
-                      <span className="quote-type-name">{item.label}</span>
-                    </div>
-                    <span className="quote-type-badge">{item.badge}</span>
-                  </div>
-                  <p className="quote-type-desc">{item.desc}</p>
-                  <div className="quote-type-radio-circle">
-                    {isSelected && <i className="fas fa-check quote-type-check-icon"></i>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {errors.quotationType && (
-            <div className="quote-field-error-msg">
-              <i className="fas fa-circle-exclamation"></i>
-              <span>{errors.quotationType.message}</span>
-            </div>
-          )}
-        </div>
-
-        <div className="quote-field-row two-col">
-          <div className="quote-field-group">
-            <div className="quote-label-with-tag">
-              <label className="quote-field-label" htmlFor="quotation-amount">
-                Quotation Amount <span className="quote-required-star">*</span>
+        <div className="quote-card-body">
+          <div className="quote-form-row">
+            <div className="quote-form-group">
+              <label className="quote-label" htmlFor="quotation-amount">
+                Quotation Amount <span className="quote-required">*</span>
               </label>
-              <span className="quote-important-tag">In INR (₹)</span>
-            </div>
-            <div className="quote-input-prefix-wrapper">
-              <span className="quote-currency-prefix">₹</span>
-              <input
-                id="quotation-amount"
-                type="number"
-                min="50"
-                max="1000000"
-                step="1"
-                placeholder="2500"
-                className={`quote-form-input quote-amount-input ${
-                  errors.amount ? "has-error is-invalid" : formValues.amount ? "is-valid" : ""
-                }`}
-                {...register("amount")}
-              />
-              {formValues.amount && !errors.amount && (
-                <i className="fas fa-check-circle quote-input-success-icon"></i>
-              )}
-            </div>
-
-            <div className="quote-amount-presets">
-              <span className="quote-preset-label">Quick set:</span>
-              {presetAmounts.map((amt) => (
-                <button
-                  key={amt}
-                  type="button"
-                  className={`quote-amt-chip ${Number(formValues.amount) === amt ? "active" : ""}`}
-                  onClick={() => {
-                    setValue("amount", amt, { shouldValidate: true, shouldDirty: true });
-                  }}
-                >
-                  ₹{amt.toLocaleString("en-IN")}
-                </button>
-              ))}
-            </div>
-
-            {errors.amount ? (
-              <div className="quote-field-error-msg">
-                <i className="fas fa-circle-exclamation"></i>
-                <span>{errors.amount.message}</span>
+              <div className="quote-input-affix">
+                <span className="quote-currency-prefix">₹</span>
+                <input
+                  id="quotation-amount"
+                  type="number"
+                  min="50"
+                  max="1000000"
+                  step="1"
+                  placeholder="2500"
+                  className={`quote-control quote-amount-input ${
+                    errors.amount ? "is-invalid" : ""
+                  }`}
+                  {...register("amount")}
+                />
               </div>
-            ) : formValues.amount ? (
-              <span className="quote-field-hint success-hint">
-                <i className="fas fa-info-circle"></i>
-                Total quotation: ₹{Number(formValues.amount).toLocaleString("en-IN")}
-              </span>
-            ) : (
-              <span className="quote-field-hint">
-                Minimum amount is ₹50, maximum is ₹10,00,000
-              </span>
-            )}
-          </div>
-
-          <div className="quote-field-group">
-            <div className="quote-label-with-tag">
-              <label className="quote-field-label">
-                Valid Until <span className="quote-required-star">*</span>
-              </label>
-              <span className="quote-field-help">Quote expiry</span>
+              {errors.amount ? (
+                <span className="quote-error-msg">{errors.amount.message}</span>
+              ) : (
+                <span className="quote-hint-msg">Minimum amount ₹50</span>
+              )}
             </div>
 
-            <div className="quote-validity-grid">
-              {validityOptions.map((opt) => {
-                const isSelected = formValues.validUntil === opt.value;
+            <div className="quote-form-group">
+              <label className="quote-label">
+                Valid Until <span className="quote-required">*</span>
+              </label>
+              <div className="quote-pill-group">
+                {validityOptions.map((opt) => {
+                  const isSelected = formValues.validUntil === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`quote-pill ${isSelected ? "selected" : ""}`}
+                      onClick={() => {
+                        setValue("validUntil", opt.value, {
+                          shouldValidate: true,
+                          shouldDirty: true
+                        });
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {errors.validUntil && (
+                <span className="quote-error-msg">{errors.validUntil.message}</span>
+              )}
+            </div>
+          </div>
+
+          <div className="quote-form-group">
+            <label className="quote-label">
+              Quotation Type <span className="quote-required">*</span>
+            </label>
+            <div className="quote-type-grid">
+              {quotationTypes.map((item) => {
+                const isSelected = formValues.quotationType === item.type;
                 return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={`quote-validity-btn ${isSelected ? "active" : ""}`}
+                  <div
+                    key={item.type}
+                    className={`quote-type-box ${isSelected ? "selected" : ""}`}
                     onClick={() => {
-                      setValue("validUntil", opt.value, {
+                      setValue("quotationType", item.type, {
                         shouldValidate: true,
                         shouldDirty: true
                       });
                     }}
+                    role="button"
+                    tabIndex={0}
                   >
-                    <div className="quote-validity-btn-top">
-                      <i className="far fa-clock"></i>
-                      <span className="quote-validity-title">{opt.label}</span>
+                    <div className="quote-type-box-header">
+                      <span className="quote-type-title">{item.label}</span>
+                      <div className="quote-radio-dot">
+                        {isSelected && <span className="quote-radio-inner" />}
+                      </div>
                     </div>
-                    <span className="quote-validity-hint">{opt.hint}</span>
-                  </button>
+                    <p className="quote-type-description">{item.desc}</p>
+                  </div>
                 );
               })}
             </div>
-
-            {errors.validUntil && (
-              <div className="quote-field-error-msg">
-                <i className="fas fa-circle-exclamation"></i>
-                <span>{errors.validUntil.message}</span>
-              </div>
+            {errors.quotationType && (
+              <span className="quote-error-msg">{errors.quotationType.message}</span>
             )}
           </div>
         </div>
       </div>
 
-      <div className={`quote-form-section ${isSection2Complete ? "section-complete" : ""}`}>
-        <div className="quote-section-title-row">
-          <div className="quote-section-number">
-            {isSection2Complete ? <i className="fas fa-check"></i> : "2"}
-          </div>
-          <div className="quote-section-meta">
-            <div className="quote-section-badge-row">
-              <span className="quote-section-pill">Step 2 of 4</span>
-              {isSection2Complete ? (
-                <span className="quote-status-pill ready">Completed</span>
-              ) : (
-                <span className="quote-status-pill pending">Required Fields</span>
-              )}
-            </div>
-            <h4 className="quote-section-title">Work Description & Scope Deliverables</h4>
-            <p className="quote-section-subtitle">
-              Clearly spell out the work scope and list exact inclusions and exclusions
-            </p>
-          </div>
+      <div className="quote-section-card">
+        <div className="quote-card-header">
+          <h2 className="quote-card-title">Scope of Work</h2>
+          <p className="quote-card-subtitle">
+            Clarify exactly what tasks are included and excluded to prevent misunderstandings.
+          </p>
         </div>
 
-        <div className="quote-field-group">
-          <div className="quote-label-with-tag">
-            <label className="quote-field-label" htmlFor="work-description">
-              Work Description <span className="quote-required-star">*</span>
-            </label>
-            <span className="quote-char-counter">
-              {(formValues.workDescription || "").length}/1000 characters
-            </span>
-          </div>
-
-          <textarea
-            id="work-description"
-            rows={3}
-            placeholder="e.g. AC gas refill and basic service. Complete vacuuming, leak check, high-grade refrigerant refilling and filter cleaning."
-            className={`quote-form-textarea ${
-              errors.workDescription ? "has-error is-invalid" : formValues.workDescription ? "is-valid" : ""
-            }`}
-            {...register("workDescription")}
-          />
-
-          {errors.workDescription ? (
-            <div className="quote-field-error-msg">
-              <i className="fas fa-circle-exclamation"></i>
-              <span>{errors.workDescription.message}</span>
+        <div className="quote-card-body">
+          <div className="quote-form-group">
+            <div className="quote-label-split">
+              <label className="quote-label" htmlFor="work-description">
+                Work Description <span className="quote-required">*</span>
+              </label>
+              <span className="quote-counter">
+                {(formValues.workDescription || "").length}/1000
+              </span>
             </div>
-          ) : (
-            <span className="quote-field-hint">
-              Be specific about the diagnostic and servicing steps you will take
-            </span>
-          )}
-        </div>
-
-        <div className="quote-field-group">
-          <div className="quote-label-with-tag">
-            <label className="quote-field-label">
-              What is Included <span className="quote-required-star">*</span>
-            </label>
-            <span className="quote-badge-count-tag">
-              {(formValues.includedItems || []).length} included
-            </span>
+            <textarea
+              id="work-description"
+              rows={3}
+              placeholder="e.g. AC gas refill and basic service. Complete vacuuming, leak check, and filter cleaning."
+              className={`quote-control quote-textarea ${
+                errors.workDescription ? "is-invalid" : ""
+              }`}
+              {...register("workDescription")}
+            />
+            {errors.workDescription ? (
+              <span className="quote-error-msg">{errors.workDescription.message}</span>
+            ) : (
+              <span className="quote-hint-msg">Minimum 15 characters</span>
+            )}
           </div>
 
-          <div className="quote-tag-builder">
+          <div className="quote-form-group">
+            <label className="quote-label">
+              What is Included <span className="quote-required">*</span>
+            </label>
             <div className="quote-tag-input-row">
-              <div className="quote-tag-input-icon-wrap">
-                <i className="fas fa-check-circle text-green"></i>
-                <input
-                  type="text"
-                  placeholder="e.g. Labour, basic service, gas check"
-                  value={includedInput}
-                  onChange={(e) => {
-                    setIncludedInput(e.target.value);
-                    if (tagError.included) {
-                      setTagError((prev) => ({ ...prev, included: undefined }));
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleAddIncluded();
-                    }
-                  }}
-                  className="quote-form-input tag-input"
-                />
-              </div>
+              <input
+                type="text"
+                placeholder="e.g. Labour, basic service, gas check"
+                value={includedInput}
+                onChange={(e) => {
+                  setIncludedInput(e.target.value);
+                  if (tagError.included) {
+                    setTagError((prev) => ({ ...prev, included: undefined }));
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddIncluded();
+                  }
+                }}
+                className="quote-control"
+              />
               <button
                 type="button"
-                className="quote-btn-add-item primary"
+                className="quote-btn-secondary"
                 onClick={() => handleAddIncluded()}
               >
-                <i className="fas fa-plus"></i>
-                <span>Add Inclusion</span>
+                Add Item
               </button>
             </div>
-
             {tagError.included && (
-              <div className="quote-field-error-msg">
-                <i className="fas fa-circle-exclamation"></i>
-                <span>{tagError.included}</span>
-              </div>
+              <span className="quote-error-msg">{tagError.included}</span>
             )}
 
-            <div className="quote-chip-suggestions">
-              <span className="quote-suggestion-label">Suggested Inclusions:</span>
-              {includedSuggestions
-                .filter((item) => !(formValues.includedItems || []).includes(item))
-                .slice(0, 4)
-                .map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    className="quote-suggest-chip included"
-                    onClick={() => handleAddIncluded(item)}
-                  >
-                    <i className="fas fa-plus"></i>
-                    <span>{item}</span>
-                  </button>
-                ))}
-            </div>
-
-            <div className="quote-items-list included">
+            <div className="quote-tags-wrapper">
               {formValues.includedItems && formValues.includedItems.length > 0 ? (
                 formValues.includedItems.map((item, idx) => (
-                  <div key={idx} className="quote-item-badge included">
-                    <i className="fas fa-check-circle text-green"></i>
-                    <span className="quote-item-text">{item}</span>
+                  <span key={idx} className="quote-tag quote-tag-included">
+                    <i className="fas fa-check"></i>
+                    <span>{item}</span>
                     <button
                       type="button"
-                      className="quote-item-remove-btn"
+                      className="quote-tag-remove"
                       onClick={() => handleRemoveIncluded(idx)}
                       aria-label={`Remove ${item}`}
                     >
                       <i className="fas fa-times"></i>
                     </button>
-                  </div>
+                  </span>
                 ))
               ) : (
-                <div className="quote-empty-tags-note">
-                  <i className="fas fa-exclamation-triangle"></i>
-                  <span>No inclusions specified yet. Please add at least 1 item.</span>
-                </div>
+                <span className="quote-empty-text">No inclusions added yet.</span>
               )}
             </div>
-
             {errors.includedItems && (
-              <div className="quote-field-error-msg">
-                <i className="fas fa-circle-exclamation"></i>
-                <span>{errors.includedItems.message}</span>
-              </div>
+              <span className="quote-error-msg">{errors.includedItems.message}</span>
             )}
           </div>
-        </div>
 
-        <div className="quote-field-group">
-          <div className="quote-label-with-tag">
-            <label className="quote-field-label">
-              What is Not Included <span className="quote-required-star">*</span>
+          <div className="quote-form-group">
+            <label className="quote-label">
+              What is Not Included <span className="quote-required">*</span>
             </label>
-            <span className="quote-badge-count-tag excluded">
-              {(formValues.excludedItems || []).length} excluded
-            </span>
-          </div>
-
-          <div className="quote-tag-builder">
             <div className="quote-tag-input-row">
-              <div className="quote-tag-input-icon-wrap">
-                <i className="fas fa-minus-circle text-amber"></i>
-                <input
-                  type="text"
-                  placeholder="e.g. Spare parts, major repair"
-                  value={excludedInput}
-                  onChange={(e) => {
-                    setExcludedInput(e.target.value);
-                    if (tagError.excluded) {
-                      setTagError((prev) => ({ ...prev, excluded: undefined }));
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleAddExcluded();
-                    }
-                  }}
-                  className="quote-form-input tag-input"
-                />
-              </div>
+              <input
+                type="text"
+                placeholder="e.g. Spare parts, major repair"
+                value={excludedInput}
+                onChange={(e) => {
+                  setExcludedInput(e.target.value);
+                  if (tagError.excluded) {
+                    setTagError((prev) => ({ ...prev, excluded: undefined }));
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddExcluded();
+                  }
+                }}
+                className="quote-control"
+              />
               <button
                 type="button"
-                className="quote-btn-add-item secondary"
+                className="quote-btn-secondary"
                 onClick={() => handleAddExcluded()}
               >
-                <i className="fas fa-plus"></i>
-                <span>Add Exclusion</span>
+                Add Item
               </button>
             </div>
-
             {tagError.excluded && (
-              <div className="quote-field-error-msg">
-                <i className="fas fa-circle-exclamation"></i>
-                <span>{tagError.excluded}</span>
-              </div>
+              <span className="quote-error-msg">{tagError.excluded}</span>
             )}
 
-            <div className="quote-chip-suggestions">
-              <span className="quote-suggestion-label">Suggested Exclusions:</span>
-              {excludedSuggestions
-                .filter((item) => !(formValues.excludedItems || []).includes(item))
-                .slice(0, 4)
-                .map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    className="quote-suggest-chip excluded"
-                    onClick={() => handleAddExcluded(item)}
-                  >
-                    <i className="fas fa-plus"></i>
-                    <span>{item}</span>
-                  </button>
-                ))}
-            </div>
-
-            <div className="quote-items-list excluded">
+            <div className="quote-tags-wrapper">
               {formValues.excludedItems && formValues.excludedItems.length > 0 ? (
                 formValues.excludedItems.map((item, idx) => (
-                  <div key={idx} className="quote-item-badge excluded">
-                    <i className="fas fa-times-circle text-red"></i>
-                    <span className="quote-item-text">{item}</span>
+                  <span key={idx} className="quote-tag quote-tag-excluded">
+                    <i className="fas fa-minus"></i>
+                    <span>{item}</span>
                     <button
                       type="button"
-                      className="quote-item-remove-btn"
+                      className="quote-tag-remove"
                       onClick={() => handleRemoveExcluded(idx)}
                       aria-label={`Remove ${item}`}
                     >
                       <i className="fas fa-times"></i>
                     </button>
-                  </div>
+                  </span>
                 ))
               ) : (
-                <div className="quote-empty-tags-note warning">
-                  <i className="fas fa-info-circle"></i>
-                  <span>Please list at least 1 exclusion to protect yourself against extra unpaid work.</span>
-                </div>
+                <span className="quote-empty-text">No exclusions added yet.</span>
               )}
             </div>
-
             {errors.excludedItems && (
-              <div className="quote-field-error-msg">
-                <i className="fas fa-circle-exclamation"></i>
-                <span>{errors.excludedItems.message}</span>
-              </div>
+              <span className="quote-error-msg">{errors.excludedItems.message}</span>
+            )}
+          </div>
+
+          <div className="quote-form-group">
+            <label className="quote-label" htmlFor="extra-charge-policy">
+              Extra-charge Policy <span className="quote-required">*</span>
+            </label>
+            <input
+              id="extra-charge-policy"
+              type="text"
+              placeholder="e.g. Spare parts at actual cost"
+              className={`quote-control ${errors.extraChargePolicy ? "is-invalid" : ""}`}
+              {...register("extraChargePolicy")}
+            />
+            {errors.extraChargePolicy ? (
+              <span className="quote-error-msg">{errors.extraChargePolicy.message}</span>
+            ) : (
+              <span className="quote-hint-msg">
+                Terms for unexpected repairs or materials required during the job
+              </span>
             )}
           </div>
         </div>
       </div>
 
-      <div className={`quote-form-section ${isSection3Complete ? "section-complete" : ""}`}>
-        <div className="quote-section-title-row">
-          <div className="quote-section-number">
-            {isSection3Complete ? <i className="fas fa-check"></i> : "3"}
-          </div>
-          <div className="quote-section-meta">
-            <div className="quote-section-badge-row">
-              <span className="quote-section-pill">Step 3 of 4</span>
-              <span className="quote-status-pill optional">Recommended</span>
-            </div>
-            <h4 className="quote-section-title">Schedule & Estimated Duration</h4>
-            <p className="quote-section-subtitle">
-              Give the customer confidence by specifying when you will arrive and job turnaround time
-            </p>
-          </div>
+      <div className="quote-section-card">
+        <div className="quote-card-header">
+          <h2 className="quote-card-title">Schedule & Customer Note</h2>
+          <p className="quote-card-subtitle">
+            Provide timing expectations and a direct message for the customer.
+          </p>
         </div>
 
-        <div className="quote-field-row two-col">
-          <div className="quote-field-group">
-            <div className="quote-label-with-tag">
-              <label className="quote-field-label" htmlFor="estimated-duration">
+        <div className="quote-card-body">
+          <div className="quote-form-row">
+            <div className="quote-form-group">
+              <label className="quote-label" htmlFor="estimated-duration">
                 Estimated Duration
               </label>
-              <span className="quote-recommended-tag">Recommended</span>
-            </div>
-            <div className="quote-input-with-icon">
-              <i className="far fa-hourglass quote-input-left-icon"></i>
               <input
                 id="estimated-duration"
                 type="text"
                 placeholder="e.g. 1–2 hours"
-                className={`quote-form-input with-left-icon ${
-                  errors.estimatedDuration ? "has-error is-invalid" : ""
-                }`}
+                className={`quote-control ${errors.estimatedDuration ? "is-invalid" : ""}`}
                 {...register("estimatedDuration")}
               />
+              {errors.estimatedDuration ? (
+                <span className="quote-error-msg">{errors.estimatedDuration.message}</span>
+              ) : (
+                <span className="quote-hint-msg">Recommended</span>
+              )}
             </div>
 
-            <div className="quote-chip-suggestions compact">
-              {durationSuggestions.map((dur) => (
-                <button
-                  key={dur}
-                  type="button"
-                  className={`quote-suggest-chip ${
-                    formValues.estimatedDuration === dur ? "active" : ""
-                  }`}
-                  onClick={() => {
-                    setValue("estimatedDuration", dur, {
-                      shouldValidate: true,
-                      shouldDirty: true
-                    });
-                  }}
-                >
-                  {dur}
-                </button>
-              ))}
-            </div>
-
-            {errors.estimatedDuration && (
-              <div className="quote-field-error-msg">
-                <i className="fas fa-circle-exclamation"></i>
-                <span>{errors.estimatedDuration.message}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="quote-field-group">
-            <div className="quote-label-with-tag">
-              <label className="quote-field-label" htmlFor="available-datetime">
+            <div className="quote-form-group">
+              <label className="quote-label" htmlFor="available-datetime">
                 Available Date / Time
               </label>
-              <span className="quote-recommended-tag">Recommended</span>
-            </div>
-            <div className="quote-input-with-icon">
-              <i className="far fa-calendar-alt quote-input-left-icon"></i>
               <input
                 id="available-datetime"
                 type="text"
-                placeholder="e.g. Today 6 PM"
-                className={`quote-form-input with-left-icon ${
-                  errors.availableDateTime ? "has-error is-invalid" : ""
-                }`}
+                placeholder="e.g. Today 6:00 PM"
+                className={`quote-control ${errors.availableDateTime ? "is-invalid" : ""}`}
                 {...register("availableDateTime")}
               />
-            </div>
-
-            <div className="quote-chip-suggestions compact">
-              {timeSlotSuggestions.map((slot) => (
-                <button
-                  key={slot}
-                  type="button"
-                  className={`quote-suggest-chip ${
-                    formValues.availableDateTime === slot ? "active" : ""
-                  }`}
-                  onClick={() => {
-                    setValue("availableDateTime", slot, {
-                      shouldValidate: true,
-                      shouldDirty: true
-                    });
-                  }}
-                >
-                  {slot}
-                </button>
-              ))}
-            </div>
-
-            {errors.availableDateTime && (
-              <div className="quote-field-error-msg">
-                <i className="fas fa-circle-exclamation"></i>
-                <span>{errors.availableDateTime.message}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className={`quote-form-section ${isSection4Complete ? "section-complete" : ""}`}>
-        <div className="quote-section-title-row">
-          <div className="quote-section-number">
-            {isSection4Complete ? <i className="fas fa-check"></i> : "4"}
-          </div>
-          <div className="quote-section-meta">
-            <div className="quote-section-badge-row">
-              <span className="quote-section-pill">Step 4 of 4</span>
-              {isSection4Complete ? (
-                <span className="quote-status-pill ready">Completed</span>
+              {errors.availableDateTime ? (
+                <span className="quote-error-msg">{errors.availableDateTime.message}</span>
               ) : (
-                <span className="quote-status-pill pending">Required Policy</span>
+                <span className="quote-hint-msg">Recommended</span>
               )}
             </div>
-            <h4 className="quote-section-title">Extra-Charge Policy & Message</h4>
-            <p className="quote-section-subtitle">
-              Prevent pricing conflicts and leave a courteous note for the customer
-            </p>
-          </div>
-        </div>
-
-        <div className="quote-field-group">
-          <div className="quote-label-with-tag">
-            <label className="quote-field-label" htmlFor="extra-charge-policy">
-              Extra-charge Policy <span className="quote-required-star">*</span>
-            </label>
-            <span className="quote-important-tag">Important</span>
           </div>
 
-          <div className="quote-policy-info-box">
-            <i className="fas fa-shield-alt quote-policy-icon"></i>
-            <div className="quote-policy-info-text">
-              <strong>Transparency Guarantee:</strong> Stating extra-charge terms upfront builds customer trust and guarantees platform support if unforeseen costs arise during the job.
-            </div>
-          </div>
-
-          <input
-            id="extra-charge-policy"
-            type="text"
-            placeholder="e.g. Spare parts at actual cost"
-            className={`quote-form-input ${
-              errors.extraChargePolicy ? "has-error is-invalid" : formValues.extraChargePolicy ? "is-valid" : ""
-            }`}
-            {...register("extraChargePolicy")}
-          />
-
-          <div className="quote-chip-suggestions">
-            <span className="quote-suggestion-label">Common Policies:</span>
-            {policySuggestions.map((pol) => (
-              <button
-                key={pol}
-                type="button"
-                className={`quote-suggest-chip policy ${
-                  formValues.extraChargePolicy === pol ? "active" : ""
-                }`}
-                onClick={() => {
-                  setValue("extraChargePolicy", pol, {
-                    shouldValidate: true,
-                    shouldDirty: true
-                  });
-                }}
-              >
-                {pol}
-              </button>
-            ))}
-          </div>
-
-          {errors.extraChargePolicy ? (
-            <div className="quote-field-error-msg">
-              <i className="fas fa-circle-exclamation"></i>
-              <span>{errors.extraChargePolicy.message}</span>
-            </div>
-          ) : (
-            <span className="quote-field-hint">
-              Examples: "Spare parts at actual cost", "Material bill with GST provided"
-            </span>
-          )}
-        </div>
-
-        <div className="quote-field-group">
-          <div className="quote-label-with-tag">
-            <label className="quote-field-label" htmlFor="message-to-customer">
-              Message to Customer
-            </label>
-            <span className="quote-recommended-tag">Recommended</span>
-          </div>
-
-          <textarea
-            id="message-to-customer"
-            rows={2}
-            placeholder="e.g. I can come today evening. I will carry all necessary equipment and diagnostic gauges."
-            className={`quote-form-textarea ${
-              errors.messageToCustomer ? "has-error is-invalid" : ""
-            }`}
-            {...register("messageToCustomer")}
-          />
-
-          <div className="quote-textarea-footer">
-            {errors.messageToCustomer ? (
-              <div className="quote-field-error-msg">
-                <i className="fas fa-circle-exclamation"></i>
-                <span>{errors.messageToCustomer.message}</span>
-              </div>
-            ) : (
-              <span className="quote-field-hint">
-                A courteous message with your arrival readiness increases acceptance rate significantly
+          <div className="quote-form-group">
+            <div className="quote-label-split">
+              <label className="quote-label" htmlFor="message-to-customer">
+                Message to Customer
+              </label>
+              <span className="quote-counter">
+                {(formValues.messageToCustomer || "").length}/500
               </span>
+            </div>
+            <textarea
+              id="message-to-customer"
+              rows={2}
+              placeholder="e.g. I can come today evening. I will carry all necessary equipment and diagnostic gauges."
+              className={`quote-control quote-textarea ${
+                errors.messageToCustomer ? "is-invalid" : ""
+              }`}
+              {...register("messageToCustomer")}
+            />
+            {errors.messageToCustomer ? (
+              <span className="quote-error-msg">{errors.messageToCustomer.message}</span>
+            ) : (
+              <span className="quote-hint-msg">Recommended introduction note</span>
             )}
-            <span className="quote-char-counter">
-              {(formValues.messageToCustomer || "").length}/500
-            </span>
           </div>
         </div>
       </div>
 
-      <div className="quote-form-actions-card">
-        <div className="quote-actions-left">
-          <span className="quote-review-note">
-            <i className="fas fa-info-circle"></i>
-            Review the live preview on the right before sending to ensure accuracy.
-          </span>
-        </div>
-        <div className="quote-actions-right">
-          {onCancel && (
-            <button
-              type="button"
-              className="quote-btn-cancel"
-              onClick={onCancel}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-          )}
+      <div className="quote-form-footer">
+        {onCancel && (
           <button
-            type="submit"
-            className="quote-btn-submit"
-            disabled={isSubmitting || !isValid}
+            type="button"
+            className="quote-btn-cancel"
+            onClick={onCancel}
+            disabled={isSubmitting}
           >
-            {isSubmitting ? (
-              <>
-                <i className="fas fa-spinner fa-spin"></i>
-                <span>Submitting Quotation...</span>
-              </>
-            ) : (
-              <>
-                <i className="fas fa-paper-plane"></i>
-                <span>Send Quotation to Customer</span>
-              </>
-            )}
+            Cancel
           </button>
-        </div>
+        )}
+        <button
+          type="submit"
+          className="quote-btn-primary"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Sending Quotation...</span>
+            </>
+          ) : (
+            <>
+              <i className="fas fa-paper-plane"></i>
+              <span>Send Quotation</span>
+            </>
+          )}
+        </button>
       </div>
     </form>
   );
