@@ -12,7 +12,6 @@ import {
 } from '../hooks/useAvailability';
 import type { ProviderProfile } from '../../../shared/types/Dtos';
 import type { Weekday, ProviderAvailabilityOverrideItem } from '../types/availability.types';
-import { SpinnerOverlay } from '../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from '../../../shared/components/ui/ConfirmModal/ConfirmModal';
 import '../../../shared/components/ui/ConfirmModal/ConfirmModal.css';
 
@@ -281,7 +280,6 @@ const AvailabilitySettingsComponent: React.FC = () => {
 
     return (
         <div className="flex flex-col gap-6">
-            {(getAvailability.isPending || getOverrides.isPending) ? (<SpinnerOverlay isLoading={true}/>):null}
             <div className="settings-card-panel fade-in" id="sec-working-availability">
                 <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
                     <div>
@@ -531,14 +529,18 @@ const AvailabilitySettingsComponent: React.FC = () => {
                     </div>
                 ) : (
                     <div
-                        className="text-center p-5 border rounded-xl mt-3"
+                        className="text-center p-6 border rounded-xl mt-3 flex flex-col items-center justify-center"
                         style={{
                             borderColor: 'var(--border)',
                             borderStyle: 'dashed',
                             backgroundColor: 'var(--surface-elevated)'
                         }}
                     >
-                        <i className="fas fa-calendar-check text-secondary mb-2 text-xl opacity-60"></i>
+                        <img
+                            src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                            alt="No data found"
+                            style={{ width: '100%', maxWidth: '200px', maxHeight: '140px', objectFit: 'contain', margin: '0 auto 1rem', display: 'block', filter: 'drop-shadow(0 8px 20px rgba(0, 0, 0, 0.1))' }}
+                        />
                         <p className="text-xs text-secondary mb-0">
                             No custom overrides scheduled. Your weekly schedule operates normally.
                         </p>

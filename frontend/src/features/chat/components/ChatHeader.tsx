@@ -6,6 +6,8 @@ interface ChatHeaderProps {
   isInfoOpen: boolean;
   onToggleInfo: () => void;
   onBackToMobileList: () => void;
+  onStartAudioCall?: () => void;
+  onStartVideoCall?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -13,16 +15,33 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   isInfoOpen,
   onToggleInfo,
   onBackToMobileList,
+  onStartAudioCall,
+  onStartVideoCall,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
     <header className="chat-main-header">
-      <div className="chat-header-left">
+      <div
+        className="chat-header-left"
+        onClick={onToggleInfo}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggleInfo();
+          }
+        }}
+        title="View details"
+      >
         <button
           type="button"
           className="chat-back-mobile-btn"
-          onClick={onBackToMobileList}
+          onClick={(e) => {
+            e.stopPropagation();
+            onBackToMobileList();
+          }}
           aria-label="Back to conversations"
         >
           <i className="fas fa-chevron-left" />
@@ -32,7 +51,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           <img
             src={
               participant.avatar ||
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(participant.name)}&background=05AD98&color=fff`
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(participant.name)}&background=FF7900&color=fff`
             }
             alt={participant.name}
             className="chat-header-avatar"
@@ -64,20 +83,35 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       </div>
 
       <div className="chat-header-actions">
-        {/*participant.phone && (
-          <a
-            href={`tel:${participant.phone}`}
-            className="chat-action-btn phone"
-            title={`Call ${participant.name}`}
+        {onStartAudioCall && (
+          <button
+            type="button"
+            className="chat-action-btn chat-call-btn chat-call-audio-btn"
+            onClick={onStartAudioCall}
+            title={`Audio call ${participant.name}`}
+            aria-label={`Audio call ${participant.name}`}
           >
             <i className="fas fa-phone-alt" />
             <span className="chat-btn-text">Call</span>
-          </a>
-        )*/}
+          </button>
+        )}
+
+        {onStartVideoCall && (
+          <button
+            type="button"
+            className="chat-action-btn chat-call-btn chat-call-video-btn"
+            onClick={onStartVideoCall}
+            title={`Video call ${participant.name}`}
+            aria-label={`Video call ${participant.name}`}
+          >
+            <i className="fas fa-video" />
+            <span className="chat-btn-text">Video</span>
+          </button>
+        )}
 
         <button
           type="button"
-          className={`chat-action-btn ${isInfoOpen ? "active" : ""}`}
+          className={`chat-action-btn chat-details-btn ${isInfoOpen ? "active" : ""}`}
           onClick={onToggleInfo}
           title="Toggle details"
         >
@@ -88,7 +122,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         <div className="chat-dropdown-wrap">
           <button
             type="button"
-            className="chat-action-btn icon-only"
+            className="chat-action-btn icon-only chat-more-btn"
             onClick={() => setShowMenu((prev) => !prev)}
             aria-label="More conversation options"
           >

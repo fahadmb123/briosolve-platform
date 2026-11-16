@@ -5,7 +5,7 @@ import type { SocketData } from "../../../../shared/realtime/types/socket-data.t
 export class ChatSocketHandler {
     constructor(
         private readonly _joinConversationUseCase: JoinConversationUseCase
-    ) {}
+    ) { }
 
     register(socket: Socket<any, any, any, SocketData>): void {
         socket.on("conversation:join", async (conversationId: string) => {

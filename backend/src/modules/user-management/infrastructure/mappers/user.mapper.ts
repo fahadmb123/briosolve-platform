@@ -3,6 +3,7 @@ import { User } from "../../domain/entities/user.entity";
 import { CustomerProfileMapper, CustomerProfileRecord } from "./customerProfile.mapper";
 import { ProviderProfileMapper, ProviderProfileRecord } from "./providerProfile.mapper";
 import { UserResponseDto } from "../../application/dtos/response/user/user-dto";
+import { CreateProviderInput } from "../../domain/repositories/IProviderRepository";
 
 export type UserRecord = Prisma.UserGetPayload<{}>;
 
@@ -43,6 +44,18 @@ export class UserMapper {
             updated_at: user.updated_at,
             customer_profile: user.customer_profile,
             provider_profile: user.provider_profile
+        };
+    }
+
+    static toPersistence(data: CreateProviderInput, role: "CUSTOMER" | "ADMIN" | "INVESTIGATOR" | "PROVIDER" = "PROVIDER") {
+        return {
+            name: data.name as never,
+            email: data.email as never,
+            password_hash: (data.password || "") as never,
+            role: role as never,
+            status: "ACTIVE" as never,
+            email_verified: true,
+            phone_verified: false
         };
     }
 }

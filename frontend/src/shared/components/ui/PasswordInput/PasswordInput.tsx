@@ -36,7 +36,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({
           <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
         </button>
       </div>
-      {error && <span className="text-danger text-xs mt-1 block">{error}</span>}
+      {error && <div className="login-error-msg">{error}</div>}
     </div>
   );
 });

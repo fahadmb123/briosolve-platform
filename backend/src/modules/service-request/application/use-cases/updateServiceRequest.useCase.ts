@@ -5,6 +5,7 @@ import { IServiceRequestRepository } from "../../domain/repositories/IServiceReq
 import { ImageUploadService } from "../../../../shared/interfaces/services/IImageUpload.service";
 import { UpdateServiceRequestDto } from "../dtos/request/update-service-request.dto";
 import { ServiceRequestDetailsDto } from "../dtos/response/service-request.dto";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export class UpdateServiceRequestUseCase implements IUseCase<UpdateServiceRequestDto, ServiceRequestDetailsDto> {
     constructor(
@@ -54,6 +55,21 @@ export class UpdateServiceRequestUseCase implements IUseCase<UpdateServiceReques
             }
         }
 
+        if (dto.imageUrls !== undefined && existing.images && existing.images.length > 0) {
+            const retainedKeys = new Set(
+                (dto.imageUrls ?? [])
+                    .filter((url) => !url.startsWith("data:"))
+                    .map((url) => StorageUtil.extractKey(url) ?? url)
+            );
+            const removedImages = existing.images.filter((img) => {
+                const key = StorageUtil.extractKey(img.image_key) ?? img.image_key;
+                return !retainedKeys.has(key);
+            });
+            for (const img of removedImages) {
+                await this._imageUploadService.deleteImageByUrl(img.image_key);
+            }
+        }
+
         let processedImageUrls = dto.imageUrls;
         if (dto.imageUrls && dto.imageUrls.length > 0) {
             if (dto.imageUrls.length > 5) {
@@ -69,19 +85,9 @@ export class UpdateServiceRequestUseCase implements IUseCase<UpdateServiceReques
                         }
                         return await this._imageUploadService.uploadImage(buffer, "service-requests");
                     }
-                    return img;
+                    return StorageUtil.extractKey(img) ?? img;
                 })
             );
-        }
-
-        if (dto.imageUrls !== undefined && existing.images && existing.images.length > 0) {
-            const retainedUrls = new Set(
-                (processedImageUrls ?? []).filter((url) => !url.startsWith("data:"))
-            );
-            const removedImages = existing.images.filter((img) => !retainedUrls.has(img.image_key));
-            for (const img of removedImages) {
-                await this._imageUploadService.deleteImageByUrl(img.image_key);
-            }
         }
 
         await this._serviceRequestRepository.update(dto.id, dto.customerId, {

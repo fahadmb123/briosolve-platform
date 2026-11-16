@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
 import { useUpdateProfile } from '../../hooks/customer/useUpdateProfile';
 import { useGetProfile } from '../../hooks/customer/useGetProfile';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { ImageCropModal } from '../../../../shared/components/ui/ImageCropModal/ImageCropModal';
 import { useUpdateProfileImage } from '../../hooks/customer/useUpdateProfileImage';
@@ -22,6 +21,11 @@ export default function Profile() {
   const customerProfile = profile as CustomerProfile | null;
 
   const defaultAddress = user?.current_address_id;
+  const customerVerifiedCount = [
+    Boolean(user?.email_verified),
+    Boolean(user?.phone_verified),
+    Boolean(defaultAddress)
+  ].filter(Boolean).length;
   const [isLocModalOpen, setIsLocModalOpen] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(customerProfile?.profile_image || null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -35,7 +39,7 @@ export default function Profile() {
   });
 
   const { mutate: updateProfile, isPending } = useUpdateProfile();
-  const getProfile = useGetProfile();
+  useGetProfile();
 
   useEffect(() => {
     (()=>{
@@ -89,8 +93,6 @@ export default function Profile() {
 
   return (
     <>
-
-    {getProfile.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
       <div className="profile-premium-wrapper">
         {/* Top Gradient/Image Banner */}
         <div className="profile-banner"></div>
@@ -118,10 +120,13 @@ export default function Profile() {
               </div>
 
               <h2 className="h4 mb-1">{user?.name || 'Customer'}</h2>
-              <span className="badge badge-success text-xs mb-3">
-                <i className="fas fa-check-circle mr-1"></i> Email Verified
-              </span>
-              <p className="text-secondary text-xs">Customer Member • Joined <strong>Jan 2025</strong></p>
+              <div className="flex justify-center mb-3">
+                <span className={`verification-pill ${customerVerifiedCount === 3 ? 'verified' : 'pending'}`}>
+                  <i className={`fas ${customerVerifiedCount === 3 ? 'fa-check-circle' : 'fa-clock'}`}></i>
+                  {customerVerifiedCount === 3 ? 'Verified Customer' : `${customerVerifiedCount}/3 Verified`}
+                </span>
+              </div>
+              <p className="text-secondary text-xs">Customer Member &bull; Joined <strong>Jan 2025</strong></p>
 
               <div className="profile-stats-modern">
                 <div className="stat-box">
@@ -135,7 +140,93 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* DEFAULT LOCATION CARD */}
+            <div className="verification-badge-card">
+              <div className="verification-card-header">
+                <div className="verification-card-title-group">
+                  <div className="verification-card-shield">
+                    <i className="fas fa-shield-alt"></i>
+                  </div>
+                  <div>
+                    <h3 className="verification-card-title">Verification Badges</h3>
+                    <p className="verification-item-subtext">Customer trust credentials</p>
+                  </div>
+                </div>
+                <span className={`verification-card-overall-badge ${customerVerifiedCount === 3 ? 'complete' : 'progress'}`}>
+                  <i className={`fas ${customerVerifiedCount === 3 ? 'fa-check-circle' : 'fa-clock'}`}></i>
+                  {customerVerifiedCount}/3 Verified
+                </span>
+              </div>
+
+              <div className="verification-items-list">
+                <div className="verification-item-row">
+                  <div className="verification-item-left">
+                    <div className={`verification-item-icon-box ${user?.email_verified ? 'verified' : 'pending'}`}>
+                      <i className={`fas ${user?.email_verified ? 'fa-envelope-open-text' : 'fa-envelope'}`}></i>
+                    </div>
+                    <div className="verification-item-text">
+                      <span className="verification-item-label">Email</span>
+                    </div>
+                  </div>
+                  <div
+                    className={`verification-checkbox ${user?.email_verified ? 'checked' : 'pending'}`}
+                    title={user?.email_verified ? 'Email Verified' : 'Email Pending'}
+                  >
+                    {user?.email_verified ? (
+                      <i className="fas fa-check text-white"></i>
+                    ) : (
+                      <i className="fas fa-clock text-2xs"></i>
+                    )}
+                  </div>
+                </div>
+
+                <div className="verification-item-row">
+                  <div className="verification-item-left">
+                    <div className={`verification-item-icon-box ${user?.phone_verified ? 'verified' : user?.phone ? 'pending' : 'empty'}`}>
+                      <i className="fas fa-phone-alt"></i>
+                    </div>
+                    <div className="verification-item-text">
+                      <span className="verification-item-label">Phone</span>
+                    </div>
+                  </div>
+                  <div
+                    className={`verification-checkbox ${user?.phone_verified ? 'checked' : user?.phone ? 'pending' : 'unchecked'}`}
+                    title={user?.phone_verified ? 'Phone Verified' : user?.phone ? 'OTP Pending' : 'Phone Not Added'}
+                  >
+                    {user?.phone_verified ? (
+                      <i className="fas fa-check text-white"></i>
+                    ) : user?.phone ? (
+                      <i className="fas fa-clock text-2xs"></i>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="verification-item-row">
+                  <div className="verification-item-left">
+                    <div className={`verification-item-icon-box ${defaultAddress ? 'verified' : 'empty'}`}>
+                      <i className="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div className="verification-item-text">
+                      <span className="verification-item-label">Address</span>
+                    </div>
+                  </div>
+                  <div
+                    className={`verification-checkbox ${defaultAddress ? 'checked' : 'unchecked'}`}
+                    title={defaultAddress ? 'Address Verified' : 'Address Not Configured'}
+                  >
+                    {defaultAddress ? (
+                      <i className="fas fa-check text-white"></i>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+
+              {customerVerifiedCount < 3 && (
+                <Link to="/settings" className="verification-btn-action">
+                  <i className="fas fa-shield-alt"></i> Complete Verifications
+                </Link>
+              )}
+            </div>
+
             <div className="form-card-modern p-5 w-full">
               <div className="flex justify-between items-center mb-4">
                 <div>
@@ -256,7 +347,15 @@ export default function Profile() {
 
               <div className="flex justify-end items-center gap-3 pt-5 mt-4 border-top border-border">
                 <button type="submit" disabled={isPending} className="btn btn-primary px-8 shadow-sm">
-                  <i className="fas fa-check mr-2"></i> {isPending ? "Saving..." : "Save Changes"}
+                  {isPending ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin mr-2"></i> Saving...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-check mr-2"></i> Save Changes
+                    </>
+                  )}
                 </button>
               </div>
             </form>

@@ -1,5 +1,6 @@
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { AdminNoData } from '../../../shared/components/ui/AdminNoData';
 
 export interface TableColumn<T> {
   key: string;
@@ -23,19 +24,19 @@ function AdminTableComponent<T>({
   columns, 
   data, 
   isLoading, 
-  emptyMessage = "No records found.", 
+  emptyMessage = "No data found matching this.", 
   keyExtractor,
   rowStyle,
-  skeletonRowCount = 5
+  skeletonRowCount = 8
 }: AdminTableProps<T>) {
   return (
     <div className="admin-table-card relative">
       <div className="table-responsive">
-        <table className="admin-table w-full text-left border-collapse">
+        <table className="admin-table w-full text-left">
           <thead>
             <tr>
               {columns.map((col) => (
-                <th key={col.key} style={{ width: col.width }} className="p-4 border-b border-border text-sm font-semibold text-secondary">
+                <th key={col.key} style={{ width: col.width }} className="text-sm font-bold text-text">
                   {col.header}
                 </th>
               ))}
@@ -44,25 +45,25 @@ function AdminTableComponent<T>({
           <tbody>
             {!isLoading && data.length > 0 ? (
               data.map((item) => (
-                <tr key={keyExtractor(item)} style={rowStyle ? rowStyle(item) : undefined} className="border-b border-border hover:bg-surface-elevated transition-colors">
+                <tr key={keyExtractor(item)} style={rowStyle ? rowStyle(item) : undefined}>
                   {columns.map((col) => (
-                    <td key={col.key} className="p-4 align-middle text-sm">
+                    <td key={col.key} className="align-middle text-sm">
                       {col.render(item)}
                     </td>
                   ))}
                 </tr>
               ))
             ) : !isLoading && data.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} className="text-center py-8 text-secondary">
-                  {emptyMessage}
+              <tr className="admin-empty-row">
+                <td colSpan={columns.length} className="admin-empty-table-cell">
+                  <AdminNoData description={emptyMessage} />
                 </td>
               </tr>
             ) : (
               Array.from({ length: skeletonRowCount }).map((_, rowIndex) => (
-                <tr key={`skeleton-row-${rowIndex}`} className="border-b border-border">
+                <tr key={`skeleton-row-${rowIndex}`} className="skeleton-row">
                   {columns.map((col, colIndex) => (
-                    <td key={`skeleton-cell-${rowIndex}-${col.key || colIndex}`} className="p-4 align-middle">
+                    <td key={`skeleton-cell-${rowIndex}-${col.key || colIndex}`} className="align-middle">
                       <Skeleton
                         height={18}
                         width={colIndex === 0 ? '75%' : colIndex === columns.length - 1 ? '45%' : '85%'}

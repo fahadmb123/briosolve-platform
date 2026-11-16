@@ -1,10 +1,10 @@
 import { AppRouter } from './router/index';
+import { BrowserRouter } from 'react-router-dom';
 import '../App.css';
 import '../shared/styles/global.css';
 import '../shared/styles/user-theme.css';
 import '../shared/styles/provider-theme.css';
 import '../shared/styles/admin-theme.css';
-import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../features/auth/stores/auth.store';
@@ -13,6 +13,8 @@ import { useNotificationSocket } from '../features/notifications/hooks/useNotifi
 import { useChatUnreadSync } from '../features/chat';
 import AccountSuspended from './pages/AccountSuspended/AccountSuspended';
 import { useCheckNetworkStatus } from '../shared/hooks/useCheckNetworkStatus';
+import { CallModalContainer } from '../features/communication';
+import { AppToaster } from '../shared/components/ui/Toast';
 
 function App() {
   const fetchUser = useAuthStore((state) => state.fetchUser);
@@ -20,10 +22,9 @@ function App() {
   const suspended = useAuthStore((state) => state.isSuspended);
 
   useNotificationSocket();
-  useCheckNetworkStatus()
+  useCheckNetworkStatus();
   useChatUnreadSync();
 
-  
   useEffect(() => {
     fetchUser().finally(() => {
       setIsInitializing(false);
@@ -35,7 +36,13 @@ function App() {
     window.location.pathname === '/login';
 
   if (suspended && !isVisitingAllowedPage) {
-    return <AccountSuspended />;
+    return (
+      <ThemeProvider>
+        <BrowserRouter>
+          <AccountSuspended />
+        </BrowserRouter>
+      </ThemeProvider>
+    );
   }
 
   return (
@@ -45,7 +52,8 @@ function App() {
           <LoadingScreen isLoading={true} />
         ) : (
           <>
-            <Toaster position="top-center" />
+            <AppToaster />
+            <CallModalContainer />
             <AppRouter />
           </>
         )}

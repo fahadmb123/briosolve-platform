@@ -14,10 +14,9 @@ import { RegisterCustomerInput } from "../../application/dtos/request/customer/r
 import { BecomeProviderInput } from "../../application/dtos/request/onboading/become-provider.dto"
 import { GetNearbyProvidersDto } from "../../application/dtos/request/customer/get-nearby-providers.dto";
 import { GetNearbyProvidersOutputDto } from "../../application/dtos/response/customer/get-nearby-providers-output.dto";
-
-
-
-
+import { GetProviderPublicProfileDto } from "../../application/dtos/request/customer/get-provider-public-profile.dto";
+import { GetProviderPublicProfileOutputDto } from "../../application/dtos/response/customer/get-provider-public-profile-output.dto";
+import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository";
 
 export class CustomerController extends BaseController{
     constructor (
@@ -28,7 +27,9 @@ export class CustomerController extends BaseController{
         private readonly _sendBecomeProviderOtpUseCase: IUseCase<string, { registrationId: string; expiresIn: number }>,
         private readonly _becomeProviderUseCase: IUseCase<BecomeProviderInput, void>,
         private readonly _jwtService: IJwtService,
-        private readonly _getNearbyProvidersUseCase: IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto>
+        private readonly _getNearbyProvidersUseCase: IUseCase<GetNearbyProvidersDto, GetNearbyProvidersOutputDto>,
+        private readonly _getProviderPublicProfileUseCase: IUseCase<GetProviderPublicProfileDto, GetProviderPublicProfileOutputDto>,
+        private readonly _customerRepository?: ICustomerRepository
     ) {super()}
 
     register = async (req:Request,res:Response,next:NextFunction) => {
@@ -75,14 +76,22 @@ export class CustomerController extends BaseController{
     uploadProfileImage = async (req:Request,res:Response,next:NextFunction) => {
         try {
             if (!req.file) throw new ApplicationError("NO_DATA","No image uploaded","NOT_FOUND")
-            const imageUrl = await this._imageUploadService.uploadImage(req.file.buffer, 'profiles')
+
+            if (this._customerRepository) {
+                const existing = await this._customerRepository.findById(req.user?.userId!);
+                if (existing?.profile_image) {
+                    await this._imageUploadService.deleteImageByUrl(existing.profile_image);
+                }
+            }
+
+            const key = await this._imageUploadService.uploadImage(req.file.buffer, 'profiles')
             
             await this._updateCustomerProfileUseCase.execute({
                 id: req.user?.userId!, 
-                data: { profile_image: imageUrl }
+                data: { profile_image: key }
             })
 
-            return this.sendSuccess(res,"Updated!", { profile_image: imageUrl })
+            return this.sendSuccess(res,"Updated!", { profile_image: key })
         } catch (err) {
             next(err)
         }
@@ -92,7 +101,16 @@ export class CustomerController extends BaseController{
         try {
             const { imageUrl } = req.body;
 
-            if (imageUrl) await this._imageUploadService.deleteImageByUrl(imageUrl)
+            if (this._customerRepository) {
+                const existing = await this._customerRepository.findById(req.user?.userId!);
+                if (existing?.profile_image) {
+                    await this._imageUploadService.deleteImageByUrl(existing.profile_image);
+                } else if (imageUrl) {
+                    await this._imageUploadService.deleteImageByUrl(imageUrl);
+                }
+            } else if (imageUrl) {
+                await this._imageUploadService.deleteImageByUrl(imageUrl);
+            }
 
             await this._updateCustomerProfileUseCase.execute({
                 id: req.user?.userId!, 
@@ -145,6 +163,21 @@ export class CustomerController extends BaseController{
             });
 
             return this.sendSuccess(res, "Nearby providers fetched successfully", response);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    getProviderPublicProfile = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const user = req.user;
+            const providerId = req.params.id as string;
+            const response = await this._getProviderPublicProfileUseCase.execute({
+                providerId,
+                customerId: user?.userId
+            });
+
+            return this.sendSuccess(res, "Provider profile fetched successfully", response);
         } catch (err) {
             next(err);
         }

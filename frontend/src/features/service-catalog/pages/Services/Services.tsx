@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { AdminPageHeader } from "../../../admin/components/AdminPageHeader";
 import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { AddServiceModal } from "../../components/AddServiceModal";
@@ -7,7 +6,6 @@ import { useGetCategoriesService } from "../../hooks/useCategory";
 import { useGetServices, useAddServiceMut, useUpdateServiceMut, useDeleteServiceMut } from "../../hooks/useService";
 import { useServiceFormData } from "../../hooks/useServiceFormData";
 import { toast } from 'react-hot-toast';
-import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 
 interface Service {
@@ -21,7 +19,11 @@ interface Service {
   category?: { id: string; name: string };
 }
 
-export default function Services() {
+interface ServicesProps {
+  onTotalChange?: (total: number) => void;
+}
+
+export default function Services({ onTotalChange }: ServicesProps) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
@@ -57,6 +59,9 @@ export default function Services() {
         if (res?.data?.services) {
           setServices(res.data.services);
           setTotalPages(res.data.totalPages || 1);
+          if (onTotalChange && !search && !filter && typeof res.data.total === 'number') {
+            onTotalChange(res.data.total);
+          }
         }
       }
     });
@@ -224,19 +229,7 @@ export default function Services() {
   ], [categoryNameMap]);
 
   return (
-    <div className="app-content">
-      {addService.isPending || updateService.isPending || deleteService.isPending ? <SpinnerOverlay isLoading={true} /> : null}
-      
-      <AdminPageHeader 
-        title="Service Management" 
-        description="Manage individual services offered under each category."
-        actionButton={{
-          label: "Add Service",
-          icon: "fas fa-plus",
-          onClick: handleOpenAddModal
-        }}
-      />
-
+    <>
       <div className="admin-filter-bar mb-6">
         <div className="admin-search-input">
           <i className="fas fa-search"></i>
@@ -268,6 +261,10 @@ export default function Services() {
           <button className="btn btn-secondary text-xs py-2" onClick={handleReset}>
             <i className="fas fa-undo mr-1"></i>Reset
           </button>
+
+          <button className="btn btn-primary text-xs py-2" onClick={handleOpenAddModal}>
+            <i className="fas fa-plus mr-1"></i>Add Service
+          </button>
         </div>
       </div>
 
@@ -277,7 +274,7 @@ export default function Services() {
         isLoading={getServicesMut.isPending}
         loadingMessage="Searching for services..."
         keyExtractor={keyExtractor}
-        emptyMessage="No services found."
+        emptyMessage="No data found matching this."
       />
 
       <AdminPagination 
@@ -292,6 +289,7 @@ export default function Services() {
         onClose={handleCloseAddModal} 
         onAdd={editingService ? handleEditService : handleAddService} 
         categories={categories}
+        isLoading={addService.isPending || updateService.isPending}
       />
       
       {serviceToDelete && (
@@ -307,6 +305,6 @@ export default function Services() {
           isLoading={deleteService.isPending}
         />
       )}
-    </div>
+    </>
   );
 }

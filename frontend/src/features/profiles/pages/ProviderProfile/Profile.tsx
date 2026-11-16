@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import { ImageCropModal } from '../../../../shared/components/ui/ImageCropModal/ImageCropModal';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { useUpdateProfileImage } from '../../hooks/provider/useUpdateProfileImage';
 import { useDeleteProfileImage } from '../../hooks/provider/useDeleteProfileImage';
 import { useGetProviderServices } from '../../../service-catalog';
@@ -19,6 +20,96 @@ const formatDocType = (type: string): string =>
     .split('_')
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(' ');
+
+const getServiceImageUrl = (image?: string | null, catImage?: string | null): string | null => {
+  const target = image || catImage;
+  if (!target) return null;
+  if (target.startsWith('http://') || target.startsWith('https://') || target.startsWith('blob:')) {
+    return target;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  return `${apiBase.replace(/\/$/, '')}/${target.replace(/^\//, '')}`;
+};
+
+const getCategoryIcon = (categoryName?: string): string => {
+  const name = (categoryName || '').toLowerCase();
+  if (name.includes('plumb')) return 'fa-faucet';
+  if (name.includes('electr')) return 'fa-bolt';
+  if (name.includes('clean')) return 'fa-broom';
+  if (name.includes('paint')) return 'fa-paint-roller';
+  if (name.includes('carpenter') || name.includes('wood')) return 'fa-hammer';
+  if (name.includes('appliance') || name.includes('ac') || name.includes('repair')) return 'fa-tools';
+  if (name.includes('garden') || name.includes('lawn')) return 'fa-leaf';
+  if (name.includes('pest')) return 'fa-bug';
+  if (name.includes('auto') || name.includes('mechanic')) return 'fa-car';
+  return 'fa-wrench';
+};
+
+function ProfileServiceCard({ item }: { item: PopulatedProviderService }) {
+  const [imgError, setImgError] = useState(false);
+  const serviceName = item.service?.name || 'Service';
+  const categoryName = item.service?.category?.name || 'Trade Category';
+  const description = item.service?.description || 'Professional service delivered by verified trade specialist.';
+  const rawImageUrl = item.service?.image || item.service?.category?.image;
+  const imageUrl = useMemo(() => getServiceImageUrl(rawImageUrl), [rawImageUrl]);
+  const iconClass = useMemo(() => getCategoryIcon(categoryName), [categoryName]);
+  const hasValidImage = Boolean(imageUrl && !imgError);
+
+  return (
+    <div className="profile-service-card">
+      <div className="profile-service-card-media">
+        {hasValidImage ? (
+          <img
+            src={imageUrl!}
+            alt={serviceName}
+            onError={() => setImgError(true)}
+            className="profile-service-card-img"
+            loading="lazy"
+          />
+        ) : (
+          <div className="profile-service-card-placeholder">
+            <div className="profile-service-placeholder-icon">
+              <i className={`fas ${iconClass}`}></i>
+            </div>
+          </div>
+        )}
+        <div className="profile-service-media-overlay" />
+        <span className="profile-service-category-badge" title={categoryName}>
+          {categoryName}
+        </span>
+        <span className="profile-service-status-pill">
+          <i className="fas fa-check-circle mr-1"></i> Active
+        </span>
+      </div>
+
+      <div className="profile-service-card-body">
+        <h4 className="profile-service-card-title" title={serviceName}>
+          {serviceName}
+        </h4>
+        <p className="profile-service-card-desc" title={description}>
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ProfileServiceCardSkeleton() {
+  return (
+    <div className="profile-service-card" aria-hidden="true">
+      <div className="profile-service-card-media profile-service-skeleton-media">
+        <Skeleton width="100%" height="100%" borderRadius={0} />
+      </div>
+      <div className="profile-service-card-body">
+        <Skeleton width="65%" height={18} borderRadius={4} />
+        <div className="w-full flex flex-col items-center gap-1.5 mt-1">
+          <Skeleton width="90%" height={12} borderRadius={4} />
+          <Skeleton width="70%" height={12} borderRadius={4} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Profile() {
   const user = useAuthStore((state) => state.user);
@@ -170,10 +261,15 @@ export default function Profile() {
     (documents.length === 0 || bothKycApproved)
   );
 
+  const verifiedCount = [
+    Boolean(user?.email_verified),
+    Boolean(user?.phone_verified),
+    Boolean(address),
+    kycStatus === 'APPROVED'
+  ].filter(Boolean).length;
+
   return (
     <>
-      <SpinnerOverlay isLoading={isImageUploading || isImageDeleting} />
-
       <div className="profile-premium-wrapper">
         <div className="profile-banner flex items-start justify-end p-4">
           
@@ -229,173 +325,164 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="form-card-modern p-5 w-full">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="h6 mb-0">Verification Badges</h3>
-                <span className={`badge ${isAllVerified ? 'badge-success' : 'badge-warning'} text-xs font-semibold px-2 py-0.5`}>
-                  {isAllVerified ? 'All Verified' : 'In Progress'}
+            <div className="verification-badge-card">
+              <div className="verification-card-header">
+                <div className="verification-card-title-group">
+                  <div className="verification-card-shield">
+                    <i className="fas fa-shield-alt"></i>
+                  </div>
+                  <div>
+                    <h3 className="verification-card-title">Verification Badges</h3>
+                    <p className="verification-item-subtext">Security & trust credentials</p>
+                  </div>
+                </div>
+                <span className={`verification-card-overall-badge ${isAllVerified ? 'complete' : 'progress'}`}>
+                  <i className={`fas ${isAllVerified ? 'fa-check-circle' : 'fa-clock'}`}></i>
+                  {verifiedCount}/4 Verified
                 </span>
               </div>
 
-              <div className="flex flex-col gap-4">
-                <div className="flex items-start gap-3">
-                  <i
-                    className={`fas ${user?.email_verified ? 'fa-check-circle text-success' : 'fa-clock text-warning'} text-lg mt-0.5`}
-                  ></i>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="font-bold text-sm text-text truncate">
-                        {user?.email || 'Email Address'}
-                      </div>
-                      <span className={`badge ${user?.email_verified ? 'badge-success' : 'badge-warning'} text-2xs uppercase px-2 py-0.5`}>
-                        {user?.email_verified ? 'Verified' : 'Pending'}
-                      </span>
+              <div className="verification-items-list">
+                <div className="verification-item-row">
+                  <div className="verification-item-left">
+                    <div className={`verification-item-icon-box ${user?.email_verified ? 'verified' : 'pending'}`}>
+                      <i className={`fas ${user?.email_verified ? 'fa-envelope-open-text' : 'fa-envelope'}`}></i>
                     </div>
-                    <div className="text-xs text-secondary mt-0.5">
-                      {user?.email_verified ? 'Email address verified' : 'Verification pending'}
+                    <div className="verification-item-text">
+                      <span className="verification-item-label">Email</span>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <i
-                    className={`fas ${user?.phone_verified ? 'fa-check-circle text-success' : 'fa-clock text-warning'} text-lg mt-0.5`}
-                  ></i>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="font-bold text-sm text-text truncate">
-                        {user?.phone ? user.phone : 'Phone Number'}
-                      </div>
-                      <span className={`badge ${user?.phone_verified ? 'badge-success' : 'badge-warning'} text-2xs uppercase px-2 py-0.5`}>
-                        {user?.phone_verified ? 'Verified' : user?.phone ? 'Pending' : 'Not Added'}
-                      </span>
-                    </div>
-                    <div className="text-xs text-secondary mt-0.5">
-                      {user?.phone_verified
-                        ? 'Phone number verified'
-                        : user?.phone
-                        ? 'Verification pending'
-                        : 'No phone number provided'}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <i
-                    className={`fas ${address ? 'fa-check-circle text-success' : 'fa-clock text-warning'} text-lg mt-0.5`}
-                  ></i>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="font-bold text-sm text-text truncate">
-                        {address
-                          ? [address.area, address.city, address.state].filter(Boolean).join(', ')
-                          : 'Operating Address'}
-                      </div>
-                      <span className={`badge ${address ? 'badge-success' : 'badge-warning'} text-2xs uppercase px-2 py-0.5`}>
-                        {address ? 'Verified' : 'Action Required'}
-                      </span>
-                    </div>
-                    <div className="text-xs text-secondary mt-0.5">
-                      {address
-                        ? address.pincode ? `Postal Code: ${address.pincode}` : 'Operational base registered'
-                        : 'No default address configured'}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <i
-                    className={`fas ${
-                      kycStatus === 'APPROVED'
-                        ? 'fa-check-circle text-success'
-                        : kycStatus === 'REJECTED'
-                        ? 'fa-times-circle text-danger'
-                        : kycStatus === 'PENDING'
-                        ? 'fa-clock text-warning'
-                        : 'fa-shield-alt text-secondary'
-                    } text-lg mt-0.5`}
-                  ></i>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="font-bold text-sm text-text truncate">
-                        KYC & Identity Verification
-                      </div>
-                      <span
-                        className={`badge ${
-                          kycStatus === 'APPROVED'
-                            ? 'badge-success'
-                            : kycStatus === 'REJECTED'
-                            ? 'badge-danger'
-                            : kycStatus === 'PENDING'
-                            ? 'badge-warning'
-                            : 'badge-neutral'
-                        } text-2xs uppercase px-2 py-0.5`}
-                      >
-                        {kycStatus === 'APPROVED'
-                          ? 'Approved'
-                          : kycStatus === 'REJECTED'
-                          ? 'Rejected'
-                          : kycStatus === 'PENDING'
-                          ? 'In Review'
-                          : 'Not Submitted'}
-                      </span>
-                    </div>
-                    <div className="text-xs text-secondary mt-0.5">
-                      {kycStatus === 'APPROVED'
-                        ? 'Government & professional identity verified'
-                        : kycStatus === 'REJECTED'
-                        ? 'Documents rejected, update required'
-                        : kycStatus === 'PENDING'
-                        ? 'Submitted credentials under admin review'
-                        : 'Submit verification documents to get verified badge'}
-                    </div>
-                  </div>
-                </div>
-
-                {documents.length > 0 && (
-                  <div className="mt-1 pt-3 border-t border-surface-variant flex flex-col gap-2.5">
-                    <span className="text-2xs font-semibold text-secondary uppercase tracking-wider">
-                      Submitted Documents ({documents.length})
-                    </span>
-                    {documents.map((doc) => (
-                      <div key={doc.id} className="flex items-center justify-between p-2 rounded-lg bg-surface border border-border">
-                        <div className="flex items-center gap-2 overflow-hidden">
-                          <i className="fas fa-file-contract text-primary text-xs shrink-0"></i>
-                          <div className="truncate">
-                            <span className="text-xs font-medium text-text block truncate">
-                              {doc.document_name}
-                            </span>
-                            <span className="text-2xs text-secondary block truncate">
-                              {formatDocType(doc.document_type)}
-                            </span>
-                          </div>
-                        </div>
-                        <span
-                          className={`badge ${
-                            doc.status === 'APPROVED'
-                              ? 'badge-success'
-                              : doc.status === 'REJECTED'
-                              ? 'badge-danger'
-                              : 'badge-warning'
-                          } text-2xs uppercase px-2 py-0.5 shrink-0`}
-                        >
-                          {doc.status === 'APPROVED' ? 'Verified' : doc.status === 'REJECTED' ? 'Rejected' : 'Pending'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {kycStatus !== 'APPROVED' && (
-                  <Link
-                    to="/provider/verification"
-                    className="btn btn-outline btn-sm w-full mt-2 text-xs flex items-center justify-center gap-1.5"
+                  <div
+                    className={`verification-checkbox ${user?.email_verified ? 'checked' : 'pending'}`}
+                    title={user?.email_verified ? 'Email Verified' : 'Email Pending'}
                   >
-                    <i className="fas fa-shield-alt text-primary"></i>
-                    <span>{documents.length > 0 ? 'Manage Verification Documents' : 'Submit KYC Documents'}</span>
-                  </Link>
-                )}
+                    {user?.email_verified ? (
+                      <i className="fas fa-check text-white"></i>
+                    ) : (
+                      <i className="fas fa-clock text-2xs"></i>
+                    )}
+                  </div>
+                </div>
+
+                <div className="verification-item-row">
+                  <div className="verification-item-left">
+                    <div className={`verification-item-icon-box ${user?.phone_verified ? 'verified' : user?.phone ? 'pending' : 'empty'}`}>
+                      <i className="fas fa-phone-alt"></i>
+                    </div>
+                    <div className="verification-item-text">
+                      <span className="verification-item-label">Phone</span>
+                    </div>
+                  </div>
+                  <div
+                    className={`verification-checkbox ${user?.phone_verified ? 'checked' : user?.phone ? 'pending' : 'unchecked'}`}
+                    title={user?.phone_verified ? 'Phone Verified' : user?.phone ? 'OTP Pending' : 'Phone Not Added'}
+                  >
+                    {user?.phone_verified ? (
+                      <i className="fas fa-check text-white"></i>
+                    ) : user?.phone ? (
+                      <i className="fas fa-clock text-2xs"></i>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="verification-item-row">
+                  <div className="verification-item-left">
+                    <div className={`verification-item-icon-box ${address ? 'verified' : 'empty'}`}>
+                      <i className="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div className="verification-item-text">
+                      <span className="verification-item-label">Address</span>
+                    </div>
+                  </div>
+                  <div
+                    className={`verification-checkbox ${address ? 'checked' : 'unchecked'}`}
+                    title={address ? 'Address Verified' : 'Address Not Configured'}
+                  >
+                    {address ? (
+                      <i className="fas fa-check text-white"></i>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="verification-item-row">
+                  <div className="verification-item-left">
+                    <div className={`verification-item-icon-box ${
+                      kycStatus === 'APPROVED' ? 'verified' : kycStatus === 'REJECTED' ? 'rejected' : kycStatus === 'PENDING' ? 'pending' : 'empty'
+                    }`}>
+                      <i className="fas fa-id-card"></i>
+                    </div>
+                    <div className="verification-item-text">
+                      <span className="verification-item-label">KYC</span>
+                    </div>
+                  </div>
+                  <div
+                    className={`verification-checkbox ${
+                      kycStatus === 'APPROVED' ? 'checked' : kycStatus === 'REJECTED' ? 'rejected' : kycStatus === 'PENDING' ? 'pending' : 'unchecked'
+                    }`}
+                    title={
+                      kycStatus === 'APPROVED'
+                        ? 'KYC Verified'
+                        : kycStatus === 'REJECTED'
+                        ? 'KYC Rejected'
+                        : kycStatus === 'PENDING'
+                        ? 'KYC In Review'
+                        : 'KYC Not Submitted'
+                    }
+                  >
+                    {kycStatus === 'APPROVED' ? (
+                      <i className="fas fa-check text-white"></i>
+                    ) : kycStatus === 'REJECTED' ? (
+                      <i className="fas fa-times text-white text-xs"></i>
+                    ) : kycStatus === 'PENDING' ? (
+                      <i className="fas fa-clock text-2xs"></i>
+                    ) : null}
+                  </div>
+                </div>
               </div>
+
+              {documents.length > 0 && (
+                <div className="verification-docs-box">
+                  <div className="verification-docs-title">
+                    Submitted Documents ({documents.length})
+                  </div>
+                  {documents.map((doc) => (
+                    <div key={doc.id} className="verification-doc-item">
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <i className="fas fa-file-contract text-primary text-xs shrink-0"></i>
+                        <div className="truncate">
+                          <span className="text-xs font-semibold text-text block truncate">
+                            {doc.document_name}
+                          </span>
+                          <span className="text-2xs text-secondary block truncate">
+                            {formatDocType(doc.document_type)}
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        className={`verification-checkbox ${
+                          doc.status === 'APPROVED' ? 'checked' : doc.status === 'REJECTED' ? 'rejected' : 'pending'
+                        }`}
+                        style={{ width: '22px', height: '22px', minWidth: '22px', borderRadius: '6px', fontSize: '0.7rem' }}
+                        title={doc.status === 'APPROVED' ? 'Verified' : doc.status === 'REJECTED' ? 'Rejected' : 'Pending'}
+                      >
+                        {doc.status === 'APPROVED' ? (
+                          <i className="fas fa-check text-white"></i>
+                        ) : doc.status === 'REJECTED' ? (
+                          <i className="fas fa-times text-white text-2xs"></i>
+                        ) : (
+                          <i className="fas fa-clock text-2xs"></i>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {kycStatus !== 'APPROVED' && (
+                <Link to="/provider/verification" className="verification-btn-action">
+                  <i className="fas fa-shield-alt"></i> Complete Verifications
+                </Link>
+              )}
             </div>
 
             <div className="form-card-modern p-5 w-full">
@@ -452,15 +539,81 @@ export default function Profile() {
             </div>
 
             <div className="form-card-modern">
-              <div className="flex justify-between items-center mb-4 pb-4 border-bottom">
+              <div className="flex justify-between items-center mb-6 pb-4 border-bottom flex-wrap gap-2">
                 <div>
-                  <h3 className="h4 mb-0">About &amp; Trade Background</h3>
-                  <span className="badge badge-primary text-xs mt-2">{experienceText}</span>
+                  <h3 className="h4 mb-0">Business &amp; Profile Details</h3>
+                </div>
+                <span className="badge badge-primary text-xs font-semibold px-2.5 py-1">
+                  {experienceText}
+                </span>
+              </div>
+
+              <div className="profile-fields-grid">
+                <div className="modern-input-group">
+                  <label>Business Name</label>
+                  <div className="form-control-static">
+                    <span className="flex items-center gap-2 truncate font-medium">
+                      <i className="fas fa-store text-primary text-sm"></i>
+                      <span className="truncate">{businessName}</span>
+                    </span>
+                    <i className="fas fa-lock text-secondary text-xs opacity-50" title="Non-editable"></i>
+                  </div>
+                </div>
+
+                <div className="modern-input-group">
+                  <label>Email Address</label>
+                  <div className="form-control-static">
+                    <span className="flex items-center gap-2 truncate font-medium">
+                      <i className="fas fa-envelope text-primary text-sm"></i>
+                      <span className="truncate">{user?.email || "Not provided"}</span>
+                    </span>
+                    {user?.email_verified ? (
+                      <span className="badge badge-success text-2xs uppercase px-2 py-0.5">Verified</span>
+                    ) : (
+                      <i className="fas fa-lock text-secondary text-xs opacity-50" title="Non-editable"></i>
+                    )}
+                  </div>
+                </div>
+
+                <div className="modern-input-group">
+                  <label>Mobile Number</label>
+                  <div className="form-control-static">
+                    <span className="flex items-center gap-2 truncate font-medium">
+                      <i className="fas fa-phone-alt text-primary text-sm"></i>
+                      <span className="truncate">{user?.phone || "Not provided"}</span>
+                    </span>
+                    {user?.phone_verified ? (
+                      <span className="badge badge-success text-2xs uppercase px-2 py-0.5">Verified</span>
+                    ) : (
+                      <i className="fas fa-lock text-secondary text-xs opacity-50" title="Non-editable"></i>
+                    )}
+                  </div>
+                </div>
+
+                <div className="modern-input-group">
+                  <label>Service Region</label>
+                  <div className="form-control-static">
+                    <span className="flex items-center gap-2 truncate font-medium">
+                      <i className="fas fa-map-marker-alt text-primary text-sm"></i>
+                      <span className="truncate">{address?.city ? `${address.city}, ${address.state || ""}` : (address?.area || "Operational Region")}</span>
+                    </span>
+                    {providerProfile?.service_radius_km ? (
+                      <span className="badge badge-primary text-2xs px-2 py-0.5">{providerProfile.service_radius_km} km</span>
+                    ) : (
+                      <i className="fas fa-lock text-secondary text-xs opacity-50" title="Non-editable"></i>
+                    )}
+                  </div>
                 </div>
               </div>
-              <p className="text-sm text-secondary leading-relaxed m-0 mt-2">{bioText}</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <div className="modern-input-group mb-0">
+                <label>Description &amp; About</label>
+                <div className="form-control-static form-control-static-bio">
+                  <p className="text-sm text-text leading-relaxed m-0">{bioText}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-5 border-t border-border">
                 <div className="flex items-center gap-4 bg-surface-hover p-4 rounded-xl border border-border">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0">
                     <i className="fas fa-certificate"></i>
@@ -489,32 +642,54 @@ export default function Profile() {
             </div>
 
             <div className="form-card-modern">
-              <div className="flex justify-between items-center mb-6 pb-4 border-bottom">
-                <h3 className="h4 mb-0">Active Service Categories</h3>
+              <div className="flex justify-between items-center mb-6 pb-4 border-bottom flex-wrap gap-2">
+                <div>
+                  <h3 className="h4 mb-0">Services Offered</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  {getProviderServices.isPending ? (
+                    <Skeleton width={80} height={24} borderRadius={9999} />
+                  ) : (
+                    <>
+                      <span className="badge badge-primary text-xs font-semibold px-2.5 py-1">
+                        {services.length} {services.length === 1 ? 'Service' : 'Services'}
+                      </span>
+                      <Link to="/provider/settings" state={{ activeSection: 'services' }} className="btn btn-outline btn-xs">
+                        <i className="fas fa-sliders-h mr-1"></i> Manage
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="flex flex-col gap-3">
-                {services.length > 0 ? (
-                  services.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-4 rounded-xl border border-border bg-surface-hover flex items-center justify-between transition-all hover:border-primary"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0">
-                          <i className="fas fa-tools"></i>
-                        </div>
-                        <div className="font-bold text-text">
-                          {item.service?.name || 'Service'}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-secondary text-sm py-4 text-center">
-                    No active services found
-                  </div>
-                )}
-              </div>
+
+              {getProviderServices.isPending ? (
+                <div className="profile-services-grid">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <ProfileServiceCardSkeleton key={`service-skeleton-${index}`} />
+                  ))}
+                </div>
+              ) : services.length > 0 ? (
+                <div className="profile-services-grid">
+                  {services.map((item) => (
+                    <ProfileServiceCard key={item.id} item={item} />
+                  ))}
+                </div>
+              ) : (
+                <div className="profile-services-empty-state">
+                  <img
+                    src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                    alt="No data found"
+                    className="profile-services-empty-img"
+                  />
+                  <h4 className="profile-services-empty-title">No Active Services Added</h4>
+                  <p className="profile-services-empty-desc">
+                    Add the trade services and skill categories you specialize in to start receiving leads from customers.
+                  </p>
+                  <Link to="/provider/settings" state={{ activeSection: 'services' }} className="btn btn-primary btn-sm">
+                    <i className="fas fa-plus mr-1.5"></i> Manage Services in Settings
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

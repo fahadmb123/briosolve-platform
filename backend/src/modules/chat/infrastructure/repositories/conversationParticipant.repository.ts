@@ -21,10 +21,9 @@ export class ConversationParticipantRepository implements IConversationParticipa
         return await db.transaction(async (tx) => {
             const records = await Promise.all(
                 data.map(item =>
-                    tx.orm.public.conversation_participants.create({
-                        conversation_id: item.conversation_id as never,
-                        user_id: item.user_id as never
-                    })
+                    tx.orm.public.conversation_participants.create(
+                        ConversationParticipantMapper.toPersistence(item) as never
+                    )
                 )
             );
 

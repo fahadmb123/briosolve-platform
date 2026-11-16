@@ -22,9 +22,10 @@ import {
     providerRoutes,
     reactivationRoutes
 } from "./modules/user-management/infrastructure/composition";
-import { createBulkNotificationUseCase, createNotificationUseCase } from "./modules/notification/infrastructure/composition/useCases";
+import { createBulkNotificationUseCase, createNotificationUseCase, webPushDelivery } from "./modules/notification/infrastructure/composition/useCases";
 import { createServiceRequestRoutes } from "./modules/service-request/infrastructure/composition";
 import { createChatRoutes } from "./modules/chat/infrastructure/composition";
+import { communicationRoutes } from "./modules/communication/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -36,7 +37,7 @@ const startServer = async (): Promise<void> => {
         const app = createApp();
         const httpServer = createServer(app);
 
-        const io = createSocketServer(httpServer, jwtService);
+        const io = createSocketServer(httpServer, jwtService, webPushDelivery);
 
         const notificationUseCase = createNotificationUseCase(io);
         const bulkNotificationUseCase = createBulkNotificationUseCase(io);
@@ -59,7 +60,8 @@ const startServer = async (): Promise<void> => {
             reactivationRoutes,
             notificationRoutes,
             serviceRequestRoutes,
-            chatRoutes
+            chatRoutes,
+            communicationRoutes
         });
 
         app.use("/api", rootRouter);

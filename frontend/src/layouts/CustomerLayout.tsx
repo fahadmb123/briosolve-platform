@@ -1,9 +1,16 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { TopNav } from "../shared/components/ui/TopNav/TopNav";
+import { CustomerNavbar } from "../shared/components/ui/TopNav/TopNav";
 import { CustomerSubnavSidebar } from "../shared/components/ui/CustomerSubnavSidebar/CustomerSubnavSidebar";
+import { useAuthStore } from "../features/auth/stores/auth.store";
 
 export default function CustomerLayout() {
   const location = useLocation();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.role === "ADMIN";
+  const verifications = useAuthStore((state) => state.verifications);
+  const isVerified = verifications !== null && Object.values(verifications).every(Boolean);
+  const showVerificationWarning = Boolean(isAuthenticated && !isAdmin && !isVerified);
 
   if (
     location.pathname.endsWith("/register") ||
@@ -23,12 +30,13 @@ export default function CustomerLayout() {
     location.pathname.startsWith("/my-requests") ||
     location.pathname.startsWith("/bookings") ||
     location.pathname.startsWith("/messages") ||
+    location.pathname.startsWith("/chat") ||
     location.pathname.startsWith("/reviews");
 
   return (
-    <div className="top-nav-layout">
-      <TopNav />
-      <div className={`customer-body-layout ${hasSubnav ? "has-subnav" : ""}`}>
+    <div className={`top-nav-layout ${showVerificationWarning ? "has-verification-warning" : ""}`}>
+      <CustomerNavbar />
+      <div className={`customer-body-layout ${hasSubnav ? "has-subnav" : ""} ${showVerificationWarning ? "has-verification-warning" : ""}`}>
         {hasSubnav && <CustomerSubnavSidebar />}
         <main className={`top-nav-content ${hasSubnav ? "with-sidebar" : ""}`}>
           <Outlet />

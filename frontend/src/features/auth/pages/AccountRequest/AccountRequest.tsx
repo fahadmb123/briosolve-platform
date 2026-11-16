@@ -8,7 +8,6 @@ import {
     accountReactivationSchema,
     type AccountReactivationInputType,
 } from '../../schemas/validation';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { OtpModal } from '../../components/OtpModal';
 import { toast } from 'react-hot-toast';
 import './AccountRequest.css';
@@ -68,8 +67,6 @@ export default function AccountRequest() {
 
     return (
         <div className="account-request-page-wrapper">
-            {(reactivationMut.isPending || sendOtpMut.isPending) && <SpinnerOverlay isLoading={true} />}
-
             <header className="account-request-topbar">
                 <Link to="/" className="brand-logo-container justify-center mb-4" aria-label="Briosolve Home">
                             <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
@@ -170,15 +167,20 @@ export default function AccountRequest() {
                                     disabled={reactivationMut.isPending || sendOtpMut.isPending}
                                     className="account-request-submit-btn"
                                 >
-                                    <span>
-                                        {sendOtpMut.isPending
-                                            ? 'Sending Code...'
-                                            : reactivationMut.isPending
-                                            ? 'Submitting...'
-                                            : 'Submit Request'}
-                                    </span>
-                                    {!(reactivationMut.isPending || sendOtpMut.isPending) && (
-                                        <i className="fas fa-arrow-right"></i>
+                                    {(sendOtpMut.isPending || reactivationMut.isPending) ? (
+                                        <>
+                                            <i className="fas fa-spinner fa-spin mr-2"></i>
+                                            <span>
+                                                {sendOtpMut.isPending
+                                                    ? 'Sending Code...'
+                                                    : 'Submitting...'}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Submit Request</span>
+                                            <i className="fas fa-arrow-right"></i>
+                                        </>
                                     )}
                                 </button>
                                 <Link to="/login" className="account-request-cancel-btn">

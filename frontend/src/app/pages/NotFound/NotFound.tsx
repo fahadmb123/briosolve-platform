@@ -2,34 +2,44 @@ import './NotFound.css';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../../shared/hooks/useTheme';
 
-
 export default function NotFound() {
   const { toggleTheme } = useTheme();
 
   return (
     <div className="notfound-wrapper">
-        <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
-            <i className="fas fa-sun"></i>
+      <div className="notfound-header">
+        <Link to="/" className="notfound-brand-link" aria-label="Briosolve Home">
+          <img src="/briosolve-text-logo.svg" alt="Briosolve" className="notfound-brand-text-logo" />
+        </Link>
+
+        <button
+          onClick={toggleTheme}
+          className="notfound-logo-btn"
+          aria-label="Toggle Theme"
+          title="Toggle Theme"
+          type="button"
+        >
+          <img src="/briosolve-logo.svg" alt="Briosolve" className="notfound-brand-logo-img" />
         </button>
+      </div>
 
-        <div className="notfound-bg-text">404</div>
-
-        <div className="notfound-content">
-            <h1 className="notfound-title">404</h1>
-            <h2 className="notfound-subtitle">Page Not Found</h2>
-            <p className="notfound-description">
-                Oops! The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
-            </p>
-
-            <div className="notfound-actions">
-                <Link to="/" className="btn btn-primary btn-lg">
-                    <i className="fas fa-home mr-2"></i> Back to Home
-                </Link>
-                <button onClick={() => window.history.back()} className="btn btn-outline btn-lg">
-                    <i className="fas fa-arrow-left mr-2"></i> Go Back
-                </button>
-            </div>
+      <div className="notfound-content">
+        <div className="notfound-image-container">
+          <img
+            src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794737367/404.png"
+            alt="404 Page Not Found"
+            className="notfound-image"
+          />
         </div>
+
+        <h1 className="notfound-title">Uh-oh, page not found...</h1>
+
+        <div className="notfound-actions">
+          <Link to="/" className="notfound-home-btn">
+            Go back home
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

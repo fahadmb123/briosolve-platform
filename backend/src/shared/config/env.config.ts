@@ -19,6 +19,9 @@ const envSchema = z.object({
     REGISTRATION_COOKIE_MAX_AGE_MS: z.coerce.number().default(10 * 60 * 1000),
     CORS_ORIGIN: z.string().default("http://localhost:5173"),
     LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).optional(),
+    LIVEKIT_URL: z.string().optional(),
+    LIVEKIT_API_KEY: z.string().optional(),
+    LIVEKIT_API_SECRET: z.string().optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -35,6 +38,9 @@ export const envConfig = {
     JWT_ACCESS_SECRET: rawConfig.JWT_ACCESS_SECRET || rawConfig.JWT_SECRET,
     JWT_REFRESH_SECRET: rawConfig.JWT_REFRESH_SECRET || rawConfig.JWT_SECRET,
     LOG_LEVEL: rawConfig.LOG_LEVEL || (rawConfig.NODE_ENV === "production" ? "info" : "debug"),
+    LIVEKIT_URL: rawConfig.LIVEKIT_URL || process.env.LIVEKIT_URL || "",
+    LIVEKIT_API_KEY: rawConfig.LIVEKIT_API_KEY || process.env.LIVEKIT_API_KEY || "",
+    LIVEKIT_API_SECRET: rawConfig.LIVEKIT_API_SECRET || process.env.LIVEKIT_API_SECRET || "",
     isProduction: rawConfig.NODE_ENV === "production"
 };
 

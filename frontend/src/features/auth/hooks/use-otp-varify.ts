@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { emailVerify, getMe, getOtpStatus, login, logout, otpVarify, resendOtp, resetPassword } from "../services/auth.service";
 import { toast } from 'react-hot-toast';
-import type { ApiError } from "../../../shared/api/ApiError";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/auth.store";
 import { useResetFlowStore } from "../stores/reset-flow.store";
@@ -56,22 +55,22 @@ export const useOtpVarify = (isInline?: boolean) => {
             if (response.data.path === "login" || response.data.path === "settings") {
                 toast.success(response.message);
             }
-        },
-        onError: (error: ApiError) => toast.error(error.message),
+        }
     });
 };
+
 export const useGetOtpStatus = () => {
     return useMutation({
-        mutationFn: getOtpStatus,
-        onError: (error: ApiError) => toast.error(error.message),
+        mutationFn: getOtpStatus
     });
 };
+
 export const useResendOtp = () => {
     return useMutation({
-        mutationFn: resendOtp,
-        onError: (error: ApiError) => toast.error(error.message),
+        mutationFn: resendOtp
     });
 };
+
 export const useLogin = () => {
     const navigate = useNavigate();
 
@@ -81,34 +80,37 @@ export const useLogin = () => {
             const user = response.data.user;
             useAuthStore.getState().setUser(user);
             useAuthStore.getState().setProfile(user.customer_profile || user.provider_profile || null);
-            
-            if (user.role === "CUSTOMER") {
+
+            const currentUser = useAuthStore.getState().user || user;
+            if (currentUser.role === "CUSTOMER") {
                 navigate("/", { replace: true });
-            } else if (user.role === "PROVIDER") {
-                const kycStatus = user.provider_profile?.kyc_status;
+            } else if (currentUser.role === "PROVIDER") {
+                const kycStatus = currentUser.provider_profile?.kyc_status;
                 if (!kycStatus || kycStatus !== "APPROVED") {
                     navigate("/provider/kyc", { replace: true });
                 } else {
                     navigate("/provider/dashboard", { replace: true });
                 }
             } else {
-                navigate(`/${user.role.toLocaleLowerCase()}`, { replace: true });
+                navigate("/admin/dashboard", { replace: true });
             }
             toast.success(response.message);
-        },
-        onError: (error: ApiError) => toast.error(error.message),
+        }
     });
 };
+
 export const useGetMe = () => {
     return useMutation({
-        mutationFn: getMe,
+        mutationFn: getMe
     });
 };
+
 export const useLogout = () => {
     return useMutation({
-        mutationFn: logout,
+        mutationFn: logout
     });
 };
+
 export const useEmailVerify = () => {
     const navigate = useNavigate();
 
@@ -119,10 +121,10 @@ export const useEmailVerify = () => {
             useResetFlowStore.getState().setOtpFlowStarted(true);
             navigate("/otp-verification", { replace: true });
             toast.success(response.message);
-        },
-        onError: (error: ApiError) => toast.error(error.message),
+        }
     });
 };
+
 export const useResetPassword = () => {
     const navigate = useNavigate();
 
@@ -132,7 +134,6 @@ export const useResetPassword = () => {
             useResetFlowStore.getState().clearResetFlow();
             navigate("/login", { replace: true });
             toast.success(response.message);
-        },
-        onError: (error: ApiError) => toast.error(error.message),
+        }
     });
 };

@@ -4,24 +4,28 @@ import { updateEmail, updatePassword, updatePhone, deletePhone } from "../../ser
 import { toast } from 'react-hot-toast';
 import { useAuthStore } from "../../../auth/stores/auth.store";
 
+const notifyErrorOrInfo = (error: ApiError) => {
+    toast.error(error.message);
+};
+
 export const useUpdateEmail = () => {
     return useMutation({
         mutationFn: updateEmail,
-        onError: (error: ApiError) => toast.error(error.message),
+        onError: notifyErrorOrInfo,
     });
 };
 
 export const useUpdatePassword = () => {
     return useMutation({
         mutationFn: updatePassword,
-        onError: (error: ApiError) => toast.error(error.message)
+        onError: notifyErrorOrInfo,
     });
 };
 
 export const useUpdatePhone = () => {
     return useMutation({
         mutationFn: updatePhone,
-        onError: (error: ApiError) => toast.error(error.message)
+        onError: notifyErrorOrInfo,
     });
 };
 
@@ -33,6 +37,6 @@ export const useDeletePhone = () => {
         onSuccess: () => {
             fetchUser();
         },
-        onError: (error: ApiError) => toast.error(error.message)
+        onError: notifyErrorOrInfo,
     });
 };

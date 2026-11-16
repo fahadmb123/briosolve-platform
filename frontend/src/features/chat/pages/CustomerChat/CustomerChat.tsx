@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
-import { useSearchParams, useLocation } from "react-router-dom";
+import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import type {
   ChatConversation,
@@ -28,12 +28,14 @@ import {
 import { toChatMessage, toChatConversation } from "../../utils/chat.mapper";
 import { useChatSocket } from "../../hooks/useChatSocket";
 import { useChatStore } from "../../stores/chat.store";
+import { useCallStore } from "../../../communication";
 import { socket } from "../../../../shared/api/socket-client";
 import "./CustomerChat.css";
 import { playChatRecieveSound, playChatSendSound, playMessageSound } from "../../utils/sound.utils";
 
 export default function CustomerChat() {
   const currentUser = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const queryConversationId =
@@ -710,6 +712,16 @@ export default function CustomerChat() {
       conversations.some((c) => c.id === selectedId)
     );
 
+  const handleOpenDetails = useCallback(() => {
+    if (!selectedConversation?.participant?.id) return;
+    navigate(`/nearby-providers/${selectedConversation.participant.id}`, {
+      state: {
+        from: 'chat',
+        returnUrl: `${location.pathname}${location.search}`
+      }
+    });
+  }, [navigate, selectedConversation?.participant?.id, location.pathname, location.search]);
+
   return (
     <div className="chat-layout-root">
       <div
@@ -736,9 +748,35 @@ export default function CustomerChat() {
             <div className="chat-thread-view">
               <ChatHeader
                 participant={selectedConversation.participant}
-                isInfoOpen={isInfoOpen}
-                onToggleInfo={() => setIsInfoOpen((prev) => !prev)}
+                isInfoOpen={false}
+                onToggleInfo={handleOpenDetails}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
+                onStartAudioCall={() => {
+                  const roomName = `room-${[currentUser?.id, selectedConversation.participant.id].sort().join("-")}`;
+                  useCallStore.getState().startOutgoingCall(
+                    {
+                      id: selectedConversation.participant.id,
+                      name: selectedConversation.participant.name,
+                      avatar: selectedConversation.participant.avatar,
+                    },
+                    "audio",
+                    roomName,
+                    selectedConversation.id
+                  );
+                }}
+                onStartVideoCall={() => {
+                  const roomName = `room-${[currentUser?.id, selectedConversation.participant.id].sort().join("-")}`;
+                  useCallStore.getState().startOutgoingCall(
+                    {
+                      id: selectedConversation.participant.id,
+                      name: selectedConversation.participant.name,
+                      avatar: selectedConversation.participant.avatar,
+                    },
+                    "video",
+                    roomName,
+                    selectedConversation.id
+                  );
+                }}
               />
 
               <div className="chat-thread-body">
@@ -758,7 +796,7 @@ export default function CustomerChat() {
               <ChatInputBar onSendMessage={handleSendMessage} />
             </div>
           ) : (
-            <EmptyChatState currentRole="CUSTOMER" />
+            <EmptyChatState currentRole="CUSTOMER" hasConversations={conversations.length > 0} />
           )}
         </div>
 

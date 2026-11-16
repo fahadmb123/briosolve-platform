@@ -9,6 +9,7 @@ import {
     ServiceRequestAddressDto,
     ServiceRequestCustomerDto
 } from "../../application/dtos/response/service-request.dto";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export type ServiceRequestRecord = Prisma.ServiceRequestGetPayload<{}>;
 export type ServiceRequestImageRecord = Prisma.ServiceRequestImageGetPayload<{}>;
@@ -33,7 +34,7 @@ export class ServiceRequestMapper {
             return {
                 id: img.id,
                 service_request_id: img.service_request_id,
-                image_key: img.image_key,
+                image_key: StorageUtil.getPublicUrl(img.image_key) ?? img.image_key,
                 display_order: img.display_order,
                 created_at: imgCreatedDate
             };
@@ -115,7 +116,7 @@ export class ServiceRequestMapper {
                 name: record.customer.name,
                 email: record.customer.email,
                 phone: record.customer.phone ?? null,
-                profile_image: record.customer.customer_profile?.profile_image ?? null
+                profile_image: StorageUtil.getPublicUrl(record.customer.customer_profile?.profile_image)
             };
         }
 

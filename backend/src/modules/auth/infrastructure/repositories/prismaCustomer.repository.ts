@@ -11,23 +11,16 @@ export class PrismaCustomerRepository implements ICustomerRepository {
 
     async createCustomer(data: RegisterCustomerInput): Promise<User> {
         return await db.transaction(async (tx) => {
-            const user = await tx.orm.public.users.create({
-                name: data.name,
-                email: data.email,
-                password_hash: data.password,
-                role: "CUSTOMER" as const,
-                status: "ACTIVE" as const,
-                email_verified: true,
-                phone_verified: false,
-            } as never)
+            const user = await tx.orm.public.users.create(
+                UserMapper.toPersistence(data, "CUSTOMER") as never
+            );
 
-            await tx.orm.public.customer_profiles.create({
-                user_id: user.id, 
-                about: "",
-            } as never)
+            await tx.orm.public.customer_profiles.create(
+                CustomerProfileMapper.toPersistence(user.id) as never
+            );
 
-            return UserMapper.toDomain(user)
-        })
+            return UserMapper.toDomain(user);
+        });
     }
 
     async findById(id : string): Promise<CustomerProfile | null> {

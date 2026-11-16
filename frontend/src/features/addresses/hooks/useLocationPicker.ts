@@ -23,7 +23,6 @@ interface PhotonFeature {
 
 export const useLocationPicker = (
   onSave: (data: AddressPayload) => void,
-  onClose: () => void,
   initialData: AddressPayload | null = null,
   isOpen: boolean = false
 ) => {
@@ -216,13 +215,11 @@ export const useLocationPicker = (
   const handleSaveAddress = form.handleSubmit((data) => {
     const apiPayload: AddressPayload = {
       ...data,
-
       type: addressType,
       latitude: Number(coordinates.lat),
       longitude: Number(coordinates.lng),
     };
     onSave(apiPayload);
-    onClose();
   });
 
   const isEditing = !!initialData;

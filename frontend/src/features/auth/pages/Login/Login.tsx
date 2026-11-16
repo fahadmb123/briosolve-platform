@@ -1,92 +1,106 @@
 import { Link } from 'react-router-dom';
-import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginInputType } from '../../schemas/validation';
-import './Login.css';
 import { useLogin } from '../../hooks/use-otp-varify';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { PasswordInput } from '../../../../shared/components/ui/PasswordInput/PasswordInput';
 
 export default function Login() {
-    const { toggleTheme } = useTheme();
-    const login = useLogin();
+  const login = useLogin();
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors }
-    } = useForm<LoginInputType>({
-        resolver: zodResolver(loginSchema),
-        mode: "onChange"
-    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<LoginInputType>({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange"
+  });
 
-    const handleLogin = (data: LoginInputType) => {
-        login.mutate(data);
-    };
+  const handleLogin = (data: LoginInputType) => {
+    login.mutate(data);
+  };
 
-    return (
-        <div className="auth-page-wrapper">
-            <button onClick={toggleTheme} id="theme-toggle" className="btn-icon auth-theme-toggle" aria-label="Toggle Theme">
-                <i className="fas fa-sun"></i>
-            </button>
-            {login.isPending ? (<SpinnerOverlay isLoading={true}/>):null }
-            <div className="auth-card-container">
-                <div className="auth-card">
-                    <div className="auth-form-header">
-                        <Link to="/" className="brand-logo-container justify-center mb-4" aria-label="Briosolve Home">
-                            <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" />
-                            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" />
-                        </Link>
-                        <h2>Sign In</h2>
-                        <p>Enter your email and password to securely access your account.</p>
-                    </div>
+  return (
+    <>
+      <div className="login-form-header">
+        <h1 className="login-title">Hi Customer</h1>
+        <p className="login-subtitle">Welcome to Briosolve</p>
+      </div>
 
-                    <form onSubmit={handleSubmit(handleLogin)}>
-                        <div className="form-group mb-4">
-                            <label className="form-label" htmlFor="email">Email Address</label>
-                            <div className="input-icon-wrapper">
-                                <i className="fas fa-envelope"></i>
-                                <input 
-                                    type="email" 
-                                    id="email" 
-                                    className={`form-control ${errors.email ? 'border-danger' : ''}`}
-                                    placeholder="name@example.com" 
-                                    {...register("email")}
-                                />
-                            </div>
-                            {errors.email && <div className="text-danger text-xs mt-2">{errors.email.message}</div>}
-                        </div>
-
-                        <div className="form-group mb-4">
-                            <label className="form-label" htmlFor="password">Password</label>
-                            <PasswordInput
-                                id="password"
-                                placeholder="••••••••"
-                                error={errors.password?.message}
-                                {...register("password")}
-                            />
-                        </div>
-
-                        <div className="flex items-center justify-between mb-6">
-                            <Link to="/forgot-password" className="text-primary font-medium text-xs">Forgot Password?</Link>
-                        </div>
-
-                        <button type="submit" className="btn btn-primary w-full btn-lg mb-4">Sign In</button>
-                    </form>
-
-                    <div className="auth-footer">
-                        Don't have an account? <Link to="/register">Sign up</Link>
-                    </div>
-
-                </div>
-            </div>
-            
-            <div className="navbar-action-box always-visible" style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 100 }}>
-                <Link to="/" className="btn btn-outline btn-sm" style={{ borderRadius: '2rem' }}>
-                    <i className="fas fa-home mr-1"></i> Home
-                </Link>
-            </div>
+      {login.error?.message ? (
+        <div className="login-error-alert" role="alert">
+          <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+          <span className="login-error-alert-text">{login.error.message}</span>
+          <button
+            type="button"
+            className="login-error-alert-close"
+            onClick={() => login.reset()}
+            aria-label="Dismiss error"
+          >
+            <i className="fas fa-times"></i>
+          </button>
         </div>
-    );
+      ) : null}
+
+      <form onSubmit={handleSubmit(handleLogin)} className="login-form" noValidate>
+        <div className="login-input-group">
+          <label className="login-label" htmlFor="email">Email</label>
+          <div className="login-input-wrapper">
+            <input
+              type="email"
+              id="email"
+              className={`login-input ${errors.email ? 'is-invalid' : ''}`}
+              placeholder="Email"
+              {...register("email")}
+            />
+          </div>
+          {errors.email && <div className="login-error-msg">{errors.email.message}</div>}
+        </div>
+
+        <div className="login-input-group">
+          <label className="login-label" htmlFor="password">Password</label>
+          <PasswordInput
+            id="password"
+            placeholder="Password"
+            icon=""
+            error={errors.password?.message}
+            wrapperClassName="login-password-wrapper"
+            className="login-input"
+            {...register("password")}
+          />
+        </div>
+
+        <div className="login-forgot-row">
+          <Link to="/forgot-password" className="login-forgot-link">Forgot password ?</Link>
+        </div>
+
+        <button type="submit" className="login-submit-btn" disabled={login.isPending}>
+          {login.isPending ? (
+            <>
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Logging in...</span>
+            </>
+          ) : (
+            <span>Login</span>
+          )}
+        </button>
+
+        <div className="login-divider-row">
+          <span className="login-divider-line"></span>
+          <span className="login-divider-text">or</span>
+          <span className="login-divider-line"></span>
+        </div>
+
+        <div className="login-register-actions">
+          <Link to="/register" className="login-secondary-action-btn">
+            Register
+          </Link>
+          <Link to="/provider/register" className="login-secondary-action-btn provider">
+            Join as a Provider
+          </Link>
+        </div>
+      </form>
+    </>
+  );
 }

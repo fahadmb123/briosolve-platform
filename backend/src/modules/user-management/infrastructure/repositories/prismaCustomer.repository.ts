@@ -22,12 +22,9 @@ export class CustomerRepository implements ICustomerRepository {
             return;
         }
 
-        await db.orm.public.customer_profiles.create({
-            user_id: userId, 
-            about: "",
-            created_at: Temporal.Now.instant(),
-            updated_at: Temporal.Now.instant()
-        } as never);
+        await db.orm.public.customer_profiles.create(
+            CustomerProfileMapper.toPersistence(userId) as never
+        );
     }
 
     async updateProfile(input:UpdateCustomerProfileInputDto): Promise<void> {
@@ -54,13 +51,9 @@ export class CustomerRepository implements ICustomerRepository {
                         updated_at: Temporal.Now.instant()
                     } as never);
             } else {
-                await tx.orm.public.customer_profiles.create({
-                    user_id: input.id,
-                    about: input.data.about || "",
-                    profile_image: input.data.profile_image || null,
-                    created_at: Temporal.Now.instant(),
-                    updated_at: Temporal.Now.instant()
-                } as never);
+                await tx.orm.public.customer_profiles.create(
+                    CustomerProfileMapper.toPersistence(input.id, input.data) as never
+                );
             }
         });
     }

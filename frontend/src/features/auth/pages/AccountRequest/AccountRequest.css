@@ -243,6 +243,7 @@
 
 .account-request-cancel-btn:hover {
     color: var(--text);
+    text-decoration: none;
 }
 
 /* Submission Success State */

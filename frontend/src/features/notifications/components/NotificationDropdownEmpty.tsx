@@ -1,30 +1,21 @@
 import React from "react";
 
-interface NotificationDropdownEmptyProps {
-  activeTab: "all" | "unread";
-}
-
-export const NotificationDropdownEmpty: React.FC<NotificationDropdownEmptyProps> = ({
-  activeTab,
-}) => {
+export const NotificationDropdownEmpty: React.FC = () => {
   return (
-    <div className="notif-empty-state">
-      <div className="notif-empty-icon">
-        <i className="fas fa-bell-slash"></i>
-      </div>
+    <div className="notif-dropdown-empty-state">
+      <img
+        src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794747453/notificastion-logo.png"
+        alt="No notifications found"
+        className="notif-dropdown-empty-img"
+      />
 
-      <p className="font-semibold text-text text-sm mb-1">
-        {activeTab === "unread"
-          ? "No unread notifications"
-          : "No notifications yet"}
+      <p className="notif-empty-title">
+        No notifications found
       </p>
 
-      <p className="text-xs text-secondary mb-0">
-        {activeTab === "unread"
-          ? "Great job! You have read all your latest updates."
-          : "New activity, quotes, and messages will appear here."}
+      <p className="notif-empty-subtitle">
+        You have no unread notifications right now.
       </p>
     </div>
   );
 };
-

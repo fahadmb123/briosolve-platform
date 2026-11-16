@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../../features/auth/stores/auth.store";
 import "./CustomerSubnavSidebar.css";
@@ -20,6 +20,11 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     label: "Find Providers",
     to: "/nearby-providers",
     icon: "fas fa-search-location",
+  },
+  {
+    label: "Messages",
+    to: "/messages",
+    icon: "fas fa-comments",
   },
   {
     label: "Profile",
@@ -50,11 +55,6 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-calendar-check",
   },
   {
-    label: "Messages",
-    to: "/messages",
-    icon: "fas fa-comments",
-  },
-  {
     label: "Reviews",
     to: "/dashboard#reviews",
     icon: "fas fa-star",
@@ -65,14 +65,16 @@ export const CustomerSubnavSidebar: React.FC = () => {
   const location = useLocation();
   const unreadMessagesCount = useUnreadChatCount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
   const verifications = useAuthStore((state) => state.verifications);
   const isVerified = isAuthenticated && verifications !== null && Object.values(verifications).every(Boolean);
+  const isAdmin = isAuthenticated && user?.role === "ADMIN";
+  const showVerificationWarning = Boolean(isAuthenticated && !isAdmin && !isVerified);
 
   const isMoreSection =
     location.pathname.startsWith("/my-requests") ||
     location.pathname.startsWith("/request-service") ||
     location.pathname.startsWith("/bookings") ||
-    location.pathname.startsWith("/messages") ||
     location.pathname.startsWith("/reviews");
 
   const isWorkspaceSection =
@@ -80,6 +82,8 @@ export const CustomerSubnavSidebar: React.FC = () => {
     (location.pathname === "/dashboard" ||
       location.pathname.startsWith("/dashboard") ||
       location.pathname.startsWith("/nearby-providers") ||
+      location.pathname.startsWith("/messages") ||
+      location.pathname.startsWith("/chat") ||
       location.pathname.startsWith("/profile") ||
       location.pathname.startsWith("/notifications") ||
       location.pathname.startsWith("/settings"));
@@ -104,10 +108,42 @@ export const CustomerSubnavSidebar: React.FC = () => {
     location.pathname === "/settings" ||
     location.pathname.startsWith("/settings");
 
+  const navRef = useRef<HTMLElement>(null);
+  const [hasMounted, setHasMounted] = useState<boolean>(false);
+  const [notchStyle, setNotchStyle] = useState<{ top: number; height: number; opacity: number }>({
+    top: 0,
+    height: 48,
+    opacity: 0,
+  });
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useLayoutEffect(() => {
+    const updateNotch = () => {
+      if (!navRef.current) return;
+      const activeEl = navRef.current.querySelector<HTMLElement>(".cust-subnav-sidebar-item.active");
+      if (activeEl) {
+        setNotchStyle({
+          top: activeEl.offsetTop,
+          height: activeEl.offsetHeight,
+          opacity: 1,
+        });
+      } else {
+        setNotchStyle((prev) => ({ ...prev, opacity: 0 }));
+      }
+    };
+
+    updateNotch();
+    window.addEventListener("resize", updateNotch);
+    return () => window.removeEventListener("resize", updateNotch);
+  }, [location.pathname, location.hash, activeSubnavItems]);
+
   if (!activeSubnavItems) return null;
 
   return (
-    <aside className="cust-subnav-sidebar" aria-label="Secondary navigation">
+    <aside className={`cust-subnav-sidebar ${showVerificationWarning ? "has-verification-warning" : ""}`} aria-label="Secondary navigation">
       <div className="cust-subnav-sidebar-header">
         <div className="cust-subnav-sidebar-badge">
           <i className={activeSubnavIcon}></i>
@@ -115,7 +151,16 @@ export const CustomerSubnavSidebar: React.FC = () => {
         </div>
       </div>
 
-      <nav className="cust-subnav-sidebar-nav">
+      <nav className="cust-subnav-sidebar-nav" ref={navRef}>
+        <div
+          className={`cust-subnav-active-notch ${hasMounted ? "is-animated" : ""}`}
+          style={{
+            transform: `translateY(${notchStyle.top}px)`,
+            height: `${notchStyle.height}px`,
+            opacity: notchStyle.opacity,
+          }}
+          aria-hidden="true"
+        />
         {activeSubnavItems.map((item) => {
           const [toPath, toHash] = item.to.split("#");
           const isActive = toHash

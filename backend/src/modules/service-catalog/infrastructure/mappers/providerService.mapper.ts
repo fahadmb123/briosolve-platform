@@ -21,4 +21,11 @@ export class ProviderServiceMapper {
             record.service ? ServiceMapper.toDomain(record.service as ServiceRecord) : undefined
         );
     }
+
+    static toPersistence(providerId: string, serviceId: string) {
+        return {
+            provider_id: providerId as never,
+            service_id: serviceId as never
+        };
+    }
 }

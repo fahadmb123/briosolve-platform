@@ -1,11 +1,7 @@
 import './ProviderRegister.css';
-
-
-import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTheme } from '../../../../shared/hooks/useTheme';
 import { providerRegistrationSchema, type ProviderRegistrationInputType } from '../../schemas/provider/providerRegistration.schema';
 import { Stepper } from './components/Stepper';
 import { BasicInfoStep } from './components/BasicInfoStep';
@@ -15,99 +11,86 @@ import { ReviewStep } from './components/ReviewStep';
 import { useRegisterProvider } from '../../hooks/provider/useRegisterProvider';
 
 export default function ProviderRegister() {
-  const { toggleTheme } = useTheme();
-  
   const [activeStep, setActiveStep] = useState(1);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const methods = useForm<ProviderRegistrationInputType>({
     resolver: zodResolver(providerRegistrationSchema),
-    mode: "onTouched",
+    mode: "onChange",
     defaultValues: {
       services: [],
     }
   });
 
-  const { mutate: submitRegistration, isPending } = useRegisterProvider();
+  const { mutate: submitRegistration, isPending, error } = useRegisterProvider();
 
   const onSubmit = (data: ProviderRegistrationInputType) => {
+    setErrorMessage(null);
     submitRegistration({
       services: data.services,
       experience: data.experience,
       bio: data.bio
+    }, {
+      onError: (err: any) => {
+        setErrorMessage(err?.message || "Failed to register provider. Please try again.");
+      }
     });
   };
 
+  const activeError = errorMessage || error?.message;
+
   return (
-    <>
-      
-    <div className="register-pro-wrapper">
-        
-        <header className="register-pro-header" style={{ position: 'relative' }}>
-            <Link to="/" className="brand-logo-container" aria-label="Briosolve Home">
-                <img src="/briosolve-logo.svg" alt="Briosolve" className="brand-emblem-logo" style={{ width: '34px', height: '34px' }} />
-                <img src="/briosolve-text-logo.svg" alt="Briosolve" className="brand-text-logo" style={{ height: '26px' }} />
-                <span className="text-secondary text-sm font-semibold ml-2 border-l pl-3 border-border">Provider Onboarding</span>
-            </Link>
-            
-            <div className="navbar-center hide-mobile" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '2rem' }}>
-                <Link to="/" className="nav-item-link font-medium hover:text-primary transition-colors">Home</Link>
-                <Link to="/register" className="nav-item-link font-medium hover:text-primary transition-colors">Sign Up</Link>
-            </div>
+    <div className="provider-register-container">
+      <div className="login-form-header">
+        <h1 className="login-title">Join as Provider</h1>
+        <p className="login-subtitle">Create your pro account to start receiving job requests</p>
+      </div>
 
-            <div className="flex items-center gap-4">
-                <button onClick={toggleTheme} id="theme-toggle" className="btn-icon" aria-label="Toggle Theme">
-                    <i className="fas fa-sun"></i>
-                </button>
-            </div>
-        </header>
-
-        
-        <main className="register-main-container">
-            
-            <div className="mb-8 text-center">
-                <h1 className="h3 mb-2 font-bold">Create Your Professional Account</h1>
-                <p className="text-secondary text-sm">Fill in your details below to get started.</p>
-            </div>
-
-            <form id="provider-register-form" onSubmit={methods.handleSubmit(onSubmit)}>
-                <FormProvider {...methods}>
-                    <Stepper activeStep={activeStep} />
-
-                    <BasicInfoStep 
-                        isActive={activeStep === 1} 
-                        onNext={() => setActiveStep(prev => prev + 1)} 
-                    />
-
-                    <ServicesStep 
-                        isActive={activeStep === 2} 
-                        onBack={() => setActiveStep(prev => prev - 1)} 
-                        onNext={() => setActiveStep(prev => prev + 1)} 
-                    />
-
-                    <ProfessionalDetailsStep 
-                        isActive={activeStep === 3} 
-                        onBack={() => setActiveStep(prev => prev - 1)} 
-                        onNext={() => setActiveStep(prev => prev + 1)} 
-                    />
-
-                    <ReviewStep 
-                        isActive={activeStep === 4} 
-                        isPending={isPending}
-                        onBack={() => setActiveStep(prev => prev - 1)} 
-                        onSubmit={methods.handleSubmit(onSubmit)} 
-                    />
-                </FormProvider>
-            </form>
-        </main>
-
-        {/* Floating Sign-In Box */}
-        <div className="navbar-action-box always-visible" style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 100 }}>
-            <span className="text-sm font-medium text-text px-1 hide-mobile">Already registered?</span>
-            <Link to="/login" className="btn btn-outline btn-sm">
-                Sign In
-            </Link>
+      {activeError && (
+        <div className="login-error-alert" role="alert">
+          <i className="fas fa-circle-exclamation login-error-alert-icon"></i>
+          <span className="login-error-alert-text">{activeError}</span>
+          <button
+            type="button"
+            className="login-error-alert-close"
+            onClick={() => setErrorMessage(null)}
+            aria-label="Dismiss error"
+          >
+            <i className="fas fa-times"></i>
+          </button>
         </div>
+      )}
+
+      <FormProvider {...methods}>
+        <Stepper activeStep={activeStep} />
+
+        <form id="provider-register-form" onSubmit={methods.handleSubmit(onSubmit)} className="login-form">
+          <BasicInfoStep 
+            isActive={activeStep === 1} 
+            onNext={() => setActiveStep(prev => prev + 1)} 
+            onError={(msg) => setErrorMessage(msg)}
+          />
+
+          <ServicesStep 
+            isActive={activeStep === 2} 
+            onBack={() => setActiveStep(prev => prev - 1)} 
+            onNext={() => setActiveStep(prev => prev + 1)} 
+          />
+
+          <ProfessionalDetailsStep 
+            isActive={activeStep === 3} 
+            onBack={() => setActiveStep(prev => prev - 1)} 
+            onNext={() => setActiveStep(prev => prev + 1)} 
+          />
+
+          <ReviewStep 
+            isActive={activeStep === 4} 
+            isPending={isPending}
+            onBack={() => setActiveStep(prev => prev - 1)} 
+            onSubmit={methods.handleSubmit(onSubmit)} 
+          />
+        </form>
+      </FormProvider>
     </div>
-    </>
   );
 }

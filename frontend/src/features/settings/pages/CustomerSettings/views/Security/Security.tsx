@@ -3,7 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { updatePasswordSchema, type UpdatePasswordInputType } from '../../../../schemas/customerSettings.schema';
 import { useUpdatePassword } from '../../../../hooks/customer/contact';
 import { toast } from 'react-hot-toast';
-import { SpinnerOverlay } from '../../../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { PasswordInput } from '../../../../../../shared/components/ui/PasswordInput/PasswordInput';
 
 export const Security = () => {
@@ -24,9 +23,7 @@ export const Security = () => {
     }
 
     return (
-        <>
-            <SpinnerOverlay isLoading={updatePassword.isPending} />
-            <form onSubmit={handleSubmit(onSubmit)} className="fade-in">
+        <form onSubmit={handleSubmit(onSubmit)} className="fade-in">
                 <div className="mb-4">
                     <h2 className="h5 mb-1">Password & Security</h2>
                     <p className="text-xs text-secondary">Update your sign-in credentials to protect your marketplace account.</p>
@@ -74,10 +71,15 @@ export const Security = () => {
 
                 <div className="flex justify-end">
                     <button type="submit" className="btn btn-primary btn-sm" disabled={updatePassword.isPending}>
-                        Update Password
+                        {updatePassword.isPending ? (
+                            <>
+                                <i className="fas fa-spinner fa-spin mr-1"></i> Updating...
+                            </>
+                        ) : (
+                            'Update Password'
+                        )}
                     </button>
                 </div>
             </form>
-        </>
     );
 };

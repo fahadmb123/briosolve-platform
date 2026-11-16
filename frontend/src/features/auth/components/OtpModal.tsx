@@ -1,4 +1,5 @@
 import OtpVerification from '../pages/OtpVerification/OtpVerification';
+import './OtpModal.css';
 
 interface OtpModalProps {
     isOpen: boolean;
@@ -11,16 +12,19 @@ export function OtpModal({ isOpen, onClose, onSuccess }: OtpModalProps) {
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" style={{
-            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
-            backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, 
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
+        <div className="pro-otp-modal-overlay" onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
         }}>
-            <div style={{ maxWidth: '400px', width: '100%', position: 'relative' }}>
+            <div className="pro-otp-modal-card">
+                <button
+                    type="button"
+                    className="pro-otp-modal-close"
+                    onClick={onClose}
+                    aria-label="Close"
+                >
+                    <i className="fas fa-times"></i>
+                </button>
                 <OtpVerification isInline={true} onInlineSuccess={onSuccess} />
-                <div className="text-center bg-surface pb-5" style={{ borderRadius: '0 0 1rem 1rem', marginTop: '-1rem' }}>
-                    <button onClick={onClose} className="btn btn-text text-secondary text-sm">Cancel</button>
-                </div>
             </div>
         </div>
     );

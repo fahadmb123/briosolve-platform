@@ -9,6 +9,7 @@ interface AddAddressModalProps {
   onClose: () => void;
   onSave?: (data: AddressPayload) => void;
   initialData?: AddressPayload | null;
+  isLoading?: boolean;
 }
 
 export const AddAddressModal: React.FC<AddAddressModalProps> = ({
@@ -16,6 +17,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
   onClose,
   onSave = () => {},
   initialData = null,
+  isLoading = false,
 }) => {
   const {
     step,
@@ -39,7 +41,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
     handleSelectLocation,
     isGeocoding,
     hasChanges,
-  } = useLocationPicker(onSave, onClose, initialData, isOpen);
+  } = useLocationPicker(onSave, initialData, isOpen);
 
   const { register, formState: { errors }, watch } = form;
   const { area, city, pincode } = watch();
@@ -451,10 +453,17 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
             ) : (
               <button
                 onClick={handleSaveAddress}
-                disabled={!hasChanges}
+                disabled={!hasChanges || isLoading}
                 className="w-full py-3.5 rounded-xl bg-primary hover:opacity-90 text-on-primary font-label-lg text-label-lg font-semibold flex items-center justify-center shadow-lg transition-all active:scale-[0.99] border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Address
+                {isLoading ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                    <span>Saving Address...</span>
+                  </>
+                ) : (
+                  "Save Address"
+                )}
               </button>
             )}
           </div>

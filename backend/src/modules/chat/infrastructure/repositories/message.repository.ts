@@ -19,12 +19,9 @@ export class MessageRepository implements IMessageRepository {
 
     async create(data: CreateMessageData): Promise<Message> {
         return await db.transaction(async (tx) => {
-            const record = await tx.orm.public.messages.create({
-                conversation_id: data.conversation_id as never,
-                sender_id: data.sender_id as never,
-                content: data.content,
-                message_type: data.message_type as never
-            });
+            const record = await tx.orm.public.messages.create(
+                MessageMapper.toPersistence(data) as never
+            );
 
             await tx.orm.public.conversations
                 .where({ id: data.conversation_id as never })

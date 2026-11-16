@@ -15,13 +15,13 @@ import { providerRepository } from "../../../user-management/infrastructure/comp
 
 import { ImageService } from "./services";
 
-export const addCategoryUseCase = new AddCategoryUseCase(categoryRepository)
-export const updateCategoryUseCase = new UpdateCategoryUseCase(categoryRepository,ImageService)
+export const addCategoryUseCase = new AddCategoryUseCase(categoryRepository, ImageService)
+export const updateCategoryUseCase = new UpdateCategoryUseCase(categoryRepository, ImageService)
 export const getCategoriesUseCase = new GetCategoriesUseCase(categoryRepository)
 export const deleteCategoryUseCase = new DeleteCategoryUseCase(categoryRepository, ImageService)
 
-export const addServiceUseCase = new AddServiceUseCase(serviceRepository)
-export const updateServiceUseCase = new UpdateServiceUseCase(serviceRepository, ImageService)
+export const addServiceUseCase = new AddServiceUseCase(serviceRepository, ImageService, categoryRepository)
+export const updateServiceUseCase = new UpdateServiceUseCase(serviceRepository, ImageService, categoryRepository)
 export const getServicesUseCase = new GetServicesUseCase(serviceRepository)
 export const deleteServiceUseCase = new DeleteServiceUseCase(serviceRepository, ImageService)
 

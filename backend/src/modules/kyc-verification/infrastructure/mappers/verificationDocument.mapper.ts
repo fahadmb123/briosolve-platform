@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { VerificationDocument, VerificationDocumentType, VerificationDocumentStatus } from "../../domain/entities/verificationDocument.entity";
 import { VerificationFileMapper, VerificationFileRecord } from "./verificationFile.mapper";
+import { CreateVerificationDocumentInputDto } from "../../application/dtos/verification-document/request/create-verification-document.dto";
 
 export type VerificationDocumentRecord = Prisma.VerificationDocumentGetPayload<{}>;
 export type VerificationDocumentRaw = VerificationDocumentRecord;
@@ -25,5 +26,15 @@ export class VerificationDocumentMapper {
                 : new Date(updatedAtRaw),
             record.files ? record.files.map((file: any) => VerificationFileMapper.toDomain(file as VerificationFileRecord)) : undefined
         );
+    }
+
+    static toPersistence(input: CreateVerificationDocumentInputDto) {
+        return {
+            provider_id: input.provider_id as never,
+            document_type: input.document_type as never,
+            document_name: input.document_name as never,
+            status: "PENDING" as never,
+            rejection_reason: null as never
+        };
     }
 }

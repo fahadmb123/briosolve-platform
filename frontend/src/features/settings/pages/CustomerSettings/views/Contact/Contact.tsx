@@ -4,30 +4,33 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { emailSchema, phoneSchema, type EmailInputType, type PhoneInputType } from '../../../../schemas/customerSettings.schema';
 import { useUpdateEmail, useUpdatePhone, useDeletePhone } from '../../../../hooks/customer/contact';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../../../auth/stores/auth.store';
 import { useResetFlowStore } from '../../../../../auth/stores/reset-flow.store';
 import { ConfirmModal } from '../../../../../../shared/components/ui/ConfirmModal/ConfirmModal';
-
-
+import { OtpModal } from '../../../../../auth/components/OtpModal';
 
 export const Contact = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [showOtpModal, setShowOtpModal] = useState(false);
     const user = useAuthStore((state) => state.user);
-    const updateEmail = useUpdateEmail()
-    const navigate = useNavigate()
-    const updatePhone = useUpdatePhone()
-    const deletePhone = useDeletePhone()
-    const {setOtpFlowStarted} = useResetFlowStore((state)=>state)
+    const updateEmail = useUpdateEmail();
+    const updatePhone = useUpdatePhone();
+    const deletePhone = useDeletePhone();
+    const { setOtpFlowStarted } = useResetFlowStore((state) => state);
 
-
-    const {register: registerEmail, handleSubmit: handleEmailSubmit, formState: { errors: emailErrors }} = useForm<EmailInputType>({
+    const { register: registerEmail, handleSubmit: handleEmailSubmit, formState: { errors: emailErrors } } = useForm<EmailInputType>({
         resolver: zodResolver(emailSchema),
         mode: "onChange",
         values: { email: user?.email || "" }
     });
 
-    const {register: registerPhone, handleSubmit: handlePhoneSubmit, formState: { errors: phoneErrors }} = useForm<PhoneInputType>({
+    const { 
+        register: registerPhone, 
+        handleSubmit: handlePhoneSubmit, 
+        watch: watchPhone,
+        setValue: setPhoneValue,
+        formState: { errors: phoneErrors } 
+    } = useForm<PhoneInputType>({
         resolver: zodResolver(phoneSchema),
         mode: "onChange",
         values: { 
@@ -36,25 +39,41 @@ export const Contact = () => {
         }
     });
 
+    const selectedCountry = watchPhone("countryCode") || "+91";
+
     const onEmailSubmit = (formData: EmailInputType) => {
+        if (user?.email === formData.email) {
+            toast.error("This is already your current registered email address");
+            return;
+        }
         updateEmail.mutate(formData, {
             onSuccess: (res) => {
-                useResetFlowStore.getState().setOtpFlowStarted(true)
-                navigate("/otp-verification",{replace:true})
-                if (res.message) toast.success(res.message)
+                setOtpFlowStarted(true);
+                setShowOtpModal(true);
+                if (res.message) toast.success(res.message);
             }
-        })
+        });
     };
 
     const onPhoneSubmit = (formData: PhoneInputType) => {
-        const fullPhone = `${formData.countryCode}${formData.phoneNumber}`;
+        const cleanDigits = formData.phoneNumber.replace(/\D/g, "");
+        const fullPhone = `${formData.countryCode}${cleanDigits}`;
+        if (user?.phone === fullPhone) {
+            toast.error("This is already your current registered mobile number");
+            return;
+        }
         updatePhone.mutate({ phone: fullPhone }, {
             onSuccess: (response) => {
-                setOtpFlowStarted(true)
-                navigate("/otp-verification",{replace:true})
-                toast.success(response.message)
+                setOtpFlowStarted(true);
+                setShowOtpModal(true);
+                toast.success(response.message);
             }
         });
+    };
+
+    const handleOtpSuccess = () => {
+        setShowOtpModal(false);
+        useAuthStore.getState().fetchUser();
     };
 
     const handleDeletePhone = () => {
@@ -68,7 +87,6 @@ export const Contact = () => {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Email Box */}
             <form onSubmit={handleEmailSubmit(onEmailSubmit)} className="card p-6 fade-in flex flex-col h-full">
                 <div className="flex justify-between items-center mb-4 border-bottom" style={{ paddingBottom: '16px' }}>
                     <h2 className="h5 mb-0">Email Address</h2>
@@ -97,7 +115,6 @@ export const Contact = () => {
                 </div>
             </form>
 
-            {/* Mobile Number Box */}
             <form onSubmit={handlePhoneSubmit(onPhoneSubmit)} className="card p-6 fade-in flex flex-col h-full">
                 <div className="flex justify-between items-center mb-4 border-bottom" style={{ paddingBottom: '16px' }}>
                     <h2 className="h5 mb-0">Mobile Number</h2>
@@ -120,7 +137,20 @@ export const Contact = () => {
                         </select>
                         <div className="input-icon-wrapper flex-grow">
                             <i className="fas fa-phone"></i>
-                            <input type="tel" id="prof-phone" className={`form-control ${phoneErrors.phoneNumber ? 'border-danger' : ''}`} style={phoneErrors.phoneNumber ? { borderColor: 'red' } : {}} placeholder="9876543210" {...registerPhone("phoneNumber")} />
+                            <input 
+                                type="tel" 
+                                id="prof-phone" 
+                                className={`form-control ${phoneErrors.phoneNumber ? 'border-danger' : ''}`} 
+                                style={phoneErrors.phoneNumber ? { borderColor: 'red' } : {}} 
+                                placeholder={selectedCountry === '+91' ? 'e.g. 9876543210 (10 digits)' : 'Enter phone number'} 
+                                maxLength={selectedCountry === '+91' || selectedCountry === '+1' ? 10 : 14}
+                                {...registerPhone("phoneNumber", {
+                                    onChange: (e) => {
+                                        const sanitized = e.target.value.replace(/\D/g, '');
+                                        setPhoneValue("phoneNumber", sanitized, { shouldValidate: true });
+                                    }
+                                })} 
+                            />
                         </div>
                     </div>
                     {phoneErrors.phoneNumber && (
@@ -137,7 +167,7 @@ export const Contact = () => {
                             {deletePhone.isPending ? 'Deleting...' : 'Delete Phone'}
                         </button>
                     )}
-                    <button type="submit" disabled={updatePhone.isPending} className="btn btn-primary btn-sm">
+                    <button type="submit" disabled={updatePhone.isPending || !!phoneErrors.phoneNumber} className="btn btn-primary btn-sm">
                         {updatePhone.isPending ? 'Sending...' : 'Update Mobile Number'}
                     </button>
                 </div>
@@ -153,6 +183,12 @@ export const Contact = () => {
                 isLoading={deletePhone.isPending}
                 onConfirm={handleDeletePhone}
                 onCancel={() => setIsDeleteModalOpen(false)}
+            />
+
+            <OtpModal
+                isOpen={showOtpModal}
+                onClose={() => setShowOtpModal(false)}
+                onSuccess={handleOtpSuccess}
             />
         </div>
     );

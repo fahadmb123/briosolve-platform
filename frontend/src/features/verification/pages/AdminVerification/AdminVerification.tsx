@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from 'react-hot-toast';
-import { AdminPageHeader } from "../../../admin/components/AdminPageHeader";
 import { AdminTable, type TableColumn } from "../../../admin/components/AdminTable";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
-import { SpinnerOverlay } from "../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay";
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import { VerificationReviewModal } from "../../components/admin/VerificationReviewModal";
 import { RejectKycModal } from "../../components/admin/RejectKycModal";
@@ -17,7 +15,11 @@ import type {
   AdminKycStats,
 } from "../../types/adminVerification.types";
 
-export default function Verification() {
+interface AdminVerificationProps {
+  onTotalChange?: (total: number) => void;
+}
+
+export default function Verification({ onTotalChange }: AdminVerificationProps = {}) {
   const [dossiers, setDossiers] = useState<AdminKycDossier[]>([]);
   const [, setStats] = useState<AdminKycStats>({
     pending: 0,
@@ -61,6 +63,9 @@ export default function Verification() {
             setTotalPages(res.data.totalPages || 1);
             if (res.data.stats) {
               setStats(res.data.stats);
+              if (onTotalChange && typeof res.data.stats.total === 'number') {
+                onTotalChange(res.data.stats.total);
+              }
             }
           }
         },
@@ -235,15 +240,7 @@ export default function Verification() {
 
   return (
     <>
-      {updateKycStatus.isPending && <SpinnerOverlay isLoading={true} />}
-
-      <div className="app-content p-6">
-        <AdminPageHeader
-          title="Provider Verification Queue"
-          description="Evaluate trade diplomas, municipal licenses, and government IDs prior to granting marketplace Verified badges."
-        />
-
-        <div className="admin-filter-bar mb-6">
+      <div className="admin-filter-bar mb-6">
           <div className="admin-search-input">
             <i className="fas fa-search"></i>
             <input
@@ -300,7 +297,7 @@ export default function Verification() {
           columns={columns}
           data={dossiers}
           isLoading={getVerifications.isPending}
-          emptyMessage="No provider verification dossiers match the current filter criteria."
+          emptyMessage="No data found matching this."
           keyExtractor={(item) => item.id}
         />
 
@@ -309,7 +306,6 @@ export default function Verification() {
           totalPages={totalPages}
           onPageChange={setPage}
         />
-      </div>
 
       <VerificationReviewModal
         isOpen={!!selectedDossier}

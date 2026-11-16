@@ -1,17 +1,19 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { AdminPageHeader } from '../../../admin/components/AdminPageHeader';
 import { AdminTable, type TableColumn } from '../../../admin/components/AdminTable';
 import { AdminPagination } from '../../../admin/components/AdminPagination';
 import { ReactivationReviewModal } from '../../components/ReactivationReviewModal';
 import { useGetReactivations } from '../../hooks/useReactivations';
 import { useUpdateCustomerStatus as useUpdateStatus } from '../../../profiles';
-import { SpinnerOverlay } from '../../../../shared/components/ui/SpinnerOverlay/SpinnerOverlay';
 import { ConfirmModal } from '../../../../shared/components/ui/ConfirmModal/ConfirmModal';
 import { BlockReasonModal } from '../../../admin/components/BlockReasonModal';
 import type { ReactivationRequestItem } from '../../types/reactivation.types';
 import { toast } from 'react-hot-toast';
 
-export default function Reactivations() {
+interface ReactivationsProps {
+  onTotalChange?: (total: number) => void;
+}
+
+export default function Reactivations({ onTotalChange }: ReactivationsProps = {}) {
   const [requests, setRequests] = useState<ReactivationRequestItem[]>([]);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
@@ -40,6 +42,9 @@ export default function Reactivations() {
           if (res?.data) {
             setRequests(res.data.requests || []);
             setTotalPages(res.data.totalPages || 1);
+            if (onTotalChange && !search && roleFilter === 'ALL' && typeof res.data.total === 'number') {
+              onTotalChange(res.data.total);
+            }
           }
         },
       }
@@ -219,19 +224,8 @@ export default function Reactivations() {
 
   return (
     <>
-      {updateStatus.isPending && <SpinnerOverlay isLoading={true} />}
-
-      <div className="app-content p-6">
-        {/* Page Header */}
-        <AdminPageHeader
-          title="Reactivation Requests"
-          description="Evaluate and adjudicate formal appeals submitted by suspended customers and providers seeking marketplace reinstatement."
-        />
-
-        {/* Filter Bar matching the other admin pages */}
-        <div className="admin-filter-bar">
-          {/* Left: Search input */}
-          <div className="admin-search-input">
+      <div className="admin-filter-bar">
+        <div className="admin-search-input">
             <i className="fas fa-search"></i>
             <input
               type="text"
@@ -290,7 +284,7 @@ export default function Reactivations() {
           columns={columns}
           data={requests}
           isLoading={getReactivations.isPending}
-          emptyMessage="No account reactivation requests match your search or filter criteria."
+          emptyMessage="No data found matching this."
           keyExtractor={(item) => item.id}
         />
 
@@ -346,7 +340,6 @@ export default function Reactivations() {
           onConfirm={confirmReject}
           onCancel={() => setPendingRejectConfirmation(null)}
         />
-      </div>
     </>
   );
 }

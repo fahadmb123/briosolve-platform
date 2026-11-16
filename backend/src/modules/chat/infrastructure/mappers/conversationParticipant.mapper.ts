@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { ConversationParticipant } from "../../domain/entities/conversationParticipant.entity";
+import { CreateParticipantData } from "../../domain/repositories/IConversationParticipantRepository";
 
 export type ConversationParticipantRecord = Prisma.ConversationParticipantGetPayload<{}>;
 
@@ -24,6 +25,13 @@ export class ConversationParticipantMapper {
             parseDate(lastReadAtRaw),
             parseDate(joinedAtRaw) ?? new Date()
         );
+    }
+
+    static toPersistence(data: CreateParticipantData) {
+        return {
+            conversation_id: data.conversation_id as never,
+            user_id: data.user_id as never
+        };
     }
 }
 

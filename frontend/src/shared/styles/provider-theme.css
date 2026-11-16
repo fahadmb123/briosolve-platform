@@ -43,7 +43,7 @@ html[data-theme="light"] .sidebar-item.active {
 
 /* Gradient Text Effect in Provider Portal */
 .gradient-text {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, #FFE642 0%, #FFBF00 50%, #FF7900 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
@@ -52,7 +52,7 @@ html[data-theme="light"] .sidebar-item.active {
 /* Form Controls Focus State */
 .form-control:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(107, 124, 152, 0.25);
+    box-shadow: 0 0 0 3px rgba(255, 121, 0, 0.25);
 }
 
 /* Notification Badge */
@@ -62,8 +62,8 @@ html[data-theme="light"] .sidebar-item.active {
 
 /* Pro Verification & Level Badges */
 .level-badge, .pro-badge {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-    color: #FFFFFF;
+    background: linear-gradient(135deg, #FFE642 0%, #FFBF00 50%, #FF7900 100%);
+    color: #180D00;
 }
 
 /* Hover Cards */

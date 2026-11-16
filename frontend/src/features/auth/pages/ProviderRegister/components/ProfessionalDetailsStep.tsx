@@ -20,39 +20,44 @@ export function ProfessionalDetailsStep({ isActive, onNext, onBack }: Profession
     };
 
     return (
-        <div className="form-step-card step-content active" id="step-3">
-            <div className="step-heading-row">
-                <div className="step-num-pill">3</div>
-                <div>
-                    <h2 className="h5 mb-0">Professional Details</h2>
-                    <p className="text-xs text-secondary mb-0">Tell us more about your experience and skills</p>
-                </div>
-            </div>
-
-            <div className="form-group mb-6">
-                <label className="form-label" htmlFor="experience-years">Years of Professional Experience <span className="text-danger">*</span></label>
-                <select id="experience-years" className="form-control" {...register("experience")}>
-                    <option value="">Select your experience</option>
+        <div className="pro-step-pane">
+            <div className="login-input-group">
+                <label className="login-label" htmlFor="experience-years">Years of Professional Experience</label>
+                <select 
+                    id="experience-years" 
+                    className={`login-input login-select ${errors.experience ? 'is-invalid' : ''}`} 
+                    {...register("experience")}
+                >
+                    <option value="">Select your experience level</option>
                     <option value="1-3">1 - 3 Years</option>
                     <option value="4-7">4 - 7 Years</option>
                     <option value="8-12">8 - 12 Years (Master Tech)</option>
                     <option value="12+">12+ Years (Industry Veteran)</option>
                 </select>
-                {errors.experience && <span className="text-danger text-xs mt-1 block">{errors.experience.message}</span>}
+                {errors.experience && <div className="login-error-msg">{errors.experience.message}</div>}
             </div>
 
-
-
-            
-            <div className="form-group mb-0">
-                <label className="form-label" htmlFor="pro-bio">Professional Overview / Pitch to Clients <span className="text-danger">*</span></label>
-                <textarea id="pro-bio" className="form-control" rows={4} placeholder="Tell clients why they should choose your quotation..." {...register("bio")}></textarea>
-                {errors.bio && <span className="text-danger text-xs mt-1 block">{errors.bio.message}</span>}
+            <div className="login-input-group">
+                <label className="login-label" htmlFor="pro-bio">Professional Overview / Client Pitch</label>
+                <textarea 
+                    id="pro-bio" 
+                    className={`login-input login-textarea ${errors.bio ? 'is-invalid' : ''}`} 
+                    rows={4} 
+                    placeholder="Tell prospective clients about your expertise, background, and why they should choose your services..." 
+                    {...register("bio")}
+                ></textarea>
+                {errors.bio && <div className="login-error-msg">{errors.bio.message}</div>}
             </div>
             
-            <div className="flex justify-between mt-6 border-top" style={{ paddingTop: "1.25rem" }}>
-                <button type="button" className="btn btn-secondary" onClick={onBack}><i className="fas fa-arrow-left mr-1"></i> Back</button>
-                <button type="button" className="btn btn-primary" onClick={handleNext}>Next Step <i className="fas fa-arrow-right ml-1"></i></button>
+            <div className="pro-step-nav-buttons">
+                <button type="button" className="login-secondary-back-btn" onClick={onBack}>
+                    <i className="fas fa-arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <button type="button" className="login-submit-btn" onClick={handleNext}>
+                    <span>Continue to Review</span>
+                    <i className="fas fa-arrow-right" style={{ marginLeft: '0.5rem' }}></i>
+                </button>
             </div>
         </div>
     );

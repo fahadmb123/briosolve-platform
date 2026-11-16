@@ -1,318 +1,553 @@
-.account-suspended-page-wrapper {
-    min-height: 100vh;
-    background-color: var(--bg);
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
+.account-suspended-wrapper {
+  min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
-.account-suspended-topbar {
-    width: 100%;
-    background-color: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 1rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.account-suspended-header {
+  position: fixed;
+  top: 1.75rem;
+  left: 0;
+  right: 0;
+  padding: 0 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 50;
+  pointer-events: none;
+  background: transparent;
+  border-bottom: none;
 }
 
-.account-suspended-topbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+.account-suspended-brand-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  pointer-events: auto;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.account-suspended-signin-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1.15rem;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text);
-    background-color: var(--surface-hover);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: all 0.2s ease;
+.account-suspended-brand-link:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
 }
 
-.account-suspended-signin-btn:hover {
-    background-color: var(--surface);
-    border-color: var(--primary);
-    color: var(--primary);
+.account-suspended-brand-text {
+  height: 32px;
+  width: auto;
+  max-width: 170px;
+  object-fit: contain;
+  display: block;
+  transition: filter 0.2s ease;
 }
 
-.account-suspended-main {
-    flex: 1;
-    width: 100%;
-    max-width: 920px;
-    margin: 0 auto;
-    padding: 3rem 2rem 5rem 2rem;
+[data-theme="dark"] .account-suspended-brand-text {
+  filter: brightness(0) invert(1);
 }
 
-.account-suspended-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--secondary);
-    margin-bottom: 1rem;
+.account-suspended-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.account-suspended-breadcrumb a {
-    color: var(--secondary);
-    text-decoration: none;
-    transition: color 0.2s;
+.account-suspended-theme-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  pointer-events: auto;
+  transition: transform 0.2s ease;
 }
 
-.account-suspended-breadcrumb a:hover {
-    color: var(--primary);
+.account-suspended-theme-btn:hover {
+  transform: scale(1.08);
 }
 
-.account-suspended-breadcrumb i {
-    font-size: 0.7rem;
-    opacity: 0.6;
+.account-suspended-brand-logo-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  display: block;
+  transition: filter 0.2s ease;
 }
 
-.account-suspended-page-header {
-    padding-bottom: 2rem;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
+[data-theme="dark"] .account-suspended-brand-logo-img {
+  filter: brightness(0) invert(1);
 }
 
-.account-suspended-badge-row {
-    margin-bottom: 0.85rem;
+@keyframes suspendedFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.account-suspended-status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.35rem 0.85rem;
-    border-radius: 50px;
-    background-color: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.25);
-    color: #ef4444;
-    font-size: 0.825rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
+.account-suspended-content {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 9.75rem 4rem 4rem 6.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  animation: suspendedFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 10;
+  box-sizing: border-box;
 }
 
-.account-suspended-status-badge i {
-    font-size: 0.8rem;
+.account-suspended-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 740px) minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 5.5rem;
+  width: 100%;
+  flex: 1;
 }
 
-.account-suspended-page-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text);
-    margin: 0 0 0.5rem 0;
-    letter-spacing: -0.02em;
+.account-suspended-left-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  max-width: 740px;
+  padding-top: 1.5rem;
 }
 
-.account-suspended-page-desc {
-    font-size: 0.95rem;
-    color: var(--secondary);
-    margin: 0;
-    line-height: 1.6;
-    max-width: 720px;
+.account-suspended-right-col {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  width: 100%;
+  position: sticky;
+  top: 5rem;
+  margin-top: -3.5rem;
 }
 
-.account-suspended-section {
-    padding-bottom: 2.25rem;
-    margin-bottom: 2.25rem;
-    border-bottom: 1px solid var(--border);
+.account-suspended-illustration-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
 }
 
-.account-suspended-section:last-of-type {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 1.5rem;
+.account-suspended-illustration {
+  width: 100%;
+  height: auto;
+  max-width: 950px;
+  max-height: 800px;
+  object-fit: contain;
+  margin-left: auto;
+  margin-top: -1.5rem;
+  user-select: none;
+  pointer-events: none;
+  filter: drop-shadow(0 20px 45px rgba(239, 68, 68, 0.22));
+  transition: transform 0.3s ease;
 }
 
-.account-suspended-section-title {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--text);
-    margin: 0 0 0.35rem 0;
+.account-suspended-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  font-size: 0.825rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
 }
 
-.account-suspended-section-hint {
-    font-size: 0.875rem;
-    color: var(--secondary);
-    margin: 0 0 1.25rem 0;
-    line-height: 1.5;
+.account-suspended-title {
+  font-size: clamp(2.35rem, 4.2vw, 3.4rem);
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 1.5rem 0;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  text-align: left;
 }
 
-.account-suspended-details-panel {
-    border-radius: 8px;
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-    padding: 0.5rem 1.25rem;
+.account-suspended-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary, #64748b);
+  max-width: 640px;
+  line-height: 1.75;
+  margin: 0 0 2.75rem 0;
+  text-align: left;
 }
 
-.account-suspended-detail-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.85rem 0;
-    font-size: 0.9rem;
-    gap: 1.5rem;
+[data-theme="dark"] .account-suspended-subtitle {
+  color: #94a3b8;
 }
 
-.account-suspended-detail-row:not(:last-child) {
-    border-bottom: 1px solid var(--border);
+.account-suspended-card {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  text-align: left;
+  margin-bottom: 2.5rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
-.account-suspended-detail-label {
-    color: var(--secondary);
-    font-weight: 500;
-    flex-shrink: 0;
+[data-theme="dark"] .account-suspended-card {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
 }
 
-.account-suspended-detail-value {
-    color: var(--text);
-    font-weight: 500;
-    text-align: right;
+.account-suspended-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
 }
 
-.account-suspended-detail-value.danger {
-    color: #ef4444;
-    font-weight: 600;
+.account-suspended-card-header span {
+  font-size: 1.35rem;
+  color: var(--primary);
 }
 
-.account-suspended-detail-value.code {
-    font-family: monospace;
-    font-size: 0.85rem;
-    background-color: var(--surface-hover);
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    border: 1px solid var(--border);
+.account-suspended-card-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
 }
 
-.account-suspended-notice-box {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.15rem 1.35rem;
-    border-radius: 8px;
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-    font-size: 0.9rem;
-    line-height: 1.55;
-    color: var(--text);
+.account-suspended-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
 }
 
-.account-suspended-notice-box i {
-    color: var(--primary);
-    font-size: 1.15rem;
-    margin-top: 0.15rem;
-    flex-shrink: 0;
+.account-suspended-info-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
-.account-suspended-actions-bar {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    padding-top: 0.5rem;
+.info-label {
+  color: var(--text-secondary, #64748b);
+  font-weight: 500;
+  min-width: 120px;
 }
 
-.account-suspended-submit-btn {
-    padding: 0.85rem 2rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--primary-content);
-    background-color: var(--primary);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+[data-theme="dark"] .info-label {
+  color: #94a3b8;
 }
 
-.account-suspended-submit-btn:hover {
-    filter: brightness(0.92);
+.info-value {
+  color: var(--text);
+  font-weight: 600;
+  text-align: right;
+  flex: 1;
 }
 
-.account-suspended-cancel-btn {
-    background: none;
-    border: none;
-    color: var(--secondary);
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: color 0.2s;
-    padding: 0.5rem 0.75rem;
+.status-danger {
+  color: #ef4444;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-content: flex-end;
 }
 
-.account-suspended-cancel-btn:hover {
-    color: var(--text);
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
 }
 
-.account-suspended-footer-help {
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-    font-size: 0.85rem;
-    color: var(--secondary);
+.info-code {
+  font-family: monospace;
+  font-size: 0.85rem;
+  background: var(--surface-container-highest, rgba(0, 0, 0, 0.05));
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.text-muted {
+  font-weight: 400;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+[data-theme="dark"] .text-muted {
+  color: #94a3b8;
+}
+
+.account-suspended-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.15rem 1.35rem;
+  border-radius: 12px;
+  background: rgba(255, 106, 0, 0.06);
+  border: 1px solid rgba(255, 106, 0, 0.18);
+  margin-top: 1.75rem;
+  text-align: left;
+}
+
+.callout-icon {
+  color: var(--primary);
+  font-size: 1.35rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.callout-text {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.account-suspended-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.25rem;
+  width: 100%;
+  margin-bottom: 2.25rem;
+  flex-wrap: wrap;
+}
+
+.account-suspended-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.95rem 2.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #FF6A00 0%, #FF4500 100%);
+  border-radius: 9999px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 24px -4px rgba(255, 85, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.account-suspended-primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -4px rgba(255, 85, 0, 0.55);
+  background: linear-gradient(135deg, #FF7711 0%, #E63E00 100%);
+  color: #ffffff;
+}
+
+.account-suspended-primary-btn:active {
+  transform: translateY(0);
+}
+
+.account-suspended-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.account-suspended-secondary-btn:hover {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.04));
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.account-suspended-footer {
+  width: 100%;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.5;
+  text-align: center;
+  margin-top: 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] .account-suspended-footer {
+  color: #94a3b8;
 }
 
 .account-suspended-footer-link {
-    color: var(--primary);
-    text-decoration: none;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
 }
 
 .account-suspended-footer-link:hover {
-    text-decoration: underline;
+  opacity: 0.85;
+  text-decoration: underline;
 }
 
-@media (max-width: 768px) {
-    .account-suspended-topbar {
-        padding: 1rem 1.25rem;
-    }
+@media (max-width: 1200px) {
+  .account-suspended-grid {
+    grid-template-columns: minmax(0, 500px) minmax(0, 1fr);
+    gap: 3rem;
+  }
 
-    .account-suspended-main {
-        padding: 2rem 1.25rem 4rem 1.25rem;
-    }
+  .account-suspended-illustration {
+    max-width: 680px;
+    max-height: 580px;
+  }
+}
 
-    .account-suspended-page-title {
-        font-size: 1.6rem;
-    }
+@media (max-width: 1024px) {
+  .account-suspended-content {
+    padding: 5.5rem 1.5rem 2.5rem;
+  }
 
-    .account-suspended-detail-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.35rem;
-    }
+  .account-suspended-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
 
-    .account-suspended-detail-value {
-        text-align: left;
-    }
+  .account-suspended-left-col {
+    max-width: 100%;
+    align-items: center;
+    text-align: center;
+  }
 
-    .account-suspended-actions-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
+  .account-suspended-title {
+    text-align: center;
+  }
 
-    .account-suspended-submit-btn {
-        justify-content: center;
-    }
+  .account-suspended-subtitle {
+    text-align: center;
+  }
+
+  .account-suspended-actions {
+    justify-content: center;
+  }
+
+  .account-suspended-footer {
+    text-align: center;
+  }
+
+  .account-suspended-right-col {
+    order: -1;
+    justify-content: center;
+    align-items: center;
+    position: static;
+    margin-top: 0;
+  }
+
+  .account-suspended-illustration-wrapper {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .account-suspended-illustration {
+    margin-left: 0;
+    margin-top: 0;
+    max-width: 560px;
+    max-height: 460px;
+  }
+}
+
+@media (max-width: 640px) {
+  .account-suspended-header {
+    top: 1.25rem;
+    padding: 0 1.25rem;
+  }
+
+  .account-suspended-brand-text {
+    height: 28px;
+    max-width: 140px;
+  }
+
+  .account-suspended-brand-logo-img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .account-suspended-content {
+    padding: 5rem 1rem 3rem;
+  }
+
+  .account-suspended-card {
+    padding: 1.25rem;
+  }
+
+  .account-suspended-info-row {
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
+
+  .info-value {
+    text-align: left;
+  }
+
+  .account-suspended-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .account-suspended-primary-btn,
+  .account-suspended-secondary-btn {
+    width: 100%;
+  }
+
+  .account-suspended-illustration {
+    max-width: 340px;
+    max-height: 280px;
+  }
 }
 
 @media (max-width: 480px) {
-    .account-suspended-topbar {
-        padding: 0.75rem 0.875rem;
-    }
-    .account-suspended-main {
-        padding: 1.5rem 0.75rem 3rem;
-    }
-    .account-suspended-page-title {
-        font-size: 1.3rem;
-    }
-    .account-suspended-card {
-        padding: 1.15rem 0.875rem;
-    }
+  .account-suspended-header {
+    top: 1rem;
+    padding: 0 1rem;
+  }
+
+  .account-suspended-brand-text {
+    height: 24px;
+    max-width: 120px;
+  }
+
+  .account-suspended-brand-logo-img {
+    width: 32px;
+    height: 32px;
+  }
 }

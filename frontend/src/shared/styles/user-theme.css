@@ -12,17 +12,19 @@
 
 /* Primary Button */
 body.theme-user .btn-primary {
-    background: var(--primary);
-    border-color: transparent;
-    color: var(--primary-content) !important;
-    box-shadow: 0 4px 14px 0 var(--primary-light);
+    background: #FF7900;
+    border: 1px solid #FF7900;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 16px rgba(255, 121, 0, 0.35);
+    font-weight: 700;
     transition: all var(--transition-fast);
 }
 
 body.theme-user .btn-primary:hover {
-    background: var(--primary-hover);
-    color: var(--primary-content) !important;
-    box-shadow: 0 6px 20px 0 rgba(0,0,0,0.2);
+    background: #FFA042;
+    color: #FFFFFF !important;
+    border-color: #FFA042;
+    box-shadow: 0 6px 22px rgba(255, 121, 0, 0.45);
     transform: translateY(-1px);
 }
 
@@ -53,7 +55,7 @@ body.theme-user .btn-primary:active {
 
 /* Gradient Text Effect */
 .gradient-text {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    background: linear-gradient(135deg, #FFE642 0%, #FFBF00 50%, #FF7900 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;

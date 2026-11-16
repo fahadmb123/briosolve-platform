@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { Category } from "../../domain/entities/category.entity";
 import { ServiceMapper } from "./service.mapper";
 import { AddCategoryUseCaseInputDto } from "../../application/dtos/category/request/add-category.dto";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export type CategoryRecord = Prisma.CategoryGetPayload<{}>;
 
@@ -15,7 +16,7 @@ export class CategoryMapper {
             record.name,
             record.description ?? null,
             record.status,
-            record.image ?? null,
+            StorageUtil.getPublicUrl(record.image),
             createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
             updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw),
             record.services ? record.services.map((s: any) => ServiceMapper.toDomain(s)) : undefined
