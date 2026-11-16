@@ -11,21 +11,22 @@ import { CalculateDistance } from "../../../../shared/utils/calculate-distance";
 export class ServiceRequestProviderRepository implements IServiceRequestProviderRepository {
     private async syncExpiredRequests(): Promise<void> {
         try {
-            const pendingRecords = await db.orm.public.service_requests
-                .where({ status: "PENDING" as never })
+            const endOfToday = new Date();
+            endOfToday.setHours(23, 59, 59, 999);
+            const endOfTodayInstant = Temporal.Instant.fromEpochMilliseconds(endOfToday.getTime());
+
+            const records = await db.orm.public.service_requests
+                .where((req) => req.status.in(["PENDING", "ACTIVE"]))
+                .where((req) => req.specific_date.isNotNull())
+                .where((req) => req.specific_date.lte(endOfTodayInstant as never))
                 .all();
 
-            const activeRecords = await db.orm.public.service_requests
-                .where({ status: "ACTIVE" as never })
-                .all();
+            if (records.length === 0) return;
 
-            const records = [...pendingRecords, ...activeRecords];
             const now = new Date();
             const expiredIds: string[] = [];
 
             for (const req of records) {
-                if (!req.specific_date) continue;
-
                 const rawDate: any = req.specific_date;
                 const dateVal = rawDate?.epochMilliseconds
                     ? new Date(Number(rawDate.epochMilliseconds))
@@ -55,20 +56,18 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
                 }
             }
 
-            for (const id of expiredIds) {
-                await db.orm.public.service_requests
-                    .where({ id: id as never })
-                    .update({
-                        status: "EXPIRED" as never,
-                        updated_at: Temporal.Now.instant()
-                    } as never);
+            if (expiredIds.length === 0) return;
 
-                await db.orm.public.service_request_providers
-                    .where({ service_request_id: id as never })
-                    .update({
-                        status: "EXPIRED" as never
-                    } as never);
-            }
+            await db.orm.public.service_requests
+                .where((req) => req.id.in(expiredIds))
+                .updateAll({
+                    status: "EXPIRED" as never,
+                    updated_at: Temporal.Now.instant()
+                } as never);
+
+            await db.orm.public.service_request_providers
+                .where((p) => p.service_request_id.in(expiredIds))
+                .deleteAll();
         } catch {
             return;
         }
