@@ -12,6 +12,7 @@ import { useNotificationStore } from "../stores/notification.store";
 import {
   useUpdateNotificationStatus,
   useGetNotifications,
+  useMarkAllNotificationsRead,
 } from "../hooks/useNotifications";
 import { mapNotificationToHeader } from "../utils/notification.mapper";
 import { NotificationDropdownItem } from "./NotificationDropdownItem";
@@ -51,6 +52,27 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   const updateStatusMutation = useUpdateNotificationStatus();
   const getNotificationsMutation = useGetNotifications();
+  const markAllMutation = useMarkAllNotificationsRead();
+
+  const handleMarkAllRead = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const readAt = new Date();
+      notifications.forEach((item) => {
+        if (!item.is_read) {
+          updateNotification(item.id, {
+            is_read: true,
+            read_at: readAt,
+          });
+        }
+      });
+
+      markAllMutation.mutate();
+    },
+    [notifications, updateNotification, markAllMutation]
+  );
 
   const resolvedRole = useMemo<UserRole>(() => {
     if (role) return role;
@@ -272,14 +294,28 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
               </div>
             </div>
 
-            <button
-              type="button"
-              className="notif-header-close-btn"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close notifications"
-            >
-              <i className="fas fa-times"></i>
-            </button>
+            <div className="notif-header-actions-right">
+              {unreadCount > 0 && (
+                <button
+                  type="button"
+                  className="notif-mark-all-read-btn"
+                  onClick={handleMarkAllRead}
+                  disabled={markAllMutation.isPending}
+                  title="Mark all as read"
+                  aria-label="Mark all as read"
+                >
+                  <i className="fas fa-check-double"></i>
+                </button>
+              )}
+              <button
+                type="button"
+                className="notif-header-close-btn"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close notifications"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
           </div>
 
           <div className="notif-dropdown-body" ref={bodyRef} onScroll={handleScroll}>
