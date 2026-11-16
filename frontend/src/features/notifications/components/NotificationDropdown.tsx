@@ -127,9 +127,10 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 isReset || page === 1
                   ? incoming
                   : (() => {
-                      const existingIds = new Set(notifications.map((n) => n.id));
+                      const current = useNotificationStore.getState().notifications;
+                      const existingIds = new Set(current.map((n) => n.id));
                       const newUnique = incoming.filter((n) => !existingIds.has(n.id));
-                      return [...notifications, ...newUnique];
+                      return [...current, ...newUnique];
                     })()
               );
               setDropdownTotalPages(res.data.totalPages || 1);
@@ -141,7 +142,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         }
       }
     );
-  }, [notifications, setNotifications, getNotificationsMutation]);
+  }, [setNotifications, getNotificationsMutation]);
 
   const handleToggle = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

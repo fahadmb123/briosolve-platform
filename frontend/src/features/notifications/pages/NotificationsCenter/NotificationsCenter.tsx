@@ -75,7 +75,7 @@ export default function NotificationsCenter({
       isLoadingMoreRef.current = true;
     }
     getNotificationsMutation.mutate(
-      { page: pageNum, limit: 2 },
+      { page: pageNum, limit: 5 },
       {
         onSuccess: (res) => {
           isLoadingMoreRef.current = false;
@@ -88,9 +88,10 @@ export default function NotificationsCenter({
                 isReset || pageNum === 1
                   ? incoming
                   : (() => {
-                      const existingIds = new Set(notifications.map((n) => n.id));
+                      const current = useNotificationStore.getState().notifications;
+                      const existingIds = new Set(current.map((n) => n.id));
                       const newUnique = incoming.filter((n) => !existingIds.has(n.id));
-                      return [...notifications, ...newUnique];
+                      return [...current, ...newUnique];
                     })()
               );
               setTotalPages(res.data.totalPages || 1);
@@ -102,12 +103,12 @@ export default function NotificationsCenter({
         }
       }
     );
-  }, [notifications, setNotifications, getNotificationsMutation]);
+  }, [setNotifications, getNotificationsMutation]);
 
   useEffect(() => {
     setPage(1);
     fetchPageNotifications(1, true);
-  }, [fetchPageNotifications]);
+  }, []);
 
   const unifiedNotifications: UnifiedNotificationItem[] = useMemo(() => {
     const now = Date.now();
