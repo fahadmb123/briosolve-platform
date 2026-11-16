@@ -58,7 +58,7 @@ export const getCustomerServiceRequestsUseCase = new GetCustomerServiceRequestsU
 );
 
 export const getProviderServiceRequestsUseCase = new GetProviderServiceRequestsUseCase(
-    serviceRequestRepository,
+    serviceRequestProviderRepository,
     providerRepository
 );
 

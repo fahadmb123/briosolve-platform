@@ -7,14 +7,11 @@ import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/upda
 import {
     ServiceRequestDetailsDto,
     GetCustomerRequestsOutputDto,
-    GetProviderRequestsOutputDto,
     GetAdminServiceRequestsInputDto
 } from "../../application/dtos/response/service-request.dto";
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
-import { GetProviderServiceRequestsInputDto } from "../../application/use-cases/getProviderServiceRequests.useCase";
 import { ServiceRequestMapper } from "../mappers/serviceRequest.mapper";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
-import { CalculateDistance } from "../../../../shared/utils/calculate-distance";
 
 export class ServiceRequestRepository implements IServiceRequestRepository {
     private async syncExpiredRequests(): Promise<void> {
@@ -171,128 +168,6 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             requests: records.map((record) => ServiceRequestMapper.toDetailsDto(record)),
             total: totalResult.total,
             counts
-        };
-    }
-
-    async findByProviderId(
-        providerProfileId: string,
-        input?: Omit<GetProviderServiceRequestsInputDto, "userId">
-    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number }> {
-        await this.syncExpiredRequests();
-        const { page = 1, limit = 10, search, urgency, budgetType, sortBy = "NEWEST" } = input || {};
-        const skip = (page - 1) * limit;
-
-        const matches = await db.orm.public.service_request_providers
-            .where({ provider_id: providerProfileId as never })
-            .all();
-
-        if (matches.length === 0) {
-            return {
-                requests: [],
-                total: 0
-            };
-        }
-
-        const providerProfile = await db.orm.public.provider_profiles
-            .where({ id: providerProfileId as never })
-            .first();
-
-        let providerLat: number | null = null;
-        let providerLng: number | null = null;
-
-        if (providerProfile) {
-            const providerUser = await db.orm.public.users
-                .where({ id: providerProfile.user_id as never })
-                .include("current_address")
-                .first();
-
-            if (providerUser?.current_address?.latitude != null && providerUser?.current_address?.longitude != null) {
-                providerLat = Number(providerUser.current_address.latitude);
-                providerLng = Number(providerUser.current_address.longitude);
-            }
-        }
-
-        const requestIds = matches.map((m) => m.service_request_id);
-
-        const records = await Promise.all(
-            requestIds.map(async (requestId) => {
-                return await db.orm.public.service_requests
-                    .where({ id: requestId as never })
-                    .include("images")
-                    .include("category")
-                    .include("subservice")
-                    .include("address")
-                    .include("customer", (c) => c.include("customer_profile"))
-                    .include("providers")
-                    .first();
-            })
-        );
-
-        const validRecords = records.filter(
-            (r): r is NonNullable<typeof r> => r !== null && r.status !== "EXPIRED" && r.status !== "CANCELLED"
-        );
-
-        let dtos = validRecords.map((record) => {
-            let distanceKm: number | null = null;
-            if (
-                providerLat != null &&
-                providerLng != null &&
-                record.address?.latitude != null &&
-                record.address?.longitude != null
-            ) {
-                distanceKm = CalculateDistance(
-                    providerLat,
-                    providerLng,
-                    Number(record.address.latitude),
-                    Number(record.address.longitude)
-                );
-            }
-            return ServiceRequestMapper.toDetailsDto(record, distanceKm);
-        });
-
-        if (urgency && urgency !== "ALL") {
-            dtos = dtos.filter((r) => r.urgency === urgency);
-        }
-
-        if (budgetType && budgetType !== "ALL") {
-            dtos = dtos.filter((r) => r.budget_type === budgetType);
-        }
-
-        if (search && search.trim()) {
-            const q = search.toLowerCase().trim();
-            dtos = dtos.filter((r) => {
-                const matchTitle = r.title.toLowerCase().includes(q);
-                const matchDesc = r.description.toLowerCase().includes(q);
-                const matchCat = (r.category_name || "").toLowerCase().includes(q);
-                const matchSub = (r.subservice_name || "").toLowerCase().includes(q);
-                const matchArea = (r.address_details?.area || "").toLowerCase().includes(q);
-                const matchCity = (r.address_details?.city || "").toLowerCase().includes(q);
-                const matchLandmark = (r.address_details?.landmark || "").toLowerCase().includes(q);
-                return matchTitle || matchDesc || matchCat || matchSub || matchArea || matchCity || matchLandmark;
-            });
-        }
-
-        dtos.sort((a, b) => {
-            if (sortBy === "BUDGET_HIGH") {
-                const aAmt = a.budget_amount ?? 0;
-                const bAmt = b.budget_amount ?? 0;
-                return bAmt - aAmt;
-            }
-            if (sortBy === "URGENT") {
-                const urgencyOrder: Record<string, number> = { TODAY: 1, THIS_WEEK: 2, SPECIFIC_DATE: 3, FLEXIBLE: 4 };
-                return (urgencyOrder[a.urgency] ?? 5) - (urgencyOrder[b.urgency] ?? 5);
-            }
-            const timeA = new Date(a.created_at).getTime();
-            const timeB = new Date(b.created_at).getTime();
-            return timeB - timeA;
-        });
-
-        const total = dtos.length;
-        const paginated = dtos.slice(skip, skip + limit);
-
-        return {
-            requests: paginated,
-            total
         };
     }
 
