@@ -3,7 +3,7 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../application/dtos/response/notification-response.dto";
 import { BaseController } from "../../../../shared/base/controller/baseController";
-import { GetNotificationRequestDto } from "../../application/dtos/request/get-notifications.dto";
+import { GetNotificationRequestDto, PaginatedNotificationsResponseDto } from "../../application/dtos/request/get-notifications.dto";
 import { UpdateNotificationRequestDto } from "../../application/dtos/request/update-notificsation.dto";
 import { SavePushSubscriptionRequestDto } from "../../application/dtos/request/save-push-subscription.dto";
 import { DeletePushSubscriptionRequestDto } from "../../application/dtos/request/delete-push-subscription.dto";
@@ -11,7 +11,7 @@ import { DeletePushSubscriptionRequestDto } from "../../application/dtos/request
 export class NotificationController extends BaseController {
     constructor(
         private readonly _createNotificationUseCase: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
-        private readonly _getNotificationsUseCase: IUseCase<GetNotificationRequestDto, NotificationResponseDto[]>,
+        private readonly _getNotificationsUseCase: IUseCase<GetNotificationRequestDto, PaginatedNotificationsResponseDto | NotificationResponseDto[]>,
         private readonly _updateNotificationUseCase: IUseCase<UpdateNotificationRequestDto, NotificationResponseDto>,
         private readonly _markAllAsRead: IUseCase<string, NotificationResponseDto[]>,
         private readonly _getUnreadCountUseCase: IUseCase<string, number>,
@@ -37,8 +37,15 @@ export class NotificationController extends BaseController {
 
     getNotifications = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
+            const page = req.query.page !== undefined ? Number(req.query.page) : undefined;
+            const limit = req.query.limit !== undefined ? Number(req.query.limit) : undefined;
+            const unreadOnly = req.query.unreadOnly !== undefined ? req.query.unreadOnly === "true" : undefined;
+
             const notifications = await this._getNotificationsUseCase.execute({
                 recipientId: req.user?.userId as string,
+                page: page && !isNaN(page) ? page : undefined,
+                limit: limit && !isNaN(limit) ? limit : undefined,
+                unreadOnly
             });
 
             this.sendSuccess(

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import "./NotificationsCenter.css";
@@ -17,6 +17,7 @@ import {
 } from "./components/NotificationToolbar";
 import { NotificationEmptyState } from "./components/NotificationEmptyState";
 import { NotificationItem } from "./components/NotificationItem";
+import { NotificationSkeletonItem } from "../../components/NotificationSkeletonItem";
 import {
   TIME_GROUPS,
   ROLE_CONFIGS,
@@ -49,6 +50,10 @@ export default function NotificationsCenter({
 
   const [activeTab, setActiveTab] = useState<NotificationFilterTab>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const isLoadingMoreRef = useRef<boolean>(false);
 
   const notifications = useNotificationStore((state) => state.notifications);
   const setNotifications = useNotificationStore(
@@ -65,15 +70,44 @@ export default function NotificationsCenter({
   const markAllMutation = useMarkAllNotificationsRead();
   const updateStatusMutation = useUpdateNotificationStatus();
 
-  useEffect(() => {
-    getNotificationsMutation.mutate(undefined, {
-      onSuccess: (res) => {
-        if (res?.data) {
-          setNotifications(res.data);
+  const fetchPageNotifications = useCallback((pageNum: number, isReset: boolean = false) => {
+    if (pageNum > 1) {
+      isLoadingMoreRef.current = true;
+    }
+    getNotificationsMutation.mutate(
+      { page: pageNum, limit: 2 },
+      {
+        onSuccess: (res) => {
+          isLoadingMoreRef.current = false;
+          if (res?.data) {
+            if (Array.isArray(res.data)) {
+              setNotifications(res.data);
+            } else {
+              const incoming = res.data.notifications || [];
+              setNotifications(
+                isReset || pageNum === 1
+                  ? incoming
+                  : (() => {
+                      const existingIds = new Set(notifications.map((n) => n.id));
+                      const newUnique = incoming.filter((n) => !existingIds.has(n.id));
+                      return [...notifications, ...newUnique];
+                    })()
+              );
+              setTotalPages(res.data.totalPages || 1);
+            }
+          }
+        },
+        onError: () => {
+          isLoadingMoreRef.current = false;
         }
-      },
-    });
-  }, [setNotifications]);
+      }
+    );
+  }, [notifications, setNotifications, getNotificationsMutation]);
+
+  useEffect(() => {
+    setPage(1);
+    fetchPageNotifications(1, true);
+  }, [fetchPageNotifications]);
 
   const unifiedNotifications: UnifiedNotificationItem[] = useMemo(() => {
     const now = Date.now();
@@ -160,6 +194,27 @@ export default function NotificationsCenter({
     });
   }, [unifiedNotifications, activeTab, searchQuery]);
 
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && page < totalPages && !isLoadingMoreRef.current && !getNotificationsMutation.isPending) {
+          setPage((prev) => {
+            const nextPage = prev + 1;
+            fetchPageNotifications(nextPage, false);
+            return nextPage;
+          });
+        }
+      },
+      { rootMargin: "400px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [page, totalPages, getNotificationsMutation.isPending, fetchPageNotifications]);
+
   const groups = useMemo(() => {
     const result = TIME_GROUPS.map((groupName) => ({
       group: groupName,
@@ -203,7 +258,15 @@ export default function NotificationsCenter({
         unreadCount={unreadCount}
       />
 
-      {groups.length === 0 ? (
+      {getNotificationsMutation.isPending && notifications.length === 0 ? (
+        <div className="notif-group-card">
+          <div className="notif-list">
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <NotificationSkeletonItem key={idx} />
+            ))}
+          </div>
+        </div>
+      ) : groups.length === 0 ? (
         <NotificationEmptyState
           isFiltered={isFiltered}
           onResetFilters={resetFilters}
@@ -229,6 +292,14 @@ export default function NotificationsCenter({
             </div>
           </div>
         ))
+      )}
+
+      {page < totalPages && <div ref={sentinelRef} className="notif-sentinel" />}
+
+      {page >= totalPages && filteredNotifications.length > 5 && (
+        <div className="notif-end-message">
+          <span>You've reached the end of your notifications</span>
+        </div>
       )}
     </div>
   );

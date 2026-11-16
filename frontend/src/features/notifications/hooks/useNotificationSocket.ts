@@ -21,7 +21,8 @@ export function useNotificationSocket(): void {
         getNotificationsMutation.mutate(undefined, {
             onSuccess: (res) => {
                 if (res?.data) {
-                    setNotifications(res.data);
+                    const items = Array.isArray(res.data) ? res.data : res.data.notifications || [];
+                    setNotifications(items);
                 }
             },
         });
