@@ -1,0 +1,128 @@
+[
+  {
+    "id": "dropCheckConstraint.service_requests.service_requests_budget_type_check_0f89b5ef",
+    "label": "Drop check constraint \"service_requests_budget_type_check_0f89b5ef\" on \"service_requests\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "service_requests_budget_type_check_0f89b5ef",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"service_requests_budget_type_check_0f89b5ef\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_budget_type_check_0f89b5ef",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"service_requests_budget_type_check_0f89b5ef\"",
+        "sql": "ALTER TABLE \"public\".\"service_requests\" DROP CONSTRAINT \"service_requests_budget_type_check_0f89b5ef\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"service_requests_budget_type_check_0f89b5ef\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "service_requests_budget_type_check_0f89b5ef",
+          "public",
+          "\"public\".\"service_requests\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropColumn.service_requests.budget_amount",
+    "label": "Drop column \"budget_amount\" from \"service_requests\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "budget_amount",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"budget_amount\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "service_requests",
+          "budget_amount"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop column \"budget_amount\"",
+        "sql": "ALTER TABLE \"public\".\"service_requests\" DROP COLUMN \"budget_amount\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"budget_amount\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "service_requests",
+          "budget_amount"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropColumn.service_requests.budget_type",
+    "label": "Drop column \"budget_type\" from \"service_requests\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "budget_type",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"budget_type\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "service_requests",
+          "budget_type"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop column \"budget_type\"",
+        "sql": "ALTER TABLE \"public\".\"service_requests\" DROP COLUMN \"budget_type\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"budget_type\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "service_requests",
+          "budget_type"
+        ]
+      }
+    ]
+  }
+]

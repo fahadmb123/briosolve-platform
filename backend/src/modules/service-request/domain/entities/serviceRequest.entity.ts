@@ -23,11 +23,11 @@ export class ServiceRequest {
         public readonly address_id: string,
         public readonly available_time_from: string,
         public readonly available_time_to: string,
-        public readonly budget_type: ServiceRequestBudgetType,
-        public readonly budget_amount: number | null,
         public readonly status: ServiceRequestStatus,
         public readonly created_at: Date,
         public readonly updated_at: Date,
-        public readonly images?: ServiceRequestImage[]
+        public readonly images?: ServiceRequestImage[],
+        public readonly budget_type?: ServiceRequestBudgetType,
+        public readonly budget_amount?: number | null
     ) {}
 }

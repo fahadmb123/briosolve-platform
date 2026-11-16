@@ -22,7 +22,7 @@ export interface LinkedRequestResponseDto {
     category_name: string;
     subservice_name?: string | null;
     urgency: string;
-    budget_type: string;
+    budget_type?: string | null;
     budget_amount?: number | null;
     status: string;
     location?: string | null;

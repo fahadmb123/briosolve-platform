@@ -200,19 +200,6 @@
               }
             ]
           },
-          "request_budget_type": {
-            "codecId": "pg/text@1",
-            "members": [
-              {
-                "name": "OPEN_BID",
-                "value": "OPEN_BID"
-              },
-              {
-                "name": "FIXED",
-                "value": "FIXED"
-              }
-            ]
-          },
           "request_urgency": {
             "codecId": "pg/text@1",
             "members": [
@@ -2596,30 +2583,6 @@
                   "kind": "scalar"
                 }
               },
-              "budget_amount": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/numeric@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "precision": 10,
-                    "scale": 2
-                  }
-                }
-              },
-              "budget_type": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
-                },
-                "valueSet": {
-                  "entityKind": "enum",
-                  "entityName": "request_budget_type",
-                  "namespaceId": "public",
-                  "plane": "domain"
-                }
-              },
               "category_id": {
                 "nullable": false,
                 "type": {
@@ -2822,12 +2785,6 @@
                 },
                 "available_time_to": {
                   "column": "available_time_to"
-                },
-                "budget_amount": {
-                  "column": "budget_amount"
-                },
-                "budget_type": {
-                  "column": "budget_type"
                 },
                 "category_id": {
                   "column": "category_id"
@@ -5324,11 +5281,6 @@
             "service_requests": {
               "checks": [
                 {
-                  "expression": "\"budget_type\" IN ('OPEN_BID', 'FIXED')",
-                  "name": "service_requests_budget_type_check_0f89b5ef",
-                  "prefix": "service_requests_budget_type_check"
-                },
-                {
                   "expression": "\"status\" IN ('PENDING', 'ACTIVE', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'EXPIRED')",
                   "name": "service_requests_status_check_bada4c1d",
                   "prefix": "service_requests_status_check"
@@ -5354,26 +5306,6 @@
                   "codecId": "pg/time-temporal@1",
                   "nativeType": "time",
                   "nullable": false
-                },
-                "budget_amount": {
-                  "codecId": "pg/numeric@1",
-                  "nativeType": "numeric",
-                  "nullable": true,
-                  "typeParams": {
-                    "precision": 10,
-                    "scale": 2
-                  }
-                },
-                "budget_type": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false,
-                  "valueSet": {
-                    "entityKind": "valueSet",
-                    "entityName": "request_budget_type",
-                    "namespaceId": "public",
-                    "plane": "storage"
-                  }
                 },
                 "category_id": {
                   "codecId": "pg/uuid@1",
@@ -5988,13 +5920,6 @@
                 "REJECTED"
               ]
             },
-            "request_budget_type": {
-              "kind": "valueSet",
-              "values": [
-                "OPEN_BID",
-                "FIXED"
-              ]
-            },
             "request_urgency": {
               "kind": "valueSet",
               "values": [
@@ -6075,7 +6000,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "a18563f1c1138c88baa26cc8b1b44e4537cd7ee7a3f4f59487712849c516bfd3"
+    "storageHash": "f4bcd9a43b6f6a40d2d7d6065debfc0d2fe55d5f8b14044a913c6a1ddc7b3271"
   },
   "execution": {
     "executionHash": "4f4677f17d162219b29c0c6bf16068f6998c645f6198ae088278763c716d2199",

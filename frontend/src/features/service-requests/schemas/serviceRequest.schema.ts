@@ -22,7 +22,7 @@ export const serviceRequestSchema = z.object({
   selectedAddressId: z.string().min(1, { message: "Please select a service location address" }),
   availableTimeFrom: z.string().min(1, { message: "Start time is required" }),
   availableTimeTo: z.string().min(1, { message: "End time is required" }),
-  budgetType: z.enum(["OPEN_BID", "FIXED"]),
+  budgetType: z.enum(["OPEN_BID", "FIXED"]).optional(),
   budgetAmount: z.string().optional(),
   images: z
     .array(z.string())
@@ -58,31 +58,6 @@ export const serviceRequestSchema = z.object({
         message: "End time must be later than start time",
         path: ["availableTimeTo"]
       });
-    }
-  }
-
-  if (data.budgetType === "FIXED") {
-    if (!data.budgetAmount || !data.budgetAmount.trim()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Budget amount is required for fixed budget",
-        path: ["budgetAmount"]
-      });
-    } else {
-      const num = Number(data.budgetAmount);
-      if (isNaN(num) || num < 100) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Minimum budget amount is ₹100",
-          path: ["budgetAmount"]
-        });
-      } else if (num > 100000) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Maximum budget amount is ₹1,00,000",
-          path: ["budgetAmount"]
-        });
-      }
     }
   }
 });

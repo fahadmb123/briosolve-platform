@@ -56,10 +56,6 @@ export class ServiceRequestMapper {
             record.address_id,
             record.available_time_from?.toString() ?? "",
             record.available_time_to?.toString() ?? "",
-            record.budget_type,
-            record.budget_amount !== null && record.budget_amount !== undefined
-                ? Number(record.budget_amount)
-                : null,
             record.status as ServiceRequestStatus,
             createdDate,
             updatedDate,
@@ -80,8 +76,6 @@ export class ServiceRequestMapper {
             address_id: serviceRequest.address_id,
             available_time_from: serviceRequest.available_time_from,
             available_time_to: serviceRequest.available_time_to,
-            budget_type: serviceRequest.budget_type,
-            budget_amount: serviceRequest.budget_amount,
             status: serviceRequest.status,
             created_at: serviceRequest.created_at,
             updated_at: serviceRequest.updated_at,
@@ -159,8 +153,6 @@ export class ServiceRequestMapper {
             address_id: data.selectedAddressId as never,
             available_time_from: parseTime(data.availableTimeFrom) as never,
             available_time_to: parseTime(data.availableTimeTo) as never,
-            budget_type: data.budgetType as never,
-            budget_amount: data.budgetAmount ? (Number(data.budgetAmount) as never) : null,
             status: "PENDING" as never,
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant()
@@ -188,8 +180,6 @@ export class ServiceRequestMapper {
             subserviceId: (v) => ["subservice_id", v],
             urgency: (v) => ["urgency", v],
             selectedAddressId: (v) => ["address_id", v],
-            budgetType: (v) => ["budget_type", v],
-            budgetAmount: (v) => ["budget_amount", v !== null && v !== undefined ? Number(v) : null],
             specificDate: (v) => ["specific_date", v ? Temporal.Instant.fromEpochMilliseconds(new Date(v).getTime()) : null],
             availableTimeFrom: (v) => {
                 const trimmed = String(v).trim();

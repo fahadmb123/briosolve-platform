@@ -237,47 +237,22 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
             </div>
           </div>
 
-          <div className="provreq-details-grid-2">
-            <div className="provreq-detail-card">
-              <div className="provreq-detail-card-header">
-                <i className="far fa-clock"></i>
-                <h5>Timing & Urgency</h5>
-              </div>
-              <div className="provreq-detail-card-body">
-                <div className="provreq-info-row">
-                  <span className="provreq-info-label">Urgency</span>
-                  <span className="provreq-info-val highlight">{getUrgencyText()}</span>
-                </div>
-                <div className="provreq-info-row">
-                  <span className="provreq-info-label">Preferred Hours</span>
-                  <span className="provreq-info-val">
-                    {request.available_time_from?.slice(0, 5) || "09:00"} to{" "}
-                    {request.available_time_to?.slice(0, 5) || "17:00"}
-                  </span>
-                </div>
-              </div>
+          <div className="provreq-detail-card">
+            <div className="provreq-detail-card-header">
+              <i className="far fa-clock"></i>
+              <h5>Timing & Urgency</h5>
             </div>
-
-            <div className="provreq-detail-card">
-              <div className="provreq-detail-card-header">
-                <i className="fas fa-wallet"></i>
-                <h5>Quotation & Budget</h5>
+            <div className="provreq-detail-card-body">
+              <div className="provreq-info-row">
+                <span className="provreq-info-label">Urgency</span>
+                <span className="provreq-info-val highlight">{getUrgencyText()}</span>
               </div>
-              <div className="provreq-detail-card-body">
-                <div className="provreq-info-row">
-                  <span className="provreq-info-label">Preference</span>
-                  <span className="provreq-info-val">
-                    {request.budget_type === "FIXED" ? "Fixed Budget" : "Open for Competitive Bids"}
-                  </span>
-                </div>
-                <div className="provreq-info-row">
-                  <span className="provreq-info-label">Target Amount</span>
-                  <span className="provreq-info-val highlight">
-                    {request.budget_type === "FIXED" && request.budget_amount
-                      ? `₹${request.budget_amount.toLocaleString()}`
-                      : "Open to your best quote"}
-                  </span>
-                </div>
+              <div className="provreq-info-row">
+                <span className="provreq-info-label">Preferred Hours</span>
+                <span className="provreq-info-val">
+                  {request.available_time_from?.slice(0, 5) || "09:00"} to{" "}
+                  {request.available_time_to?.slice(0, 5) || "17:00"}
+                </span>
               </div>
             </div>
           </div>

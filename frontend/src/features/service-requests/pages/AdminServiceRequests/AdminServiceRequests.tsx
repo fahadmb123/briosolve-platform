@@ -186,7 +186,7 @@ export default function AdminServiceRequests() {
                 <tr>
                   <th style={{ width: "24%" }}>Request Details</th>
                   <th style={{ width: "18%" }}>Customer</th>
-                  <th style={{ width: "16%" }}>Budget & Timing</th>
+                  <th style={{ width: "16%" }}>Timing</th>
                   <th style={{ width: "14%" }}>Location</th>
                   <th style={{ width: "12%" }}>Status</th>
                   <th style={{ width: "8%" }}>Posted</th>
@@ -248,13 +248,11 @@ export default function AdminServiceRequests() {
                       </td>
                       <td>
                         <div className="font-semibold text-text">
-                          {req.budget_type === "FIXED" && req.budget_amount
-                            ? `₹${Number(req.budget_amount).toLocaleString()}`
-                            : "Open to Bids"}
+                          <i className="far fa-clock mr-1 text-primary"></i>
+                          {req.urgency.replace("_", " ")}
                         </div>
                         <div className="text-xs text-muted">
-                          <i className="far fa-clock mr-1"></i>
-                          {req.urgency.replace("_", " ")}
+                          {req.available_time_from?.slice(0, 5)} - {req.available_time_to?.slice(0, 5)}
                         </div>
                       </td>
                       <td>
@@ -426,29 +424,6 @@ export default function AdminServiceRequests() {
                     <span className="admin-sr-info-label">Preferred Time</span>
                     <span className="admin-sr-info-val">
                       {selectedRequest.available_time_from} - {selectedRequest.available_time_to}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="admin-sr-section">
-                <div className="admin-sr-section-title">
-                  <i className="fas fa-wallet text-primary"></i>
-                  <span>Budget Terms</span>
-                </div>
-                <div className="admin-sr-grid-2">
-                  <div className="admin-sr-info-item">
-                    <span className="admin-sr-info-label">Budget Model</span>
-                    <span className="admin-sr-info-val">
-                      {selectedRequest.budget_type === "FIXED" ? "Fixed Budget" : "Open for Bids"}
-                    </span>
-                  </div>
-                  <div className="admin-sr-info-item">
-                    <span className="admin-sr-info-label">Amount</span>
-                    <span className="admin-sr-info-val">
-                      {selectedRequest.budget_type === "FIXED" && selectedRequest.budget_amount
-                        ? `₹${Number(selectedRequest.budget_amount).toLocaleString()}`
-                        : "Competitive Quotations"}
                     </span>
                   </div>
                 </div>

@@ -20,7 +20,7 @@ export interface CreateServiceRequestPayload {
   selectedAddressId: string;
   availableTimeFrom: string;
   availableTimeTo: string;
-  budgetType: RequestBudgetType;
+  budgetType?: RequestBudgetType;
   budgetAmount?: string;
   images: string[];
 }
@@ -86,8 +86,8 @@ export interface CustomerServiceRequestItem {
   distance_km?: number | null;
   available_time_from: string;
   available_time_to: string;
-  budget_type: RequestBudgetType;
-  budget_amount: number | null;
+  budget_type?: RequestBudgetType;
+  budget_amount?: number | null;
   status: ServiceRequestStatus;
   created_at: string;
   updated_at: string;
@@ -108,8 +108,8 @@ export interface ServiceRequestItem {
   address_id: string;
   available_time_from: string;
   available_time_to: string;
-  budget_type: RequestBudgetType;
-  budget_amount: number;
+  budget_type?: RequestBudgetType;
+  budget_amount?: number | null;
   status: ServiceRequestStatus;
   created_at: string;
   updated_at: string;

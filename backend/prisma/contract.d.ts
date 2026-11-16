@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'a18563f1c1138c88baa26cc8b1b44e4537cd7ee7a3f4f59487712849c516bfd3'>;
+  StorageHashBase<'f4bcd9a43b6f6a40d2d7d6065debfc0d2fe55d5f8b14044a913c6a1ddc7b3271'>;
 export type ExecutionHash =
   ExecutionHashBase<'4f4677f17d162219b29c0c6bf16068f6998c645f6198ae088278763c716d2199'>;
 export type ProfileHash =
@@ -417,8 +417,6 @@ export type FieldOutputTypes = {
       readonly address_id: CodecTypes['pg/uuid@1']['output'];
       readonly available_time_from: CodecTypes['pg/time-temporal@1']['output'];
       readonly available_time_to: CodecTypes['pg/time-temporal@1']['output'];
-      readonly budget_type: 'OPEN_BID' | 'FIXED';
-      readonly budget_amount: Numeric<10, 2> | null;
       readonly status:
         'PENDING' | 'ACTIVE' | 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -637,8 +635,6 @@ export type FieldInputTypes = {
       readonly address_id: CodecTypes['pg/uuid@1']['input'];
       readonly available_time_from: CodecTypes['pg/time-temporal@1']['input'];
       readonly available_time_to: CodecTypes['pg/time-temporal@1']['input'];
-      readonly budget_type: 'OPEN_BID' | 'FIXED';
-      readonly budget_amount: CodecTypes['pg/numeric@1']['input'] | null;
       readonly status:
         'PENDING' | 'ACTIVE' | 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -849,8 +845,6 @@ export type StorageColumnTypes = {
       readonly address_id: CodecTypes['pg/uuid@1']['output'];
       readonly available_time_from: CodecTypes['pg/time-temporal@1']['output'];
       readonly available_time_to: CodecTypes['pg/time-temporal@1']['output'];
-      readonly budget_amount: Numeric<10, 2> | null;
-      readonly budget_type: 'OPEN_BID' | 'FIXED';
       readonly category_id: CodecTypes['pg/uuid@1']['output'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly customer_id: CodecTypes['pg/uuid@1']['output'];
@@ -1069,8 +1063,6 @@ export type StorageColumnInputTypes = {
       readonly address_id: CodecTypes['pg/uuid@1']['input'];
       readonly available_time_from: CodecTypes['pg/time-temporal@1']['input'];
       readonly available_time_to: CodecTypes['pg/time-temporal@1']['input'];
-      readonly budget_amount: CodecTypes['pg/numeric@1']['input'] | null;
-      readonly budget_type: 'OPEN_BID' | 'FIXED';
       readonly category_id: CodecTypes['pg/uuid@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly customer_id: CodecTypes['pg/uuid@1']['input'];
@@ -1367,8 +1359,6 @@ export namespace Models {
     address_id: CodecTypes['pg/uuid@1']['output'];
     available_time_from: CodecTypes['pg/time-temporal@1']['output'];
     available_time_to: CodecTypes['pg/time-temporal@1']['output'];
-    budget_type: 'OPEN_BID' | 'FIXED';
-    budget_amount: Numeric<10, 2> | null;
     status:
       'PENDING' | 'ACTIVE' | 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -2835,17 +2825,6 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/time-temporal@1';
                   readonly nullable: false;
                 };
-                readonly budget_type: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly budget_amount: {
-                  readonly nativeType: 'numeric';
-                  readonly codecId: 'pg/numeric@1';
-                  readonly nullable: true;
-                  readonly typeParams: { readonly precision: 10; readonly scale: 2 };
-                };
                 readonly status: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
@@ -3237,10 +3216,6 @@ type ContractBase = Omit<
             readonly reactivation_request_status: {
               readonly kind: 'valueSet';
               readonly values: readonly ['PENDING', 'APPROVED', 'REJECTED'];
-            };
-            readonly request_budget_type: {
-              readonly kind: 'valueSet';
-              readonly values: readonly ['OPEN_BID', 'FIXED'];
             };
             readonly request_urgency: {
               readonly kind: 'valueSet';
@@ -4914,18 +4889,6 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/time-temporal@1' };
               };
-              readonly budget_type: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly budget_amount: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/numeric@1';
-                  readonly typeParams: { readonly precision: 10; readonly scale: 2 };
-                };
-              };
               readonly status: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -5032,8 +4995,6 @@ type ContractBase = Omit<
                 readonly address_id: { readonly column: 'address_id' };
                 readonly available_time_from: { readonly column: 'available_time_from' };
                 readonly available_time_to: { readonly column: 'available_time_to' };
-                readonly budget_type: { readonly column: 'budget_type' };
-                readonly budget_amount: { readonly column: 'budget_amount' };
                 readonly status: { readonly column: 'status' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
@@ -5559,13 +5520,6 @@ type ContractBase = Omit<
               { readonly name: 'THIS_WEEK'; readonly value: 'THIS_WEEK' },
               { readonly name: 'SPECIFIC_DATE'; readonly value: 'SPECIFIC_DATE' },
               { readonly name: 'FLEXIBLE'; readonly value: 'FLEXIBLE' },
-            ];
-          };
-          readonly request_budget_type: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'OPEN_BID'; readonly value: 'OPEN_BID' },
-              { readonly name: 'FIXED'; readonly value: 'FIXED' },
             ];
           };
           readonly service_request_status: {

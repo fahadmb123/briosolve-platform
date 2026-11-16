@@ -74,8 +74,6 @@ export default function RequestService() {
       selectedAddressId: (customerAddress?.id as string) || "",
       availableTimeFrom: "09:00",
       availableTimeTo: "17:00",
-      budgetType: "OPEN_BID",
-      budgetAmount: "1500",
       images: [],
       agreedToPolicy: false,
     }
@@ -88,8 +86,6 @@ export default function RequestService() {
   const selectedAddressId = watch("selectedAddressId");
   const availableTimeFrom = watch("availableTimeFrom");
   const availableTimeTo = watch("availableTimeTo");
-  const budgetType = watch("budgetType");
-  const budgetAmount = watch("budgetAmount");
   const agreedToPolicy = watch("agreedToPolicy");
 
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -101,7 +97,7 @@ export default function RequestService() {
       1: ["categoryId", "subserviceId"],
       2: ["title", "description", "urgency", "specificDate"],
       3: ["selectedAddressId", "availableTimeFrom", "availableTimeTo"],
-      4: ["budgetType", "budgetAmount", "images", "agreedToPolicy"],
+      4: ["images", "agreedToPolicy"],
     };
     const currentKeys = levelKeysMap[currentLevel] || [];
     currentKeys.forEach((key) => {
@@ -268,10 +264,6 @@ export default function RequestService() {
     });
   };
 
-  const handlePresetBudget = (amount: string) => {
-    setValue("budgetAmount", amount, { shouldValidate: true });
-  };
-
   const handleUrgencySelect = (
     selectedUrgency: ServiceRequestInputType["urgency"]
   ) => {
@@ -296,7 +288,7 @@ export default function RequestService() {
     } else if (currentLevel === 3) {
       isValid = await trigger(["selectedAddressId", "availableTimeFrom", "availableTimeTo"]);
     } else if (currentLevel === 4) {
-      isValid = await trigger(["budgetType", "budgetAmount", "images", "agreedToPolicy"]);
+      isValid = await trigger(["images", "agreedToPolicy"]);
     }
 
     if (isValid && currentLevel < 4) {
@@ -352,8 +344,7 @@ export default function RequestService() {
         selectedAddressId: data.selectedAddressId,
         availableTimeFrom: data.availableTimeFrom,
         availableTimeTo: data.availableTimeTo,
-        budgetType: data.budgetType,
-        budgetAmount: data.budgetAmount,
+        budgetType: "OPEN_BID",
         images: uploadedImages
       },
       {
@@ -523,12 +514,9 @@ export default function RequestService() {
             {currentLevel === 4 && (
               <Level4BudgetStep
                 fileInputId={fileInputId}
-                budgetType={budgetType}
                 uploadedImages={uploadedImages}
                 register={register}
                 errors={errors}
-                onSelectBudgetType={(bt) => setValue("budgetType", bt, { shouldValidate: true })}
-                onPresetBudget={handlePresetBudget}
                 onFileUpload={handleFileUpload}
                 onRemoveImage={handleRemoveImage}
                 onPrev={handlePrevLevel}
@@ -542,8 +530,6 @@ export default function RequestService() {
             selectedSubservice={selectedSubservice}
             urgencyLabel={urgencyLabel}
             selectedAddressText={selectedAddress?.landmark || selectedAddress?.area || "Not selected"}
-            budgetType={budgetType}
-            budgetAmount={budgetAmount || ""}
             uploadedImagesCount={uploadedImages.length}
             isSubmitting={isSubmitting}
             agreedToPolicy={agreedToPolicy}

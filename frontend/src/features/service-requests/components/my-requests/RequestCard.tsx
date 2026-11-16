@@ -110,15 +110,6 @@ export const RequestCard: React.FC<RequestCardProps> = ({
             <i className="fas fa-map-marker-alt"></i>
             <span className="myreq-meta-text-truncate">{addressText}</span>
           </div>
-
-          <div className="myreq-meta-chip budget" title="Budget">
-            <i className="fas fa-wallet"></i>
-            <span>
-              {request.budget_type === "FIXED" && request.budget_amount
-                ? `₹${request.budget_amount}`
-                : "Open Bids"}
-            </span>
-          </div>
         </div>
 
         {request.images && request.images.length > 0 && (

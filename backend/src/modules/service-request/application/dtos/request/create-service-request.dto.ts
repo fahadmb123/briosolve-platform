@@ -9,7 +9,7 @@ export interface CreateServiceRequestInputDto {
     selectedAddressId: string;
     availableTimeFrom: string;
     availableTimeTo: string;
-    budgetType: "OPEN_BID" | "FIXED";
+    budgetType?: "OPEN_BID" | "FIXED";
     budgetAmount?: string | null;
     images: string[];
 }
@@ -25,7 +25,7 @@ export interface CreateServiceRequestRepoDto {
     selectedAddressId: string;
     availableTimeFrom: string;
     availableTimeTo: string;
-    budgetType: "OPEN_BID" | "FIXED";
+    budgetType?: "OPEN_BID" | "FIXED";
     budgetAmount?: string | null;
     imageUrls: string[];
 }

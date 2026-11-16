@@ -23,25 +23,6 @@ export const updateServiceRequestSchema = z.object({
             });
         }
     }
-
-    if (data.budgetType === "FIXED") {
-        if (!data.budgetAmount || !data.budgetAmount.trim()) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Budget amount is required for fixed budget",
-                path: ["budgetAmount"]
-            });
-        } else {
-            const num = Number(data.budgetAmount);
-            if (isNaN(num) || num < 100) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: "Minimum budget amount is 100",
-                    path: ["budgetAmount"]
-                });
-            }
-        }
-    }
 });
 
 export type UpdateServiceRequestSchema = z.infer<typeof updateServiceRequestSchema>;

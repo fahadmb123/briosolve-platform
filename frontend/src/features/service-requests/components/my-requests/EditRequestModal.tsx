@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import type {
   CustomerServiceRequestItem,
-  RequestUrgency,
-  RequestBudgetType
+  RequestUrgency
 } from "../../types/serviceRequest.types";
 import { checkRequestEditPermission } from "../../utils/serviceRequestEdit.utils";
 import { computeDateForUrgency } from "../../utils/serviceDate.utils";
@@ -34,8 +33,6 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [availableTimeFrom, setAvailableTimeFrom] = useState<string>("09:00");
   const [availableTimeTo, setAvailableTimeTo] = useState<string>("17:00");
-  const [budgetType, setBudgetType] = useState<RequestBudgetType>("OPEN_BID");
-  const [budgetAmount, setBudgetAmount] = useState<string>("1500");
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [selectedPreviewImage, setSelectedPreviewImage] = useState<string | null>(null);
 
@@ -62,8 +59,6 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
     setSelectedAddressId(request.address_id || "");
     setAvailableTimeFrom(request.available_time_from?.slice(0, 5) || "09:00");
     setAvailableTimeTo(request.available_time_to?.slice(0, 5) || "17:00");
-    setBudgetType(request.budget_type || "OPEN_BID");
-    setBudgetAmount(request.budget_amount ? String(request.budget_amount) : "");
 
     const existingImgs = (request.images || []).map((img) => img.image_key);
     setUploadedImages(existingImgs);
@@ -223,13 +218,6 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
       toast.error("Please pick a specific date");
       return;
     }
-    if (budgetType === "FIXED") {
-      const num = Number(budgetAmount);
-      if (isNaN(num) || num < 100) {
-        toast.error("Fixed budget must be at least ₹100");
-        return;
-      }
-    }
     if (uploadedImages.length === 0) {
       toast.error("Please provide at least 1 image");
       return;
@@ -242,8 +230,6 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
       specificDate: specificDate || null,
       availableTimeFrom,
       availableTimeTo,
-      budgetType,
-      budgetAmount: budgetType === "FIXED" ? budgetAmount : null,
       images: uploadedImages,
       ...(!isRestricted && {
         categoryId,
@@ -319,7 +305,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 <div>
                   <strong>Quotes Received — Core Trade Locked</strong>
                   <p>
-                    Providers have already submitted pricing estimates for this request. Category, subservice, and service location cannot be changed to ensure quotations remain valid. You can adjust the description, schedule hours, budget amount, and attachments.
+                    Providers have already submitted pricing estimates for this request. Category, subservice, and service location cannot be changed to ensure quotations remain valid. You can adjust the description, schedule hours, and attachments.
                   </p>
                 </div>
               </div>
@@ -515,49 +501,6 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                     </option>
                   ))}
                 </select>
-              )}
-            </div>
-
-            <div className="myreq-edit-field">
-              <label className="myreq-edit-label">Budget Preference</label>
-              <div className="myreq-budget-type-row">
-                <button
-                  type="button"
-                  className={`myreq-budget-type-btn ${
-                    budgetType === "OPEN_BID" ? "active" : ""
-                  }`}
-                  onClick={() => setBudgetType("OPEN_BID")}
-                >
-                  <i className="fas fa-comments-dollar"></i>
-                  <span>Open for Bids</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`myreq-budget-type-btn ${
-                    budgetType === "FIXED" ? "active" : ""
-                  }`}
-                  onClick={() => setBudgetType("FIXED")}
-                >
-                  <i className="fas fa-tag"></i>
-                  <span>Fixed Budget</span>
-                </button>
-              </div>
-
-              {budgetType === "FIXED" && (
-                <div className="myreq-fixed-budget-input-wrapper">
-                  <span className="myreq-currency-symbol">₹</span>
-                  <input
-                    type="number"
-                    min="100"
-                    step="50"
-                    value={budgetAmount}
-                    onChange={(e) => setBudgetAmount(e.target.value)}
-                    placeholder="Enter fixed amount"
-                    className="myreq-edit-input budget-input"
-                    required
-                  />
-                </div>
               )}
             </div>
 

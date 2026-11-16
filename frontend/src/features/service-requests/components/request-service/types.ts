@@ -43,8 +43,8 @@ export const LEVEL_STEPS: LevelStep[] = [
   {
     level: 4,
     label: "Level 4",
-    title: "Budget & Media",
-    subtext: "Pricing & photos",
+    title: "Media & Policy",
+    subtext: "Photos & agreement",
   },
 ];
 

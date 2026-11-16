@@ -333,11 +333,6 @@ enum request_urgency {
   FLEXIBLE
 }
 
-enum request_budget_type {
-  OPEN_BID
-  FIXED
-}
-
 enum service_request_status {
   PENDING
   ACTIVE
@@ -361,8 +356,6 @@ model service_requests {
   address_id          Uuid
   available_time_from Time
   available_time_to   Time
-  budget_type         request_budget_type
-  budget_amount       Numeric(10, 2)?
   status              service_request_status      @default(PENDING)
 
   created_at          DateTime                    @default(now())

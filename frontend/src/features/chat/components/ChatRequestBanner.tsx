@@ -33,13 +33,6 @@ export const ChatRequestBanner: React.FC<ChatRequestBannerProps> = ({
             </span>
             <span className="chat-banner-bullet">•</span>
             <span>
-              <i className="fas fa-wallet" />{" "}
-              {request.budgetType === "FIXED" && request.budgetAmount
-                ? `₹${request.budgetAmount.toLocaleString()}`
-                : "Open to Bids"}
-            </span>
-            <span className="chat-banner-bullet">•</span>
-            <span>
               <i className="fas fa-map-marker-alt" /> {request.location}
             </span>
           </div>

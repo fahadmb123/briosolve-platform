@@ -124,15 +124,6 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
             </span>
           </div>
 
-          <div className="provreq-meta-chip budget" title="Client budget">
-            <i className="fas fa-wallet"></i>
-            <span>
-              {request.budget_type === "FIXED" && request.budget_amount
-                ? `₹${request.budget_amount.toLocaleString()}`
-                : "Open to Bids"}
-            </span>
-          </div>
-
           <div className="provreq-meta-chip" title="Quotations received">
             <i className="fas fa-comment-dollar"></i>
             <span>
