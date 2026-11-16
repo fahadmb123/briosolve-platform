@@ -6,7 +6,8 @@ import {
   ProviderSettings,
   ProviderKyc,
   ProviderServiceRequests,
-  ProviderChat
+  ProviderChat,
+  ProviderSubmitQuotation
 } from '../lazy/provider.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
 import RoleRoute from '../guards/RoleRoute';
@@ -14,10 +15,12 @@ import RoleRoute from '../guards/RoleRoute';
 export const providerRoutes = (
   <>
   <Route element={<ProtectedRoute />}>
-    <Route  element={<RoleRoute allowedRoles={["PROVIDER"]} />}>
+    <Route element={<RoleRoute allowedRoles={["PROVIDER"]} />}>
       <Route index element={<Navigate to="dashboard" replace />} />
       <Route path="dashboard" element={<ProviderDashboard />} />
       <Route path="service-requests" element={<ProviderServiceRequests />} />
+      <Route path="service-requests/:requestId/quote" element={<ProviderSubmitQuotation />} />
+      <Route path="requests/:requestId/quote" element={<ProviderSubmitQuotation />} />
       <Route path="messages" element={<ProviderChat />} />
       <Route path="chat" element={<ProviderChat />} />
       <Route path="profile" element={<ProviderProfile />} />

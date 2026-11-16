@@ -136,7 +136,9 @@ export default function ProviderServiceRequests() {
   }, [selectedRequest, requests]);
 
   const handleQuoteClick = (req: CustomerServiceRequestItem) => {
-    setSelectedRequest(req);
+    navigate(`/provider/service-requests/${req.id}/quote`, {
+      state: { request: req }
+    });
   };
 
   const handleChatClick = (req: CustomerServiceRequestItem) => {
