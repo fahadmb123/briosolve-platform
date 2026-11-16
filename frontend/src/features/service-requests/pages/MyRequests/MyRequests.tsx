@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import "./MyRequests.css";
@@ -20,7 +20,6 @@ import {
   type SortOrderType
 } from "../../components/my-requests";
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
-import { Pagination } from "../../../../shared/components/ui/Pagination/Pagination";
 
 export default function MyRequests() {
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
@@ -55,14 +54,20 @@ export default function MyRequests() {
     useState<CustomerServiceRequestItem | null>(null);
   const [isReopenModalOpen, setIsReopenModalOpen] = useState<boolean>(false);
 
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const isLoadingMoreRef = useRef<boolean>(false);
+
   const getRequestsMutation = useGetMyServiceRequests();
   const cancelMutation = useCancelServiceRequest();
   const reopenMutation = useReopenServiceRequest();
 
-  const fetchRequests = useCallback(() => {
+  const fetchRequests = useCallback((pageNum: number, isInitial: boolean = false) => {
+    if (pageNum > 1) {
+      isLoadingMoreRef.current = true;
+    }
     getRequestsMutation.mutate(
       {
-        page,
+        page: pageNum,
         limit: 10,
         search: searchQuery.trim() || undefined,
         status: selectedStatus !== "ALL" ? selectedStatus : undefined,
@@ -70,12 +75,24 @@ export default function MyRequests() {
       },
       {
         onSuccess: (res) => {
+          isLoadingMoreRef.current = false;
           if (res.data) {
             const data = res.data;
             if (Array.isArray(data)) {
-              setRequests(data);
+              setRequests((prev) => {
+                if (isInitial || pageNum === 1) return data;
+                const existingIds = new Set(prev.map((r) => r.id));
+                const newItems = data.filter((r) => !existingIds.has(r.id));
+                return [...prev, ...newItems];
+              });
             } else {
-              setRequests(data.requests || []);
+              const incoming = data.requests || [];
+              setRequests((prev) => {
+                if (isInitial || pageNum === 1) return incoming;
+                const existingIds = new Set(prev.map((r) => r.id));
+                const newItems = incoming.filter((r) => !existingIds.has(r.id));
+                return [...prev, ...newItems];
+              });
               if (data.counts) {
                 setCounts((prev) => ({ ...prev, ...data.counts }));
               }
@@ -85,15 +102,38 @@ export default function MyRequests() {
           }
         },
         onError: () => {
+          isLoadingMoreRef.current = false;
           toast.error("Failed to load your service requests");
         }
       }
     );
-  }, [page, searchQuery, selectedStatus, sortBy]);
+  }, [searchQuery, selectedStatus, sortBy]);
 
   useEffect(() => {
-    fetchRequests();
+    setPage(1);
+    fetchRequests(1, true);
   }, [fetchRequests]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && page < totalPages && !isLoadingMoreRef.current && !getRequestsMutation.isPending) {
+          setPage((prev) => {
+            const nextPage = prev + 1;
+            fetchRequests(nextPage, false);
+            return nextPage;
+          });
+        }
+      },
+      { rootMargin: "400px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [page, totalPages, getRequestsMutation.isPending, fetchRequests]);
 
   const handleStatusChange = (status: StatusFilterType) => {
     setSelectedStatus(status);
@@ -169,7 +209,7 @@ export default function MyRequests() {
               prev.map((r) => (r.id === res.data.id ? { ...r, ...res.data } : r))
             );
           }
-          fetchRequests();
+          fetchRequests(1, true);
         },
         onError: (err: any) => {
           toast.error(
@@ -189,7 +229,7 @@ export default function MyRequests() {
     if (selectedRequestForDetails?.id === updated.id) {
       setSelectedRequestForDetails(updated);
     }
-    fetchRequests();
+    fetchRequests(1, true);
   };
 
   const handleConfirmCancel = () => {
@@ -199,7 +239,7 @@ export default function MyRequests() {
       onSuccess: () => {
         toast.success("Service request cancelled");
         handleCloseCancel();
-        fetchRequests();
+        fetchRequests(1, true);
       },
       onError: (err: any) => {
         toast.error(err?.response?.data?.message || err?.message || "Failed to cancel request");
@@ -294,15 +334,19 @@ export default function MyRequests() {
                 onReopenRequest={handleOpenReopen}
               />
             ))}
+            {getRequestsMutation.isPending && page > 1 &&
+              Array.from({ length: 2 }).map((_, idx) => (
+                <ServiceRequestCardSkeleton key={`skeleton-${idx}`} variant="customer" />
+              ))}
           </div>
 
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-            showTotalText={false}
-            className="justify-center"
-          />
+          {page < totalPages && <div ref={sentinelRef} className="myreq-sentinel" />}
+
+          {page >= totalPages && requests.length > 0 && totalPages > 1 && (
+            <div className="myreq-end-message">
+              <span>You've reached the end of your service requests</span>
+            </div>
+          )}
         </>
       )}
 

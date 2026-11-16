@@ -23,6 +23,7 @@ export default function ProviderServiceRequests() {
   const [limit] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(false);
+  const isLoadingMoreRef = useRef<boolean>(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const [selectedRequest, setSelectedRequest] = useState<CustomerServiceRequestItem | null>(null);
@@ -38,6 +39,9 @@ export default function ProviderServiceRequests() {
   }, [searchQuery]);
 
   const fetchRequests = useCallback((pageNum: number, isReset: boolean = false) => {
+    if (pageNum > 1) {
+      isLoadingMoreRef.current = true;
+    }
     getRequestsMutation.mutate(
       {
         page: pageNum,
@@ -48,6 +52,7 @@ export default function ProviderServiceRequests() {
       },
       {
         onSuccess: (res) => {
+          isLoadingMoreRef.current = false;
           if (res.data) {
             const newItems = res.data.requests || [];
             setRequests((prev) => {
@@ -61,6 +66,7 @@ export default function ProviderServiceRequests() {
           }
         },
         onError: () => {
+          isLoadingMoreRef.current = false;
           toast.error("Failed to load service requests");
         },
       }
@@ -74,27 +80,25 @@ export default function ProviderServiceRequests() {
   }, [isVerified, debouncedSearch, urgencyFilter, sortBy]);
 
   useEffect(() => {
-    if (page > 1) {
-      fetchRequests(page, false);
-    }
-  }, [page]);
-
-  useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel || !hasMore || getRequestsMutation.isPending) return;
+    if (!sentinel) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !getRequestsMutation.isPending) {
-          setPage((prev) => prev + 1);
+        if (entries[0].isIntersecting && hasMore && !isLoadingMoreRef.current && !getRequestsMutation.isPending) {
+          setPage((prev) => {
+            const next = prev + 1;
+            fetchRequests(next, false);
+            return next;
+          });
         }
       },
-      { threshold: 0.1, rootMargin: "100px" }
+      { rootMargin: "400px" }
     );
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasMore, getRequestsMutation.isPending]);
+  }, [hasMore, fetchRequests, getRequestsMutation.isPending]);
 
   useEffect(() => {
     const handleNotification = (e: Event) => {
