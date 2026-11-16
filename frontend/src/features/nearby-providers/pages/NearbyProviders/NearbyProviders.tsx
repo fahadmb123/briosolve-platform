@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import './NearbyProviders.css';
 import { useGetNearbyProviders } from '../../hooks/mutations/useNearbyProviders';
 import Skeleton from 'react-loading-skeleton';
 import { ProviderCard } from '../../components/ProviderCard';
-import { ProviderCardSkeletonGrid } from '../../components/ProviderCardSkeleton';
+import { ProviderCardSkeleton } from '../../components/ProviderCardSkeleton';
 import { ProviderProfileView } from '../../components/ProviderProfileView/ProviderProfileView';
-import { AdminPagination } from '../../../admin/components/AdminPagination';
 import { useAuthStore } from '../../../auth/stores/auth.store';
 import type { User, response } from '../../../../shared/types/Dtos';
 import type { Address } from '../../../addresses';
@@ -33,27 +32,64 @@ export default function NearbyProviders() {
     const [hasLocation, setHasLocation] = useState(true);
     const [activeRadiusKm, setActiveRadiusKm] = useState(20);
     const limit = 12;
+    const sentinelRef = useRef<HTMLDivElement | null>(null);
+    const isLoadingMoreRef = useRef<boolean>(false);
 
     const getProvidersMut = useGetNearbyProviders();
 
-    const fetchProviders = useCallback((currentPage: number, currentSearch: string, radiusFilter?: number) => {
+    const fetchProviders = useCallback((currentPage: number, currentSearch: string, radiusFilter?: number, isReset: boolean = false) => {
+        if (currentPage > 1) {
+            isLoadingMoreRef.current = true;
+        }
         getProvidersMut.mutate(
             { page: currentPage, limit, search: currentSearch, radius: radiusFilter },
             {
                 onSuccess: (res: response<NearbyProvidersResponseData>) => {
-                    setProviders(res.data.users);
+                    isLoadingMoreRef.current = false;
+                    const incoming = res.data.users || [];
+                    setProviders((prev) => {
+                        if (isReset || currentPage === 1) return incoming;
+                        const existingIds = new Set(prev.map((p) => p.id));
+                        const uniqueNew = incoming.filter((p) => !existingIds.has(p.id));
+                        return [...prev, ...uniqueNew];
+                    });
                     setTotal(res.data.total);
                     setTotalPages(res.data.totalPages);
                     setHasLocation(res.data.hasCustomerLocation);
                     setActiveRadiusKm(res.data.customerRadius);
+                },
+                onError: () => {
+                    isLoadingMoreRef.current = false;
                 }
             }
         );
     }, []);
 
     useEffect(() => {
-        fetchProviders(page, search, appliedRadius);
-    }, [page, search, appliedRadius, fetchProviders]);
+        setPage(1);
+        fetchProviders(1, search, appliedRadius, true);
+    }, [search, appliedRadius, fetchProviders]);
+
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && page < totalPages && !isLoadingMoreRef.current && !getProvidersMut.isPending) {
+                    setPage((prev) => {
+                        const nextPage = prev + 1;
+                        fetchProviders(nextPage, search, appliedRadius, false);
+                        return nextPage;
+                    });
+                }
+            },
+            { rootMargin: '400px' }
+        );
+
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, [page, totalPages, search, appliedRadius, getProvidersMut.isPending, fetchProviders]);
 
     const activeProvider = useMemo(() => {
         if (selectedProvider && (!providerId || selectedProvider.id === providerId)) {
@@ -237,8 +273,12 @@ export default function NearbyProviders() {
                         </span>
                     </div>
 
-                    {getProvidersMut.isPending ? (
-                        <ProviderCardSkeletonGrid count={4} />
+                    {getProvidersMut.isPending && providers.length === 0 ? (
+                        <div className="providers-grid" aria-busy="true" aria-label="Loading providers">
+                            {Array.from({ length: 8 }).map((_, idx) => (
+                                <ProviderCardSkeleton key={idx} />
+                            ))}
+                        </div>
                     ) : displayedProviders.length > 0 ? (
                         <>
                             <div className="providers-grid">
@@ -250,13 +290,19 @@ export default function NearbyProviders() {
                                         onViewDetails={handleViewDetails}
                                     />
                                 ))}
+                                {getProvidersMut.isPending && page > 1 &&
+                                    Array.from({ length: 4 }).map((_, idx) => (
+                                        <ProviderCardSkeleton key={`skeleton-${idx}`} />
+                                    ))}
                             </div>
 
-                            <AdminPagination
-                                currentPage={page}
-                                totalPages={totalPages}
-                                onPageChange={(newPage) => setPage(newPage)}
-                            />
+                            {page < totalPages && <div ref={sentinelRef} className="nearby-sentinel" />}
+
+                            {page >= totalPages && displayedProviders.length > 0 && totalPages > 1 && (
+                                <div className="nearby-end-message">
+                                    <span>You've reached the end of available providers</span>
+                                </div>
+                            )}
                         </>
                     ) : (
                         <div className="empty-providers-state">
