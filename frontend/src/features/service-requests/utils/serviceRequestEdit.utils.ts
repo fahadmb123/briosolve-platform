@@ -33,7 +33,7 @@ export function checkRequestEditPermission(request: CustomerServiceRequestItem):
       isRestricted: true,
       statusLabel: "Open (Quotations received)",
       badgeText: "Editable with restrictions",
-      reason: "Providers have already submitted price quotes for this job. Category, subservice, and service address are locked to protect quotation estimates. You may update description, timing, budget amount, and photos."
+      reason: "Providers have already submitted price quotes for this job. Category, subservice, and service address are locked to protect quotation estimates. You may update description, timing, and photos."
     };
   }
 

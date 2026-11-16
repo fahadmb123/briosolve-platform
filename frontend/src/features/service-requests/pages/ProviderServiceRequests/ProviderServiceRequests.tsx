@@ -19,8 +19,7 @@ export default function ProviderServiceRequests() {
   const [searchQuery, setSearchQuery] = useState<string>("" );
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("ALL");
-  const [budgetFilter, setBudgetFilter] = useState<string>("ALL");
-  const [sortBy, setSortBy] = useState<"NEWEST" | "BUDGET_HIGH" | "URGENT">("NEWEST");
+  const [sortBy, setSortBy] = useState<"NEWEST" | "URGENT">("NEWEST");
   const [page, setPage] = useState<number>(1);
   const [limit] = useState<number>(10);
   const [, setTotal] = useState<number>(0);
@@ -45,7 +44,6 @@ export default function ProviderServiceRequests() {
         limit,
         search: debouncedSearch.trim() || undefined,
         urgency: urgencyFilter !== "ALL" ? urgencyFilter : undefined,
-        budgetType: budgetFilter !== "ALL" ? budgetFilter : undefined,
         sortBy,
       },
       {
@@ -61,7 +59,7 @@ export default function ProviderServiceRequests() {
         },
       }
     );
-  }, [page, limit, debouncedSearch, urgencyFilter, budgetFilter, sortBy]);
+  }, [page, limit, debouncedSearch, urgencyFilter, sortBy]);
 
   useEffect(() => {
     if (!isVerified) return;
@@ -93,12 +91,7 @@ export default function ProviderServiceRequests() {
     setPage(1);
   };
 
-  const handleBudgetChange = (budget: string) => {
-    setBudgetFilter(budget);
-    setPage(1);
-  };
-
-  const handleSortChange = (sort: "NEWEST" | "BUDGET_HIGH" | "URGENT") => {
+  const handleSortChange = (sort: "NEWEST" | "URGENT") => {
     setSortBy(sort);
     setPage(1);
   };
@@ -190,23 +183,12 @@ export default function ProviderServiceRequests() {
 
           <div className="provreq-filter-controls">
             <select
-              value={budgetFilter}
-              onChange={(e) => handleBudgetChange(e.target.value)}
-              className="provreq-sort-select"
-            >
-              <option value="ALL">All Budget Types</option>
-              <option value="FIXED">Fixed Budget Only</option>
-              <option value="OPEN_BID">Open to Bids Only</option>
-            </select>
-
-            <select
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value as typeof sortBy)}
               className="provreq-sort-select"
             >
               <option value="NEWEST">Newest First</option>
               <option value="URGENT">Most Urgent First</option>
-              <option value="BUDGET_HIGH">Highest Budget</option>
             </select>
           </div>
         </div>

@@ -1,3 +1,5 @@
+import { ServiceQuestion } from "../../../../domain/entities/service.entity";
+
 export interface AddServiceUseCaseInputDto {
     name: string;
     category_id: string;
@@ -5,4 +7,5 @@ export interface AddServiceUseCaseInputDto {
     image?: string | null;
     status: 'ACTIVE' | 'INACTIVE';
     imageBuffer?: Buffer;
+    questions?: ServiceQuestion[] | null;
 }

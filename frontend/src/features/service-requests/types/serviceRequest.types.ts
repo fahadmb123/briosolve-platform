@@ -10,6 +10,12 @@ export type ServiceRequestStatus =
   | "CANCELLED"
   | "EXPIRED";
 
+export interface ServiceRequestAnswerItem {
+  question_id: string;
+  question_label: string;
+  answer: string | string[] | boolean | number;
+}
+
 export interface CreateServiceRequestPayload {
   categoryId: string;
   subserviceId?: string;
@@ -20,9 +26,10 @@ export interface CreateServiceRequestPayload {
   selectedAddressId: string;
   availableTimeFrom: string;
   availableTimeTo: string;
-  budgetType: RequestBudgetType;
+  budgetType?: RequestBudgetType;
   budgetAmount?: string;
   images: string[];
+  answers?: ServiceRequestAnswerItem[] | null;
 }
 
 export interface UpdateServiceRequestPayload {
@@ -38,6 +45,7 @@ export interface UpdateServiceRequestPayload {
   budgetType?: RequestBudgetType;
   budgetAmount?: string | null;
   images?: string[];
+  answers?: ServiceRequestAnswerItem[] | null;
 }
 
 export interface ServiceRequestImageItem {
@@ -86,12 +94,13 @@ export interface CustomerServiceRequestItem {
   distance_km?: number | null;
   available_time_from: string;
   available_time_to: string;
-  budget_type: RequestBudgetType;
-  budget_amount: number | null;
+  budget_type?: RequestBudgetType;
+  budget_amount?: number | null;
   status: ServiceRequestStatus;
   created_at: string;
   updated_at: string;
   images?: ServiceRequestImageItem[];
+  answers?: ServiceRequestAnswerItem[] | null;
   matched_providers_count?: number;
   quotations_count?: number;
 }
@@ -108,10 +117,11 @@ export interface ServiceRequestItem {
   address_id: string;
   available_time_from: string;
   available_time_to: string;
-  budget_type: RequestBudgetType;
-  budget_amount: number;
+  budget_type?: RequestBudgetType;
+  budget_amount?: number | null;
   status: ServiceRequestStatus;
   created_at: string;
   updated_at: string;
   images?: ServiceRequestImageItem[];
+  answers?: ServiceRequestAnswerItem[] | null;
 }

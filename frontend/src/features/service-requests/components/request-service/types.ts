@@ -1,8 +1,18 @@
+export interface ServiceQuestion {
+  id: string;
+  label: string;
+  type: "TEXT" | "NUMBER" | "SELECT" | "MULTI_SELECT" | "BOOLEAN";
+  options?: string[];
+  is_required: boolean;
+  placeholder?: string;
+}
+
 export interface ServiceItem {
   id: string;
   name: string;
   description?: string | null;
   status?: string;
+  questions?: ServiceQuestion[] | null;
 }
 
 export interface Category {
@@ -43,8 +53,8 @@ export const LEVEL_STEPS: LevelStep[] = [
   {
     level: 4,
     label: "Level 4",
-    title: "Budget & Media",
-    subtext: "Pricing & photos",
+    title: "Media & Policy",
+    subtext: "Photos & agreement",
   },
 ];
 

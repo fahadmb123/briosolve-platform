@@ -17,7 +17,73 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { CalculateDistance } from "../../../../shared/utils/calculate-distance";
 
 export class ServiceRequestRepository implements IServiceRequestRepository {
+    private async syncExpiredRequests(): Promise<void> {
+        try {
+            const pendingRecords = await db.orm.public.service_requests
+                .where({ status: "PENDING" as never })
+                .all();
+
+            const activeRecords = await db.orm.public.service_requests
+                .where({ status: "ACTIVE" as never })
+                .all();
+
+            const records = [...pendingRecords, ...activeRecords];
+            const now = new Date();
+            const expiredIds: string[] = [];
+
+            for (const req of records) {
+                if (!req.specific_date) continue;
+
+                const rawDate: any = req.specific_date;
+                const dateVal = rawDate?.epochMilliseconds
+                    ? new Date(Number(rawDate.epochMilliseconds))
+                    : new Date(rawDate);
+
+                if (isNaN(dateVal.getTime())) continue;
+
+                let timeStr = "23:59:59";
+                if (req.available_time_to) {
+                    timeStr = req.available_time_to.toString();
+                    if (timeStr.length === 5) {
+                        timeStr = `${timeStr}:00`;
+                    }
+                }
+
+                const [hours, minutes] = timeStr.split(":").map(Number);
+                const deadline = new Date(dateVal);
+                deadline.setHours(
+                    hours !== undefined && !isNaN(hours) ? hours : 23,
+                    minutes !== undefined && !isNaN(minutes) ? minutes : 59,
+                    59,
+                    999
+                );
+
+                if (now.getTime() > deadline.getTime()) {
+                    expiredIds.push(req.id);
+                }
+            }
+
+            for (const id of expiredIds) {
+                await db.orm.public.service_requests
+                    .where({ id: id as never })
+                    .update({
+                        status: "EXPIRED" as never,
+                        updated_at: Temporal.Now.instant()
+                    } as never);
+
+                await db.orm.public.service_request_providers
+                    .where({ service_request_id: id as never })
+                    .update({
+                        status: "EXPIRED" as never
+                    } as never);
+            }
+        } catch {
+            return;
+        }
+    }
+
     async findById(id: string): Promise<ServiceRequest | null> {
+        await this.syncExpiredRequests();
         const record = await db.orm.public.service_requests
             .where({ id: id as never })
             .include("images")
@@ -28,6 +94,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
     }
 
     async findDetailsById(id: string, customerId: string): Promise<ServiceRequestDetailsDto | null> {
+        await this.syncExpiredRequests();
         const record = await db.orm.public.service_requests
             .where({ id: id as never, customer_id: customerId as never })
             .include("images")
@@ -45,6 +112,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
     async findByCustomerId(
         input: GetCustomerServiceRequestsInputDto
     ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts: Record<string, number> }> {
+        await this.syncExpiredRequests();
         const { customerId, page = 1, limit = 10, search, status, sortBy = "NEWEST" } = input;
         const skip = (page - 1) * limit;
 
@@ -110,6 +178,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         providerProfileId: string,
         input?: Omit<GetProviderServiceRequestsInputDto, "userId">
     ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number }> {
+        await this.syncExpiredRequests();
         const { page = 1, limit = 10, search, urgency, budgetType, sortBy = "NEWEST" } = input || {};
         const skip = (page - 1) * limit;
 
@@ -159,7 +228,9 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             })
         );
 
-        const validRecords = records.filter((r): r is NonNullable<typeof r> => r !== null);
+        const validRecords = records.filter(
+            (r): r is NonNullable<typeof r> => r !== null && r.status !== "EXPIRED" && r.status !== "CANCELLED"
+        );
 
         let dtos = validRecords.map((record) => {
             let distanceKm: number | null = null;
@@ -314,6 +385,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
     async findAdminRequests(
         input: GetAdminServiceRequestsInputDto
     ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts: Record<string, number> }> {
+        await this.syncExpiredRequests();
         const { page = 1, limit = 10, search, status, sortBy = "NEWEST" } = input;
         const skip = (page - 1) * limit;
 

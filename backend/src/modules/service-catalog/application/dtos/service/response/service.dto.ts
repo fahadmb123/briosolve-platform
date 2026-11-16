@@ -1,4 +1,5 @@
 import { Category } from "../../../../domain/entities/category.entity";
+import { ServiceQuestion } from "../../../../domain/entities/service.entity";
 
 export interface ServiceResponseDto {
     id: string,
@@ -10,4 +11,5 @@ export interface ServiceResponseDto {
     created_at: Date,
     updated_at: Date,
     category?: Category,
+    questions?: ServiceQuestion[] | null,
 }

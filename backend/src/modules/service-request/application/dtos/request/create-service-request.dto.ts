@@ -1,3 +1,5 @@
+import { ServiceRequestAnswer } from "../../../domain/entities/serviceRequest.entity";
+
 export interface CreateServiceRequestInputDto {
     customerId: string;
     categoryId: string;
@@ -9,9 +11,10 @@ export interface CreateServiceRequestInputDto {
     selectedAddressId: string;
     availableTimeFrom: string;
     availableTimeTo: string;
-    budgetType: "OPEN_BID" | "FIXED";
+    budgetType?: "OPEN_BID" | "FIXED";
     budgetAmount?: string | null;
     images: string[];
+    answers?: ServiceRequestAnswer[] | null;
 }
 
 export interface CreateServiceRequestRepoDto {
@@ -25,7 +28,8 @@ export interface CreateServiceRequestRepoDto {
     selectedAddressId: string;
     availableTimeFrom: string;
     availableTimeTo: string;
-    budgetType: "OPEN_BID" | "FIXED";
+    budgetType?: "OPEN_BID" | "FIXED";
     budgetAmount?: string | null;
     imageUrls: string[];
+    answers?: ServiceRequestAnswer[] | null;
 }

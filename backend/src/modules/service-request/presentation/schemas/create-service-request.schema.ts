@@ -10,9 +10,14 @@ export const createServiceRequestSchema = z.object({
     selectedAddressId: z.string().min(1, "Address is required"),
     availableTimeFrom: z.string().min(1, "Available start time is required"),
     availableTimeTo: z.string().min(1, "Available end time is required"),
-    budgetType: z.enum(["OPEN_BID", "FIXED"]),
+    budgetType: z.enum(["OPEN_BID", "FIXED"]).default("OPEN_BID").optional(),
     budgetAmount: z.string().optional().nullable(),
-    images: z.array(z.string()).min(1, "At least 1 image is required").max(5, "Maximum 5 images allowed")
+    images: z.array(z.string()).min(1, "At least 1 image is required").max(5, "Maximum 5 images allowed"),
+    answers: z.array(z.object({
+        question_id: z.string(),
+        question_label: z.string(),
+        answer: z.any()
+    })).optional().nullable()
 }).superRefine((data, ctx) => {
     if (data.urgency === "SPECIFIC_DATE") {
         if (!data.specificDate || !data.specificDate.trim()) {
@@ -21,25 +26,6 @@ export const createServiceRequestSchema = z.object({
                 message: "Specific date is required when urgency is SPECIFIC_DATE",
                 path: ["specificDate"]
             });
-        }
-    }
-
-    if (data.budgetType === "FIXED") {
-        if (!data.budgetAmount || !data.budgetAmount.trim()) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Budget amount is required for fixed budget",
-                path: ["budgetAmount"]
-            });
-        } else {
-            const num = Number(data.budgetAmount);
-            if (isNaN(num) || num < 100) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: "Minimum budget amount is 100",
-                    path: ["budgetAmount"]
-                });
-            }
         }
     }
 });

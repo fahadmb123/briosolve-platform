@@ -1,3 +1,5 @@
+import { ServiceRequestAnswer } from "../../../domain/entities/serviceRequest.entity";
+
 export interface UpdateServiceRequestDto {
     id: string;
     customerId: string;
@@ -13,6 +15,7 @@ export interface UpdateServiceRequestDto {
     budgetType?: "OPEN_BID" | "FIXED";
     budgetAmount?: number | null;
     imageUrls?: string[];
+    answers?: ServiceRequestAnswer[] | null;
 }
 
 export interface UpdateServiceRequestRepoDto {
@@ -28,5 +31,6 @@ export interface UpdateServiceRequestRepoDto {
     budgetType?: "OPEN_BID" | "FIXED";
     budgetAmount?: number | null;
     imageUrls?: string[];
+    answers?: ServiceRequestAnswer[] | null;
 }
 

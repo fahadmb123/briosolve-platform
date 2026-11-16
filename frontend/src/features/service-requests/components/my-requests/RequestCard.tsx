@@ -37,6 +37,9 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   };
 
   const getUrgencyText = () => {
+    if (request.status === "EXPIRED") {
+      return "Expired";
+    }
     if (request.specific_date) {
       const dateStr = new Date(request.specific_date).toISOString().split("T")[0];
       return `By ${dateStr}`;
@@ -109,15 +112,6 @@ export const RequestCard: React.FC<RequestCardProps> = ({
           <div className="myreq-meta-chip" title="Location">
             <i className="fas fa-map-marker-alt"></i>
             <span className="myreq-meta-text-truncate">{addressText}</span>
-          </div>
-
-          <div className="myreq-meta-chip budget" title="Budget">
-            <i className="fas fa-wallet"></i>
-            <span>
-              {request.budget_type === "FIXED" && request.budget_amount
-                ? `₹${request.budget_amount}`
-                : "Open Bids"}
-            </span>
           </div>
         </div>
 

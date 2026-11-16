@@ -1,0 +1,86 @@
+[
+  {
+    "id": "column.public.service_requests.answers",
+    "label": "Add column \"answers\" to \"service_requests\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "answers",
+        "table": "service_requests"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"answers\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "service_requests",
+          "answers"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"answers\"",
+        "sql": "ALTER TABLE \"public\".\"service_requests\" ADD COLUMN \"answers\" json"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"answers\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "service_requests",
+          "answers"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.services.questions",
+    "label": "Add column \"questions\" to \"services\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "questions",
+        "table": "services"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"questions\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "services",
+          "questions"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"questions\"",
+        "sql": "ALTER TABLE \"public\".\"services\" ADD COLUMN \"questions\" json"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"questions\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "services",
+          "questions"
+        ]
+      }
+    ]
+  }
+]

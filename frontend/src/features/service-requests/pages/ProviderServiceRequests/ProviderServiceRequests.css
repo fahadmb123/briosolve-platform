@@ -380,6 +380,12 @@
     border-color: var(--border, #e4e4e7);
 }
 
+.provreq-urgency-pill.urgent-expired {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
 .provreq-card-body {
     flex: 1;
 }

@@ -6,12 +6,12 @@ interface RequestSummaryProps {
   selectedSubservice: ServiceItem | null;
   urgencyLabel: string;
   selectedAddressText: string;
-  budgetType: "OPEN_BID" | "FIXED";
-  budgetAmount: string;
   uploadedImagesCount: number;
   isSubmitting: boolean;
   agreedToPolicy: boolean;
   onNextLevel: () => void;
+  budgetType?: "OPEN_BID" | "FIXED";
+  budgetAmount?: string;
 }
 
 export function RequestSummary({
@@ -20,8 +20,6 @@ export function RequestSummary({
   selectedSubservice,
   urgencyLabel,
   selectedAddressText,
-  budgetType,
-  budgetAmount,
   uploadedImagesCount,
   isSubmitting,
   agreedToPolicy,
@@ -75,27 +73,13 @@ export function RequestSummary({
 
           <div className="summary-item">
             <span className="summary-item-label">
-              <i className="fas fa-wallet"></i>
+              <i className="fas fa-camera"></i>
               Level 4
             </span>
             <span className="summary-item-value highlight">
-              {budgetType === "OPEN_BID"
-                ? "Open to Quotes"
-                : `₹${budgetAmount}`}
+              {uploadedImagesCount > 0 ? `${uploadedImagesCount} attached` : "Media & Policy"}
             </span>
           </div>
-
-          {uploadedImagesCount > 0 && (
-            <div className="summary-item">
-              <span className="summary-item-label">
-                <i className="fas fa-camera"></i>
-                Photos
-              </span>
-              <span className="summary-item-value">
-                {uploadedImagesCount} attached
-              </span>
-            </div>
-          )}
         </div>
 
         <div className="summary-how-it-works">

@@ -4,25 +4,22 @@ import type { ServiceRequestInputType } from "../../schemas/serviceRequest.schem
 
 interface Level4BudgetStepProps {
   fileInputId: string;
-  budgetType: "OPEN_BID" | "FIXED";
   uploadedImages: string[];
   register: UseFormRegister<ServiceRequestInputType>;
   errors: FieldErrors<ServiceRequestInputType>;
-  onSelectBudgetType: (type: "OPEN_BID" | "FIXED") => void;
-  onPresetBudget: (amount: string) => void;
   onFileUpload: (e: ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: (index: number) => void;
   onPrev: () => void;
+  budgetType?: "OPEN_BID" | "FIXED";
+  onSelectBudgetType?: (type: "OPEN_BID" | "FIXED") => void;
+  onPresetBudget?: (amount: string) => void;
 }
 
 export function Level4BudgetStep({
   fileInputId,
-  budgetType,
   uploadedImages,
   register,
   errors,
-  onSelectBudgetType,
-  onPresetBudget,
   onFileUpload,
   onRemoveImage,
   onPrev,
@@ -33,68 +30,10 @@ export function Level4BudgetStep({
       <div className="request-section-header">
         <div className="request-step-badge">4</div>
         <div className="request-section-title-group">
-          <h2>Level 4: Budget & Attachments</h2>
-          <p>Choose quotation preference and attach photos of the requirement</p>
+          <h2>Level 4: Photos & Policy Agreement</h2>
+          <p>Attach photos of the requirement and review marketplace policy</p>
         </div>
       </div>
-
-      <div className="budget-type-tabs">
-        <button
-          type="button"
-          className={`budget-tab-btn ${budgetType === "OPEN_BID" ? "selected" : ""}`}
-          onClick={() => onSelectBudgetType("OPEN_BID")}
-        >
-          <i className="fas fa-tags mr-1.5"></i>
-          Open to Bids
-        </button>
-        <button
-          type="button"
-          className={`budget-tab-btn ${budgetType === "FIXED" ? "selected" : ""}`}
-          onClick={() => onSelectBudgetType("FIXED")}
-        >
-          <i className="fas fa-coins mr-1.5"></i>
-          Fixed Budget
-        </button>
-      </div>
-
-      {budgetType === "FIXED" && (
-        <div className="mb-4">
-          <div className="request-form-group">
-            <label className="request-form-label">
-              <span>Target Budget Amount (₹)</span>
-            </label>
-            <input
-              type="number"
-              min={100}
-              max={100000}
-              step={50}
-              className={`request-form-input ${errors.budgetAmount ? "border-danger" : ""}`}
-              {...register("budgetAmount")}
-            />
-            {errors.budgetAmount && (
-              <span className="text-danger text-xs mt-1 block">
-                {errors.budgetAmount.message}
-              </span>
-            )}
-          </div>
-
-          <div className="budget-presets-row">
-            <span className="text-xs text-secondary self-center mr-1">
-              Quick select:
-            </span>
-            {["500", "1000", "2000", "3500", "5000"].map((amt) => (
-              <button
-                key={amt}
-                type="button"
-                className="budget-preset-chip"
-                onClick={() => onPresetBudget(amt)}
-              >
-                ₹{amt}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="request-form-group">
         <label className="request-form-label">

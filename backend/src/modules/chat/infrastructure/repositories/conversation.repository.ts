@@ -229,8 +229,6 @@ export class ConversationRepository implements IConversationRepository {
                         category_name: activeReq.category?.name || "Services",
                         subservice_name: activeReq.subservice?.name || null,
                         urgency: activeReq.urgency,
-                        budget_type: activeReq.budget_type,
-                        budget_amount: activeReq.budget_amount ? Number(activeReq.budget_amount) : null,
                         status: activeReq.status,
                         location: loc || null,
                         scheduled_time: scheduledTime

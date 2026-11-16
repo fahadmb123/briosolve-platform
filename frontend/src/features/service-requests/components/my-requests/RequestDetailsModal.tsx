@@ -33,6 +33,9 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
   });
 
   const getUrgencyText = () => {
+    if (request.status === "EXPIRED") {
+      return "Expired";
+    }
     if (request.specific_date) {
       const dateStr = new Date(request.specific_date).toISOString().split("T")[0];
       return `Specific Date: ${dateStr}`;
@@ -121,38 +124,38 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
             <p className="myreq-description-body">{request.description}</p>
           </div>
 
-          <div className="myreq-modal-two-col">
+          {request.answers && request.answers.length > 0 && (
             <div className="myreq-modal-block">
-              <h4 className="myreq-block-heading">Schedule & Timing</h4>
+              <h4 className="myreq-block-heading">Service Specifications</h4>
               <div className="myreq-key-value-list">
-                <div className="myreq-kv-item">
-                  <span className="myreq-kv-key">Timeline</span>
-                  <span className="myreq-kv-val">{getUrgencyText()}</span>
-                </div>
-                <div className="myreq-kv-item">
-                  <span className="myreq-kv-key">Preferred Hours</span>
-                  <span className="myreq-kv-val">
-                    {request.available_time_from.slice(0, 5)} - {request.available_time_to.slice(0, 5)}
-                  </span>
-                </div>
+                {request.answers.map((ans, idx) => (
+                  <div key={ans.question_id || idx} className="myreq-kv-item">
+                    <span className="myreq-kv-key">{ans.question_label}</span>
+                    <span className="myreq-kv-val">
+                      {Array.isArray(ans.answer)
+                        ? ans.answer.join(", ")
+                        : typeof ans.answer === "boolean"
+                        ? ans.answer ? "Yes" : "No"
+                        : String(ans.answer ?? "")}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
+          )}
 
-            <div className="myreq-modal-block">
-              <h4 className="myreq-block-heading">Budget Details</h4>
-              <div className="myreq-key-value-list">
-                <div className="myreq-kv-item">
-                  <span className="myreq-kv-key">Pricing Model</span>
-                  <span className="myreq-kv-val">
-                    {request.budget_type === "FIXED" ? "Fixed Price" : "Open for Quotes"}
-                  </span>
-                </div>
-                {request.budget_type === "FIXED" && request.budget_amount && (
-                  <div className="myreq-kv-item">
-                    <span className="myreq-kv-key">Target Amount</span>
-                    <span className="myreq-kv-val bold">₹{request.budget_amount}</span>
-                  </div>
-                )}
+          <div className="myreq-modal-block">
+            <h4 className="myreq-block-heading">Schedule & Timing</h4>
+            <div className="myreq-key-value-list">
+              <div className="myreq-kv-item">
+                <span className="myreq-kv-key">Timeline</span>
+                <span className="myreq-kv-val">{getUrgencyText()}</span>
+              </div>
+              <div className="myreq-kv-item">
+                <span className="myreq-kv-key">Preferred Hours</span>
+                <span className="myreq-kv-val">
+                  {request.available_time_from.slice(0, 5)} - {request.available_time_to.slice(0, 5)}
+                </span>
               </div>
             </div>
           </div>
