@@ -212,7 +212,7 @@ export class ConversationRepository implements IConversationRepository {
                 const validRequests = requestMatches.filter((r): r is NonNullable<typeof r> => r !== null);
                 if (validRequests.length > 0) {
                     validRequests.sort(
-                        (a, b) => parseDate(b.created_at).getTime() - parseDate(a.created_at).getTime()
+                        (a, b) => parseDate(b.updated_at).getTime() - parseDate(a.updated_at).getTime()
                     );
                     const activeReq = validRequests[0];
                     const loc = [activeReq.address?.area, activeReq.address?.city]

@@ -29,7 +29,7 @@ export class AccountReactivationRequestRepository implements IAccountReactivatio
     async findByUserId(userId: string): Promise<AccountReactivationRequest[]> {
         const records = await db.orm.public.account_reactivation_requests
             .where({ user_id: userId })
-            .orderBy((req) => req.created_at.desc())
+            .orderBy((req) => req.updated_at.desc())
             .all();
 
         return records.map(AccountReactivationRequestMapper.toDomain)
@@ -49,9 +49,9 @@ export class AccountReactivationRequestRepository implements IAccountReactivatio
         }
 
         if (sort === "asc") {
-            query = query.orderBy((req) => req.created_at.asc());
+            query = query.orderBy((req) => req.updated_at.asc());
         } else {
-            query = query.orderBy((req) => req.created_at.desc());
+            query = query.orderBy((req) => req.updated_at.desc());
         }
 
         let records = await query.all();

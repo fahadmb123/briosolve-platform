@@ -123,9 +123,9 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         }
 
         if (sortBy === "OLDEST") {
-            query = query.orderBy((req) => req.created_at.asc());
+            query = query.orderBy((req) => req.updated_at.asc());
         } else {
-            query = query.orderBy((req) => req.created_at.desc());
+            query = query.orderBy((req) => req.updated_at.desc());
         }
 
         const records = await query
@@ -274,9 +274,9 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         }
 
         if (sortBy === "OLDEST") {
-            query = query.orderBy((req) => req.created_at.asc());
+            query = query.orderBy((req) => req.updated_at.asc());
         } else {
-            query = query.orderBy((req) => req.created_at.desc());
+            query = query.orderBy((req) => req.updated_at.desc());
         }
 
         const records = await query

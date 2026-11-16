@@ -230,8 +230,8 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
                 const urgencyOrder: Record<string, number> = { TODAY: 1, THIS_WEEK: 2, SPECIFIC_DATE: 3, FLEXIBLE: 4 };
                 return (urgencyOrder[a.urgency] ?? 5) - (urgencyOrder[b.urgency] ?? 5);
             }
-            const timeA = new Date(a.created_at).getTime();
-            const timeB = new Date(b.created_at).getTime();
+            const timeA = new Date(a.updated_at).getTime();
+            const timeB = new Date(b.updated_at).getTime();
             return timeB - timeA;
         });
 
