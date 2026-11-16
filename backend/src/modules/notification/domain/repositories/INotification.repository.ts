@@ -24,9 +24,22 @@ export interface UpdateNotificationData {
   readAt?: Date | null;
 }
 
+export interface FindNotificationsOptions {
+  page?: number;
+  limit?: number;
+  unreadOnly?: boolean;
+}
+
+export interface PaginatedNotificationsResult {
+  notifications: Notification[];
+  total: number;
+  totalPages: number;
+}
+
 export interface INotificationRepository extends BaseRepository<Notification | null> {
   create(data: CreateNotificationData): Promise<Notification>;
-  findByRecipientId(id: string): Promise<Notification[]>;
+  findByRecipientId(id: string, options?: FindNotificationsOptions): Promise<Notification[]>;
+  findPaginatedByRecipientId(id: string, options?: FindNotificationsOptions): Promise<PaginatedNotificationsResult>;
   update(id: string, data: UpdateNotificationData): Promise<Notification | null>;
   markAllAsRead(recipientId: string): Promise<Notification[] | null>;
   getUnreadCount(recipientId: string): Promise<number>;

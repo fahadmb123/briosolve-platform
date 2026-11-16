@@ -6,7 +6,9 @@ import {
   getAdminServiceRequests,
   updateServiceRequest,
   cancelServiceRequest,
-  adminCancelServiceRequest
+  adminCancelServiceRequest,
+  reopenServiceRequest,
+  type ReopenServiceRequestPayload
 } from "../services/serviceRequest.service";
 import type { UpdateServiceRequestPayload } from "../types/serviceRequest.types";
 
@@ -65,6 +67,19 @@ export const useAdminCancelServiceRequest = () => {
     mutationFn: adminCancelServiceRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminServiceRequests"] });
+    }
+  });
+};
+
+export const useReopenServiceRequest = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ReopenServiceRequestPayload }) =>
+      reopenServiceRequest(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myServiceRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["adminServiceRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["providerServiceRequests"] });
     }
   });
 };

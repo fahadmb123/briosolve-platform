@@ -1,3 +1,5 @@
+import { ServiceRequestAnswer } from "../../../domain/entities/serviceRequest.entity";
+
 export interface CreateServiceRequestInputDto {
     customerId: string;
     categoryId: string;
@@ -12,6 +14,7 @@ export interface CreateServiceRequestInputDto {
     budgetType?: "OPEN_BID" | "FIXED";
     budgetAmount?: string | null;
     images: string[];
+    answers?: ServiceRequestAnswer[] | null;
 }
 
 export interface CreateServiceRequestRepoDto {
@@ -28,4 +31,5 @@ export interface CreateServiceRequestRepoDto {
     budgetType?: "OPEN_BID" | "FIXED";
     budgetAmount?: string | null;
     imageUrls: string[];
+    answers?: ServiceRequestAnswer[] | null;
 }

@@ -21,8 +21,18 @@ export class ServiceController extends BaseController {
         try {
             if (!req.file) throw new ApplicationError("NOT_FOUND", "Service image is required", "NOT_FOUND");
 
+            let questions = req.body.questions;
+            if (typeof questions === "string") {
+                try {
+                    questions = JSON.parse(questions);
+                } catch {
+                    questions = null;
+                }
+            }
+
             const response = await this._addServiceUseCase.execute({
                 ...req.body,
+                questions,
                 imageBuffer: req.file.buffer
             });
 
@@ -37,10 +47,20 @@ export class ServiceController extends BaseController {
             const id = req.params.id;
             if (!id) throw new ApplicationError("BAD_REQUEST", "Service ID is required", "UNSUPPORTED");
 
+            let questions = req.body.questions;
+            if (typeof questions === "string") {
+                try {
+                    questions = JSON.parse(questions);
+                } catch {
+                    questions = null;
+                }
+            }
+
             const response = await this._updateServiceUseCase.execute({
                 id: id as string,
                 input: {
-                    ...req.body
+                    ...req.body,
+                    ...(questions !== undefined && { questions })
                 },
                 imageBuffer: req.file ? req.file.buffer : undefined
             });

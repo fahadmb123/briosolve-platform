@@ -35,7 +35,7 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
         const records = await db.orm.public.provider_verification_documents
             .where({ provider_id: providerId as never })
             .include("files")
-            .orderBy((doc) => doc.created_at.desc())
+            .orderBy((doc) => doc.updated_at.desc())
             .all();
 
         return records.map((record) =>
@@ -291,9 +291,9 @@ export class VerificationDocumentRepository implements IVerificationDocumentRepo
         }
 
         if (input.sort === "asc") {
-            filtered.sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
+            filtered.sort((a, b) => a.updated_at.getTime() - b.updated_at.getTime());
         } else {
-            filtered.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+            filtered.sort((a, b) => b.updated_at.getTime() - a.updated_at.getTime());
         }
 
         const total = filtered.length;

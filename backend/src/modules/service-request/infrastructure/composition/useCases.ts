@@ -7,6 +7,7 @@ import { CreateServiceRequestUseCase } from "../../application/use-cases/createS
 import { GetCustomerServiceRequestsUseCase } from "../../application/use-cases/getCustomerServiceRequests.useCase";
 import { GetProviderServiceRequestsUseCase } from "../../application/use-cases/getProviderServiceRequests.useCase";
 import { CancelServiceRequestUseCase } from "../../application/use-cases/cancelServiceRequest.useCase";
+import { ReopenServiceRequestUseCase } from "../../application/use-cases/reopenServiceRequest.useCase";
 import { UpdateServiceRequestUseCase } from "../../application/use-cases/updateServiceRequest.useCase";
 import { GetAdminServiceRequestsUseCase } from "../../application/use-cases/getAdminServiceRequests.useCase";
 import { AdminCancelServiceRequestUseCase } from "../../application/use-cases/adminCancelServiceRequest.useCase";
@@ -39,12 +40,25 @@ export function createCancelServiceRequestUseCase(
     );
 }
 
+export function createReopenServiceRequestUseCase(
+    createBulkNotificationUseCase: IUseCase<CreateBulkNotificationRequestDto, NotificationResponseDto[]>
+): ReopenServiceRequestUseCase {
+    return new ReopenServiceRequestUseCase(
+        serviceRequestRepository,
+        createBulkNotificationUseCase,
+        userRepository,
+        addressRepository,
+        providerSelectionService,
+        serviceRequestProviderRepository
+    );
+}
+
 export const getCustomerServiceRequestsUseCase = new GetCustomerServiceRequestsUseCase(
     serviceRequestRepository
 );
 
 export const getProviderServiceRequestsUseCase = new GetProviderServiceRequestsUseCase(
-    serviceRequestRepository,
+    serviceRequestProviderRepository,
     providerRepository
 );
 

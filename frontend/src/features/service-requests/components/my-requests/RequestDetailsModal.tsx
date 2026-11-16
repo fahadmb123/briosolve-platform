@@ -8,6 +8,7 @@ interface RequestDetailsModalProps {
   onClose: () => void;
   onEditRequest: (request: CustomerServiceRequestItem) => void;
   onCancelRequest: (request: CustomerServiceRequestItem) => void;
+  onReopenRequest?: (request: CustomerServiceRequestItem) => void;
 }
 
 export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
@@ -16,6 +17,7 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
   onClose,
   onEditRequest,
   onCancelRequest,
+  onReopenRequest,
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
@@ -33,6 +35,9 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
   });
 
   const getUrgencyText = () => {
+    if (request.status === "EXPIRED") {
+      return "Expired";
+    }
     if (request.specific_date) {
       const dateStr = new Date(request.specific_date).toISOString().split("T")[0];
       return `Specific Date: ${dateStr}`;
@@ -121,6 +126,26 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
             <p className="myreq-description-body">{request.description}</p>
           </div>
 
+          {request.answers && request.answers.length > 0 && (
+            <div className="myreq-modal-block">
+              <h4 className="myreq-block-heading">Service Specifications</h4>
+              <div className="myreq-key-value-list">
+                {request.answers.map((ans, idx) => (
+                  <div key={ans.question_id || idx} className="myreq-kv-item">
+                    <span className="myreq-kv-key">{ans.question_label}</span>
+                    <span className="myreq-kv-val">
+                      {Array.isArray(ans.answer)
+                        ? ans.answer.join(", ")
+                        : typeof ans.answer === "boolean"
+                        ? ans.answer ? "Yes" : "No"
+                        : String(ans.answer ?? "")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="myreq-modal-block">
             <h4 className="myreq-block-heading">Schedule & Timing</h4>
             <div className="myreq-key-value-list">
@@ -199,6 +224,20 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
         </div>
 
         <div className="myreq-modal-footer">
+          {request.status === "EXPIRED" && onReopenRequest && (
+            <button
+              type="button"
+              className="myreq-btn-reopen"
+              onClick={() => {
+                onClose();
+                onReopenRequest(request);
+              }}
+            >
+              <i className="fas fa-redo-alt"></i>
+              <span>Reopen Request</span>
+            </button>
+          )}
+
           {permission.canEdit && (
             <button
               type="button"

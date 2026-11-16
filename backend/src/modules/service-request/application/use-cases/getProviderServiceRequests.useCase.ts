@@ -1,5 +1,5 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
-import { IServiceRequestRepository } from "../../domain/repositories/IServiceRequestRepository";
+import { IServiceRequestProviderRepository } from "../../domain/repositories/IServiceRequestProviderRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { GetProviderRequestsOutputDto } from "../dtos/response/service-request.dto";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
@@ -16,7 +16,7 @@ export interface GetProviderServiceRequestsInputDto {
 
 export class GetProviderServiceRequestsUseCase implements IUseCase<GetProviderServiceRequestsInputDto, GetProviderRequestsOutputDto> {
     constructor(
-        private readonly _serviceRequestRepository: IServiceRequestRepository,
+        private readonly _serviceRequestProviderRepository: IServiceRequestProviderRepository,
         private readonly _providerRepository: IProviderRepository
     ) {}
 
@@ -38,7 +38,7 @@ export class GetProviderServiceRequestsUseCase implements IUseCase<GetProviderSe
 
         const page = input.page || 1;
         const limit = input.limit || 10;
-        const response = await this._serviceRequestRepository.findByProviderId(profile.id, {
+        const response = await this._serviceRequestProviderRepository.findByProviderId(profile.id, {
             ...input,
             page,
             limit

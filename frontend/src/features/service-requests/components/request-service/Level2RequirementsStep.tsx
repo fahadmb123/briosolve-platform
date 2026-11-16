@@ -1,6 +1,7 @@
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import type { ServiceRequestInputType } from "../../schemas/serviceRequest.schema";
 import { getTodayDate, getEndOfWeekDate, getFlexibleDate } from "../../utils/serviceDate.utils";
+import type { ServiceQuestion } from "./types";
 
 interface Level2RequirementsStepProps {
   register: UseFormRegister<ServiceRequestInputType>;
@@ -11,6 +12,11 @@ interface Level2RequirementsStepProps {
   onSelectUrgency: (urgency: "TODAY" | "THIS_WEEK" | "SPECIFIC_DATE" | "FLEXIBLE") => void;
   onPrev: () => void;
   onNext: () => void;
+  questions?: ServiceQuestion[] | null;
+  answers: Record<string, any>;
+  onAnswerChange: (questionId: string, value: any) => void;
+  questionErrors?: Record<string, string>;
+  subserviceName?: string;
 }
 
 export function Level2RequirementsStep({
@@ -22,6 +28,11 @@ export function Level2RequirementsStep({
   onSelectUrgency,
   onPrev,
   onNext,
+  questions,
+  answers,
+  onAnswerChange,
+  questionErrors,
+  subserviceName
 }: Level2RequirementsStepProps) {
   const minDate = getTodayDate();
   const todayDate = getTodayDate();
@@ -81,6 +92,137 @@ export function Level2RequirementsStep({
           </span>
         )}
       </div>
+
+      {questions && questions.length > 0 && (
+        <div className="request-form-group">
+          <div className="mb-2">
+            <label className="request-form-label mb-0">
+              <span>
+                Specific Questions ({subserviceName || "Selected Service"})
+              </span>
+            </label>
+            <span className="text-xs text-secondary">
+              Please answer these questions to help providers provide accurate quotes.
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-4 p-4 bg-surface rounded-xl border border-border mt-2">
+            {questions.map((q) => {
+              const currentVal = answers[q.id];
+              const hasError = !!questionErrors?.[q.id];
+
+              return (
+                <div key={q.id} className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-text flex items-center gap-1">
+                    <span>{q.label}</span>
+                    {q.is_required && <span className="text-danger">*</span>}
+                  </label>
+
+                  {q.type === "TEXT" && (
+                    <input
+                      type="text"
+                      className={`request-form-input ${hasError ? "border-danger" : ""}`}
+                      placeholder={q.placeholder || "Enter details..."}
+                      value={typeof currentVal === "string" ? currentVal : ""}
+                      onChange={(e) => onAnswerChange(q.id, e.target.value)}
+                    />
+                  )}
+
+                  {q.type === "NUMBER" && (
+                    <input
+                      type="number"
+                      className={`request-form-input ${hasError ? "border-danger" : ""}`}
+                      placeholder={q.placeholder || "e.g. 2"}
+                      value={currentVal !== undefined && currentVal !== null ? currentVal : ""}
+                      onChange={(e) => onAnswerChange(q.id, e.target.value === "" ? "" : Number(e.target.value))}
+                    />
+                  )}
+
+                  {q.type === "SELECT" && (
+                    <select
+                      className={`request-form-input ${hasError ? "border-danger" : ""}`}
+                      value={typeof currentVal === "string" ? currentVal : ""}
+                      onChange={(e) => onAnswerChange(q.id, e.target.value)}
+                    >
+                      <option value="">Select an option...</option>
+                      {(q.options || []).map((opt, oIdx) => (
+                        <option key={oIdx} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
+                  {q.type === "MULTI_SELECT" && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {(q.options || []).map((opt, oIdx) => {
+                        const selectedArray = Array.isArray(currentVal) ? currentVal : [];
+                        const isChecked = selectedArray.includes(opt);
+                        return (
+                          <button
+                            key={oIdx}
+                            type="button"
+                            onClick={() => {
+                              if (isChecked) {
+                                onAnswerChange(q.id, selectedArray.filter((item: string) => item !== opt));
+                              } else {
+                                onAnswerChange(q.id, [...selectedArray, opt]);
+                              }
+                            }}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                              isChecked
+                                ? "bg-primary text-white border-primary"
+                                : "bg-surface hover:bg-surface-hover border-border text-text"
+                            }`}
+                          >
+                            <i className={`fas ${isChecked ? "fa-check-square mr-1.5" : "fa-square mr-1.5 opacity-40"}`}></i>
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {q.type === "BOOLEAN" && (
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => onAnswerChange(q.id, true)}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold border transition-colors flex items-center justify-center gap-1.5 ${
+                          currentVal === true
+                            ? "bg-primary text-white border-primary"
+                            : "bg-surface hover:bg-surface-hover border-border text-text"
+                        }`}
+                      >
+                        <i className="fas fa-check"></i>
+                        <span>Yes</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onAnswerChange(q.id, false)}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold border transition-colors flex items-center justify-center gap-1.5 ${
+                          currentVal === false
+                            ? "bg-primary text-white border-primary"
+                            : "bg-surface hover:bg-surface-hover border-border text-text"
+                        }`}
+                      >
+                        <i className="fas fa-times"></i>
+                        <span>No</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {hasError && (
+                    <span className="text-danger text-xs mt-0.5 block">
+                      {questionErrors[q.id]}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="request-form-group">
         <label className="request-form-label">

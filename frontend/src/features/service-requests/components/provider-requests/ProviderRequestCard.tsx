@@ -35,6 +35,9 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
   const formattedDist = formatDistance(computedDistance);
 
   const getUrgencyBadge = () => {
+    if (request.status === "EXPIRED") {
+      return { label: "Expired", className: "urgent-expired" };
+    }
     switch (request.urgency) {
       case "TODAY":
         return { label: "Needed Today", className: "urgent-today" };
@@ -213,6 +216,16 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
             >
               <i className="fas fa-ban"></i>
               <span>Cancelled</span>
+            </button>
+          ) : request.status === "EXPIRED" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This request deadline has expired"
+            >
+              <i className="fas fa-calendar-times"></i>
+              <span>Expired</span>
             </button>
           ) : (
             <button

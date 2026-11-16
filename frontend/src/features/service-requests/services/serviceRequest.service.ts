@@ -4,7 +4,8 @@ import type {
   CreateServiceRequestPayload,
   UpdateServiceRequestPayload,
   ServiceRequestItem,
-  CustomerServiceRequestItem
+  CustomerServiceRequestItem,
+  RequestUrgency
 } from "../types/serviceRequest.types";
 
 export interface GetCustomerRequestsParams {
@@ -79,5 +80,17 @@ export const cancelServiceRequest = async (id: string): Promise<response<Service
 
 export const adminCancelServiceRequest = async (id: string): Promise<response<void>> => {
   const res = await apiClient.patch(`/api/service-request/${id}/admin-cancel`);
+  return res.data;
+};
+
+export interface ReopenServiceRequestPayload {
+  urgency: RequestUrgency;
+  specificDate?: string | null;
+  availableTimeFrom?: string;
+  availableTimeTo?: string;
+}
+
+export const reopenServiceRequest = async (id: string, data: ReopenServiceRequestPayload): Promise<response<CustomerServiceRequestItem>> => {
+  const res = await apiClient.patch(`/api/service-request/${id}/reopen`, data);
   return res.data;
 };

@@ -9,7 +9,7 @@ import { computeDateForUrgency } from "../../utils/serviceDate.utils";
 import { useUpdateServiceRequest } from "../../hooks/useServiceRequestMutations";
 import { useGetCategoriesService } from "../../../service-catalog";
 import { useGetAddresses, type AddressPayload } from "../../../addresses";
-import type { Category } from "../request-service";
+import type { Category, ServiceQuestion } from "../request-service";
 
 interface EditRequestModalProps {
   request: CustomerServiceRequestItem | null;
@@ -35,6 +35,8 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
   const [availableTimeTo, setAvailableTimeTo] = useState<string>("17:00");
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [selectedPreviewImage, setSelectedPreviewImage] = useState<string | null>(null);
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [questionErrors, setQuestionErrors] = useState<Record<string, string>>({});
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [addresses, setAddresses] = useState<AddressPayload[]>([]);
@@ -63,18 +65,27 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
     const existingImgs = (request.images || []).map((img) => img.image_key);
     setUploadedImages(existingImgs);
 
+    const initialAnswers: Record<string, any> = {};
+    if (request.answers && Array.isArray(request.answers)) {
+      for (const a of request.answers) {
+        initialAnswers[a.question_id] = a.answer;
+      }
+    }
+    setAnswers(initialAnswers);
+    setQuestionErrors({});
+
+    getCategoriesMutation.mutate(
+      { page: 1, limit: 100, filter: "ACTIVE" },
+      {
+        onSuccess: (res) => {
+          const rawCats = (res.data?.categories || []) as Category[];
+          setCategories(rawCats);
+        }
+      }
+    );
+
     const permission = checkRequestEditPermission(request);
     if (!permission.isRestricted) {
-      getCategoriesMutation.mutate(
-        { page: 1, limit: 100, filter: "ACTIVE" },
-        {
-          onSuccess: (res) => {
-            const rawCats = (res.data?.categories || []) as Category[];
-            setCategories(rawCats);
-          }
-        }
-      );
-
       getAddressesMutation.mutate(
         { page: 1, search: "", limit: 100 },
         {
@@ -134,6 +145,50 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
   const selectedCategoryObj = categories.find((c) => c.id === categoryId);
   const activeSubservices = selectedCategoryObj?.services || [];
+  const selectedSubservice = activeSubservices.find((s) => s.id === subserviceId);
+  const currentQuestions: ServiceQuestion[] = selectedSubservice?.questions || [];
+
+  const handleAnswerChange = (questionId: string, value: any) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: value
+    }));
+    setQuestionErrors((prev) => {
+      if (prev[questionId]) {
+        const next = { ...prev };
+        delete next[questionId];
+        return next;
+      }
+      return prev;
+    });
+  };
+
+  const validateCustomQuestions = (): boolean => {
+    if (!currentQuestions || currentQuestions.length === 0) return true;
+
+    const newErrors: Record<string, string> = {};
+    for (const q of currentQuestions) {
+      if (q.is_required) {
+        const val = answers[q.id];
+        if (
+          val === undefined ||
+          val === null ||
+          val === "" ||
+          (Array.isArray(val) && val.length === 0)
+        ) {
+          newErrors[q.id] = `"${q.label}" is required`;
+        }
+      }
+    }
+
+    setQuestionErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      const firstError = Object.values(newErrors)[0];
+      toast.error(firstError);
+      return false;
+    }
+    return true;
+  };
 
   const handleUrgencyChange = (newUrgency: RequestUrgency) => {
     setUrgency(newUrgency);
@@ -223,6 +278,26 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
       return;
     }
 
+    if (!validateCustomQuestions()) {
+      return;
+    }
+
+    const formattedAnswers = currentQuestions.length > 0
+      ? currentQuestions
+          .filter(
+            (q) =>
+              answers[q.id] !== undefined &&
+              answers[q.id] !== null &&
+              answers[q.id] !== "" &&
+              (!Array.isArray(answers[q.id]) || answers[q.id].length > 0)
+          )
+          .map((q) => ({
+            question_id: q.id,
+            question_label: q.label,
+            answer: answers[q.id]
+          }))
+      : [];
+
     const payload = {
       title: title.trim(),
       description: description.trim(),
@@ -231,6 +306,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
       availableTimeFrom,
       availableTimeTo,
       images: uploadedImages,
+      answers: formattedAnswers,
       ...(!isRestricted && {
         categoryId,
         subserviceId: subserviceId || null,
@@ -382,6 +458,144 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 )}
               </div>
             </div>
+
+            {currentQuestions && currentQuestions.length > 0 && (
+              <div className="myreq-edit-field">
+                <label className="myreq-edit-label">
+                  <span>Specific Questions ({selectedSubservice?.name || "Selected Service"})</span>
+                  <span className="text-xs text-secondary font-normal">
+                    Please answer the questions below
+                  </span>
+                </label>
+                <div className="flex flex-col gap-3 p-3 bg-surface rounded-lg border border-border mt-1">
+                  {currentQuestions.map((q) => {
+                    const currentVal = answers[q.id];
+                    const hasError = !!questionErrors[q.id];
+
+                    return (
+                      <div key={q.id} className="flex flex-col gap-1">
+                        <label className="text-xs font-semibold text-text flex items-center justify-between">
+                          <span>
+                            {q.label} {q.is_required && <span className="text-danger">*</span>}
+                          </span>
+                          {hasError && (
+                            <span className="text-danger text-[11px] font-normal">
+                              {questionErrors[q.id]}
+                            </span>
+                          )}
+                        </label>
+
+                        {q.type === "TEXT" && (
+                          <input
+                            type="text"
+                            className={`myreq-edit-input ${hasError ? "border-danger" : ""}`}
+                            placeholder={q.placeholder || "Enter details..."}
+                            value={typeof currentVal === "string" ? currentVal : ""}
+                            onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                          />
+                        )}
+
+                        {q.type === "NUMBER" && (
+                          <input
+                            type="number"
+                            className={`myreq-edit-input ${hasError ? "border-danger" : ""}`}
+                            placeholder={q.placeholder || "e.g. 2"}
+                            value={currentVal !== undefined && currentVal !== null ? currentVal : ""}
+                            onChange={(e) =>
+                              handleAnswerChange(
+                                q.id,
+                                e.target.value === "" ? "" : Number(e.target.value)
+                              )
+                            }
+                          />
+                        )}
+
+                        {q.type === "SELECT" && (
+                          <select
+                            className={`myreq-edit-select ${hasError ? "border-danger" : ""}`}
+                            value={typeof currentVal === "string" ? currentVal : ""}
+                            onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                          >
+                            <option value="">Select an option...</option>
+                            {(q.options || []).map((opt, oIdx) => (
+                              <option key={oIdx} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+
+                        {q.type === "MULTI_SELECT" && (
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {(q.options || []).map((opt, oIdx) => {
+                              const selectedArray = Array.isArray(currentVal) ? currentVal : [];
+                              const isChecked = selectedArray.includes(opt);
+                              return (
+                                <button
+                                  key={oIdx}
+                                  type="button"
+                                  onClick={() => {
+                                    if (isChecked) {
+                                      handleAnswerChange(
+                                        q.id,
+                                        selectedArray.filter((item: string) => item !== opt)
+                                      );
+                                    } else {
+                                      handleAnswerChange(q.id, [...selectedArray, opt]);
+                                    }
+                                  }}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                                    isChecked
+                                      ? "bg-primary text-white border-primary"
+                                      : "bg-surface hover:bg-surface-hover border-border text-text"
+                                  }`}
+                                >
+                                  <i
+                                    className={`fas ${
+                                      isChecked ? "fa-check-square mr-1.5" : "fa-square mr-1.5 opacity-40"
+                                    }`}
+                                  ></i>
+                                  {opt}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {q.type === "BOOLEAN" && (
+                          <div className="flex gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => handleAnswerChange(q.id, true)}
+                              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-colors flex items-center justify-center gap-1.5 ${
+                                currentVal === true
+                                  ? "bg-primary text-white border-primary"
+                                  : "bg-surface hover:bg-surface-hover border-border text-text"
+                              }`}
+                            >
+                              <i className="fas fa-check"></i>
+                              <span>Yes</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleAnswerChange(q.id, false)}
+                              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-colors flex items-center justify-center gap-1.5 ${
+                                currentVal === false
+                                  ? "bg-primary text-white border-primary"
+                                  : "bg-surface hover:bg-surface-hover border-border text-text"
+                              }`}
+                            >
+                              <i className="fas fa-times"></i>
+                              <span>No</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="myreq-edit-field">
               <label className="myreq-edit-label">Request Title</label>

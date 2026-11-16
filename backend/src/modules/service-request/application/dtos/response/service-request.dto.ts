@@ -1,4 +1,4 @@
-import { ServiceRequestImage } from "../../../domain/entities/serviceRequest.entity";
+import { ServiceRequestImage, ServiceRequestAnswer } from "../../../domain/entities/serviceRequest.entity";
 
 export interface ServiceRequestResponseDto {
     id: string;
@@ -20,6 +20,7 @@ export interface ServiceRequestResponseDto {
     created_at: Date;
     updated_at: Date;
     images?: ServiceRequestImage[];
+    answers?: ServiceRequestAnswer[] | null;
 }
 
 export interface ServiceRequestAddressDto {

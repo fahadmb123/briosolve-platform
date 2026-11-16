@@ -44,6 +44,8 @@ export default function RequestService() {
   const [selectedSubservice, setSelectedSubservice] = useState<ServiceItem | null>(null);
   const [addresses, setAddresses] = useState<AddressPayload[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [questionErrors, setQuestionErrors] = useState<Record<string, string>>({});
   const createServiceRequestMutation = useCreateServiceRequest();
   const isSubmitting = createServiceRequestMutation.isPending;
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
@@ -91,32 +93,10 @@ export default function RequestService() {
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [dismissedErrors, setDismissedErrors] = useState(false);
 
-  const currentLevelErrors: string[] = useMemo(() => {
-    const errorMessages: string[] = [];
-    const levelKeysMap: Record<number, (keyof ServiceRequestInputType)[]> = {
-      1: ["categoryId", "subserviceId"],
-      2: ["title", "description", "urgency", "specificDate"],
-      3: ["selectedAddressId", "availableTimeFrom", "availableTimeTo"],
-      4: ["images", "agreedToPolicy"],
-    };
-    const currentKeys = levelKeysMap[currentLevel] || [];
-    currentKeys.forEach((key) => {
-      const fieldError = errors[key];
-      if (fieldError?.message && !errorMessages.includes(fieldError.message)) {
-        errorMessages.push(fieldError.message);
-      }
-    });
-    return errorMessages;
-  }, [errors, currentLevel]);
-
   const displayedErrors = useMemo(() => {
-    if (dismissedErrors) return [];
-    const list = [...currentLevelErrors];
-    if (submissionError && !list.includes(submissionError)) {
-      list.unshift(submissionError);
-    }
-    return list;
-  }, [dismissedErrors, currentLevelErrors, submissionError]);
+    if (dismissedErrors || !submissionError) return [];
+    return [submissionError];
+  }, [dismissedErrors, submissionError]);
 
   useEffect(() => {
     setDismissedErrors(false);
@@ -275,6 +255,41 @@ export default function RequestService() {
     setValue("specificDate", computedDate, { shouldValidate: true });
   };
 
+  const handleAnswerChange = (questionId: string, value: any) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+    setQuestionErrors((prev) => {
+      if (prev[questionId]) {
+        const next = { ...prev };
+        delete next[questionId];
+        return next;
+      }
+      return prev;
+    });
+  };
+
+  const validateCustomQuestions = (): boolean => {
+    const questions = selectedSubservice?.questions;
+    if (!questions || questions.length === 0) return true;
+
+    const newErrors: Record<string, string> = {};
+    for (const q of questions) {
+      if (q.is_required) {
+        const val = answers[q.id];
+        if (
+          val === undefined ||
+          val === null ||
+          val === "" ||
+          (Array.isArray(val) && val.length === 0)
+        ) {
+          newErrors[q.id] = `"${q.label}" is required`;
+        }
+      }
+    }
+
+    setQuestionErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleNextLevel = async () => {
     setDismissedErrors(false);
     let isValid = false;
@@ -284,7 +299,9 @@ export default function RequestService() {
         toast.error(errors.categoryId.message || "Please select a service category");
       }
     } else if (currentLevel === 2) {
-      isValid = await trigger(["title", "description", "urgency", "specificDate"]);
+      const isFormValid = await trigger(["title", "description", "urgency", "specificDate"]);
+      const areQuestionsValid = validateCustomQuestions();
+      isValid = isFormValid && areQuestionsValid;
     } else if (currentLevel === 3) {
       isValid = await trigger(["selectedAddressId", "availableTimeFrom", "availableTimeTo"]);
     } else if (currentLevel === 4) {
@@ -312,11 +329,13 @@ export default function RequestService() {
       window.scrollTo({ top: 120, behavior: "smooth" });
       return;
     }
-    let isValid:boolean;
+    let isValid: boolean;
     if (currentLevel === 1) {
       isValid = await trigger(["categoryId", "subserviceId"]);
     } else if (currentLevel === 2) {
-      isValid = await trigger(["title", "description", "urgency", "specificDate"]);
+      const isFormValid = await trigger(["title", "description", "urgency", "specificDate"]);
+      const areQuestionsValid = validateCustomQuestions();
+      isValid = isFormValid && areQuestionsValid;
     } else if (currentLevel === 3) {
       isValid = await trigger(["selectedAddressId", "availableTimeFrom", "availableTimeTo"]);
     } else {
@@ -333,6 +352,17 @@ export default function RequestService() {
     setSubmissionError(null);
     const resolvedSpecificDate =
       data.specificDate || computeDateForUrgency(data.urgency);
+
+    const formattedAnswers = selectedSubservice?.questions
+      ? selectedSubservice.questions
+          .filter((q) => answers[q.id] !== undefined && answers[q.id] !== null && answers[q.id] !== "")
+          .map((q) => ({
+            question_id: q.id,
+            question_label: q.label,
+            answer: answers[q.id]
+          }))
+      : [];
+
     createServiceRequestMutation.mutate(
       {
         categoryId: data.categoryId,
@@ -345,7 +375,8 @@ export default function RequestService() {
         availableTimeFrom: data.availableTimeFrom,
         availableTimeTo: data.availableTimeTo,
         budgetType: "OPEN_BID",
-        images: uploadedImages
+        images: uploadedImages,
+        answers: formattedAnswers.length > 0 ? formattedAnswers : undefined
       },
       {
         onSuccess: () => {
@@ -459,6 +490,7 @@ export default function RequestService() {
           <div className="request-form-column">
             <RequestErrorBox
               errors={displayedErrors}
+              title="Submission Error"
               onDismiss={() => {
                 setDismissedErrors(true);
                 setSubmissionError(null);
@@ -495,6 +527,11 @@ export default function RequestService() {
                 onSelectUrgency={handleUrgencySelect}
                 onPrev={handlePrevLevel}
                 onNext={handleNextLevel}
+                questions={selectedSubservice?.questions}
+                answers={answers}
+                onAnswerChange={handleAnswerChange}
+                questionErrors={questionErrors}
+                subserviceName={selectedSubservice?.name}
               />
             )}
 

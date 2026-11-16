@@ -1,13 +1,25 @@
 import { apiClient } from "../../../shared/api/Client";
 import type {
     NotificationResponseDto,
+    PaginatedNotificationsResponseDto,
     PushSubscriptionPayload,
     UnsubscribePushPayload,
 } from "../types/notification.types";
 import type { response } from "../../../shared/types/Dtos";
 
-export const getNotifications = async (): Promise<response<NotificationResponseDto[]>> => {
-    const res = await apiClient.get<response<NotificationResponseDto[]>>("/api/notification");
+export interface GetNotificationsParams {
+    page?: number;
+    limit?: number;
+    unreadOnly?: boolean;
+}
+
+export const getNotifications = async (
+    params?: GetNotificationsParams
+): Promise<response<PaginatedNotificationsResponseDto | NotificationResponseDto[]>> => {
+    const res = await apiClient.get<response<PaginatedNotificationsResponseDto | NotificationResponseDto[]>>(
+        "/api/notification",
+        { params }
+    );
     return res.data;
 };
 

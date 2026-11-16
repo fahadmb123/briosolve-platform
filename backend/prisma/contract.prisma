@@ -247,6 +247,7 @@ model services {
   description      VarChar(1000)?
   image            VarChar(500)?
   status           active_status        @default(ACTIVE)
+  questions        Json?
 
   created_at       DateTime             @default(now())
   updated_at       temporal.updatedAt()
@@ -356,6 +357,7 @@ model service_requests {
   address_id          Uuid
   available_time_from Time
   available_time_to   Time
+  answers             Json?
   status              service_request_status      @default(PENDING)
 
   created_at          DateTime                    @default(now())

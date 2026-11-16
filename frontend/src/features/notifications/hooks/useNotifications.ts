@@ -5,11 +5,12 @@ import {
   getNotifications,
   markAllNotificationsAsRead,
   updateNotificationStatus,
+  type GetNotificationsParams,
 } from "../services/notification.service";
 
 export const useGetNotifications = () => {
   return useMutation({
-    mutationFn: getNotifications,
+    mutationFn: (params?: GetNotificationsParams) => getNotifications(params),
   });
 };
 

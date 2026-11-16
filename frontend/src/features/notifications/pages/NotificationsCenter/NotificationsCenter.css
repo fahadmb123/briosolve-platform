@@ -792,3 +792,28 @@
   }
 }
 
+.notif-sentinel {
+  width: 100%;
+  height: 20px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.notif-end-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.notif-end-message span {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted, #71717a);
+  background: var(--surface, #ffffff);
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  border: 1px dashed var(--border, #e4e4e7);
+}
+

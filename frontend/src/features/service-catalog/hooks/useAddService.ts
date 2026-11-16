@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
 import { getCroppedImg } from '../../../shared/utils/cropImage';
 import { serviceSchema, type ServiceFormData } from '../schemas/service.schema';
+import type { ServiceQuestion } from './useServiceFormData';
 
 export interface Area {
   width: number;
@@ -13,8 +14,24 @@ export interface Area {
 }
 
 interface UseAddServiceProps {
-    initialData?: { id?: string; categoryId: string; name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; image?: string | null } | null;
-    onAdd: (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => Promise<void> | void;
+    initialData?: {
+        id?: string;
+        categoryId: string;
+        name: string;
+        description: string;
+        status: 'ACTIVE' | 'INACTIVE';
+        image?: string | null;
+        questions?: ServiceQuestion[] | null;
+    } | null;
+    onAdd: (data: {
+        name: string;
+        categoryId: string;
+        categoryName: string;
+        description: string;
+        status: 'ACTIVE' | 'INACTIVE';
+        imageFile: File | null;
+        questions?: ServiceQuestion[] | null;
+    }) => Promise<void> | void;
     onClose: () => void;
     categories: { id: string; name: string }[];
 }
@@ -32,6 +49,7 @@ export const useAddService = ({ initialData, onAdd, onClose, categories }: UseAd
         mode: 'onChange',
     });
 
+    const [questions, setQuestions] = useState<ServiceQuestion[]>(initialData?.questions || []);
 
     useEffect(() => {
         if (initialData) {
@@ -42,8 +60,10 @@ export const useAddService = ({ initialData, onAdd, onClose, categories }: UseAd
                 status: initialData.status,
                 rawImage: undefined as unknown as File,
             });
+            setQuestions(initialData.questions || []);
         } else {
             form.reset({ name: '', categoryId: '', description: '', status: 'ACTIVE', rawImage: undefined as unknown as File });
+            setQuestions([]);
         }
     }, [initialData, form]);
 
@@ -63,6 +83,54 @@ export const useAddService = ({ initialData, onAdd, onClose, categories }: UseAd
     }, [initialData]);
 
     const handleFieldChange = () => {
+        setIsFormChanged(true);
+    };
+
+    const handleAddQuestion = () => {
+        const newQ: ServiceQuestion = {
+            id: `q_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+            label: '',
+            type: 'TEXT',
+            is_required: false,
+            placeholder: ''
+        };
+        setQuestions((prev) => [...prev, newQ]);
+        setIsFormChanged(true);
+    };
+
+    const handleRemoveQuestion = (id: string) => {
+        setQuestions((prev) => prev.filter((q) => q.id !== id));
+        setIsFormChanged(true);
+    };
+
+    const handleUpdateQuestion = (id: string, updated: Partial<ServiceQuestion>) => {
+        setQuestions((prev) =>
+            prev.map((q) => (q.id === id ? { ...q, ...updated } : q))
+        );
+        setIsFormChanged(true);
+    };
+
+    const handleAddQuestionOption = (id: string, optionText: string) => {
+        if (!optionText.trim()) return;
+        setQuestions((prev) =>
+            prev.map((q) => {
+                if (q.id !== id) return q;
+                const existing = q.options || [];
+                if (existing.includes(optionText.trim())) return q;
+                return { ...q, options: [...existing, optionText.trim()] };
+            })
+        );
+        setIsFormChanged(true);
+    };
+
+    const handleRemoveQuestionOption = (id: string, optionIndex: number) => {
+        setQuestions((prev) =>
+            prev.map((q) => {
+                if (q.id !== id) return q;
+                const existing = q.options || [];
+                return { ...q, options: existing.filter((_, idx) => idx !== optionIndex) };
+            })
+        );
         setIsFormChanged(true);
     };
     
@@ -128,7 +196,8 @@ export const useAddService = ({ initialData, onAdd, onClose, categories }: UseAd
                     categoryName,
                     description: data.description,
                     status: data.status,
-                    imageFile: croppedImageFile 
+                    imageFile: croppedImageFile,
+                    questions
                 });
                 
                 reset();
@@ -156,6 +225,12 @@ export const useAddService = ({ initialData, onAdd, onClose, categories }: UseAd
         onSubmit,
         handleFieldChange,
         handleInteractionStart,
-        hasChanges: !!initialData ? (isFormChanged || isCropModified) : true
+        hasChanges: !!initialData ? (isFormChanged || isCropModified) : true,
+        questions,
+        handleAddQuestion,
+        handleRemoveQuestion,
+        handleUpdateQuestion,
+        handleAddQuestionOption,
+        handleRemoveQuestionOption
     };
 };

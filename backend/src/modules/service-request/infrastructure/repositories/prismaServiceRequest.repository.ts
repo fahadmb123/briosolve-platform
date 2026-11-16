@@ -7,17 +7,79 @@ import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/upda
 import {
     ServiceRequestDetailsDto,
     GetCustomerRequestsOutputDto,
-    GetProviderRequestsOutputDto,
     GetAdminServiceRequestsInputDto
 } from "../../application/dtos/response/service-request.dto";
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
-import { GetProviderServiceRequestsInputDto } from "../../application/use-cases/getProviderServiceRequests.useCase";
 import { ServiceRequestMapper } from "../mappers/serviceRequest.mapper";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
-import { CalculateDistance } from "../../../../shared/utils/calculate-distance";
 
 export class ServiceRequestRepository implements IServiceRequestRepository {
+    private async syncExpiredRequests(): Promise<void> {
+        try {
+            const endOfToday = new Date();
+            endOfToday.setHours(23, 59, 59, 999);
+            const endOfTodayInstant = Temporal.Instant.fromEpochMilliseconds(endOfToday.getTime());
+
+            const records = await db.orm.public.service_requests
+                .where((req) => req.status.in(["PENDING", "ACTIVE"]))
+                .where((req) => req.specific_date.isNotNull())
+                .where((req) => req.specific_date.lte(endOfTodayInstant as never))
+                .all();
+
+            if (records.length === 0) return;
+
+            const now = new Date();
+            const expiredIds: string[] = [];
+
+            for (const req of records) {
+                const rawDate: any = req.specific_date;
+                const dateVal = rawDate?.epochMilliseconds
+                    ? new Date(Number(rawDate.epochMilliseconds))
+                    : new Date(rawDate);
+
+                if (isNaN(dateVal.getTime())) continue;
+
+                let timeStr = "23:59:59";
+                if (req.available_time_to) {
+                    timeStr = req.available_time_to.toString();
+                    if (timeStr.length === 5) {
+                        timeStr = `${timeStr}:00`;
+                    }
+                }
+
+                const [hours, minutes] = timeStr.split(":").map(Number);
+                const deadline = new Date(dateVal);
+                deadline.setHours(
+                    hours !== undefined && !isNaN(hours) ? hours : 23,
+                    minutes !== undefined && !isNaN(minutes) ? minutes : 59,
+                    59,
+                    999
+                );
+
+                if (now.getTime() > deadline.getTime()) {
+                    expiredIds.push(req.id);
+                }
+            }
+
+            if (expiredIds.length === 0) return;
+
+            await db.orm.public.service_requests
+                .where((req) => req.id.in(expiredIds))
+                .updateAll({
+                    status: "EXPIRED" as never,
+                    updated_at: Temporal.Now.instant()
+                } as never);
+
+            await db.orm.public.service_request_providers
+                .where((p) => p.service_request_id.in(expiredIds))
+                .deleteAll();
+        } catch {
+            return;
+        }
+    }
+
     async findById(id: string): Promise<ServiceRequest | null> {
+        await this.syncExpiredRequests();
         const record = await db.orm.public.service_requests
             .where({ id: id as never })
             .include("images")
@@ -28,6 +90,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
     }
 
     async findDetailsById(id: string, customerId: string): Promise<ServiceRequestDetailsDto | null> {
+        await this.syncExpiredRequests();
         const record = await db.orm.public.service_requests
             .where({ id: id as never, customer_id: customerId as never })
             .include("images")
@@ -45,6 +108,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
     async findByCustomerId(
         input: GetCustomerServiceRequestsInputDto
     ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts: Record<string, number> }> {
+        await this.syncExpiredRequests();
         const { customerId, page = 1, limit = 10, search, status, sortBy = "NEWEST" } = input;
         const skip = (page - 1) * limit;
 
@@ -59,9 +123,9 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         }
 
         if (sortBy === "OLDEST") {
-            query = query.orderBy((req) => req.created_at.asc());
+            query = query.orderBy((req) => req.updated_at.asc());
         } else {
-            query = query.orderBy((req) => req.created_at.desc());
+            query = query.orderBy((req) => req.updated_at.desc());
         }
 
         const records = await query
@@ -103,125 +167,6 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             requests: records.map((record) => ServiceRequestMapper.toDetailsDto(record)),
             total: totalResult.total,
             counts
-        };
-    }
-
-    async findByProviderId(
-        providerProfileId: string,
-        input?: Omit<GetProviderServiceRequestsInputDto, "userId">
-    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number }> {
-        const { page = 1, limit = 10, search, urgency, budgetType, sortBy = "NEWEST" } = input || {};
-        const skip = (page - 1) * limit;
-
-        const matches = await db.orm.public.service_request_providers
-            .where({ provider_id: providerProfileId as never })
-            .all();
-
-        if (matches.length === 0) {
-            return {
-                requests: [],
-                total: 0
-            };
-        }
-
-        const providerProfile = await db.orm.public.provider_profiles
-            .where({ id: providerProfileId as never })
-            .first();
-
-        let providerLat: number | null = null;
-        let providerLng: number | null = null;
-
-        if (providerProfile) {
-            const providerUser = await db.orm.public.users
-                .where({ id: providerProfile.user_id as never })
-                .include("current_address")
-                .first();
-
-            if (providerUser?.current_address?.latitude != null && providerUser?.current_address?.longitude != null) {
-                providerLat = Number(providerUser.current_address.latitude);
-                providerLng = Number(providerUser.current_address.longitude);
-            }
-        }
-
-        const requestIds = matches.map((m) => m.service_request_id);
-
-        const records = await Promise.all(
-            requestIds.map(async (requestId) => {
-                return await db.orm.public.service_requests
-                    .where({ id: requestId as never })
-                    .include("images")
-                    .include("category")
-                    .include("subservice")
-                    .include("address")
-                    .include("customer", (c) => c.include("customer_profile"))
-                    .include("providers")
-                    .first();
-            })
-        );
-
-        const validRecords = records.filter((r): r is NonNullable<typeof r> => r !== null);
-
-        let dtos = validRecords.map((record) => {
-            let distanceKm: number | null = null;
-            if (
-                providerLat != null &&
-                providerLng != null &&
-                record.address?.latitude != null &&
-                record.address?.longitude != null
-            ) {
-                distanceKm = CalculateDistance(
-                    providerLat,
-                    providerLng,
-                    Number(record.address.latitude),
-                    Number(record.address.longitude)
-                );
-            }
-            return ServiceRequestMapper.toDetailsDto(record, distanceKm);
-        });
-
-        if (urgency && urgency !== "ALL") {
-            dtos = dtos.filter((r) => r.urgency === urgency);
-        }
-
-        if (budgetType && budgetType !== "ALL") {
-            dtos = dtos.filter((r) => r.budget_type === budgetType);
-        }
-
-        if (search && search.trim()) {
-            const q = search.toLowerCase().trim();
-            dtos = dtos.filter((r) => {
-                const matchTitle = r.title.toLowerCase().includes(q);
-                const matchDesc = r.description.toLowerCase().includes(q);
-                const matchCat = (r.category_name || "").toLowerCase().includes(q);
-                const matchSub = (r.subservice_name || "").toLowerCase().includes(q);
-                const matchArea = (r.address_details?.area || "").toLowerCase().includes(q);
-                const matchCity = (r.address_details?.city || "").toLowerCase().includes(q);
-                const matchLandmark = (r.address_details?.landmark || "").toLowerCase().includes(q);
-                return matchTitle || matchDesc || matchCat || matchSub || matchArea || matchCity || matchLandmark;
-            });
-        }
-
-        dtos.sort((a, b) => {
-            if (sortBy === "BUDGET_HIGH") {
-                const aAmt = a.budget_amount ?? 0;
-                const bAmt = b.budget_amount ?? 0;
-                return bAmt - aAmt;
-            }
-            if (sortBy === "URGENT") {
-                const urgencyOrder: Record<string, number> = { TODAY: 1, THIS_WEEK: 2, SPECIFIC_DATE: 3, FLEXIBLE: 4 };
-                return (urgencyOrder[a.urgency] ?? 5) - (urgencyOrder[b.urgency] ?? 5);
-            }
-            const timeA = new Date(a.created_at).getTime();
-            const timeB = new Date(b.created_at).getTime();
-            return timeB - timeA;
-        });
-
-        const total = dtos.length;
-        const paginated = dtos.slice(skip, skip + limit);
-
-        return {
-            requests: paginated,
-            total
         };
     }
 
@@ -314,6 +259,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
     async findAdminRequests(
         input: GetAdminServiceRequestsInputDto
     ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts: Record<string, number> }> {
+        await this.syncExpiredRequests();
         const { page = 1, limit = 10, search, status, sortBy = "NEWEST" } = input;
         const skip = (page - 1) * limit;
 
@@ -328,9 +274,9 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
         }
 
         if (sortBy === "OLDEST") {
-            query = query.orderBy((req) => req.created_at.asc());
+            query = query.orderBy((req) => req.updated_at.asc());
         } else {
-            query = query.orderBy((req) => req.created_at.desc());
+            query = query.orderBy((req) => req.updated_at.desc());
         }
 
         const records = await query
@@ -381,6 +327,62 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
                     status: "CANCELLED" as never,
                     updated_at: Temporal.Now.instant()
                 } as never);
+
+            if (!updated) return null;
+            return ServiceRequestMapper.toDomain(updated);
+        });
+    }
+
+    async reopen(
+        id: string,
+        customerId: string,
+        data: {
+            urgency: "TODAY" | "THIS_WEEK" | "SPECIFIC_DATE" | "FLEXIBLE";
+            specificDate: Date | null;
+            availableTimeFrom?: string;
+            availableTimeTo?: string;
+        }
+    ): Promise<ServiceRequest | null> {
+        return await db.transaction(async (tx) => {
+            const existing = await tx.orm.public.service_requests
+                .where({ id: id as never, customer_id: customerId as never })
+                .first();
+
+            if (!existing) return null;
+
+            if (existing.status !== "EXPIRED") {
+                throw new ApplicationError("INVALID_STATE", "Only expired requests can be reopened", "VALIDATION");
+            }
+
+            const updatePayload: Record<string, unknown> = {
+                status: "PENDING" as never,
+                urgency: data.urgency as never,
+                specific_date: data.specificDate ? Temporal.Instant.fromEpochMilliseconds(data.specificDate.getTime()) : null,
+                updated_at: Temporal.Now.instant()
+            };
+
+            if (data.availableTimeFrom) {
+                const trimmed = data.availableTimeFrom.trim();
+                updatePayload.available_time_from = Temporal.PlainTime.from(trimmed.length === 5 ? `${trimmed}:00` : trimmed);
+            }
+
+            if (data.availableTimeTo) {
+                const trimmed = data.availableTimeTo.trim();
+                updatePayload.available_time_to = Temporal.PlainTime.from(trimmed.length === 5 ? `${trimmed}:00` : trimmed);
+            }
+
+            await tx.orm.public.service_requests
+                .where({ id: id as never, customer_id: customerId as never })
+                .update(updatePayload as never);
+
+            await tx.orm.public.service_request_providers
+                .where({ service_request_id: id as never })
+                .update({ status: "MATCHED" as never });
+
+            const updated = await tx.orm.public.service_requests
+                .where({ id: id as never })
+                .include("images")
+                .first();
 
             if (!updated) return null;
             return ServiceRequestMapper.toDomain(updated);

@@ -1,3 +1,5 @@
+import { ServiceQuestion } from "../../../../domain/entities/service.entity";
+
 export interface UpdateServiceUseCaseDto {
     id: string;
     input: {
@@ -6,6 +8,7 @@ export interface UpdateServiceUseCaseDto {
         description?: string;
         image?: string | null;
         status?: 'ACTIVE' | 'INACTIVE';
+        questions?: ServiceQuestion[] | null;
     };
     imageBuffer?: Buffer;
 }

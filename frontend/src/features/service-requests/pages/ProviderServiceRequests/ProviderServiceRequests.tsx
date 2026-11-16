@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMutations";
@@ -7,7 +7,6 @@ import { ProviderRequestCard, ProviderRequestDetailsModal } from "../../componen
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
-import { Pagination } from "../../../../shared/components/ui/Pagination/Pagination";
 import "./ProviderServiceRequests.css";
 
 export default function ProviderServiceRequests() {
@@ -16,14 +15,16 @@ export default function ProviderServiceRequests() {
   const isVerified =
     verifications !== null && Object.values(verifications).every(Boolean);
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("" );
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("ALL");
   const [sortBy, setSortBy] = useState<"NEWEST" | "URGENT">("NEWEST");
   const [page, setPage] = useState<number>(1);
   const [limit] = useState<number>(10);
-  const [, setTotal] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(false);
+  const isLoadingMoreRef = useRef<boolean>(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const [selectedRequest, setSelectedRequest] = useState<CustomerServiceRequestItem | null>(null);
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
@@ -37,10 +38,13 @@ export default function ProviderServiceRequests() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const fetchRequests = useCallback(() => {
+  const fetchRequests = useCallback((pageNum: number, isReset: boolean = false) => {
+    if (pageNum > 1) {
+      isLoadingMoreRef.current = true;
+    }
     getRequestsMutation.mutate(
       {
-        page,
+        page: pageNum,
         limit,
         search: debouncedSearch.trim() || undefined,
         urgency: urgencyFilter !== "ALL" ? urgencyFilter : undefined,
@@ -48,30 +52,63 @@ export default function ProviderServiceRequests() {
       },
       {
         onSuccess: (res) => {
+          isLoadingMoreRef.current = false;
           if (res.data) {
-            setRequests(res.data.requests || []);
-            setTotal(res.data.total || 0);
+            const newItems = res.data.requests || [];
+            setRequests((prev) => {
+              if (isReset || pageNum === 1) return newItems;
+              const existingIds = new Set(prev.map((r) => r.id));
+              const uniqueNewItems = newItems.filter((r) => !existingIds.has(r.id));
+              return [...prev, ...uniqueNewItems];
+            });
             setTotalPages(res.data.totalPages || 0);
+            setHasMore(pageNum < (res.data.totalPages || 0));
           }
         },
         onError: () => {
+          isLoadingMoreRef.current = false;
           toast.error("Failed to load service requests");
         },
       }
     );
-  }, [page, limit, debouncedSearch, urgencyFilter, sortBy]);
+  }, [limit, debouncedSearch, urgencyFilter, sortBy]);
 
   useEffect(() => {
     if (!isVerified) return;
-    fetchRequests();
+    setPage(1);
+    fetchRequests(1, true);
+  }, [isVerified, debouncedSearch, urgencyFilter, sortBy]);
 
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMoreRef.current && !getRequestsMutation.isPending) {
+          setPage((prev) => {
+            const next = prev + 1;
+            fetchRequests(next, false);
+            return next;
+          });
+        }
+      },
+      { rootMargin: "400px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, fetchRequests, getRequestsMutation.isPending]);
+
+  useEffect(() => {
     const handleNotification = (e: Event) => {
       const customEvent = e as CustomEvent;
       if (
         customEvent.detail?.title_code === "SERVICE_REQUEST_CANCELLED" ||
         customEvent.detail?.title_code === "NEW_SERVICE_REQUEST"
       ) {
-        fetchRequests();
+        setPage(1);
+        fetchRequests(1, true);
       }
     };
 
@@ -79,21 +116,18 @@ export default function ProviderServiceRequests() {
     return () => {
       window.removeEventListener("app:notification", handleNotification);
     };
-  }, [isVerified, fetchRequests]);
+  }, [fetchRequests]);
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
-    setPage(1);
   };
 
   const handleUrgencyChange = (urgency: string) => {
     setUrgencyFilter(urgency);
-    setPage(1);
   };
 
   const handleSortChange = (sort: "NEWEST" | "URGENT") => {
     setSortBy(sort);
-    setPage(1);
   };
 
   const currentSelectedRequest = useMemo(() => {
@@ -159,11 +193,14 @@ export default function ProviderServiceRequests() {
           <button
             type="button"
             className="provreq-btn-refresh"
-            onClick={fetchRequests}
+            onClick={() => {
+              setPage(1);
+              fetchRequests(1, true);
+            }}
             disabled={getRequestsMutation.isPending}
           >
-            <i className={`fas fa-sync-alt ${getRequestsMutation.isPending ? "fa-spin" : ""}`}></i>
-            <span>{getRequestsMutation.isPending ? "Refreshing..." : "Refresh Leads"}</span>
+            <i className={`fas fa-sync-alt ${getRequestsMutation.isPending && page === 1 ? "fa-spin" : ""}`}></i>
+            <span>{getRequestsMutation.isPending && page === 1 ? "Refreshing..." : "Refresh Leads"}</span>
           </button>
         </div>
       </div>
@@ -244,15 +281,19 @@ export default function ProviderServiceRequests() {
                 onChat={handleChatClick}
               />
             ))}
+            {getRequestsMutation.isPending && page > 1 &&
+              Array.from({ length: 2 }).map((_, idx) => (
+                <ServiceRequestCardSkeleton key={`skeleton-${idx}`} variant="provider" />
+              ))}
           </div>
 
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-            showTotalText={false}
-            className="justify-center"
-          />
+          {hasMore && <div ref={sentinelRef} className="provreq-sentinel" />}
+
+          {!hasMore && requests.length > 0 && totalPages > 1 && (
+            <div className="provreq-end-message">
+              <span>You've reached the end of available service requests</span>
+            </div>
+          )}
         </>
       )}
 

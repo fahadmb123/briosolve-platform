@@ -39,6 +39,14 @@ export interface NotificationResponseDto {
     created_at: Date;
 }
 
+export interface PaginatedNotificationsResponseDto {
+    notifications: NotificationResponseDto[];
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+}
+
 export interface HeaderNotification {
     id: string;
     title: string;

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { socket } from "../../../shared/api/socket-client";
 import { useAuthStore } from "../../auth/stores/auth.store";
 import { useNotificationStore } from "../stores/notification.store";
@@ -15,7 +15,18 @@ export function useNotificationSocket(): void {
         (state) => state.setNotifications,
     );
     const getNotificationsMutation = useGetNotifications();
-    
+
+    const fetchLatestNotifications = useCallback(() => {
+        if (!isAuthenticated) return;
+        getNotificationsMutation.mutate(undefined, {
+            onSuccess: (res) => {
+                if (res?.data) {
+                    const items = Array.isArray(res.data) ? res.data : res.data.notifications || [];
+                    setNotifications(items);
+                }
+            },
+        });
+    }, [isAuthenticated, setNotifications]);
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -23,13 +34,7 @@ export function useNotificationSocket(): void {
             return;
         }
 
-        getNotificationsMutation.mutate(undefined, {
-            onSuccess: (res) => {
-                if (res?.data) {
-                    setNotifications(res.data);
-                }
-            },
-        });
+        fetchLatestNotifications();
 
         const handleNewNotification = (notification: NotificationResponseDto) => {
             if (
@@ -49,26 +54,36 @@ export function useNotificationSocket(): void {
             addNotification(notification);
             playNotificationSound();
             window.dispatchEvent(new CustomEvent("app:notification", { detail: notification }));
+            fetchLatestNotifications();
         };
 
         const handleConnect = () => {
-            console.log("Notification socket connected successfully");
+            fetchLatestNotifications();
         };
 
-        const handleConnectError = (error: Error) => {
-            console.error("Notification socket connection error:", error.message);
+        const handleFocus = () => {
+            fetchLatestNotifications();
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                fetchLatestNotifications();
+            }
         };
 
         socket.on("connect", handleConnect);
-        socket.on("connect_error", handleConnectError);
         socket.on("notification:new", handleNewNotification);
+        window.addEventListener("focus", handleFocus);
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
         socket.connect();
 
         return () => {
             socket.off("connect", handleConnect);
-            socket.off("connect_error", handleConnectError);
             socket.off("notification:new", handleNewNotification);
+            window.removeEventListener("focus", handleFocus);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
             socket.disconnect();
         };
-    }, [isAuthenticated, addNotification, setNotifications]);
+    }, [isAuthenticated, addNotification, fetchLatestNotifications]);
 }

@@ -28,7 +28,7 @@ export class UserRepository implements IUserRepository{
         }
 
         const users = await query
-            .orderBy((user) => user.created_at.desc())
+            .orderBy((user) => user.updated_at.desc())
             .offset(skip)
             .limit(limit)
             .all();

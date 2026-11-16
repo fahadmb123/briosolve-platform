@@ -2569,6 +2569,13 @@
                   "kind": "scalar"
                 }
               },
+              "answers": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
               "available_time_from": {
                 "nullable": false,
                 "type": {
@@ -2780,6 +2787,9 @@
                 "address_id": {
                   "column": "address_id"
                 },
+                "answers": {
+                  "column": "answers"
+                },
                 "available_time_from": {
                   "column": "available_time_from"
                 },
@@ -2877,6 +2887,13 @@
                   }
                 }
               },
+              "questions": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
               "status": {
                 "nullable": false,
                 "type": {
@@ -2950,6 +2967,9 @@
                 },
                 "name": {
                   "column": "name"
+                },
+                "questions": {
+                  "column": "questions"
                 },
                 "status": {
                   "column": "status"
@@ -5297,6 +5317,11 @@
                   "nativeType": "uuid",
                   "nullable": false
                 },
+                "answers": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
                 "available_time_from": {
                   "codecId": "pg/time-temporal@1",
                   "nativeType": "time",
@@ -5547,6 +5572,11 @@
                   "typeParams": {
                     "length": 150
                   }
+                },
+                "questions": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
                 },
                 "status": {
                   "codecId": "pg/text@1",
@@ -6000,7 +6030,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "f4bcd9a43b6f6a40d2d7d6065debfc0d2fe55d5f8b14044a913c6a1ddc7b3271"
+    "storageHash": "c0f046817e93fe4f32bfe8f1fbd646b066498df7b669166b07002dcfda3a928e"
   },
   "execution": {
     "executionHash": "4f4677f17d162219b29c0c6bf16068f6998c645f6198ae088278763c716d2199",

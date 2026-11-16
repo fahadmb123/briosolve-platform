@@ -59,7 +59,8 @@ export class ServiceRequestMapper {
             record.status as ServiceRequestStatus,
             createdDate,
             updatedDate,
-            images
+            images,
+            record.answers ? (record.answers as any) : null
         );
     }
 
@@ -79,7 +80,8 @@ export class ServiceRequestMapper {
             status: serviceRequest.status,
             created_at: serviceRequest.created_at,
             updated_at: serviceRequest.updated_at,
-            images: serviceRequest.images
+            images: serviceRequest.images,
+            answers: serviceRequest.answers ?? null
         };
     }
 
@@ -153,6 +155,7 @@ export class ServiceRequestMapper {
             address_id: data.selectedAddressId as never,
             available_time_from: parseTime(data.availableTimeFrom) as never,
             available_time_to: parseTime(data.availableTimeTo) as never,
+            answers: data.answers ? (data.answers as never) : null,
             status: "PENDING" as never,
             created_at: Temporal.Now.instant(),
             updated_at: Temporal.Now.instant()
@@ -188,7 +191,8 @@ export class ServiceRequestMapper {
             availableTimeTo: (v) => {
                 const trimmed = String(v).trim();
                 return ["available_time_to", Temporal.PlainTime.from(trimmed.length === 5 ? `${trimmed}:00` : trimmed)];
-            }
+            },
+            answers: (v) => ["answers", v]
         };
 
         for (const [key, value] of Object.entries(data)) {

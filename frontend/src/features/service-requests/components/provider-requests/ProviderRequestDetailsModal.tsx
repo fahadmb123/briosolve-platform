@@ -79,6 +79,9 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
       : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddressString)}`;
 
   const getUrgencyText = () => {
+    if (request.status === "EXPIRED") {
+      return "Expired";
+    }
     if (request.specific_date) {
       const dateStr = new Date(request.specific_date).toLocaleDateString(undefined, {
         weekday: "short",
@@ -236,6 +239,29 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
               <p>{request.description}</p>
             </div>
           </div>
+
+          {request.answers && request.answers.length > 0 && (
+            <div className="provreq-detail-section">
+              <h4 className="provreq-section-heading">
+                <i className="fas fa-clipboard-list"></i>
+                <span>Service Specifications</span>
+              </h4>
+              <div className="provreq-description-box flex flex-col gap-2.5">
+                {request.answers.map((ans, idx) => (
+                  <div key={ans.question_id || idx} className="flex flex-col border-b border-border/40 pb-2 last:border-b-0 last:pb-0">
+                    <span className="text-xs font-semibold text-secondary uppercase tracking-wider">{ans.question_label}</span>
+                    <span className="text-sm font-medium text-text mt-0.5">
+                      {Array.isArray(ans.answer)
+                        ? ans.answer.join(", ")
+                        : typeof ans.answer === "boolean"
+                        ? ans.answer ? "Yes" : "No"
+                        : String(ans.answer ?? "")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="provreq-detail-card">
             <div className="provreq-detail-card-header">
@@ -414,6 +440,11 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
             <button type="button" className="provreq-btn-quote disabled" disabled>
               <i className="fas fa-ban mr-1.5"></i>
               <span>Request Cancelled</span>
+            </button>
+          ) : request.status === "EXPIRED" ? (
+            <button type="button" className="provreq-btn-quote disabled" disabled>
+              <i className="fas fa-calendar-times mr-1.5"></i>
+              <span>Request Expired</span>
             </button>
           ) : (
             <button

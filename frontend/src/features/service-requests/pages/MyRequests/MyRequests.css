@@ -1631,3 +1631,29 @@
         grid-template-columns: 1fr;
     }
 }
+
+.myreq-sentinel {
+    width: 100%;
+    height: 20px;
+    margin-top: 1rem;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.myreq-end-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+.myreq-end-message span {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted, #71717a);
+    background: var(--bg-surface-soft, #f4f4f5);
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    border: 1px dashed var(--border-light, #e4e4e7);
+}

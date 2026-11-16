@@ -4,7 +4,7 @@ import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { AddServiceModal } from "../../components/AddServiceModal";
 import { useGetCategoriesService } from "../../hooks/useCategory";
 import { useGetServices, useAddServiceMut, useUpdateServiceMut, useDeleteServiceMut } from "../../hooks/useService";
-import { useServiceFormData } from "../../hooks/useServiceFormData";
+import { useServiceFormData, type ServiceQuestion } from "../../hooks/useServiceFormData";
 import { toast } from 'react-hot-toast';
 import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 
@@ -17,6 +17,7 @@ interface Service {
   image?: string | null;
   updated_at: string;
   category?: { id: string; name: string };
+  questions?: ServiceQuestion[] | null;
 }
 
 interface ServicesProps {
@@ -71,8 +72,8 @@ export default function Services({ onTotalChange }: ServicesProps) {
     getServicesFn();
   }, [page, search, filter]);
 
-  const handleAddService = useCallback(async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
-    const formData = getFormData(data.name, data.categoryId, data.description, data.status, data.imageFile);
+  const handleAddService = useCallback(async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null; questions?: ServiceQuestion[] | null }) => {
+    const formData = getFormData(data.name, data.categoryId, data.description, data.status, data.imageFile, data.questions);
     await addService.mutateAsync(formData, {
       onSuccess: (res) => {
         setServices((prev) => [res.data, ...prev]);
@@ -82,9 +83,9 @@ export default function Services({ onTotalChange }: ServicesProps) {
     });
   }, [addService, getFormData]);
 
-  const handleEditService = useCallback(async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
+  const handleEditService = useCallback(async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null; questions?: ServiceQuestion[] | null }) => {
     if (!editingService) return;
-    const formData = getFormData(data.name, data.categoryId, data.description, data.status, data.imageFile);
+    const formData = getFormData(data.name, data.categoryId, data.description, data.status, data.imageFile, data.questions);
     await updateService.mutateAsync({ id: editingService.id, data: formData }, {
       onSuccess: (res) => {
         setServices(prev => {
@@ -149,7 +150,8 @@ export default function Services({ onTotalChange }: ServicesProps) {
       name: editingService.name,
       description: editingService.description,
       status: editingService.status,
-      image: editingService.image
+      image: editingService.image,
+      questions: editingService.questions
     };
   }, [editingService]);
 

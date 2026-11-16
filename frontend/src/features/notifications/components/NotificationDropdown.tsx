@@ -11,10 +11,13 @@ import "./NotificationDropdown.css";
 import { useNotificationStore } from "../stores/notification.store";
 import {
   useUpdateNotificationStatus,
+  useGetNotifications,
+  useMarkAllNotificationsRead,
 } from "../hooks/useNotifications";
 import { mapNotificationToHeader } from "../utils/notification.mapper";
 import { NotificationDropdownItem } from "./NotificationDropdownItem";
 import { NotificationDropdownEmpty } from "./NotificationDropdownEmpty";
+import { NotificationDropdownSkeleton } from "./NotificationDropdownSkeleton";
 import {
   MAX_DROPDOWN_BADGE_COUNT,
   NOTIFICATION_ROUTES,
@@ -34,13 +37,42 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPage, setDropdownPage] = useState(1);
+  const [dropdownTotalPages, setDropdownTotalPages] = useState(1);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const isFetchingMoreRef = useRef(false);
 
   const notifications = useNotificationStore((state) => state.notifications);
+  const setNotifications = useNotificationStore(
+    (state) => state.setNotifications,
+  );
   const updateNotification = useNotificationStore(
     (state) => state.updateNotification,
   );
 
   const updateStatusMutation = useUpdateNotificationStatus();
+  const getNotificationsMutation = useGetNotifications();
+  const markAllMutation = useMarkAllNotificationsRead();
+
+  const handleMarkAllRead = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const readAt = new Date();
+      notifications.forEach((item) => {
+        if (!item.is_read) {
+          updateNotification(item.id, {
+            is_read: true,
+            read_at: readAt,
+          });
+        }
+      });
+
+      markAllMutation.mutate();
+    },
+    [notifications, updateNotification, markAllMutation]
+  );
 
   const resolvedRole = useMemo<UserRole>(() => {
     if (role) return role;
@@ -77,11 +109,65 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     return NOTIFICATION_ROUTES[resolvedRole] || NOTIFICATION_ROUTES.CUSTOMER;
   }, [viewAllLink, resolvedRole]);
 
+  const fetchDropdownNotifications = useCallback((page: number, isReset: boolean = false) => {
+    if (page > 1) {
+      isFetchingMoreRef.current = true;
+    }
+    getNotificationsMutation.mutate(
+      { page, limit: 5, unreadOnly: true },
+      {
+        onSuccess: (res) => {
+          isFetchingMoreRef.current = false;
+          if (res?.data) {
+            if (Array.isArray(res.data)) {
+              setNotifications(res.data);
+            } else {
+              const incoming = res.data.notifications || [];
+              setNotifications(
+                isReset || page === 1
+                  ? incoming
+                  : (() => {
+                      const current = useNotificationStore.getState().notifications;
+                      const existingIds = new Set(current.map((n) => n.id));
+                      const newUnique = incoming.filter((n) => !existingIds.has(n.id));
+                      return [...current, ...newUnique];
+                    })()
+              );
+              setDropdownTotalPages(res.data.totalPages || 1);
+            }
+          }
+        },
+        onError: () => {
+          isFetchingMoreRef.current = false;
+        }
+      }
+    );
+  }, [setNotifications, getNotificationsMutation]);
+
   const handleToggle = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsOpen((prev) => !prev);
-  }, []);
+    setIsOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setDropdownPage(1);
+        fetchDropdownNotifications(1, true);
+      }
+      return next;
+    });
+  }, [fetchDropdownNotifications]);
+
+  const handleScroll = useCallback(() => {
+    const el = bodyRef.current;
+    if (!el || isFetchingMoreRef.current || getNotificationsMutation.isPending) return;
+
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+    if (nearBottom && dropdownPage < dropdownTotalPages) {
+      const nextPage = dropdownPage + 1;
+      setDropdownPage(nextPage);
+      fetchDropdownNotifications(nextPage, false);
+    }
+  }, [dropdownPage, dropdownTotalPages, getNotificationsMutation.isPending, fetchDropdownNotifications]);
 
   const handleToggleRead = useCallback(
     (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
@@ -209,28 +295,49 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
               </div>
             </div>
 
-            <button
-              type="button"
-              className="notif-header-close-btn"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close notifications"
-            >
-              <i className="fas fa-times"></i>
-            </button>
+            <div className="notif-header-actions-right">
+              {unreadCount > 0 && (
+                <button
+                  type="button"
+                  className="notif-mark-all-read-btn"
+                  onClick={handleMarkAllRead}
+                  disabled={markAllMutation.isPending}
+                  title="Mark all as read"
+                  aria-label="Mark all as read"
+                >
+                  <i className="fas fa-check-double"></i>
+                </button>
+              )}
+              <button
+                type="button"
+                className="notif-header-close-btn"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close notifications"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
           </div>
 
-          <div className="notif-dropdown-body">
-            {displayedNotifications.length === 0 ? (
+          <div className="notif-dropdown-body" ref={bodyRef} onScroll={handleScroll}>
+            {getNotificationsMutation.isPending && notifications.length === 0 ? (
+              <NotificationDropdownSkeleton />
+            ) : displayedNotifications.length === 0 ? (
               <NotificationDropdownEmpty />
             ) : (
-              displayedNotifications.map((item) => (
-                <NotificationDropdownItem
-                  key={item.id}
-                  item={item}
-                  onItemClick={handleItemClick}
-                  onToggleRead={handleToggleRead}
-                />
-              ))
+              <>
+                {displayedNotifications.map((item) => (
+                  <NotificationDropdownItem
+                    key={item.id}
+                    item={item}
+                    onItemClick={handleItemClick}
+                    onToggleRead={handleToggleRead}
+                  />
+                ))}
+                {getNotificationsMutation.isPending && dropdownPage > 1 && (
+                  <NotificationDropdownSkeleton />
+                )}
+              </>
             )}
           </div>
 

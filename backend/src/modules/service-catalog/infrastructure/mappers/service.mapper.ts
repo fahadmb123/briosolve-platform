@@ -20,7 +20,8 @@ export class ServiceMapper {
             record.status,
             createdAtRaw?.epochMilliseconds ? new Date(Number(createdAtRaw.epochMilliseconds)) : new Date(createdAtRaw),
             updatedAtRaw?.epochMilliseconds ? new Date(Number(updatedAtRaw.epochMilliseconds)) : new Date(updatedAtRaw),
-            record.category ? CategoryMapper.toDomain(record.category as CategoryRecord) : undefined
+            record.category ? CategoryMapper.toDomain(record.category as CategoryRecord) : undefined,
+            record.questions ? (record.questions as any) : null
         );
     }
 
@@ -30,7 +31,8 @@ export class ServiceMapper {
             category_id: input.category_id,
             description: input.description,
             status: input.status,
-            image: input.image
+            image: input.image,
+            questions: input.questions ? (input.questions as any) : null
         };
     }
 }

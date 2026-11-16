@@ -10,6 +10,12 @@ export interface ServiceRequestImage {
     created_at: Date;
 }
 
+export interface ServiceRequestAnswer {
+    question_id: string;
+    question_label: string;
+    answer: string | string[] | boolean | number;
+}
+
 export class ServiceRequest {
     constructor(
         public readonly id: string,
@@ -27,6 +33,7 @@ export class ServiceRequest {
         public readonly created_at: Date,
         public readonly updated_at: Date,
         public readonly images?: ServiceRequestImage[],
+        public readonly answers?: ServiceRequestAnswer[] | null,
         public readonly budget_type?: ServiceRequestBudgetType,
         public readonly budget_amount?: number | null
     ) {}

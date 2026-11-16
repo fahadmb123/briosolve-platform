@@ -155,18 +155,60 @@
     color: #fdba74;
 }
 
+.notif-header-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.notif-mark-all-read-btn {
+    background: #FFEDD5;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: #EA580C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.notif-mark-all-read-btn:hover {
+    background: #FED7AA;
+    color: #C2410C;
+    transform: scale(1.05);
+}
+
+.notif-mark-all-read-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+[data-theme="dark"] .notif-mark-all-read-btn {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fdba74;
+}
+
+[data-theme="dark"] .notif-mark-all-read-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+}
+
 .notif-header-close-btn {
     background: #FFEDD5;
     border: none;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     color: #9A3412;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     transition: all 0.2s ease;
 }
 
