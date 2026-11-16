@@ -79,16 +79,16 @@ export class PrismaNotificationRepository implements INotificationRepository {
         return Number(result.total ?? 0);
     }
 
-    async createMany(data: CreateNotificationRequestDto[]): Promise<Notification[] | null>{
-        const notifications = await db.orm.public.notifications
-            .createAll(data.map((notification)=>{
-                    return NotificationMapper.toPersistence(notification)
-                }))
-                
-        if (!notifications) return null
-
-        return notifications.map(notification =>
-            NotificationMapper.toDomain(notification),
-        )
+    async createMany(data: CreateNotificationRequestDto[]): Promise<Notification[] | null> {
+        return await db.transaction(async (tx) => {
+            const results: Notification[] = [];
+            for (const item of data) {
+                const record = await tx.orm.public.notifications.create(
+                    NotificationMapper.toPersistence(item) as never
+                );
+                results.push(NotificationMapper.toDomain(record));
+            }
+            return results;
+        });
     }
 }

@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateServiceRequestInputDto } from "../../application/dtos/request/create-service-request.dto";
 import { UpdateServiceRequestDto } from "../../application/dtos/request/update-service-request.dto";
+import { ReopenServiceRequestInputDto } from "../../application/dtos/request/reopen-service-request.dto";
 import {
     ServiceRequestResponseDto,
     ServiceRequestDetailsDto,
@@ -24,7 +25,8 @@ export class ServiceRequestController extends BaseController {
         private readonly _updateServiceRequestUseCase: IUseCase<UpdateServiceRequestDto, ServiceRequestDetailsDto>,
         private readonly _getProviderServiceRequestsUseCase: IUseCase<GetProviderServiceRequestsInputDto, GetProviderRequestsOutputDto>,
         private readonly _getAdminServiceRequestsUseCase: IUseCase<GetAdminServiceRequestsInputDto, GetAdminRequestsOutputDto>,
-        private readonly _adminCancelServiceRequestUseCase: IUseCase<string, void>
+        private readonly _adminCancelServiceRequestUseCase: IUseCase<string, void>,
+        private readonly _reopenServiceRequestUseCase: IUseCase<ReopenServiceRequestInputDto, ServiceRequestResponseDto>
     ) {
         super();
     }
@@ -172,6 +174,26 @@ export class ServiceRequestController extends BaseController {
             const requestId = req.params.id as string;
             await this._adminCancelServiceRequestUseCase.execute(requestId);
             return this.sendSuccess(res, "Service request cancelled successfully", null, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    reopenServiceRequest = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const customerId = req.user?.userId;
+            if (!customerId) {
+                throw new ApplicationError("UNAUTHORIZED", "Customer ID is required", "AUTHENTICATION");
+            }
+
+            const requestId = req.params.id as string;
+            const response = await this._reopenServiceRequestUseCase.execute({
+                ...req.body,
+                requestId,
+                customerId
+            });
+
+            return this.sendSuccess(res, "Service request reopened successfully", response, 200);
         } catch (error) {
             next(error);
         }

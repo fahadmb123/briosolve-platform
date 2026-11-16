@@ -458,4 +458,60 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             return ServiceRequestMapper.toDomain(updated);
         });
     }
+
+    async reopen(
+        id: string,
+        customerId: string,
+        data: {
+            urgency: "TODAY" | "THIS_WEEK" | "SPECIFIC_DATE" | "FLEXIBLE";
+            specificDate: Date | null;
+            availableTimeFrom?: string;
+            availableTimeTo?: string;
+        }
+    ): Promise<ServiceRequest | null> {
+        return await db.transaction(async (tx) => {
+            const existing = await tx.orm.public.service_requests
+                .where({ id: id as never, customer_id: customerId as never })
+                .first();
+
+            if (!existing) return null;
+
+            if (existing.status !== "EXPIRED") {
+                throw new ApplicationError("INVALID_STATE", "Only expired requests can be reopened", "VALIDATION");
+            }
+
+            const updatePayload: Record<string, unknown> = {
+                status: "PENDING" as never,
+                urgency: data.urgency as never,
+                specific_date: data.specificDate ? Temporal.Instant.fromEpochMilliseconds(data.specificDate.getTime()) : null,
+                updated_at: Temporal.Now.instant()
+            };
+
+            if (data.availableTimeFrom) {
+                const trimmed = data.availableTimeFrom.trim();
+                updatePayload.available_time_from = Temporal.PlainTime.from(trimmed.length === 5 ? `${trimmed}:00` : trimmed);
+            }
+
+            if (data.availableTimeTo) {
+                const trimmed = data.availableTimeTo.trim();
+                updatePayload.available_time_to = Temporal.PlainTime.from(trimmed.length === 5 ? `${trimmed}:00` : trimmed);
+            }
+
+            await tx.orm.public.service_requests
+                .where({ id: id as never, customer_id: customerId as never })
+                .update(updatePayload as never);
+
+            await tx.orm.public.service_request_providers
+                .where({ service_request_id: id as never })
+                .update({ status: "MATCHED" as never });
+
+            const updated = await tx.orm.public.service_requests
+                .where({ id: id as never })
+                .include("images")
+                .first();
+
+            if (!updated) return null;
+            return ServiceRequestMapper.toDomain(updated);
+        });
+    }
 }

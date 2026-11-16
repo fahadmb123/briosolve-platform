@@ -4,3 +4,4 @@ export { RequestCard } from "./RequestCard";
 export { RequestDetailsModal } from "./RequestDetailsModal";
 export { CancelConfirmModal } from "./CancelConfirmModal";
 export { EditRequestModal } from "./EditRequestModal";
+export { ReopenRequestModal } from "./ReopenRequestModal";

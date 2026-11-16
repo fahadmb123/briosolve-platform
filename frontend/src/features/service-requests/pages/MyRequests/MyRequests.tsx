@@ -4,15 +4,18 @@ import { toast } from "react-hot-toast";
 import "./MyRequests.css";
 import {
   useGetMyServiceRequests,
-  useCancelServiceRequest
+  useCancelServiceRequest,
+  useReopenServiceRequest
 } from "../../hooks/useServiceRequestMutations";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
+import type { ReopenServiceRequestPayload } from "../../services/serviceRequest.service";
 import {
   RequestFilterBar,
   RequestCard,
   RequestDetailsModal,
   CancelConfirmModal,
   EditRequestModal,
+  ReopenRequestModal,
   type StatusFilterType,
   type SortOrderType
 } from "../../components/my-requests";
@@ -48,9 +51,13 @@ export default function MyRequests() {
   const [selectedRequestForEdit, setSelectedRequestForEdit] =
     useState<CustomerServiceRequestItem | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [selectedRequestForReopen, setSelectedRequestForReopen] =
+    useState<CustomerServiceRequestItem | null>(null);
+  const [isReopenModalOpen, setIsReopenModalOpen] = useState<boolean>(false);
 
   const getRequestsMutation = useGetMyServiceRequests();
   const cancelMutation = useCancelServiceRequest();
+  const reopenMutation = useReopenServiceRequest();
 
   const fetchRequests = useCallback(() => {
     getRequestsMutation.mutate(
@@ -131,6 +138,48 @@ export default function MyRequests() {
   const handleCloseEdit = () => {
     setIsEditModalOpen(false);
     setSelectedRequestForEdit(null);
+  };
+
+  const handleOpenReopen = (request: CustomerServiceRequestItem) => {
+    setSelectedRequestForReopen(request);
+    setIsReopenModalOpen(true);
+  };
+
+  const handleCloseReopen = () => {
+    setIsReopenModalOpen(false);
+    setSelectedRequestForReopen(null);
+  };
+
+  const handleConfirmReopen = (data: ReopenServiceRequestPayload) => {
+    if (!selectedRequestForReopen) return;
+
+    reopenMutation.mutate(
+      {
+        id: selectedRequestForReopen.id,
+        data
+      },
+      {
+        onSuccess: (res) => {
+          toast.success("Service request reopened successfully");
+          handleCloseReopen();
+          setSelectedStatus("ALL");
+          setPage(1);
+          if (res?.data) {
+            setRequests((prev) =>
+              prev.map((r) => (r.id === res.data.id ? { ...r, ...res.data } : r))
+            );
+          }
+          fetchRequests();
+        },
+        onError: (err: any) => {
+          toast.error(
+            err?.response?.data?.message ||
+              err?.message ||
+              "Failed to reopen service request"
+          );
+        }
+      }
+    );
   };
 
   const handleEditSuccess = (updated: CustomerServiceRequestItem) => {
@@ -242,6 +291,7 @@ export default function MyRequests() {
                 onViewDetails={handleOpenDetails}
                 onEditRequest={handleOpenEdit}
                 onCancelRequest={handleOpenCancel}
+                onReopenRequest={handleOpenReopen}
               />
             ))}
           </div>
@@ -262,6 +312,7 @@ export default function MyRequests() {
         onClose={handleCloseDetails}
         onEditRequest={handleOpenEdit}
         onCancelRequest={handleOpenCancel}
+        onReopenRequest={handleOpenReopen}
       />
 
       <EditRequestModal
@@ -277,6 +328,14 @@ export default function MyRequests() {
         isCancelling={cancelMutation.isPending}
         onClose={handleCloseCancel}
         onConfirm={handleConfirmCancel}
+      />
+
+      <ReopenRequestModal
+        request={selectedRequestForReopen}
+        isOpen={isReopenModalOpen}
+        isReopening={reopenMutation.isPending}
+        onClose={handleCloseReopen}
+        onConfirm={handleConfirmReopen}
       />
     </div>
   );

@@ -7,6 +7,7 @@ interface RequestCardProps {
   onViewDetails: (request: CustomerServiceRequestItem) => void;
   onEditRequest: (request: CustomerServiceRequestItem) => void;
   onCancelRequest: (request: CustomerServiceRequestItem) => void;
+  onReopenRequest?: (request: CustomerServiceRequestItem) => void;
 }
 
 export const RequestCard: React.FC<RequestCardProps> = ({
@@ -14,6 +15,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   onViewDetails,
   onEditRequest,
   onCancelRequest,
+  onReopenRequest,
 }) => {
   const getStatusBadge = (status: CustomerServiceRequestItem["status"]) => {
     switch (status) {
@@ -155,6 +157,18 @@ export const RequestCard: React.FC<RequestCardProps> = ({
               <i className="fas fa-edit"></i>
               <span>Edit</span>
               {permission.isRestricted && <span className="myreq-edit-dot-restricted" />}
+            </button>
+          )}
+
+          {request.status === "EXPIRED" && onReopenRequest && (
+            <button
+              type="button"
+              className="myreq-btn-reopen"
+              onClick={() => onReopenRequest(request)}
+              title="Reschedule and reopen this expired request"
+            >
+              <i className="fas fa-redo-alt mr-1"></i>
+              <span>Reopen</span>
             </button>
           )}
 

@@ -11,6 +11,7 @@ import "./NotificationDropdown.css";
 import { useNotificationStore } from "../stores/notification.store";
 import {
   useUpdateNotificationStatus,
+  useGetNotifications,
 } from "../hooks/useNotifications";
 import { mapNotificationToHeader } from "../utils/notification.mapper";
 import { NotificationDropdownItem } from "./NotificationDropdownItem";
@@ -36,11 +37,15 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const notifications = useNotificationStore((state) => state.notifications);
+  const setNotifications = useNotificationStore(
+    (state) => state.setNotifications,
+  );
   const updateNotification = useNotificationStore(
     (state) => state.updateNotification,
   );
 
   const updateStatusMutation = useUpdateNotificationStatus();
+  const getNotificationsMutation = useGetNotifications();
 
   const resolvedRole = useMemo<UserRole>(() => {
     if (role) return role;
@@ -80,8 +85,20 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const handleToggle = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsOpen((prev) => !prev);
-  }, []);
+    setIsOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        getNotificationsMutation.mutate(undefined, {
+          onSuccess: (res) => {
+            if (res?.data) {
+              setNotifications(res.data);
+            }
+          }
+        });
+      }
+      return next;
+    });
+  }, [getNotificationsMutation, setNotifications]);
 
   const handleToggleRead = useCallback(
     (id: string, e: React.MouseEvent<HTMLButtonElement>) => {

@@ -8,6 +8,7 @@ interface RequestDetailsModalProps {
   onClose: () => void;
   onEditRequest: (request: CustomerServiceRequestItem) => void;
   onCancelRequest: (request: CustomerServiceRequestItem) => void;
+  onReopenRequest?: (request: CustomerServiceRequestItem) => void;
 }
 
 export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
@@ -16,6 +17,7 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
   onClose,
   onEditRequest,
   onCancelRequest,
+  onReopenRequest,
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
@@ -222,6 +224,20 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
         </div>
 
         <div className="myreq-modal-footer">
+          {request.status === "EXPIRED" && onReopenRequest && (
+            <button
+              type="button"
+              className="myreq-btn-reopen"
+              onClick={() => {
+                onClose();
+                onReopenRequest(request);
+              }}
+            >
+              <i className="fas fa-redo-alt"></i>
+              <span>Reopen Request</span>
+            </button>
+          )}
+
           {permission.canEdit && (
             <button
               type="button"
