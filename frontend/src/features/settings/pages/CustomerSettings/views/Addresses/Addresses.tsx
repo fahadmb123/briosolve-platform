@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { AddAddressModal, AddressCardSkeletonGrid, type AddressPayload, useAddAddress, useDeleteAddress, useEditAddress, useGetAddresses, useSetDefaultAddress } from '../../../../../addresses';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { AddAddressModal, AddressCardSkeleton, AddressCardSkeletonGrid, type AddressPayload, useAddAddress, useDeleteAddress, useEditAddress, useGetAddresses, useSetDefaultAddress } from '../../../../../addresses';
 import Skeleton from 'react-loading-skeleton';
 import { toast } from 'react-hot-toast';
 import { useAuthStore } from '../../../../../auth/stores/auth.store';
@@ -24,19 +24,60 @@ export const Addresses = () => {
   const [limit] = useState(5)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const isLoadingMoreRef = useRef<boolean>(false)
 
-
-  useEffect(()=>{
-    (()=>{
-      getAddresses.mutate({page,search,limit},{
-        onSuccess:(response)=>{
-          setAddresses(response.data.addresses as [])
-          setTotal(response.data.total)
-          setTotalPages(response.data.totalPages)
+  const fetchAddresses = useCallback((currentPage: number, isReset: boolean = false) => {
+    if (currentPage > 1) {
+      isLoadingMoreRef.current = true;
+    }
+    getAddresses.mutate(
+      { page: currentPage, search: search.trim(), limit },
+      {
+        onSuccess: (response) => {
+          isLoadingMoreRef.current = false;
+          const incoming = (response.data.addresses as AddressPayload[]) || [];
+          setAddresses((prev) => {
+            if (isReset || currentPage === 1) return incoming;
+            const existingIds = new Set(prev.map((a) => a.id));
+            const uniqueNew = incoming.filter((a) => !existingIds.has(a.id));
+            return [...prev, ...uniqueNew];
+          });
+          setTotal(response.data.total);
+          setTotalPages(response.data.totalPages);
+        },
+        onError: () => {
+          isLoadingMoreRef.current = false;
         }
-      })
-    })()
-  }, [page,search])
+      }
+    );
+  }, [search, limit]);
+
+  useEffect(() => {
+    setPage(1);
+    fetchAddresses(1, true);
+  }, [search, fetchAddresses]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && page < totalPages && !isLoadingMoreRef.current && !getAddresses.isPending) {
+          setPage((prev) => {
+            const nextPage = prev + 1;
+            fetchAddresses(nextPage, false);
+            return nextPage;
+          });
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [page, totalPages, getAddresses.isPending, fetchAddresses]);
 
   const handleDelete = async ()=>{
     if (!addressToDelete) return;
@@ -92,28 +133,6 @@ export const Addresses = () => {
     if (type.toLowerCase() === 'home') return 'home';
     if (type.toLowerCase() === 'work') return 'corporate_fare';
     return 'location_on';
-  };
-
-  const getPaginationItems = () => {
-    const cleanItems: (number | string)[] = [];
-    let last = 0;
-    
-    for (let i = 1; i <= totalPages; i++) {
-        let shouldInclude = false;
-        if (i === 1 || i === totalPages) shouldInclude = true;
-        else if (page <= 2 && i <= 3) shouldInclude = true;
-        else if (page >= totalPages - 1 && i >= totalPages - 2) shouldInclude = true;
-        else if (i >= page - 1 && i <= page + 1) shouldInclude = true;
-        
-        if (shouldInclude) {
-            if (last && i - last > 1) {
-                cleanItems.push('...');
-            }
-            cleanItems.push(i);
-            last = i;
-        }
-    }
-    return cleanItems;
   };
 
   return (
@@ -272,6 +291,21 @@ export const Addresses = () => {
             </div>
               )})}
 
+              {getAddresses.isPending && page > 1 &&
+                Array.from({ length: 2 }).map((_, idx) => (
+                  <AddressCardSkeleton key={`skeleton-${idx}`} />
+                ))}
+
+              {page < totalPages && <div ref={sentinelRef} className="w-full h-5 pointer-events-none opacity-0" />}
+
+              {page >= totalPages && addresses.length > 0 && totalPages > 1 && (
+                <div className="flex items-center justify-center py-6 text-center">
+                  <span className="text-xs font-medium text-on-surface-variant bg-surface-container px-4 py-2 rounded-full border border-dashed border-surface-variant">
+                    You've reached the end of your saved addresses
+                  </span>
+                </div>
+              )}
+
               {addresses.length === 0 && search !== '' && (
                 <div className="text-center py-10 px-4 bg-surface-container rounded-xl border border-surface-variant flex flex-col items-center justify-center">
                   <img
@@ -299,43 +333,6 @@ export const Addresses = () => {
             <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-sm m-0">Set up a new location for instant delivery, bulk dispatches, or regional pickup centers.</p>
           </div>
           </>
-          )}
-
-          {/* Pagination Container (Bottom Right) */}
-          {totalPages > 1 && (
-            <div className="flex justify-end pt-4 mt-2 border-t border-surface-variant">
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                  disabled={page === 1}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${page === 1 ? 'bg-surface-container text-on-surface-variant/50 border-surface-variant cursor-not-allowed' : 'bg-surface-container hover:bg-surface-container-highest text-on-surface-variant border-surface-variant cursor-pointer'}`}
-                >
-                  <span className="material-symbols-outlined text-sm">chevron_left</span>
-                </button>
-                <div className="flex items-center gap-1">
-                  {getPaginationItems().map((item, idx) => (
-                    item === '...' ? (
-                      <span key={`ellipsis-${idx}`} className="w-8 h-8 flex items-center justify-center text-on-surface-variant font-medium">...</span>
-                    ) : (
-                      <button 
-                        key={item}
-                        onClick={() => setPage(item as number)}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center font-label-md font-semibold border-none ${page === item ? 'bg-primary text-on-primary cursor-default shadow-md' : 'bg-transparent text-on-surface-variant hover:bg-surface-container-highest cursor-pointer'}`}
-                      >
-                        {item}
-                      </button>
-                    )
-                  ))}
-                </div>
-                <button 
-                  onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                  disabled={page === totalPages}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${page === totalPages ? 'bg-surface-container text-on-surface-variant/50 border-surface-variant cursor-not-allowed' : 'bg-surface-container hover:bg-surface-container-highest text-on-surface-variant border-surface-variant cursor-pointer'}`}
-                >
-                  <span className="material-symbols-outlined text-sm">chevron_right</span>
-                </button>
-              </div>
-            </div>
           )}
         </div>
       </div>
