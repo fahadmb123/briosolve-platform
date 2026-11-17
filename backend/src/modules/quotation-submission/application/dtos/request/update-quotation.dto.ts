@@ -1,4 +1,4 @@
-import { QuotationType, QuotationValidity } from "../../../domain/entities/quotation.entity";
+import { QuotationType, QuotationValidity, QuotationStatus } from "../../../domain/entities/quotation.entity";
 
 export interface UpdateQuotationInputDto {
     providerUserId: string;
@@ -24,4 +24,5 @@ export interface UpdateQuotationRepoDto {
     availableDateTime?: string | null;
     validUntil?: QuotationValidity;
     extraChargePolicy?: string;
+    status?: QuotationStatus;
 }

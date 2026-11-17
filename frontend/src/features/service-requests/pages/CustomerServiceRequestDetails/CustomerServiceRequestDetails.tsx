@@ -105,6 +105,24 @@ export default function CustomerServiceRequestDetails() {
     );
   };
 
+  const handleQuotationAccepted = () => {
+    setRequest((prev) => (prev ? { ...prev, status: "ACCEPTED" } : null));
+    if (requestId) {
+      getRequestsMutation.mutate(
+        { page: 1, limit: 50 },
+        {
+          onSuccess: (res) => {
+            const list = Array.isArray(res.data) ? res.data : res.data?.requests || [];
+            const found = list.find((r: CustomerServiceRequestItem) => r.id === requestId);
+            if (found) {
+              setRequest(found);
+            }
+          }
+        }
+      );
+    }
+  };
+
   return (
     <>
       <ServiceRequestDetailsView
@@ -118,6 +136,7 @@ export default function CustomerServiceRequestDetails() {
         onEdit={() => setIsEditModalOpen(true)}
         onCancel={() => setIsCancelModalOpen(true)}
         onReopen={() => setIsReopenModalOpen(true)}
+        onQuotationAccepted={handleQuotationAccepted}
       />
 
       {request && (

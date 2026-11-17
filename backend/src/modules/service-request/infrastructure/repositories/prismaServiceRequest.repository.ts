@@ -388,4 +388,23 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             return ServiceRequestMapper.toDomain(updated);
         });
     }
+
+    async updateStatus(id: string, status: string): Promise<ServiceRequest | null> {
+        const updated = await db.orm.public.service_requests
+            .where({ id: id as never })
+            .update({
+                status: status as never,
+                updated_at: Temporal.Now.instant()
+            });
+
+        if (!updated) return null;
+
+        const record = await db.orm.public.service_requests
+            .where({ id: id as never })
+            .include("images")
+            .first();
+
+        if (!record) return null;
+        return ServiceRequestMapper.toDomain(record);
+    }
 }

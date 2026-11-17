@@ -168,6 +168,7 @@ export class QuotationMapper {
                 valid_until_date: validUntilInstant
             }),
             ...(data.extraChargePolicy !== undefined && { extra_charge_policy: data.extraChargePolicy }),
+            ...(data.status !== undefined && { status: data.status }),
             updated_at: Temporal.Now.instant()
         };
     }

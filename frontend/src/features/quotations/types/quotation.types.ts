@@ -62,6 +62,44 @@ export interface ProviderQuotationItem {
   updatedAt: string;
 }
 
+export interface RequestQuotationProvider {
+  id: string;
+  userId: string;
+  name: string;
+  businessName: string;
+  profileImage: string | null;
+  experience: string;
+  completedJobs: number;
+  phone: string | null;
+  email: string | null;
+}
+
+export interface RequestQuotationItem {
+  id: string;
+  serviceRequestId: string;
+  providerId: string;
+  provider: RequestQuotationProvider;
+  amount: number;
+  quotationType: QuotationType;
+  workDescription: string;
+  includedItems: string[];
+  excludedItems: string[];
+  estimatedDuration: string | null;
+  availableDateTime: string | null;
+  validUntil: string;
+  validUntilDate: string;
+  extraChargePolicy: string;
+  status: QuotationStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RequestQuotationsResponse {
+  quotations: RequestQuotationItem[];
+  total: number;
+  acceptedQuotationId: string | null;
+}
+
 export interface GetMyQuotationsParams {
   page?: number;
   limit?: number;

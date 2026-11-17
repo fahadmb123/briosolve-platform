@@ -17,6 +17,7 @@ export interface IServiceRequestRepository extends BaseRepository<ServiceRequest
     update(id: string, customerId: string, data: UpdateServiceRequestRepoDto): Promise<ServiceRequest | null>;
     cancel(id: string, customerId: string): Promise<ServiceRequest | null>;
     adminCancel(id: string): Promise<ServiceRequest | null>;
+    updateStatus(id: string, status: string): Promise<ServiceRequest | null>;
     reopen(
         id: string,
         customerId: string,

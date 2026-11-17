@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
+import { RequestQuotations } from "../RequestQuotations/RequestQuotations";
 import "./ServiceRequestDetailsView.css";
 
 export interface ServiceRequestDetailsViewProps {
@@ -16,6 +17,7 @@ export interface ServiceRequestDetailsViewProps {
   onQuote?: () => void;
   onViewQuotation?: () => void;
   onChat?: () => void;
+  onQuotationAccepted?: () => void;
   distanceKm?: number | null;
   serviceRadiusKm?: number;
   isWithinRadius?: boolean;
@@ -35,6 +37,7 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
   onQuote,
   onViewQuotation,
   onChat,
+  onQuotationAccepted,
   distanceKm,
   serviceRadiusKm = 20,
   isWithinRadius = true
@@ -457,6 +460,14 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                 ))}
               </div>
             </div>
+          )}
+
+          {role === "CUSTOMER" && request.id && (
+            <RequestQuotations
+              requestId={request.id}
+              requestStatus={request.status}
+              onQuotationAccepted={onQuotationAccepted}
+            />
           )}
         </div>
 

@@ -4,7 +4,8 @@ import type {
   SubmitQuotationPayload,
   UpdateQuotationPayload,
   GetMyQuotationsParams,
-  GetMyQuotationsResponse
+  GetMyQuotationsResponse,
+  RequestQuotationsResponse
 } from "../types/quotation.types";
 
 export const submitQuotationService = async (
@@ -25,7 +26,29 @@ export const updateQuotationService = async (
 export const getQuotationByRequestId = async (
   requestId: string
 ): Promise<response<any>> => {
-  const res = await apiClient.get(`/api/service-request/${requestId}/quotation`);
+  const res = await apiClient.get(`/api/quotation/request/${requestId}`);
+  return res.data;
+};
+
+export const getRequestQuotationsService = async (
+  requestId: string
+): Promise<response<RequestQuotationsResponse>> => {
+  const res = await apiClient.get(`/api/quotation/request/${requestId}`);
+  return res.data;
+};
+
+export const acceptQuotationService = async (
+  quotationId: string
+): Promise<response<{ id: string; status: string; serviceRequestId: string }>> => {
+  const res = await apiClient.patch(`/api/quotation/${quotationId}/accept`);
+  return res.data;
+};
+
+export const rejectQuotationService = async (
+  quotationId: string,
+  reason?: string
+): Promise<response<{ id: string; status: string }>> => {
+  const res = await apiClient.patch(`/api/quotation/${quotationId}/reject`, { reason });
   return res.data;
 };
 

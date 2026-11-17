@@ -12,6 +12,9 @@ export function buildQuotationRoute(controller: QuotationRouteDependencies): Rou
     router.post("/", authMiddleware, requireRole(["PROVIDER"]), validate(submitQuotationSchema), controller.quotation.submitQuotation);
     router.get("/my", authMiddleware, requireRole(["PROVIDER"]), controller.quotation.getMyQuotations);
     router.put("/:id", authMiddleware, requireRole(["PROVIDER"]), validate(updateQuotationSchema), controller.quotation.updateQuotation);
+    router.get("/request/:serviceRequestId", authMiddleware, requireRole(["CUSTOMER", "PROVIDER", "ADMIN"]), controller.quotation.getRequestQuotations);
+    router.patch("/:id/accept", authMiddleware, requireRole(["CUSTOMER"]), controller.quotation.acceptQuotation);
+    router.patch("/:id/reject", authMiddleware, requireRole(["CUSTOMER"]), controller.quotation.rejectQuotation);
 
     return router;
 }

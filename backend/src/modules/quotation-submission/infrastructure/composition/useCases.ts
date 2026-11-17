@@ -7,6 +7,9 @@ import { providerRepository } from "../../../user-management/infrastructure/comp
 import { SubmitQuotationUseCase } from "../../application/use-cases/submitQuotation.useCase";
 import { GetProviderQuotationsUseCase } from "../../application/use-cases/getProviderQuotations.useCase";
 import { UpdateQuotationUseCase } from "../../application/use-cases/updateQuotation.useCase";
+import { GetRequestQuotationsUseCase } from "../../application/use-cases/getRequestQuotations.useCase";
+import { AcceptQuotationUseCase } from "../../application/use-cases/acceptQuotation.useCase";
+import { RejectQuotationUseCase } from "../../application/use-cases/rejectQuotation.useCase";
 
 export function createSubmitQuotationUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
@@ -34,6 +37,33 @@ export function createUpdateQuotationUseCase(
     return new UpdateQuotationUseCase(
         quotationRepository,
         providerRepository,
+        serviceRequestRepository,
+        createNotificationUseCase
+    );
+}
+
+export function createGetRequestQuotationsUseCase(): GetRequestQuotationsUseCase {
+    return new GetRequestQuotationsUseCase(
+        quotationRepository,
+        serviceRequestRepository
+    );
+}
+
+export function createAcceptQuotationUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): AcceptQuotationUseCase {
+    return new AcceptQuotationUseCase(
+        quotationRepository,
+        serviceRequestRepository,
+        createNotificationUseCase
+    );
+}
+
+export function createRejectQuotationUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): RejectQuotationUseCase {
+    return new RejectQuotationUseCase(
+        quotationRepository,
         serviceRequestRepository,
         createNotificationUseCase
     );
