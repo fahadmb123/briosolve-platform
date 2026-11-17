@@ -39,17 +39,8 @@ export class UpdateQuotationUseCase implements IUseCase<UpdateQuotationInputDto,
             );
         }
 
-        const updated = await this._quotationRepository.update(input.quotationId, {
-            amount: input.amount,
-            quotationType: input.quotationType,
-            workDescription: input.workDescription,
-            includedItems: input.includedItems,
-            excludedItems: input.excludedItems,
-            estimatedDuration: input.estimatedDuration ?? null,
-            availableDateTime: input.availableDateTime ?? null,
-            validUntil: input.validUntil,
-            extraChargePolicy: input.extraChargePolicy
-        });
+        const { providerUserId, quotationId, ...updateData } = input;
+        const updated = await this._quotationRepository.update(quotationId, updateData);
 
         if (!updated) {
             throw new ApplicationError("UPDATE_FAILED", "Failed to update quotation", "INTERNAL");

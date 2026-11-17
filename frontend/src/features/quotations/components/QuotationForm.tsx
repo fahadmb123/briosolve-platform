@@ -56,6 +56,71 @@ const formatDateDisplay = (isoDate: string): string => {
   }
 };
 
+const normalizeToFrontendValidity = (val?: string): QuotationValidity => {
+  if (val === "HOURS_24" || val === "24_HOURS") return "24_HOURS";
+  if (val === "HOURS_48" || val === "48_HOURS") return "48_HOURS";
+  if (val === "DAYS_3" || val === "3_DAYS") return "3_DAYS";
+  if (val === "DAYS_7" || val === "7_DAYS") return "7_DAYS";
+  return "24_HOURS";
+};
+
+const parseCustomDuration = (dur: string) => {
+  const trimmed = dur.trim();
+  const match = trimmed.match(/^(\d+)\s*(.*)$/);
+  if (match) {
+    return { num: match[1], unit: match[2] || "Hours" };
+  }
+  return { num: "1", unit: "Hours" };
+};
+
+const parseAvailableDateTime = (str: string) => {
+  let dType = "today";
+  let cDate = getTodayIso();
+  let tType = "Morning (9 AM – 12 PM)";
+  let sTime = "18:00";
+
+  if (!str) return { dType, cDate, tType, sTime };
+
+  const lower = str.toLowerCase();
+  if (lower.includes("tomorrow")) {
+    dType = "tomorrow";
+  } else if (lower.includes("today")) {
+    dType = "today";
+  } else {
+    dType = "custom";
+    const dateMatch = str.match(/\d{4}-\d{2}-\d{2}/);
+    if (dateMatch) {
+      cDate = dateMatch[0];
+    }
+  }
+
+  const standardTimeSlots = [
+    "Evening (6 PM – 9 PM)",
+    "Morning (9 AM – 12 PM)",
+    "Afternoon (12 PM – 3 PM)",
+    "Evening (3 PM – 6 PM)",
+    "Any time / Flexible"
+  ];
+
+  const matchedSlot = standardTimeSlots.find((slot) => str.includes(slot));
+  if (matchedSlot) {
+    tType = matchedSlot;
+  } else {
+    tType = "specific";
+    const timeMatch = str.match(/(\d{1,2}):(\d{2})(?:\s*(AM|PM))?/i);
+    if (timeMatch) {
+      let h = parseInt(timeMatch[1], 10);
+      const m = timeMatch[2];
+      const meridiem = timeMatch[3]?.toUpperCase();
+      if (meridiem === "PM" && h < 12) h += 12;
+      if (meridiem === "AM" && h === 12) h = 0;
+      sTime = `${String(h).padStart(2, "0")}:${m}`;
+    }
+  }
+
+  return { dType, cDate, tType, sTime };
+};
+
 export const QuotationForm: FC<QuotationFormProps> = ({
   initialValues,
   onSubmit,
@@ -80,36 +145,30 @@ export const QuotationForm: FC<QuotationFormProps> = ({
   ];
 
   const initialDur = initialValues?.estimatedDuration || "";
-  const [isCustomDuration, setIsCustomDuration] = useState<boolean>(
-    Boolean(initialDur && !standardDurations.includes(initialDur))
+  const isCustomDurInitial = Boolean(initialDur && !standardDurations.includes(initialDur));
+  const parsedDurInitial = parseCustomDuration(initialDur);
+
+  const [isCustomDuration, setIsCustomDuration] = useState<boolean>(isCustomDurInitial);
+  const [customDurationNum, setCustomDurationNum] = useState<string>(
+    isCustomDurInitial ? parsedDurInitial.num : "1"
   );
-  const [customDurationNum, setCustomDurationNum] = useState<string>("1");
-  const [customDurationUnit, setCustomDurationUnit] = useState<string>("Hours");
+  const [customDurationUnit, setCustomDurationUnit] = useState<string>(
+    isCustomDurInitial ? parsedDurInitial.unit : "Hours"
+  );
 
   const initialAvail = initialValues?.availableDateTime || "";
-  const [dateType, setDateType] = useState<string>(() => {
-    if (!initialAvail) return "today";
-    if (initialAvail.toLowerCase().includes("tomorrow")) return "tomorrow";
-    if (initialAvail.toLowerCase().includes("today")) return "today";
-    return "custom";
-  });
-  const [customDateVal, setCustomDateVal] = useState<string>(getTodayIso());
-  const [timeType, setTimeType] = useState<string>(() => {
-    if (!initialAvail) return "Morning (9 AM – 12 PM)";
-    if (initialAvail.includes("Evening (6 PM – 9 PM)")) return "Evening (6 PM – 9 PM)";
-    if (initialAvail.includes("Morning (9 AM – 12 PM)")) return "Morning (9 AM – 12 PM)";
-    if (initialAvail.includes("Afternoon (12 PM – 3 PM)")) return "Afternoon (12 PM – 3 PM)";
-    if (initialAvail.includes("Evening (3 PM – 6 PM)")) return "Evening (3 PM – 6 PM)";
-    if (initialAvail.includes("Any time / Flexible")) return "Any time / Flexible";
-    return "specific";
-  });
-  const [specificTimeVal, setSpecificTimeVal] = useState<string>("18:00");
+  const parsedAvailInitial = parseAvailableDateTime(initialAvail);
+  const [dateType, setDateType] = useState<string>(parsedAvailInitial.dType);
+  const [customDateVal, setCustomDateVal] = useState<string>(parsedAvailInitial.cDate);
+  const [timeType, setTimeType] = useState<string>(parsedAvailInitial.tType);
+  const [specificTimeVal, setSpecificTimeVal] = useState<string>(parsedAvailInitial.sTime);
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors }
   } = useForm<QuotationInputType>({
     resolver: zodResolver(quotationSchema),
@@ -122,10 +181,45 @@ export const QuotationForm: FC<QuotationFormProps> = ({
       excludedItems: initialValues?.excludedItems || [],
       estimatedDuration: initialValues?.estimatedDuration || "1–2 hours",
       availableDateTime: initialValues?.availableDateTime || "Today · Morning (9 AM – 12 PM)",
-      validUntil: (initialValues?.validUntil as QuotationValidity) || "24_HOURS",
+      validUntil: normalizeToFrontendValidity(initialValues?.validUntil),
       extraChargePolicy: initialValues?.extraChargePolicy || ""
     }
   });
+
+  useEffect(() => {
+    if (initialValues) {
+      const normalizedValidity = normalizeToFrontendValidity(initialValues.validUntil);
+      reset({
+        amount: initialValues.amount !== undefined ? initialValues.amount : "",
+        quotationType: initialValues.quotationType || "FIXED",
+        workDescription: initialValues.workDescription || "",
+        includedItems: initialValues.includedItems ? [...initialValues.includedItems] : [],
+        excludedItems: initialValues.excludedItems ? [...initialValues.excludedItems] : [],
+        estimatedDuration: initialValues.estimatedDuration || "1–2 hours",
+        availableDateTime: initialValues.availableDateTime || "Today · Morning (9 AM – 12 PM)",
+        validUntil: normalizedValidity,
+        extraChargePolicy: initialValues.extraChargePolicy || ""
+      });
+
+      const dur = initialValues.estimatedDuration || "";
+      if (dur && !standardDurations.includes(dur)) {
+        setIsCustomDuration(true);
+        const parsed = parseCustomDuration(dur);
+        setCustomDurationNum(parsed.num);
+        setCustomDurationUnit(parsed.unit);
+      } else {
+        setIsCustomDuration(false);
+      }
+
+      if (initialValues.availableDateTime) {
+        const parsedAvail = parseAvailableDateTime(initialValues.availableDateTime);
+        setDateType(parsedAvail.dType);
+        setCustomDateVal(parsedAvail.cDate);
+        setTimeType(parsedAvail.tType);
+        setSpecificTimeVal(parsedAvail.sTime);
+      }
+    }
+  }, [initialValues, reset]);
 
   const formValues = watch();
 

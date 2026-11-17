@@ -6,7 +6,7 @@ import type { CustomerServiceRequestItem } from "../../../service-requests/types
 import { QuotationForm } from "../../components/QuotationForm";
 import { RequestBriefCard } from "../../components/RequestBriefCard";
 import type { QuotationFormData, ProviderQuotationItem } from "../../types/quotation.types";
-import { useSubmitQuotation, useUpdateQuotation } from "../../hooks/useQuotationMutations";
+import { useSubmitQuotation, useUpdateQuotation, useGetMyQuotations } from "../../hooks/useQuotationMutations";
 import "./SubmitQuotation.css";
 
 export default function SubmitQuotation() {
@@ -22,14 +22,19 @@ export default function SubmitQuotation() {
 
   const passedRequest = locationState?.request;
   const passedQuotation = locationState?.quotation;
-  const isEditing = Boolean(locationState?.isEditing && passedQuotation);
 
   const [request, setRequest] = useState<CustomerServiceRequestItem | null>(
     passedRequest || null
   );
+  const [quotationToEdit, setQuotationToEdit] = useState<ProviderQuotationItem | null>(
+    passedQuotation || null
+  );
+  const isEditing = Boolean((locationState?.isEditing || quotationToEdit) && quotationToEdit);
+
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
 
   const getRequestsMutation = useGetProviderServiceRequests();
+  const getMyQuotationsMutation = useGetMyQuotations();
   const submitQuotationMutation = useSubmitQuotation();
   const updateQuotationMutation = useUpdateQuotation();
 
@@ -48,6 +53,22 @@ export default function SubmitQuotation() {
       );
     }
   }, [requestId, request]);
+
+  useEffect(() => {
+    if (!quotationToEdit && requestId && locationState?.isEditing) {
+      getMyQuotationsMutation.mutate(
+        { page: 1, limit: 50 },
+        {
+          onSuccess: (res) => {
+            const found = res.data?.quotations?.find((q) => q.serviceRequestId === requestId);
+            if (found) {
+              setQuotationToEdit(found);
+            }
+          }
+        }
+      );
+    }
+  }, [requestId, quotationToEdit, locationState?.isEditing]);
 
   const handleChatClick = () => {
     if (!request?.customer_id) {
@@ -80,10 +101,10 @@ export default function SubmitQuotation() {
       return;
     }
 
-    if (isEditing && passedQuotation) {
+    if (isEditing && quotationToEdit) {
       updateQuotationMutation.mutate(
         {
-          id: passedQuotation.id,
+          id: quotationToEdit.id,
           amount: Number(formData.amount),
           quotationType: formData.quotationType,
           workDescription: formData.workDescription,
@@ -181,17 +202,17 @@ export default function SubmitQuotation() {
         <div className="quote-main-column">
           <QuotationForm
             initialValues={
-              isEditing && passedQuotation
+              isEditing && quotationToEdit
                 ? {
-                    amount: passedQuotation.amount,
-                    quotationType: passedQuotation.quotationType,
-                    workDescription: passedQuotation.workDescription,
-                    includedItems: passedQuotation.includedItems,
-                    excludedItems: passedQuotation.excludedItems,
-                    estimatedDuration: passedQuotation.estimatedDuration || "",
-                    availableDateTime: passedQuotation.availableDateTime || "",
-                    validUntil: passedQuotation.validUntil,
-                    extraChargePolicy: passedQuotation.extraChargePolicy
+                    amount: quotationToEdit.amount,
+                    quotationType: quotationToEdit.quotationType,
+                    workDescription: quotationToEdit.workDescription,
+                    includedItems: quotationToEdit.includedItems,
+                    excludedItems: quotationToEdit.excludedItems,
+                    estimatedDuration: quotationToEdit.estimatedDuration || "",
+                    availableDateTime: quotationToEdit.availableDateTime || "",
+                    validUntil: quotationToEdit.validUntil,
+                    extraChargePolicy: quotationToEdit.extraChargePolicy
                   }
                 : undefined
             }
