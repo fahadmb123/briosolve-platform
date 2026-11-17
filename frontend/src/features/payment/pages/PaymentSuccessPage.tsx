@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import "./PaymentSuccessPage.css";
 
@@ -22,6 +22,13 @@ export const PaymentSuccessPage: React.FC = () => {
   const paymentId = state.paymentId || "rzp_simulated_success";
   const serviceRequestId = state.serviceRequestId || "";
   const providerDisplay = state.providerBusinessName || state.providerName || "Service Provider";
+
+  useEffect(() => {
+    try {
+      const containers = document.querySelectorAll(".razorpay-container");
+      containers.forEach((el) => el.remove());
+    } catch {}
+  }, []);
 
   return (
     <div className="paysuccess-page-container">

@@ -91,6 +91,20 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
               return;
             }
 
+            let rzp: any = null;
+
+            const cleanupRazorpayModal = () => {
+              try {
+                if (rzp && typeof rzp.close === "function") {
+                  rzp.close();
+                }
+              } catch {}
+              try {
+                const containers = document.querySelectorAll(".razorpay-container");
+                containers.forEach((el) => el.remove());
+              } catch {}
+            };
+
             const options = {
               key: orderData.keyId,
               amount: orderData.amount * 100,
@@ -107,6 +121,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 color: "#ea580c"
               },
               handler: (paymentResponse: any) => {
+                cleanupRazorpayModal();
                 const quoteAccepted = confirmAcceptQuote;
                 const totalPaidAmount = Math.round(quoteAccepted.amount * 1.1);
 
@@ -136,7 +151,8 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                         seconds -= 1;
                         if (seconds <= 0) {
                           clearInterval(timer);
-                          navigate("/customer/payment/success", {
+                          cleanupRazorpayModal();
+                          navigate("/payment/success", {
                             state: {
                               paymentId: paymentResponse.razorpay_payment_id,
                               orderId: paymentResponse.razorpay_order_id,
@@ -164,6 +180,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
               },
               modal: {
                 ondismiss: () => {
+                  cleanupRazorpayModal();
                   const quoteCancelled = confirmAcceptQuote;
                   setIsProcessingPayment(false);
                   setConfirmAcceptQuote(null);
@@ -181,7 +198,8 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                     seconds -= 1;
                     if (seconds <= 0) {
                       clearInterval(timer);
-                      navigate("/customer/payment/cancelled", {
+                      cleanupRazorpayModal();
+                      navigate("/payment/cancelled", {
                         state: {
                           serviceRequestId: requestId,
                           quotationId: quoteCancelled.id,
@@ -201,8 +219,9 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
               }
             };
 
-            const rzp = new window.Razorpay(options);
+            rzp = new window.Razorpay(options);
             rzp.on("payment.failed", (resp: any) => {
+              cleanupRazorpayModal();
               const quoteCancelled = confirmAcceptQuote;
               setIsProcessingPayment(false);
               setConfirmAcceptQuote(null);
@@ -220,7 +239,8 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 seconds -= 1;
                 if (seconds <= 0) {
                   clearInterval(timer);
-                  navigate("/customer/payment/cancelled", {
+                  cleanupRazorpayModal();
+                  navigate("/payment/cancelled", {
                     state: {
                       serviceRequestId: requestId,
                       quotationId: quoteCancelled.id,

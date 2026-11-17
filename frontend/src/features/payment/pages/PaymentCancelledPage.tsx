@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import "./PaymentCancelledPage.css";
 
@@ -19,6 +19,13 @@ export const PaymentCancelledPage: React.FC = () => {
   const amount = state.amount || 0;
   const serviceRequestId = state.serviceRequestId || "";
   const providerDisplay = state.providerBusinessName || state.providerName || "Service Provider";
+
+  useEffect(() => {
+    try {
+      const containers = document.querySelectorAll(".razorpay-container");
+      containers.forEach((el) => el.remove());
+    } catch {}
+  }, []);
 
   return (
     <div className="paycancel-page-container">
