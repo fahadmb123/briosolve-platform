@@ -31,6 +31,8 @@ export const customerRoutes = (
         <Route path="service-requests/:requestId" element={<CustomerServiceRequestDetails />} />
         <Route path="payment/success" element={<CustomerPaymentSuccess />} />
         <Route path="payment/cancelled" element={<CustomerPaymentCancelled />} />
+        <Route path="customer/payment/success" element={<CustomerPaymentSuccess />} />
+        <Route path="customer/payment/cancelled" element={<CustomerPaymentCancelled />} />
         <Route path="messages" element={<CustomerChat />} />
         <Route path="chat" element={<CustomerChat />} />
       </Route>

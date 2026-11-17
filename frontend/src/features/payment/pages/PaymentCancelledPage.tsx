@@ -75,19 +75,19 @@ export const PaymentCancelledPage: React.FC = () => {
             <button
               type="button"
               className="paycancel-btn-primary"
-              onClick={() => navigate(`/customer/my-requests/${serviceRequestId}`)}
+              onClick={() => navigate(`/my-requests/${serviceRequestId}`)}
             >
               <i className="fas fa-redo-alt"></i>
               <span>Try Payment Again</span>
             </button>
           ) : (
-            <Link to="/customer/my-requests" className="paycancel-btn-primary">
+            <Link to="/my-requests" className="paycancel-btn-primary">
               <i className="fas fa-list-alt"></i>
               <span>Return to My Requests</span>
             </Link>
           )}
 
-          <Link to="/customer/dashboard" className="paycancel-btn-secondary">
+          <Link to="/dashboard" className="paycancel-btn-secondary">
             <i className="fas fa-home"></i>
             <span>Customer Dashboard</span>
           </Link>

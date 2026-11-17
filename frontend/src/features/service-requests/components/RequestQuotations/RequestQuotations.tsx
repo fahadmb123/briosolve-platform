@@ -58,7 +58,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
       return;
     }
 
-    navigate(`/customer/messages?recipientId=${quote.provider.userId}`, {
+    navigate(`/messages?recipientId=${quote.provider.userId}`, {
       state: {
         recipientId: quote.provider.userId,
         recipientName: quote.provider.businessName || quote.provider.name,

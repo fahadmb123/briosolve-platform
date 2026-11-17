@@ -86,19 +86,19 @@ export const PaymentSuccessPage: React.FC = () => {
             <button
               type="button"
               className="paysuccess-btn-primary"
-              onClick={() => navigate(`/customer/my-requests/${serviceRequestId}`)}
+              onClick={() => navigate(`/my-requests/${serviceRequestId}`)}
             >
               <i className="fas fa-arrow-left"></i>
               <span>View Service Request</span>
             </button>
           ) : (
-            <Link to="/customer/my-requests" className="paysuccess-btn-primary">
+            <Link to="/my-requests" className="paysuccess-btn-primary">
               <i className="fas fa-list-alt"></i>
               <span>View My Requests</span>
             </Link>
           )}
 
-          <Link to="/customer/dashboard" className="paysuccess-btn-secondary">
+          <Link to="/dashboard" className="paysuccess-btn-secondary">
             <i className="fas fa-home"></i>
             <span>Customer Dashboard</span>
           </Link>
