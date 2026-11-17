@@ -1,4 +1,4 @@
-import { useState, useEffect, type FC, type ChangeEvent } from "react";
+import { useState, useEffect, useRef, type FC, type ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -13,6 +13,7 @@ import type {
 
 interface QuotationFormProps {
   initialValues?: Partial<QuotationFormData>;
+  isEditing?: boolean;
   onSubmit: (data: QuotationFormData) => void;
   isSubmitting?: boolean;
   onCancel?: () => void;
@@ -123,6 +124,7 @@ const parseAvailableDateTime = (str: string) => {
 
 export const QuotationForm: FC<QuotationFormProps> = ({
   initialValues,
+  isEditing = false,
   onSubmit,
   isSubmitting = false,
   onCancel,
@@ -132,6 +134,8 @@ export const QuotationForm: FC<QuotationFormProps> = ({
   const [includedInput, setIncludedInput] = useState("");
   const [excludedInput, setExcludedInput] = useState("");
   const [tagError, setTagError] = useState<{ included?: string; excluded?: string }>({});
+
+  const lastResetRef = useRef<string>("");
 
   const standardDurations = [
     "30–45 mins",
@@ -169,7 +173,7 @@ export const QuotationForm: FC<QuotationFormProps> = ({
     setValue,
     watch,
     reset,
-    formState: { errors }
+    formState: { errors, isDirty }
   } = useForm<QuotationInputType>({
     resolver: zodResolver(quotationSchema),
     mode: "onChange",
@@ -186,8 +190,16 @@ export const QuotationForm: FC<QuotationFormProps> = ({
     }
   });
 
+  const isSubmitDisabled = isSubmitting || (Boolean(isEditing) && !isDirty);
+
   useEffect(() => {
     if (initialValues) {
+      const serialized = JSON.stringify(initialValues);
+      if (lastResetRef.current === serialized) {
+        return;
+      }
+      lastResetRef.current = serialized;
+
       const normalizedValidity = normalizeToFrontendValidity(initialValues.validUntil);
       reset({
         amount: initialValues.amount !== undefined ? initialValues.amount : "",
@@ -911,17 +923,18 @@ export const QuotationForm: FC<QuotationFormProps> = ({
         <button
           type="submit"
           className="quote-btn-primary"
-          disabled={isSubmitting}
+          disabled={isSubmitDisabled}
+          title={isEditing && !isDirty ? "Make changes to update the quotation" : undefined}
         >
           {isSubmitting ? (
             <>
               <i className="fas fa-spinner fa-spin"></i>
-              <span>Sending Quotation...</span>
+              <span>{isEditing ? "Updating Quotation..." : "Sending Quotation..."}</span>
             </>
           ) : (
             <>
-              <i className="fas fa-paper-plane"></i>
-              <span>Send Quotation</span>
+              <i className={isEditing ? "fas fa-edit" : "fas fa-paper-plane"}></i>
+              <span>{isEditing ? "Edit Quotation" : "Send Quotation"}</span>
             </>
           )}
         </button>

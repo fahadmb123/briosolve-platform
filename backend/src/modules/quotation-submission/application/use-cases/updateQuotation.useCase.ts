@@ -57,7 +57,7 @@ export class UpdateQuotationUseCase implements IUseCase<UpdateQuotationInputDto,
                 if (serviceRequest?.customer_id) {
                     await this._createNotificationUseCase.execute({
                         recipientId: serviceRequest.customer_id,
-                        type: "SERVICE_REQUEST",
+                        type: "INFO",
                         title_code: "QUOTATION_UPDATED",
                         title: "Quotation Updated",
                         message: `A provider updated their quotation to ₹${updated.amount} for "${serviceRequest.title}".`

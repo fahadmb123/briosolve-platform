@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useGetProviderServiceRequests } from "../../../service-requests/hooks/useServiceRequestMutations";
@@ -167,6 +167,21 @@ export default function SubmitQuotation() {
     navigate("/provider/service-requests");
   };
 
+  const formInitialValues = useMemo(() => {
+    if (!isEditing || !quotationToEdit) return undefined;
+    return {
+      amount: quotationToEdit.amount,
+      quotationType: quotationToEdit.quotationType,
+      workDescription: quotationToEdit.workDescription,
+      includedItems: quotationToEdit.includedItems,
+      excludedItems: quotationToEdit.excludedItems,
+      estimatedDuration: quotationToEdit.estimatedDuration || "",
+      availableDateTime: quotationToEdit.availableDateTime || "",
+      validUntil: quotationToEdit.validUntil,
+      extraChargePolicy: quotationToEdit.extraChargePolicy
+    };
+  }, [isEditing, quotationToEdit]);
+
   return (
     <div className="quote-page">
       <div className="quote-hero-banner">
@@ -201,21 +216,8 @@ export default function SubmitQuotation() {
       <div className="quote-grid-container">
         <div className="quote-main-column">
           <QuotationForm
-            initialValues={
-              isEditing && quotationToEdit
-                ? {
-                    amount: quotationToEdit.amount,
-                    quotationType: quotationToEdit.quotationType,
-                    workDescription: quotationToEdit.workDescription,
-                    includedItems: quotationToEdit.includedItems,
-                    excludedItems: quotationToEdit.excludedItems,
-                    estimatedDuration: quotationToEdit.estimatedDuration || "",
-                    availableDateTime: quotationToEdit.availableDateTime || "",
-                    validUntil: quotationToEdit.validUntil,
-                    extraChargePolicy: quotationToEdit.extraChargePolicy
-                  }
-                : undefined
-            }
+            initialValues={formInitialValues}
+            isEditing={isEditing}
             onSubmit={handleFormSubmit}
             isSubmitting={submitQuotationMutation.isPending || updateQuotationMutation.isPending}
             onCancel={handleBack}

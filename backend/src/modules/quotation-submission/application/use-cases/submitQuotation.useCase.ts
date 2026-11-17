@@ -62,7 +62,7 @@ export class SubmitQuotationUseCase implements IUseCase<SubmitQuotationInputDto,
                 
                 await this._createNotificationUseCase.execute({
                     recipientId: serviceRequest.customer_id,
-                    type: "SERVICE_REQUEST",
+                    type: "INFO",
                     title_code: "NEW_QUOTATION",
                     title: "New Quotation Received",
                     message: `A provider submitted a quotation of ₹${input.amount} for "${serviceRequest.title}".`

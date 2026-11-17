@@ -45,7 +45,7 @@ export class NotificationMapper {
             case "ERROR":
                 return value;
             default:
-                throw new Error(`Unsupported notification type: ${value}`);
+                return "INFO";
         }
     }
 
