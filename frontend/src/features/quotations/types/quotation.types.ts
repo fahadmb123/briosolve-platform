@@ -10,9 +10,9 @@ export interface QuotationFormData {
   excludedItems: string[];
   estimatedDuration: string;
   availableDateTime: string;
-  messageToCustomer: string;
   validUntil: QuotationValidity | string;
   extraChargePolicy: string;
+  messageToCustomer?: string;
 }
 
 export interface SubmitQuotationPayload {

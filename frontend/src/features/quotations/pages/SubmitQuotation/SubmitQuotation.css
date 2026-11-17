@@ -1,52 +1,86 @@
 .quote-page {
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.5rem 1.5rem 4rem 1.5rem;
+    max-width: 100%;
+    margin: 0;
+    padding: 1.5rem 2rem 3rem 2rem;
     box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
     .quote-page {
-        padding: 1rem 1rem 3rem 1rem;
+        padding: 1rem 1rem 2.5rem 1rem;
     }
 }
 
-.quote-top-bar {
-    margin-bottom: 1rem;
+.quote-hero-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: var(--surface, #ffffff);
+    border: 1px solid var(--border, #e4e4e7);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.quote-back-button {
+.quote-hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.quote-back-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary, #71717a);
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.35rem 0;
-    transition: color 0.15s ease;
-}
-
-.quote-back-button:hover {
+    gap: 0.45rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border, #e4e4e7);
+    background: var(--surface-hover, #f4f4f5);
     color: var(--text, #09090b);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    width: fit-content;
+    margin-bottom: 0.25rem;
 }
 
-.quote-heading-section {
-    margin-bottom: 2rem;
+.quote-back-btn:hover {
+    background: var(--border, #e4e4e7);
 }
 
-.quote-main-title {
-    font-size: 1.625rem;
+.quote-hero-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.quote-hero-title {
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--text, #09090b);
-    margin: 0 0 0.35rem 0;
+    margin: 0;
     letter-spacing: -0.02em;
 }
 
-.quote-main-subtitle {
+.quote-hero-category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary, #FF7900);
+    background: rgba(255, 121, 0, 0.08);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+}
+
+.quote-hero-subtext {
     font-size: 0.875rem;
     color: var(--text-secondary, #71717a);
     margin: 0;
@@ -54,12 +88,20 @@
 
 .quote-grid-container {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 1.75rem;
+    grid-template-columns: minmax(0, 1.8fr) minmax(380px, 1.15fr);
+    gap: 1.5rem;
     align-items: flex-start;
+    width: 100%;
 }
 
-@media (max-width: 1024px) {
+@media (min-width: 1600px) {
+    .quote-grid-container {
+        grid-template-columns: minmax(0, 2fr) minmax(440px, 1.15fr);
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 1100px) {
     .quote-grid-container {
         grid-template-columns: 1fr;
     }
@@ -79,7 +121,7 @@
     top: 1.5rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
     .quote-sidebar-column {
         position: static;
     }
@@ -94,9 +136,9 @@
 .quote-section-card {
     background: var(--surface, #ffffff);
     border: 1px solid var(--border, #e4e4e7);
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .quote-card-header {
@@ -121,16 +163,16 @@
 .quote-card-body {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.35rem;
 }
 
 .quote-form-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 1.5rem;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .quote-form-row {
         grid-template-columns: 1fr;
     }
@@ -139,7 +181,7 @@
 .quote-form-group {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.45rem;
 }
 
 .quote-label-split {
@@ -156,6 +198,7 @@
 
 .quote-required {
     color: #ef4444;
+    margin-left: 2px;
 }
 
 .quote-counter {
@@ -171,8 +214,8 @@
 
 .quote-currency-prefix {
     position: absolute;
-    left: 0.9rem;
-    font-size: 1rem;
+    left: 0.95rem;
+    font-size: 1.05rem;
     font-weight: 600;
     color: var(--text-secondary, #71717a);
     pointer-events: none;
@@ -193,7 +236,7 @@
 }
 
 .quote-amount-input {
-    padding-left: 2rem;
+    padding-left: 2.15rem;
     font-weight: 600;
     font-size: 1rem;
 }
@@ -232,17 +275,17 @@
 .quote-pill-group {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.4rem;
+    gap: 0.45rem;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
     .quote-pill-group {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 .quote-pill {
-    padding: 0.65rem 0.5rem;
+    padding: 0.65rem 0.45rem;
     border: 1px solid var(--border, #e4e4e7);
     border-radius: 8px;
     background: var(--surface, #ffffff);
@@ -252,6 +295,7 @@
     cursor: pointer;
     text-align: center;
     transition: all 0.15s ease;
+    white-space: nowrap;
 }
 
 .quote-pill:hover {
@@ -268,10 +312,10 @@
 .quote-type-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.75rem;
+    gap: 0.85rem;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .quote-type-grid {
         grid-template-columns: 1fr;
     }
@@ -280,10 +324,10 @@
 .quote-type-box {
     border: 1px solid var(--border, #e4e4e7);
     border-radius: 8px;
-    padding: 0.85rem;
+    padding: 0.95rem;
     cursor: pointer;
     background: var(--surface, #ffffff);
-    transition: border-color 0.15s ease, background 0.15s ease;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
@@ -296,6 +340,7 @@
 .quote-type-box.selected {
     border-color: var(--primary, #FF7900);
     background: rgba(255, 121, 0, 0.04);
+    box-shadow: 0 0 0 1px var(--primary, #FF7900);
 }
 
 .quote-type-box-header {
@@ -305,7 +350,7 @@
 }
 
 .quote-type-title {
-    font-size: 0.8125rem;
+    font-size: 0.84375rem;
     font-weight: 600;
     color: var(--text, #09090b);
 }
@@ -340,17 +385,17 @@
 
 .quote-tag-input-row {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.65rem;
 }
 
 .quote-btn-secondary {
-    padding: 0 1rem;
+    padding: 0 1.15rem;
     border-radius: 8px;
     border: 1px solid var(--border, #e4e4e7);
     background: var(--surface-hover, #f4f4f5);
     color: var(--text, #09090b);
     font-size: 0.8125rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.15s ease;
@@ -363,17 +408,16 @@
 .quote-tags-wrapper {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
-    min-height: 24px;
+    gap: 0.5rem;
 }
 
 .quote-tag {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.3rem 0.65rem;
+    gap: 0.45rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 6px;
-    font-size: 0.78125rem;
+    font-size: 0.8125rem;
     font-weight: 500;
 }
 
@@ -398,6 +442,7 @@
     padding: 0;
     display: inline-flex;
     align-items: center;
+    margin-left: 2px;
 }
 
 .quote-tag-remove:hover {
@@ -410,6 +455,61 @@
     font-style: italic;
 }
 
+.quote-chat-action-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.1rem 1.25rem;
+    background: var(--surface-hover, #f4f4f5);
+    border: 1px solid var(--border, #e4e4e7);
+    border-radius: 8px;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.quote-chat-text-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+    min-width: 240px;
+}
+
+.quote-chat-headline {
+    font-size: 0.84375rem;
+    font-weight: 600;
+    color: var(--text, #09090b);
+}
+
+.quote-chat-subheadline {
+    font-size: 0.78125rem;
+    color: var(--text-secondary, #71717a);
+    line-height: 1.4;
+}
+
+.quote-btn-chat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.15rem;
+    border-radius: 8px;
+    border: 1px solid var(--border, #e4e4e7);
+    background: var(--surface, #ffffff);
+    color: var(--text, #09090b);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.quote-btn-chat:hover {
+    border-color: var(--primary, #FF7900);
+    color: var(--primary, #FF7900);
+    background: rgba(255, 121, 0, 0.05);
+}
+
 .quote-form-footer {
     display: flex;
     justify-content: flex-end;
@@ -419,13 +519,13 @@
 }
 
 .quote-btn-cancel {
-    padding: 0.65rem 1.25rem;
+    padding: 0.7rem 1.35rem;
     border-radius: 8px;
     border: 1px solid var(--border, #e4e4e7);
     background: transparent;
     color: var(--text, #09090b);
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.15s ease;
 }
@@ -437,8 +537,8 @@
 .quote-btn-primary {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.65rem 1.6rem;
+    gap: 0.55rem;
+    padding: 0.7rem 1.75rem;
     border-radius: 8px;
     border: none;
     background: var(--primary, #FF7900);
@@ -447,6 +547,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s ease, opacity 0.15s ease;
+    box-shadow: 0 1px 3px rgba(255, 121, 0, 0.2);
 }
 
 .quote-btn-primary:hover:not(:disabled) {
@@ -461,9 +562,9 @@
 .quote-sidebar-card {
     background: var(--surface, #ffffff);
     border: 1px solid var(--border, #e4e4e7);
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .quote-sidebar-header {
@@ -475,15 +576,18 @@
 .quote-header-tag-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
-    margin-bottom: 0.5rem;
+    gap: 0.45rem;
+    margin-bottom: 0.65rem;
 }
 
 .quote-sidebar-badge {
-    font-size: 0.6875rem;
+    font-size: 0.71875rem;
     font-weight: 600;
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
 .quote-sidebar-badge.category {
@@ -494,6 +598,7 @@
 .quote-sidebar-badge.subservice {
     background: var(--surface-hover, #f4f4f5);
     color: var(--text, #09090b);
+    border: 1px solid var(--border, #e4e4e7);
 }
 
 .quote-sidebar-badge.urgency {
@@ -502,8 +607,8 @@
 }
 
 .quote-sidebar-title {
-    font-size: 1.05rem;
-    font-weight: 600;
+    font-size: 1.125rem;
+    font-weight: 700;
     color: var(--text, #09090b);
     margin: 0;
     line-height: 1.35;
@@ -518,8 +623,8 @@
 .quote-details-list {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
-    padding-bottom: 1rem;
+    gap: 0.75rem;
+    padding-bottom: 1.15rem;
     border-bottom: 1px solid var(--border, #e4e4e7);
 }
 
@@ -527,28 +632,53 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.8125rem;
-    gap: 0.5rem;
+    font-size: 0.84375rem;
+    gap: 0.75rem;
 }
 
 .quote-detail-label {
     color: var(--text-secondary, #71717a);
+    font-weight: 500;
 }
 
 .quote-detail-value {
     color: var(--text, #09090b);
-    font-weight: 500;
+    font-weight: 600;
     text-align: right;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 60%;
+}
+
+.quote-customer-col {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quote-chat-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(255, 121, 0, 0.1);
+    color: var(--primary, #FF7900);
+    border: none;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.quote-chat-link-btn:hover {
+    background: rgba(255, 121, 0, 0.2);
 }
 
 .quote-sidebar-section {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.45rem;
 }
 
 .quote-section-label {
@@ -560,51 +690,64 @@
 }
 
 .quote-customer-desc {
-    font-size: 0.8125rem;
+    font-size: 0.84375rem;
     color: var(--text, #09090b);
-    line-height: 1.5;
+    line-height: 1.55;
     margin: 0;
+    padding: 0.75rem 0.95rem;
+    background: var(--surface-hover, #f4f4f5);
+    border-radius: 8px;
+    border-left: 3px solid var(--primary, #FF7900);
 }
 
 .quote-answers-grid {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.5rem;
 }
 
 .quote-answer-item {
-    font-size: 0.75rem;
-    background: var(--surface-hover, #f4f4f5);
-    padding: 0.4rem 0.65rem;
-    border-radius: 6px;
     display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0.85rem;
+    background: var(--surface-hover, #f4f4f5);
+    border: 1px solid var(--border, #e4e4e7);
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    gap: 0.75rem;
 }
 
 .quote-answer-label {
-    font-weight: 600;
     color: var(--text-secondary, #71717a);
+    font-weight: 500;
 }
 
 .quote-answer-value {
     color: var(--text, #09090b);
+    font-weight: 600;
+    text-align: right;
 }
 
 .quote-photos-grid {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.65rem;
     overflow-x: auto;
 }
 
 .quote-photo-thumbnail {
-    width: 60px;
-    height: 60px;
-    border-radius: 6px;
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     flex-shrink: 0;
     border: 1px solid var(--border, #e4e4e7);
+    transition: transform 0.15s ease;
+}
+
+.quote-photo-thumbnail:hover {
+    transform: scale(1.05);
 }
 
 .quote-photo-thumbnail img {

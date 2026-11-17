@@ -17,6 +17,7 @@ interface QuotationFormProps {
   isSubmitting?: boolean;
   onCancel?: () => void;
   onFormChange?: (data: Partial<QuotationFormData>) => void;
+  onChat?: () => void;
 }
 
 export const QuotationForm: FC<QuotationFormProps> = ({
@@ -24,7 +25,8 @@ export const QuotationForm: FC<QuotationFormProps> = ({
   onSubmit,
   isSubmitting = false,
   onCancel,
-  onFormChange
+  onFormChange,
+  onChat
 }) => {
   const [includedInput, setIncludedInput] = useState("");
   const [excludedInput, setExcludedInput] = useState("");
@@ -56,7 +58,6 @@ export const QuotationForm: FC<QuotationFormProps> = ({
       ],
       estimatedDuration: initialValues?.estimatedDuration || "1–2 hours",
       availableDateTime: initialValues?.availableDateTime || "Today 6:00 PM",
-      messageToCustomer: initialValues?.messageToCustomer || "I can come today evening.",
       validUntil: (initialValues?.validUntil as QuotationValidity) || "24_HOURS",
       extraChargePolicy:
         initialValues?.extraChargePolicy || "Spare parts at actual cost"
@@ -75,7 +76,6 @@ export const QuotationForm: FC<QuotationFormProps> = ({
         excludedItems: formValues.excludedItems,
         estimatedDuration: formValues.estimatedDuration,
         availableDateTime: formValues.availableDateTime,
-        messageToCustomer: formValues.messageToCustomer,
         validUntil: formValues.validUntil,
         extraChargePolicy: formValues.extraChargePolicy
       });
@@ -88,7 +88,6 @@ export const QuotationForm: FC<QuotationFormProps> = ({
     formValues.excludedItems,
     formValues.estimatedDuration,
     formValues.availableDateTime,
-    formValues.messageToCustomer,
     formValues.validUntil,
     formValues.extraChargePolicy,
     onFormChange
@@ -213,7 +212,6 @@ export const QuotationForm: FC<QuotationFormProps> = ({
       excludedItems: data.excludedItems,
       estimatedDuration: data.estimatedDuration || "",
       availableDateTime: data.availableDateTime || "",
-      messageToCustomer: data.messageToCustomer || "",
       validUntil: data.validUntil,
       extraChargePolicy: data.extraChargePolicy
     });
@@ -503,9 +501,9 @@ export const QuotationForm: FC<QuotationFormProps> = ({
 
       <div className="quote-section-card">
         <div className="quote-card-header">
-          <h2 className="quote-card-title">Schedule & Customer Note</h2>
+          <h2 className="quote-card-title">Schedule & Communication</h2>
           <p className="quote-card-subtitle">
-            Provide timing expectations and a direct message for the customer.
+            Provide timing expectations or message the customer directly.
           </p>
         </div>
 
@@ -548,28 +546,22 @@ export const QuotationForm: FC<QuotationFormProps> = ({
             </div>
           </div>
 
-          <div className="quote-form-group">
-            <div className="quote-label-split">
-              <label className="quote-label" htmlFor="message-to-customer">
-                Message to Customer
-              </label>
-              <span className="quote-counter">
-                {(formValues.messageToCustomer || "").length}/500
+          <div className="quote-chat-action-box">
+            <div className="quote-chat-text-col">
+              <span className="quote-chat-headline">Have questions before submitting?</span>
+              <span className="quote-chat-subheadline">
+                Chat directly with the customer to clarify job requirements, address details, or schedule.
               </span>
             </div>
-            <textarea
-              id="message-to-customer"
-              rows={2}
-              placeholder="e.g. I can come today evening. I will carry all necessary equipment and diagnostic gauges."
-              className={`quote-control quote-textarea ${
-                errors.messageToCustomer ? "is-invalid" : ""
-              }`}
-              {...register("messageToCustomer")}
-            />
-            {errors.messageToCustomer ? (
-              <span className="quote-error-msg">{errors.messageToCustomer.message}</span>
-            ) : (
-              <span className="quote-hint-msg">Recommended introduction note</span>
+            {onChat && (
+              <button
+                type="button"
+                className="quote-btn-chat"
+                onClick={onChat}
+              >
+                <i className="fas fa-comment-dots"></i>
+                <span>Chat with Customer</span>
+              </button>
             )}
           </div>
         </div>

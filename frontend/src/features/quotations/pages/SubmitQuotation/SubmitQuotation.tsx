@@ -39,6 +39,31 @@ export default function SubmitQuotation() {
     }
   }, [requestId, request]);
 
+  const handleChatClick = () => {
+    if (!request?.customer_id) {
+      toast.error("Customer details not available for this request");
+      return;
+    }
+
+    const addressStr = request.address_details
+      ? `${request.address_details.area || ""}, ${request.address_details.city || ""}`.trim().replace(/^,|,$/g, "")
+      : "Service Location";
+
+    navigate(`/provider/messages?recipientId=${request.customer_id}`, {
+      state: {
+        recipientId: request.customer_id,
+        recipientName: request.customer_details?.name || "Customer",
+        requestTitle: request.title,
+        requestId: request.id,
+        categoryName: request.category_name || "Services",
+        urgency: request.urgency,
+        budgetType: request.budget_type,
+        budgetAmount: request.budget_amount || undefined,
+        location: addressStr || "Service Location",
+      },
+    });
+  };
+
   const handleFormSubmit = async (_formData: QuotationFormData) => {
     setIsSubmitting(true);
     try {
@@ -58,22 +83,31 @@ export default function SubmitQuotation() {
 
   return (
     <div className="quote-page">
-      <div className="quote-top-bar">
-        <button
-          type="button"
-          className="quote-back-button"
-          onClick={handleBack}
-        >
-          <i className="fas fa-arrow-left"></i>
-          <span>Back to Requests</span>
-        </button>
-      </div>
-
-      <div className="quote-heading-section">
-        <h1 className="quote-main-title">Send Quotation</h1>
-        <p className="quote-main-subtitle">
-          Submit your proposal, deliverables, and terms directly to the customer.
-        </p>
+      <div className="quote-hero-banner">
+        <div className="quote-hero-left">
+          <button
+            type="button"
+            className="quote-back-btn"
+            onClick={handleBack}
+          >
+            <i className="fas fa-arrow-left"></i>
+            <span>Back to Service Requests</span>
+          </button>
+          <div className="quote-hero-title-row">
+            <h1 className="quote-hero-title">Send Quotation</h1>
+            {request?.category_name && (
+              <span className="quote-hero-category-badge">
+                <i className="fas fa-tag"></i>
+                {request.category_name}
+              </span>
+            )}
+          </div>
+          <p className="quote-hero-subtext">
+            {request?.title
+              ? `Submit your proposal and pricing for "${request.title}"`
+              : "Submit your proposal, deliverables, and terms directly to the customer."}
+          </p>
+        </div>
       </div>
 
       <div className="quote-grid-container">
@@ -82,6 +116,7 @@ export default function SubmitQuotation() {
             onSubmit={handleFormSubmit}
             isSubmitting={isSubmitting}
             onCancel={handleBack}
+            onChat={handleChatClick}
           />
         </div>
 
@@ -89,6 +124,7 @@ export default function SubmitQuotation() {
           <RequestBriefCard
             request={request}
             onSelectPhoto={setLightboxPhoto}
+            onChat={handleChatClick}
           />
         </div>
       </div>

@@ -4,11 +4,13 @@ import type { CustomerServiceRequestItem } from "../../service-requests/types/se
 interface RequestBriefCardProps {
   request: CustomerServiceRequestItem | null;
   onSelectPhoto?: (url: string) => void;
+  onChat?: () => void;
 }
 
 export const RequestBriefCard: FC<RequestBriefCardProps> = ({
   request,
-  onSelectPhoto
+  onSelectPhoto,
+  onChat
 }) => {
   if (!request) {
     return (
@@ -62,9 +64,22 @@ export const RequestBriefCard: FC<RequestBriefCardProps> = ({
         <div className="quote-details-list">
           <div className="quote-detail-row">
             <span className="quote-detail-label">Customer</span>
-            <span className="quote-detail-value">
-              {request.customer_details?.name || "Customer"}
-            </span>
+            <div className="quote-customer-col">
+              <span className="quote-detail-value">
+                {request.customer_details?.name || "Customer"}
+              </span>
+              {onChat && (
+                <button
+                  type="button"
+                  className="quote-chat-link-btn"
+                  onClick={onChat}
+                  title="Chat with Customer"
+                >
+                  <i className="fas fa-comment-dots"></i>
+                  <span>Chat</span>
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="quote-detail-row">
