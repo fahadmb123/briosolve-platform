@@ -6,6 +6,7 @@ import type { CustomerServiceRequestItem } from "../../../service-requests/types
 import { QuotationForm } from "../../components/QuotationForm";
 import { RequestBriefCard } from "../../components/RequestBriefCard";
 import type { QuotationFormData } from "../../types/quotation.types";
+import { useSubmitQuotation } from "../../hooks/useQuotationMutations";
 import "./SubmitQuotation.css";
 
 export default function SubmitQuotation() {
@@ -19,9 +20,9 @@ export default function SubmitQuotation() {
     passedRequest || null
   );
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const getRequestsMutation = useGetProviderServiceRequests();
+  const submitQuotationMutation = useSubmitQuotation();
 
   useEffect(() => {
     if (!request && requestId) {
@@ -64,17 +65,43 @@ export default function SubmitQuotation() {
     });
   };
 
-  const handleFormSubmit = async (_formData: QuotationFormData) => {
-    setIsSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      toast.success("Quotation submitted successfully");
-      navigate("/provider/service-requests");
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to submit quotation");
-    } finally {
-      setIsSubmitting(false);
+  const handleFormSubmit = async (formData: QuotationFormData) => {
+    const targetRequestId = requestId || request?.id;
+    if (!targetRequestId) {
+      toast.error("Invalid service request ID");
+      return;
     }
+
+    if (!formData.amount || Number(formData.amount) <= 0) {
+      toast.error("Please enter a valid quotation amount");
+      return;
+    }
+
+    submitQuotationMutation.mutate(
+      {
+        serviceRequestId: targetRequestId,
+        amount: Number(formData.amount),
+        quotationType: formData.quotationType,
+        workDescription: formData.workDescription,
+        includedItems: formData.includedItems,
+        excludedItems: formData.excludedItems,
+        estimatedDuration: formData.estimatedDuration || undefined,
+        availableDateTime: formData.availableDateTime || undefined,
+        validUntil: formData.validUntil,
+        extraChargePolicy: formData.extraChargePolicy
+      },
+      {
+        onSuccess: () => {
+          toast.success("Quotation submitted successfully");
+          navigate("/provider/quotations");
+        },
+        onError: (err: any) => {
+          const errorMessage =
+            err?.response?.data?.message || err?.message || "Failed to submit quotation";
+          toast.error(errorMessage);
+        }
+      }
+    );
   };
 
   const handleBack = () => {
@@ -114,7 +141,7 @@ export default function SubmitQuotation() {
         <div className="quote-main-column">
           <QuotationForm
             onSubmit={handleFormSubmit}
-            isSubmitting={isSubmitting}
+            isSubmitting={submitQuotationMutation.isPending}
             onCancel={handleBack}
             onChat={handleChatClick}
           />

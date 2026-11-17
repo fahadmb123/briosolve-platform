@@ -101,12 +101,7 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
       );
     }
 
-    return (
-      <span className="provreq-badge-pill provreq-badge-first">
-        <i className="fas fa-star"></i>
-        <span>Be 1st to Quote</span>
-      </span>
-    );
+    return null;
   };
 
   const attachedPhoto = request.images && request.images.length > 0 ? request.images[0].image_key : null;

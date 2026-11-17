@@ -79,14 +79,14 @@ export const QuotationForm: FC<QuotationFormProps> = ({
     "1–2 weeks"
   ];
 
-  const initialDur = initialValues?.estimatedDuration || "1–2 hours";
+  const initialDur = initialValues?.estimatedDuration || "";
   const [isCustomDuration, setIsCustomDuration] = useState<boolean>(
-    !standardDurations.includes(initialDur) && Boolean(initialDur)
+    Boolean(initialDur && !standardDurations.includes(initialDur))
   );
   const [customDurationNum, setCustomDurationNum] = useState<string>("1");
   const [customDurationUnit, setCustomDurationUnit] = useState<string>("Hours");
 
-  const initialAvail = initialValues?.availableDateTime || "Today at 6:00 PM";
+  const initialAvail = initialValues?.availableDateTime || "";
   const [dateType, setDateType] = useState<string>(() => {
     if (!initialAvail) return "today";
     if (initialAvail.toLowerCase().includes("tomorrow")) return "tomorrow";
@@ -95,7 +95,7 @@ export const QuotationForm: FC<QuotationFormProps> = ({
   });
   const [customDateVal, setCustomDateVal] = useState<string>(getTodayIso());
   const [timeType, setTimeType] = useState<string>(() => {
-    if (!initialAvail) return "specific";
+    if (!initialAvail) return "Morning (9 AM – 12 PM)";
     if (initialAvail.includes("Evening (6 PM – 9 PM)")) return "Evening (6 PM – 9 PM)";
     if (initialAvail.includes("Morning (9 AM – 12 PM)")) return "Morning (9 AM – 12 PM)";
     if (initialAvail.includes("Afternoon (12 PM – 3 PM)")) return "Afternoon (12 PM – 3 PM)";
@@ -115,25 +115,15 @@ export const QuotationForm: FC<QuotationFormProps> = ({
     resolver: zodResolver(quotationSchema),
     mode: "onChange",
     defaultValues: {
-      amount: initialValues?.amount !== undefined ? initialValues.amount : 2500,
+      amount: initialValues?.amount !== undefined ? initialValues.amount : "",
       quotationType: initialValues?.quotationType || "FIXED",
-      workDescription:
-        initialValues?.workDescription ||
-        "AC gas refill and basic service. Complete vacuuming, leak check, refrigerant top-up and filter cleaning.",
-      includedItems: initialValues?.includedItems || [
-        "Labour charges",
-        "Basic service inspection",
-        "Gas check"
-      ],
-      excludedItems: initialValues?.excludedItems || [
-        "Spare parts & materials",
-        "Major repair"
-      ],
+      workDescription: initialValues?.workDescription || "",
+      includedItems: initialValues?.includedItems || [],
+      excludedItems: initialValues?.excludedItems || [],
       estimatedDuration: initialValues?.estimatedDuration || "1–2 hours",
-      availableDateTime: initialValues?.availableDateTime || "Today at 6:00 PM",
+      availableDateTime: initialValues?.availableDateTime || "Today · Morning (9 AM – 12 PM)",
       validUntil: (initialValues?.validUntil as QuotationValidity) || "24_HOURS",
-      extraChargePolicy:
-        initialValues?.extraChargePolicy || "Spare parts at actual cost"
+      extraChargePolicy: initialValues?.extraChargePolicy || ""
     }
   });
 
