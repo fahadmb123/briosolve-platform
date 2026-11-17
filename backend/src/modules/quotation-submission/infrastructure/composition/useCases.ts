@@ -5,6 +5,7 @@ import { quotationRepository } from "./repositories";
 import { serviceRequestRepository, serviceRequestProviderRepository } from "../../../service-request/infrastructure/composition/repositories";
 import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
 import { SubmitQuotationUseCase } from "../../application/use-cases/submitQuotation.useCase";
+import { GetProviderQuotationsUseCase } from "../../application/use-cases/getProviderQuotations.useCase";
 
 export function createSubmitQuotationUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
@@ -15,5 +16,13 @@ export function createSubmitQuotationUseCase(
         providerRepository,
         serviceRequestProviderRepository,
         createNotificationUseCase
+    );
+}
+
+export function createGetProviderQuotationsUseCase(): GetProviderQuotationsUseCase {
+    return new GetProviderQuotationsUseCase(
+        quotationRepository,
+        providerRepository,
+        serviceRequestRepository
     );
 }

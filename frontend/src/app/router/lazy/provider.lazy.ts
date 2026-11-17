@@ -10,3 +10,4 @@ export const ProviderNotifications = React.lazy(() => import('../../../features/
 export const ProviderServiceRequests = React.lazy(() => import('../../../features/service-requests/pages/ProviderServiceRequests/ProviderServiceRequests'));
 export const ProviderChat = React.lazy(() => import('../../../features/chat/pages/ProviderChat/ProviderChat'));
 export const ProviderSubmitQuotation = React.lazy(() => import('../../../features/quotations/pages/SubmitQuotation/SubmitQuotation'));
+export const ProviderMyQuotations = React.lazy(() => import('../../../features/quotations/pages/MyQuotations/MyQuotations'));

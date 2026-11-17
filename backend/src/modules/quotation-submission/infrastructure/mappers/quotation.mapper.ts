@@ -2,6 +2,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { Quotation, QuotationType, QuotationValidity, QuotationStatus } from "../../domain/entities/quotation.entity";
 import { CreateQuotationRepoDto } from "../../application/dtos/request/submit-quotation.dto";
 import { QuotationResponseDto } from "../../application/dtos/response/quotation-response.dto";
+import { ProviderQuotationItemDto } from "../../application/dtos/response/provider-quotations-response.dto";
 
 export class QuotationMapper {
     static toDomain(record: any): Quotation {
@@ -66,6 +67,28 @@ export class QuotationMapper {
             id: entity.id,
             serviceRequestId: entity.service_request_id,
             providerId: entity.provider_id,
+            amount: entity.amount,
+            quotationType: entity.quotation_type,
+            workDescription: entity.work_description,
+            includedItems: entity.included_items,
+            excludedItems: entity.excluded_items,
+            estimatedDuration: entity.estimated_duration,
+            availableDateTime: entity.available_date_time,
+            validUntil: entity.valid_until,
+            validUntilDate: entity.valid_until_date.toISOString(),
+            extraChargePolicy: entity.extra_charge_policy,
+            status: entity.status,
+            createdAt: entity.created_at.toISOString(),
+            updatedAt: entity.updated_at.toISOString()
+        };
+    }
+
+    static toProviderItemDto(entity: Quotation, serviceRequestTitle?: string | null, categoryName?: string | null): ProviderQuotationItemDto {
+        return {
+            id: entity.id,
+            serviceRequestId: entity.service_request_id,
+            serviceRequestTitle: serviceRequestTitle ?? null,
+            categoryName: categoryName ?? null,
             amount: entity.amount,
             quotationType: entity.quotation_type,
             workDescription: entity.work_description,

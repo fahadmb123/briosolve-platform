@@ -51,6 +51,29 @@ const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
   },
 ];
 
+const FINANCES_SUBNAV_ITEMS: SubnavItem[] = [
+  {
+    label: "My Quotations",
+    to: "/provider/quotations",
+    icon: "fas fa-file-invoice-dollar",
+  },
+  {
+    label: "Invoices & Receipts",
+    to: "/provider/quotations#invoices",
+    icon: "fas fa-receipt",
+  },
+  {
+    label: "Payout Overview",
+    to: "/provider/dashboard#payouts",
+    icon: "fas fa-wallet",
+  },
+  {
+    label: "Service Rates",
+    to: "/provider/settings#rates",
+    icon: "fas fa-tags",
+  },
+];
+
 export const ProviderSubnavSidebar: React.FC = () => {
   const location = useLocation();
   const unreadMessagesCount = useUnreadChatCount();
@@ -66,6 +89,9 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/provider/notifications") ||
     location.pathname.startsWith("/provider/verification");
 
+  const isFinancesSection =
+    location.pathname.startsWith("/provider/quotations");
+
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
     location.pathname.startsWith("/provider/dashboard") ||
@@ -78,17 +104,25 @@ export const ProviderSubnavSidebar: React.FC = () => {
     ? SETTINGS_SUBNAV_ITEMS
     : isWorkspaceSection
     ? WORKSPACE_SUBNAV_ITEMS
+    : isFinancesSection
+    ? FINANCES_SUBNAV_ITEMS
     : null;
 
   const activeSubnavTitle = isSettingsSection
     ? "Settings"
     : isWorkspaceSection
     ? "Workspace"
+    : isFinancesSection
+    ? "Finances"
     : "";
 
   const activeSubnavIcon = isSettingsSection
     ? "fas fa-sliders-h"
-    : "fas fa-th-large";
+    : isWorkspaceSection
+    ? "fas fa-th-large"
+    : isFinancesSection
+    ? "fas fa-wallet"
+    : "";
 
   const isAccountSettingsActive =
     location.pathname === "/provider/settings" ||

@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   submitQuotationService,
-  getQuotationByRequestId
+  getQuotationByRequestId,
+  getMyQuotationsService
 } from "../services/quotation.service";
-import type { SubmitQuotationPayload } from "../types/quotation.types";
+import type { SubmitQuotationPayload, GetMyQuotationsParams } from "../types/quotation.types";
 
 export const useSubmitQuotation = () => {
   const queryClient = useQueryClient();
@@ -12,6 +13,7 @@ export const useSubmitQuotation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["providerServiceRequests"] });
       queryClient.invalidateQueries({ queryKey: ["quotations"] });
+      queryClient.invalidateQueries({ queryKey: ["myQuotations"] });
     }
   });
 };
@@ -19,5 +21,11 @@ export const useSubmitQuotation = () => {
 export const useGetQuotationByRequestId = () => {
   return useMutation({
     mutationFn: (requestId: string) => getQuotationByRequestId(requestId)
+  });
+};
+
+export const useGetMyQuotations = () => {
+  return useMutation({
+    mutationFn: (params?: GetMyQuotationsParams) => getMyQuotationsService(params)
   });
 };

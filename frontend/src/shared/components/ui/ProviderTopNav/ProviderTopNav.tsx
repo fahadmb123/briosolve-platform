@@ -80,6 +80,9 @@ export const ProviderTopNav: React.FC = () => {
     location.pathname.startsWith("/provider/notifications") ||
     location.pathname.startsWith("/provider/verification");
 
+  const isFinancesSection =
+    location.pathname.startsWith("/provider/quotations");
+
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
     location.pathname.startsWith("/provider/dashboard") ||
@@ -324,8 +327,15 @@ export const ProviderTopNav: React.FC = () => {
           >
             <button
               type="button"
-              className="prov-category-btn"
-              onClick={() => togglePanel("finances")}
+              className={`prov-category-btn ${isFinancesSection ? "active" : ""}`}
+              onClick={() => {
+                if (isFinancesSection) {
+                  togglePanel("finances");
+                } else {
+                  closeAll();
+                  navigate("/provider/quotations");
+                }
+              }}
               aria-expanded={activePanel === "finances"}
             >
               <span>Finances</span>
@@ -341,17 +351,18 @@ export const ProviderTopNav: React.FC = () => {
                 <div className="prov-panel-grid">
                   <div className="prov-panel-col">
                     <div className="prov-col-title">QUOTATIONS & BILLING</div>
-                    <Link
-                      to="#"
-                      className="prov-panel-item"
+                    <NavLink
+                      to="/provider/quotations"
+                      className={({ isActive }) =>
+                        `prov-panel-item ${isActive ? "item-active" : ""}`
+                      }
                       onClick={closeAll}
                     >
                       <div className="prov-item-main">
                         <i className="fas fa-file-invoice-dollar"></i>
                         <span>My Quotations</span>
                       </div>
-                      <span className="prov-mono-badge">4</span>
-                    </Link>
+                    </NavLink>
                     <Link
                       to="#"
                       className="prov-panel-item"
@@ -842,6 +853,17 @@ export const ProviderTopNav: React.FC = () => {
                   </span>
                 )}
               </Link>
+            </div>
+
+            <div className="prov-mobile-section">
+              <div className="prov-col-title">FINANCES</div>
+              <NavLink
+                to="/provider/quotations"
+                className="prov-mobile-item"
+                onClick={closeAll}
+              >
+                <span>My Quotations</span>
+              </NavLink>
             </div>
 
             <div className="prov-mobile-section">
