@@ -34,8 +34,8 @@ export const RequestFilterBar: React.FC<RequestFilterBarProps> = ({
   ];
 
   return (
-    <div className="myreq-filter-strip">
-      <div className="myreq-segmented-tabs">
+    <div className="myreq-filter-bar-container">
+      <div className="myreq-status-tabs-list" role="tablist">
         {tabs.map((tab) => {
           const count = counts[tab.key] || 0;
           const isActive = selectedStatus === tab.key;
@@ -43,30 +43,34 @@ export const RequestFilterBar: React.FC<RequestFilterBarProps> = ({
             <button
               key={tab.key}
               type="button"
-              className={`myreq-segmented-tab ${isActive ? "active" : ""}`}
+              role="tab"
+              aria-selected={isActive}
+              className={`myreq-status-tab-btn ${isActive ? "active" : ""}`}
               onClick={() => onSelectStatus(tab.key)}
             >
-              <span>{tab.label}</span>
-              <span className="myreq-tab-count">{count}</span>
+              <span className="myreq-tab-label">{tab.label}</span>
+              <span className={`myreq-tab-bubble ${count > 0 ? "has-items" : ""}`}>
+                {count}
+              </span>
             </button>
           );
         })}
       </div>
 
-      <div className="myreq-filter-controls">
-        <div className="myreq-search-box">
-          <i className="fas fa-search myreq-search-icon"></i>
+      <div className="myreq-search-sort-group">
+        <div className="myreq-search-field-wrapper">
+          <i className="fas fa-search myreq-search-prefix-icon"></i>
           <input
             type="text"
             placeholder="Search by title, service, location..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="myreq-search-input"
+            className="myreq-search-text-input"
           />
           {searchQuery && (
             <button
               type="button"
-              className="myreq-search-clear"
+              className="myreq-search-reset-btn"
               onClick={() => onSearchChange("")}
               title="Clear search"
             >
@@ -75,16 +79,17 @@ export const RequestFilterBar: React.FC<RequestFilterBarProps> = ({
           )}
         </div>
 
-        <div className="myreq-sort-box">
+        <div className="myreq-sort-dropdown-wrapper">
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortOrderType)}
-            className="myreq-sort-select"
-            aria-label="Sort requests"
+            className="myreq-sort-select-input"
+            aria-label="Sort service requests"
           >
             <option value="NEWEST">Newest First</option>
             <option value="OLDEST">Oldest First</option>
           </select>
+          <i className="fas fa-chevron-down myreq-sort-chevron"></i>
         </div>
       </div>
     </div>

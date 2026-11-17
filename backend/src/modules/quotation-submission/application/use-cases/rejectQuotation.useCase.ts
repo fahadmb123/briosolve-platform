@@ -1,0 +1,61 @@
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
+import { ApplicationError } from "../../../../shared/errors/applicationError";
+import { IQuotationRepository } from "../../domain/repositories/IQuotationRepository";
+import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
+import { RejectQuotationInputDto } from "../dtos/request/reject-quotation.dto";
+import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
+import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
+import { db } from "../../../../shared/database/client";
+
+export class RejectQuotationUseCase implements IUseCase<RejectQuotationInputDto, { id: string; status: string }> {
+    constructor(
+        private readonly _quotationRepository: IQuotationRepository,
+        private readonly _serviceRequestRepository: IServiceRequestRepository,
+        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+    ) {}
+
+    async execute(input: RejectQuotationInputDto): Promise<{ id: string; status: string }> {
+        const quotation = await this._quotationRepository.findById(input.quotationId);
+        if (!quotation) {
+            throw new ApplicationError("QUOTATION_NOT_FOUND", "Quotation not found", "NOT_FOUND");
+        }
+
+        if (quotation.status !== "PENDING") {
+            throw new ApplicationError("INVALID_STATE", `Cannot decline a quotation that is ${quotation.status}`, "VALIDATION");
+        }
+
+        const serviceRequest = await this._serviceRequestRepository.findById(quotation.service_request_id);
+        if (!serviceRequest) {
+            throw new ApplicationError("REQUEST_NOT_FOUND", "Service request not found", "NOT_FOUND");
+        }
+
+        if (serviceRequest.customer_id !== input.customerUserId) {
+            throw new ApplicationError("FORBIDDEN", "You are not authorized to decline quotations for this request", "AUTHENTICATION");
+        }
+
+        await this._quotationRepository.update(quotation.id, {
+            status: "REJECTED"
+        });
+
+        if (this._createNotificationUseCase) {
+            const providerProfile = await db.orm.public.provider_profiles
+                .where({ id: quotation.provider_id as never })
+                .first();
+
+            if (providerProfile) {
+                await this._createNotificationUseCase.execute({
+                    recipientId: providerProfile.user_id,
+                    type: "QUOTATION_REJECTED",
+                    title: "Quotation Declined",
+                    title_code: "QUOTATION_REJECTED",
+                    message: `The customer declined your quotation for "${serviceRequest.title}".`
+                }).catch(() => null);
+            }
+        }
+
+        return {
+            id: quotation.id,
+            status: "REJECTED"
+        };
+    }
+}

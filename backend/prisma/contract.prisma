@@ -114,6 +114,7 @@ model provider_profiles {
   overrides              provider_availability_overrides[]
   verification_documents provider_verification_documents[]
   service_requests       service_request_providers[]
+  quotations             quotations[]
 }
 
 model provider_verification_documents {
@@ -370,6 +371,7 @@ model service_requests {
 
   images              service_request_images[]
   providers           service_request_providers[]
+  quotations          quotations[]
 }
 
 model service_request_images {
@@ -471,4 +473,53 @@ model messages {
   @@index([conversation_id])
   @@index([sender_id])
   @@index([created_at])
+}
+
+enum quotation_type {
+  FIXED
+  ESTIMATED
+  INSPECTION_REQUIRED
+}
+
+enum quotation_validity {
+  HOURS_24
+  HOURS_48
+  DAYS_3
+  DAYS_7
+}
+
+enum quotation_status {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  WITHDRAWN
+}
+
+model quotations {
+  id                  Uuid                @id @default(uuid())
+  service_request_id  Uuid
+  provider_id         Uuid
+
+  amount              Numeric(12, 2)
+  quotation_type      quotation_type      @default(FIXED)
+  work_description    VarChar(1000)
+  included_items      Json
+  excluded_items      Json
+  estimated_duration  VarChar(60)?
+  available_date_time VarChar(80)?
+  valid_until         quotation_validity  @default(HOURS_24)
+  valid_until_date    DateTime
+  extra_charge_policy VarChar(300)
+  status              quotation_status    @default(PENDING)
+
+  created_at          DateTime            @default(now())
+  updated_at          temporal.updatedAt()
+
+  service_request     service_requests    @relation(fields:[service_request_id], references:[id], onDelete: Cascade)
+  provider            provider_profiles   @relation(fields:[provider_id], references:[id], onDelete: Cascade)
+
+  @@index([service_request_id])
+  @@index([provider_id])
+  @@index([status])
 }

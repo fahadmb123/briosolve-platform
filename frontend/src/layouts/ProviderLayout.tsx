@@ -32,7 +32,10 @@ export default function ProviderLayout() {
     location.pathname.startsWith("/provider/messages") ||
     location.pathname.startsWith("/provider/chat");
 
-  const hasSubnav = isSettingsSection || isWorkspaceSection;
+  const isFinancesSection =
+    location.pathname.startsWith("/provider/quotations");
+
+  const hasSubnav = isSettingsSection || isWorkspaceSection || isFinancesSection;
 
   return (
     <div className={`provider-top-layout ${showVerificationWarning ? "has-verification-warning" : ""}`}>

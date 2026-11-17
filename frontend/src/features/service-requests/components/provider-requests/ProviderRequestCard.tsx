@@ -1,13 +1,15 @@
-import type { FC } from "react";
+import { useState, type FC } from "react";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { calculateDistanceKm, formatDistance } from "../../utils/distance.utils";
+import { getCategoryVisualConfig } from "../../utils/categoryIcon.utils";
 
 interface ProviderRequestCardProps {
   request: CustomerServiceRequestItem;
   onViewDetails: (request: CustomerServiceRequestItem) => void;
   onSelectPhoto: (photoUrl: string) => void;
   onQuote: (request: CustomerServiceRequestItem) => void;
+  onViewQuotation?: (request: CustomerServiceRequestItem) => void;
   onChat?: (request: CustomerServiceRequestItem) => void;
 }
 
@@ -16,8 +18,10 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
   onViewDetails,
   onSelectPhoto,
   onQuote,
+  onViewQuotation,
   onChat,
 }) => {
+  const [imageError, setImageError] = useState(false);
   const user = useAuthStore((state) => state.user);
   const providerAddress = user?.current_address_id;
   const providerLat = providerAddress?.latitude != null ? Number(providerAddress.latitude) : null;
@@ -33,172 +37,175 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
       : null);
 
   const formattedDist = formatDistance(computedDistance);
+  const visual = getCategoryVisualConfig(request.category_name, request.subservice_name);
 
-  const getUrgencyBadge = () => {
+  const getUrgencyText = () => {
     if (request.status === "EXPIRED") {
-      return { label: "Expired", className: "urgent-expired" };
+      return "Expired";
+    }
+    if (request.specific_date) {
+      const dateStr = new Date(request.specific_date).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      });
+      return `Required by: ${dateStr}`;
     }
     switch (request.urgency) {
       case "TODAY":
-        return { label: "Needed Today", className: "urgent-today" };
+        return "Required: Today";
       case "THIS_WEEK":
-        return { label: "This Week", className: "urgent-week" };
-      case "SPECIFIC_DATE": {
-        const dateStr = request.specific_date
-          ? new Date(request.specific_date).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-            })
-          : "Scheduled";
-        return { label: `By ${dateStr}`, className: "urgent-date" };
-      }
+        return "Required: This Week";
       case "FLEXIBLE":
       default:
-        return { label: "Flexible Schedule", className: "urgent-flexible" };
+        return "Schedule: Flexible";
     }
   };
 
   const addressText = request.address_details
-    ? `${request.address_details.area}, ${request.address_details.city}`
+    ? `${request.address_details.area || ""}, ${request.address_details.city || ""}`.trim().replace(/^,|,$/g, "")
     : "Local client";
 
   const formattedDate = new Date(request.created_at).toLocaleDateString(undefined, {
-    month: "short",
     day: "numeric",
+    month: "short",
+    year: "numeric",
   });
 
-  const urgencyInfo = getUrgencyBadge();
   const quotationsCount = request.quotations_count ?? 0;
+  const isCancelled = request.status === "CANCELLED";
+  const isExpired = request.status === "EXPIRED";
+
+  const renderStatusBadge = () => {
+    if (isCancelled) {
+      return (
+        <span className="provreq-badge-pill provreq-badge-cancelled">
+          <span className="provreq-dot-indicator"></span>
+          <span>Cancelled</span>
+        </span>
+      );
+    }
+
+    if (isExpired) {
+      return (
+        <span className="provreq-badge-pill provreq-badge-expired">
+          <span className="provreq-dot-indicator"></span>
+          <span>Expired</span>
+        </span>
+      );
+    }
+
+    if (quotationsCount > 0) {
+      return (
+        <span className="provreq-badge-pill provreq-badge-quotes">
+          <i className="fas fa-bolt"></i>
+          <span>{quotationsCount} {quotationsCount === 1 ? "quote" : "quotes"} submitted</span>
+        </span>
+      );
+    }
+
+    return null;
+  };
+
+  const attachedPhoto = request.images && request.images.length > 0 ? request.images[0].image_key : null;
+  const serviceImageUrl = request.subservice_image || request.category_image || attachedPhoto;
+  const showServiceImage = Boolean(serviceImageUrl && !imageError);
 
   return (
-    <div className="provreq-clean-card">
-      <div className="provreq-card-top-row">
-        <div className="provreq-category-crumbs">
-          <i className="fas fa-layer-group provreq-crumb-icon"></i>
-          <span className="provreq-category-name">{request.category_name || "General Service"}</span>
+    <div className="provreq-row-card">
+      {showServiceImage ? (
+        <div
+          className="provreq-category-avatar has-image"
+          onClick={() => onViewDetails(request)}
+          title={request.subservice_name || request.category_name || "Service"}
+        >
+          <img
+            src={serviceImageUrl!}
+            alt={request.subservice_name || request.category_name || "Service"}
+            className="provreq-avatar-img"
+            onError={() => setImageError(true)}
+          />
+        </div>
+      ) : (
+        <div
+          className="provreq-category-avatar"
+          style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
+          aria-hidden="true"
+        >
+          <i className={visual.icon}></i>
+        </div>
+      )}
+
+      <div className="provreq-row-center">
+        <div className="provreq-row-breadcrumbs">
+          <span className="provreq-crumb-category">{request.category_name || "General Service"}</span>
           {request.subservice_name && (
             <>
-              <span className="provreq-crumb-separator">/</span>
-              <span className="provreq-subservice-name">{request.subservice_name}</span>
+              <span className="provreq-crumb-sep">/</span>
+              <span className="provreq-crumb-sub">{request.subservice_name}</span>
             </>
           )}
+          <span className="provreq-crumb-bullet">•</span>
+          <span className="provreq-crumb-date">Posted {formattedDate}</span>
         </div>
 
-        <div className={`provreq-urgency-pill ${urgencyInfo.className}`}>
-          <i className="far fa-clock"></i>
-          <span>{urgencyInfo.label}</span>
-        </div>
-      </div>
-
-      <div className="provreq-card-body">
-        <h3
-          className="provreq-card-headline"
-          onClick={() => onViewDetails(request)}
-          title="Click to view details"
-        >
+        <h3 className="provreq-row-title" onClick={() => onViewDetails(request)}>
           {request.title}
         </h3>
-        <p className="provreq-card-description">{request.description}</p>
 
-        <div className="provreq-meta-grid">
-          <div className="provreq-meta-chip location" title="Service location">
+        <p className="provreq-row-desc">{request.description}</p>
+
+        <div className="provreq-row-meta">
+          <div className="provreq-meta-tag">
+            <i className="far fa-calendar-alt"></i>
+            <span>{getUrgencyText()}</span>
+          </div>
+
+          <div className="provreq-meta-tag">
+            <i className="far fa-clock"></i>
+            <span>
+              {request.available_time_from?.slice(0, 5) || "09:00"} - {request.available_time_to?.slice(0, 5) || "17:00"}
+            </span>
+          </div>
+
+          <div className="provreq-meta-tag location">
             <i className="fas fa-map-marker-alt"></i>
-            <span className="provreq-meta-text-truncate">{addressText}</span>
+            <span className="provreq-meta-location-text">{addressText}</span>
           </div>
 
           {formattedDist && (
-            <div className="provreq-meta-chip distance" title="Distance from your base">
+            <div className="provreq-meta-tag distance">
               <i className="fas fa-location-arrow"></i>
               <span>{formattedDist} away</span>
             </div>
           )}
 
           {request.customer_details?.name && (
-            <div className="provreq-meta-chip customer" title="Customer">
-              <i className="fas fa-user-circle"></i>
-              <span className="provreq-meta-text-truncate">{request.customer_details.name}</span>
+            <div className="provreq-meta-tag customer">
+              <i className="far fa-user"></i>
+              <span>{request.customer_details.name}</span>
             </div>
           )}
-
-          <div className="provreq-meta-chip" title="Available time slot">
-            <i className="far fa-calendar-check"></i>
-            <span>
-              {request.available_time_from?.slice(0, 5) || "09:00"} - {request.available_time_to?.slice(0, 5) || "17:00"}
-            </span>
-          </div>
-
-          <div className="provreq-meta-chip" title="Quotations received">
-            <i className="fas fa-comment-dollar"></i>
-            <span>
-              {quotationsCount === 0 ? "Be 1st to Quote" : `${quotationsCount} Quote${quotationsCount > 1 ? "s" : ""}`}
-            </span>
-          </div>
         </div>
-
-        {request.images && request.images.length > 0 && (
-          <div className="provreq-photos-strip">
-            {request.images.slice(0, 4).map((img, idx) => (
-              <div
-                key={img.id || idx}
-                className="provreq-photo-thumb-wrapper"
-                onClick={() => onSelectPhoto(img.image_key)}
-                title="Click to view full image"
-              >
-                <img
-                  src={img.image_key}
-                  alt={`Attachment ${idx + 1}`}
-                  className="provreq-photo-item"
-                />
-                <div className="provreq-photo-hover-indicator">
-                  <i className="fas fa-search-plus"></i>
-                </div>
-              </div>
-            ))}
-            {request.images.length > 4 && (
-              <span
-                className="provreq-photos-overflow"
-                onClick={() => onViewDetails(request)}
-                title="View all attached photos"
-              >
-                +{request.images.length - 4}
-              </span>
-            )}
-          </div>
-        )}
       </div>
 
-      <div className="provreq-card-bottom-row">
-        <div className="provreq-footer-meta">
-          <span className="provreq-post-date">
-            <i className="far fa-calendar mr-1"></i> Posted {formattedDate}
-          </span>
-          {request.status === "CANCELLED" ? (
-            <span className="provreq-status-dot-cancelled">
-              <span className="provreq-dot-cancelled"></span>
-              Cancelled
-            </span>
-          ) : (
-            <span className="provreq-status-dot-active">
-              <span className="provreq-pulse-dot"></span>
-              Open for Quotes
-            </span>
-          )}
-        </div>
+      <div className="provreq-row-right">
+        {renderStatusBadge()}
 
-        <div className="provreq-card-actions">
-          <button
-            type="button"
-            className="provreq-btn-details"
-            onClick={() => onViewDetails(request)}
+        {attachedPhoto && (
+          <div
+            className="provreq-row-thumb"
+            onClick={() => onSelectPhoto(attachedPhoto)}
+            title="Click to view photo"
           >
-            <i className="far fa-eye"></i>
-            <span>View Scope</span>
-          </button>
+            <img src={attachedPhoto} alt="Attachment thumbnail" />
+          </div>
+        )}
 
-          {request.status !== "CANCELLED" && onChat && (
+        <div className="provreq-row-actions">
+          {!isCancelled && onChat && (
             <button
               type="button"
-              className="provreq-btn-chat-card"
+              className="provreq-action-chat-btn"
               onClick={() => onChat(request)}
               title="Chat with Customer"
             >
@@ -207,25 +214,39 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
             </button>
           )}
 
-          {request.status === "CANCELLED" ? (
+          <button
+            type="button"
+            className="provreq-action-link"
+            onClick={() => onViewDetails(request)}
+          >
+            <span>View Details</span>
+          </button>
+
+          {isCancelled ? (
             <button
               type="button"
               className="provreq-btn-quote disabled"
               disabled
-              title="This request has been cancelled by the customer"
             >
-              <i className="fas fa-ban"></i>
               <span>Cancelled</span>
             </button>
-          ) : request.status === "EXPIRED" ? (
+          ) : isExpired ? (
             <button
               type="button"
               className="provreq-btn-quote disabled"
               disabled
-              title="This request deadline has expired"
             >
-              <i className="fas fa-calendar-times"></i>
               <span>Expired</span>
+            </button>
+          ) : request.has_quoted ? (
+            <button
+              type="button"
+              className="provreq-btn-quoted"
+              onClick={() => (onViewQuotation ? onViewQuotation(request) : onViewDetails(request))}
+              title="You have already quoted on this request"
+            >
+              <i className="fas fa-check-circle"></i>
+              <span>Quoted</span>
             </button>
           ) : (
             <button
@@ -233,8 +254,8 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
               className="provreq-btn-quote"
               onClick={() => onQuote(request)}
             >
-              <i className="fas fa-paper-plane"></i>
               <span>Send Quote</span>
+              <i className="fas fa-arrow-right"></i>
             </button>
           )}
         </div>

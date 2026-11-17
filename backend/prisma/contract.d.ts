@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'c0f046817e93fe4f32bfe8f1fbd646b066498df7b669166b07002dcfda3a928e'>;
+  StorageHashBase<'ddae0ee318d7ab3d9984804018f0a5412daea8351d80f76df5589c2e0399b095'>;
 export type ExecutionHash =
-  ExecutionHashBase<'4f4677f17d162219b29c0c6bf16068f6998c645f6198ae088278763c716d2199'>;
+  ExecutionHashBase<'710a614916244243ae86df704ca79f263374a0bac2ea7239d29e4b79024ef636'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -390,6 +390,24 @@ export type FieldOutputTypes = {
       readonly auth: Varchar<255>;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
+    readonly quotations: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly service_request_id: CodecTypes['pg/uuid@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly amount: Numeric<12, 2>;
+      readonly quotation_type: 'FIXED' | 'ESTIMATED' | 'INSPECTION_REQUIRED';
+      readonly work_description: Varchar<1000>;
+      readonly included_items: CodecTypes['pg/json@1']['output'];
+      readonly excluded_items: CodecTypes['pg/json@1']['output'];
+      readonly estimated_duration: Varchar<60> | null;
+      readonly available_date_time: Varchar<80> | null;
+      readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
+      readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly extra_charge_policy: Varchar<300>;
+      readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
     readonly service_request_images: {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly service_request_id: CodecTypes['pg/uuid@1']['output'];
@@ -609,6 +627,24 @@ export type FieldInputTypes = {
       readonly p256dh: CodecTypes['sql/varchar@1']['input'];
       readonly auth: CodecTypes['sql/varchar@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly quotations: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly service_request_id: CodecTypes['pg/uuid@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly amount: CodecTypes['pg/numeric@1']['input'];
+      readonly quotation_type: 'FIXED' | 'ESTIMATED' | 'INSPECTION_REQUIRED';
+      readonly work_description: CodecTypes['sql/varchar@1']['input'];
+      readonly included_items: CodecTypes['pg/json@1']['input'];
+      readonly excluded_items: CodecTypes['pg/json@1']['input'];
+      readonly estimated_duration: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly available_date_time: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
+      readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly extra_charge_policy: CodecTypes['sql/varchar@1']['input'];
+      readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly service_request_images: {
       readonly id: CodecTypes['pg/uuid@1']['input'];
@@ -830,6 +866,24 @@ export type StorageColumnTypes = {
       readonly p256dh: Varchar<255>;
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
     };
+    readonly quotations: {
+      readonly amount: Numeric<12, 2>;
+      readonly available_date_time: Varchar<80> | null;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly estimated_duration: Varchar<60> | null;
+      readonly excluded_items: CodecTypes['pg/json@1']['output'];
+      readonly extra_charge_policy: Varchar<300>;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly included_items: CodecTypes['pg/json@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly quotation_type: 'FIXED' | 'ESTIMATED' | 'INSPECTION_REQUIRED';
+      readonly service_request_id: CodecTypes['pg/uuid@1']['output'];
+      readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
+      readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly work_description: Varchar<1000>;
+    };
     readonly service_request_images: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly display_order: CodecTypes['pg/int4@1']['output'];
@@ -1050,6 +1104,24 @@ export type StorageColumnInputTypes = {
       readonly p256dh: CodecTypes['sql/varchar@1']['input'];
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
     };
+    readonly quotations: {
+      readonly amount: CodecTypes['pg/numeric@1']['input'];
+      readonly available_date_time: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly estimated_duration: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly excluded_items: CodecTypes['pg/json@1']['input'];
+      readonly extra_charge_policy: CodecTypes['sql/varchar@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly included_items: CodecTypes['pg/json@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly quotation_type: 'FIXED' | 'ESTIMATED' | 'INSPECTION_REQUIRED';
+      readonly service_request_id: CodecTypes['pg/uuid@1']['input'];
+      readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
+      readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly work_description: CodecTypes['sql/varchar@1']['input'];
+    };
     readonly service_request_images: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly display_order: CodecTypes['pg/int4@1']['input'];
@@ -1180,6 +1252,7 @@ export namespace Models {
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     availabilities: public_provider_availability[];
     overrides: public_provider_availability_overrides[];
+    quotations: public_quotations[];
     service_requests: public_service_request_providers[];
     services: public_provider_services[];
     user: public_users;
@@ -1187,6 +1260,7 @@ export namespace Models {
     readonly [RelationKeys]?:
       | 'availabilities'
       | 'overrides'
+      | 'quotations'
       | 'service_requests'
       | 'services'
       | 'user'
@@ -1378,9 +1452,10 @@ export namespace Models {
     customer: public_users;
     images: public_service_request_images[];
     providers: public_service_request_providers[];
+    quotations: public_quotations[];
     subservice: public_services | null;
     readonly [RelationKeys]?:
-      'address' | 'category' | 'customer' | 'images' | 'providers' | 'subservice';
+      'address' | 'category' | 'customer' | 'images' | 'providers' | 'quotations' | 'subservice';
   };
   export type public_service_request_images = {
     id: CodecTypes['pg/uuid@1']['output'];
@@ -1435,6 +1510,27 @@ export namespace Models {
     sender: public_users;
     readonly [RelationKeys]?: 'conversation' | 'sender';
   };
+  export type public_quotations = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    service_request_id: CodecTypes['pg/uuid@1']['output'];
+    provider_id: CodecTypes['pg/uuid@1']['output'];
+    amount: Numeric<12, 2>;
+    quotation_type: 'FIXED' | 'ESTIMATED' | 'INSPECTION_REQUIRED';
+    work_description: Varchar<1000>;
+    included_items: CodecTypes['pg/json@1']['output'];
+    excluded_items: CodecTypes['pg/json@1']['output'];
+    estimated_duration: Varchar<60> | null;
+    available_date_time: Varchar<80> | null;
+    valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
+    valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    extra_charge_policy: Varchar<300>;
+    status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    provider: public_provider_profiles;
+    service_request: public_service_requests;
+    readonly [RelationKeys]?: 'provider' | 'service_request';
+  };
 }
 
 export declare const models: {
@@ -1460,6 +1556,7 @@ export declare const models: {
     conversations: Models.public_conversations;
     conversation_participants: Models.public_conversation_participants;
     messages: Models.public_messages;
+    quotations: Models.public_quotations;
   };
 };
 
@@ -2634,6 +2731,156 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly quotations: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly service_request_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly provider_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly amount: {
+                  readonly nativeType: 'numeric';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
+                readonly quotation_type: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'FIXED'>;
+                  };
+                };
+                readonly work_description: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 1000 };
+                };
+                readonly included_items: {
+                  readonly nativeType: 'json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: false;
+                };
+                readonly excluded_items: {
+                  readonly nativeType: 'json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: false;
+                };
+                readonly estimated_duration: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 60 };
+                };
+                readonly available_date_time: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 80 };
+                };
+                readonly valid_until: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'HOURS_24'>;
+                  };
+                };
+                readonly valid_until_date: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+                readonly extra_charge_policy: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 300 };
+                };
+                readonly status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'PENDING'>;
+                  };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updated_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'quotations_service_request_id_idx_8060a003';
+                  readonly prefix: 'quotations_service_request_id_idx';
+                  readonly columns: readonly ['service_request_id'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'quotations_provider_id_idx_d89e110d';
+                  readonly prefix: 'quotations_provider_id_idx';
+                  readonly columns: readonly ['provider_id'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'quotations_status_idx_e98638ab';
+                  readonly prefix: 'quotations_status_idx';
+                  readonly columns: readonly ['status'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'quotations';
+                    readonly columns: readonly ['service_request_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'service_requests';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'quotations';
+                    readonly columns: readonly ['provider_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_profiles';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly service_request_images: {
               columns: {
                 readonly id: {
@@ -3233,6 +3480,18 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['TEXT', 'IMAGE', 'FILE'];
             };
+            readonly quotation_status: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['PENDING', 'ACCEPTED', 'REJECTED', 'EXPIRED', 'WITHDRAWN'];
+            };
+            readonly quotation_type: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['FIXED', 'ESTIMATED', 'INSPECTION_REQUIRED'];
+            };
+            readonly quotation_validity: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['HOURS_24', 'HOURS_48', 'DAYS_3', 'DAYS_7'];
+            };
             readonly reactivation_request_status: {
               readonly kind: 'valueSet';
               readonly values: readonly ['PENDING', 'APPROVED', 'REJECTED'];
@@ -3368,6 +3627,10 @@ type ContractBase = Omit<
       readonly model: 'conversation_participants';
     };
     readonly messages: { readonly namespace: 'public' & NamespaceId; readonly model: 'messages' };
+    readonly quotations: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'quotations';
+    };
   };
   readonly domain: {
     readonly namespaces: {
@@ -4389,6 +4652,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['provider_id'];
                 };
               };
+              readonly quotations: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'quotations';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['provider_id'];
+                };
+              };
               readonly service_requests: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -4724,6 +4998,151 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly quotations: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly service_request_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly provider_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly amount: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
+              };
+              readonly quotation_type: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly work_description: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 1000 };
+                };
+              };
+              readonly included_items: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly excluded_items: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly estimated_duration: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 60 };
+                };
+              };
+              readonly available_date_time: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 80 };
+                };
+              };
+              readonly valid_until: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly valid_until_date: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly extra_charge_policy: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 300 };
+                };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly updated_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly provider: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_profiles';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['provider_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly service_request: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'service_requests';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['service_request_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'quotations';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly service_request_id: { readonly column: 'service_request_id' };
+                readonly provider_id: { readonly column: 'provider_id' };
+                readonly amount: { readonly column: 'amount' };
+                readonly quotation_type: { readonly column: 'quotation_type' };
+                readonly work_description: { readonly column: 'work_description' };
+                readonly included_items: { readonly column: 'included_items' };
+                readonly excluded_items: { readonly column: 'excluded_items' };
+                readonly estimated_duration: { readonly column: 'estimated_duration' };
+                readonly available_date_time: { readonly column: 'available_date_time' };
+                readonly valid_until: { readonly column: 'valid_until' };
+                readonly valid_until_date: { readonly column: 'valid_until_date' };
+                readonly extra_charge_policy: { readonly column: 'extra_charge_policy' };
+                readonly status: { readonly column: 'status' };
+                readonly created_at: { readonly column: 'created_at' };
+                readonly updated_at: { readonly column: 'updated_at' };
+              };
+            };
+          };
           readonly service_request_images: {
             readonly fields: {
               readonly id: {
@@ -4984,6 +5403,17 @@ type ContractBase = Omit<
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
                   readonly model: 'service_request_providers';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['service_request_id'];
+                };
+              };
+              readonly quotations: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'quotations';
                 };
                 readonly cardinality: '1:N';
                 readonly on: {
@@ -5596,6 +6026,33 @@ type ContractBase = Omit<
               { readonly name: 'FILE'; readonly value: 'FILE' },
             ];
           };
+          readonly quotation_type: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'FIXED'; readonly value: 'FIXED' },
+              { readonly name: 'ESTIMATED'; readonly value: 'ESTIMATED' },
+              { readonly name: 'INSPECTION_REQUIRED'; readonly value: 'INSPECTION_REQUIRED' },
+            ];
+          };
+          readonly quotation_validity: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'HOURS_24'; readonly value: 'HOURS_24' },
+              { readonly name: 'HOURS_48'; readonly value: 'HOURS_48' },
+              { readonly name: 'DAYS_3'; readonly value: 'DAYS_3' },
+              { readonly name: 'DAYS_7'; readonly value: 'DAYS_7' },
+            ];
+          };
+          readonly quotation_status: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'PENDING'; readonly value: 'PENDING' },
+              { readonly name: 'ACCEPTED'; readonly value: 'ACCEPTED' },
+              { readonly name: 'REJECTED'; readonly value: 'REJECTED' },
+              { readonly name: 'EXPIRED'; readonly value: 'EXPIRED' },
+              { readonly name: 'WITHDRAWN'; readonly value: 'WITHDRAWN' },
+            ];
+          };
         };
       };
     };
@@ -5832,6 +6289,23 @@ type ContractBase = Omit<
             readonly column: 'id';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'quotations';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'quotations';
+            readonly column: 'updated_at';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
         },
         {
           readonly ref: {

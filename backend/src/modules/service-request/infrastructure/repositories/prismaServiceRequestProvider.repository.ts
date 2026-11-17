@@ -195,7 +195,10 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
                     Number(record.address.longitude)
                 );
             }
-            return ServiceRequestMapper.toDetailsDto(record, distanceKm);
+            const dto = ServiceRequestMapper.toDetailsDto(record, distanceKm);
+            const providerRecord = record.providers?.find((p: any) => p.provider_id === providerProfileId);
+            dto.has_quoted = providerRecord?.status === "QUOTED";
+            return dto;
         });
 
         if (urgency && urgency !== "ALL") {

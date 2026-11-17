@@ -82,8 +82,10 @@ export interface CustomerServiceRequestItem {
   customer_id: string;
   category_id: string;
   category_name?: string;
+  category_image?: string | null;
   subservice_id?: string | null;
   subservice_name?: string | null;
+  subservice_image?: string | null;
   title: string;
   description: string;
   urgency: RequestUrgency;
@@ -103,6 +105,7 @@ export interface CustomerServiceRequestItem {
   answers?: ServiceRequestAnswerItem[] | null;
   matched_providers_count?: number;
   quotations_count?: number;
+  has_quoted?: boolean;
 }
 
 export interface ServiceRequestItem {

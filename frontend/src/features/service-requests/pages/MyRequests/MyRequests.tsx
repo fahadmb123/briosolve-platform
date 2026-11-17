@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import "./MyRequests.css";
 import {
@@ -22,6 +22,7 @@ import {
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
 
 export default function MyRequests() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -151,8 +152,9 @@ export default function MyRequests() {
   };
 
   const handleOpenDetails = (request: CustomerServiceRequestItem) => {
-    setSelectedRequestForDetails(request);
-    setIsDetailsModalOpen(true);
+    navigate(`/my-requests/${request.id}`, {
+      state: { request }
+    });
   };
 
   const handleCloseDetails = () => {
@@ -253,9 +255,12 @@ export default function MyRequests() {
     <div className="app-content myreq-wrapper">
       <div className="myreq-top-header">
         <div className="myreq-header-info">
-          <h1 className="myreq-page-title">My Service Requests</h1>
+          <div className="myreq-title-badge-row">
+            <h1 className="myreq-page-title">My Service Requests</h1>
+            <span className="myreq-client-badge">Client Portal</span>
+          </div>
           <p className="myreq-page-subtitle">
-            Manage your posted requirements, evaluate responses, and keep track of job progress.
+            Manage your posted requirements, evaluate contractor responses, and track real-time job progress.
           </p>
         </div>
 
@@ -278,8 +283,8 @@ export default function MyRequests() {
       />
 
       {isLoading ? (
-        <div className="myreq-cards-grid">
-          {Array.from({ length: 6 }).map((_, idx) => (
+        <div className="myreq-cards-stack">
+          {Array.from({ length: 4 }).map((_, idx) => (
             <ServiceRequestCardSkeleton key={idx} variant="customer" />
           ))}
         </div>
@@ -323,7 +328,7 @@ export default function MyRequests() {
         </div>
       ) : (
         <>
-          <div className="myreq-cards-grid">
+          <div className="myreq-cards-stack">
             {requests.map((request) => (
               <RequestCard
                 key={request.id}
