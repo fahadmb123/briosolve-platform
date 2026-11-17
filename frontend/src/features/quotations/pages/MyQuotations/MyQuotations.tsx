@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import { useGetMyQuotations } from "../../hooks/useQuotationMutations";
 import type { ProviderQuotationItem } from "../../types/quotation.types";
 import QuotationCard from "../../components/QuotationCard/QuotationCard";
+import { QuotationDetailsModal } from "../../components/QuotationDetailsModal";
 import "./MyQuotations.css";
 
 const STATUS_TABS: { id: string; label: string }[] = [
@@ -27,6 +28,8 @@ export default function MyQuotations() {
   const [hasMore, setHasMore] = useState<boolean>(false);
   const isLoadingMoreRef = useRef<boolean>(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const [selectedQuotation, setSelectedQuotation] = useState<ProviderQuotationItem | null>(null);
 
   const getMyQuotationsMutation = useGetMyQuotations();
 
@@ -161,27 +164,27 @@ export default function MyQuotations() {
 
       {isInitialLoading ? (
         <div className="myquote-skeleton-stack">
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <div key={idx} className="myquote-skeleton-card">
-              <div className="myquote-skeleton-row">
-                <div className="myquote-skeleton-block myquote-sk-amount" />
-                <div className="myquote-skeleton-block myquote-sk-type" />
-                <div className="myquote-skeleton-block myquote-sk-badge" />
+          {Array.from({ length: 5 }).map((_, idx) => (
+            <div key={idx} className="myquote-skeleton-row-card">
+              <div className="myquote-skeleton-block myquote-sk-avatar" />
+              <div className="myquote-sk-center">
+                <div className="myquote-skeleton-block myquote-sk-crumbs" />
+                <div className="myquote-skeleton-block myquote-sk-title" />
+                <div className="myquote-skeleton-block myquote-sk-desc" />
+                <div className="myquote-sk-meta-row">
+                  <div className="myquote-skeleton-block myquote-sk-pill" />
+                  <div className="myquote-skeleton-block myquote-sk-pill" />
+                </div>
               </div>
-              <div className="myquote-skeleton-block myquote-sk-title" />
-              <div className="myquote-skeleton-block myquote-sk-desc" />
-              <div className="myquote-skeleton-block myquote-sk-desc myquote-sk-short" />
-              <div className="myquote-skeleton-row myquote-sk-meta-row">
-                <div className="myquote-skeleton-block myquote-sk-meta" />
-                <div className="myquote-skeleton-block myquote-sk-meta" />
-              </div>
-              <div className="myquote-skeleton-row myquote-sk-tags-row">
-                <div className="myquote-skeleton-block myquote-sk-tag" />
-                <div className="myquote-skeleton-block myquote-sk-tag" />
-                <div className="myquote-skeleton-block myquote-sk-tag" />
-              </div>
-              <div className="myquote-skeleton-footer">
-                <div className="myquote-skeleton-block myquote-sk-btn" />
+              <div className="myquote-sk-right">
+                <div className="myquote-sk-badge-row">
+                  <div className="myquote-skeleton-block myquote-sk-status-badge" />
+                  <div className="myquote-skeleton-block myquote-sk-price" />
+                </div>
+                <div className="myquote-sk-actions">
+                  <div className="myquote-skeleton-block myquote-sk-btn" />
+                  <div className="myquote-skeleton-block myquote-sk-btn" />
+                </div>
               </div>
             </div>
           ))}
@@ -210,26 +213,27 @@ export default function MyQuotations() {
         </div>
       ) : (
         <>
-          <div className="myquote-cards-grid">
+          <div className="myquote-cards-stack">
             {quotations.map((quotation) => (
               <QuotationCard
                 key={quotation.id}
                 quotation={quotation}
+                onViewDetails={setSelectedQuotation}
                 onViewRequest={handleViewRequest}
               />
             ))}
             {getMyQuotationsMutation.isPending && page > 1 &&
-              Array.from({ length: 4 }).map((_, idx) => (
-                <div key={`skeleton-${idx}`} className="myquote-skeleton-card">
-                  <div className="myquote-skeleton-row">
-                    <div className="myquote-skeleton-block myquote-sk-amount" />
-                    <div className="myquote-skeleton-block myquote-sk-type" />
-                    <div className="myquote-skeleton-block myquote-sk-badge" />
+              Array.from({ length: 2 }).map((_, idx) => (
+                <div key={`skeleton-${idx}`} className="myquote-skeleton-row-card">
+                  <div className="myquote-skeleton-block myquote-sk-avatar" />
+                  <div className="myquote-sk-center">
+                    <div className="myquote-skeleton-block myquote-sk-crumbs" />
+                    <div className="myquote-skeleton-block myquote-sk-title" />
                   </div>
-                  <div className="myquote-skeleton-block myquote-sk-title" />
-                  <div className="myquote-skeleton-block myquote-sk-desc" />
-                  <div className="myquote-skeleton-footer">
-                    <div className="myquote-skeleton-block myquote-sk-btn" />
+                  <div className="myquote-sk-right">
+                    <div className="myquote-sk-actions">
+                      <div className="myquote-skeleton-block myquote-sk-btn" />
+                    </div>
                   </div>
                 </div>
               ))}
@@ -244,6 +248,13 @@ export default function MyQuotations() {
           )}
         </>
       )}
+
+      <QuotationDetailsModal
+        quotation={selectedQuotation}
+        isOpen={Boolean(selectedQuotation)}
+        onClose={() => setSelectedQuotation(null)}
+        onViewRequest={handleViewRequest}
+      />
     </div>
   );
 }

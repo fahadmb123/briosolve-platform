@@ -1,16 +1,19 @@
+import type { FC } from "react";
 import type { ProviderQuotationItem, QuotationStatus } from "../../types/quotation.types";
+import { getCategoryVisualConfig } from "../../../service-requests/utils/categoryIcon.utils";
 
 interface QuotationCardProps {
   quotation: ProviderQuotationItem;
+  onViewDetails: (quotation: ProviderQuotationItem) => void;
   onViewRequest: (serviceRequestId: string) => void;
 }
 
 const STATUS_CONFIG: Record<QuotationStatus, { label: string; className: string }> = {
-  PENDING: { label: "Pending", className: "myquote-badge-pending" },
-  ACCEPTED: { label: "Accepted", className: "myquote-badge-accepted" },
-  REJECTED: { label: "Rejected", className: "myquote-badge-rejected" },
-  EXPIRED: { label: "Expired", className: "myquote-badge-expired" },
-  WITHDRAWN: { label: "Withdrawn", className: "myquote-badge-withdrawn" }
+  PENDING: { label: "Pending", className: "myquote-status-pending" },
+  ACCEPTED: { label: "Accepted", className: "myquote-status-accepted" },
+  REJECTED: { label: "Rejected", className: "myquote-status-rejected" },
+  EXPIRED: { label: "Expired", className: "myquote-status-expired" },
+  WITHDRAWN: { label: "Withdrawn", className: "myquote-status-withdrawn" }
 };
 
 const TYPE_LABEL: Record<string, string> = {
@@ -28,7 +31,7 @@ const VALIDITY_LABEL: Record<string, string> = {
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-IN", {
-    day: "2-digit",
+    day: "numeric",
     month: "short",
     year: "numeric"
   });
@@ -42,92 +45,123 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-export default function QuotationCard({ quotation, onViewRequest }: QuotationCardProps) {
-  const statusConfig = STATUS_CONFIG[quotation.status as QuotationStatus] ?? { label: quotation.status, className: "myquote-badge-pending" };
-  const isExpiredOrWithdrawn = quotation.status === "EXPIRED" || quotation.status === "WITHDRAWN";
+export const QuotationCard: FC<QuotationCardProps> = ({
+  quotation,
+  onViewDetails,
+  onViewRequest
+}) => {
+  const statusConfig = STATUS_CONFIG[quotation.status as QuotationStatus] ?? {
+    label: quotation.status,
+    className: "myquote-status-pending"
+  };
+
+  const isExpiredOrWithdrawn =
+    quotation.status === "EXPIRED" || quotation.status === "WITHDRAWN";
   const validUntilPassed = new Date(quotation.validUntilDate) < new Date();
+  const visual = getCategoryVisualConfig(quotation.categoryName, undefined);
 
   return (
-    <div className={`myquote-card ${isExpiredOrWithdrawn ? "myquote-card-dimmed" : ""}`}>
-      <div className="myquote-card-top">
-        <div className="myquote-card-left">
-          <div className="myquote-amount-badge">
-            <span className="myquote-currency-sym">₹</span>
-            <span className="myquote-amount-val">{formatCurrency(quotation.amount).replace("₹", "").trim()}</span>
-          </div>
-          <div className="myquote-type-pill">
-            <i className="fas fa-tag myquote-type-icon" />
+    <div className={`myquote-row-card ${isExpiredOrWithdrawn ? "dimmed" : ""}`}>
+      <div
+        className="myquote-row-avatar"
+        style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
+        onClick={() => onViewDetails(quotation)}
+      >
+        <i className={visual.icon} />
+      </div>
+
+      <div className="myquote-row-center">
+        <div className="myquote-row-breadcrumbs">
+          <span className="myquote-crumb-category">
+            {quotation.categoryName || "Quotation"}
+          </span>
+          <span className="myquote-crumb-bullet">•</span>
+          <span className="myquote-crumb-date">Submitted {formatDate(quotation.createdAt)}</span>
+        </div>
+
+        <h3 className="myquote-row-title" onClick={() => onViewDetails(quotation)}>
+          {quotation.serviceRequestTitle || "Service Request Proposal"}
+        </h3>
+
+        <p className="myquote-row-desc">{quotation.workDescription}</p>
+
+        <div className="myquote-row-meta">
+          <div className="myquote-meta-pill">
+            <i className="fas fa-tag" />
             <span>{TYPE_LABEL[quotation.quotationType] ?? quotation.quotationType}</span>
           </div>
-        </div>
 
-        <div className="myquote-card-right">
-          <span className={`myquote-status-badge ${statusConfig.className}`}>
-            <span className="myquote-status-dot" />
+          <div className="myquote-meta-pill">
+            <i className="far fa-clock" />
+            <span>
+              Valid: {VALIDITY_LABEL[quotation.validUntil] ?? quotation.validUntil}
+              {validUntilPassed && quotation.status === "PENDING" && (
+                <span className="myquote-expired-tag"> · Validity Passed</span>
+              )}
+            </span>
+          </div>
+
+          {quotation.estimatedDuration && (
+            <div className="myquote-meta-pill">
+              <i className="fas fa-hourglass-half" />
+              <span>{quotation.estimatedDuration}</span>
+            </div>
+          )}
+
+          {quotation.availableDateTime && (
+            <div className="myquote-meta-pill">
+              <i className="far fa-calendar-check" />
+              <span>{quotation.availableDateTime}</span>
+            </div>
+          )}
+
+          {quotation.includedItems.length > 0 && (
+            <div className="myquote-meta-pill included">
+              <i className="fas fa-check" />
+              <span>{quotation.includedItems.length} included items</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="myquote-row-right">
+        <div className="myquote-row-header-right">
+          <span className={`myquote-badge-pill ${statusConfig.className}`}>
+            <span className="myquote-dot-indicator" />
             <span>{statusConfig.label}</span>
           </span>
-        </div>
-      </div>
 
-      {quotation.serviceRequestTitle && (
-        <div className="myquote-request-title">
-          <i className="fas fa-clipboard-list myquote-req-icon" />
-          <span>{quotation.serviceRequestTitle}</span>
-        </div>
-      )}
-
-      <p className="myquote-work-desc">{quotation.workDescription}</p>
-
-      <div className="myquote-meta-row">
-        <div className="myquote-meta-item">
-          <i className="fas fa-calendar-alt myquote-meta-icon" />
-          <span>Submitted {formatDate(quotation.createdAt)}</span>
-        </div>
-        <div className="myquote-meta-item">
-          <i className="fas fa-clock myquote-meta-icon" />
-          <span>
-            Valid for {VALIDITY_LABEL[quotation.validUntil] ?? quotation.validUntil}
-            {validUntilPassed && quotation.status === "PENDING" && (
-              <span className="myquote-expired-hint"> · Validity passed</span>
-            )}
-          </span>
-        </div>
-        {quotation.estimatedDuration && (
-          <div className="myquote-meta-item">
-            <i className="fas fa-hourglass-half myquote-meta-icon" />
-            <span>{quotation.estimatedDuration}</span>
+          <div className="myquote-price-tag">
+            <span className="myquote-price-symbol">₹</span>
+            <span className="myquote-price-val">
+              {formatCurrency(quotation.amount).replace("₹", "").trim()}
+            </span>
           </div>
-        )}
-        {quotation.availableDateTime && (
-          <div className="myquote-meta-item">
-            <i className="fas fa-calendar-check myquote-meta-icon" />
-            <span>{quotation.availableDateTime}</span>
-          </div>
-        )}
-      </div>
+        </div>
 
-      <div className="myquote-tags-row">
-        {quotation.includedItems.slice(0, 3).map((item, i) => (
-          <span key={i} className="myquote-included-tag">
-            <i className="fas fa-check myquote-tag-icon" />
-            {item}
-          </span>
-        ))}
-        {quotation.includedItems.length > 3 && (
-          <span className="myquote-more-tag">+{quotation.includedItems.length - 3} more</span>
-        )}
-      </div>
+        <div className="myquote-row-actions">
+          <button
+            type="button"
+            className="myquote-btn-view-details"
+            onClick={() => onViewDetails(quotation)}
+            title="View quotation details"
+          >
+            <span>View Details</span>
+          </button>
 
-      <div className="myquote-card-footer">
-        <button
-          type="button"
-          className="myquote-btn-view-request"
-          onClick={() => onViewRequest(quotation.serviceRequestId)}
-        >
-          <i className="fas fa-external-link-alt" />
-          <span>View Request</span>
-        </button>
+          <button
+            type="button"
+            className="myquote-btn-open-request"
+            onClick={() => onViewRequest(quotation.serviceRequestId)}
+            title="Open related service request"
+          >
+            <span>View Request</span>
+            <i className="fas fa-arrow-right" />
+          </button>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default QuotationCard;
