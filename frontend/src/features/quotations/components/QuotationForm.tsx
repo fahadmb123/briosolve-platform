@@ -20,6 +20,42 @@ interface QuotationFormProps {
   onChat?: () => void;
 }
 
+const getTodayIso = (): string => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const format12Hour = (time24: string): string => {
+  if (!time24) return "";
+  const parts = time24.split(":");
+  let hour = parseInt(parts[0], 10);
+  const min = parts[1] || "00";
+  if (isNaN(hour)) return time24;
+  const ampm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12;
+  hour = hour ? hour : 12;
+  return `${hour}:${min} ${ampm}`;
+};
+
+const formatDateDisplay = (isoDate: string): string => {
+  if (!isoDate) return "";
+  try {
+    const parts = isoDate.split("-").map(Number);
+    if (!parts[0] || !parts[1] || !parts[2]) return isoDate;
+    const date = new Date(parts[0], parts[1] - 1, parts[2]);
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+  } catch {
+    return isoDate;
+  }
+};
+
 export const QuotationForm: FC<QuotationFormProps> = ({
   initialValues,
   onSubmit,
@@ -50,6 +86,25 @@ export const QuotationForm: FC<QuotationFormProps> = ({
   const [customDurationNum, setCustomDurationNum] = useState<string>("1");
   const [customDurationUnit, setCustomDurationUnit] = useState<string>("Hours");
 
+  const initialAvail = initialValues?.availableDateTime || "Today at 6:00 PM";
+  const [dateType, setDateType] = useState<string>(() => {
+    if (!initialAvail) return "today";
+    if (initialAvail.toLowerCase().includes("tomorrow")) return "tomorrow";
+    if (initialAvail.toLowerCase().includes("today")) return "today";
+    return "custom";
+  });
+  const [customDateVal, setCustomDateVal] = useState<string>(getTodayIso());
+  const [timeType, setTimeType] = useState<string>(() => {
+    if (!initialAvail) return "specific";
+    if (initialAvail.includes("Evening (6 PM – 9 PM)")) return "Evening (6 PM – 9 PM)";
+    if (initialAvail.includes("Morning (9 AM – 12 PM)")) return "Morning (9 AM – 12 PM)";
+    if (initialAvail.includes("Afternoon (12 PM – 3 PM)")) return "Afternoon (12 PM – 3 PM)";
+    if (initialAvail.includes("Evening (3 PM – 6 PM)")) return "Evening (3 PM – 6 PM)";
+    if (initialAvail.includes("Any time / Flexible")) return "Any time / Flexible";
+    return "specific";
+  });
+  const [specificTimeVal, setSpecificTimeVal] = useState<string>("18:00");
+
   const {
     register,
     handleSubmit,
@@ -75,7 +130,7 @@ export const QuotationForm: FC<QuotationFormProps> = ({
         "Major repair"
       ],
       estimatedDuration: initialValues?.estimatedDuration || "1–2 hours",
-      availableDateTime: initialValues?.availableDateTime || "Today 6:00 PM",
+      availableDateTime: initialValues?.availableDateTime || "Today at 6:00 PM",
       validUntil: (initialValues?.validUntil as QuotationValidity) || "24_HOURS",
       extraChargePolicy:
         initialValues?.extraChargePolicy || "Spare parts at actual cost"
@@ -219,6 +274,72 @@ export const QuotationForm: FC<QuotationFormProps> = ({
     const unit = e.target.value;
     setCustomDurationUnit(unit);
     setValue("estimatedDuration", customDurationNum ? `${customDurationNum} ${unit}` : "", {
+      shouldValidate: true,
+      shouldDirty: true
+    });
+  };
+
+  const buildAvailableString = (
+    dType: string,
+    cDate: string,
+    tType: string,
+    sTime: string
+  ): string => {
+    let dateStr = "Today";
+    if (dType === "tomorrow") {
+      dateStr = "Tomorrow";
+    } else if (dType === "custom") {
+      dateStr = formatDateDisplay(cDate) || "Selected date";
+    }
+
+    let timeStr = "";
+    if (tType === "specific") {
+      timeStr = sTime ? `at ${format12Hour(sTime)}` : "";
+    } else if (tType) {
+      timeStr = tType;
+    }
+
+    if (dateStr && timeStr) {
+      return timeStr.startsWith("at ") ? `${dateStr} ${timeStr}` : `${dateStr}, ${timeStr}`;
+    }
+    return dateStr || timeStr;
+  };
+
+  const handleDateTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setDateType(val);
+    const newStr = buildAvailableString(val, customDateVal, timeType, specificTimeVal);
+    setValue("availableDateTime", newStr, {
+      shouldValidate: true,
+      shouldDirty: true
+    });
+  };
+
+  const handleCustomDateValChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setCustomDateVal(val);
+    const newStr = buildAvailableString(dateType, val, timeType, specificTimeVal);
+    setValue("availableDateTime", newStr, {
+      shouldValidate: true,
+      shouldDirty: true
+    });
+  };
+
+  const handleTimeTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setTimeType(val);
+    const newStr = buildAvailableString(dateType, customDateVal, val, specificTimeVal);
+    setValue("availableDateTime", newStr, {
+      shouldValidate: true,
+      shouldDirty: true
+    });
+  };
+
+  const handleSpecificTimeValChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSpecificTimeVal(val);
+    const newStr = buildAvailableString(dateType, customDateVal, timeType, val);
+    setValue("availableDateTime", newStr, {
       shouldValidate: true,
       shouldDirty: true
     });
@@ -611,20 +732,62 @@ export const QuotationForm: FC<QuotationFormProps> = ({
             </div>
 
             <div className="quote-form-group">
-              <label className="quote-label" htmlFor="available-datetime">
-                Available Date / Time
+              <label className="quote-label" htmlFor="available-date-select">
+                Available Date & Time
               </label>
-              <input
-                id="available-datetime"
-                type="text"
-                placeholder="e.g. Today 6:00 PM"
-                className={`quote-control ${errors.availableDateTime ? "is-invalid" : ""}`}
-                {...register("availableDateTime")}
-              />
+              <div className="quote-avail-row">
+                <div className="quote-avail-col">
+                  <select
+                    id="available-date-select"
+                    className="quote-control quote-select"
+                    value={dateType}
+                    onChange={handleDateTypeChange}
+                  >
+                    <option value="today">Today</option>
+                    <option value="tomorrow">Tomorrow</option>
+                    <option value="custom">Pick specific date...</option>
+                  </select>
+                  {dateType === "custom" && (
+                    <input
+                      type="date"
+                      min={getTodayIso()}
+                      className="quote-control quote-date-input"
+                      value={customDateVal}
+                      onChange={handleCustomDateValChange}
+                    />
+                  )}
+                </div>
+
+                <div className="quote-avail-col">
+                  <select
+                    id="available-time-select"
+                    className="quote-control quote-select"
+                    value={timeType}
+                    onChange={handleTimeTypeChange}
+                  >
+                    <option value="specific">Specific time...</option>
+                    <option value="Evening (6 PM – 9 PM)">Evening (6 PM – 9 PM)</option>
+                    <option value="Morning (9 AM – 12 PM)">Morning (9 AM – 12 PM)</option>
+                    <option value="Afternoon (12 PM – 3 PM)">Afternoon (12 PM – 3 PM)</option>
+                    <option value="Evening (3 PM – 6 PM)">Evening (3 PM – 6 PM)</option>
+                    <option value="Any time / Flexible">Any time / Flexible</option>
+                  </select>
+                  {timeType === "specific" && (
+                    <input
+                      type="time"
+                      className="quote-control quote-time-input"
+                      value={specificTimeVal}
+                      onChange={handleSpecificTimeValChange}
+                    />
+                  )}
+                </div>
+              </div>
               {errors.availableDateTime ? (
                 <span className="quote-error-msg">{errors.availableDateTime.message}</span>
               ) : (
-                <span className="quote-hint-msg">Recommended</span>
+                <span className="quote-hint-msg">
+                  {formValues.availableDateTime ? `Scheduled: ${formValues.availableDateTime}` : "Recommended"}
+                </span>
               )}
             </div>
           </div>

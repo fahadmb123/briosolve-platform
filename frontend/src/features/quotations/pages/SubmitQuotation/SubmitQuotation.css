@@ -283,6 +283,30 @@
     flex: 1;
 }
 
+.quote-avail-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+}
+
+@media (max-width: 520px) {
+    .quote-avail-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.quote-avail-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.quote-date-input,
+.quote-time-input {
+    font-family: inherit;
+    cursor: pointer;
+}
+
 .quote-error-msg {
     font-size: 0.75rem;
     color: #ef4444;
