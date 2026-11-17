@@ -6,6 +6,7 @@ import {
   ProviderSettings,
   ProviderKyc,
   ProviderServiceRequests,
+  ProviderServiceRequestDetails,
   ProviderChat,
   ProviderSubmitQuotation,
   ProviderMyQuotations
@@ -20,6 +21,8 @@ export const providerRoutes = (
       <Route index element={<Navigate to="dashboard" replace />} />
       <Route path="dashboard" element={<ProviderDashboard />} />
       <Route path="service-requests" element={<ProviderServiceRequests />} />
+      <Route path="service-requests/:requestId" element={<ProviderServiceRequestDetails />} />
+      <Route path="requests/:requestId" element={<ProviderServiceRequestDetails />} />
       <Route path="service-requests/:requestId/quote" element={<ProviderSubmitQuotation />} />
       <Route path="requests/:requestId/quote" element={<ProviderSubmitQuotation />} />
       <Route path="quotations" element={<ProviderMyQuotations />} />

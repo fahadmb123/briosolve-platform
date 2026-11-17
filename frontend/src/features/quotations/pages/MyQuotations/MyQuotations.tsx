@@ -94,9 +94,7 @@ export default function MyQuotations() {
   }, [hasMore, fetchQuotations, getMyQuotationsMutation.isPending]);
 
   const handleViewRequest = (serviceRequestId: string) => {
-    navigate(`/provider/service-requests`, {
-      state: { highlightRequestId: serviceRequestId }
-    });
+    navigate(`/provider/service-requests/${serviceRequestId}`);
   };
 
   const handleEditQuotation = (quotation: ProviderQuotationItem) => {

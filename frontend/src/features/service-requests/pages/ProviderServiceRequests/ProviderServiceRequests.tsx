@@ -135,6 +135,12 @@ export default function ProviderServiceRequests() {
     return requests.find((r) => r.id === selectedRequest.id) || selectedRequest;
   }, [selectedRequest, requests]);
 
+  const handleViewDetails = (req: CustomerServiceRequestItem) => {
+    navigate(`/provider/service-requests/${req.id}`, {
+      state: { request: req }
+    });
+  };
+
   const handleQuoteClick = (req: CustomerServiceRequestItem) => {
     navigate(`/provider/service-requests/${req.id}/quote`, {
       state: { request: req }
@@ -293,7 +299,7 @@ export default function ProviderServiceRequests() {
               <ProviderRequestCard
                 key={request.id}
                 request={request}
-                onViewDetails={setSelectedRequest}
+                onViewDetails={handleViewDetails}
                 onSelectPhoto={setLightboxPhoto}
                 onQuote={handleQuoteClick}
                 onViewQuotation={handleViewQuotationClick}

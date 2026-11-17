@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import "./MyRequests.css";
 import {
@@ -22,6 +22,7 @@ import {
 import { ServiceRequestCardSkeleton } from "../../components/ServiceRequestCardSkeleton";
 
 export default function MyRequests() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -151,8 +152,9 @@ export default function MyRequests() {
   };
 
   const handleOpenDetails = (request: CustomerServiceRequestItem) => {
-    setSelectedRequestForDetails(request);
-    setIsDetailsModalOpen(true);
+    navigate(`/my-requests/${request.id}`, {
+      state: { request }
+    });
   };
 
   const handleCloseDetails = () => {
