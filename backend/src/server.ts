@@ -27,6 +27,7 @@ import { createServiceRequestRoutes } from "./modules/service-request/infrastruc
 import { createChatRoutes } from "./modules/chat/infrastructure/composition";
 import { communicationRoutes } from "./modules/communication/infrastructure/composition";
 import { createQuotationRoutes } from "./modules/quotation-submission/infrastructure/composition";
+import { createPaymentRoutes } from "./modules/payment/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -49,6 +50,7 @@ const startServer = async (): Promise<void> => {
         const serviceRequestRoutes = createServiceRequestRoutes(bulkNotificationUseCase, notificationUseCase);
         const chatRoutes = createChatRoutes(io);
         const quotationRoutes = createQuotationRoutes(notificationUseCase);
+        const paymentRoutes = createPaymentRoutes(notificationUseCase);
 
         const rootRouter = createRootRouter({
             authRoutes,
@@ -64,7 +66,8 @@ const startServer = async (): Promise<void> => {
             serviceRequestRoutes,
             chatRoutes,
             communicationRoutes,
-            quotationRoutes
+            quotationRoutes,
+            paymentRoutes
         });
 
         app.use("/api", rootRouter);
