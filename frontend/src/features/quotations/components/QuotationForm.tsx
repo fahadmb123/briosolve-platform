@@ -1,4 +1,4 @@
-import { useState, useEffect, type FC } from "react";
+import { useState, useEffect, type FC, type ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -31,6 +31,24 @@ export const QuotationForm: FC<QuotationFormProps> = ({
   const [includedInput, setIncludedInput] = useState("");
   const [excludedInput, setExcludedInput] = useState("");
   const [tagError, setTagError] = useState<{ included?: string; excluded?: string }>({});
+
+  const standardDurations = [
+    "30–45 mins",
+    "1–2 hours",
+    "2–4 hours",
+    "Half day (4–6 hours)",
+    "Full day (1 day)",
+    "2–3 days",
+    "4–7 days",
+    "1–2 weeks"
+  ];
+
+  const initialDur = initialValues?.estimatedDuration || "1–2 hours";
+  const [isCustomDuration, setIsCustomDuration] = useState<boolean>(
+    !standardDurations.includes(initialDur) && Boolean(initialDur)
+  );
+  const [customDurationNum, setCustomDurationNum] = useState<string>("1");
+  const [customDurationUnit, setCustomDurationUnit] = useState<string>("Hours");
 
   const {
     register,
@@ -166,6 +184,41 @@ export const QuotationForm: FC<QuotationFormProps> = ({
     const current = formValues.excludedItems || [];
     const updated = current.filter((_, idx) => idx !== idxToRemove);
     setValue("excludedItems", updated, {
+      shouldValidate: true,
+      shouldDirty: true
+    });
+  };
+
+  const handleDurationSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === "custom") {
+      setIsCustomDuration(true);
+      setValue("estimatedDuration", `${customDurationNum} ${customDurationUnit}`, {
+        shouldValidate: true,
+        shouldDirty: true
+      });
+    } else {
+      setIsCustomDuration(false);
+      setValue("estimatedDuration", val, {
+        shouldValidate: true,
+        shouldDirty: true
+      });
+    }
+  };
+
+  const handleCustomNumChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const num = e.target.value;
+    setCustomDurationNum(num);
+    setValue("estimatedDuration", num ? `${num} ${customDurationUnit}` : "", {
+      shouldValidate: true,
+      shouldDirty: true
+    });
+  };
+
+  const handleCustomUnitChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const unit = e.target.value;
+    setCustomDurationUnit(unit);
+    setValue("estimatedDuration", customDurationNum ? `${customDurationNum} ${unit}` : "", {
       shouldValidate: true,
       shouldDirty: true
     });
@@ -513,13 +566,43 @@ export const QuotationForm: FC<QuotationFormProps> = ({
               <label className="quote-label" htmlFor="estimated-duration">
                 Estimated Duration
               </label>
-              <input
+              <select
                 id="estimated-duration"
-                type="text"
-                placeholder="e.g. 1–2 hours"
-                className={`quote-control ${errors.estimatedDuration ? "is-invalid" : ""}`}
-                {...register("estimatedDuration")}
-              />
+                className={`quote-control quote-select ${errors.estimatedDuration ? "is-invalid" : ""}`}
+                value={isCustomDuration ? "custom" : (formValues.estimatedDuration || "")}
+                onChange={handleDurationSelectChange}
+              >
+                <option value="">Select duration</option>
+                {standardDurations.map((dur) => (
+                  <option key={dur} value={dur}>
+                    {dur}
+                  </option>
+                ))}
+                <option value="custom">Custom duration...</option>
+              </select>
+              {isCustomDuration && (
+                <div className="quote-custom-duration-row">
+                  <input
+                    type="number"
+                    min="1"
+                    max="99"
+                    className="quote-control quote-custom-duration-num"
+                    placeholder="Qty"
+                    value={customDurationNum}
+                    onChange={handleCustomNumChange}
+                  />
+                  <select
+                    className="quote-control quote-select quote-custom-duration-unit"
+                    value={customDurationUnit}
+                    onChange={handleCustomUnitChange}
+                  >
+                    <option value="Hours">Hours</option>
+                    <option value="Days">Days</option>
+                    <option value="Weeks">Weeks</option>
+                    <option value="Minutes">Minutes</option>
+                  </select>
+                </div>
+              )}
               {errors.estimatedDuration ? (
                 <span className="quote-error-msg">{errors.estimatedDuration.message}</span>
               ) : (
