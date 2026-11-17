@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import type { CustomerServiceRequestItem } from "../../service-requests/types/serviceRequest.types";
 import "./PaymentSuccessPage.css";
 
 interface PaymentSuccessLocationState {
@@ -11,6 +12,7 @@ interface PaymentSuccessLocationState {
   providerName?: string;
   providerBusinessName?: string;
   serviceTitle?: string;
+  requestItem?: CustomerServiceRequestItem | null;
 }
 
 export const PaymentSuccessPage: React.FC = () => {
@@ -22,13 +24,6 @@ export const PaymentSuccessPage: React.FC = () => {
   const paymentId = state.paymentId || "rzp_simulated_success";
   const serviceRequestId = state.serviceRequestId || "";
   const providerDisplay = state.providerBusinessName || state.providerName || "Service Provider";
-
-  useEffect(() => {
-    try {
-      const containers = document.querySelectorAll(".razorpay-container");
-      containers.forEach((el) => el.remove());
-    } catch {}
-  }, []);
 
   return (
     <div className="paysuccess-page-container">
@@ -93,7 +88,13 @@ export const PaymentSuccessPage: React.FC = () => {
             <button
               type="button"
               className="paysuccess-btn-primary"
-              onClick={() => navigate(`/my-requests/${serviceRequestId}`)}
+              onClick={() =>
+                navigate(`/my-requests/${serviceRequestId}`, {
+                  state: {
+                    request: state.requestItem || null
+                  }
+                })
+              }
             >
               <i className="fas fa-arrow-left"></i>
               <span>View Service Request</span>

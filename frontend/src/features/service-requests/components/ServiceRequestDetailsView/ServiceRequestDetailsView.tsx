@@ -466,6 +466,7 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
             <RequestQuotations
               requestId={request.id}
               requestStatus={request.status}
+              requestItem={request}
               onQuotationAccepted={onQuotationAccepted}
             />
           )}

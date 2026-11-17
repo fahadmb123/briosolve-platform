@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import type { CustomerServiceRequestItem } from "../../service-requests/types/serviceRequest.types";
 import "./PaymentCancelledPage.css";
 
 interface PaymentCancelledLocationState {
@@ -9,6 +10,7 @@ interface PaymentCancelledLocationState {
   providerName?: string;
   providerBusinessName?: string;
   serviceTitle?: string;
+  requestItem?: CustomerServiceRequestItem | null;
 }
 
 export const PaymentCancelledPage: React.FC = () => {
@@ -19,13 +21,6 @@ export const PaymentCancelledPage: React.FC = () => {
   const amount = state.amount || 0;
   const serviceRequestId = state.serviceRequestId || "";
   const providerDisplay = state.providerBusinessName || state.providerName || "Service Provider";
-
-  useEffect(() => {
-    try {
-      const containers = document.querySelectorAll(".razorpay-container");
-      containers.forEach((el) => el.remove());
-    } catch {}
-  }, []);
 
   return (
     <div className="paycancel-page-container">
@@ -82,7 +77,14 @@ export const PaymentCancelledPage: React.FC = () => {
             <button
               type="button"
               className="paycancel-btn-primary"
-              onClick={() => navigate(`/my-requests/${serviceRequestId}`)}
+              onClick={() =>
+                navigate(`/my-requests/${serviceRequestId}`, {
+                  state: {
+                    request: state.requestItem || null,
+                    retryQuotationId: state.quotationId
+                  }
+                })
+              }
             >
               <i className="fas fa-redo-alt"></i>
               <span>Try Payment Again</span>

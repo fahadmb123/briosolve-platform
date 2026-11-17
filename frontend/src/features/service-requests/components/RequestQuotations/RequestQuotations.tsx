@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
   useGetRequestQuotations,
@@ -11,20 +11,24 @@ import {
 } from "../../../payment/hooks/usePayment";
 import { loadRazorpayScript } from "../../../payment/utils/razorpay.utils";
 import type { RequestQuotationItem } from "../../../quotations/types/quotation.types";
+import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import "./RequestQuotations.css";
 
 export interface RequestQuotationsProps {
   requestId: string;
   requestStatus?: string;
+  requestItem?: CustomerServiceRequestItem | null;
   onQuotationAccepted?: () => void;
 }
 
 export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   requestId,
   requestStatus,
+  requestItem,
   onQuotationAccepted
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: responseData, isLoading, error, refetch } = useGetRequestQuotations(requestId);
   const rejectMutation = useRejectQuotation();
   const createOrderMutation = useCreatePaymentOrder();
@@ -33,6 +37,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   const [confirmAcceptQuote, setConfirmAcceptQuote] = useState<RequestQuotationItem | null>(null);
   const [confirmRejectQuote, setConfirmRejectQuote] = useState<RequestQuotationItem | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
+  const activeRazorpayRef = useRef<any>(null);
   const [redirectOverlay, setRedirectOverlay] = useState<{
     show: boolean;
     type: "SUCCESS" | "CANCELLED";
@@ -51,6 +56,16 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
     requestStatus === "CANCELLED" ||
     requestStatus === "EXPIRED" ||
     requestStatus === "COMPLETED";
+
+  useEffect(() => {
+    const retryId = (location.state as any)?.retryQuotationId;
+    if (retryId && quotations.length > 0 && !confirmAcceptQuote) {
+      const match = quotations.find((q) => q.id === retryId && q.status === "PENDING");
+      if (match) {
+        setConfirmAcceptQuote(match);
+      }
+    }
+  }, [quotations, location.state]);
 
   const handleChat = (quote: RequestQuotationItem) => {
     if (!quote.provider.userId) {
@@ -73,6 +88,13 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
     setIsProcessingPayment(true);
 
     try {
+      if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+        try {
+          activeRazorpayRef.current.close();
+        } catch {}
+        activeRazorpayRef.current = null;
+      }
+
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded) {
         toast.error("Unable to load Razorpay payment gateway. Please check your internet connection.");
@@ -92,17 +114,62 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
             }
 
             let rzp: any = null;
+            let cancelHandled = false;
 
             const cleanupRazorpayModal = () => {
-              try {
-                if (rzp && typeof rzp.close === "function") {
+              if (rzp && typeof rzp.close === "function") {
+                try {
                   rzp.close();
+                } catch {}
+              }
+              if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+                try {
+                  activeRazorpayRef.current.close();
+                } catch {}
+                activeRazorpayRef.current = null;
+              }
+            };
+
+            const handlePaymentCancellation = (customMessage?: string) => {
+              if (cancelHandled) return;
+              cancelHandled = true;
+
+              cleanupRazorpayModal();
+              const quoteCancelled = confirmAcceptQuote;
+              setIsProcessingPayment(false);
+              setConfirmAcceptQuote(null);
+              if (!quoteCancelled) return;
+
+              setRedirectOverlay({
+                show: true,
+                type: "CANCELLED",
+                countdown: 3,
+                message: customMessage || "Payment process was cancelled. Your quotation is safe."
+              });
+
+              let seconds = 3;
+              const timer = setInterval(() => {
+                seconds -= 1;
+                if (seconds <= 0) {
+                  clearInterval(timer);
+                  cleanupRazorpayModal();
+                  navigate("/payment/cancelled", {
+                    state: {
+                      serviceRequestId: requestId,
+                      quotationId: quoteCancelled.id,
+                      amount: Math.round(quoteCancelled.amount * 1.1),
+                      providerName: quoteCancelled.provider.name,
+                      providerBusinessName: quoteCancelled.provider.businessName,
+                      requestItem: requestItem || null
+                    }
+                  });
+                } else {
+                  setRedirectOverlay((prev) => ({
+                    ...prev,
+                    countdown: seconds
+                  }));
                 }
-              } catch {}
-              try {
-                const containers = document.querySelectorAll(".razorpay-container");
-                containers.forEach((el) => el.remove());
-              } catch {}
+              }, 1000);
             };
 
             const options = {
@@ -112,6 +179,9 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
               name: "BrioSolve",
               description: `Booking with ${confirmAcceptQuote.provider.businessName || "Provider"}`,
               order_id: orderData.orderId,
+              retry: {
+                enabled: false
+              },
               prefill: {
                 name: orderData.customerName || "",
                 email: orderData.customerEmail || "",
@@ -160,7 +230,8 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                               quotationId: quoteAccepted.id,
                               serviceRequestId: requestId,
                               providerName: quoteAccepted.provider.name,
-                              providerBusinessName: quoteAccepted.provider.businessName
+                              providerBusinessName: quoteAccepted.provider.businessName,
+                              requestItem: requestItem || null
                             }
                           });
                         } else {
@@ -180,82 +251,22 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
               },
               modal: {
                 ondismiss: () => {
-                  cleanupRazorpayModal();
-                  const quoteCancelled = confirmAcceptQuote;
-                  setIsProcessingPayment(false);
-                  setConfirmAcceptQuote(null);
-                  if (!quoteCancelled) return;
-
-                  setRedirectOverlay({
-                    show: true,
-                    type: "CANCELLED",
-                    countdown: 3,
-                    message: "Payment process was cancelled. Your quotation is safe."
-                  });
-
-                  let seconds = 3;
-                  const timer = setInterval(() => {
-                    seconds -= 1;
-                    if (seconds <= 0) {
-                      clearInterval(timer);
-                      cleanupRazorpayModal();
-                      navigate("/payment/cancelled", {
-                        state: {
-                          serviceRequestId: requestId,
-                          quotationId: quoteCancelled.id,
-                          amount: Math.round(quoteCancelled.amount * 1.1),
-                          providerName: quoteCancelled.provider.name,
-                          providerBusinessName: quoteCancelled.provider.businessName
-                        }
-                      });
-                    } else {
-                      setRedirectOverlay((prev) => ({
-                        ...prev,
-                        countdown: seconds
-                      }));
-                    }
-                  }, 1000);
+                  handlePaymentCancellation("Payment process was cancelled. Your quotation is safe.");
                 }
               }
             };
 
+            if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+              try {
+                activeRazorpayRef.current.close();
+              } catch {}
+              activeRazorpayRef.current = null;
+            }
+
             rzp = new window.Razorpay(options);
+            activeRazorpayRef.current = rzp;
             rzp.on("payment.failed", (resp: any) => {
-              cleanupRazorpayModal();
-              const quoteCancelled = confirmAcceptQuote;
-              setIsProcessingPayment(false);
-              setConfirmAcceptQuote(null);
-              if (!quoteCancelled) return;
-
-              setRedirectOverlay({
-                show: true,
-                type: "CANCELLED",
-                countdown: 3,
-                message: resp.error?.description || "Payment failed or was cancelled."
-              });
-
-              let seconds = 3;
-              const timer = setInterval(() => {
-                seconds -= 1;
-                if (seconds <= 0) {
-                  clearInterval(timer);
-                  cleanupRazorpayModal();
-                  navigate("/payment/cancelled", {
-                    state: {
-                      serviceRequestId: requestId,
-                      quotationId: quoteCancelled.id,
-                      amount: Math.round(quoteCancelled.amount * 1.1),
-                      providerName: quoteCancelled.provider.name,
-                      providerBusinessName: quoteCancelled.provider.businessName
-                    }
-                  });
-                } else {
-                  setRedirectOverlay((prev) => ({
-                    ...prev,
-                    countdown: seconds
-                  }));
-                }
-              }, 1000);
+              handlePaymentCancellation(resp?.error?.description || "Payment failed or was cancelled.");
             });
             rzp.open();
           },
