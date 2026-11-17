@@ -1,0 +1,116 @@
+import { Temporal } from "@js-temporal/polyfill";
+import { Quotation, QuotationType, QuotationValidity, QuotationStatus } from "../../domain/entities/quotation.entity";
+import { CreateQuotationRepoDto } from "../../application/dtos/request/submit-quotation.dto";
+import { QuotationResponseDto } from "../../application/dtos/response/quotation-response.dto";
+
+export class QuotationMapper {
+    static toDomain(record: any): Quotation {
+        const parseDate = (val: any): Date => {
+            if (!val) return new Date();
+            if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
+                const epoch = (val as { epochMilliseconds: bigint | number }).epochMilliseconds;
+                return new Date(Number(epoch));
+            }
+            return new Date(val);
+        };
+
+        const parseNullableDate = (val: any): Date | null => {
+            if (!val) return null;
+            if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
+                const epoch = (val as { epochMilliseconds: bigint | number }).epochMilliseconds;
+                return new Date(Number(epoch));
+            }
+            return new Date(val);
+        };
+
+        const parseJsonArray = (val: any): string[] => {
+            if (!val) return [];
+            if (Array.isArray(val)) return val.map(String);
+            if (typeof val === "string") {
+                try {
+                    const parsed = JSON.parse(val);
+                    return Array.isArray(parsed) ? parsed.map(String) : [val];
+                } catch {
+                    return [val];
+                }
+            }
+            return [];
+        };
+
+        const createdDate = parseDate(record.created_at);
+        const updatedDate = parseDate(record.updated_at);
+        const validUntilDate = parseNullableDate(record.valid_until_date) ?? new Date();
+
+        return new Quotation(
+            record.id,
+            record.service_request_id,
+            record.provider_id,
+            Number(record.amount),
+            record.quotation_type as QuotationType,
+            record.work_description,
+            parseJsonArray(record.included_items),
+            parseJsonArray(record.excluded_items),
+            record.estimated_duration ?? null,
+            record.available_date_time ?? null,
+            record.valid_until as QuotationValidity,
+            validUntilDate,
+            record.extra_charge_policy,
+            record.status as QuotationStatus,
+            createdDate,
+            updatedDate
+        );
+    }
+
+    static toResponseDto(entity: Quotation): QuotationResponseDto {
+        return {
+            id: entity.id,
+            serviceRequestId: entity.service_request_id,
+            providerId: entity.provider_id,
+            amount: entity.amount,
+            quotationType: entity.quotation_type,
+            workDescription: entity.work_description,
+            includedItems: entity.included_items,
+            excludedItems: entity.excluded_items,
+            estimatedDuration: entity.estimated_duration,
+            availableDateTime: entity.available_date_time,
+            validUntil: entity.valid_until,
+            validUntilDate: entity.valid_until_date.toISOString(),
+            extraChargePolicy: entity.extra_charge_policy,
+            status: entity.status,
+            createdAt: entity.created_at.toISOString(),
+            updatedAt: entity.updated_at.toISOString()
+        };
+    }
+
+    static toPersistence(data: CreateQuotationRepoDto): any {
+        const now = new Date();
+        let validUntilHours = 24;
+        if (data.validUntil === "HOURS_48") {
+            validUntilHours = 48;
+        } else if (data.validUntil === "DAYS_3") {
+            validUntilHours = 72;
+        } else if (data.validUntil === "DAYS_7") {
+            validUntilHours = 168;
+        }
+
+        const validUntilDate = new Date(now.getTime() + validUntilHours * 60 * 60 * 1000);
+        const validUntilInstant = Temporal.Instant.fromEpochMilliseconds(validUntilDate.getTime());
+
+        return {
+            service_request_id: data.serviceRequestId,
+            provider_id: data.providerId,
+            amount: data.amount.toString(),
+            quotation_type: data.quotationType,
+            work_description: data.workDescription,
+            included_items: data.includedItems,
+            excluded_items: data.excludedItems,
+            estimated_duration: data.estimatedDuration ?? null,
+            available_date_time: data.availableDateTime ?? null,
+            valid_until: data.validUntil,
+            valid_until_date: validUntilInstant,
+            extra_charge_policy: data.extraChargePolicy,
+            status: "PENDING",
+            created_at: Temporal.Now.instant()
+        };
+    }
+}

@@ -40,7 +40,7 @@ export const QuotationSummaryPreview: FC<QuotationSummaryPreviewProps> = ({
         <span className="quote-preview-label">
           <i className="far fa-eye"></i> Customer Preview
         </span>
-        <span className="quote-preview-sub">What customer will see</span>
+        <span className="quote-preview-sub">Quotation from {providerName}</span>
       </div>
 
       <div className="quote-preview-body">
@@ -128,15 +128,6 @@ export const QuotationSummaryPreview: FC<QuotationSummaryPreviewProps> = ({
               <i className="fas fa-shield-alt"></i> Extra-charge Policy
             </span>
             <p className="quote-preview-policy-text">{quote.extraChargePolicy}</p>
-          </div>
-        )}
-
-        {quote.messageToCustomer && (
-          <div className="quote-preview-section message">
-            <span className="quote-preview-heading">
-              <i className="far fa-comment-dots"></i> Note from {providerName}
-            </span>
-            <p className="quote-preview-message-text">"{quote.messageToCustomer}"</p>
           </div>
         )}
       </div>

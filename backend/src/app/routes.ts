@@ -18,6 +18,7 @@ export function createRootRouter(route: RootRouterDependencies) {
     router.use("/service-request", route.serviceRequestRoutes);
     router.use("/chat", route.chatRoutes);
     router.use("/communication", route.communicationRoutes);
+    router.use("/quotation", route.quotationRoutes);
 
     return router;
 }

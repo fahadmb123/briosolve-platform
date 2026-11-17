@@ -60,12 +60,6 @@ export const quotationSchema = z.object({
     .max(80, { message: "Available date/time cannot exceed 80 characters" })
     .optional(),
 
-  messageToCustomer: z
-    .string()
-    .trim()
-    .max(500, { message: "Message cannot exceed 500 characters" })
-    .optional(),
-
   validUntil: z.enum(["24_HOURS", "48_HOURS", "3_DAYS", "7_DAYS"], {
     message: "Please select quotation validity period"
   }),

@@ -64,6 +64,10 @@
       "model": "push_subscriptions",
       "namespace": "public"
     },
+    "quotations": {
+      "model": "quotations",
+      "namespace": "public"
+    },
     "service_request_images": {
       "model": "service_request_images",
       "namespace": "public"
@@ -180,6 +184,69 @@
               {
                 "name": "FILE",
                 "value": "FILE"
+              }
+            ]
+          },
+          "quotation_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "ACCEPTED",
+                "value": "ACCEPTED"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
+              },
+              {
+                "name": "EXPIRED",
+                "value": "EXPIRED"
+              },
+              {
+                "name": "WITHDRAWN",
+                "value": "WITHDRAWN"
+              }
+            ]
+          },
+          "quotation_type": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "FIXED",
+                "value": "FIXED"
+              },
+              {
+                "name": "ESTIMATED",
+                "value": "ESTIMATED"
+              },
+              {
+                "name": "INSPECTION_REQUIRED",
+                "value": "INSPECTION_REQUIRED"
+              }
+            ]
+          },
+          "quotation_validity": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "HOURS_24",
+                "value": "HOURS_24"
+              },
+              {
+                "name": "HOURS_48",
+                "value": "HOURS_48"
+              },
+              {
+                "name": "DAYS_3",
+                "value": "DAYS_3"
+              },
+              {
+                "name": "DAYS_7",
+                "value": "DAYS_7"
               }
             ]
           },
@@ -1865,6 +1932,21 @@
                   "namespace": "public"
                 }
               },
+              "quotations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "provider_id"
+                  ]
+                },
+                "to": {
+                  "model": "quotations",
+                  "namespace": "public"
+                }
+              },
               "service_requests": {
                 "cardinality": "1:N",
                 "on": {
@@ -2369,6 +2451,244 @@
               "table": "push_subscriptions"
             }
           },
+          "quotations": {
+            "fields": {
+              "amount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
+              "available_date_time": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 80
+                  }
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "estimated_duration": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 60
+                  }
+                }
+              },
+              "excluded_items": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "extra_charge_policy": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 300
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "included_items": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "quotation_type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "quotation_type",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "service_request_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "quotation_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updated_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "valid_until": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "quotation_validity",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "valid_until_date": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "work_description": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 1000
+                  }
+                }
+              }
+            },
+            "relations": {
+              "provider": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "provider_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "provider_profiles",
+                  "namespace": "public"
+                }
+              },
+              "service_request": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "service_request_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "service_requests",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "amount": {
+                  "column": "amount"
+                },
+                "available_date_time": {
+                  "column": "available_date_time"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "estimated_duration": {
+                  "column": "estimated_duration"
+                },
+                "excluded_items": {
+                  "column": "excluded_items"
+                },
+                "extra_charge_policy": {
+                  "column": "extra_charge_policy"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "included_items": {
+                  "column": "included_items"
+                },
+                "provider_id": {
+                  "column": "provider_id"
+                },
+                "quotation_type": {
+                  "column": "quotation_type"
+                },
+                "service_request_id": {
+                  "column": "service_request_id"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updated_at": {
+                  "column": "updated_at"
+                },
+                "valid_until": {
+                  "column": "valid_until"
+                },
+                "valid_until_date": {
+                  "column": "valid_until_date"
+                },
+                "work_description": {
+                  "column": "work_description"
+                }
+              },
+              "namespaceId": "public",
+              "table": "quotations"
+            }
+          },
           "service_request_images": {
             "fields": {
               "created_at": {
@@ -2762,6 +3082,21 @@
                 },
                 "to": {
                   "model": "service_request_providers",
+                  "namespace": "public"
+                }
+              },
+              "quotations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "service_request_id"
+                  ]
+                },
+                "to": {
+                  "model": "quotations",
                   "namespace": "public"
                 }
               },
@@ -5101,6 +5436,225 @@
                 }
               ]
             },
+            "quotations": {
+              "checks": [
+                {
+                  "expression": "\"quotation_type\" IN ('FIXED', 'ESTIMATED', 'INSPECTION_REQUIRED')",
+                  "name": "quotations_quotation_type_check_4adf5ec5",
+                  "prefix": "quotations_quotation_type_check"
+                },
+                {
+                  "expression": "\"status\" IN ('PENDING', 'ACCEPTED', 'REJECTED', 'EXPIRED', 'WITHDRAWN')",
+                  "name": "quotations_status_check_9282885c",
+                  "prefix": "quotations_status_check"
+                },
+                {
+                  "expression": "\"valid_until\" IN ('HOURS_24', 'HOURS_48', 'DAYS_3', 'DAYS_7')",
+                  "name": "quotations_valid_until_check_23f86f6a",
+                  "prefix": "quotations_valid_until_check"
+                }
+              ],
+              "columns": {
+                "amount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
+                "available_date_time": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 80
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "estimated_duration": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 60
+                  }
+                },
+                "excluded_items": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": false
+                },
+                "extra_charge_policy": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 300
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "included_items": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": false
+                },
+                "provider_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "quotation_type": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "FIXED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "quotation_type",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "service_request_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "quotation_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "valid_until": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "HOURS_24"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "quotation_validity",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "valid_until_date": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "work_description": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 1000
+                  }
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "service_request_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "quotations"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_requests"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "provider_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "quotations"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "provider_profiles"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "provider_id"
+                  ],
+                  "name": "quotations_provider_id_idx_d89e110d",
+                  "prefix": "quotations_provider_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "service_request_id"
+                  ],
+                  "name": "quotations_service_request_id_idx_8060a003",
+                  "prefix": "quotations_service_request_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "status"
+                  ],
+                  "name": "quotations_status_idx_e98638ab",
+                  "prefix": "quotations_status_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "service_request_images": {
               "columns": {
                 "created_at": {
@@ -5942,6 +6496,33 @@
                 "FILE"
               ]
             },
+            "quotation_status": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "ACCEPTED",
+                "REJECTED",
+                "EXPIRED",
+                "WITHDRAWN"
+              ]
+            },
+            "quotation_type": {
+              "kind": "valueSet",
+              "values": [
+                "FIXED",
+                "ESTIMATED",
+                "INSPECTION_REQUIRED"
+              ]
+            },
+            "quotation_validity": {
+              "kind": "valueSet",
+              "values": [
+                "HOURS_24",
+                "HOURS_48",
+                "DAYS_3",
+                "DAYS_7"
+              ]
+            },
             "reactivation_request_status": {
               "kind": "valueSet",
               "values": [
@@ -6030,10 +6611,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "c0f046817e93fe4f32bfe8f1fbd646b066498df7b669166b07002dcfda3a928e"
+    "storageHash": "ddae0ee318d7ab3d9984804018f0a5412daea8351d80f76df5589c2e0399b095"
   },
   "execution": {
-    "executionHash": "4f4677f17d162219b29c0c6bf16068f6998c645f6198ae088278763c716d2199",
+    "executionHash": "710a614916244243ae86df704ca79f263374a0bac2ea7239d29e4b79024ef636",
     "mutations": {
       "defaults": [
         {
@@ -6349,6 +6930,32 @@
             "column": "id",
             "namespace": "public",
             "table": "push_subscriptions"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "quotations"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "quotations"
           }
         },
         {

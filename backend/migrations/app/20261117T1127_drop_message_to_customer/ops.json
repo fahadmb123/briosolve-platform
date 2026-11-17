@@ -1,0 +1,44 @@
+[
+  {
+    "id": "dropColumn.quotations.message_to_customer",
+    "label": "Drop column \"message_to_customer\" from \"quotations\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "message_to_customer",
+        "table": "quotations"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"message_to_customer\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "quotations",
+          "message_to_customer"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop column \"message_to_customer\"",
+        "sql": "ALTER TABLE \"public\".\"quotations\" DROP COLUMN \"message_to_customer\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"message_to_customer\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "quotations",
+          "message_to_customer"
+        ]
+      }
+    ]
+  }
+]

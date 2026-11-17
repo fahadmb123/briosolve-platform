@@ -1,0 +1,242 @@
+[
+  {
+    "id": "table.quotations",
+    "label": "Create table \"quotations\"",
+    "summary": "Creates table \"quotations\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "quotations"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"quotations\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"quotations\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"quotations\"",
+        "sql": "CREATE TABLE \"public\".\"quotations\" (\n  \"amount\" numeric(12,2) NOT NULL,\n  \"available_date_time\" character varying(80),\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"estimated_duration\" character varying(60),\n  \"excluded_items\" json NOT NULL,\n  \"extra_charge_policy\" character varying(300) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"included_items\" json NOT NULL,\n  \"message_to_customer\" character varying(500),\n  \"provider_id\" uuid NOT NULL,\n  \"quotation_type\" text DEFAULT 'FIXED' NOT NULL,\n  \"service_request_id\" uuid NOT NULL,\n  \"status\" text DEFAULT 'PENDING' NOT NULL,\n  \"updated_at\" timestamptz NOT NULL,\n  \"valid_until\" text DEFAULT 'HOURS_24' NOT NULL,\n  \"valid_until_date\" timestamptz NOT NULL,\n  \"work_description\" character varying(1000) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"quotations_quotation_type_check_4adf5ec5\" CHECK (\"quotation_type\" IN ('FIXED', 'ESTIMATED', 'INSPECTION_REQUIRED')),\n  CONSTRAINT \"quotations_status_check_9282885c\" CHECK (\"status\" IN ('PENDING', 'ACCEPTED', 'REJECTED', 'EXPIRED', 'WITHDRAWN')),\n  CONSTRAINT \"quotations_valid_until_check_23f86f6a\" CHECK (\"valid_until\" IN ('HOURS_24', 'HOURS_48', 'DAYS_3', 'DAYS_7'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"quotations\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"quotations\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.quotations.quotations_provider_id_idx_d89e110d",
+    "label": "Create index \"quotations_provider_id_idx_d89e110d\" on \"quotations\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "quotations_provider_id_idx_d89e110d",
+        "table": "quotations"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"quotations_provider_id_idx_d89e110d\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"quotations_provider_id_idx_d89e110d\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"quotations_provider_id_idx_d89e110d\"",
+        "sql": "CREATE INDEX \"quotations_provider_id_idx_d89e110d\" ON \"public\".\"quotations\" (\"provider_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"quotations_provider_id_idx_d89e110d\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"quotations_provider_id_idx_d89e110d\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.quotations.quotations_service_request_id_idx_8060a003",
+    "label": "Create index \"quotations_service_request_id_idx_8060a003\" on \"quotations\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "quotations_service_request_id_idx_8060a003",
+        "table": "quotations"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"quotations_service_request_id_idx_8060a003\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"quotations_service_request_id_idx_8060a003\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"quotations_service_request_id_idx_8060a003\"",
+        "sql": "CREATE INDEX \"quotations_service_request_id_idx_8060a003\" ON \"public\".\"quotations\" (\"service_request_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"quotations_service_request_id_idx_8060a003\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"quotations_service_request_id_idx_8060a003\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.quotations.quotations_status_idx_e98638ab",
+    "label": "Create index \"quotations_status_idx_e98638ab\" on \"quotations\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "quotations_status_idx_e98638ab",
+        "table": "quotations"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"quotations_status_idx_e98638ab\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"quotations_status_idx_e98638ab\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"quotations_status_idx_e98638ab\"",
+        "sql": "CREATE INDEX \"quotations_status_idx_e98638ab\" ON \"public\".\"quotations\" (\"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"quotations_status_idx_e98638ab\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"quotations_status_idx_e98638ab\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.quotations.quotations_service_request_id_fkey",
+    "label": "Add foreign key \"quotations_service_request_id_fkey\" on \"quotations\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "quotations_service_request_id_fkey",
+        "table": "quotations"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"quotations_service_request_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "quotations_service_request_id_fkey",
+          "public",
+          "\"public\".\"quotations\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"quotations_service_request_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"quotations\"\nADD CONSTRAINT \"quotations_service_request_id_fkey\"\nFOREIGN KEY (\"service_request_id\")\nREFERENCES \"public\".\"service_requests\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"quotations_service_request_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "quotations_service_request_id_fkey",
+          "public",
+          "\"public\".\"quotations\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.quotations.quotations_provider_id_fkey",
+    "label": "Add foreign key \"quotations_provider_id_fkey\" on \"quotations\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "quotations_provider_id_fkey",
+        "table": "quotations"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"quotations_provider_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "quotations_provider_id_fkey",
+          "public",
+          "\"public\".\"quotations\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"quotations_provider_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"quotations\"\nADD CONSTRAINT \"quotations_provider_id_fkey\"\nFOREIGN KEY (\"provider_id\")\nREFERENCES \"public\".\"provider_profiles\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"quotations_provider_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "quotations_provider_id_fkey",
+          "public",
+          "\"public\".\"quotations\""
+        ]
+      }
+    ]
+  }
+]

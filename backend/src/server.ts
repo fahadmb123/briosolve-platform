@@ -26,6 +26,7 @@ import { createBulkNotificationUseCase, createNotificationUseCase, webPushDelive
 import { createServiceRequestRoutes } from "./modules/service-request/infrastructure/composition";
 import { createChatRoutes } from "./modules/chat/infrastructure/composition";
 import { communicationRoutes } from "./modules/communication/infrastructure/composition";
+import { createQuotationRoutes } from "./modules/quotation-submission/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -47,6 +48,7 @@ const startServer = async (): Promise<void> => {
         const verificationRoutes = createVerificationRoutes(notificationUseCase);
         const serviceRequestRoutes = createServiceRequestRoutes(bulkNotificationUseCase, notificationUseCase);
         const chatRoutes = createChatRoutes(io);
+        const quotationRoutes = createQuotationRoutes(notificationUseCase);
 
         const rootRouter = createRootRouter({
             authRoutes,
@@ -61,7 +63,8 @@ const startServer = async (): Promise<void> => {
             notificationRoutes,
             serviceRequestRoutes,
             chatRoutes,
-            communicationRoutes
+            communicationRoutes,
+            quotationRoutes
         });
 
         app.use("/api", rootRouter);

@@ -12,7 +12,6 @@ export interface QuotationFormData {
   availableDateTime: string;
   validUntil: QuotationValidity | string;
   extraChargePolicy: string;
-  messageToCustomer?: string;
 }
 
 export interface SubmitQuotationPayload {
@@ -24,7 +23,6 @@ export interface SubmitQuotationPayload {
   excludedItems: string[];
   estimatedDuration?: string;
   availableDateTime?: string;
-  messageToCustomer?: string;
   validUntil: string;
   extraChargePolicy: string;
 }
