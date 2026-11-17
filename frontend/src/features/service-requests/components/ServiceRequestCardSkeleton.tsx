@@ -10,43 +10,28 @@ export const ServiceRequestCardSkeleton: React.FC<ServiceRequestCardSkeletonProp
   variant = "customer",
 }) => {
   const isProvider = variant === "provider";
-  const cardClass = isProvider ? "provreq-clean-card" : "myreq-clean-card";
-  const topRowClass = isProvider ? "provreq-card-top-row" : "myreq-card-top-row";
-  const bodyClass = isProvider ? "provreq-card-body" : "myreq-card-content";
-  const metaClass = isProvider ? "provreq-meta-grid" : "myreq-meta-row";
-  const bottomRowClass = isProvider ? "provreq-card-bottom-row" : "myreq-card-bottom-row";
-  const actionsClass = isProvider ? "provreq-card-actions" : "myreq-card-actions";
+  const cardClass = isProvider ? "provreq-row-card" : "myreq-row-card";
 
   return (
     <div className={cardClass} aria-hidden="true" style={{ pointerEvents: "none" }}>
-      <div className={topRowClass}>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <Skeleton width={16} height={16} borderRadius={4} />
-          <Skeleton width={135} height={16} borderRadius={4} />
-        </div>
-        <Skeleton width={96} height={24} borderRadius={9999} />
-      </div>
+      <Skeleton circle width={48} height={48} />
 
-      <div className={bodyClass}>
-        <Skeleton width="72%" height={22} borderRadius={4} style={{ marginBottom: 10 }} />
-        <Skeleton count={2} height={14} borderRadius={4} style={{ marginBottom: 6 }} />
-
-        <div className={metaClass} style={{ marginTop: 12 }}>
-          <Skeleton width={115} height={26} borderRadius={6} />
-          <Skeleton width={125} height={26} borderRadius={6} />
-          <Skeleton width={110} height={26} borderRadius={6} />
-          <Skeleton width={95} height={26} borderRadius={6} />
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+        <Skeleton width={180} height={13} borderRadius={4} />
+        <Skeleton width="55%" height={20} borderRadius={4} />
+        <Skeleton width="85%" height={14} borderRadius={4} />
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.25rem" }}>
+          <Skeleton width={115} height={16} borderRadius={4} />
+          <Skeleton width={125} height={16} borderRadius={4} />
+          <Skeleton width={150} height={16} borderRadius={4} />
         </div>
       </div>
 
-      <div className={bottomRowClass} style={{ marginTop: 16 }}>
-        <Skeleton width={120} height={16} borderRadius={4} />
-        <div className={actionsClass}>
-          <Skeleton width={80} height={32} borderRadius={7} />
-          <Skeleton width={105} height={32} borderRadius={7} />
-        </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexShrink: 0 }}>
+        <Skeleton width={110} height={26} borderRadius={9999} />
+        <Skeleton width={48} height={48} borderRadius={8} />
+        <Skeleton width={110} height={34} borderRadius={9999} />
       </div>
     </div>
   );
 };
-

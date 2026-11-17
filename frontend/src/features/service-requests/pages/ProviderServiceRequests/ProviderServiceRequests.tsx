@@ -181,13 +181,12 @@ export default function ProviderServiceRequests() {
     <div className="provreq-page-container">
       <div className="provreq-hero-banner">
         <div className="provreq-hero-left">
-          <span className="provreq-page-badge">
-            <i className="fas fa-radar"></i>
-            <span>Marketplace Leads</span>
-          </span>
-          <h1 className="provreq-hero-title">Service Request Opportunities</h1>
+          <div className="provreq-title-badge-row">
+            <h1 className="provreq-hero-title">Service Requests</h1>
+            <span className="provreq-portal-badge">Provider Portal</span>
+          </div>
           <p className="provreq-hero-subtext">
-            Browse and respond to customer service requests matched to your skills and operating radius
+            Browse and respond to client requirements in your service area and submit competitive quotations.
           </p>
         </div>
 
@@ -207,34 +206,10 @@ export default function ProviderServiceRequests() {
         </div>
       </div>
 
-      <div className="provreq-filter-bar">
-        <div className="provreq-filter-top-row">
-          <div className="provreq-search-box">
-            <i className="fas fa-search provreq-search-icon"></i>
-            <input
-              type="text"
-              placeholder="Search by title, location, category..."
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="provreq-search-input"
-            />
-          </div>
-
-          <div className="provreq-filter-controls">
-            <select
-              value={sortBy}
-              onChange={(e) => handleSortChange(e.target.value as typeof sortBy)}
-              className="provreq-sort-select"
-            >
-              <option value="NEWEST">Newest First</option>
-              <option value="URGENT">Most Urgent First</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="provreq-filter-pills-row">
+      <div className="provreq-filter-bar-container">
+        <div className="provreq-status-tabs-list" role="tablist">
           {[
-            { id: "ALL", label: "All Opportunities" },
+            { id: "ALL", label: "All Leads" },
             { id: "TODAY", label: "Needed Today" },
             { id: "THIS_WEEK", label: "This Week" },
             { id: "SPECIFIC_DATE", label: "Specific Date" },
@@ -243,18 +218,53 @@ export default function ProviderServiceRequests() {
             <button
               key={pill.id}
               type="button"
-              className={`provreq-filter-pill ${urgencyFilter === pill.id ? "active" : ""}`}
+              className={`provreq-status-tab-btn ${urgencyFilter === pill.id ? "active" : ""}`}
               onClick={() => handleUrgencyChange(pill.id)}
             >
-              {pill.label}
+              <span>{pill.label}</span>
             </button>
           ))}
+        </div>
+
+        <div className="provreq-search-sort-group">
+          <div className="provreq-search-field-wrapper">
+            <i className="fas fa-search provreq-search-prefix-icon"></i>
+            <input
+              type="text"
+              placeholder="Search by title, service, location..."
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="provreq-search-text-input"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="provreq-search-reset-btn"
+                onClick={() => handleSearchChange("")}
+                title="Clear search"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            )}
+          </div>
+
+          <div className="provreq-sort-dropdown-wrapper">
+            <select
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value as typeof sortBy)}
+              className="provreq-sort-select-input"
+            >
+              <option value="NEWEST">Newest First</option>
+              <option value="URGENT">Most Urgent First</option>
+            </select>
+            <i className="fas fa-chevron-down provreq-sort-chevron"></i>
+          </div>
         </div>
       </div>
 
       {getRequestsMutation.isPending && requests.length === 0 ? (
-        <div className="provreq-cards-grid">
-          {Array.from({ length: 6 }).map((_, idx) => (
+        <div className="provreq-cards-stack">
+          {Array.from({ length: 4 }).map((_, idx) => (
             <ServiceRequestCardSkeleton key={idx} variant="provider" />
           ))}
         </div>
@@ -272,7 +282,7 @@ export default function ProviderServiceRequests() {
         </div>
       ) : (
         <>
-          <div className="provreq-cards-grid">
+          <div className="provreq-cards-stack">
             {requests.map((request) => (
               <ProviderRequestCard
                 key={request.id}

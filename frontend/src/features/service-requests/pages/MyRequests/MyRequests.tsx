@@ -253,9 +253,12 @@ export default function MyRequests() {
     <div className="app-content myreq-wrapper">
       <div className="myreq-top-header">
         <div className="myreq-header-info">
-          <h1 className="myreq-page-title">My Service Requests</h1>
+          <div className="myreq-title-badge-row">
+            <h1 className="myreq-page-title">My Service Requests</h1>
+            <span className="myreq-client-badge">Client Portal</span>
+          </div>
           <p className="myreq-page-subtitle">
-            Manage your posted requirements, evaluate responses, and keep track of job progress.
+            Manage your posted requirements, evaluate contractor responses, and track real-time job progress.
           </p>
         </div>
 
@@ -278,8 +281,8 @@ export default function MyRequests() {
       />
 
       {isLoading ? (
-        <div className="myreq-cards-grid">
-          {Array.from({ length: 6 }).map((_, idx) => (
+        <div className="myreq-cards-stack">
+          {Array.from({ length: 4 }).map((_, idx) => (
             <ServiceRequestCardSkeleton key={idx} variant="customer" />
           ))}
         </div>
@@ -323,7 +326,7 @@ export default function MyRequests() {
         </div>
       ) : (
         <>
-          <div className="myreq-cards-grid">
+          <div className="myreq-cards-stack">
             {requests.map((request) => (
               <RequestCard
                 key={request.id}

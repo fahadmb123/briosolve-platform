@@ -1,6 +1,7 @@
 import React from "react";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { checkRequestEditPermission } from "../../utils/serviceRequestEdit.utils";
+import { getCategoryVisualConfig } from "../../utils/categoryIcon.utils";
 
 interface RequestCardProps {
   request: CustomerServiceRequestItem;
@@ -17,178 +18,222 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   onCancelRequest,
   onReopenRequest,
 }) => {
-  const getStatusBadge = (status: CustomerServiceRequestItem["status"]) => {
-    switch (status) {
-      case "PENDING":
-        return { label: "Pending Quotes", variant: "pending" };
-      case "ACTIVE":
-        return { label: "Active", variant: "active" };
-      case "ACCEPTED":
-        return { label: "Accepted", variant: "accepted" };
-      case "IN_PROGRESS":
-        return { label: "In Progress", variant: "in-progress" };
-      case "COMPLETED":
-        return { label: "Completed", variant: "completed" };
-      case "CANCELLED":
-        return { label: "Cancelled", variant: "cancelled" };
-      case "EXPIRED":
-        return { label: "Expired", variant: "expired" };
-      default:
-        return { label: status, variant: "default" };
-    }
-  };
-
-  const getUrgencyText = () => {
-    if (request.status === "EXPIRED") {
-      return "Expired";
-    }
-    if (request.specific_date) {
-      const dateStr = new Date(request.specific_date).toISOString().split("T")[0];
-      return `By ${dateStr}`;
-    }
-    switch (request.urgency) {
-      case "TODAY":
-        return "Needed Today";
-      case "THIS_WEEK":
-        return "Needed This Week";
-      case "FLEXIBLE":
-        return "Flexible Schedule";
-      default:
-        return "Specific Date";
-    }
-  };
-
-  const statusInfo = getStatusBadge(request.status);
+  const visual = getCategoryVisualConfig(request.category_name, request.subservice_name);
   const permission = checkRequestEditPermission(request);
   const canCancel = request.status === "PENDING" || request.status === "ACTIVE";
 
+  const getUrgencyText = () => {
+    if (request.status === "EXPIRED") {
+      const expDate = request.created_at
+        ? new Date(request.created_at).toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric",
+            year: "numeric"
+          })
+        : "Past due";
+      return `Expired: ${expDate}`;
+    }
+    if (request.specific_date) {
+      const dateStr = new Date(request.specific_date).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+      return `Required by: ${dateStr}`;
+    }
+    switch (request.urgency) {
+      case "TODAY":
+        return "Required: Today";
+      case "THIS_WEEK":
+        return "Required: This Week";
+      case "FLEXIBLE":
+        return "Schedule: Flexible";
+      default:
+        return "Scheduled Service";
+    }
+  };
+
   const addressText = request.address_details
-    ? `${request.address_details.area}, ${request.address_details.city}`
+    ? `${request.address_details.area || ""}, ${request.address_details.city || ""}`.trim().replace(/^,|,$/g, "")
     : "Address on file";
 
   const formattedDate = new Date(request.created_at).toLocaleDateString(undefined, {
-    month: "short",
     day: "numeric",
+    month: "short",
     year: "numeric",
   });
 
-  return (
-    <div className="myreq-clean-card">
-      <div className="myreq-card-top-row">
-        <div className="myreq-card-category-crumbs">
-          <i className="fas fa-layer-group myreq-crumb-icon"></i>
-          <span className="myreq-category-name">{request.category_name || "Service"}</span>
-          {request.subservice_name && (
-            <>
-              <span className="myreq-crumb-separator">/</span>
-              <span className="myreq-subservice-name">{request.subservice_name}</span>
-            </>
-          )}
-        </div>
+  const quotesCount = request.quotations_count ?? 0;
+  const notifiedCount = request.matched_providers_count ?? 0;
+  const isExpired = request.status === "EXPIRED";
 
-        <div className={`myreq-status-pill ${statusInfo.variant}`}>
-          <span className="myreq-status-dot"></span>
-          <span>{statusInfo.label}</span>
-        </div>
+  const renderStatusBadge = () => {
+    if (isExpired) {
+      return (
+        <span className="myreq-badge-pill myreq-badge-expired">
+          <span className="myreq-dot-indicator"></span>
+          <span>Expired</span>
+        </span>
+      );
+    }
+
+    if (quotesCount > 0) {
+      return (
+        <span className="myreq-badge-pill myreq-badge-quotes">
+          <i className="fas fa-bolt"></i>
+          <span>{quotesCount} {quotesCount === 1 ? "quote" : "quotes"} arriving</span>
+        </span>
+      );
+    }
+
+    if (notifiedCount > 0) {
+      return (
+        <span className="myreq-badge-pill myreq-badge-notified">
+          <i className="fas fa-user-friends"></i>
+          <span>{notifiedCount} {notifiedCount === 1 ? "professional" : "professionals"} notified</span>
+        </span>
+      );
+    }
+
+    if (request.status === "COMPLETED") {
+      return (
+        <span className="myreq-badge-pill myreq-badge-completed">
+          <span className="myreq-dot-indicator"></span>
+          <span>Completed</span>
+        </span>
+      );
+    }
+
+    if (request.status === "IN_PROGRESS") {
+      return (
+        <span className="myreq-badge-pill myreq-badge-progress">
+          <span className="myreq-dot-indicator"></span>
+          <span>In Progress</span>
+        </span>
+      );
+    }
+
+    if (request.status === "CANCELLED") {
+      return (
+        <span className="myreq-badge-pill myreq-badge-cancelled">
+          <span className="myreq-dot-indicator"></span>
+          <span>Cancelled</span>
+        </span>
+      );
+    }
+
+    return (
+      <span className="myreq-badge-pill myreq-badge-pending">
+        <span className="myreq-dot-indicator"></span>
+        <span>Pending</span>
+      </span>
+    );
+  };
+
+  const firstImage = request.images && request.images.length > 0 ? request.images[0].image_key : null;
+
+  return (
+    <div className="myreq-row-card">
+      <div
+        className="myreq-category-avatar"
+        style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
+        aria-hidden="true"
+      >
+        <i className={visual.icon}></i>
       </div>
 
-      <div className="myreq-card-content">
-        <h3 className="myreq-card-headline" onClick={() => onViewDetails(request)}>
+      <div className="myreq-row-center">
+        <div className="myreq-row-breadcrumbs">
+          <span className="myreq-crumb-category">{request.category_name || "General Service"}</span>
+          {request.subservice_name && (
+            <>
+              <span className="myreq-crumb-sep">/</span>
+              <span className="myreq-crumb-sub">{request.subservice_name}</span>
+            </>
+          )}
+          <span className="myreq-crumb-bullet">•</span>
+          <span className="myreq-crumb-date">Posted {formattedDate}</span>
+        </div>
+
+        <h3 className="myreq-row-title" onClick={() => onViewDetails(request)}>
           {request.title}
         </h3>
-        <p className="myreq-card-description">{request.description}</p>
 
-        <div className="myreq-meta-row">
-          <div className="myreq-meta-chip" title="Schedule">
+        <p className="myreq-row-desc">{request.description}</p>
+
+        <div className="myreq-row-meta">
+          <div className="myreq-meta-tag">
             <i className="far fa-calendar-alt"></i>
             <span>{getUrgencyText()}</span>
           </div>
 
-          <div className="myreq-meta-chip" title="Time window">
+          <div className="myreq-meta-tag">
             <i className="far fa-clock"></i>
             <span>
-              {request.available_time_from.slice(0, 5)} - {request.available_time_to.slice(0, 5)}
+              {request.available_time_from?.slice(0, 5) || "09:00"} - {request.available_time_to?.slice(0, 5) || "17:00"}
             </span>
           </div>
 
-          <div className="myreq-meta-chip" title="Location">
+          <div className="myreq-meta-tag location">
             <i className="fas fa-map-marker-alt"></i>
-            <span className="myreq-meta-text-truncate">{addressText}</span>
+            <span className="myreq-meta-location-text">{addressText}</span>
           </div>
         </div>
-
-        {request.images && request.images.length > 0 && (
-          <div className="myreq-photos-strip">
-            {request.images.slice(0, 3).map((img, idx) => (
-              <img
-                key={img.id || idx}
-                src={img.image_key}
-                alt="Attachment thumbnail"
-                className="myreq-photo-item"
-                onClick={() => onViewDetails(request)}
-              />
-            ))}
-            {request.images.length > 3 && (
-              <span className="myreq-photos-overflow">+{request.images.length - 3}</span>
-            )}
-          </div>
-        )}
       </div>
 
-      <div className="myreq-card-bottom-row">
-        <div className="myreq-meta-footer">
-          <span className="myreq-post-date">Posted {formattedDate}</span>
-          {typeof request.matched_providers_count === "number" && (
-            <span className="myreq-notified-badge">
-              <i className="fas fa-users"></i>
-              <span>{request.matched_providers_count} notified</span>
-            </span>
-          )}
-        </div>
+      <div className="myreq-row-right">
+        {renderStatusBadge()}
 
-        <div className="myreq-card-actions">
-          {permission.canEdit && (
+        {firstImage && (
+          <div
+            className="myreq-row-thumb"
+            onClick={() => onViewDetails(request)}
+            title="View attachment"
+          >
+            <img src={firstImage} alt="Attachment thumbnail" />
+          </div>
+        )}
+
+        <div className="myreq-row-actions">
+          {permission.canEdit && !isExpired && (
             <button
               type="button"
-              className="myreq-btn-edit"
+              className="myreq-action-link"
               onClick={() => onEditRequest(request)}
-              title={permission.isRestricted ? "Edit request (Restricted - quotations received)" : "Edit request"}
             >
-              <i className="fas fa-edit"></i>
               <span>Edit</span>
               {permission.isRestricted && <span className="myreq-edit-dot-restricted" />}
             </button>
           )}
 
-          {request.status === "EXPIRED" && onReopenRequest && (
+          {canCancel && !isExpired && (
             <button
               type="button"
-              className="myreq-btn-reopen"
-              onClick={() => onReopenRequest(request)}
-              title="Reschedule and reopen this expired request"
-            >
-              <i className="fas fa-redo-alt mr-1"></i>
-              <span>Reopen</span>
-            </button>
-          )}
-
-          {canCancel && (
-            <button
-              type="button"
-              className="myreq-btn-link-danger"
+              className="myreq-action-link danger"
               onClick={() => onCancelRequest(request)}
             >
               Cancel
             </button>
           )}
 
+          {isExpired && onReopenRequest && (
+            <button
+              type="button"
+              className="myreq-action-reopen-link"
+              onClick={() => onReopenRequest(request)}
+            >
+              <i className="fas fa-sync-alt"></i>
+              <span>Reopen</span>
+            </button>
+          )}
+
           <button
             type="button"
-            className="myreq-btn-details"
+            className="myreq-btn-view-details"
             onClick={() => onViewDetails(request)}
           >
             <span>View Details</span>
-            <i className="fas fa-chevron-right"></i>
+            <i className="fas fa-arrow-right"></i>
           </button>
         </div>
       </div>
