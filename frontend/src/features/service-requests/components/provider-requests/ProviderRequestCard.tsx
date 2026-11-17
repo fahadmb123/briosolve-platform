@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { useState, type FC } from "react";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { calculateDistanceKm, formatDistance } from "../../utils/distance.utils";
@@ -19,6 +19,7 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
   onQuote,
   onChat,
 }) => {
+  const [imageError, setImageError] = useState(false);
   const user = useAuthStore((state) => state.user);
   const providerAddress = user?.current_address_id;
   const providerLat = providerAddress?.latitude != null ? Number(providerAddress.latitude) : null;
@@ -72,8 +73,6 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
   const isCancelled = request.status === "CANCELLED";
   const isExpired = request.status === "EXPIRED";
 
-  const firstImage = request.images && request.images.length > 0 ? request.images[0].image_key : null;
-
   const renderStatusBadge = () => {
     if (isCancelled) {
       return (
@@ -110,15 +109,34 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
     );
   };
 
+  const attachedPhoto = request.images && request.images.length > 0 ? request.images[0].image_key : null;
+  const serviceImageUrl = request.subservice_image || request.category_image || attachedPhoto;
+  const showServiceImage = Boolean(serviceImageUrl && !imageError);
+
   return (
     <div className="provreq-row-card">
-      <div
-        className="provreq-category-avatar"
-        style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
-        aria-hidden="true"
-      >
-        <i className={visual.icon}></i>
-      </div>
+      {showServiceImage ? (
+        <div
+          className="provreq-category-avatar has-image"
+          onClick={() => onViewDetails(request)}
+          title={request.subservice_name || request.category_name || "Service"}
+        >
+          <img
+            src={serviceImageUrl!}
+            alt={request.subservice_name || request.category_name || "Service"}
+            className="provreq-avatar-img"
+            onError={() => setImageError(true)}
+          />
+        </div>
+      ) : (
+        <div
+          className="provreq-category-avatar"
+          style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
+          aria-hidden="true"
+        >
+          <i className={visual.icon}></i>
+        </div>
+      )}
 
       <div className="provreq-row-center">
         <div className="provreq-row-breadcrumbs">
@@ -176,13 +194,13 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
       <div className="provreq-row-right">
         {renderStatusBadge()}
 
-        {firstImage && (
+        {attachedPhoto && (
           <div
             className="provreq-row-thumb"
-            onClick={() => onSelectPhoto(firstImage)}
+            onClick={() => onSelectPhoto(attachedPhoto)}
             title="Click to view photo"
           >
-            <img src={firstImage} alt="Attachment thumbnail" />
+            <img src={attachedPhoto} alt="Attachment thumbnail" />
           </div>
         )}
 

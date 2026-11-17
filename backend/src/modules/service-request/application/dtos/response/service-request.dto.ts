@@ -46,7 +46,9 @@ export interface ServiceRequestCustomerDto {
 
 export interface ServiceRequestDetailsDto extends ServiceRequestResponseDto {
     category_name?: string;
+    category_image?: string | null;
     subservice_name?: string | null;
+    subservice_image?: string | null;
     address_details?: ServiceRequestAddressDto | null;
     customer_details?: ServiceRequestCustomerDto | null;
     distance_km?: number | null;

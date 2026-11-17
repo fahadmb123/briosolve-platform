@@ -233,9 +233,9 @@
 
 .myreq-status-tab-btn.active {
     color: #ffffff;
-    background: #0f172a;
+    background: #FF7900;
     font-weight: 600;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+    box-shadow: 0 1px 3px rgba(255, 121, 0, 0.3);
 }
 
 .myreq-tab-label {
@@ -263,7 +263,7 @@
 }
 
 .myreq-status-tab-btn.active .myreq-tab-bubble {
-    background: #334155;
+    background: rgba(255, 255, 255, 0.25);
     color: #ffffff;
 }
 
@@ -386,6 +386,20 @@
     justify-content: center;
     font-size: 1.15rem;
     flex-shrink: 0;
+}
+
+.myreq-category-avatar.has-image {
+    background: #f8f8f9;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.myreq-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
 }
 
 .myreq-row-center {

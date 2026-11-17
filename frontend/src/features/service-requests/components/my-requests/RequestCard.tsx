@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { checkRequestEditPermission } from "../../utils/serviceRequestEdit.utils";
 import { getCategoryVisualConfig } from "../../utils/categoryIcon.utils";
@@ -18,6 +18,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   onCancelRequest,
   onReopenRequest,
 }) => {
+  const [imageError, setImageError] = useState(false);
   const visual = getCategoryVisualConfig(request.category_name, request.subservice_name);
   const permission = checkRequestEditPermission(request);
   const canCancel = request.status === "PENDING" || request.status === "ACTIVE";
@@ -130,17 +131,38 @@ export const RequestCard: React.FC<RequestCardProps> = ({
     );
   };
 
-  const firstImage = request.images && request.images.length > 0 ? request.images[0].image_key : null;
+  const attachedPhoto = request.images && request.images.length > 0 ? request.images[0].image_key : null;
+  const serviceImageUrl =
+    request.subservice_image ||
+    request.category_image ||
+    attachedPhoto;
+
+  const showServiceImage = Boolean(serviceImageUrl && !imageError);
 
   return (
     <div className="myreq-row-card">
-      <div
-        className="myreq-category-avatar"
-        style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
-        aria-hidden="true"
-      >
-        <i className={visual.icon}></i>
-      </div>
+      {showServiceImage ? (
+        <div
+          className="myreq-category-avatar has-image"
+          onClick={() => onViewDetails(request)}
+          title={request.subservice_name || request.category_name || "Service"}
+        >
+          <img
+            src={serviceImageUrl!}
+            alt={request.subservice_name || request.category_name || "Service"}
+            className="myreq-avatar-img"
+            onError={() => setImageError(true)}
+          />
+        </div>
+      ) : (
+        <div
+          className="myreq-category-avatar"
+          style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
+          aria-hidden="true"
+        >
+          <i className={visual.icon}></i>
+        </div>
+      )}
 
       <div className="myreq-row-center">
         <div className="myreq-row-breadcrumbs">
@@ -184,13 +206,13 @@ export const RequestCard: React.FC<RequestCardProps> = ({
       <div className="myreq-row-right">
         {renderStatusBadge()}
 
-        {firstImage && (
+        {attachedPhoto && (
           <div
             className="myreq-row-thumb"
             onClick={() => onViewDetails(request)}
             title="View attachment"
           >
-            <img src={firstImage} alt="Attachment thumbnail" />
+            <img src={attachedPhoto} alt="Attachment thumbnail" />
           </div>
         )}
 

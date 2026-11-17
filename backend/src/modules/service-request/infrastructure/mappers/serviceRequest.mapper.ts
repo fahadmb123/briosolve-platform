@@ -122,7 +122,9 @@ export class ServiceRequestMapper {
         return {
             ...dto,
             category_name: record.category?.name,
+            category_image: StorageUtil.getPublicUrl(record.category?.image) ?? null,
             subservice_name: record.subservice?.name ?? null,
+            subservice_image: StorageUtil.getPublicUrl(record.subservice?.image) ?? null,
             address_details: addressDetails,
             customer_details: customerDetails,
             distance_km: distanceKm !== undefined ? distanceKm : null,
