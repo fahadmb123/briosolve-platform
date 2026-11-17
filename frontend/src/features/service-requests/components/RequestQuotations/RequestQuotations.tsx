@@ -99,17 +99,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   };
 
   if (isLoading) {
-    return (
-      <div className="srdetails-card reqquotes-card-wrapper">
-        <div className="srdetails-card-header">
-          <div className="srdetails-card-header-left">
-            <i className="fas fa-file-invoice-dollar srdetails-card-icon"></i>
-            <h3 className="srdetails-card-title">Provider Quotations</h3>
-          </div>
-        </div>
-        <div className="srdetails-shimmer" style={{ height: "140px", borderRadius: "10px" }} />
-      </div>
-    );
+    return <RequestQuotationsSkeleton />;
   }
 
   if (error) {
@@ -462,5 +452,55 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
         </div>
       )}
     </>
+  );
+};
+
+export const RequestQuotationsSkeleton: React.FC = () => {
+  return (
+    <div className="srdetails-card reqquotes-card-wrapper">
+      <div className="srdetails-card-header">
+        <div className="srdetails-card-header-left">
+          <i className="fas fa-file-invoice-dollar srdetails-card-icon"></i>
+          <h3 className="srdetails-card-title">Provider Quotations</h3>
+        </div>
+        <div className="reqquotes-sk-pill srdetails-shimmer" style={{ width: "95px", height: "24px" }} />
+      </div>
+
+      <div className="reqquotes-list">
+        {[1, 2].map((idx) => (
+          <div key={idx} className="reqquotes-item reqquotes-sk-item">
+            <div className="reqquotes-item-header">
+              <div className="reqquotes-provider-info">
+                <div className="reqquotes-avatar srdetails-shimmer" />
+                <div className="reqquotes-provider-details" style={{ gap: "0.45rem" }}>
+                  <div className="reqquotes-sk-line srdetails-shimmer" style={{ width: "150px", height: "16px" }} />
+                  <div className="reqquotes-sk-line srdetails-shimmer" style={{ width: "210px", height: "12px" }} />
+                </div>
+              </div>
+              <div className="reqquotes-price-container" style={{ alignItems: "flex-end", gap: "0.4rem" }}>
+                <div className="reqquotes-sk-line srdetails-shimmer" style={{ width: "90px", height: "24px" }} />
+                <div className="reqquotes-sk-line srdetails-shimmer" style={{ width: "75px", height: "14px" }} />
+              </div>
+            </div>
+
+            <div className="reqquotes-sk-box srdetails-shimmer" style={{ height: "48px", marginBottom: "0.95rem" }} />
+
+            <div className="reqquotes-meta-grid">
+              <div className="reqquotes-sk-pill srdetails-shimmer" style={{ width: "160px", height: "28px" }} />
+              <div className="reqquotes-sk-pill srdetails-shimmer" style={{ width: "120px", height: "28px" }} />
+              <div className="reqquotes-sk-pill srdetails-shimmer" style={{ width: "145px", height: "28px" }} />
+            </div>
+
+            <div className="reqquotes-card-footer" style={{ marginTop: "0.85rem" }}>
+              <div className="reqquotes-sk-btn srdetails-shimmer" style={{ width: "140px", height: "36px" }} />
+              <div className="reqquotes-actions-group">
+                <div className="reqquotes-sk-btn srdetails-shimmer" style={{ width: "80px", height: "36px" }} />
+                <div className="reqquotes-sk-btn srdetails-shimmer" style={{ width: "115px", height: "36px" }} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };

@@ -2,6 +2,28 @@
   margin-top: 1.25rem;
 }
 
+.reqquotes-sk-item {
+  border-color: #f1f5f9;
+  box-shadow: none;
+}
+
+.reqquotes-sk-line {
+  border-radius: 6px;
+}
+
+.reqquotes-sk-pill {
+  border-radius: 9999px;
+}
+
+.reqquotes-sk-box {
+  border-radius: 8px;
+  width: 100%;
+}
+
+.reqquotes-sk-btn {
+  border-radius: 8px;
+}
+
 .reqquotes-count-badge {
   font-size: 0.78rem;
   font-weight: 700;
