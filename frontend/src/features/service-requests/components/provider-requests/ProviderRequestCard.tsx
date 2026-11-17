@@ -9,6 +9,7 @@ interface ProviderRequestCardProps {
   onViewDetails: (request: CustomerServiceRequestItem) => void;
   onSelectPhoto: (photoUrl: string) => void;
   onQuote: (request: CustomerServiceRequestItem) => void;
+  onViewQuotation?: (request: CustomerServiceRequestItem) => void;
   onChat?: (request: CustomerServiceRequestItem) => void;
 }
 
@@ -17,6 +18,7 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
   onViewDetails,
   onSelectPhoto,
   onQuote,
+  onViewQuotation,
   onChat,
 }) => {
   const [imageError, setImageError] = useState(false);
@@ -235,6 +237,16 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
               disabled
             >
               <span>Expired</span>
+            </button>
+          ) : request.has_quoted ? (
+            <button
+              type="button"
+              className="provreq-btn-quoted"
+              onClick={() => (onViewQuotation ? onViewQuotation(request) : onViewDetails(request))}
+              title="You have already quoted on this request"
+            >
+              <i className="fas fa-check-circle"></i>
+              <span>Quoted</span>
             </button>
           ) : (
             <button

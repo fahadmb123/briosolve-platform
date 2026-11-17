@@ -614,6 +614,27 @@
     box-shadow: none;
 }
 
+.provreq-btn-quoted {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #f0fdf4;
+    color: #15803d !important;
+    padding: 0.45rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border: 1px solid #bbf7d0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.provreq-btn-quoted:hover {
+    background: #dcfce7;
+    border-color: #86efac;
+}
+
 @media (max-width: 960px) {
     .provreq-row-card {
         flex-direction: column;

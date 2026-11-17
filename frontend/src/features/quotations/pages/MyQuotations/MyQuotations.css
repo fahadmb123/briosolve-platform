@@ -447,6 +447,27 @@
     border-color: #cbd5e1;
 }
 
+.myquote-btn-edit-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.42rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #fed7aa;
+    background: #fff7ed;
+    color: #c2410c;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.myquote-btn-edit-inline:hover {
+    background: #ffedd5;
+    border-color: #fdba74;
+}
+
 .myquote-btn-open-request {
     display: inline-flex;
     align-items: center;

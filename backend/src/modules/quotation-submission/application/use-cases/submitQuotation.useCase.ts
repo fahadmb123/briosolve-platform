@@ -20,10 +20,6 @@ export class SubmitQuotationUseCase implements IUseCase<SubmitQuotationInputDto,
     ) {}
 
     async execute(input: SubmitQuotationInputDto): Promise<QuotationResponseDto> {
-        if (!input.providerUserId) {
-            throw new ApplicationError("UNAUTHORIZED", "Provider user ID is required", "AUTHENTICATION");
-        }
-
         const providerProfile = await this._providerRepository.findProfileByUserId(input.providerUserId);
         if (!providerProfile) {
             throw new ApplicationError("PROVIDER_NOT_FOUND", "Provider profile not found", "NOT_FOUND");
@@ -63,6 +59,7 @@ export class SubmitQuotationUseCase implements IUseCase<SubmitQuotationInputDto,
 
         if (this._createNotificationUseCase) {
             try {
+                
                 await this._createNotificationUseCase.execute({
                     recipientId: serviceRequest.customer_id,
                     type: "SERVICE_REQUEST",

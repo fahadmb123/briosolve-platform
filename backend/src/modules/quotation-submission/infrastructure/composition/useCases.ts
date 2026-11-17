@@ -6,6 +6,7 @@ import { serviceRequestRepository, serviceRequestProviderRepository } from "../.
 import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
 import { SubmitQuotationUseCase } from "../../application/use-cases/submitQuotation.useCase";
 import { GetProviderQuotationsUseCase } from "../../application/use-cases/getProviderQuotations.useCase";
+import { UpdateQuotationUseCase } from "../../application/use-cases/updateQuotation.useCase";
 
 export function createSubmitQuotationUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
@@ -24,5 +25,12 @@ export function createGetProviderQuotationsUseCase(): GetProviderQuotationsUseCa
         quotationRepository,
         providerRepository,
         serviceRequestRepository
+    );
+}
+
+export function createUpdateQuotationUseCase(): UpdateQuotationUseCase {
+    return new UpdateQuotationUseCase(
+        quotationRepository,
+        providerRepository
     );
 }

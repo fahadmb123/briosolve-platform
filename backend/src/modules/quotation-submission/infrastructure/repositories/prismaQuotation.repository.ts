@@ -2,6 +2,7 @@ import { db } from "../../../../shared/database/client";
 import { Quotation } from "../../domain/entities/quotation.entity";
 import { IQuotationRepository, GetProviderQuotationsParams, ProviderQuotationsResult } from "../../domain/repositories/IQuotationRepository";
 import { CreateQuotationRepoDto } from "../../application/dtos/request/submit-quotation.dto";
+import { UpdateQuotationRepoDto } from "../../application/dtos/request/update-quotation.dto";
 import { QuotationMapper } from "../mappers/quotation.mapper";
 
 export class PrismaQuotationRepository implements IQuotationRepository {
@@ -43,6 +44,16 @@ export class PrismaQuotationRepository implements IQuotationRepository {
 
         if (!created) return null;
         return QuotationMapper.toDomain(created);
+    }
+
+    async update(id: string, data: UpdateQuotationRepoDto): Promise<Quotation | null> {
+        const persistence = QuotationMapper.toUpdatePersistence(data);
+        const updated = await db.orm.public.quotations
+            .where({ id: id as never })
+            .update(persistence as never);
+
+        if (!updated) return null;
+        return QuotationMapper.toDomain(updated);
     }
 
     async findByProviderId(providerId: string, params: GetProviderQuotationsParams): Promise<ProviderQuotationsResult> {

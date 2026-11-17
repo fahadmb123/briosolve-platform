@@ -1,11 +1,24 @@
 import { apiClient } from "../../../shared/api/Client";
 import type { response } from "../../../shared/types/Dtos";
-import type { SubmitQuotationPayload, GetMyQuotationsParams, GetMyQuotationsResponse } from "../types/quotation.types";
+import type {
+  SubmitQuotationPayload,
+  UpdateQuotationPayload,
+  GetMyQuotationsParams,
+  GetMyQuotationsResponse
+} from "../types/quotation.types";
 
 export const submitQuotationService = async (
   payload: SubmitQuotationPayload
 ): Promise<response<{ id: string; status: string }>> => {
   const res = await apiClient.post("/api/quotation", payload);
+  return res.data;
+};
+
+export const updateQuotationService = async (
+  id: string,
+  payload: Omit<UpdateQuotationPayload, "id">
+): Promise<response<{ id: string; status: string }>> => {
+  const res = await apiClient.put(`/api/quotation/${id}`, payload);
   return res.data;
 };
 

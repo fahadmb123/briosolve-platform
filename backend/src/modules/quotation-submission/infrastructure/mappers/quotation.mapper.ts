@@ -1,6 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Quotation, QuotationType, QuotationValidity, QuotationStatus } from "../../domain/entities/quotation.entity";
 import { CreateQuotationRepoDto } from "../../application/dtos/request/submit-quotation.dto";
+import { UpdateQuotationRepoDto } from "../../application/dtos/request/update-quotation.dto";
 import { QuotationResponseDto } from "../../application/dtos/response/quotation-response.dto";
 import { ProviderQuotationItemDto } from "../../application/dtos/response/provider-quotations-response.dto";
 
@@ -134,6 +135,35 @@ export class QuotationMapper {
             extra_charge_policy: data.extraChargePolicy,
             status: "PENDING",
             created_at: Temporal.Now.instant()
+        };
+    }
+
+    static toUpdatePersistence(data: UpdateQuotationRepoDto): any {
+        const now = new Date();
+        let validUntilHours = 24;
+        if (data.validUntil === "HOURS_48") {
+            validUntilHours = 48;
+        } else if (data.validUntil === "DAYS_3") {
+            validUntilHours = 72;
+        } else if (data.validUntil === "DAYS_7") {
+            validUntilHours = 168;
+        }
+
+        const validUntilDate = new Date(now.getTime() + validUntilHours * 60 * 60 * 1000);
+        const validUntilInstant = Temporal.Instant.fromEpochMilliseconds(validUntilDate.getTime());
+
+        return {
+            amount: data.amount.toString(),
+            quotation_type: data.quotationType,
+            work_description: data.workDescription,
+            included_items: data.includedItems,
+            excluded_items: data.excludedItems,
+            estimated_duration: data.estimatedDuration ?? null,
+            available_date_time: data.availableDateTime ?? null,
+            valid_until: data.validUntil,
+            valid_until_date: validUntilInstant,
+            extra_charge_policy: data.extraChargePolicy,
+            updated_at: Temporal.Now.instant()
         };
     }
 }

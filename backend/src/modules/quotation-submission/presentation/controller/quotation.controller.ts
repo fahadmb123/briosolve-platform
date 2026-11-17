@@ -5,12 +5,14 @@ import { SubmitQuotationInputDto } from "../../application/dtos/request/submit-q
 import { QuotationResponseDto } from "../../application/dtos/response/quotation-response.dto";
 import { GetProviderQuotationsInputDto } from "../../application/dtos/request/get-provider-quotations.dto";
 import { ProviderQuotationsResponseDto } from "../../application/dtos/response/provider-quotations-response.dto";
+import { UpdateQuotationInputDto } from "../../application/dtos/request/update-quotation.dto";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export class QuotationController extends BaseController {
     constructor(
         private readonly _submitQuotationUseCase: IUseCase<SubmitQuotationInputDto, QuotationResponseDto>,
-        private readonly _getProviderQuotationsUseCase: IUseCase<GetProviderQuotationsInputDto, ProviderQuotationsResponseDto>
+        private readonly _getProviderQuotationsUseCase: IUseCase<GetProviderQuotationsInputDto, ProviderQuotationsResponseDto>,
+        private readonly _updateQuotationUseCase: IUseCase<UpdateQuotationInputDto, QuotationResponseDto>
     ) {
         super();
     }
@@ -48,6 +50,23 @@ export class QuotationController extends BaseController {
             });
 
             return this.sendSuccess(res, "Fetched", response, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    updateQuotation = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const providerUserId = req.user?.userId;
+            const quotationId = req.params.id;
+
+            const response = await this._updateQuotationUseCase.execute({
+                ...req.body,
+                quotationId,
+                providerUserId: providerUserId!
+            });
+
+            return this.sendSuccess(res, "Updated", response, 200);
         } catch (error) {
             next(error);
         }

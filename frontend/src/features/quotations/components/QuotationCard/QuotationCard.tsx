@@ -6,6 +6,7 @@ interface QuotationCardProps {
   quotation: ProviderQuotationItem;
   onViewDetails: (quotation: ProviderQuotationItem) => void;
   onViewRequest: (serviceRequestId: string) => void;
+  onEdit?: (quotation: ProviderQuotationItem) => void;
 }
 
 const STATUS_CONFIG: Record<QuotationStatus, { label: string; className: string }> = {
@@ -48,7 +49,8 @@ function formatCurrency(amount: number): string {
 export const QuotationCard: FC<QuotationCardProps> = ({
   quotation,
   onViewDetails,
-  onViewRequest
+  onViewRequest,
+  onEdit
 }) => {
   const statusConfig = STATUS_CONFIG[quotation.status as QuotationStatus] ?? {
     label: quotation.status,
@@ -140,6 +142,18 @@ export const QuotationCard: FC<QuotationCardProps> = ({
         </div>
 
         <div className="myquote-row-actions">
+          {quotation.status === "PENDING" && onEdit && (
+            <button
+              type="button"
+              className="myquote-btn-edit-inline"
+              onClick={() => onEdit(quotation)}
+              title="Edit quotation"
+            >
+              <i className="fas fa-edit" />
+              <span>Edit</span>
+            </button>
+          )}
+
           <button
             type="button"
             className="myquote-btn-view-details"

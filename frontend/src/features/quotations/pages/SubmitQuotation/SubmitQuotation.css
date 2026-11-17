@@ -118,15 +118,31 @@
     flex-direction: column;
     gap: 1.5rem;
     position: sticky;
-    top: 88px;
-    max-height: calc(100vh - 104px);
+    top: 80px;
+    align-self: flex-start;
+    max-height: calc(100vh - 96px);
     overflow-y: auto;
     scrollbar-width: thin;
+}
+
+.quote-sidebar-column::-webkit-scrollbar {
+    width: 4px;
+}
+
+.quote-sidebar-column::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.quote-sidebar-column::-webkit-scrollbar-thumb {
+    background: var(--border, #e4e4e7);
+    border-radius: 9999px;
 }
 
 @media (max-width: 1100px) {
     .quote-sidebar-column {
         position: static;
+        max-height: none;
+        overflow-y: visible;
     }
 }
 

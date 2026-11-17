@@ -8,6 +8,7 @@ interface ProviderRequestDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onQuote: (request: CustomerServiceRequestItem) => void;
+  onViewQuotation?: (request: CustomerServiceRequestItem) => void;
   onSelectPhoto: (photoUrl: string) => void;
   onChat?: (request: CustomerServiceRequestItem) => void;
   isChatLoading?: boolean;
@@ -18,6 +19,7 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
   isOpen,
   onClose,
   onQuote,
+  onViewQuotation,
   onSelectPhoto,
   onChat,
   isChatLoading = false,
@@ -445,6 +447,20 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
             <button type="button" className="provreq-btn-quote disabled" disabled>
               <i className="fas fa-calendar-times mr-1.5"></i>
               <span>Request Expired</span>
+            </button>
+          ) : request.has_quoted ? (
+            <button
+              type="button"
+              className="provreq-btn-quoted"
+              onClick={() => {
+                onClose();
+                if (onViewQuotation) {
+                  onViewQuotation(request);
+                }
+              }}
+            >
+              <i className="fas fa-check-circle mr-1.5"></i>
+              <span>View Submitted Quotation</span>
             </button>
           ) : (
             <button

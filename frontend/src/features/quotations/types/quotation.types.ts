@@ -29,6 +29,19 @@ export interface SubmitQuotationPayload {
   extraChargePolicy: string;
 }
 
+export interface UpdateQuotationPayload {
+  id: string;
+  amount: number;
+  quotationType: QuotationType;
+  workDescription: string;
+  includedItems: string[];
+  excludedItems: string[];
+  estimatedDuration?: string;
+  availableDateTime?: string;
+  validUntil: string;
+  extraChargePolicy: string;
+}
+
 export interface ProviderQuotationItem {
   id: string;
   serviceRequestId: string;

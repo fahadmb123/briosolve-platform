@@ -99,6 +99,15 @@ export default function MyQuotations() {
     });
   };
 
+  const handleEditQuotation = (quotation: ProviderQuotationItem) => {
+    navigate(`/provider/service-requests/${quotation.serviceRequestId}/quote`, {
+      state: {
+        quotation,
+        isEditing: true
+      }
+    });
+  };
+
   const isInitialLoading = getMyQuotationsMutation.isPending && quotations.length === 0;
 
   return (
@@ -220,6 +229,7 @@ export default function MyQuotations() {
                 quotation={quotation}
                 onViewDetails={setSelectedQuotation}
                 onViewRequest={handleViewRequest}
+                onEdit={handleEditQuotation}
               />
             ))}
             {getMyQuotationsMutation.isPending && page > 1 &&
@@ -254,6 +264,7 @@ export default function MyQuotations() {
         isOpen={Boolean(selectedQuotation)}
         onClose={() => setSelectedQuotation(null)}
         onViewRequest={handleViewRequest}
+        onEdit={handleEditQuotation}
       />
     </div>
   );

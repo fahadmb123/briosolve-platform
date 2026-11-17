@@ -141,6 +141,12 @@ export default function ProviderServiceRequests() {
     });
   };
 
+  const handleViewQuotationClick = (req: CustomerServiceRequestItem) => {
+    navigate("/provider/quotations", {
+      state: { highlightRequestId: req.id }
+    });
+  };
+
   const handleChatClick = (req: CustomerServiceRequestItem) => {
     if (!req.customer_id) {
       toast.error("Customer details not available for this request");
@@ -290,6 +296,7 @@ export default function ProviderServiceRequests() {
                 onViewDetails={setSelectedRequest}
                 onSelectPhoto={setLightboxPhoto}
                 onQuote={handleQuoteClick}
+                onViewQuotation={handleViewQuotationClick}
                 onChat={handleChatClick}
               />
             ))}
@@ -314,6 +321,7 @@ export default function ProviderServiceRequests() {
         isOpen={Boolean(selectedRequest)}
         onClose={() => setSelectedRequest(null)}
         onQuote={handleQuoteClick}
+        onViewQuotation={handleViewQuotationClick}
         onSelectPhoto={setLightboxPhoto}
         onChat={handleChatClick}
       />

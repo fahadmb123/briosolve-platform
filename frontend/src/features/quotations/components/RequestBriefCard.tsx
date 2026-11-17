@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import type { CustomerServiceRequestItem } from "../../service-requests/types/serviceRequest.types";
+import "./RequestBriefCard.css";
 
 interface RequestBriefCardProps {
   request: CustomerServiceRequestItem | null;
@@ -15,11 +16,44 @@ export const RequestBriefCard: FC<RequestBriefCardProps> = ({
   if (!request) {
     return (
       <div className="quote-sidebar-card">
-        <div className="quote-sidebar-header">
-          <h3 className="quote-sidebar-title">Request Details</h3>
-        </div>
-        <div className="quote-sidebar-body">
-          <p className="quote-empty-text">Loading request details...</p>
+        <div className="quote-sidebar-skeleton">
+          <div className="quote-sidebar-sk-header">
+            <div className="quote-sk-shimmer quote-sidebar-sk-badge" />
+            <div className="quote-sk-shimmer quote-sidebar-sk-chat-btn" />
+          </div>
+
+          <div className="quote-sk-shimmer quote-sidebar-sk-title" />
+
+          <div className="quote-sidebar-sk-meta">
+            <div className="quote-sidebar-sk-meta-row">
+              <div className="quote-sk-shimmer quote-sidebar-sk-meta-label" />
+              <div className="quote-sk-shimmer quote-sidebar-sk-meta-val" />
+            </div>
+            <div className="quote-sidebar-sk-meta-row">
+              <div className="quote-sk-shimmer quote-sidebar-sk-meta-label" />
+              <div className="quote-sk-shimmer quote-sidebar-sk-meta-val" />
+            </div>
+            <div className="quote-sidebar-sk-meta-row">
+              <div className="quote-sk-shimmer quote-sidebar-sk-meta-label" />
+              <div className="quote-sk-shimmer quote-sidebar-sk-meta-val" />
+            </div>
+          </div>
+
+          <div className="quote-sidebar-sk-desc-block">
+            <div className="quote-sk-shimmer quote-sidebar-sk-section-title" />
+            <div className="quote-sk-shimmer quote-sidebar-sk-box" />
+          </div>
+
+          <div className="quote-sidebar-sk-answers">
+            <div className="quote-sk-shimmer quote-sidebar-sk-section-title" />
+            <div className="quote-sk-shimmer quote-sidebar-sk-answer-row" />
+            <div className="quote-sk-shimmer quote-sidebar-sk-answer-row" />
+          </div>
+
+          <div className="quote-sidebar-sk-photos">
+            <div className="quote-sk-shimmer quote-sidebar-sk-photo-box" />
+            <div className="quote-sk-shimmer quote-sidebar-sk-photo-box" />
+          </div>
         </div>
       </div>
     );
@@ -92,9 +126,16 @@ export const RequestBriefCard: FC<RequestBriefCardProps> = ({
           <div className="quote-detail-row">
             <span className="quote-detail-label">Preferred Time</span>
             <span className="quote-detail-value">
-              {request.available_time_from && request.available_time_to
-                ? `${request.available_time_from} - ${request.available_time_to}`
-                : "Flexible"}
+              {request.urgency === "SPECIFIC_DATE" && request.specific_date
+                ? new Date(request.specific_date).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                  })
+                : urgencyLabels[request.urgency] || request.urgency}
+              {request.available_time_from && request.available_time_to && (
+                <span> ({request.available_time_from} - {request.available_time_to})</span>
+              )}
             </span>
           </div>
 
@@ -108,17 +149,19 @@ export const RequestBriefCard: FC<RequestBriefCardProps> = ({
           )}
         </div>
 
-        <div className="quote-sidebar-section">
-          <span className="quote-section-label">Customer Description</span>
-          <p className="quote-customer-desc">{request.description}</p>
-        </div>
+        {request.description && (
+          <div className="quote-sidebar-section">
+            <span className="quote-section-label">Customer Description</span>
+            <p className="quote-customer-desc">{request.description}</p>
+          </div>
+        )}
 
         {request.answers && request.answers.length > 0 && (
           <div className="quote-sidebar-section">
             <span className="quote-section-label">Additional Details</span>
             <div className="quote-answers-grid">
-              {request.answers.map((ans) => (
-                <div key={ans.question_id} className="quote-answer-item">
+              {request.answers.map((ans, idx) => (
+                <div key={ans.question_id || idx} className="quote-answer-item">
                   <span className="quote-answer-label">{ans.question_label}</span>
                   <span className="quote-answer-value">
                     {Array.isArray(ans.answer) ? ans.answer.join(", ") : String(ans.answer)}

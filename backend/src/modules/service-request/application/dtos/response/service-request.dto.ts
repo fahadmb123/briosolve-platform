@@ -54,6 +54,7 @@ export interface ServiceRequestDetailsDto extends ServiceRequestResponseDto {
     distance_km?: number | null;
     matched_providers_count?: number;
     quotations_count?: number;
+    has_quoted?: boolean;
 }
 
 export interface GetCustomerRequestsOutputDto {

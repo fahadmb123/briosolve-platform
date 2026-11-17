@@ -7,6 +7,7 @@ interface QuotationDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onViewRequest: (serviceRequestId: string) => void;
+  onEdit?: (quotation: ProviderQuotationItem) => void;
 }
 
 const STATUS_CONFIG: Record<QuotationStatus, { label: string; className: string }> = {
@@ -52,7 +53,8 @@ export const QuotationDetailsModal: FC<QuotationDetailsModalProps> = ({
   quotation,
   isOpen,
   onClose,
-  onViewRequest
+  onViewRequest,
+  onEdit
 }) => {
   if (!isOpen || !quotation) return null;
 
@@ -195,6 +197,20 @@ export const QuotationDetailsModal: FC<QuotationDetailsModalProps> = ({
         </div>
 
         <div className="quote-modal-footer">
+          {quotation.status === "PENDING" && onEdit && (
+            <button
+              type="button"
+              className="quote-modal-btn-edit"
+              onClick={() => {
+                onClose();
+                onEdit(quotation);
+              }}
+            >
+              <i className="fas fa-edit" />
+              <span>Edit Quotation</span>
+            </button>
+          )}
+
           <button
             type="button"
             className="quote-modal-btn-view-req"
