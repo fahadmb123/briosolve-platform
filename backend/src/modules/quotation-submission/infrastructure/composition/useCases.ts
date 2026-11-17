@@ -28,9 +28,13 @@ export function createGetProviderQuotationsUseCase(): GetProviderQuotationsUseCa
     );
 }
 
-export function createUpdateQuotationUseCase(): UpdateQuotationUseCase {
+export function createUpdateQuotationUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): UpdateQuotationUseCase {
     return new UpdateQuotationUseCase(
         quotationRepository,
-        providerRepository
+        providerRepository,
+        serviceRequestRepository,
+        createNotificationUseCase
     );
 }

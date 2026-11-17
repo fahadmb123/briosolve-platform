@@ -2,14 +2,19 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IQuotationRepository } from "../../domain/repositories/IQuotationRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
+import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { UpdateQuotationInputDto } from "../dtos/request/update-quotation.dto";
 import { QuotationResponseDto } from "../dtos/response/quotation-response.dto";
 import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
+import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
+import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 
 export class UpdateQuotationUseCase implements IUseCase<UpdateQuotationInputDto, QuotationResponseDto> {
     constructor(
         private readonly _quotationRepository: IQuotationRepository,
-        private readonly _providerRepository: IProviderRepository
+        private readonly _providerRepository: IProviderRepository,
+        private readonly _serviceRequestRepository: IServiceRequestRepository,
+        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
 
     async execute(input: UpdateQuotationInputDto): Promise<QuotationResponseDto> {
@@ -44,6 +49,23 @@ export class UpdateQuotationUseCase implements IUseCase<UpdateQuotationInputDto,
 
         if (!updated) {
             throw new ApplicationError("UPDATE_FAILED", "Failed to update quotation", "INTERNAL");
+        }
+
+        if (this._createNotificationUseCase) {
+            try {
+                const serviceRequest = await this._serviceRequestRepository.findById(existingQuote.service_request_id);
+                if (serviceRequest?.customer_id) {
+                    await this._createNotificationUseCase.execute({
+                        recipientId: serviceRequest.customer_id,
+                        type: "SERVICE_REQUEST",
+                        title_code: "QUOTATION_UPDATED",
+                        title: "Quotation Updated",
+                        message: `A provider updated their quotation to ₹${updated.amount} for "${serviceRequest.title}".`
+                    });
+                }
+            } catch {
+                return QuotationMapper.toResponseDto(updated);
+            }
         }
 
         return QuotationMapper.toResponseDto(updated);

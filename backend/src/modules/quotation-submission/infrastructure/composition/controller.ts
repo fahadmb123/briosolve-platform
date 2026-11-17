@@ -9,6 +9,6 @@ export function createQuotationController(
 ): QuotationController {
     const submitQuotationUseCase = createSubmitQuotationUseCase(createNotificationUseCase);
     const getProviderQuotationsUseCase = createGetProviderQuotationsUseCase();
-    const updateQuotationUseCase = createUpdateQuotationUseCase();
+    const updateQuotationUseCase = createUpdateQuotationUseCase(createNotificationUseCase);
     return new QuotationController(submitQuotationUseCase, getProviderQuotationsUseCase, updateQuotationUseCase);
 }
