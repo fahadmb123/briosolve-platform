@@ -5,6 +5,7 @@ import { IServiceRequestRepository } from "../../../service-request/domain/repos
 import { IRazorpayService } from "../../domain/services/IRazorpayService";
 import { CreatePaymentOrderInputDto } from "../dtos/request/create-payment-order.dto";
 import { CreatePaymentOrderResponseDto } from "../dtos/response/create-payment-order-response.dto";
+import { PaymentMapper } from "../../infrastructure/mappers/payment.mapper";
 import { db } from "../../../../shared/database/client";
 
 export class CreatePaymentOrderUseCase implements IUseCase<CreatePaymentOrderInputDto, CreatePaymentOrderResponseDto> {
@@ -59,18 +60,13 @@ export class CreatePaymentOrderUseCase implements IUseCase<CreatePaymentOrderInp
             }
         });
 
-        return {
-            orderId: order.id,
-            amount: totalAmount,
-            baseAmount,
-            platformFee,
-            currency: order.currency,
-            keyId: this._razorpayService.getKeyId(),
-            quotationId: quotation.id,
-            serviceRequestId: serviceRequest.id,
-            customerName: customerUser?.name ?? "Customer",
-            customerEmail: customerUser?.email ?? "",
-            customerPhone: customerUser?.phone ?? ""
-        };
+        return PaymentMapper.toCreatePaymentOrderResponseDto(
+            order,
+            { totalAmount, baseAmount, platformFee },
+            this._razorpayService.getKeyId(),
+            quotation.id,
+            serviceRequest.id,
+            customerUser
+        );
     }
 }

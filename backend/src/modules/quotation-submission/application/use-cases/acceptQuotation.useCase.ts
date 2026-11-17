@@ -3,18 +3,20 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IQuotationRepository } from "../../domain/repositories/IQuotationRepository";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { AcceptQuotationInputDto } from "../dtos/request/accept-quotation.dto";
+import { AcceptQuotationResponseDto } from "../dtos/response/accept-quotation-response.dto";
+import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { db } from "../../../../shared/database/client";
 
-export class AcceptQuotationUseCase implements IUseCase<AcceptQuotationInputDto, { id: string; status: string; serviceRequestId: string }> {
+export class AcceptQuotationUseCase implements IUseCase<AcceptQuotationInputDto, AcceptQuotationResponseDto> {
     constructor(
         private readonly _quotationRepository: IQuotationRepository,
         private readonly _serviceRequestRepository: IServiceRequestRepository,
         private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
 
-    async execute(input: AcceptQuotationInputDto): Promise<{ id: string; status: string; serviceRequestId: string }> {
+    async execute(input: AcceptQuotationInputDto): Promise<AcceptQuotationResponseDto> {
         const quotation = await this._quotationRepository.findById(input.quotationId);
         if (!quotation) {
             throw new ApplicationError("QUOTATION_NOT_FOUND", "Quotation not found", "NOT_FOUND");
@@ -84,10 +86,10 @@ export class AcceptQuotationUseCase implements IUseCase<AcceptQuotationInputDto,
             }
         }
 
-        return {
-            id: quotation.id,
-            status: "ACCEPTED",
-            serviceRequestId: serviceRequest.id
-        };
+        return QuotationMapper.toAcceptQuotationResponseDto(
+            quotation.id,
+            "ACCEPTED",
+            serviceRequest.id
+        );
     }
 }

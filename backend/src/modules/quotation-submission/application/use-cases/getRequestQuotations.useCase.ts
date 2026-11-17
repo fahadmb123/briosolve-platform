@@ -4,6 +4,7 @@ import { IQuotationRepository } from "../../domain/repositories/IQuotationReposi
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { GetRequestQuotationsInputDto } from "../dtos/request/get-request-quotations.dto";
 import { RequestQuotationsResponseDto, RequestQuotationItemDto } from "../dtos/response/request-quotations-response.dto";
+import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
 import { db } from "../../../../shared/database/client";
 
 export class GetRequestQuotationsUseCase implements IUseCase<GetRequestQuotationsInputDto, RequestQuotationsResponseDto> {
@@ -42,35 +43,7 @@ export class GetRequestQuotationsUseCase implements IUseCase<GetRequestQuotation
                         .first();
                 }
 
-                return {
-                    id: q.id,
-                    serviceRequestId: q.service_request_id,
-                    providerId: q.provider_id,
-                    provider: {
-                        id: providerProfile?.id ?? q.provider_id,
-                        userId: providerProfile?.user_id ?? "",
-                        name: providerUser?.name ?? "Service Provider",
-                        businessName: providerProfile?.business_name ?? providerUser?.name ?? "Provider",
-                        profileImage: providerProfile?.profile_image ?? null,
-                        experience: providerProfile?.experience ?? "",
-                        completedJobs: providerProfile?.completed_jobs ?? 0,
-                        phone: providerUser?.phone ?? null,
-                        email: providerUser?.email ?? null
-                    },
-                    amount: q.amount,
-                    quotationType: q.quotation_type,
-                    workDescription: q.work_description,
-                    includedItems: q.included_items,
-                    excludedItems: q.excluded_items,
-                    estimatedDuration: q.estimated_duration,
-                    availableDateTime: q.available_date_time,
-                    validUntil: q.valid_until,
-                    validUntilDate: q.valid_until_date instanceof Date ? q.valid_until_date.toISOString() : String(q.valid_until_date),
-                    extraChargePolicy: q.extra_charge_policy,
-                    status: q.status,
-                    createdAt: q.created_at instanceof Date ? q.created_at.toISOString() : String(q.created_at),
-                    updatedAt: q.updated_at instanceof Date ? q.updated_at.toISOString() : String(q.updated_at)
-                };
+                return QuotationMapper.toRequestQuotationItemDto(q, providerProfile, providerUser);
             })
         );
 
@@ -80,10 +53,6 @@ export class GetRequestQuotationsUseCase implements IUseCase<GetRequestQuotation
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
-        return {
-            quotations: quotationDtos,
-            total: quotationDtos.length,
-            acceptedQuotationId
-        };
+        return QuotationMapper.toRequestQuotationsResponseDto(quotationDtos, acceptedQuotationId);
     }
 }

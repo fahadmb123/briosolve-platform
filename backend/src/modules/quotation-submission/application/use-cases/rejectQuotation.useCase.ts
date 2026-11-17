@@ -3,18 +3,20 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IQuotationRepository } from "../../domain/repositories/IQuotationRepository";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { RejectQuotationInputDto } from "../dtos/request/reject-quotation.dto";
+import { RejectQuotationResponseDto } from "../dtos/response/reject-quotation-response.dto";
+import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { db } from "../../../../shared/database/client";
 
-export class RejectQuotationUseCase implements IUseCase<RejectQuotationInputDto, { id: string; status: string }> {
+export class RejectQuotationUseCase implements IUseCase<RejectQuotationInputDto, RejectQuotationResponseDto> {
     constructor(
         private readonly _quotationRepository: IQuotationRepository,
         private readonly _serviceRequestRepository: IServiceRequestRepository,
         private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
 
-    async execute(input: RejectQuotationInputDto): Promise<{ id: string; status: string }> {
+    async execute(input: RejectQuotationInputDto): Promise<RejectQuotationResponseDto> {
         const quotation = await this._quotationRepository.findById(input.quotationId);
         if (!quotation) {
             throw new ApplicationError("QUOTATION_NOT_FOUND", "Quotation not found", "NOT_FOUND");
@@ -53,9 +55,9 @@ export class RejectQuotationUseCase implements IUseCase<RejectQuotationInputDto,
             }
         }
 
-        return {
-            id: quotation.id,
-            status: "REJECTED"
-        };
+        return QuotationMapper.toRejectQuotationResponseDto(
+            quotation.id,
+            "REJECTED"
+        );
     }
 }

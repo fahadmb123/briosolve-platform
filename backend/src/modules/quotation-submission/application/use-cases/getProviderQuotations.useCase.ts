@@ -38,13 +38,13 @@ export class GetProviderQuotationsUseCase implements IUseCase<GetProviderQuotati
             })
         );
 
-        return {
-            quotations: quotationDtos,
-            total: result.total,
-            totalPages: result.totalPages,
-            page: result.page,
-            limit: result.limit,
-            counts: result.counts
-        };
+        return QuotationMapper.toProviderQuotationsResponseDto(
+            quotationDtos,
+            result.total,
+            result.totalPages,
+            result.page,
+            result.limit,
+            result.counts
+        );
     }
 }

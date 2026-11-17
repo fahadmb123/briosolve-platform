@@ -5,6 +5,7 @@ import { IServiceRequestRepository } from "../../../service-request/domain/repos
 import { IRazorpayService } from "../../domain/services/IRazorpayService";
 import { VerifyPaymentInputDto } from "../dtos/request/verify-payment.dto";
 import { VerifyPaymentResponseDto } from "../dtos/response/verify-payment-response.dto";
+import { PaymentMapper } from "../../infrastructure/mappers/payment.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { db } from "../../../../shared/database/client";
@@ -97,12 +98,11 @@ export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, Ver
             }
         }
 
-        return {
-            success: true,
-            quotationId: quotation.id,
-            serviceRequestId: serviceRequest.id,
-            paymentId: input.razorpayPaymentId,
-            status: "ACCEPTED"
-        };
+        return PaymentMapper.toVerifyPaymentResponseDto(
+            quotation.id,
+            serviceRequest.id,
+            input.razorpayPaymentId,
+            "ACCEPTED"
+        );
     }
 }
