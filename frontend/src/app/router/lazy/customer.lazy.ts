@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 export const CustomerRegister = React.lazy(() => import('../../../features/auth/pages/CustomerRegister/CustomerRegister'));
 export const CustomerDashboard = React.lazy(() => import('../../../features/dashboard/pages/CustomerDashboard/Dashboard'));
 export const CustomerProfile = React.lazy(() => import('../../../features/profiles/pages/CustomerProfile/Profile'));
@@ -11,3 +10,5 @@ export const CustomerRequestService = React.lazy(() => import('../../../features
 export const CustomerMyRequests = React.lazy(() => import('../../../features/service-requests/pages/MyRequests/MyRequests'));
 export const CustomerServiceRequestDetails = React.lazy(() => import('../../../features/service-requests/pages/CustomerServiceRequestDetails/CustomerServiceRequestDetails'));
 export const CustomerChat = React.lazy(() => import('../../../features/chat/pages/CustomerChat/CustomerChat'));
+export const CustomerPaymentSuccess = React.lazy(() => import('../../../features/payment/pages/PaymentSuccessPage'));
+export const CustomerPaymentCancelled = React.lazy(() => import('../../../features/payment/pages/PaymentCancelledPage'));

@@ -33,6 +33,17 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   const [confirmAcceptQuote, setConfirmAcceptQuote] = useState<RequestQuotationItem | null>(null);
   const [confirmRejectQuote, setConfirmRejectQuote] = useState<RequestQuotationItem | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
+  const [redirectOverlay, setRedirectOverlay] = useState<{
+    show: boolean;
+    type: "SUCCESS" | "CANCELLED";
+    countdown: number;
+    message: string;
+  }>({
+    show: false,
+    type: "SUCCESS",
+    countdown: 3,
+    message: ""
+  });
 
   const quotations: RequestQuotationItem[] = responseData?.data?.quotations || [];
   const acceptedQuoteId = responseData?.data?.acceptedQuotationId;
@@ -96,20 +107,53 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 color: "#ea580c"
               },
               handler: (paymentResponse: any) => {
+                const quoteAccepted = confirmAcceptQuote;
+                const totalPaidAmount = Math.round(quoteAccepted.amount * 1.1);
+
                 verifyPaymentMutation.mutate(
                   {
-                    quotationId: confirmAcceptQuote.id,
+                    quotationId: quoteAccepted.id,
                     razorpayOrderId: paymentResponse.razorpay_order_id,
                     razorpayPaymentId: paymentResponse.razorpay_payment_id,
                     razorpaySignature: paymentResponse.razorpay_signature
                   },
                   {
                     onSuccess: () => {
-                      toast.success(`Payment verified! Booking confirmed with ${confirmAcceptQuote.provider.businessName || "provider"}.`);
                       setConfirmAcceptQuote(null);
                       setIsProcessingPayment(false);
                       refetch();
                       onQuotationAccepted?.();
+
+                      setRedirectOverlay({
+                        show: true,
+                        type: "SUCCESS",
+                        countdown: 3,
+                        message: `Payment verified! Confirmed with ${quoteAccepted.provider.businessName || quoteAccepted.provider.name}.`
+                      });
+
+                      let seconds = 3;
+                      const timer = setInterval(() => {
+                        seconds -= 1;
+                        if (seconds <= 0) {
+                          clearInterval(timer);
+                          navigate("/customer/payment/success", {
+                            state: {
+                              paymentId: paymentResponse.razorpay_payment_id,
+                              orderId: paymentResponse.razorpay_order_id,
+                              amount: totalPaidAmount,
+                              quotationId: quoteAccepted.id,
+                              serviceRequestId: requestId,
+                              providerName: quoteAccepted.provider.name,
+                              providerBusinessName: quoteAccepted.provider.businessName
+                            }
+                          });
+                        } else {
+                          setRedirectOverlay((prev) => ({
+                            ...prev,
+                            countdown: seconds
+                          }));
+                        }
+                      }, 1000);
                     },
                     onError: (err: any) => {
                       toast.error(err?.response?.data?.message || err?.message || "Payment verification failed");
@@ -120,15 +164,78 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
               },
               modal: {
                 ondismiss: () => {
+                  const quoteCancelled = confirmAcceptQuote;
                   setIsProcessingPayment(false);
+                  setConfirmAcceptQuote(null);
+                  if (!quoteCancelled) return;
+
+                  setRedirectOverlay({
+                    show: true,
+                    type: "CANCELLED",
+                    countdown: 3,
+                    message: "Payment process was cancelled. Your quotation is safe."
+                  });
+
+                  let seconds = 3;
+                  const timer = setInterval(() => {
+                    seconds -= 1;
+                    if (seconds <= 0) {
+                      clearInterval(timer);
+                      navigate("/customer/payment/cancelled", {
+                        state: {
+                          serviceRequestId: requestId,
+                          quotationId: quoteCancelled.id,
+                          amount: Math.round(quoteCancelled.amount * 1.1),
+                          providerName: quoteCancelled.provider.name,
+                          providerBusinessName: quoteCancelled.provider.businessName
+                        }
+                      });
+                    } else {
+                      setRedirectOverlay((prev) => ({
+                        ...prev,
+                        countdown: seconds
+                      }));
+                    }
+                  }, 1000);
                 }
               }
             };
 
             const rzp = new window.Razorpay(options);
             rzp.on("payment.failed", (resp: any) => {
-              toast.error(resp.error?.description || "Payment failed or was cancelled.");
+              const quoteCancelled = confirmAcceptQuote;
               setIsProcessingPayment(false);
+              setConfirmAcceptQuote(null);
+              if (!quoteCancelled) return;
+
+              setRedirectOverlay({
+                show: true,
+                type: "CANCELLED",
+                countdown: 3,
+                message: resp.error?.description || "Payment failed or was cancelled."
+              });
+
+              let seconds = 3;
+              const timer = setInterval(() => {
+                seconds -= 1;
+                if (seconds <= 0) {
+                  clearInterval(timer);
+                  navigate("/customer/payment/cancelled", {
+                    state: {
+                      serviceRequestId: requestId,
+                      quotationId: quoteCancelled.id,
+                      amount: Math.round(quoteCancelled.amount * 1.1),
+                      providerName: quoteCancelled.provider.name,
+                      providerBusinessName: quoteCancelled.provider.businessName
+                    }
+                  });
+                } else {
+                  setRedirectOverlay((prev) => ({
+                    ...prev,
+                    countdown: seconds
+                  }));
+                }
+              }, 1000);
             });
             rzp.open();
           },
@@ -583,6 +690,28 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                   </>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {redirectOverlay.show && (
+        <div className="reqquotes-overlay-backdrop">
+          <div className="reqquotes-overlay-box">
+            <div className={`reqquotes-overlay-spinner ${redirectOverlay.type === "SUCCESS" ? "success" : "cancelled"}`}>
+              {redirectOverlay.type === "SUCCESS" ? (
+                <i className="fas fa-check-circle reqquotes-overlay-icon success"></i>
+              ) : (
+                <i className="fas fa-spinner fa-spin reqquotes-overlay-icon cancelled"></i>
+              )}
+            </div>
+            <h3 className="reqquotes-overlay-title">
+              {redirectOverlay.type === "SUCCESS" ? "Payment Successful!" : "Payment Cancelled"}
+            </h3>
+            <p className="reqquotes-overlay-text">{redirectOverlay.message}</p>
+            <div className="reqquotes-overlay-timer">
+              <span>Redirecting in </span>
+              <strong>{redirectOverlay.countdown}s</strong>
             </div>
           </div>
         </div>

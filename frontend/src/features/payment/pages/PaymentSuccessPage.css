@@ -1,0 +1,216 @@
+.paysuccess-page-container {
+  min-height: calc(100vh - 80px);
+  padding: 3rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8fafc;
+}
+
+.paysuccess-card {
+  max-width: 580px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  text-align: center;
+  animation: paysuccess-fade-in 0.3s ease-out;
+}
+
+.paysuccess-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 2.4rem;
+  box-shadow: 0 10px 20px -3px rgba(16, 185, 129, 0.35);
+  animation: paysuccess-scale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.paysuccess-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem 0;
+}
+
+.paysuccess-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0 0 1.75rem 0;
+  line-height: 1.5;
+}
+
+.paysuccess-escrow-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.paysuccess-escrow-badge i {
+  color: #16a34a;
+  font-size: 1.15rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.paysuccess-escrow-content h4 {
+  margin: 0 0 0.2rem 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #14532d;
+}
+
+.paysuccess-escrow-content p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #166534;
+  line-height: 1.45;
+}
+
+.paysuccess-details-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+  text-align: left;
+}
+
+.paysuccess-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0;
+  font-size: 0.88rem;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.paysuccess-detail-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.paysuccess-detail-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.paysuccess-detail-value {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.paysuccess-detail-value.highlight {
+  color: #16a34a;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.paysuccess-detail-value.mono {
+  font-family: monospace;
+  font-size: 0.82rem;
+  background: #ffffff;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+
+.paysuccess-warranty-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  margin-bottom: 1.5rem;
+}
+
+.paysuccess-actions {
+  display: flex;
+  gap: 0.85rem;
+  justify-content: center;
+}
+
+.paysuccess-btn-primary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #15803d;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.paysuccess-btn-primary:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.paysuccess-btn-secondary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.paysuccess-btn-secondary:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+@keyframes paysuccess-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes paysuccess-scale {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 640px) {
+  .paysuccess-card {
+    padding: 1.75rem 1.25rem;
+  }
+  .paysuccess-actions {
+    flex-direction: column;
+  }
+}

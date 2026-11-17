@@ -793,3 +793,82 @@
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
 }
+
+.reqquotes-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: reqquotes-fade-in 0.2s ease-out;
+}
+
+.reqquotes-overlay-box {
+  background: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 420px;
+  padding: 2.2rem 1.75rem;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: reqquotes-scale-up 0.2s ease-out;
+}
+
+.reqquotes-overlay-spinner {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem auto;
+}
+
+.reqquotes-overlay-spinner.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.reqquotes-overlay-spinner.cancelled {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.reqquotes-overlay-icon {
+  font-size: 2.2rem;
+}
+
+.reqquotes-overlay-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.45rem 0;
+}
+
+.reqquotes-overlay-text {
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 1.25rem 0;
+}
+
+.reqquotes-overlay-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+.reqquotes-overlay-timer strong {
+  color: #0f172a;
+  font-weight: 800;
+}
