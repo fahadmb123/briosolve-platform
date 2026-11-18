@@ -1,4 +1,4 @@
-import { BookingStatus } from "../../../domain/entities/booking.entity";
+import { BookingStatus, BookingPaymentStatus } from "../../../domain/entities/booking.entity";
 
 export interface CreateBookingInputDto {
     serviceRequestId: string;
@@ -12,6 +12,7 @@ export interface CreateBookingInputDto {
     paymentId?: string | null;
     orderId?: string | null;
     notes?: string | null;
+    paymentStatus?: BookingPaymentStatus;
 }
 
 export interface CreateBookingRepoDto {
@@ -23,6 +24,7 @@ export interface CreateBookingRepoDto {
     totalAmount: number;
     platformFee: number;
     status?: BookingStatus;
+    paymentStatus?: BookingPaymentStatus;
     scheduledDate?: Date | null;
     scheduledTime?: string | null;
     paymentId?: string | null;

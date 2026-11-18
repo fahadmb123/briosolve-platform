@@ -674,8 +674,26 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             <div className="bkdet-meta-grid" style={{ gridTemplateColumns: "1fr", gap: "8px" }}>
               <div className="bkdet-meta-box">
                 <div className="bkdet-meta-box-label">Payment Status</div>
-                <div className="bkdet-meta-box-value" style={{ color: "#16a34a" }}>
-                  Escrow Funded & Verified
+                <div
+                  className="bkdet-meta-box-value"
+                  style={{
+                    color:
+                      booking.paymentStatus === "PAID"
+                        ? "#16a34a"
+                        : booking.paymentStatus === "ADVANCE_PAID"
+                        ? "#0284c7"
+                        : booking.paymentStatus === "REFUNDED"
+                        ? "#dc2626"
+                        : "#d97706"
+                  }}
+                >
+                  {booking.paymentStatus === "PAID"
+                    ? "Fully Paid & Settled"
+                    : booking.paymentStatus === "ADVANCE_PAID"
+                    ? "Advance Paid (Balance Due on Completion)"
+                    : booking.paymentStatus === "REFUNDED"
+                    ? "Refunded"
+                    : "Payment Pending"}
                 </div>
               </div>
 

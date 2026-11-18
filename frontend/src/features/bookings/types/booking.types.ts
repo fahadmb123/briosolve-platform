@@ -1,5 +1,7 @@
 export type BookingStatus = "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 
+export type BookingPaymentStatus = "PENDING" | "ADVANCE_PAID" | "PAID" | "REFUNDED";
+
 export interface BookingStatusHistoryItem {
   status: BookingStatus;
   note: string;
@@ -17,6 +19,7 @@ export interface BookingItem {
   totalAmount: number;
   platformFee: number;
   status: BookingStatus;
+  paymentStatus: BookingPaymentStatus;
   scheduledDate: string | null;
   scheduledTime: string | null;
   paymentId: string | null;
@@ -70,6 +73,7 @@ export interface ProviderBookingsResponse {
 export interface UpdateBookingStatusPayload {
   status: BookingStatus;
   notes?: string | null;
+  paymentStatus?: BookingPaymentStatus;
 }
 
 export type BookingFilterTab = "ALL" | "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";

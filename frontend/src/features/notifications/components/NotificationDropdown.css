@@ -267,9 +267,6 @@
     color: #ffffff;
     background: rgba(255, 255, 255, 0.15);
 }
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.15);
-}
 
 .notif-tab-pill.active {
     background: linear-gradient(135deg, #FF7900 0%, #FF9429 100%);

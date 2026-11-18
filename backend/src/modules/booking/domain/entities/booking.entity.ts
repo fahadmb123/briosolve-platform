@@ -1,4 +1,5 @@
 export type BookingStatus = "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+export type BookingPaymentStatus = "PENDING" | "ADVANCE_PAID" | "PAID" | "REFUNDED";
 
 export class Booking {
     constructor(
@@ -17,6 +18,7 @@ export class Booking {
         public readonly order_id: string | null,
         public readonly notes: string | null,
         public readonly created_at: Date,
-        public readonly updated_at: Date
+        public readonly updated_at: Date,
+        public readonly payment_status: BookingPaymentStatus = "ADVANCE_PAID"
     ) {}
 }

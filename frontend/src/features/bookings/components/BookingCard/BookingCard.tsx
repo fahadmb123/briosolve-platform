@@ -141,7 +141,15 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 
           <div className="bkcard-meta-tag escrow">
             <i className="fas fa-shield-alt"></i>
-            <span>Escrow Secured</span>
+            <span>
+              {booking.paymentStatus === "PAID"
+                ? "Fully Paid"
+                : booking.paymentStatus === "ADVANCE_PAID"
+                ? "Advance Paid"
+                : booking.paymentStatus === "REFUNDED"
+                ? "Refunded"
+                : "Escrow Secured"}
+            </span>
           </div>
         </div>
       </div>

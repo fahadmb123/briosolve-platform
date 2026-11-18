@@ -70,9 +70,12 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
 
         const serializedNotes = history.length > 0 ? JSON.stringify(history) : details.booking.notes;
 
+        const nextPaymentStatus = input.paymentStatus || (input.status === "COMPLETED" ? "PAID" : details.booking.payment_status);
+
         const updated = await this._bookingRepository.update(details.booking.id, {
             status: input.status,
-            notes: serializedNotes
+            notes: serializedNotes,
+            paymentStatus: nextPaymentStatus
         });
 
         if (!updated) {

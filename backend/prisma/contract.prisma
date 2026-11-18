@@ -537,17 +537,25 @@ enum booking_status {
   CANCELLED
 }
 
+enum booking_payment_status {
+  PENDING
+  ADVANCE_PAID
+  PAID
+  REFUNDED
+}
+
 model bookings {
-  id                 Uuid                 @id @default(uuid())
-  booking_number     VarChar(50)          @unique
+  id                 Uuid                   @id @default(uuid())
+  booking_number     VarChar(50)            @unique
   service_request_id Uuid
-  quotation_id       Uuid                 @unique
+  quotation_id       Uuid                   @unique
   customer_id        Uuid
   provider_id        Uuid
 
   total_amount       Numeric(12, 2)
   platform_fee       Numeric(12, 2)
-  status             booking_status       @default(CONFIRMED)
+  status             booking_status         @default(CONFIRMED)
+  payment_status     booking_payment_status @default(ADVANCE_PAID)
 
   scheduled_date     DateTime?
   scheduled_time     VarChar(80)?

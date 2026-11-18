@@ -1,7 +1,8 @@
-import { BookingStatus } from "../../../domain/entities/booking.entity";
+import { BookingStatus, BookingPaymentStatus } from "../../../domain/entities/booking.entity";
 
 export interface BookingStatusHistoryItem {
     status: BookingStatus;
+    paymentStatus?: BookingPaymentStatus;
     note: string;
     timestamp: string;
     authorName?: string | null;
@@ -17,6 +18,7 @@ export interface BookingResponseDto {
     totalAmount: number;
     platformFee: number;
     status: BookingStatus;
+    paymentStatus: BookingPaymentStatus;
     scheduledDate: string | null;
     scheduledTime: string | null;
     paymentId: string | null;

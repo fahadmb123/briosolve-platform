@@ -1,5 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { Booking, BookingStatus } from "../../domain/entities/booking.entity";
+import { Booking, BookingStatus, BookingPaymentStatus } from "../../domain/entities/booking.entity";
 import { BookingDetails, BookingListResult } from "../../domain/repositories/IBookingRepository";
 import { CreateBookingInputDto, CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
@@ -52,6 +52,7 @@ export class BookingMapper {
             totalAmount,
             platformFee,
             status: "CONFIRMED",
+            paymentStatus: "ADVANCE_PAID",
             scheduledDate: scheduledDateObj,
             scheduledTime: data.scheduledTime ?? null,
             paymentId: data.paymentId ?? null,
@@ -103,7 +104,8 @@ export class BookingMapper {
             record.order_id ?? null,
             record.notes ?? null,
             createdDate,
-            updatedDate
+            updatedDate,
+            (record.payment_status as BookingPaymentStatus) || "ADVANCE_PAID"
         );
     }
 
