@@ -9,7 +9,7 @@ import {
   useCreatePaymentOrder,
   useVerifyPayment
 } from "../../../payment/hooks/usePayment";
-import { loadRazorpayScript } from "../../../payment/utils/razorpay.utils";
+import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
 import type { RequestQuotationItem } from "../../../quotations/types/quotation.types";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import "./RequestQuotations.css";
@@ -67,6 +67,12 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
     }
   }, [quotations, location.state]);
 
+  useEffect(() => {
+    return () => {
+      resetRazorpay();
+    };
+  }, []);
+
   const handleChat = (quote: RequestQuotationItem) => {
     if (!quote.provider.userId) {
       toast.error("Provider messaging unavailable");
@@ -88,14 +94,8 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
     setIsProcessingPayment(true);
 
     try {
-      if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
-        try {
-          activeRazorpayRef.current.close();
-        } catch {}
-        activeRazorpayRef.current = null;
-      }
-
-      const isLoaded = await loadRazorpayScript();
+      resetRazorpay();
+      const isLoaded = await loadRazorpayScript(true);
       if (!isLoaded) {
         toast.error("Unable to load Razorpay payment gateway. Please check your internet connection.");
         setIsProcessingPayment(false);
@@ -128,6 +128,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 } catch {}
                 activeRazorpayRef.current = null;
               }
+              resetRazorpay();
             };
 
             const handlePaymentCancellation = (customMessage?: string) => {

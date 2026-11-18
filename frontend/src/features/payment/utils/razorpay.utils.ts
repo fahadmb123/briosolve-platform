@@ -4,14 +4,33 @@ declare global {
   }
 }
 
-export const loadRazorpayScript = (): Promise<boolean> => {
+export const resetRazorpay = (): void => {
+  if (typeof window === "undefined") return;
+
+  try {
+    const containers = document.querySelectorAll(".razorpay-container");
+    containers.forEach((c) => {
+      (c as HTMLElement).style.display = "none";
+      c.remove();
+    });
+
+    const scripts = document.querySelectorAll('script[src*="checkout.razorpay.com"]');
+    scripts.forEach((s) => s.remove());
+
+    delete (window as any).Razorpay;
+  } catch {}
+};
+
+export const loadRazorpayScript = (forceReload: boolean = false): Promise<boolean> => {
   return new Promise((resolve) => {
     if (typeof window === "undefined") {
       resolve(false);
       return;
     }
 
-    if (window.Razorpay) {
+    if (forceReload) {
+      resetRazorpay();
+    } else if (window.Razorpay) {
       resolve(true);
       return;
     }
