@@ -806,7 +806,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                     : isFullyPaid
                       ? "Fully Paid & Settled"
                       : isAdvancePaid
-                        ? "Advance Paid (Balance Due Later)"
+                        ? isInspectionQuote ? "Inspection Fee Secured" : "Advance Paid & Secured"
                         : booking.paymentStatus === "REFUNDED"
                           ? "Refunded"
                           : "Pending"}
@@ -898,44 +898,35 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 </div>
               </>
             ) : (
-              <>
-                <div className="bkdet-payment-grid-two">
-                  <div className="bkdet-payment-tile paid">
-                    <div className="bkdet-tile-header">
-                      <span className="bkdet-tile-k">
-                        {isInspectionQuote ? "Inspection Fee" : "Initial Advance"}
-                      </span>
-                      <span className="bkdet-milestone-pill paid">Paid (Advance)</span>
-                    </div>
-                    <div className="bkdet-tile-amount">{formatCurrency(advanceAmount)}</div>
-                    <span className="bkdet-tile-desc">Paid online & held in Escrow</span>
-                  </div>
-
-                  <div className="bkdet-payment-tile">
-                    <div className="bkdet-tile-header">
-                      <span className="bkdet-tile-k">Final Service Bill</span>
-                      <span className="bkdet-milestone-pill pending">Pending Quote</span>
-                    </div>
-                    <div className="bkdet-tile-amount" style={{ fontSize: "1rem", color: "#64748b" }}>
-                      TBD on site
-                    </div>
-                    <span className="bkdet-tile-desc">
-                      {isInspectionQuote
-                        ? "Provider will inspect and quote final total"
-                        : "Provider will confirm final total upon diagnosis"}
+              <div className="bkdet-payment-grid-two">
+                <div className="bkdet-payment-tile paid">
+                  <div className="bkdet-tile-header">
+                    <span className="bkdet-tile-k">
+                      <i className="fas fa-check-circle" style={{ color: "#16a34a" }} />
+                      {isInspectionQuote ? "Inspection Fee Paid" : "Initial Advance Paid"}
                     </span>
+                    <span className="bkdet-milestone-pill paid">Paid Online</span>
                   </div>
+                  <div className="bkdet-tile-amount">{formatCurrency(advanceAmount)}</div>
+                  <span className="bkdet-tile-desc">Paid upfront & safely secured in Escrow</span>
                 </div>
 
-                <div className="bkdet-quote-type-notice">
-                  <i className="fas fa-info-circle" />
-                  <span>
+                <div className="bkdet-payment-tile pending">
+                  <div className="bkdet-tile-header">
+                    <span className="bkdet-tile-k">
+                      <i className="fas fa-clock" style={{ color: "#d97706" }} />
+                      Final Service Bill
+                    </span>
+                    <span className="bkdet-milestone-pill pending">Pending Quote</span>
+                  </div>
+                  <div className="bkdet-tile-amount pending-val">TBD On Site</div>
+                  <span className="bkdet-tile-desc">
                     {isInspectionQuote
-                      ? `Inspection fee of ${formatCurrency(advanceAmount)} is secured in Escrow. The provider will diagnose requirements on site and confirm the final total before any balance is requested.`
-                      : `Initial advance of ${formatCurrency(advanceAmount)} is secured in Escrow. The provider will assess the job on site and confirm the final total before any balance is requested.`}
+                      ? "Technician will diagnose on site and quote final total"
+                      : "Provider will diagnose on site and quote final total"}
                   </span>
                 </div>
-              </>
+              </div>
             )}
 
             <div className="bkdet-breakdown-card">

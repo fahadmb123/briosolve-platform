@@ -796,6 +796,7 @@
   border-radius: 9999px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
 .bkdet-milestone-pill.paid {
@@ -963,9 +964,62 @@
   margin: 0;
 }
 
+.bkdet-advance-paid-tile {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.bkdet-apt-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.bkdet-apt-icon {
+  font-size: 1.35rem;
+  color: #16a34a;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bkdet-apt-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bkdet-apt-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.bkdet-apt-desc {
+  font-size: 0.78rem;
+  color: #166534;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.bkdet-apt-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed #bbf7d0;
+  font-size: 0.75rem;
+  color: #15803d;
+}
+
 .bkdet-payment-grid-two {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -974,15 +1028,20 @@
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .bkdet-payment-tile.paid {
   border-color: #bbf7d0;
   background: #f0fdf4;
+}
+
+.bkdet-payment-tile.pending {
+  border-color: #fef3c7;
+  background: #fffdf5;
 }
 
 .bkdet-payment-tile.due {
@@ -999,20 +1058,31 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
 }
 
 .bkdet-tile-k {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #64748b;
-  letter-spacing: 0.04em;
+  color: #475569;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
 }
 
 .bkdet-tile-amount {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: #0f172a;
+}
+
+.bkdet-tile-amount.pending-val {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #d97706;
 }
 
 .bkdet-tile-desc {
