@@ -1,0 +1,33 @@
+import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
+import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
+import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
+import { bookingRepository } from "./repositories";
+import { CreateBookingUseCase } from "../../application/use-cases/createBooking.useCase";
+import { GetBookingByIdUseCase } from "../../application/use-cases/getBookingById.useCase";
+import { GetCustomerBookingsUseCase } from "../../application/use-cases/getCustomerBookings.useCase";
+import { GetProviderBookingsUseCase } from "../../application/use-cases/getProviderBookings.useCase";
+import { UpdateBookingStatusUseCase } from "../../application/use-cases/updateBookingStatus.useCase";
+
+export function createCreateBookingUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): CreateBookingUseCase {
+    return new CreateBookingUseCase(bookingRepository, createNotificationUseCase);
+}
+
+export function createGetBookingByIdUseCase(): GetBookingByIdUseCase {
+    return new GetBookingByIdUseCase(bookingRepository);
+}
+
+export function createGetCustomerBookingsUseCase(): GetCustomerBookingsUseCase {
+    return new GetCustomerBookingsUseCase(bookingRepository);
+}
+
+export function createGetProviderBookingsUseCase(): GetProviderBookingsUseCase {
+    return new GetProviderBookingsUseCase(bookingRepository);
+}
+
+export function createUpdateBookingStatusUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): UpdateBookingStatusUseCase {
+    return new UpdateBookingStatusUseCase(bookingRepository, createNotificationUseCase);
+}

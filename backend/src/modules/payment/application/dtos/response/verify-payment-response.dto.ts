@@ -4,4 +4,6 @@ export interface VerifyPaymentResponseDto {
     serviceRequestId: string;
     paymentId: string;
     status: string;
+    bookingId?: string;
+    bookingNumber?: string;
 }

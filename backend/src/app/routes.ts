@@ -22,6 +22,9 @@ export function createRootRouter(route: RootRouterDependencies) {
     if (route.paymentRoutes) {
         router.use("/payment", route.paymentRoutes);
     }
+    if (route.bookingRoutes) {
+        router.use("/booking", route.bookingRoutes);
+    }
 
     return router;
 }

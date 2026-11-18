@@ -2,6 +2,7 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
+import { IBookingRepository } from "../../../booking/domain/repositories/IBookingRepository";
 import { IRazorpayService } from "../../domain/services/IRazorpayService";
 import { VerifyPaymentInputDto } from "../dtos/request/verify-payment.dto";
 import { VerifyPaymentResponseDto } from "../dtos/response/verify-payment-response.dto";
@@ -14,6 +15,7 @@ export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, Ver
     constructor(
         private readonly _quotationRepository: IQuotationRepository,
         private readonly _serviceRequestRepository: IServiceRequestRepository,
+        private readonly _bookingRepository: IBookingRepository,
         private readonly _razorpayService: IRazorpayService,
         private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
@@ -58,6 +60,33 @@ export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, Ver
 
         await this._serviceRequestRepository.updateStatus(serviceRequest.id, "ACCEPTED");
 
+        const quoteAmount = quotation.amount;
+        const platformFee = Math.round(quoteAmount * 0.1);
+        const totalAmount = Math.round(quoteAmount * 1.1);
+
+        let booking = await this._bookingRepository.findByQuotationId(quotation.id);
+        if (!booking) {
+            const dateSuffix = Date.now().toString(36).toUpperCase();
+            const randomPart = Math.floor(1000 + Math.random() * 9000);
+            const bookingNumber = `BK-${dateSuffix}-${randomPart}`;
+
+            booking = await this._bookingRepository.create({
+                bookingNumber,
+                serviceRequestId: serviceRequest.id,
+                quotationId: quotation.id,
+                customerId: input.customerId,
+                providerId: quotation.provider_id,
+                totalAmount,
+                platformFee,
+                status: "CONFIRMED",
+                scheduledDate: quotation.valid_until_date || serviceRequest.specific_date || null,
+                scheduledTime: quotation.available_date_time || null,
+                paymentId: input.razorpayPaymentId,
+                orderId: input.razorpayOrderId,
+                notes: quotation.work_description
+            });
+        }
+
         if (this._createNotificationUseCase) {
             const providerProfile = await db.orm.public.provider_profiles
                 .where({ id: quotation.provider_id as never })
@@ -66,10 +95,10 @@ export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, Ver
             if (providerProfile) {
                 await this._createNotificationUseCase.execute({
                     recipientId: providerProfile.user_id,
-                    type: "PAYMENT_CONFIRMED",
-                    title: "Booking & Payment Confirmed!",
-                    title_code: "PAYMENT_CONFIRMED",
-                    message: `Customer payment of ₹${quotation.amount} is safely secured in escrow. Your quote for "${serviceRequest.title}" is accepted.`
+                    type: "BOOKING_CREATED",
+                    title: "New Booking Confirmed!",
+                    title_code: "BOOKING_CREATED",
+                    message: `Customer payment of ₹${totalAmount} is secured in escrow. Booking #${booking?.booking_number || ""} confirmed for "${serviceRequest.title}".`
                 }).catch(() => null);
             }
 
@@ -78,7 +107,7 @@ export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, Ver
                 type: "BOOKING_CONFIRMED",
                 title: "Booking Confirmed!",
                 title_code: "BOOKING_CONFIRMED",
-                message: `Payment successful. Your booking for "${serviceRequest.title}" is confirmed with 15-day service warranty.`
+                message: `Payment successful! Your booking #${booking?.booking_number || ""} for "${serviceRequest.title}" is confirmed with 15-day service warranty.`
             }).catch(() => null);
 
             for (const other of otherQuotes) {
@@ -102,7 +131,9 @@ export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, Ver
             quotation.id,
             serviceRequest.id,
             input.razorpayPaymentId,
-            "ACCEPTED"
+            "ACCEPTED",
+            booking?.id,
+            booking?.booking_number
         );
     }
 }

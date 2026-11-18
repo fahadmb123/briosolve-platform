@@ -1,0 +1,15 @@
+import { Router } from "express";
+import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/middlewares/role.middleware";
+import { BookingRouteDependencies } from "../types/booking.route.dependencies";
+
+export function buildBookingRoute(controller: BookingRouteDependencies): Router {
+    const router = Router();
+
+    router.get("/customer", authMiddleware, requireRole(["CUSTOMER"]), controller.booking.getCustomerBookings);
+    router.get("/provider", authMiddleware, requireRole(["PROVIDER"]), controller.booking.getProviderBookings);
+    router.get("/:id", authMiddleware, controller.booking.getById);
+    router.patch("/:id/status", authMiddleware, controller.booking.updateStatus);
+
+    return router;
+}

@@ -12,6 +12,10 @@
       "model": "addresses",
       "namespace": "public"
     },
+    "bookings": {
+      "model": "bookings",
+      "namespace": "public"
+    },
     "categories": {
       "model": "categories",
       "namespace": "public"
@@ -120,6 +124,27 @@
               {
                 "name": "CUSTOM_HOURS",
                 "value": "CUSTOM_HOURS"
+              }
+            ]
+          },
+          "booking_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "CONFIRMED",
+                "value": "CONFIRMED"
+              },
+              {
+                "name": "IN_PROGRESS",
+                "value": "IN_PROGRESS"
+              },
+              {
+                "name": "COMPLETED",
+                "value": "COMPLETED"
+              },
+              {
+                "name": "CANCELLED",
+                "value": "CANCELLED"
               }
             ]
           },
@@ -845,6 +870,271 @@
               },
               "namespaceId": "public",
               "table": "addresses"
+            }
+          },
+          "bookings": {
+            "fields": {
+              "booking_number": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 50
+                  }
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "customer_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "notes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 1000
+                  }
+                }
+              },
+              "order_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 255
+                  }
+                }
+              },
+              "payment_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 255
+                  }
+                }
+              },
+              "platform_fee": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
+              "provider_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "quotation_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "scheduled_date": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "scheduled_time": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 80
+                  }
+                }
+              },
+              "service_request_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "booking_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "total_amount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
+              "updated_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "customer": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "customer_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "users",
+                  "namespace": "public"
+                }
+              },
+              "provider": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "provider_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "provider_profiles",
+                  "namespace": "public"
+                }
+              },
+              "quotation": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "quotation_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "quotations",
+                  "namespace": "public"
+                }
+              },
+              "service_request": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "service_request_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "service_requests",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "booking_number": {
+                  "column": "booking_number"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "customer_id": {
+                  "column": "customer_id"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "notes": {
+                  "column": "notes"
+                },
+                "order_id": {
+                  "column": "order_id"
+                },
+                "payment_id": {
+                  "column": "payment_id"
+                },
+                "platform_fee": {
+                  "column": "platform_fee"
+                },
+                "provider_id": {
+                  "column": "provider_id"
+                },
+                "quotation_id": {
+                  "column": "quotation_id"
+                },
+                "scheduled_date": {
+                  "column": "scheduled_date"
+                },
+                "scheduled_time": {
+                  "column": "scheduled_time"
+                },
+                "service_request_id": {
+                  "column": "service_request_id"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "total_amount": {
+                  "column": "total_amount"
+                },
+                "updated_at": {
+                  "column": "updated_at"
+                }
+              },
+              "namespaceId": "public",
+              "table": "bookings"
             }
           },
           "categories": {
@@ -1917,6 +2207,21 @@
                   "namespace": "public"
                 }
               },
+              "bookings": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "provider_id"
+                  ]
+                },
+                "to": {
+                  "model": "bookings",
+                  "namespace": "public"
+                }
+              },
               "overrides": {
                 "cardinality": "1:N",
                 "on": {
@@ -2601,6 +2906,22 @@
               }
             },
             "relations": {
+              "booking": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "quotation_id"
+                  ]
+                },
+                "to": {
+                  "model": "bookings",
+                  "namespace": "public"
+                }
+              },
               "provider": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -3020,6 +3341,21 @@
                 },
                 "to": {
                   "model": "addresses",
+                  "namespace": "public"
+                }
+              },
+              "bookings": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "service_request_id"
+                  ]
+                },
+                "to": {
+                  "model": "bookings",
                   "namespace": "public"
                 }
               },
@@ -3616,6 +3952,21 @@
                   "namespace": "public"
                 }
               },
+              "bookings": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "customer_id"
+                  ]
+                },
+                "to": {
+                  "model": "bookings",
+                  "namespace": "public"
+                }
+              },
               "conversation_participants": {
                 "cardinality": "1:N",
                 "on": {
@@ -4128,6 +4479,262 @@
                 ]
               },
               "uniques": []
+            },
+            "bookings": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')",
+                  "name": "bookings_status_check_9a77072c",
+                  "prefix": "bookings_status_check"
+                }
+              ],
+              "columns": {
+                "booking_number": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 50
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "customer_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "notes": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 1000
+                  }
+                },
+                "order_id": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 255
+                  }
+                },
+                "payment_id": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 255
+                  }
+                },
+                "platform_fee": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
+                "provider_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "quotation_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "scheduled_date": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "scheduled_time": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 80
+                  }
+                },
+                "service_request_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "CONFIRMED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "booking_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "total_amount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "service_request_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bookings"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "service_requests"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "quotation_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bookings"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "quotations"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "customer_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bookings"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "provider_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bookings"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "provider_profiles"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "customer_id"
+                  ],
+                  "name": "bookings_customer_id_idx_e16dfa6b",
+                  "prefix": "bookings_customer_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "provider_id"
+                  ],
+                  "name": "bookings_provider_id_idx_d89e110d",
+                  "prefix": "bookings_provider_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "quotation_id"
+                  ],
+                  "name": "bookings_quotation_id_idx_617d3967",
+                  "prefix": "bookings_quotation_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "service_request_id"
+                  ],
+                  "name": "bookings_service_request_id_idx_8060a003",
+                  "prefix": "bookings_service_request_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "status"
+                  ],
+                  "name": "bookings_status_idx_e98638ab",
+                  "prefix": "bookings_status_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "booking_number"
+                  ]
+                },
+                {
+                  "columns": [
+                    "quotation_id"
+                  ]
+                }
+              ]
             },
             "categories": {
               "checks": [
@@ -6465,6 +7072,15 @@
                 "CUSTOM_HOURS"
               ]
             },
+            "booking_status": {
+              "kind": "valueSet",
+              "values": [
+                "CONFIRMED",
+                "IN_PROGRESS",
+                "COMPLETED",
+                "CANCELLED"
+              ]
+            },
             "conversation_status": {
               "kind": "valueSet",
               "values": [
@@ -6611,10 +7227,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "ddae0ee318d7ab3d9984804018f0a5412daea8351d80f76df5589c2e0399b095"
+    "storageHash": "e984a5dff6d3ef63a8920b4aa70d8be5e7a9cd67c9d0ea19dcd4295db0528a17"
   },
   "execution": {
-    "executionHash": "710a614916244243ae86df704ca79f263374a0bac2ea7239d29e4b79024ef636",
+    "executionHash": "80f20cd258a9b67e141022463b45697108bf2abd0e87c87c3c6b67a379f32796",
     "mutations": {
       "defaults": [
         {
@@ -6667,6 +7283,32 @@
             "column": "updated_at",
             "namespace": "public",
             "table": "addresses"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "bookings"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "bookings"
           }
         },
         {
