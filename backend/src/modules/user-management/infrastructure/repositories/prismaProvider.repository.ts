@@ -84,16 +84,27 @@ export class ProviderRepository implements IProviderRepository {
     }
 
     async findById(id: string): Promise<ProviderProfile | null> {
-        const provider = await db.orm.public.provider_profiles
-            .where({ user_id: id as Varchar<255> })
+        let provider = await db.orm.public.provider_profiles
+            .where({ id: id as Varchar<255> })
             .first();
+
+        if (!provider) {
+            provider = await db.orm.public.provider_profiles
+                .where({ user_id: id as Varchar<255> })
+                .first();
+        }
 
         if (!provider) return null;
         return ProviderProfileMapper.toDomain(provider as ProviderProfileRaw);
     }
 
     async findProfileByUserId(userId: string): Promise<ProviderProfile | null> {
-        return this.findById(userId);
+        const provider = await db.orm.public.provider_profiles
+            .where({ user_id: userId as Varchar<255> })
+            .first();
+
+        if (!provider) return null;
+        return ProviderProfileMapper.toDomain(provider as ProviderProfileRaw);
     }
 
     async deleteByUserId(userId: string): Promise<void> {

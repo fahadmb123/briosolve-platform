@@ -75,15 +75,16 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   }, []);
 
   const handleChat = (quote: RequestQuotationItem) => {
-    if (!quote.provider.userId) {
+    const targetUserId = quote.provider.userId || quote.provider.id;
+    if (!targetUserId) {
       toast.error("Provider messaging unavailable");
       return;
     }
 
-    navigate(`/messages?recipientId=${quote.provider.userId}`, {
+    navigate(`/messages?recipientId=${targetUserId}`, {
       state: {
-        recipientId: quote.provider.userId,
-        recipientName: quote.provider.businessName || quote.provider.name,
+        recipientId: targetUserId,
+        recipientName: quote.provider.businessName || quote.provider.name || "Provider",
         requestId: quote.serviceRequestId,
         requestTitle: "Service Quotation"
       }

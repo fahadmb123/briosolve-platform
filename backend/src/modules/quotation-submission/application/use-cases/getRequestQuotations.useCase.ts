@@ -35,11 +35,17 @@ export class GetRequestQuotationsUseCase implements IUseCase<GetRequestQuotation
                     acceptedQuotationId = q.id;
                 }
 
-                const providerProfile = await this._providerRepository.findById(q.provider_id);
+                let providerProfile = await this._providerRepository.findById(q.provider_id);
+                if (!providerProfile) {
+                    providerProfile = await this._providerRepository.findProfileByUserId(q.provider_id);
+                }
 
                 let providerUser: any = null;
-                if (providerProfile) {
+                if (providerProfile?.user_id) {
                     providerUser = await this._userRepository.findById(providerProfile.user_id);
+                }
+                if (!providerUser) {
+                    providerUser = await this._userRepository.findById(q.provider_id);
                 }
 
                 return QuotationMapper.toRequestQuotationItemDto(q, providerProfile, providerUser);
