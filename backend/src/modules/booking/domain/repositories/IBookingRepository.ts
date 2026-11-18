@@ -16,6 +16,8 @@ export interface BookingDetails {
     providerUserId?: string | null;
     customerName: string | null;
     customerPhone?: string | null;
+    quotationType?: string | null;
+    requiresInspection?: boolean;
 }
 
 export interface BookingListResult {

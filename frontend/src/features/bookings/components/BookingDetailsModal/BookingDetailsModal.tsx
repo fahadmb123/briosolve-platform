@@ -45,6 +45,12 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
       ? booking.providerBusinessName || booking.providerName || "Assigned Provider"
       : booking.customerName || "Customer";
 
+  const requiresInspection =
+    booking.requiresInspection === true ||
+    booking.quotationType === "INSPECTION_REQUIRED" ||
+    booking.quotationType === "ESTIMATED" ||
+    booking.status === "INSPECTION";
+
   const mapsUrl = booking.addressText
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.addressText)}`
     : null;
@@ -287,17 +293,31 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           )}
 
           {role === "PROVIDER" && booking.status === "EN_ROUTE" && onUpdateStatus && (
-            <button
-              type="button"
-              className="bkmodal-btn-action-inspection"
-              onClick={() => {
-                onClose();
-                onUpdateStatus(booking, "INSPECTION");
-              }}
-            >
-              <i className="fas fa-clipboard-check"></i>
-              <span>Start Inspection</span>
-            </button>
+            requiresInspection ? (
+              <button
+                type="button"
+                className="bkmodal-btn-action-inspection"
+                onClick={() => {
+                  onClose();
+                  onUpdateStatus(booking, "INSPECTION");
+                }}
+              >
+                <i className="fas fa-clipboard-check"></i>
+                <span>Start Inspection</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="bkmodal-btn-action-primary"
+                onClick={() => {
+                  onClose();
+                  onUpdateStatus(booking, "IN_PROGRESS");
+                }}
+              >
+                <i className="fas fa-tools"></i>
+                <span>Start Work</span>
+              </button>
+            )
           )}
 
           {role === "PROVIDER" && booking.status === "INSPECTION" && onUpdateStatus && (

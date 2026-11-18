@@ -90,6 +90,12 @@ export const BookingCard: React.FC<BookingCardProps> = ({
       ? booking.providerBusinessName || booking.providerName || "Assigned Provider"
       : booking.customerName || "Customer";
 
+  const requiresInspection =
+    booking.requiresInspection === true ||
+    booking.quotationType === "INSPECTION_REQUIRED" ||
+    booking.quotationType === "ESTIMATED" ||
+    booking.status === "INSPECTION";
+
   return (
     <div className="bkcard-row-card">
       <div className="bkcard-header">
@@ -127,6 +133,11 @@ export const BookingCard: React.FC<BookingCardProps> = ({
               <span>{booking.addressText}</span>
             </div>
           )}
+
+          <div className={`bkcard-meta-tag ${requiresInspection ? "type-inspection" : "type-fixed"}`}>
+            <i className={requiresInspection ? "fas fa-clipboard-check" : "fas fa-lock"}></i>
+            <span>{requiresInspection ? "Inspection Required" : "Fixed Price"}</span>
+          </div>
 
           <div className="bkcard-meta-tag escrow">
             <i className="fas fa-shield-alt"></i>
@@ -175,14 +186,25 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           )}
 
           {role === "PROVIDER" && booking.status === "EN_ROUTE" && onUpdateStatus && (
-            <button
-              type="button"
-              className="bkcard-btn-action inspection"
-              onClick={() => onUpdateStatus(booking, "INSPECTION")}
-            >
-              <i className="fas fa-clipboard-check"></i>
-              <span>Start Inspection</span>
-            </button>
+            requiresInspection ? (
+              <button
+                type="button"
+                className="bkcard-btn-action inspection"
+                onClick={() => onUpdateStatus(booking, "INSPECTION")}
+              >
+                <i className="fas fa-clipboard-check"></i>
+                <span>Start Inspection</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="bkcard-btn-action primary"
+                onClick={() => onUpdateStatus(booking, "IN_PROGRESS")}
+              >
+                <i className="fas fa-tools"></i>
+                <span>Start Work</span>
+              </button>
+            )
           )}
 
           {role === "PROVIDER" && booking.status === "INSPECTION" && onUpdateStatus && (

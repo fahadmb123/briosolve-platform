@@ -212,14 +212,28 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const isInProgress = booking.status === "IN_PROGRESS";
   const isCompleted = booking.status === "COMPLETED";
 
-  const stepProgressPercent = isCompleted
+  const requiresInspection =
+    booking.requiresInspection === true ||
+    booking.quotationType === "INSPECTION_REQUIRED" ||
+    booking.quotationType === "ESTIMATED" ||
+    booking.status === "INSPECTION";
+
+  const stepProgressPercent = requiresInspection
+    ? isCompleted
+      ? 100
+      : isInProgress
+      ? 75
+      : isInspection
+      ? 50
+      : isEnRoute
+      ? 25
+      : 0
+    : isCompleted
     ? 100
     : isInProgress
-    ? 75
-    : isInspection
-    ? 50
+    ? 66.6
     : isEnRoute
-    ? 25
+    ? 33.3
     : 0;
 
   return (
@@ -255,6 +269,11 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <span>{booking.categoryName}</span>
               </span>
             )}
+
+            <span className={`bkdet-type-pill ${requiresInspection ? "inspection" : "fixed"}`}>
+              <i className={requiresInspection ? "fas fa-clipboard-check" : "fas fa-lock"} />
+              <span>{requiresInspection ? "Inspection Required" : "Fixed Price"}</span>
+            </span>
 
             <span className={`bkdet-status-badge ${booking.status.toLowerCase().replace(/_/g, "-")}`}>
               <i
@@ -316,14 +335,25 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           )}
 
           {isProvider && isEnRoute && (
-            <button
-              type="button"
-              className="bkdet-action-btn inspection"
-              onClick={() => handleTriggerStatusChange("INSPECTION")}
-            >
-              <i className="fas fa-clipboard-check" />
-              <span>Start Inspection</span>
-            </button>
+            requiresInspection ? (
+              <button
+                type="button"
+                className="bkdet-action-btn inspection"
+                onClick={() => handleTriggerStatusChange("INSPECTION")}
+              >
+                <i className="fas fa-clipboard-check" />
+                <span>Start Inspection</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="bkdet-action-btn primary"
+                onClick={() => handleTriggerStatusChange("IN_PROGRESS")}
+              >
+                <i className="fas fa-tools" />
+                <span>Start Work</span>
+              </button>
+            )
           )}
 
           {isProvider && isInspection && (
@@ -376,7 +406,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </div>
             </div>
 
-            <div className="bkdet-stepper">
+            <div className={`bkdet-stepper ${requiresInspection ? "has-inspection" : "fixed-flow"}`}>
               <div className="bkdet-step-line">
                 <div className="bkdet-step-line-fill" style={{ width: `${stepProgressPercent}%` }} />
               </div>
@@ -388,19 +418,21 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <span className="bkdet-step-label">Confirmed</span>
               </div>
 
-              <div className={`bkdet-step-item ${isInspection || isInProgress || isCompleted ? "done" : isEnRoute ? "active" : ""}`}>
+              <div className={`bkdet-step-item ${(requiresInspection ? (isInspection || isInProgress || isCompleted) : (isInProgress || isCompleted)) ? "done" : isEnRoute ? "active" : ""}`}>
                 <div className="bkdet-step-circle">
                   <i className="fas fa-route" />
                 </div>
                 <span className="bkdet-step-label">On The Way</span>
               </div>
 
-              <div className={`bkdet-step-item ${isInProgress || isCompleted ? "done" : isInspection ? "active" : ""}`}>
-                <div className="bkdet-step-circle">
-                  <i className="fas fa-clipboard-check" />
+              {requiresInspection && (
+                <div className={`bkdet-step-item ${isInProgress || isCompleted ? "done" : isInspection ? "active" : ""}`}>
+                  <div className="bkdet-step-circle">
+                    <i className="fas fa-clipboard-check" />
+                  </div>
+                  <span className="bkdet-step-label">Inspection</span>
                 </div>
-                <span className="bkdet-step-label">Inspection</span>
-              </div>
+              )}
 
               <div className={`bkdet-step-item ${isCompleted ? "done" : isInProgress ? "active" : ""}`}>
                 <div className="bkdet-step-circle">
@@ -447,6 +479,13 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <div className="bkdet-meta-box-label">Quotation Ref</div>
                 <div className="bkdet-meta-box-value" style={{ fontFamily: "monospace" }}>
                   {booking.quotationId.slice(0, 8)}...
+                </div>
+              </div>
+
+              <div className="bkdet-meta-box">
+                <div className="bkdet-meta-box-label">Pricing / Job Model</div>
+                <div className="bkdet-meta-box-value">
+                  {requiresInspection ? "Inspection Required" : "Fixed Price"}
                 </div>
               </div>
             </div>

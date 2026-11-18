@@ -26,4 +26,6 @@ export interface BookingResponseDto {
     providerUserId?: string | null;
     customerName?: string | null;
     customerPhone?: string | null;
+    quotationType?: string | null;
+    requiresInspection?: boolean;
 }

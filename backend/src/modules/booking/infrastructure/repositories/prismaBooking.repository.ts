@@ -31,7 +31,9 @@ export class PrismaBookingRepository implements IBookingRepository {
             serviceRequestTitle: null,
             providerBusinessName: null,
             providerName: null,
-            customerName: null
+            customerName: null,
+            quotationType: null,
+            requiresInspection: false
         };
     }
 
@@ -250,6 +252,19 @@ export class PrismaBookingRepository implements IBookingRepository {
                     customerPhone = cUser.phone;
                 }
 
+                let quotationType: string | null = null;
+                let requiresInspection = false;
+
+                const quote = await db.orm.public.quotations
+                    .where({ id: booking.quotation_id as never })
+                    .first();
+                if (quote) {
+                    quotationType = quote.quotation_type;
+                    requiresInspection =
+                        quote.quotation_type === "INSPECTION_REQUIRED" ||
+                        quote.quotation_type === "ESTIMATED";
+                }
+
                 return {
                     booking,
                     serviceRequestTitle,
@@ -260,7 +275,9 @@ export class PrismaBookingRepository implements IBookingRepository {
                     providerPhone,
                     providerUserId,
                     customerName,
-                    customerPhone
+                    customerPhone,
+                    quotationType,
+                    requiresInspection
                 };
             })
         );

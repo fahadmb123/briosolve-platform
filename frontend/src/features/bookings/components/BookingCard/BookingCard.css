@@ -170,6 +170,28 @@
   color: #ea580c;
 }
 
+.bkcard-meta-tag.type-fixed {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #15803d;
+  font-weight: 600;
+}
+
+.bkcard-meta-tag.type-fixed i {
+  color: #16a34a;
+}
+
+.bkcard-meta-tag.type-inspection {
+  background: #faf5ff;
+  border-color: #e9d5ff;
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.bkcard-meta-tag.type-inspection i {
+  color: #8b5cf6;
+}
+
 .bkcard-footer {
   display: flex;
   align-items: center;

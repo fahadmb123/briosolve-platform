@@ -129,6 +129,36 @@
   font-weight: 600;
 }
 
+.bkdet-type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bkdet-type-pill.fixed {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.bkdet-type-pill.fixed i {
+  color: #16a34a;
+}
+
+.bkdet-type-pill.inspection {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+
+.bkdet-type-pill.inspection i {
+  color: #8b5cf6;
+}
+
 .bkdet-status-badge {
   display: inline-flex;
   align-items: center;
@@ -453,6 +483,16 @@
   height: 2px;
   background: #e2e8f0;
   z-index: 1;
+}
+
+.bkdet-stepper.fixed-flow .bkdet-step-line {
+  left: 12.5%;
+  right: 12.5%;
+}
+
+.bkdet-stepper.has-inspection .bkdet-step-line {
+  left: 10%;
+  right: 10%;
 }
 
 .bkdet-step-line-fill {

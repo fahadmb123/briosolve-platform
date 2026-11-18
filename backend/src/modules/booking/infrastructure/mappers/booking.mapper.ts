@@ -106,6 +106,8 @@ export class BookingMapper {
             providerName?: string | null;
             providerUserId?: string | null;
             customerName?: string | null;
+            quotationType?: string | null;
+            requiresInspection?: boolean;
         }
     ): BookingResponseDto {
         const isDetails = "booking" in source;
@@ -137,7 +139,9 @@ export class BookingMapper {
             providerPhone: details?.providerPhone ?? null,
             providerUserId: details?.providerUserId ?? extra?.providerUserId ?? null,
             customerName: details?.customerName ?? extra?.customerName ?? null,
-            customerPhone: details?.customerPhone ?? null
+            customerPhone: details?.customerPhone ?? null,
+            quotationType: details?.quotationType ?? extra?.quotationType ?? null,
+            requiresInspection: details?.requiresInspection ?? extra?.requiresInspection ?? false
         };
     }
 

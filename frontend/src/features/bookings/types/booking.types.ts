@@ -26,6 +26,8 @@ export interface BookingItem {
   providerUserId?: string | null;
   customerName?: string | null;
   customerPhone?: string | null;
+  quotationType?: "FIXED" | "ESTIMATED" | "INSPECTION_REQUIRED" | string | null;
+  requiresInspection?: boolean;
 }
 
 export interface BookingCounts {
