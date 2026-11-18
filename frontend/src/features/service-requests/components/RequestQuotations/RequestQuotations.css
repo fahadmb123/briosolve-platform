@@ -541,21 +541,26 @@
   animation: reqquotes-scale-up 0.15s ease-out;
 }
 
+.reqquotes-payment-modal {
+  max-width: 520px;
+}
+
 .reqquotes-modal-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.15rem;
 }
 
 .reqquotes-modal-icon {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .reqquotes-modal-icon.accept {
@@ -569,10 +574,17 @@
 }
 
 .reqquotes-modal-title {
-  font-size: 1.1rem;
+  font-size: 1.12rem;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
+}
+
+.reqquotes-modal-subtitle {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+  display: block;
 }
 
 .reqquotes-modal-body {
@@ -582,22 +594,151 @@
   margin-bottom: 1.25rem;
 }
 
-.reqquotes-modal-highlight-box {
+.reqquotes-modal-provider-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 0.85rem 1rem;
-  margin: 0.85rem 0;
+  padding: 0.75rem 0.95rem;
+  margin-bottom: 0.95rem;
+}
+
+.reqquotes-modal-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #cbd5e1;
+}
+
+.reqquotes-modal-avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ea580c, #f97316);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reqquotes-modal-prov-name {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.reqquotes-modal-prov-exp {
+  font-size: 0.76rem;
+  color: #64748b;
+}
+
+.reqquotes-pay-breakdown {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.95rem 1.1rem;
+  margin-bottom: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.reqquotes-pay-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 0.84rem;
+  color: #475569;
+}
+
+.reqquotes-pay-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 0.35rem 0;
+}
+
+.reqquotes-pay-row.total {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.reqquotes-pay-total-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.reqquotes-warranty-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.reqquotes-warranty-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  color: #166534;
+}
+
+.reqquotes-warranty-item i {
+  color: #16a34a;
+  font-size: 0.88rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.reqquotes-warranty-item strong {
+  display: block;
+  font-size: 0.82rem;
+  color: #14532d;
+  margin-bottom: 0.1rem;
+}
+
+.reqquotes-warranty-item p {
+  margin: 0;
+  color: #166534;
+  line-height: 1.45;
+}
+
+.reqquotes-compliance-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  line-height: 1.45;
+}
+
+.reqquotes-compliance-notice i {
+  color: #d97706;
+  font-size: 0.85rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
 }
 
 .reqquotes-modal-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 .reqquotes-btn-cancel {
@@ -606,7 +747,7 @@
   color: #64748b;
   background: #f8fafc;
   border: 1px solid #cbd5e1;
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.1rem;
   border-radius: 8px;
   cursor: pointer;
 }
@@ -614,6 +755,33 @@
 .reqquotes-btn-cancel:hover {
   background: #f1f5f9;
   color: #334155;
+}
+
+.reqquotes-btn-pay {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: #16a34a;
+  border: 1px solid #15803d;
+  padding: 0.55rem 1.35rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(22, 163, 74, 0.25);
+  transition: all 0.15s ease;
+}
+
+.reqquotes-btn-pay:hover:not(:disabled) {
+  background: #15803d;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  transform: translateY(-1px);
+}
+
+.reqquotes-btn-pay:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @keyframes reqquotes-fade-in {
@@ -624,4 +792,83 @@
 @keyframes reqquotes-scale-up {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
+}
+
+.reqquotes-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: reqquotes-fade-in 0.2s ease-out;
+}
+
+.reqquotes-overlay-box {
+  background: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 420px;
+  padding: 2.2rem 1.75rem;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: reqquotes-scale-up 0.2s ease-out;
+}
+
+.reqquotes-overlay-spinner {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem auto;
+}
+
+.reqquotes-overlay-spinner.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.reqquotes-overlay-spinner.cancelled {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.reqquotes-overlay-icon {
+  font-size: 2.2rem;
+}
+
+.reqquotes-overlay-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.45rem 0;
+}
+
+.reqquotes-overlay-text {
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 1.25rem 0;
+}
+
+.reqquotes-overlay-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+.reqquotes-overlay-timer strong {
+  color: #0f172a;
+  font-weight: 800;
 }

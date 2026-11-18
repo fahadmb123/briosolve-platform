@@ -1,32 +1,54 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
   useGetRequestQuotations,
-  useAcceptQuotation,
   useRejectQuotation
 } from "../../../quotations/hooks/useQuotationMutations";
+import {
+  useCreatePaymentOrder,
+  useVerifyPayment
+} from "../../../payment/hooks/usePayment";
+import { loadRazorpayScript } from "../../../payment/utils/razorpay.utils";
 import type { RequestQuotationItem } from "../../../quotations/types/quotation.types";
+import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import "./RequestQuotations.css";
 
 export interface RequestQuotationsProps {
   requestId: string;
   requestStatus?: string;
+  requestItem?: CustomerServiceRequestItem | null;
   onQuotationAccepted?: () => void;
 }
 
 export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   requestId,
   requestStatus,
+  requestItem,
   onQuotationAccepted
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: responseData, isLoading, error, refetch } = useGetRequestQuotations(requestId);
-  const acceptMutation = useAcceptQuotation();
   const rejectMutation = useRejectQuotation();
+  const createOrderMutation = useCreatePaymentOrder();
+  const verifyPaymentMutation = useVerifyPayment();
 
   const [confirmAcceptQuote, setConfirmAcceptQuote] = useState<RequestQuotationItem | null>(null);
   const [confirmRejectQuote, setConfirmRejectQuote] = useState<RequestQuotationItem | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
+  const activeRazorpayRef = useRef<any>(null);
+  const [redirectOverlay, setRedirectOverlay] = useState<{
+    show: boolean;
+    type: "SUCCESS" | "CANCELLED";
+    countdown: number;
+    message: string;
+  }>({
+    show: false,
+    type: "SUCCESS",
+    countdown: 3,
+    message: ""
+  });
 
   const quotations: RequestQuotationItem[] = responseData?.data?.quotations || [];
   const acceptedQuoteId = responseData?.data?.acceptedQuotationId;
@@ -35,13 +57,23 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
     requestStatus === "EXPIRED" ||
     requestStatus === "COMPLETED";
 
+  useEffect(() => {
+    const retryId = (location.state as any)?.retryQuotationId;
+    if (retryId && quotations.length > 0 && !confirmAcceptQuote) {
+      const match = quotations.find((q) => q.id === retryId && q.status === "PENDING");
+      if (match) {
+        setConfirmAcceptQuote(match);
+      }
+    }
+  }, [quotations, location.state]);
+
   const handleChat = (quote: RequestQuotationItem) => {
     if (!quote.provider.userId) {
       toast.error("Provider messaging unavailable");
       return;
     }
 
-    navigate(`/customer/messages?recipientId=${quote.provider.userId}`, {
+    navigate(`/messages?recipientId=${quote.provider.userId}`, {
       state: {
         recipientId: quote.provider.userId,
         recipientName: quote.provider.businessName || quote.provider.name,
@@ -51,20 +83,203 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
     });
   };
 
-  const handleConfirmAccept = () => {
+  const handlePayAndAccept = async () => {
     if (!confirmAcceptQuote) return;
+    setIsProcessingPayment(true);
 
-    acceptMutation.mutate(confirmAcceptQuote.id, {
-      onSuccess: () => {
-        toast.success(`Accepted quotation from ${confirmAcceptQuote.provider.businessName}!`);
-        setConfirmAcceptQuote(null);
-        refetch();
-        onQuotationAccepted?.();
-      },
-      onError: (err: any) => {
-        toast.error(err?.response?.data?.message || err?.message || "Failed to accept quotation");
+    try {
+      if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+        try {
+          activeRazorpayRef.current.close();
+        } catch {}
+        activeRazorpayRef.current = null;
       }
-    });
+
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        toast.error("Unable to load Razorpay payment gateway. Please check your internet connection.");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      createOrderMutation.mutate(
+        { quotationId: confirmAcceptQuote.id },
+        {
+          onSuccess: (res) => {
+            const orderData = res.data;
+            if (!orderData) {
+              toast.error("Failed to generate payment order");
+              setIsProcessingPayment(false);
+              return;
+            }
+
+            let rzp: any = null;
+            let cancelHandled = false;
+
+            const cleanupRazorpayModal = () => {
+              if (rzp && typeof rzp.close === "function") {
+                try {
+                  rzp.close();
+                } catch {}
+              }
+              if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+                try {
+                  activeRazorpayRef.current.close();
+                } catch {}
+                activeRazorpayRef.current = null;
+              }
+            };
+
+            const handlePaymentCancellation = (customMessage?: string) => {
+              if (cancelHandled) return;
+              cancelHandled = true;
+
+              cleanupRazorpayModal();
+              const quoteCancelled = confirmAcceptQuote;
+              setIsProcessingPayment(false);
+              setConfirmAcceptQuote(null);
+              if (!quoteCancelled) return;
+
+              setRedirectOverlay({
+                show: true,
+                type: "CANCELLED",
+                countdown: 3,
+                message: customMessage || "Payment process was cancelled. Your quotation is safe."
+              });
+
+              let seconds = 3;
+              const timer = setInterval(() => {
+                seconds -= 1;
+                if (seconds <= 0) {
+                  clearInterval(timer);
+                  cleanupRazorpayModal();
+                  navigate("/payment/cancelled", {
+                    state: {
+                      serviceRequestId: requestId,
+                      quotationId: quoteCancelled.id,
+                      amount: Math.round(quoteCancelled.amount * 1.1),
+                      providerName: quoteCancelled.provider.name,
+                      providerBusinessName: quoteCancelled.provider.businessName,
+                      requestItem: requestItem || null
+                    }
+                  });
+                } else {
+                  setRedirectOverlay((prev) => ({
+                    ...prev,
+                    countdown: seconds
+                  }));
+                }
+              }, 1000);
+            };
+
+            const options = {
+              key: orderData.keyId,
+              amount: orderData.amount * 100,
+              currency: orderData.currency || "INR",
+              name: "BrioSolve",
+              description: `Booking with ${confirmAcceptQuote.provider.businessName || "Provider"}`,
+              order_id: orderData.orderId,
+              retry: {
+                enabled: false
+              },
+              prefill: {
+                name: orderData.customerName || "",
+                email: orderData.customerEmail || "",
+                contact: orderData.customerPhone || ""
+              },
+              theme: {
+                color: "#ea580c"
+              },
+              handler: (paymentResponse: any) => {
+                cleanupRazorpayModal();
+                const quoteAccepted = confirmAcceptQuote;
+                const totalPaidAmount = Math.round(quoteAccepted.amount * 1.1);
+
+                verifyPaymentMutation.mutate(
+                  {
+                    quotationId: quoteAccepted.id,
+                    razorpayOrderId: paymentResponse.razorpay_order_id,
+                    razorpayPaymentId: paymentResponse.razorpay_payment_id,
+                    razorpaySignature: paymentResponse.razorpay_signature
+                  },
+                  {
+                    onSuccess: () => {
+                      setConfirmAcceptQuote(null);
+                      setIsProcessingPayment(false);
+                      refetch();
+                      onQuotationAccepted?.();
+
+                      setRedirectOverlay({
+                        show: true,
+                        type: "SUCCESS",
+                        countdown: 3,
+                        message: `Payment verified! Confirmed with ${quoteAccepted.provider.businessName || quoteAccepted.provider.name}.`
+                      });
+
+                      let seconds = 3;
+                      const timer = setInterval(() => {
+                        seconds -= 1;
+                        if (seconds <= 0) {
+                          clearInterval(timer);
+                          cleanupRazorpayModal();
+                          navigate("/payment/success", {
+                            state: {
+                              paymentId: paymentResponse.razorpay_payment_id,
+                              orderId: paymentResponse.razorpay_order_id,
+                              amount: totalPaidAmount,
+                              quotationId: quoteAccepted.id,
+                              serviceRequestId: requestId,
+                              providerName: quoteAccepted.provider.name,
+                              providerBusinessName: quoteAccepted.provider.businessName,
+                              requestItem: requestItem || null
+                            }
+                          });
+                        } else {
+                          setRedirectOverlay((prev) => ({
+                            ...prev,
+                            countdown: seconds
+                          }));
+                        }
+                      }, 1000);
+                    },
+                    onError: (err: any) => {
+                      toast.error(err?.response?.data?.message || err?.message || "Payment verification failed");
+                      setIsProcessingPayment(false);
+                    }
+                  }
+                );
+              },
+              modal: {
+                ondismiss: () => {
+                  handlePaymentCancellation("Payment process was cancelled. Your quotation is safe.");
+                }
+              }
+            };
+
+            if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+              try {
+                activeRazorpayRef.current.close();
+              } catch {}
+              activeRazorpayRef.current = null;
+            }
+
+            rzp = new window.Razorpay(options);
+            activeRazorpayRef.current = rzp;
+            rzp.on("payment.failed", (resp: any) => {
+              handlePaymentCancellation(resp?.error?.description || "Payment failed or was cancelled.");
+            });
+            rzp.open();
+          },
+          onError: (err: any) => {
+            toast.error(err?.response?.data?.message || err?.message || "Failed to initialize payment order");
+            setIsProcessingPayment(false);
+          }
+        }
+      );
+    } catch {
+      toast.error("An unexpected error occurred while initiating payment");
+      setIsProcessingPayment(false);
+    }
   };
 
   const handleConfirmReject = () => {
@@ -322,7 +537,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                           <button
                             type="button"
                             className="reqquotes-btn-decline"
-                            disabled={isRequestClosed || acceptMutation.isPending || rejectMutation.isPending}
+                            disabled={isRequestClosed || isProcessingPayment || rejectMutation.isPending}
                             onClick={() => setConfirmRejectQuote(quote)}
                           >
                             <i className="fas fa-times"></i>
@@ -331,7 +546,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                           <button
                             type="button"
                             className="reqquotes-btn-accept"
-                            disabled={isRequestClosed || acceptMutation.isPending || rejectMutation.isPending}
+                            disabled={isRequestClosed || isProcessingPayment || rejectMutation.isPending}
                             onClick={() => setConfirmAcceptQuote(quote)}
                           >
                             <i className="fas fa-check"></i>
@@ -349,53 +564,112 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
       </div>
 
       {confirmAcceptQuote && (
-        <div className="reqquotes-modal-overlay" onClick={() => setConfirmAcceptQuote(null)}>
-          <div className="reqquotes-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="reqquotes-modal-overlay"
+          onClick={() => !isProcessingPayment && setConfirmAcceptQuote(null)}
+        >
+          <div
+            className="reqquotes-modal-content reqquotes-payment-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="reqquotes-modal-header">
               <div className="reqquotes-modal-icon accept">
-                <i className="fas fa-handshake"></i>
+                <i className="fas fa-shield-alt"></i>
               </div>
-              <h3 className="reqquotes-modal-title">Accept Quotation</h3>
+              <div>
+                <h3 className="reqquotes-modal-title">Confirm Booking & Payment</h3>
+                <span className="reqquotes-modal-subtitle">Secure escrow payment with 15-day warranty</span>
+              </div>
             </div>
+
             <div className="reqquotes-modal-body">
-              <p>
-                Are you sure you want to accept the quotation from{" "}
-                <strong>{confirmAcceptQuote.provider.businessName || confirmAcceptQuote.provider.name}</strong>?
-              </p>
-              <div className="reqquotes-modal-highlight-box">
-                <span style={{ fontSize: "0.85rem", color: "#64748b" }}>Agreed Amount:</span>
-                <span style={{ fontSize: "1.3rem", fontWeight: 800, color: "#16a34a" }}>
-                  ₹{confirmAcceptQuote.amount.toLocaleString("en-IN")}
-                </span>
+              <div className="reqquotes-modal-provider-card">
+                {confirmAcceptQuote.provider.profileImage ? (
+                  <img
+                    src={confirmAcceptQuote.provider.profileImage}
+                    alt={confirmAcceptQuote.provider.businessName}
+                    className="reqquotes-modal-avatar"
+                  />
+                ) : (
+                  <div className="reqquotes-modal-avatar-fallback">
+                    {(confirmAcceptQuote.provider.businessName || confirmAcceptQuote.provider.name || "P").charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <h4 className="reqquotes-modal-prov-name">
+                    {confirmAcceptQuote.provider.businessName || confirmAcceptQuote.provider.name}
+                  </h4>
+                  <span className="reqquotes-modal-prov-exp">
+                    {confirmAcceptQuote.provider.experience ? `${confirmAcceptQuote.provider.experience} exp` : "Verified Provider"}
+                  </span>
+                </div>
               </div>
-              <p style={{ fontSize: "0.8rem", color: "#64748b" }}>
-                Accepting this quotation will assign this provider to your request and automatically decline any other quotes.
-              </p>
+
+              <div className="reqquotes-pay-breakdown">
+                <div className="reqquotes-pay-row">
+                  <span>Service Quote</span>
+                  <span>₹{confirmAcceptQuote.amount.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="reqquotes-pay-row">
+                  <span>Platform Fee (10%)</span>
+                  <span>+₹{Math.round(confirmAcceptQuote.amount * 0.1).toLocaleString("en-IN")}</span>
+                </div>
+                <div className="reqquotes-pay-divider" />
+                <div className="reqquotes-pay-row total">
+                  <span>Total Payable Amount</span>
+                  <span className="reqquotes-pay-total-val">
+                    ₹{Math.round(confirmAcceptQuote.amount * 1.1).toLocaleString("en-IN")}
+                  </span>
+                </div>
+              </div>
+
+              <div className="reqquotes-warranty-box">
+                <div className="reqquotes-warranty-item">
+                  <i className="fas fa-certificate"></i>
+                  <div>
+                    <strong>15-Day Service Warranty</strong>
+                    <p>If any issue reoccurs within 15 days, we coordinate a free inspection or re-service.</p>
+                  </div>
+                </div>
+                <div className="reqquotes-warranty-item">
+                  <i className="fas fa-lock"></i>
+                  <div>
+                    <strong>Escrow Protected Payment</strong>
+                    <p>Your payment is held safely and released to the provider only after completion through the platform.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="reqquotes-compliance-notice">
+                <i className="fas fa-info-circle"></i>
+                <span>To ensure your 15-day warranty and dispute protection stay active, payments must be completed through the platform website.</span>
+              </div>
             </div>
+
             <div className="reqquotes-modal-actions">
               <button
                 type="button"
                 className="reqquotes-btn-cancel"
                 onClick={() => setConfirmAcceptQuote(null)}
-                disabled={acceptMutation.isPending}
+                disabled={isProcessingPayment}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="reqquotes-btn-accept"
-                onClick={handleConfirmAccept}
-                disabled={acceptMutation.isPending}
+                className="reqquotes-btn-pay"
+                onClick={handlePayAndAccept}
+                disabled={isProcessingPayment}
               >
-                {acceptMutation.isPending ? (
+                {isProcessingPayment ? (
                   <>
                     <i className="fas fa-spinner fa-spin"></i>
-                    <span>Accepting...</span>
+                    <span>Connecting Razorpay...</span>
                   </>
                 ) : (
                   <>
-                    <i className="fas fa-check"></i>
-                    <span>Confirm & Accept</span>
+                    <i className="fas fa-lock"></i>
+                    <span>Pay ₹{Math.round(confirmAcceptQuote.amount * 1.1).toLocaleString("en-IN")} with Razorpay</span>
                   </>
                 )}
               </button>
@@ -447,6 +721,28 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                   </>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {redirectOverlay.show && (
+        <div className="reqquotes-overlay-backdrop">
+          <div className="reqquotes-overlay-box">
+            <div className={`reqquotes-overlay-spinner ${redirectOverlay.type === "SUCCESS" ? "success" : "cancelled"}`}>
+              {redirectOverlay.type === "SUCCESS" ? (
+                <i className="fas fa-check-circle reqquotes-overlay-icon success"></i>
+              ) : (
+                <i className="fas fa-spinner fa-spin reqquotes-overlay-icon cancelled"></i>
+              )}
+            </div>
+            <h3 className="reqquotes-overlay-title">
+              {redirectOverlay.type === "SUCCESS" ? "Payment Successful!" : "Payment Cancelled"}
+            </h3>
+            <p className="reqquotes-overlay-text">{redirectOverlay.message}</p>
+            <div className="reqquotes-overlay-timer">
+              <span>Redirecting in </span>
+              <strong>{redirectOverlay.countdown}s</strong>
             </div>
           </div>
         </div>

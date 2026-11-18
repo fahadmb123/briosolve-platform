@@ -1,0 +1,188 @@
+.paycancel-page-container {
+  min-height: calc(100vh - 80px);
+  padding: 3rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8fafc;
+}
+
+.paycancel-card {
+  max-width: 560px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  text-align: center;
+  animation: paycancel-fade-in 0.3s ease-out;
+}
+
+.paycancel-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 2.2rem;
+  box-shadow: 0 10px 20px -3px rgba(245, 158, 11, 0.35);
+  animation: paycancel-scale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.paycancel-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem 0;
+}
+
+.paycancel-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0 0 1.75rem 0;
+  line-height: 1.5;
+}
+
+.paycancel-notice-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.paycancel-notice-box i {
+  color: #d97706;
+  font-size: 1.15rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.paycancel-notice-content h4 {
+  margin: 0 0 0.2rem 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.paycancel-notice-content p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #b45309;
+  line-height: 1.45;
+}
+
+.paycancel-details-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+  text-align: left;
+}
+
+.paycancel-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0;
+  font-size: 0.88rem;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.paycancel-detail-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.paycancel-detail-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.paycancel-detail-value {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.paycancel-actions {
+  display: flex;
+  gap: 0.85rem;
+  justify-content: center;
+}
+
+.paycancel-btn-primary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #ea580c;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #c2410c;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+}
+
+.paycancel-btn-primary:hover {
+  background: #c2410c;
+  transform: translateY(-1px);
+}
+
+.paycancel-btn-secondary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.paycancel-btn-secondary:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+@keyframes paycancel-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes paycancel-scale {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 640px) {
+  .paycancel-card {
+    padding: 1.75rem 1.25rem;
+  }
+  .paycancel-actions {
+    flex-direction: column;
+  }
+}

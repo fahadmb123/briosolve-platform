@@ -9,7 +9,9 @@ import { UpdateQuotationInputDto } from "../../application/dtos/request/update-q
 import { GetRequestQuotationsInputDto } from "../../application/dtos/request/get-request-quotations.dto";
 import { RequestQuotationsResponseDto } from "../../application/dtos/response/request-quotations-response.dto";
 import { AcceptQuotationInputDto } from "../../application/dtos/request/accept-quotation.dto";
+import { AcceptQuotationResponseDto } from "../../application/dtos/response/accept-quotation-response.dto";
 import { RejectQuotationInputDto } from "../../application/dtos/request/reject-quotation.dto";
+import { RejectQuotationResponseDto } from "../../application/dtos/response/reject-quotation-response.dto";
 
 export class QuotationController extends BaseController {
     constructor(
@@ -17,8 +19,8 @@ export class QuotationController extends BaseController {
         private readonly _getProviderQuotationsUseCase: IUseCase<GetProviderQuotationsInputDto, ProviderQuotationsResponseDto>,
         private readonly _updateQuotationUseCase: IUseCase<UpdateQuotationInputDto, QuotationResponseDto>,
         private readonly _getRequestQuotationsUseCase: IUseCase<GetRequestQuotationsInputDto, RequestQuotationsResponseDto>,
-        private readonly _acceptQuotationUseCase: IUseCase<AcceptQuotationInputDto, { id: string; status: string; serviceRequestId: string }>,
-        private readonly _rejectQuotationUseCase: IUseCase<RejectQuotationInputDto, { id: string; status: string }>
+        private readonly _acceptQuotationUseCase: IUseCase<AcceptQuotationInputDto, AcceptQuotationResponseDto>,
+        private readonly _rejectQuotationUseCase: IUseCase<RejectQuotationInputDto, RejectQuotationResponseDto>
     ) {
         super();
     }

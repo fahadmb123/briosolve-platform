@@ -3,7 +3,10 @@ import { Quotation, QuotationType, QuotationValidity, QuotationStatus } from "..
 import { CreateQuotationRepoDto } from "../../application/dtos/request/submit-quotation.dto";
 import { UpdateQuotationRepoDto } from "../../application/dtos/request/update-quotation.dto";
 import { QuotationResponseDto } from "../../application/dtos/response/quotation-response.dto";
-import { ProviderQuotationItemDto } from "../../application/dtos/response/provider-quotations-response.dto";
+import { ProviderQuotationItemDto, ProviderQuotationsResponseDto } from "../../application/dtos/response/provider-quotations-response.dto";
+import { RequestQuotationItemDto, RequestQuotationsResponseDto } from "../../application/dtos/response/request-quotations-response.dto";
+import { AcceptQuotationResponseDto } from "../../application/dtos/response/accept-quotation-response.dto";
+import { RejectQuotationResponseDto } from "../../application/dtos/response/reject-quotation-response.dto";
 
 export class QuotationMapper {
     static toDomain(record: any): Quotation {
@@ -103,6 +106,93 @@ export class QuotationMapper {
             status: entity.status,
             createdAt: entity.created_at.toISOString(),
             updatedAt: entity.updated_at.toISOString()
+        };
+    }
+
+    static toRequestQuotationItemDto(
+        entity: Quotation,
+        providerProfile?: any,
+        providerUser?: any
+    ): RequestQuotationItemDto {
+        return {
+            id: entity.id,
+            serviceRequestId: entity.service_request_id,
+            providerId: entity.provider_id,
+            provider: {
+                id: providerProfile?.id ?? entity.provider_id,
+                userId: providerProfile?.user_id ?? "",
+                name: providerUser?.name ?? "Service Provider",
+                businessName: providerProfile?.business_name ?? providerUser?.name ?? "Provider",
+                profileImage: providerProfile?.profile_image ?? null,
+                experience: providerProfile?.experience ?? "",
+                completedJobs: providerProfile?.completed_jobs ?? 0,
+                phone: providerUser?.phone ?? null,
+                email: providerUser?.email ?? null
+            },
+            amount: entity.amount,
+            quotationType: entity.quotation_type,
+            workDescription: entity.work_description,
+            includedItems: entity.included_items,
+            excludedItems: entity.excluded_items,
+            estimatedDuration: entity.estimated_duration,
+            availableDateTime: entity.available_date_time,
+            validUntil: entity.valid_until,
+            validUntilDate: entity.valid_until_date.toISOString(),
+            extraChargePolicy: entity.extra_charge_policy,
+            status: entity.status,
+            createdAt: entity.created_at.toISOString(),
+            updatedAt: entity.updated_at.toISOString()
+        };
+    }
+
+    static toRequestQuotationsResponseDto(
+        quotations: RequestQuotationItemDto[],
+        acceptedQuotationId: string | null
+    ): RequestQuotationsResponseDto {
+        return {
+            quotations,
+            total: quotations.length,
+            acceptedQuotationId
+        };
+    }
+
+    static toAcceptQuotationResponseDto(
+        quotationId: string,
+        status: string,
+        serviceRequestId: string
+    ): AcceptQuotationResponseDto {
+        return {
+            id: quotationId,
+            status,
+            serviceRequestId
+        };
+    }
+
+    static toRejectQuotationResponseDto(
+        quotationId: string,
+        status: string
+    ): RejectQuotationResponseDto {
+        return {
+            id: quotationId,
+            status
+        };
+    }
+
+    static toProviderQuotationsResponseDto(
+        quotations: ProviderQuotationItemDto[],
+        total: number,
+        totalPages: number,
+        page: number,
+        limit: number,
+        counts: Record<string, number>
+    ): ProviderQuotationsResponseDto {
+        return {
+            quotations,
+            total,
+            totalPages,
+            page,
+            limit,
+            counts
         };
     }
 

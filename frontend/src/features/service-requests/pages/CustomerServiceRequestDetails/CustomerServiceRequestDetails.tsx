@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
@@ -33,23 +33,44 @@ export default function CustomerServiceRequestDetails() {
   const getRequestsMutation = useGetMyServiceRequests();
   const cancelMutation = useCancelServiceRequest();
   const reopenMutation = useReopenServiceRequest();
+  const hasFetchedRef = useRef<boolean>(false);
 
   useEffect(() => {
-    if (!request && requestId) {
+    if (stateRequest) {
+      setRequest(stateRequest);
+      return;
+    }
+
+    if (!request && requestId && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
       getRequestsMutation.mutate(
         { page: 1, limit: 50 },
         {
-          onSuccess: (res) => {
-            const list = Array.isArray(res.data) ? res.data : res.data?.requests || [];
+          onSuccess: (res: any) => {
+            const raw = res?.data || res;
+            const list = Array.isArray(raw)
+              ? raw
+              : Array.isArray(raw?.requests)
+              ? raw.requests
+              : Array.isArray(res)
+              ? res
+              : [];
             const found = list.find((r: CustomerServiceRequestItem) => r.id === requestId);
             if (found) {
               setRequest(found);
+            } else {
+              toast.error("Service request not found");
+              navigate("/my-requests");
             }
+          },
+          onError: () => {
+            toast.error("Failed to load service request details");
+            navigate("/my-requests");
           }
         }
       );
     }
-  }, [requestId, request]);
+  }, [requestId, request, stateRequest, navigate]);
 
   const permission = request ? checkRequestEditPermission(request) : { canEdit: false };
   const canCancel = request ? request.status === "PENDING" || request.status === "ACTIVE" : false;
