@@ -120,12 +120,12 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             newStatus === "EN_ROUTE"
               ? "Technician marked as On The Way"
               : newStatus === "INSPECTION"
-              ? "Inspection / Diagnostic started"
-              : newStatus === "IN_PROGRESS"
-              ? "Job marked as In Progress"
-              : newStatus === "COMPLETED"
-              ? "Job marked as Completed"
-              : "Booking status updated"
+                ? "Inspection / Diagnostic started"
+                : newStatus === "IN_PROGRESS"
+                  ? "Job marked as In Progress"
+                  : newStatus === "COMPLETED"
+                    ? "Job marked as Completed"
+                    : "Booking status updated"
           );
           handleCloseStatusModal();
           refetch();
@@ -238,11 +238,11 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const dayNum = dateObj ? dateObj.getDate() : "--";
   const fullDateText = dateObj
     ? dateObj.toLocaleDateString("en-IN", {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        year: "numeric"
-      })
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    })
     : "Flexible schedule";
 
   const timeSlotText = booking.scheduledTime || "Schedule window as agreed with provider";
@@ -262,6 +262,15 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const isInProgress = booking.status === "IN_PROGRESS";
   const isCompleted = booking.status === "COMPLETED";
 
+  const totalAmount = booking.totalAmount || 0;
+  const platformFee = booking.platformFee || Math.round((totalAmount / 1.1) * 0.1);
+  const baseAmount = Math.max(0, totalAmount - platformFee);
+  const advanceAmount = Math.round(totalAmount * 0.3);
+  const remainingAmount = Math.max(0, totalAmount - advanceAmount);
+
+  const isAdvancePaid = booking.paymentStatus === "ADVANCE_PAID";
+  const isFullyPaid = booking.paymentStatus === "PAID";
+
   const requiresInspection =
     booking.requiresInspection === true ||
     booking.quotationType === "INSPECTION_REQUIRED" ||
@@ -272,19 +281,19 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     ? isCompleted
       ? 100
       : isInProgress
-      ? 75
-      : isInspection
-      ? 50
-      : isEnRoute
-      ? 25
-      : 0
+        ? 75
+        : isInspection
+          ? 50
+          : isEnRoute
+            ? 25
+            : 0
     : isCompleted
-    ? 100
-    : isInProgress
-    ? 66.6
-    : isEnRoute
-    ? 33.3
-    : 0;
+      ? 100
+      : isInProgress
+        ? 66.6
+        : isEnRoute
+          ? 33.3
+          : 0;
 
   return (
     <div className={`bkdet-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
@@ -327,26 +336,25 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
             <span className={`bkdet-status-badge ${booking.status.toLowerCase().replace(/_/g, "-")}`}>
               <i
-                className={`fas ${
-                  isConfirmed
-                    ? "fa-check-circle"
-                    : isEnRoute
+                className={`fas ${isConfirmed
+                  ? "fa-check-circle"
+                  : isEnRoute
                     ? "fa-route"
                     : isInspection
-                    ? "fa-clipboard-check"
-                    : isInProgress
-                    ? "fa-tools"
-                    : isCompleted
-                    ? "fa-award"
-                    : "fa-times-circle"
-                }`}
+                      ? "fa-clipboard-check"
+                      : isInProgress
+                        ? "fa-tools"
+                        : isCompleted
+                          ? "fa-award"
+                          : "fa-times-circle"
+                  }`}
               />
               <span>
                 {booking.status === "EN_ROUTE"
                   ? "On The Way"
                   : booking.status === "INSPECTION"
-                  ? "Inspection"
-                  : booking.status.replace(/_/g, " ")}
+                    ? "Inspection"
+                    : booking.status.replace(/_/g, " ")}
               </span>
             </span>
           </div>
@@ -656,55 +664,146 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <div className="bkdet-section-icon">
                   <i className="fas fa-shield-alt" />
                 </div>
-                <h3 className="bkdet-section-title">Payment & Escrow</h3>
+                <h3 className="bkdet-section-title">Payment & Billing</h3>
+              </div>
+              <span
+                className={`bkdet-milestone-pill ${
+                  isFullyPaid
+                    ? "paid"
+                    : isAdvancePaid
+                    ? "pending"
+                    : ""
+                }`}
+              >
+                {isFullyPaid
+                  ? "Fully Paid"
+                  : isAdvancePaid
+                  ? "Advance Paid"
+                  : booking.paymentStatus === "REFUNDED"
+                  ? "Refunded"
+                  : "Pending"}
+              </span>
+            </div>
+
+            <div className="bkdet-price-wrapper">
+              <span className="bkdet-price-sublabel">Total Booking Value</span>
+              <div className="bkdet-price-huge">
+                {formatCurrency(totalAmount)}
               </div>
             </div>
 
-            <div className="bkdet-price-huge">
-              {formatCurrency(booking.totalAmount)}
+            <div className="bkdet-payment-stages">
+              <div
+                className={`bkdet-stage-item ${
+                  isAdvancePaid || isFullyPaid ? "paid" : "pending"
+                }`}
+              >
+                <div className="bkdet-stage-left">
+                  <div className="bkdet-stage-icon">
+                    <i
+                      className={`fas ${
+                        isAdvancePaid || isFullyPaid
+                          ? "fa-check"
+                          : "fa-hourglass-start"
+                      }`}
+                    />
+                  </div>
+                  <div className="bkdet-stage-info">
+                    <span className="bkdet-stage-title">Advance Payment</span>
+                    <span className="bkdet-stage-subtitle">
+                      Initial deposit secured in Escrow
+                    </span>
+                  </div>
+                </div>
+                <div className="bkdet-stage-right">
+                  <span className="bkdet-stage-amount">
+                    {formatCurrency(advanceAmount)}
+                  </span>
+                  <span
+                    className={`bkdet-milestone-pill ${
+                      isAdvancePaid || isFullyPaid ? "paid" : "pending"
+                    }`}
+                  >
+                    {isAdvancePaid || isFullyPaid ? "Paid" : "Pending"}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                className={`bkdet-stage-item ${isFullyPaid ? "paid" : "pending"}`}
+              >
+                <div className="bkdet-stage-left">
+                  <div className="bkdet-stage-icon">
+                    <i
+                      className={`fas ${
+                        isFullyPaid ? "fa-check" : "fa-clock"
+                      }`}
+                    />
+                  </div>
+                  <div className="bkdet-stage-info">
+                    <span className="bkdet-stage-title">Final Balance</span>
+                    <span className="bkdet-stage-subtitle">
+                      {isFullyPaid
+                        ? "Settled upon completion"
+                        : "Due upon job completion"}
+                    </span>
+                  </div>
+                </div>
+                <div className="bkdet-stage-right">
+                  <span className="bkdet-stage-amount">
+                    {formatCurrency(remainingAmount)}
+                  </span>
+                  <span
+                    className={`bkdet-milestone-pill ${
+                      isFullyPaid ? "paid" : "pending"
+                    }`}
+                  >
+                    {isFullyPaid ? "Settled" : "Pending"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bkdet-breakdown-card">
+              <div className="bkdet-breakdown-header">
+                <i className="fas fa-file-invoice-dollar" />
+                <span>Financial Breakdown</span>
+              </div>
+              <div className="bkdet-breakdown-row">
+                <span>Base Service Quote</span>
+                <span>{formatCurrency(baseAmount)}</span>
+              </div>
+              <div className="bkdet-breakdown-row">
+                <span>Platform Fee (10%)</span>
+                <span>+{formatCurrency(platformFee)}</span>
+              </div>
+              <div className="bkdet-breakdown-divider" />
+              <div className="bkdet-breakdown-row total">
+                <span>Total Amount</span>
+                <span>{formatCurrency(totalAmount)}</span>
+              </div>
+            </div>
+
+            <div className="bkdet-transaction-card">
+              {booking.orderId && (
+                <div className="bkdet-tx-row">
+                  <span className="bkdet-tx-label">Razorpay Order ID</span>
+                  <span className="bkdet-tx-val">{booking.orderId}</span>
+                </div>
+              )}
+              {booking.paymentId && (
+                <div className="bkdet-tx-row">
+                  <span className="bkdet-tx-label">Payment ID</span>
+                  <span className="bkdet-tx-val">{booking.paymentId}</span>
+                </div>
+              )}
             </div>
 
             <div className="bkdet-escrow-badge">
-              <i className="fas fa-lock" />
+              <i className="fas fa-shield-alt" />
               <div className="bkdet-escrow-badge-text">
-                <strong>100% Escrow Secured.</strong> The payment is safely locked by BrioSolve and only released after verified job completion.
+                <strong>100% Escrow Protection:</strong> Advance funds are securely held with BrioSolve. The remaining balance and final payout to the provider are released only after verified completion of the service.
               </div>
-            </div>
-
-            <div className="bkdet-meta-grid" style={{ gridTemplateColumns: "1fr", gap: "8px" }}>
-              <div className="bkdet-meta-box">
-                <div className="bkdet-meta-box-label">Payment Status</div>
-                <div
-                  className="bkdet-meta-box-value"
-                  style={{
-                    color:
-                      booking.paymentStatus === "PAID"
-                        ? "#16a34a"
-                        : booking.paymentStatus === "ADVANCE_PAID"
-                        ? "#0284c7"
-                        : booking.paymentStatus === "REFUNDED"
-                        ? "#dc2626"
-                        : "#d97706"
-                  }}
-                >
-                  {booking.paymentStatus === "PAID"
-                    ? "Fully Paid & Settled"
-                    : booking.paymentStatus === "ADVANCE_PAID"
-                    ? "Advance Paid (Balance Due on Completion)"
-                    : booking.paymentStatus === "REFUNDED"
-                    ? "Refunded"
-                    : "Payment Pending"}
-                </div>
-              </div>
-
-              {booking.orderId && (
-                <div className="bkdet-meta-box">
-                  <div className="bkdet-meta-box-label">Order Ref</div>
-                  <div className="bkdet-meta-box-value" style={{ fontFamily: "monospace", fontSize: "0.82rem" }}>
-                    {booking.orderId}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 

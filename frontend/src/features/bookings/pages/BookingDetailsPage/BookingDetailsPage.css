@@ -617,12 +617,207 @@
   border: 1px solid #fed7aa;
 }
 
+.bkdet-price-wrapper {
+  margin: 4px 0 16px;
+}
+
+.bkdet-price-sublabel {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 2px;
+}
+
 .bkdet-price-huge {
-  font-size: 2rem;
+  font-size: 1.85rem;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.02em;
-  margin: 4px 0 12px;
+  margin: 0;
+}
+
+.bkdet-payment-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.bkdet-stage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.bkdet-stage-item.paid {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.bkdet-stage-item.pending {
+  border-color: #fed7aa;
+  background: #fffbeb;
+}
+
+.bkdet-stage-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bkdet-stage-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.bkdet-stage-item.paid .bkdet-stage-icon {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.bkdet-stage-item.pending .bkdet-stage-icon {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.bkdet-stage-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bkdet-stage-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.bkdet-stage-subtitle {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.bkdet-stage-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.bkdet-stage-amount {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.bkdet-milestone-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bkdet-milestone-pill.paid {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.bkdet-milestone-pill.pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.bkdet-breakdown-card {
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.bkdet-breakdown-header {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bkdet-breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #475569;
+  padding: 4px 0;
+}
+
+.bkdet-breakdown-row.total {
+  border-top: 1px dashed #cbd5e1;
+  margin-top: 6px;
+  padding-top: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.bkdet-breakdown-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 6px 0;
+}
+
+.bkdet-transaction-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.bkdet-tx-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  padding: 8px 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.bkdet-tx-label {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.bkdet-tx-val {
+  font-family: monospace;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 0.8rem;
 }
 
 .bkdet-escrow-badge {
@@ -633,7 +828,7 @@
   border: 1px solid #ffedd5;
   border-radius: 10px;
   padding: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .bkdet-escrow-badge i {
@@ -983,10 +1178,12 @@
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.7);
   }
+
   70% {
     transform: scale(1);
     box-shadow: 0 0 0 6px rgba(234, 88, 12, 0);
   }
+
   100% {
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(234, 88, 12, 0);

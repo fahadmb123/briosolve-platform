@@ -8,12 +8,12 @@ import { CustomerBookingsResponseDto, BookingCountsDto } from "../../application
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
 
 export const BookingStatusToTitle = {
-    "CONFIRMED":"Confirmed",
-    "EN_ROUTE":"On the way",
-    "INSPECTION":"Inspection finished",
-    "IN_PROGRESS":"In the progress",
-    "COMPLETED":"Completed",
-    "CANCELLED":"Cancelled"
+    "CONFIRMED": "Confirmed",
+    "EN_ROUTE": "On the way",
+    "INSPECTION": "Inspection finished",
+    "IN_PROGRESS": "In the progress",
+    "COMPLETED": "Completed",
+    "CANCELLED": "Cancelled"
 }
 
 export class BookingMapper {
@@ -153,6 +153,7 @@ export class BookingMapper {
             totalAmount: entity.total_amount,
             platformFee: entity.platform_fee,
             status: entity.status,
+            paymentStatus: entity.payment_status || "ADVANCE_PAID",
             scheduledDate: entity.scheduled_date ? entity.scheduled_date.toISOString() : null,
             scheduledTime: entity.scheduled_time,
             paymentId: entity.payment_id,
@@ -243,6 +244,7 @@ export class BookingMapper {
             total_amount: data.totalAmount.toString(),
             platform_fee: data.platformFee.toString(),
             status: data.status || "CONFIRMED",
+            payment_status: data.paymentStatus || "ADVANCE_PAID",
             scheduled_date: scheduledInstant,
             scheduled_time: data.scheduledTime ?? null,
             payment_id: data.paymentId ?? null,
@@ -255,6 +257,9 @@ export class BookingMapper {
         const payload: any = {};
         if (data.status) {
             payload.status = data.status;
+        }
+        if (data.paymentStatus) {
+            payload.payment_status = data.paymentStatus;
         }
         if (data.notes !== undefined) {
             payload.notes = data.notes;
