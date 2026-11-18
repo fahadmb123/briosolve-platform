@@ -7,17 +7,19 @@ import {
 } from "../services/booking.service";
 import type { UpdateBookingStatusPayload } from "../types/booking.types";
 
-export const useGetCustomerBookings = () => {
+export const useGetCustomerBookings = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ["customerBookings"],
-    queryFn: getCustomerBookings
+    queryFn: getCustomerBookings,
+    enabled: options?.enabled ?? true
   });
 };
 
-export const useGetProviderBookings = () => {
+export const useGetProviderBookings = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ["providerBookings"],
-    queryFn: getProviderBookings
+    queryFn: getProviderBookings,
+    enabled: options?.enabled ?? true
   });
 };
 

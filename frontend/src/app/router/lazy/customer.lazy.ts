@@ -12,4 +12,4 @@ export const CustomerServiceRequestDetails = React.lazy(() => import('../../../f
 export const CustomerChat = React.lazy(() => import('../../../features/chat/pages/CustomerChat/CustomerChat'));
 export const CustomerPaymentSuccess = React.lazy(() => import('../../../features/payment/pages/PaymentSuccessPage'));
 export const CustomerPaymentCancelled = React.lazy(() => import('../../../features/payment/pages/PaymentCancelledPage'));
-export const CustomerBookings = React.lazy(() => import('../../../features/bookings/pages/CustomerBookings/CustomerBookings'));
+export const CustomerBookings = React.lazy(() => import('../../../features/bookings/pages/BookingsPage/BookingsPage').then(m => ({ default: m.BookingsPage })));
