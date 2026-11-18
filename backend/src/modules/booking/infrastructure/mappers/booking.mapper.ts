@@ -7,6 +7,17 @@ import { BookingResponseDto } from "../../application/dtos/response/booking-resp
 import { CustomerBookingsResponseDto, BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
 
+export type BookingStatus = "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+
+export const BookingStatusToTitle = {
+    "CONFIRMED":"Confirmed",
+    "EN_ROUTE":"On the way",
+    "INSPECTION":"Inspection finished",
+    "IN_PROGRESS":"In the progress",
+    "COMPLETED":"Completed",
+    "CANCELLED":"Cancelled"
+}
+
 export class BookingMapper {
     static toCreateRepoDto(data: {
         serviceRequestId: string;

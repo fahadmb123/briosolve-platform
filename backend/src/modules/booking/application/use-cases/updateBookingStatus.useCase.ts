@@ -4,7 +4,7 @@ import { IBookingRepository } from "../../domain/repositories/IBookingRepository
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { UpdateBookingStatusInputDto } from "../dtos/request/update-booking-status.dto";
 import { BookingResponseDto } from "../dtos/response/booking-response.dto";
-import { BookingMapper } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper, BookingStatusToTitle } from "../../infrastructure/mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 
@@ -57,7 +57,7 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
                 await this._createNotificationUseCase.execute({
                     recipientId: targetRecipientId,
                     type: "BOOKING_STATUS_UPDATED",
-                    title: `Booking ${input.status}`,
+                    title: `Booking ${BookingStatusToTitle[input.status]}`,
                     title_code: "BOOKING_STATUS_UPDATED",
                     message: `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" has been marked as ${input.status}.`
                 }).catch(() => null);
