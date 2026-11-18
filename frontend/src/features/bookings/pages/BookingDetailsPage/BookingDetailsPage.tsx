@@ -196,7 +196,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const counterpartyName = isProvider
     ? booking.customerName || "Customer"
     : booking.providerBusinessName || booking.providerName || "Service Provider";
-  const counterpartyPhone = isProvider ? booking.customerPhone : booking.providerPhone;
   const counterpartyInitial = counterpartyName.charAt(0).toUpperCase();
 
   const mapsUrl = booking.addressText
@@ -280,13 +279,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             <i className="fas fa-comment-dots" />
             <span>Chat</span>
           </button>
-
-          {counterpartyPhone && (
-            <a href={`tel:${counterpartyPhone}`} className="bkdet-action-btn outline">
-              <i className="fas fa-phone-alt" />
-              <span>Call</span>
-            </a>
-          )}
 
           {isProvider && isConfirmed && (
             <button
@@ -514,27 +506,14 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <span className="bkdet-counterparty-name">
                   {counterpartyName}
                 </span>
-                {counterpartyPhone && (
-                  <a href={`tel:${counterpartyPhone}`} className="bkdet-counterparty-phone">
-                    <i className="fas fa-phone-alt" />
-                    <span>{counterpartyPhone}</span>
-                  </a>
-                )}
               </div>
             </div>
 
             <div className="bkdet-contact-actions">
               <button type="button" className="bkdet-contact-btn" onClick={handleChat}>
                 <i className="fas fa-comment-dots" />
-                <span>Message</span>
+                <span>Chat</span>
               </button>
-
-              {counterpartyPhone && (
-                <a href={`tel:${counterpartyPhone}`} className="bkdet-contact-btn">
-                  <i className="fas fa-phone-alt" />
-                  <span>Call</span>
-                </a>
-              )}
             </div>
           </div>
         </div>

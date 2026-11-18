@@ -45,8 +45,6 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
       ? booking.providerBusinessName || booking.providerName || "Assigned Provider"
       : booking.customerName || "Customer";
 
-  const counterpartyPhone = role === "CUSTOMER" ? booking.providerPhone : booking.customerPhone;
-
   const mapsUrl = booking.addressText
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.addressText)}`
     : null;
@@ -145,12 +143,6 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
               </div>
               <div className="bkmodal-counterparty-info">
                 <span className="bkmodal-counterparty-name">{counterpartyName}</span>
-                {counterpartyPhone && (
-                  <span className="bkmodal-counterparty-phone">
-                    <i className="fas fa-phone-alt"></i>
-                    <span>{counterpartyPhone}</span>
-                  </span>
-                )}
               </div>
               <button
                 type="button"
