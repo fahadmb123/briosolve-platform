@@ -102,15 +102,27 @@ export class PrismaBookingRepository implements IBookingRepository {
         return Promise.all(
             bookings.map(async (booking) => {
                 let serviceRequestTitle: string | null = null;
+                let categoryName: string | null = null;
+                let addressText: string | null = null;
                 let providerBusinessName: string | null = null;
                 let providerName: string | null = null;
+                let providerPhone: string | null = null;
                 let customerName: string | null = null;
+                let customerPhone: string | null = null;
 
                 const sr = await db.orm.public.service_requests
                     .where({ id: booking.service_request_id as never })
+                    .include("category")
+                    .include("address")
                     .first();
                 if (sr) {
                     serviceRequestTitle = sr.title;
+                    categoryName = sr.category?.name || null;
+                    if (sr.address) {
+                        addressText = [sr.address.house_no, sr.address.area, sr.address.city]
+                            .filter(Boolean)
+                            .join(", ");
+                    }
                 }
 
                 const providerProfile = await db.orm.public.provider_profiles
@@ -123,6 +135,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                         .first();
                     if (pUser) {
                         providerName = pUser.name;
+                        providerPhone = pUser.phone;
                     }
                 }
 
@@ -131,14 +144,19 @@ export class PrismaBookingRepository implements IBookingRepository {
                     .first();
                 if (cUser) {
                     customerName = cUser.name;
+                    customerPhone = cUser.phone;
                 }
 
                 return {
                     booking,
                     serviceRequestTitle,
+                    categoryName,
+                    addressText,
                     providerBusinessName,
                     providerName,
-                    customerName
+                    providerPhone,
+                    customerName,
+                    customerPhone
                 };
             })
         );

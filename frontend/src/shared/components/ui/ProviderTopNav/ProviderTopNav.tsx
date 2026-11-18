@@ -87,7 +87,8 @@ export const ProviderTopNav: React.FC = () => {
     location.pathname === "/provider/dashboard" ||
     location.pathname.startsWith("/provider/dashboard") ||
     location.pathname.startsWith("/provider/service-requests") ||
-    location.pathname.startsWith("/provider/requests");
+    location.pathname.startsWith("/provider/requests") ||
+    location.pathname.startsWith("/provider/bookings");
 
 
   const user = useAuthStore((state) => state.user);
@@ -288,17 +289,18 @@ export const ProviderTopNav: React.FC = () => {
 
                   <div className="prov-panel-col">
                     <div className="prov-col-title">OPERATIONS</div>
-                    <Link
-                      to="#"
-                      className="prov-panel-item"
+                    <NavLink
+                      to="/provider/bookings"
+                      className={({ isActive }) =>
+                        `prov-panel-item ${isActive ? "item-active" : ""}`
+                      }
                       onClick={closeAll}
                     >
                       <div className="prov-item-main">
                         <i className="fas fa-calendar-check"></i>
                         <span>Bookings</span>
                       </div>
-                      <span className="prov-mono-badge">3</span>
-                    </Link>
+                    </NavLink>
                     <Link
                       to="/provider/messages"
                       className="prov-panel-item"
@@ -844,6 +846,13 @@ export const ProviderTopNav: React.FC = () => {
                 onClick={closeAll}
               >
                 <span>Service Requests</span>
+              </NavLink>
+              <NavLink
+                to="/provider/bookings"
+                className="prov-mobile-item"
+                onClick={closeAll}
+              >
+                <span>Bookings</span>
               </NavLink>
               <Link to="/provider/messages" className="prov-mobile-item" onClick={closeAll}>
                 <span>Messages</span>

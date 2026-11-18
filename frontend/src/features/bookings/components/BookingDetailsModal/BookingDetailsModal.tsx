@@ -1,0 +1,312 @@
+import React from "react";
+import type { BookingItem, BookingStatus } from "../../types/booking.types";
+import "./BookingDetailsModal.css";
+
+interface BookingDetailsModalProps {
+  booking: BookingItem | null;
+  isOpen: boolean;
+  role: "CUSTOMER" | "PROVIDER";
+  onClose: () => void;
+  onChat: (booking: BookingItem) => void;
+  onUpdateStatus?: (booking: BookingItem, newStatus: BookingStatus) => void;
+  onViewServiceRequest?: (serviceRequestId: string) => void;
+}
+
+export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
+  booking,
+  isOpen,
+  role,
+  onClose,
+  onChat,
+  onUpdateStatus,
+  onViewServiceRequest
+}) => {
+  if (!isOpen || !booking) return null;
+
+  const formattedScheduledDate = booking.scheduledDate
+    ? new Date(booking.scheduledDate).toLocaleDateString("en-IN", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      })
+    : "Flexible schedule";
+
+  const formattedBookedDate = new Date(booking.createdAt).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  const counterpartyName =
+    role === "CUSTOMER"
+      ? booking.providerBusinessName || booking.providerName || "Assigned Provider"
+      : booking.customerName || "Customer";
+
+  const counterpartyPhone = role === "CUSTOMER" ? booking.providerPhone : booking.customerPhone;
+
+  const mapsUrl = booking.addressText
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.addressText)}`
+    : null;
+
+  const renderStatusBadge = () => {
+    switch (booking.status) {
+      case "CONFIRMED":
+        return (
+          <span className="bkmodal-badge confirmed">
+            <i className="fas fa-check-circle"></i>
+            <span>Confirmed</span>
+          </span>
+        );
+      case "IN_PROGRESS":
+        return (
+          <span className="bkmodal-badge in-progress">
+            <i className="fas fa-tools"></i>
+            <span>In Progress</span>
+          </span>
+        );
+      case "COMPLETED":
+        return (
+          <span className="bkmodal-badge completed">
+            <i className="fas fa-award"></i>
+            <span>Completed</span>
+          </span>
+        );
+      case "CANCELLED":
+        return (
+          <span className="bkmodal-badge cancelled">
+            <i className="fas fa-ban"></i>
+            <span>Cancelled</span>
+          </span>
+        );
+      default:
+        return (
+          <span className="bkmodal-badge confirmed">
+            <span>{booking.status}</span>
+          </span>
+        );
+    }
+  };
+
+  return (
+    <div className="bkmodal-overlay" onClick={onClose}>
+      <div
+        className="bkmodal-dialog"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="bkmodal-header">
+          <div className="bkmodal-header-titles">
+            <div className="bkmodal-ref-row">
+              <span className="bkmodal-ref-chip">
+                <i className="fas fa-receipt"></i>
+                <span>{booking.bookingNumber}</span>
+              </span>
+              {renderStatusBadge()}
+            </div>
+            <h2 className="bkmodal-title">
+              {booking.serviceRequestTitle || "Service Requirement"}
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            className="bkmodal-btn-close"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div className="bkmodal-body">
+          <div className="bkmodal-escrow-card">
+            <i className="fas fa-shield-alt bkmodal-escrow-icon"></i>
+            <div className="bkmodal-escrow-text">
+              <h4>Escrow Protection Active</h4>
+              <p>
+                Payment of ₹{booking.totalAmount.toLocaleString("en-IN")} is secured in BrioSolve Escrow and is only disbursed once service delivery is confirmed.
+              </p>
+            </div>
+          </div>
+
+          <div className="bkmodal-section">
+            <h4 className="bkmodal-section-title">
+              <i className={role === "CUSTOMER" ? "fas fa-user-tie" : "fas fa-user"}></i>
+              <span>{role === "CUSTOMER" ? "Service Provider Details" : "Customer Details"}</span>
+            </h4>
+
+            <div className="bkmodal-counterparty-card">
+              <div className="bkmodal-counterparty-avatar">
+                {counterpartyName.charAt(0).toUpperCase()}
+              </div>
+              <div className="bkmodal-counterparty-info">
+                <span className="bkmodal-counterparty-name">{counterpartyName}</span>
+                {counterpartyPhone && (
+                  <span className="bkmodal-counterparty-phone">
+                    <i className="fas fa-phone-alt"></i>
+                    <span>{counterpartyPhone}</span>
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                className="bkmodal-btn-chat-partner"
+                onClick={() => {
+                  onClose();
+                  onChat(booking);
+                }}
+              >
+                <i className="fas fa-comment-dots"></i>
+                <span>Message</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="bkmodal-section">
+            <h4 className="bkmodal-section-title">
+              <i className="far fa-calendar-alt"></i>
+              <span>Schedule & Location</span>
+            </h4>
+
+            <div className="bkmodal-grid-two">
+              <div className="bkmodal-info-box">
+                <span className="bkmodal-info-label">Scheduled Date</span>
+                <span className="bkmodal-info-value">{formattedScheduledDate}</span>
+              </div>
+
+              <div className="bkmodal-info-box">
+                <span className="bkmodal-info-label">Preferred Time</span>
+                <span className="bkmodal-info-value">{booking.scheduledTime || "Flexible hours"}</span>
+              </div>
+
+              <div className="bkmodal-info-box full">
+                <span className="bkmodal-info-label">Service Address</span>
+                <div className="bkmodal-address-line">
+                  <span className="bkmodal-info-value">{booking.addressText || "Customer address on record"}</span>
+                  {mapsUrl && (
+                    <a
+                      href={mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bkmodal-link-maps"
+                    >
+                      <i className="fas fa-external-link-alt"></i>
+                      <span>Google Maps</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bkmodal-section">
+            <h4 className="bkmodal-section-title">
+              <i className="fas fa-file-invoice-dollar"></i>
+              <span>Payment Breakdown</span>
+            </h4>
+
+            <div className="bkmodal-pricing-box">
+              <div className="bkmodal-price-row">
+                <span>Agreed Service Amount</span>
+                <span>₹{(booking.totalAmount - booking.platformFee).toLocaleString("en-IN")}</span>
+              </div>
+              <div className="bkmodal-price-row">
+                <span>Platform Assurance & Escrow Fee</span>
+                <span>₹{booking.platformFee.toLocaleString("en-IN")}</span>
+              </div>
+              <div className="bkmodal-price-row total">
+                <span>Total Paid & Escrow Secured</span>
+                <span>₹{booking.totalAmount.toLocaleString("en-IN")}</span>
+              </div>
+            </div>
+
+            <div className="bkmodal-meta-grid">
+              <div className="bkmodal-meta-item">
+                <span className="bkmodal-meta-k">Payment ID</span>
+                <span className="bkmodal-meta-v mono">{booking.paymentId || "rzp_verified"}</span>
+              </div>
+              <div className="bkmodal-meta-item">
+                <span className="bkmodal-meta-k">Booked On</span>
+                <span className="bkmodal-meta-v">{formattedBookedDate}</span>
+              </div>
+            </div>
+          </div>
+
+          {booking.notes && (
+            <div className="bkmodal-section">
+              <h4 className="bkmodal-section-title">
+                <i className="fas fa-sticky-note"></i>
+                <span>Work Scope & Notes</span>
+              </h4>
+              <p className="bkmodal-notes-text">{booking.notes}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="bkmodal-footer">
+          <button type="button" className="bkmodal-btn-dismiss" onClick={onClose}>
+            Close
+          </button>
+
+          {role === "CUSTOMER" && onViewServiceRequest && (
+            <button
+              type="button"
+              className="bkmodal-btn-action-outline"
+              onClick={() => {
+                onClose();
+                onViewServiceRequest(booking.serviceRequestId);
+              }}
+            >
+              <i className="fas fa-clipboard-list"></i>
+              <span>View Service Request</span>
+            </button>
+          )}
+
+          {role === "PROVIDER" && booking.status === "CONFIRMED" && onUpdateStatus && (
+            <button
+              type="button"
+              className="bkmodal-btn-action-primary"
+              onClick={() => {
+                onClose();
+                onUpdateStatus(booking, "IN_PROGRESS");
+              }}
+            >
+              <i className="fas fa-play"></i>
+              <span>Start Job</span>
+            </button>
+          )}
+
+          {role === "PROVIDER" && booking.status === "IN_PROGRESS" && onUpdateStatus && (
+            <button
+              type="button"
+              className="bkmodal-btn-action-success"
+              onClick={() => {
+                onClose();
+                onUpdateStatus(booking, "COMPLETED");
+              }}
+            >
+              <i className="fas fa-check"></i>
+              <span>Mark Job Completed</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="bkmodal-btn-action-primary"
+            onClick={() => {
+              onClose();
+              onChat(booking);
+            }}
+          >
+            <i className="fas fa-comment-dots"></i>
+            <span>Chat</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

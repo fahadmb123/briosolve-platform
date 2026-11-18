@@ -18,7 +18,11 @@ export interface BookingResponseDto {
     createdAt: string;
     updatedAt: string;
     serviceRequestTitle?: string | null;
+    categoryName?: string | null;
+    addressText?: string | null;
     providerBusinessName?: string | null;
     providerName?: string | null;
+    providerPhone?: string | null;
     customerName?: string | null;
+    customerPhone?: string | null;
 }

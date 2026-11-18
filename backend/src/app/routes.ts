@@ -24,6 +24,7 @@ export function createRootRouter(route: RootRouterDependencies) {
     }
     if (route.bookingRoutes) {
         router.use("/booking", route.bookingRoutes);
+        router.use("/bookings", route.bookingRoutes);
     }
 
     return router;

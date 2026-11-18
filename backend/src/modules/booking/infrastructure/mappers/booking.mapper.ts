@@ -129,9 +129,13 @@ export class BookingMapper {
             createdAt: entity.created_at.toISOString(),
             updatedAt: entity.updated_at.toISOString(),
             serviceRequestTitle: details?.serviceRequestTitle ?? extra?.serviceRequestTitle ?? null,
+            categoryName: details?.categoryName ?? null,
+            addressText: details?.addressText ?? null,
             providerBusinessName: details?.providerBusinessName ?? extra?.providerBusinessName ?? null,
             providerName: details?.providerName ?? extra?.providerName ?? null,
-            customerName: details?.customerName ?? extra?.customerName ?? null
+            providerPhone: details?.providerPhone ?? null,
+            customerName: details?.customerName ?? extra?.customerName ?? null,
+            customerPhone: details?.customerPhone ?? null
         };
     }
 

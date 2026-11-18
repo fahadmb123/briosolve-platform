@@ -6,9 +6,13 @@ import { UpdateBookingRepoDto } from "../../application/dtos/request/update-book
 export interface BookingDetails {
     booking: Booking;
     serviceRequestTitle: string | null;
+    categoryName?: string | null;
+    addressText?: string | null;
     providerBusinessName: string | null;
     providerName: string | null;
+    providerPhone?: string | null;
     customerName: string | null;
+    customerPhone?: string | null;
 }
 
 export interface IBookingRepository extends BaseRepository<Booking | null> {

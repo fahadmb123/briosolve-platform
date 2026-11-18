@@ -51,7 +51,7 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
   },
   {
     label: "Bookings",
-    to: "/dashboard#bookings",
+    to: "/bookings",
     icon: "fas fa-calendar-check",
   },
   {

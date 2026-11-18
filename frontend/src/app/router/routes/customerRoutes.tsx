@@ -10,7 +10,8 @@ import {
   CustomerServiceRequestDetails,
   CustomerChat,
   CustomerPaymentSuccess,
-  CustomerPaymentCancelled
+  CustomerPaymentCancelled,
+  CustomerBookings
 } from '../lazy/customer.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
 import RoleRoute from '../guards/RoleRoute';
@@ -29,6 +30,8 @@ export const customerRoutes = (
         <Route path="my-requests" element={<CustomerMyRequests />} />
         <Route path="my-requests/:requestId" element={<CustomerServiceRequestDetails />} />
         <Route path="service-requests/:requestId" element={<CustomerServiceRequestDetails />} />
+        <Route path="bookings" element={<CustomerBookings />} />
+        <Route path="my-bookings" element={<CustomerBookings />} />
         <Route path="payment/success" element={<CustomerPaymentSuccess />} />
         <Route path="payment/cancelled" element={<CustomerPaymentCancelled />} />
         <Route path="customer/payment/success" element={<CustomerPaymentSuccess />} />

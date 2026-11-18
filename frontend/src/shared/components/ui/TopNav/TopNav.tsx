@@ -363,7 +363,7 @@ export const TopNav: React.FC = () => {
                         <i className="fas fa-file-alt"></i>
                       </Link>
                       <Link
-                        to="/dashboard"
+                        to="/bookings"
                         className="topnav-dropdown-item"
                         role="menuitem"
                         onClick={closeAllMenus}
@@ -780,7 +780,7 @@ export const TopNav: React.FC = () => {
                     My Requests
                   </Link>
                   <Link
-                    to="/dashboard"
+                    to="/bookings"
                     className="topnav-mobile-item"
                     onClick={closeAllMenus}
                   >
