@@ -98,14 +98,6 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
     }
   };
 
-  const handleViewServiceRequest = (serviceRequestId: string) => {
-    if (isProvider) {
-      navigate(`/provider/service-requests/${serviceRequestId}`);
-    } else {
-      navigate(`/my-requests/${serviceRequestId}`);
-    }
-  };
-
   const handleRequestStatusChange = (booking: BookingItem, newStatus: BookingStatus) => {
     setStatusModalBooking(booking);
     setTargetStatus(newStatus);
@@ -325,7 +317,6 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
                 role={cardRole}
                 onViewDetails={handleOpenDetails}
                 onChat={handleChat}
-                onViewServiceRequest={handleViewServiceRequest}
                 onUpdateStatus={isProvider ? handleRequestStatusChange : undefined}
               />
             ))}

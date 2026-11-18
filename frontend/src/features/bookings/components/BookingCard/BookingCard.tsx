@@ -8,7 +8,6 @@ interface BookingCardProps {
   onViewDetails: (booking: BookingItem) => void;
   onChat: (booking: BookingItem) => void;
   onUpdateStatus?: (booking: BookingItem, newStatus: BookingStatus) => void;
-  onViewServiceRequest?: (serviceRequestId: string) => void;
 }
 
 export const BookingCard: React.FC<BookingCardProps> = ({
@@ -16,8 +15,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   role,
   onViewDetails,
   onChat,
-  onUpdateStatus,
-  onViewServiceRequest
+  onUpdateStatus
 }) => {
   const formattedDate = booking.scheduledDate
     ? new Date(booking.scheduledDate).toLocaleDateString("en-IN", {
@@ -147,7 +145,8 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             className="bkcard-btn-details"
             onClick={() => onViewDetails(booking)}
           >
-            <span>View Details</span>
+            <i className="fas fa-file-contract"></i>
+            <span>Booking Details</span>
           </button>
 
           {role === "PROVIDER" && booking.status === "CONFIRMED" && onUpdateStatus && (
@@ -169,18 +168,6 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             >
               <i className="fas fa-check"></i>
               <span>Mark Completed</span>
-            </button>
-          )}
-
-          {role === "CUSTOMER" && onViewServiceRequest && (
-            <button
-              type="button"
-              className="bkcard-btn-request"
-              onClick={() => onViewServiceRequest(booking.serviceRequestId)}
-              title="Open associated service request"
-            >
-              <span>View Request</span>
-              <i className="fas fa-arrow-right"></i>
             </button>
           )}
         </div>
