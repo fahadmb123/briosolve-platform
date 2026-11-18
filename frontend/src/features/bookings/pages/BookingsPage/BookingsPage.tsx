@@ -10,7 +10,6 @@ import type { BookingItem, BookingStatus, BookingFilterTab } from "../../types/b
 import {
   BookingCard,
   BookingCardSkeleton,
-  BookingDetailsModal,
   BookingStatusModal
 } from "../../components";
 import "./BookingsPage.css";
@@ -37,9 +36,6 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
 
   const [activeTab, setActiveTab] = useState<BookingFilterTab>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedBooking, setSelectedBooking] = useState<BookingItem | null>(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-
   const [statusModalBooking, setStatusModalBooking] = useState<BookingItem | null>(null);
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
 
@@ -73,13 +69,11 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
   }, [bookings, activeTab, searchQuery, isProvider]);
 
   const handleOpenDetails = (booking: BookingItem) => {
-    setSelectedBooking(booking);
-    setIsDetailsOpen(true);
-  };
-
-  const handleCloseDetails = () => {
-    setIsDetailsOpen(false);
-    setSelectedBooking(null);
+    if (isProvider) {
+      navigate(`/provider/bookings/${booking.id}`, { state: { booking } });
+    } else {
+      navigate(`/bookings/${booking.id}`, { state: { booking } });
+    }
   };
 
   const handleChat = (booking: BookingItem) => {
@@ -338,15 +332,6 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
           </div>
         )}
       </div>
-
-      <BookingDetailsModal
-        booking={selectedBooking}
-        isOpen={isDetailsOpen}
-        onClose={handleCloseDetails}
-        role={cardRole}
-        onChat={handleChat}
-        onViewServiceRequest={handleViewServiceRequest}
-      />
 
       {isProvider && (
         <BookingStatusModal
