@@ -38,10 +38,9 @@ export default function CustomerServiceRequestDetails() {
   useEffect(() => {
     if (stateRequest) {
       setRequest(stateRequest);
-      return;
     }
 
-    if (!request && requestId && !hasFetchedRef.current) {
+    if (requestId && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       getRequestsMutation.mutate(
         { page: 1, limit: 50 },
@@ -58,19 +57,21 @@ export default function CustomerServiceRequestDetails() {
             const found = list.find((r: CustomerServiceRequestItem) => r.id === requestId);
             if (found) {
               setRequest(found);
-            } else {
+            } else if (!stateRequest) {
               toast.error("Service request not found");
               navigate("/my-requests");
             }
           },
           onError: () => {
-            toast.error("Failed to load service request details");
-            navigate("/my-requests");
+            if (!stateRequest) {
+              toast.error("Failed to load service request details");
+              navigate("/my-requests");
+            }
           }
         }
       );
     }
-  }, [requestId, request, stateRequest, navigate]);
+  }, [requestId, stateRequest, navigate]);
 
   const permission = request ? checkRequestEditPermission(request) : { canEdit: false };
   const canCancel = request ? request.status === "PENDING" || request.status === "ACTIVE" : false;

@@ -55,7 +55,8 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   const isRequestClosed =
     requestStatus === "CANCELLED" ||
     requestStatus === "EXPIRED" ||
-    requestStatus === "COMPLETED";
+    requestStatus === "COMPLETED" ||
+    requestStatus === "ACCEPTED";
 
   useEffect(() => {
     const retryId = (location.state as any)?.retryQuotationId;
@@ -234,7 +235,9 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                               serviceRequestId: requestId,
                               providerName: quoteAccepted.provider.name,
                               providerBusinessName: quoteAccepted.provider.businessName,
-                              requestItem: requestItem || null,
+                              requestItem: requestItem
+                                ? { ...requestItem, status: "ACCEPTED" }
+                                : null,
                               bookingId: bookingData?.bookingId,
                               bookingNumber: bookingData?.bookingNumber
                             }

@@ -102,7 +102,9 @@ export const PaymentSuccessPage: React.FC = () => {
               onClick={() =>
                 navigate(`/my-requests/${serviceRequestId}`, {
                   state: {
-                    request: state.requestItem || null
+                    request: state.requestItem
+                      ? { ...state.requestItem, status: "ACCEPTED" }
+                      : null
                   }
                 })
               }

@@ -157,6 +157,13 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
           </span>
         );
       }
+      if (request.status === "ACCEPTED") {
+        return (
+          <span className="srdetails-status-pill completed">
+            <i className="fas fa-check-circle"></i> Quotation Accepted
+          </span>
+        );
+      }
       return (
         <span className="srdetails-status-pill open">
           <i className="fas fa-circle text-xs"></i> Open for Quotations
@@ -175,6 +182,12 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
         return (
           <span className="srdetails-status-pill pending">
             <i className="fas fa-clock"></i> Pending
+          </span>
+        );
+      case "ACCEPTED":
+        return (
+          <span className="srdetails-status-pill completed">
+            <i className="fas fa-check-circle"></i> Quotation Accepted
           </span>
         );
       case "IN_PROGRESS":
@@ -224,7 +237,7 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
         <div className="srdetails-top-actions">
           {role === "CUSTOMER" && (
             <>
-              {canEdit && request.status !== "EXPIRED" && onEdit && (
+              {canEdit && request.status !== "EXPIRED" && request.status !== "ACCEPTED" && onEdit && (
                 <button
                   type="button"
                   className="srdetails-btn-edit-top"
@@ -650,6 +663,23 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                     This request has passed its validity window and is closed for new quotations.
                   </p>
                 </>
+              ) : request.status === "ACCEPTED" ? (
+                <>
+                  <h4 className="srdetails-cta-title">Job Awarded</h4>
+                  <p className="srdetails-cta-sub">
+                    A quotation has been accepted for this service request.
+                  </p>
+                  {onViewQuotation && (
+                    <button
+                      type="button"
+                      className="srdetails-btn-quoted-cta"
+                      onClick={onViewQuotation}
+                    >
+                      <i className="fas fa-file-invoice-dollar"></i>
+                      <span>Manage My Quotations</span>
+                    </button>
+                  )}
+                </>
               ) : request.has_quoted ? (
                 <>
                   <div className="srdetails-quoted-box">
@@ -726,6 +756,20 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                       <span>Reopen Request</span>
                     </button>
                   )}
+                </>
+              ) : request.status === "ACCEPTED" ? (
+                <>
+                  <h4 className="srdetails-cta-title">Quotation Accepted</h4>
+                  <p className="srdetails-cta-sub">
+                    You have accepted a quotation and secured the booking for this service request.
+                  </p>
+                  <div className="srdetails-quoted-box">
+                    <i className="fas fa-check-circle srdetails-quoted-icon"></i>
+                    <div className="srdetails-quoted-text">
+                      <h5>Booking Confirmed</h5>
+                      <p>Editing is locked because a provider has been booked for this job.</p>
+                    </div>
+                  </div>
                 </>
               ) : (
                 <>
