@@ -137,14 +137,18 @@
   border-radius: 8px;
   font-size: 0.8rem;
   font-weight: 600;
+  position: static !important;
 }
 
+.bkdet-type-pill.type-fixed,
 .bkdet-type-pill.fixed {
   background: #f0fdf4;
   color: #15803d;
   border: 1px solid #bbf7d0;
+  position: static !important;
 }
 
+.bkdet-type-pill.type-fixed i,
 .bkdet-type-pill.fixed i {
   color: #16a34a;
 }
@@ -848,34 +852,324 @@
   margin: 6px 0;
 }
 
-.bkdet-transaction-card {
+.bkdet-header-pills-wrap {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
-.bkdet-tx-row {
+.bkdet-quote-type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  position: static !important;
+}
+
+.bkdet-quote-type-tag.type-fixed,
+.bkdet-quote-type-tag.fixed {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  position: static !important;
+}
+
+.bkdet-quote-type-tag.type-estimated,
+.bkdet-quote-type-tag.estimated {
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
+  position: static !important;
+}
+
+.bkdet-quote-type-tag.type-inspection,
+.bkdet-quote-type-tag.inspection {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+  position: static !important;
+}
+
+.bkdet-quote-type-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: #475569;
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
+
+.bkdet-quote-type-notice i {
+  color: #64748b;
+  margin-top: 2px;
+  font-size: 0.85rem;
+}
+
+.bkdet-quote-type-notice.confirmed {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+.bkdet-quote-type-notice.confirmed i {
+  color: #16a34a;
+}
+
+.bkdet-fixed-paid-tile {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.bkdet-fpt-icon {
+  font-size: 1.35rem;
+  color: #16a34a;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bkdet-fpt-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bkdet-fpt-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.bkdet-fpt-desc {
+  font-size: 0.78rem;
+  color: #166534;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.bkdet-payment-grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.bkdet-payment-tile {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bkdet-payment-tile.paid {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.bkdet-payment-tile.due {
+  border-color: #fed7aa;
+  background: #fffbeb;
+}
+
+.bkdet-payment-tile.settled {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.bkdet-tile-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.78rem;
-  padding: 8px 10px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
 }
 
-.bkdet-tx-label {
+.bkdet-tile-k {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
   color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+.bkdet-tile-amount {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.bkdet-tile-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.bkdet-calc-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.bkdet-calc-title {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bkdet-calc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #475569;
+  padding: 3px 0;
+}
+
+.bkdet-calc-row.advance {
+  color: #16a34a;
   font-weight: 600;
 }
 
-.bkdet-tx-val {
-  font-family: monospace;
-  color: #0f172a;
-  font-weight: 600;
-  font-size: 0.8rem;
+.bkdet-calc-row.balance {
+  border-top: 1px dashed #cbd5e1;
+  margin-top: 6px;
+  padding-top: 6px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #b45309;
+}
+
+.bkdet-calc-row.settled {
+  color: #16a34a;
+}
+
+.bkdet-pay-balance-action-box {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bkdet-pba-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bkdet-pba-text strong {
+  font-size: 0.88rem;
+  color: #92400e;
+}
+
+.bkdet-pba-text p {
+  font-size: 0.78rem;
+  color: #78350f;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.bkdet-pay-balance-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+  transition: all 0.18s ease;
+}
+
+.bkdet-pay-balance-btn:hover {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  transform: translateY(-1px);
+}
+
+.bkdet-pay-balance-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  font-size: 0.78rem;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.bkdet-pay-balance-info-box i {
+  color: #0284c7;
+  font-size: 0.95rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bkdet-pay-balance-info-box.warning {
+  background: #fefce8;
+  border-color: #fef08a;
+  color: #854d0e;
+}
+
+.bkdet-pay-balance-info-box.warning i {
+  color: #ca8a04;
+}
+
+.bkdet-pay-balance-success-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 9px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  font-size: 0.78rem;
+  color: #166534;
+  line-height: 1.4;
+}
+
+.bkdet-pay-balance-success-box i {
+  color: #16a34a;
+  font-size: 0.95rem;
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 .bkdet-escrow-badge {

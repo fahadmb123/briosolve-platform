@@ -13,6 +13,7 @@ export interface CreateBookingInputDto {
     orderId?: string | null;
     notes?: string | null;
     paymentStatus?: BookingPaymentStatus;
+    advanceAmount?: number;
 }
 
 export interface CreateBookingRepoDto {
@@ -23,6 +24,7 @@ export interface CreateBookingRepoDto {
     providerId: string;
     totalAmount: number;
     platformFee: number;
+    advanceAmount?: number;
     status?: BookingStatus;
     paymentStatus?: BookingPaymentStatus;
     scheduledDate?: Date | null;

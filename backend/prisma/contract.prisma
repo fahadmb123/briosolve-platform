@@ -555,6 +555,7 @@ model bookings {
 
   total_amount       Numeric(12, 2)
   platform_fee       Numeric(12, 2)
+  advance_amount     Numeric(12, 2)?        @default(0)
   status             booking_status         @default(CONFIRMED)
   payment_status     booking_payment_status @default(ADVANCE_PAID)
 

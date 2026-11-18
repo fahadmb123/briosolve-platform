@@ -35,6 +35,7 @@ export class BookingMapper {
         const baseAmount = data.amount ?? (data.totalAmount ? Math.round(data.totalAmount / 1.1) : 0);
         const platformFee = data.platformFee ?? Math.round(baseAmount * 0.1);
         const totalAmount = data.totalAmount ?? (baseAmount + platformFee);
+        const advanceAmount = Math.round(totalAmount * 0.3);
 
         const dateSuffix = Date.now().toString(36).toUpperCase();
         const randomPart = Math.floor(1000 + Math.random() * 9000);
@@ -52,6 +53,7 @@ export class BookingMapper {
             providerId: data.providerId,
             totalAmount,
             platformFee,
+            advanceAmount,
             status: "CONFIRMED",
             paymentStatus: "ADVANCE_PAID",
             scheduledDate: scheduledDateObj,
@@ -106,7 +108,8 @@ export class BookingMapper {
             record.notes ?? null,
             createdDate,
             updatedDate,
-            (record.payment_status as BookingPaymentStatus) || "ADVANCE_PAID"
+            (record.payment_status as BookingPaymentStatus) || "ADVANCE_PAID",
+            Number(record.advance_amount) || Math.round(Number(record.total_amount) * 0.3)
         );
     }
 
@@ -144,6 +147,17 @@ export class BookingMapper {
             }
         }
 
+        const isFixed = (details?.quotationType ?? extra?.quotationType) === "FIXED";
+        const resolvedAdvance = isFixed
+            ? entity.total_amount
+            : (entity.advance_amount || Math.round(entity.total_amount * 0.3));
+        const resolvedRemaining = isFixed
+            ? 0
+            : Math.max(0, entity.total_amount - resolvedAdvance);
+        const resolvedPaymentStatus = isFixed
+            ? "PAID"
+            : (entity.payment_status || "ADVANCE_PAID");
+
         return {
             id: entity.id,
             bookingNumber: entity.booking_number,
@@ -153,8 +167,10 @@ export class BookingMapper {
             providerId: entity.provider_id,
             totalAmount: entity.total_amount,
             platformFee: entity.platform_fee,
+            advanceAmount: resolvedAdvance,
+            remainingAmount: resolvedRemaining,
             status: entity.status,
-            paymentStatus: entity.payment_status || "ADVANCE_PAID",
+            paymentStatus: resolvedPaymentStatus,
             scheduledDate: entity.scheduled_date ? entity.scheduled_date.toISOString() : null,
             scheduledTime: entity.scheduled_time,
             paymentId: entity.payment_id,
@@ -246,6 +262,7 @@ export class BookingMapper {
             provider_id: data.providerId,
             total_amount: data.totalAmount.toString(),
             platform_fee: data.platformFee.toString(),
+            advance_amount: (data.advanceAmount ?? Math.round(data.totalAmount * 0.3)).toString(),
             status: data.status || "CONFIRMED",
             payment_status: data.paymentStatus || "ADVANCE_PAID",
             scheduled_date: scheduledInstant,

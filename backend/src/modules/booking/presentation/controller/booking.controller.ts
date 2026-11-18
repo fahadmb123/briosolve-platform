@@ -81,13 +81,14 @@ export class BookingController extends BaseController {
         try {
             const userId = req.user?.userId;
             const bookingId = req.params.id as string;
-            const { status, notes } = req.body;
+            const { status, notes, totalAmount } = req.body;
 
             const response = await this._updateBookingStatusUseCase.execute({
                 bookingId,
                 userId: userId!,
                 status,
-                notes
+                notes,
+                totalAmount: totalAmount !== undefined ? Number(totalAmount) : undefined
             });
 
             return this.sendSuccess(res, "Booking status updated successfully", response, 200);

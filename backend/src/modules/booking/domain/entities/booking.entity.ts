@@ -19,6 +19,7 @@ export class Booking {
         public readonly notes: string | null,
         public readonly created_at: Date,
         public readonly updated_at: Date,
-        public readonly payment_status: BookingPaymentStatus = "ADVANCE_PAID"
+        public readonly payment_status: BookingPaymentStatus = "ADVANCE_PAID",
+        public readonly advance_amount: number = 0
     ) {}
 }

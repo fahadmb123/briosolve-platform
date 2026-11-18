@@ -225,6 +225,123 @@
   line-height: 1.4;
 }
 
+.bkstatus-fixed-quote-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.bkstatus-fq-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.bkstatus-fq-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.bkstatus-fq-row strong {
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.bkstatus-fq-row.advance {
+  color: #16a34a;
+}
+
+.bkstatus-fq-row.balance {
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 6px;
+  color: #b45309;
+  font-weight: 700;
+}
+
+.bkstatus-fq-note {
+  font-size: 0.73rem;
+  color: #64748b;
+  line-height: 1.35;
+  margin-top: 4px;
+}
+
+.bkstatus-dynamic-header {
+  margin-bottom: 6px;
+}
+
+.bkstatus-dyn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #ffedd5;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.bkstatus-amount-input.error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.bkstatus-amount-calc-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 4px;
+}
+
+.bkstatus-calc-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bkstatus-calc-item span {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.bkstatus-calc-item strong {
+  font-size: 0.85rem;
+  color: #0f172a;
+}
+
+.bkstatus-calc-item.balance strong {
+  color: #ea580c;
+}
+
+.bkstatus-amount-error {
+  font-size: 0.74rem;
+  color: #ef4444;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
 .bkstatus-btn-confirm:disabled,
 .bkstatus-btn-cancel:disabled {
   opacity: 0.6;

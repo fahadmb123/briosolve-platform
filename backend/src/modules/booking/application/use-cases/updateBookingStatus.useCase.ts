@@ -72,11 +72,19 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
 
         const nextPaymentStatus = input.paymentStatus || (input.status === "COMPLETED" ? "PAID" : details.booking.payment_status);
 
+        const isFixedQuote = details.quotationType === "FIXED";
+        let resolvedTotalAmount: number | undefined = undefined;
+        if (input.totalAmount !== undefined && Number(input.totalAmount) > 0) {
+            if (!isFixedQuote) {
+                resolvedTotalAmount = Math.max(Number(input.totalAmount), Number(details.booking.advance_amount || 0));
+            }
+        }
+
         const updated = await this._bookingRepository.update(details.booking.id, {
             status: input.status,
             notes: serializedNotes,
             paymentStatus: nextPaymentStatus,
-            totalAmount: input.totalAmount
+            totalAmount: resolvedTotalAmount
         });
 
         if (!updated) {
@@ -97,12 +105,16 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             }
 
             if (targetRecipientId) {
+                const message = input.status === "PAYMENT_PENDING"
+                    ? `Booking #${details.booking.booking_number} total confirmed at ₹${(resolvedTotalAmount || details.booking.total_amount).toLocaleString("en-IN")}. Please review and settle the remaining balance.`
+                    : `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" has been marked as ${input.status}.`;
+
                 await this._createNotificationUseCase.execute({
                     recipientId: targetRecipientId,
                     type: "BOOKING_STATUS_UPDATED",
                     title: `Booking ${BookingStatusToTitle[input.status]}`,
                     title_code: "BOOKING_STATUS_UPDATED",
-                    message: `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" has been marked as ${input.status}.`
+                    message
                 }).catch(() => null);
             }
         }

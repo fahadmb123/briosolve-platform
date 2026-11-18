@@ -18,6 +18,8 @@ export interface BookingItem {
   providerId: string;
   totalAmount: number;
   platformFee: number;
+  advanceAmount?: number;
+  remainingAmount?: number;
   status: BookingStatus;
   paymentStatus: BookingPaymentStatus;
   scheduledDate: string | null;

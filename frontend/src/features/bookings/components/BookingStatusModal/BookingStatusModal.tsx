@@ -30,6 +30,16 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
 
   if (!isOpen || !booking || !targetStatus) return null;
 
+  const isFixed = booking.quotationType === "FIXED" || (!booking.quotationType && !booking.requiresInspection);
+  const isInspection = booking.quotationType === "INSPECTION_REQUIRED" || booking.requiresInspection;
+
+  const advancePaid = booking.advanceAmount || Math.round(booking.totalAmount * 0.3);
+  const calculatedBalance = Math.max(0, confirmedAmount - advancePaid);
+  const isInvalidAmount =
+    targetStatus === "PAYMENT_PENDING" &&
+    !isFixed &&
+    (confirmedAmount < advancePaid || isNaN(confirmedAmount) || confirmedAmount <= 0);
+
   const getStatusConfig = () => {
     switch (targetStatus) {
       case "EN_ROUTE":
@@ -60,10 +70,20 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
           variant: "primary"
         };
       case "PAYMENT_PENDING":
+        if (isFixed) {
+          return {
+            title: "Request Final Payment Settlement?",
+            description: `Work is complete for "${booking.serviceRequestTitle || "this job"}". Under this Fixed Price agreement of ₹${booking.totalAmount.toLocaleString("en-IN")}, request the customer to settle the remaining balance of ₹${(booking.totalAmount - advancePaid).toLocaleString("en-IN")}.`,
+            placeholder: "e.g., Job executed completely as agreed. Ready for settlement...",
+            confirmText: `Request Settlement (₹${(booking.totalAmount - advancePaid).toLocaleString("en-IN")})`,
+            confirmIcon: "fas fa-file-invoice-dollar",
+            variant: "warning"
+          };
+        }
         return {
-          title: "Confirm Total Payment Amount?",
-          description: `Confirm the final total amount for "${booking.serviceRequestTitle || "this job"}". The customer will be notified to review and settle the remaining balance.`,
-          placeholder: "e.g., Job executed completely. Final price verified and ready for settlement...",
+          title: isInspection ? "Confirm Inspection-Based Final Total?" : "Confirm Estimated Final Total?",
+          description: `Confirm the final total amount for "${booking.serviceRequestTitle || "this job"}". The customer will be requested to pay the balance after deducting the advance paid.`,
+          placeholder: "e.g., Completed all work including extra parts. Final amount confirmed...",
           confirmText: "Confirm Total & Request Payment",
           confirmIcon: "fas fa-file-invoice-dollar",
           variant: "warning"
@@ -92,11 +112,12 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   const config = getStatusConfig();
 
   const handleConfirm = () => {
+    if (isInvalidAmount) return;
     onConfirm(
       booking,
       targetStatus,
       notes.trim() || undefined,
-      targetStatus === "PAYMENT_PENDING" ? confirmedAmount : undefined
+      targetStatus === "PAYMENT_PENDING" && !isFixed ? confirmedAmount : undefined
     );
   };
 
@@ -118,22 +139,68 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
 
         <div className="bkstatus-modal-body">
           {targetStatus === "PAYMENT_PENDING" && (
-            <div className="bkstatus-amount-section">
-              <label className="bkstatus-label" htmlFor="status-total-amount">
-                Confirmed Total Amount (₹)
-              </label>
-              <input
-                id="status-total-amount"
-                type="number"
-                min="1"
-                className="bkstatus-amount-input"
-                value={confirmedAmount}
-                onChange={(e) => setConfirmedAmount(Number(e.target.value))}
-              />
-              <span className="bkstatus-amount-helper">
-                Current Quote Total: ₹{booking.totalAmount.toLocaleString("en-IN")}. You can adjust this amount if parts, materials, or on-site changes altered the final bill.
-              </span>
-            </div>
+            isFixed ? (
+              <div className="bkstatus-fixed-quote-box">
+                <div className="bkstatus-fq-badge">
+                  <i className="fas fa-lock" />
+                  <span>Fixed Price Agreement</span>
+                </div>
+                <div className="bkstatus-fq-row">
+                  <span>Agreed Fixed Total</span>
+                  <strong>₹{booking.totalAmount.toLocaleString("en-IN")}</strong>
+                </div>
+                <div className="bkstatus-fq-row advance">
+                  <span>(-) Advance Already Paid</span>
+                  <span>-₹{advancePaid.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="bkstatus-fq-row balance">
+                  <span>(=) Balance Customer Must Settle</span>
+                  <strong>₹{(booking.totalAmount - advancePaid).toLocaleString("en-IN")}</strong>
+                </div>
+                <span className="bkstatus-fq-note">
+                  This booking was accepted under a fixed price quotation. The total price is agreed and locked.
+                </span>
+              </div>
+            ) : (
+              <div className="bkstatus-amount-section">
+                <div className="bkstatus-dynamic-header">
+                  <span className="bkstatus-dyn-badge">
+                    <i className={isInspection ? "fas fa-clipboard-check" : "fas fa-calculator"} />
+                    {isInspection ? "Inspection-Based Final Amount" : "Estimated Quote — Final Amount"}
+                  </span>
+                </div>
+                <label className="bkstatus-label" htmlFor="status-total-amount">
+                  Final Confirmed Total Amount (₹)
+                </label>
+                <input
+                  id="status-total-amount"
+                  type="number"
+                  min={advancePaid}
+                  className={`bkstatus-amount-input ${isInvalidAmount ? "error" : ""}`}
+                  value={confirmedAmount}
+                  onChange={(e) => setConfirmedAmount(Number(e.target.value))}
+                />
+                <div className="bkstatus-amount-calc-preview">
+                  <div className="bkstatus-calc-item">
+                    <span>Advance Paid Online:</span>
+                    <strong>₹{advancePaid.toLocaleString("en-IN")}</strong>
+                  </div>
+                  <div className="bkstatus-calc-item balance">
+                    <span>Remaining Due:</span>
+                    <strong>₹{calculatedBalance.toLocaleString("en-IN")}</strong>
+                  </div>
+                </div>
+                {isInvalidAmount ? (
+                  <span className="bkstatus-amount-error">
+                    Total amount cannot be less than the advance deposit already collected (₹{advancePaid.toLocaleString("en-IN")}).
+                  </span>
+                ) : (
+                  <span className="bkstatus-amount-helper">
+                    Initial Quote: ₹{booking.totalAmount.toLocaleString("en-IN")}. Adjust the total if extra labor, parts, or diagnostic findings changed the final cost.
+                  </span>
+                )}
+              </div>
+            )
           )}
 
           <label className="bkstatus-label" htmlFor="status-notes">
@@ -162,7 +229,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
             type="button"
             className={`bkstatus-btn-confirm ${config.variant}`}
             onClick={handleConfirm}
-            disabled={isLoading}
+            disabled={isLoading || isInvalidAmount}
           >
             {isLoading ? (
               <>

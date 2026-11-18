@@ -272,39 +272,53 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const totalAmount = booking.totalAmount || 0;
   const platformFee = booking.platformFee || Math.round((totalAmount / 1.1) * 0.1);
   const baseAmount = Math.max(0, totalAmount - platformFee);
-  const advanceAmount = Math.round(totalAmount * 0.3);
-  const remainingAmount = Math.max(0, totalAmount - advanceAmount);
+  const advanceAmount = booking.advanceAmount || Math.round(totalAmount * 0.3);
+  const remainingAmount = booking.remainingAmount ?? Math.max(0, totalAmount - advanceAmount);
 
   const isAdvancePaid = booking.paymentStatus === "ADVANCE_PAID";
   const isFullyPaid = booking.paymentStatus === "PAID";
 
+  const quotationType =
+    booking.quotationType || (booking.requiresInspection ? "INSPECTION_REQUIRED" : "FIXED");
+  const isFixedQuote = quotationType === "FIXED";
+  const isEstimatedQuote = quotationType === "ESTIMATED";
+  const isInspectionQuote = quotationType === "INSPECTION_REQUIRED";
+
   const requiresInspection =
     booking.requiresInspection === true ||
-    booking.quotationType === "INSPECTION_REQUIRED" ||
-    booking.quotationType === "ESTIMATED" ||
+    quotationType === "INSPECTION_REQUIRED" ||
+    quotationType === "ESTIMATED" ||
     booking.status === "INSPECTION";
 
-  const stepProgressPercent = requiresInspection
+  const stepProgressPercent = isFixedQuote
     ? isCompleted
       ? 100
-      : isPaymentPending
-        ? 80
-        : isInProgress
-          ? 60
-          : isInspection
-            ? 40
+      : isInProgress
+        ? 66
+        : isEnRoute
+          ? 33
+          : 0
+    : requiresInspection
+      ? isCompleted
+        ? 100
+        : isPaymentPending
+          ? 80
+          : isInProgress
+            ? 60
+            : isInspection
+              ? 40
+              : isEnRoute
+                ? 20
+                : 0
+      : isCompleted
+        ? 100
+        : isPaymentPending
+          ? 75
+          : isInProgress
+            ? 50
             : isEnRoute
-              ? 20
-              : 0
-    : isCompleted
-      ? 100
-      : isPaymentPending
-        ? 75
-        : isInProgress
-          ? 50
-          : isEnRoute
-            ? 25
-            : 0;
+              ? 25
+              : 0;
 
   return (
     <div className={`bkdet-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
@@ -340,7 +354,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </span>
             )}
 
-            <span className={`bkdet-type-pill ${requiresInspection ? "inspection" : "fixed"}`}>
+            <span className={`bkdet-type-pill ${requiresInspection ? "inspection" : "type-fixed"}`}>
               <i className={requiresInspection ? "fas fa-clipboard-check" : "fas fa-lock"} />
               <span>{requiresInspection ? "Inspection Required" : "Fixed Price"}</span>
             </span>
@@ -441,17 +455,28 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           )}
 
           {isProvider && isInProgress && (
-            <button
-              type="button"
-              className="bkdet-action-btn primary"
-              onClick={() => handleTriggerStatusChange("PAYMENT_PENDING")}
-            >
-              <i className="fas fa-file-invoice-dollar" />
-              <span>Confirm Total & Request Payment</span>
-            </button>
+            isFixedQuote ? (
+              <button
+                type="button"
+                className="bkdet-action-btn success"
+                onClick={() => handleTriggerStatusChange("COMPLETED")}
+              >
+                <i className="fas fa-check-double" />
+                <span>Mark Completed</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="bkdet-action-btn primary"
+                onClick={() => handleTriggerStatusChange("PAYMENT_PENDING")}
+              >
+                <i className="fas fa-file-invoice-dollar" />
+                <span>Confirm Total & Request Payment</span>
+              </button>
+            )
           )}
 
-          {isProvider && isPaymentPending && (
+          {isProvider && !isFixedQuote && isPaymentPending && (
             <button
               type="button"
               className="bkdet-action-btn success"
@@ -464,7 +489,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         </div>
       </div>
 
-      {isPaymentPending && (
+      {!isFixedQuote && isPaymentPending && (
         <div className="bkdet-payment-pending-banner">
           <div className="bkdet-ppb-left">
             <div className="bkdet-ppb-icon">
@@ -473,13 +498,21 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             <div>
               <h4 className="bkdet-ppb-title">
                 {isProvider
-                  ? "Final Total Confirmed — Awaiting Customer Settlement"
-                  : "Work Completed — Final Payment Due"}
+                  ? isFixedQuote
+                    ? "Work Completed — Awaiting Customer Settlement"
+                    : "Final Total Confirmed — Awaiting Customer Settlement"
+                  : isFixedQuote
+                    ? "Work Completed — Final Payment Due"
+                    : "Work Completed & Total Confirmed — Final Payment Due"}
               </h4>
               <p className="bkdet-ppb-desc">
                 {isProvider
-                  ? `You confirmed the final total of ${formatCurrency(totalAmount)}. The customer has been requested to settle the remaining balance of ${formatCurrency(remainingAmount)}.`
-                  : `The provider completed the work and confirmed the final total of ${formatCurrency(totalAmount)}. Please settle the remaining balance of ${formatCurrency(remainingAmount)} to conclude the booking.`}
+                  ? isFixedQuote
+                    ? `You completed the work under the fixed price agreement of ${formatCurrency(totalAmount)}. The customer has been requested to settle the remaining balance of ${formatCurrency(remainingAmount)}.`
+                    : `You confirmed the final total of ${formatCurrency(totalAmount)}. The customer has been requested to settle the remaining balance of ${formatCurrency(remainingAmount)}.`
+                  : isFixedQuote
+                    ? `The provider completed the work for the agreed fixed price of ${formatCurrency(totalAmount)}. Please settle the remaining balance of ${formatCurrency(remainingAmount)} to conclude the booking.`
+                    : `The provider completed the work and confirmed the final total of ${formatCurrency(totalAmount)}. Please settle the remaining balance of ${formatCurrency(remainingAmount)} to conclude the booking.`}
               </p>
             </div>
           </div>
@@ -575,12 +608,14 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <span className="bkdet-step-label">In Progress</span>
               </div>
 
-              <div className={`bkdet-step-item ${isCompleted ? "done" : isPaymentPending ? "active" : ""}`}>
-                <div className="bkdet-step-circle">
-                  <i className="fas fa-file-invoice-dollar" />
+              {!isFixedQuote && (
+                <div className={`bkdet-step-item ${isCompleted ? "done" : isPaymentPending ? "active" : ""}`}>
+                  <div className="bkdet-step-circle">
+                    <i className="fas fa-file-invoice-dollar" />
+                  </div>
+                  <span className="bkdet-step-label">Payment Due</span>
                 </div>
-                <span className="bkdet-step-label">Payment Due</span>
-              </div>
+              )}
 
               <div className={`bkdet-step-item ${isCompleted ? "done" : ""}`}>
                 <div className="bkdet-step-circle">
@@ -749,102 +784,148 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 </div>
                 <h3 className="bkdet-section-title">Payment & Billing</h3>
               </div>
-              <span
-                className={`bkdet-milestone-pill ${isFullyPaid
-                  ? "paid"
-                  : isAdvancePaid
-                    ? "pending"
-                    : ""
-                  }`}
-              >
-                {isFullyPaid
-                  ? "Fully Paid"
-                  : isAdvancePaid
-                    ? "Advance Paid"
-                    : booking.paymentStatus === "REFUNDED"
-                      ? "Refunded"
-                      : "Pending"}
-              </span>
+              <div className="bkdet-header-pills-wrap">
+                {!isFixedQuote && (
+                  <span className={`bkdet-quote-type-tag ${isEstimatedQuote ? "type-estimated" : "type-inspection"}`}>
+                    <i className={isEstimatedQuote ? "fas fa-calculator" : "fas fa-clipboard-check"} />
+                    {isEstimatedQuote ? "Estimated Quote" : "Inspection Required"}
+                  </span>
+                )}
+                <span
+                  className={`bkdet-milestone-pill ${isFixedQuote || isFullyPaid
+                    ? "paid"
+                    : isAdvancePaid
+                      ? "pending"
+                      : ""
+                    }`}
+                >
+                  {isFixedQuote
+                    ? "100% Paid & Secured"
+                    : isFullyPaid
+                      ? "Fully Paid & Settled"
+                      : isAdvancePaid
+                        ? "Advance Paid (Balance Due Later)"
+                        : booking.paymentStatus === "REFUNDED"
+                          ? "Refunded"
+                          : "Pending"}
+                </span>
+              </div>
             </div>
 
             <div className="bkdet-price-wrapper">
-              <span className="bkdet-price-sublabel">Total Booking Value</span>
+              <span className="bkdet-price-sublabel">
+                {isFixedQuote
+                  ? "Total Fixed Amount Paid"
+                  : (isPaymentPending || isCompleted)
+                    ? "Final Confirmed Total"
+                    : "Estimated / Baseline Total"}
+              </span>
               <div className="bkdet-price-huge">
                 {formatCurrency(totalAmount)}
               </div>
             </div>
 
-            <div className="bkdet-payment-stages">
-              <div
-                className={`bkdet-stage-item ${isAdvancePaid || isFullyPaid ? "paid" : "pending"
-                  }`}
-              >
-                <div className="bkdet-stage-left">
-                  <div className="bkdet-stage-icon">
-                    <i
-                      className={`fas ${isAdvancePaid || isFullyPaid
-                        ? "fa-check"
-                        : "fa-hourglass-start"
-                        }`}
-                    />
-                  </div>
-                  <div className="bkdet-stage-info">
-                    <span className="bkdet-stage-title">Advance Payment</span>
-                    <span className="bkdet-stage-subtitle">
-                      Initial deposit secured in Escrow
-                    </span>
-                  </div>
+            {isFixedQuote ? (
+              <div className="bkdet-fixed-paid-tile">
+                <div className="bkdet-fpt-icon">
+                  <i className="fas fa-check-circle" />
                 </div>
-                <div className="bkdet-stage-right">
-                  <span className="bkdet-stage-amount">
-                    {formatCurrency(advanceAmount)}
-                  </span>
-                  <span
-                    className={`bkdet-milestone-pill ${isAdvancePaid || isFullyPaid ? "paid" : "pending"
-                      }`}
-                  >
-                    {isAdvancePaid || isFullyPaid ? "Paid" : "Pending"}
-                  </span>
+                <div className="bkdet-fpt-content">
+                  <span className="bkdet-fpt-title">Full Payment Secured in Escrow</span>
+                  <p className="bkdet-fpt-desc">
+                    The entire agreed amount of {formatCurrency(totalAmount)} was paid upfront upon booking. No additional balance or payments are due. Funds will be released to the provider upon completion.
+                  </p>
                 </div>
               </div>
-
-              <div
-                className={`bkdet-stage-item ${isFullyPaid ? "paid" : "pending"}`}
-              >
-                <div className="bkdet-stage-left">
-                  <div className="bkdet-stage-icon">
-                    <i
-                      className={`fas ${isFullyPaid ? "fa-check" : "fa-clock"
-                        }`}
-                    />
+            ) : (
+              <>
+                <div className="bkdet-payment-grid-two">
+                  <div className="bkdet-payment-tile paid">
+                    <div className="bkdet-tile-header">
+                      <span className="bkdet-tile-k">Initial Advance</span>
+                      <span className="bkdet-milestone-pill paid">Paid (Advance)</span>
+                    </div>
+                    <div className="bkdet-tile-amount">{formatCurrency(advanceAmount)}</div>
+                    <span className="bkdet-tile-desc">Paid online & held in Escrow</span>
                   </div>
-                  <div className="bkdet-stage-info">
-                    <span className="bkdet-stage-title">Final Balance</span>
-                    <span className="bkdet-stage-subtitle">
+
+                  <div className={`bkdet-payment-tile ${isFullyPaid ? "settled" : isPaymentPending ? "due" : ""}`}>
+                    <div className="bkdet-tile-header">
+                      <span className="bkdet-tile-k">
+                        {isPaymentPending || isCompleted ? "Remaining Balance" : "Estimated Balance"}
+                      </span>
+                      <span className={`bkdet-milestone-pill ${isFullyPaid ? "paid" : isPaymentPending ? "warning" : "pending"}`}>
+                        {isFullyPaid ? "Settled" : isPaymentPending ? "Due Now" : "Estimated"}
+                      </span>
+                    </div>
+                    <div className="bkdet-tile-amount">{formatCurrency(remainingAmount)}</div>
+                    <span className="bkdet-tile-desc">
                       {isFullyPaid
                         ? "Settled upon completion"
-                        : "Due upon job completion"}
+                        : isPaymentPending
+                          ? "Ready for customer payment"
+                          : "Payable after final confirmation"}
                     </span>
                   </div>
                 </div>
-                <div className="bkdet-stage-right">
-                  <span className="bkdet-stage-amount">
-                    {formatCurrency(remainingAmount)}
-                  </span>
-                  <span
-                    className={`bkdet-milestone-pill ${isFullyPaid ? "paid" : "pending"
-                      }`}
-                  >
-                    {isFullyPaid ? "Settled" : "Pending"}
-                  </span>
+
+                <div className="bkdet-calc-summary">
+                  <div className="bkdet-calc-title">
+                    <i className="fas fa-calculator" />
+                    <span>Balance Calculation</span>
+                  </div>
+                  <div className="bkdet-calc-row">
+                    <span>
+                      {(isPaymentPending || isCompleted)
+                        ? "Final Confirmed Total"
+                        : "Estimated Total Quote"}
+                    </span>
+                    <span>{formatCurrency(totalAmount)}</span>
+                  </div>
+                  <div className="bkdet-calc-row advance">
+                    <span>(-) Advance Paid Online</span>
+                    <span>-{formatCurrency(advanceAmount)}</span>
+                  </div>
+                  <div className={`bkdet-calc-row balance ${isFullyPaid ? "settled" : ""}`}>
+                    <span>
+                      {isFullyPaid
+                        ? "(=) Balance Settled"
+                        : isPaymentPending
+                          ? "(=) Remaining Balance Due Now"
+                          : "(=) Estimated Balance Due"}
+                    </span>
+                    <span>{formatCurrency(remainingAmount)}</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+
+                {!isPaymentPending && !isCompleted && (
+                  <div className="bkdet-quote-type-notice">
+                    <i className="fas fa-info-circle" />
+                    <span>
+                      {isInspectionQuote
+                        ? "This is an inspection-required quote. The final total will be confirmed by the provider after diagnosing on site."
+                        : "This is an estimated quote. The final total will be confirmed by the provider upon completion."}
+                    </span>
+                  </div>
+                )}
+
+                {(isPaymentPending || isCompleted) && (
+                  <div className="bkdet-quote-type-notice confirmed">
+                    <i className="fas fa-check-circle" />
+                    <span>
+                      {isInspectionQuote
+                        ? "Final total confirmed by provider after on-site inspection."
+                        : "Final total confirmed by provider upon job completion."}
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
 
             <div className="bkdet-breakdown-card">
               <div className="bkdet-breakdown-header">
                 <i className="fas fa-file-invoice-dollar" />
-                <span>Financial Breakdown</span>
+                <span>Price Details</span>
               </div>
               <div className="bkdet-breakdown-row">
                 <span>Base Service Quote</span>
@@ -861,10 +942,58 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </div>
             </div>
 
+            {!isFixedQuote && !isProvider && isPaymentPending && (
+              <div className="bkdet-pay-balance-action-box">
+                <div className="bkdet-pba-text">
+                  <strong>Ready to Pay Remaining Balance</strong>
+                  <p>The provider completed the work and confirmed the total. Pay {formatCurrency(remainingAmount)} now to conclude this booking.</p>
+                </div>
+                <button
+                  type="button"
+                  className="bkdet-pay-balance-btn"
+                  onClick={() =>
+                    handleConfirmStatusChange(
+                      booking,
+                      "COMPLETED",
+                      "Final balance payment confirmed by client. Escrow released."
+                    )
+                  }
+                >
+                  <i className="fas fa-credit-card" />
+                  <span>Pay Remaining Balance ({formatCurrency(remainingAmount)})</span>
+                </button>
+              </div>
+            )}
+
+            {!isFixedQuote && !isProvider && !isPaymentPending && !isFullyPaid && (
+              <div className="bkdet-pay-balance-info-box">
+                <i className="fas fa-info-circle" />
+                <span>The remaining balance of {formatCurrency(remainingAmount)} will be payable right here once the provider completes work and confirms the total.</span>
+              </div>
+            )}
+
+            {!isFixedQuote && isFullyPaid && (
+              <div className="bkdet-pay-balance-success-box">
+                <i className="fas fa-check-circle" />
+                <span>Full payment completed. Advance and final balance have been settled.</span>
+              </div>
+            )}
+
+            {!isFixedQuote && isProvider && isPaymentPending && (
+              <div className="bkdet-pay-balance-info-box warning">
+                <i className="fas fa-clock" />
+                <span>Awaiting customer settlement for remaining balance of {formatCurrency(remainingAmount)}.</span>
+              </div>
+            )}
+
             <div className="bkdet-escrow-badge">
               <i className="fas fa-shield-alt" />
               <div className="bkdet-escrow-badge-text">
-                <strong>100% Escrow Protection:</strong> Advance funds are securely held with BrioSolve. The remaining balance and final payout to the provider are released only after verified completion of the service.
+                {isFixedQuote ? (
+                  <><strong>100% Escrow Protection:</strong> Full payment of {formatCurrency(totalAmount)} is held safely in Escrow and released to the provider only after verified service completion.</>
+                ) : (
+                  <><strong>100% Escrow Protection:</strong> Advance deposit of {formatCurrency(advanceAmount)} is safely held in Escrow. Remaining balance of {formatCurrency(remainingAmount)} is paid upon job completion.</>
+                )}
               </div>
             </div>
           </div>
