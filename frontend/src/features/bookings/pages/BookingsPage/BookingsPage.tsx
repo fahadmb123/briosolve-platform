@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
@@ -26,22 +26,42 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
     roleProp || (location.pathname.startsWith("/provider") ? "provider" : "customer");
   const isProvider = role === "provider";
 
-  const customerQuery = useGetCustomerBookings({ enabled: !isProvider });
-  const providerQuery = useGetProviderBookings({ enabled: isProvider });
+  const [activeTab, setActiveTab] = useState<BookingFilterTab>("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const queryParams = useMemo(
+    () => ({
+      search: debouncedSearch || undefined,
+      status: activeTab !== "ALL" ? activeTab : undefined
+    }),
+    [debouncedSearch, activeTab]
+  );
+
+  const customerQuery = useGetCustomerBookings(queryParams, { enabled: !isProvider });
+  const providerQuery = useGetProviderBookings(queryParams, { enabled: isProvider });
   const updateStatusMutation = useUpdateBookingStatus();
 
-  const { data: responseData, isLoading, error, refetch } = isProvider
+  const { data: responseData, isLoading, error, refetch, isFetching } = isProvider
     ? providerQuery
     : customerQuery;
 
-  const [activeTab, setActiveTab] = useState<BookingFilterTab>("ALL");
-  const [searchQuery, setSearchQuery] = useState("");
   const [statusModalBooking, setStatusModalBooking] = useState<BookingItem | null>(null);
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
 
   const bookings: BookingItem[] = responseData?.data?.bookings || [];
 
   const counts = useMemo(() => {
+    if (responseData?.data?.counts) {
+      return responseData.data.counts;
+    }
     return {
       ALL: bookings.length,
       CONFIRMED: bookings.filter((b) => b.status === "CONFIRMED").length,
@@ -49,24 +69,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
       COMPLETED: bookings.filter((b) => b.status === "COMPLETED").length,
       CANCELLED: bookings.filter((b) => b.status === "CANCELLED").length
     };
-  }, [bookings]);
-
-  const filteredBookings = useMemo(() => {
-    return bookings.filter((item) => {
-      const matchTab = activeTab === "ALL" || item.status === activeTab;
-      const q = searchQuery.toLowerCase().trim();
-      const matchSearch =
-        !q ||
-        (item.bookingNumber && item.bookingNumber.toLowerCase().includes(q)) ||
-        (item.serviceRequestTitle && item.serviceRequestTitle.toLowerCase().includes(q)) ||
-        (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
-        (!isProvider && item.providerBusinessName && item.providerBusinessName.toLowerCase().includes(q)) ||
-        (!isProvider && item.providerName && item.providerName.toLowerCase().includes(q)) ||
-        (isProvider && item.customerName && item.customerName.toLowerCase().includes(q));
-
-      return matchTab && matchSearch;
-    });
-  }, [bookings, activeTab, searchQuery, isProvider]);
+  }, [responseData, bookings]);
 
   const handleOpenDetails = (booking: BookingItem) => {
     if (isProvider) {
@@ -239,7 +242,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
       </div>
 
       <div className="bk-content-area">
-        {isLoading ? (
+        {isLoading || isFetching ? (
           <div className="bk-cards-stack">
             {Array.from({ length: 3 }).map((_, idx) => (
               <BookingCardSkeleton key={idx} />
@@ -261,7 +264,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
               <span>Retry</span>
             </button>
           </div>
-        ) : filteredBookings.length === 0 ? (
+        ) : bookings.length === 0 ? (
           <div className="bk-empty-card">
             <div className="bk-empty-icon-wrap">
               <i className="fas fa-calendar-check"></i>
@@ -310,7 +313,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
           </div>
         ) : (
           <div className="bk-cards-stack">
-            {filteredBookings.map((booking) => (
+            {bookings.map((booking) => (
               <BookingCard
                 key={booking.id}
                 booking={booking}

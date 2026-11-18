@@ -36,9 +36,17 @@ export class BookingController extends BaseController {
     getCustomerBookings = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const customerId = req.user?.userId;
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 50;
+            const search = req.query.search as string | undefined;
+            const status = req.query.status as string | undefined;
 
             const response = await this._getCustomerBookingsUseCase.execute({
-                customerId: customerId!
+                customerId: customerId!,
+                page,
+                limit,
+                search,
+                status
             });
 
             return this.sendSuccess(res, "Customer bookings retrieved successfully", response, 200);
@@ -50,9 +58,17 @@ export class BookingController extends BaseController {
     getProviderBookings = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const providerId = req.user?.userId;
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 50;
+            const search = req.query.search as string | undefined;
+            const status = req.query.status as string | undefined;
 
             const response = await this._getProviderBookingsUseCase.execute({
-                providerId: providerId!
+                providerId: providerId!,
+                page,
+                limit,
+                search,
+                status
             });
 
             return this.sendSuccess(res, "Provider bookings retrieved successfully", response, 200);

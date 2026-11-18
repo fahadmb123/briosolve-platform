@@ -1,8 +1,10 @@
 import { db } from "../../../../shared/database/client";
 import { Booking } from "../../domain/entities/booking.entity";
-import { IBookingRepository, BookingDetails } from "../../domain/repositories/IBookingRepository";
+import { IBookingRepository, BookingDetails, BookingListResult } from "../../domain/repositories/IBookingRepository";
 import { CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
+import { GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
+import { BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { BookingMapper } from "../mappers/booking.mapper";
 
 export class PrismaBookingRepository implements IBookingRepository {
@@ -60,22 +62,117 @@ export class PrismaBookingRepository implements IBookingRepository {
         return BookingMapper.toDomain(record);
     }
 
-    async findByCustomerId(customerId: string): Promise<BookingDetails[]> {
-        const records = await db.orm.public.bookings
+    async findByCustomerId(
+        input: GetCustomerBookingsInputDto | string
+    ): Promise<BookingListResult> {
+        const customerId = typeof input === "string" ? input : input.customerId;
+        const page = typeof input === "object" && input.page ? Number(input.page) : 1;
+        const limit = typeof input === "object" && input.limit ? Number(input.limit) : 50;
+        const search = typeof input === "object" ? input.search : undefined;
+        const status = typeof input === "object" ? input.status : undefined;
+        const skip = (page - 1) * limit;
+
+        const allUserRecords = await db.orm.public.bookings
             .where({ customer_id: customerId as never })
             .all();
 
+        const counts: BookingCountsDto = {
+            ALL: allUserRecords.length,
+            CONFIRMED: allUserRecords.filter((b: any) => b.status === "CONFIRMED").length,
+            IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
+            COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
+            CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length
+        };
+
+        let query = db.orm.public.bookings.where({ customer_id: customerId as never });
+
+        if (status && status !== "ALL") {
+            query = query.where({ status: status as never });
+        }
+
+        query = query.orderBy((b) => b.updated_at.desc());
+
+        const records = await query.all();
         const bookings = records.map((r: any) => BookingMapper.toDomain(r));
-        return this.populateDetails(bookings);
+        let detailed = await this.populateDetails(bookings);
+
+        if (search && search.trim()) {
+            const q = search.trim().toLowerCase();
+            detailed = detailed.filter((item) => {
+                return (
+                    (item.booking.booking_number && item.booking.booking_number.toLowerCase().includes(q)) ||
+                    (item.serviceRequestTitle && item.serviceRequestTitle.toLowerCase().includes(q)) ||
+                    (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
+                    (item.providerBusinessName && item.providerBusinessName.toLowerCase().includes(q)) ||
+                    (item.providerName && item.providerName.toLowerCase().includes(q))
+                );
+            });
+        }
+
+        const total = detailed.length;
+        const paged = detailed.slice(skip, skip + limit);
+
+        return {
+            bookings: paged,
+            total,
+            counts
+        };
     }
 
-    async findByProviderProfileId(providerProfileId: string): Promise<BookingDetails[]> {
-        const records = await db.orm.public.bookings
+    async findByProviderProfileId(
+        input: (GetProviderBookingsInputDto & { providerProfileId: string }) | string
+    ): Promise<BookingListResult> {
+        const providerProfileId = typeof input === "string" ? input : input.providerProfileId;
+        const page = typeof input === "object" && input.page ? Number(input.page) : 1;
+        const limit = typeof input === "object" && input.limit ? Number(input.limit) : 50;
+        const search = typeof input === "object" ? input.search : undefined;
+        const status = typeof input === "object" ? input.status : undefined;
+        const skip = (page - 1) * limit;
+
+        const allUserRecords = await db.orm.public.bookings
             .where({ provider_id: providerProfileId as never })
             .all();
 
+        const counts: BookingCountsDto = {
+            ALL: allUserRecords.length,
+            CONFIRMED: allUserRecords.filter((b: any) => b.status === "CONFIRMED").length,
+            IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
+            COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
+            CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length
+        };
+
+        let query = db.orm.public.bookings.where({ provider_id: providerProfileId as never });
+
+        if (status && status !== "ALL") {
+            query = query.where({ status: status as never });
+        }
+
+        query = query.orderBy((b) => b.updated_at.desc());
+
+        const records = await query.all();
         const bookings = records.map((r: any) => BookingMapper.toDomain(r));
-        return this.populateDetails(bookings);
+        let detailed = await this.populateDetails(bookings);
+
+        if (search && search.trim()) {
+            const q = search.trim().toLowerCase();
+            detailed = detailed.filter((item) => {
+                return (
+                    (item.booking.booking_number && item.booking.booking_number.toLowerCase().includes(q)) ||
+                    (item.serviceRequestTitle && item.serviceRequestTitle.toLowerCase().includes(q)) ||
+                    (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
+                    (item.customerName && item.customerName.toLowerCase().includes(q))
+                );
+            });
+        }
+
+        const total = detailed.length;
+        const paged = detailed.slice(skip, skip + limit);
+
+        return {
+            bookings: paged,
+            total,
+            counts
+        };
     }
 
     async create(data: CreateBookingRepoDto): Promise<Booking | null> {

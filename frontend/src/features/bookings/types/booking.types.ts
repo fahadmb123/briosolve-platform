@@ -27,14 +27,31 @@ export interface BookingItem {
   customerPhone?: string | null;
 }
 
+export interface BookingCounts {
+  ALL: number;
+  CONFIRMED: number;
+  IN_PROGRESS: number;
+  COMPLETED: number;
+  CANCELLED: number;
+}
+
+export interface GetBookingsQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+}
+
 export interface CustomerBookingsResponse {
   bookings: BookingItem[];
   total: number;
+  counts?: BookingCounts;
 }
 
 export interface ProviderBookingsResponse {
   bookings: BookingItem[];
   total: number;
+  counts?: BookingCounts;
 }
 
 export interface UpdateBookingStatusPayload {

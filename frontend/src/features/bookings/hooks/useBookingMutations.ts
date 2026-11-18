@@ -5,20 +5,26 @@ import {
   getBookingById,
   updateBookingStatus
 } from "../services/booking.service";
-import type { UpdateBookingStatusPayload } from "../types/booking.types";
+import type { GetBookingsQueryParams, UpdateBookingStatusPayload } from "../types/booking.types";
 
-export const useGetCustomerBookings = (options?: { enabled?: boolean }) => {
+export const useGetCustomerBookings = (
+  params?: GetBookingsQueryParams,
+  options?: { enabled?: boolean }
+) => {
   return useQuery({
-    queryKey: ["customerBookings"],
-    queryFn: getCustomerBookings,
+    queryKey: ["customerBookings", params],
+    queryFn: () => getCustomerBookings(params),
     enabled: options?.enabled ?? true
   });
 };
 
-export const useGetProviderBookings = (options?: { enabled?: boolean }) => {
+export const useGetProviderBookings = (
+  params?: GetBookingsQueryParams,
+  options?: { enabled?: boolean }
+) => {
   return useQuery({
-    queryKey: ["providerBookings"],
-    queryFn: getProviderBookings,
+    queryKey: ["providerBookings", params],
+    queryFn: () => getProviderBookings(params),
     enabled: options?.enabled ?? true
   });
 };

@@ -8,7 +8,7 @@ export class GetCustomerBookingsUseCase implements IUseCase<GetCustomerBookingsI
     constructor(private readonly _bookingRepository: IBookingRepository) {}
 
     async execute(input: GetCustomerBookingsInputDto): Promise<CustomerBookingsResponseDto> {
-        const detailsList = await this._bookingRepository.findByCustomerId(input.customerId);
-        return BookingMapper.toCustomerBookingsResponseDto(detailsList);
+        const result = await this._bookingRepository.findByCustomerId(input);
+        return BookingMapper.toCustomerBookingsResponseDto(result);
     }
 }

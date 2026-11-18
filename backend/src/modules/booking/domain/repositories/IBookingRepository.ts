@@ -2,6 +2,8 @@ import { BaseRepository } from "../../../../shared/base/repository/baseRepositor
 import { Booking } from "../entities/booking.entity";
 import { CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
+import { GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
+import { BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
 
 export interface BookingDetails {
     booking: Booking;
@@ -15,6 +17,12 @@ export interface BookingDetails {
     customerPhone?: string | null;
 }
 
+export interface BookingListResult {
+    bookings: BookingDetails[];
+    total: number;
+    counts: BookingCountsDto;
+}
+
 export interface IBookingRepository extends BaseRepository<Booking | null> {
     create(data: CreateBookingRepoDto): Promise<Booking | null>;
     update(id: string, data: UpdateBookingRepoDto): Promise<Booking | null>;
@@ -22,6 +30,6 @@ export interface IBookingRepository extends BaseRepository<Booking | null> {
     findByBookingNumber(bookingNumber: string): Promise<Booking | null>;
     findByQuotationId(quotationId: string): Promise<Booking | null>;
     findByServiceRequestId(serviceRequestId: string): Promise<Booking | null>;
-    findByCustomerId(customerId: string): Promise<BookingDetails[]>;
-    findByProviderProfileId(providerProfileId: string): Promise<BookingDetails[]>;
+    findByCustomerId(input: GetCustomerBookingsInputDto | string): Promise<BookingListResult | BookingDetails[]>;
+    findByProviderProfileId(input: (GetProviderBookingsInputDto & { providerProfileId: string }) | string): Promise<BookingListResult | BookingDetails[]>;
 }

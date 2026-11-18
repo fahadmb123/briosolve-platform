@@ -17,7 +17,10 @@ export class GetProviderBookingsUseCase implements IUseCase<GetProviderBookingsI
             return BookingMapper.toProviderBookingsResponseDto([]);
         }
 
-        const detailsList = await this._bookingRepository.findByProviderProfileId(profile.id);
-        return BookingMapper.toProviderBookingsResponseDto(detailsList);
+        const result = await this._bookingRepository.findByProviderProfileId({
+            ...input,
+            providerProfileId: profile.id
+        });
+        return BookingMapper.toProviderBookingsResponseDto(result);
     }
 }

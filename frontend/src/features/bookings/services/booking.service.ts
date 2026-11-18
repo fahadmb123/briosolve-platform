@@ -4,16 +4,25 @@ import type {
   BookingItem,
   CustomerBookingsResponse,
   ProviderBookingsResponse,
+  GetBookingsQueryParams,
   UpdateBookingStatusPayload
 } from "../types/booking.types";
 
-export const getCustomerBookings = async (): Promise<response<CustomerBookingsResponse>> => {
-  const res = await apiClient.get<response<CustomerBookingsResponse>>("/api/booking/customer");
+export const getCustomerBookings = async (
+  params?: GetBookingsQueryParams
+): Promise<response<CustomerBookingsResponse>> => {
+  const res = await apiClient.get<response<CustomerBookingsResponse>>("/api/booking/customer", {
+    params
+  });
   return res.data;
 };
 
-export const getProviderBookings = async (): Promise<response<ProviderBookingsResponse>> => {
-  const res = await apiClient.get<response<ProviderBookingsResponse>>("/api/booking/provider");
+export const getProviderBookings = async (
+  params?: GetBookingsQueryParams
+): Promise<response<ProviderBookingsResponse>> => {
+  const res = await apiClient.get<response<ProviderBookingsResponse>>("/api/booking/provider", {
+    params
+  });
   return res.data;
 };
 

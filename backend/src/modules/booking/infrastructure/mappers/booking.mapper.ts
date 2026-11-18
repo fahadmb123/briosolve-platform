@@ -1,10 +1,10 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Booking, BookingStatus } from "../../domain/entities/booking.entity";
-import { BookingDetails } from "../../domain/repositories/IBookingRepository";
+import { BookingDetails, BookingListResult } from "../../domain/repositories/IBookingRepository";
 import { CreateBookingInputDto, CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
 import { BookingResponseDto } from "../../application/dtos/response/booking-response.dto";
-import { CustomerBookingsResponseDto } from "../../application/dtos/response/customer-bookings-response.dto";
+import { CustomerBookingsResponseDto, BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
 
 export class BookingMapper {
@@ -139,17 +139,51 @@ export class BookingMapper {
         };
     }
 
-    static toCustomerBookingsResponseDto(items: BookingDetails[]): CustomerBookingsResponseDto {
+    static toCustomerBookingsResponseDto(
+        input: BookingListResult | BookingDetails[]
+    ): CustomerBookingsResponseDto {
+        if (Array.isArray(input)) {
+            const counts: BookingCountsDto = {
+                ALL: input.length,
+                CONFIRMED: input.filter((b) => b.booking.status === "CONFIRMED").length,
+                IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
+                COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
+                CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length
+            };
+            return {
+                bookings: input.map((item) => this.toResponseDto(item)),
+                total: input.length,
+                counts
+            };
+        }
         return {
-            bookings: items.map((item) => this.toResponseDto(item)),
-            total: items.length
+            bookings: input.bookings.map((item) => this.toResponseDto(item)),
+            total: input.total,
+            counts: input.counts
         };
     }
 
-    static toProviderBookingsResponseDto(items: BookingDetails[]): ProviderBookingsResponseDto {
+    static toProviderBookingsResponseDto(
+        input: BookingListResult | BookingDetails[]
+    ): ProviderBookingsResponseDto {
+        if (Array.isArray(input)) {
+            const counts: BookingCountsDto = {
+                ALL: input.length,
+                CONFIRMED: input.filter((b) => b.booking.status === "CONFIRMED").length,
+                IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
+                COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
+                CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length
+            };
+            return {
+                bookings: input.map((item) => this.toResponseDto(item)),
+                total: input.length,
+                counts
+            };
+        }
         return {
-            bookings: items.map((item) => this.toResponseDto(item)),
-            total: items.length
+            bookings: input.bookings.map((item) => this.toResponseDto(item)),
+            total: input.total,
+            counts: input.counts
         };
     }
 
