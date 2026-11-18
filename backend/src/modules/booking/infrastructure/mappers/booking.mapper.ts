@@ -262,9 +262,7 @@ export class BookingMapper {
             provider_id: data.providerId,
             total_amount: data.totalAmount.toString(),
             platform_fee: data.platformFee.toString(),
-            advance_amount: (data.advanceAmount ?? Math.round(data.totalAmount * 0.3)).toString(),
             status: data.status || "CONFIRMED",
-            payment_status: data.paymentStatus || "ADVANCE_PAID",
             scheduled_date: scheduledInstant,
             scheduled_time: data.scheduledTime ?? null,
             payment_id: data.paymentId ?? null,
@@ -277,9 +275,6 @@ export class BookingMapper {
         const payload: any = {};
         if (data.status) {
             payload.status = data.status;
-        }
-        if (data.paymentStatus) {
-            payload.payment_status = data.paymentStatus;
         }
         if (data.totalAmount !== undefined) {
             payload.total_amount = data.totalAmount.toString();
