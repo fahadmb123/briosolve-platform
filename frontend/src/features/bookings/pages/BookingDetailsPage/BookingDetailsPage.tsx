@@ -270,19 +270,21 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const isCompleted = booking.status === "COMPLETED";
 
   const totalAmount = booking.totalAmount || 0;
-  const platformFee = booking.platformFee || Math.round((totalAmount / 1.1) * 0.1);
-  const baseAmount = Math.max(0, totalAmount - platformFee);
-  const advanceAmount = booking.advanceAmount || Math.round(totalAmount * 0.3);
-  const remainingAmount = booking.remainingAmount ?? Math.max(0, totalAmount - advanceAmount);
-
-  const isAdvancePaid = booking.paymentStatus === "ADVANCE_PAID";
-  const isFullyPaid = booking.paymentStatus === "PAID";
-
+  const advanceAmount = booking.advanceAmount || totalAmount;
   const quotationType =
     booking.quotationType || (booking.requiresInspection ? "INSPECTION_REQUIRED" : "FIXED");
   const isFixedQuote = quotationType === "FIXED";
   const isEstimatedQuote = quotationType === "ESTIMATED";
   const isInspectionQuote = quotationType === "INSPECTION_REQUIRED";
+  const isFinalConfirmed = Boolean(booking.isFinalConfirmed || isFixedQuote || isPaymentPending || isCompleted);
+  const remainingAmount = isFinalConfirmed
+    ? (booking.remainingAmount ?? Math.max(0, totalAmount - advanceAmount))
+    : 0;
+  const platformFee = booking.platformFee || Math.round((totalAmount / 1.1) * 0.1);
+  const baseAmount = Math.max(0, totalAmount - platformFee);
+
+  const isAdvancePaid = booking.paymentStatus === "ADVANCE_PAID";
+  const isFullyPaid = booking.paymentStatus === "PAID";
 
   const requiresInspection =
     booking.requiresInspection === true ||
@@ -818,10 +820,12 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   ? "Total Fixed Amount Paid"
                   : (isPaymentPending || isCompleted)
                     ? "Final Confirmed Total"
-                    : "Estimated / Baseline Total"}
+                    : isInspectionQuote
+                      ? "Inspection Fee Paid"
+                      : "Initial Advance Paid"}
               </span>
               <div className="bkdet-price-huge">
-                {formatCurrency(totalAmount)}
+                {formatCurrency((isPaymentPending || isCompleted || isFixedQuote) ? totalAmount : advanceAmount)}
               </div>
             </div>
 
@@ -837,7 +841,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   </p>
                 </div>
               </div>
-            ) : (
+            ) : (isPaymentPending || isCompleted) ? (
               <>
                 <div className="bkdet-payment-grid-two">
                   <div className="bkdet-payment-tile paid">
@@ -849,22 +853,16 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                     <span className="bkdet-tile-desc">Paid online & held in Escrow</span>
                   </div>
 
-                  <div className={`bkdet-payment-tile ${isFullyPaid ? "settled" : isPaymentPending ? "due" : ""}`}>
+                  <div className={`bkdet-payment-tile ${isFullyPaid ? "settled" : "due"}`}>
                     <div className="bkdet-tile-header">
-                      <span className="bkdet-tile-k">
-                        {isPaymentPending || isCompleted ? "Remaining Balance" : "Estimated Balance"}
-                      </span>
-                      <span className={`bkdet-milestone-pill ${isFullyPaid ? "paid" : isPaymentPending ? "warning" : "pending"}`}>
-                        {isFullyPaid ? "Settled" : isPaymentPending ? "Due Now" : "Estimated"}
+                      <span className="bkdet-tile-k">Remaining Balance</span>
+                      <span className={`bkdet-milestone-pill ${isFullyPaid ? "paid" : "warning"}`}>
+                        {isFullyPaid ? "Settled" : "Due Now"}
                       </span>
                     </div>
                     <div className="bkdet-tile-amount">{formatCurrency(remainingAmount)}</div>
                     <span className="bkdet-tile-desc">
-                      {isFullyPaid
-                        ? "Settled upon completion"
-                        : isPaymentPending
-                          ? "Ready for customer payment"
-                          : "Payable after final confirmation"}
+                      {isFullyPaid ? "Settled upon completion" : "Ready for customer payment"}
                     </span>
                   </div>
                 </div>
@@ -875,11 +873,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                     <span>Balance Calculation</span>
                   </div>
                   <div className="bkdet-calc-row">
-                    <span>
-                      {(isPaymentPending || isCompleted)
-                        ? "Final Confirmed Total"
-                        : "Estimated Total Quote"}
-                    </span>
+                    <span>Final Confirmed Total</span>
                     <span>{formatCurrency(totalAmount)}</span>
                   </div>
                   <div className="bkdet-calc-row advance">
@@ -888,37 +882,59 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   </div>
                   <div className={`bkdet-calc-row balance ${isFullyPaid ? "settled" : ""}`}>
                     <span>
-                      {isFullyPaid
-                        ? "(=) Balance Settled"
-                        : isPaymentPending
-                          ? "(=) Remaining Balance Due Now"
-                          : "(=) Estimated Balance Due"}
+                      {isFullyPaid ? "(=) Balance Settled" : "(=) Remaining Balance Due Now"}
                     </span>
                     <span>{formatCurrency(remainingAmount)}</span>
                   </div>
                 </div>
 
-                {!isPaymentPending && !isCompleted && (
-                  <div className="bkdet-quote-type-notice">
-                    <i className="fas fa-info-circle" />
-                    <span>
-                      {isInspectionQuote
-                        ? "This is an inspection-required quote. The final total will be confirmed by the provider after diagnosing on site."
-                        : "This is an estimated quote. The final total will be confirmed by the provider upon completion."}
-                    </span>
+                <div className="bkdet-quote-type-notice confirmed">
+                  <i className="fas fa-check-circle" />
+                  <span>
+                    {isInspectionQuote
+                      ? "Final total confirmed by provider after on-site inspection."
+                      : "Final total confirmed by provider upon job completion."}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bkdet-payment-grid-two">
+                  <div className="bkdet-payment-tile paid">
+                    <div className="bkdet-tile-header">
+                      <span className="bkdet-tile-k">
+                        {isInspectionQuote ? "Inspection Fee" : "Initial Advance"}
+                      </span>
+                      <span className="bkdet-milestone-pill paid">Paid (Advance)</span>
+                    </div>
+                    <div className="bkdet-tile-amount">{formatCurrency(advanceAmount)}</div>
+                    <span className="bkdet-tile-desc">Paid online & held in Escrow</span>
                   </div>
-                )}
 
-                {(isPaymentPending || isCompleted) && (
-                  <div className="bkdet-quote-type-notice confirmed">
-                    <i className="fas fa-check-circle" />
-                    <span>
+                  <div className="bkdet-payment-tile">
+                    <div className="bkdet-tile-header">
+                      <span className="bkdet-tile-k">Final Service Bill</span>
+                      <span className="bkdet-milestone-pill pending">Pending Quote</span>
+                    </div>
+                    <div className="bkdet-tile-amount" style={{ fontSize: "1rem", color: "#64748b" }}>
+                      TBD on site
+                    </div>
+                    <span className="bkdet-tile-desc">
                       {isInspectionQuote
-                        ? "Final total confirmed by provider after on-site inspection."
-                        : "Final total confirmed by provider upon job completion."}
+                        ? "Provider will inspect and quote final total"
+                        : "Provider will confirm final total upon diagnosis"}
                     </span>
                   </div>
-                )}
+                </div>
+
+                <div className="bkdet-quote-type-notice">
+                  <i className="fas fa-info-circle" />
+                  <span>
+                    {isInspectionQuote
+                      ? `Inspection fee of ${formatCurrency(advanceAmount)} is secured in Escrow. The provider will diagnose requirements on site and confirm the final total before any balance is requested.`
+                      : `Initial advance of ${formatCurrency(advanceAmount)} is secured in Escrow. The provider will assess the job on site and confirm the final total before any balance is requested.`}
+                  </span>
+                </div>
               </>
             )}
 
@@ -928,7 +944,15 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <span>Price Details</span>
               </div>
               <div className="bkdet-breakdown-row">
-                <span>Base Service Quote</span>
+                <span>
+                  {isFixedQuote
+                    ? "Base Service Quote"
+                    : (isPaymentPending || isCompleted)
+                      ? "Confirmed Service Amount"
+                      : isInspectionQuote
+                        ? "Inspection / Visit Fee"
+                        : "Initial Base Quote"}
+                </span>
                 <span>{formatCurrency(baseAmount)}</span>
               </div>
               <div className="bkdet-breakdown-row">
@@ -937,8 +961,16 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </div>
               <div className="bkdet-breakdown-divider" />
               <div className="bkdet-breakdown-row total">
-                <span>Total Amount</span>
-                <span>{formatCurrency(totalAmount)}</span>
+                <span>
+                  {isFixedQuote
+                    ? "Total Amount Paid"
+                    : (isPaymentPending || isCompleted)
+                      ? "Total Confirmed Amount"
+                      : isInspectionQuote
+                        ? "Total Inspection Fee Paid"
+                        : "Total Advance Paid"}
+                </span>
+                <span>{formatCurrency((isPaymentPending || isCompleted || isFixedQuote) ? totalAmount : advanceAmount)}</span>
               </div>
             </div>
 
@@ -968,7 +1000,11 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             {!isFixedQuote && !isProvider && !isPaymentPending && !isFullyPaid && (
               <div className="bkdet-pay-balance-info-box">
                 <i className="fas fa-info-circle" />
-                <span>The remaining balance of {formatCurrency(remainingAmount)} will be payable right here once the provider completes work and confirms the total.</span>
+                <span>
+                  {isInspectionQuote
+                    ? "The provider will perform the on-site inspection and confirm the final total before any balance is requested."
+                    : "The provider will assess the job on site and confirm the final total before any balance is requested."}
+                </span>
               </div>
             )}
 
@@ -992,7 +1028,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 {isFixedQuote ? (
                   <><strong>100% Escrow Protection:</strong> Full payment of {formatCurrency(totalAmount)} is held safely in Escrow and released to the provider only after verified service completion.</>
                 ) : (
-                  <><strong>100% Escrow Protection:</strong> Advance deposit of {formatCurrency(advanceAmount)} is safely held in Escrow. Remaining balance of {formatCurrency(remainingAmount)} is paid upon job completion.</>
+                  <><strong>100% Escrow Protection:</strong> Advance deposit of {formatCurrency(advanceAmount)} is safely held in Escrow. Remaining balance will be settled only after final confirmation and completion.</>
                 )}
               </div>
             </div>

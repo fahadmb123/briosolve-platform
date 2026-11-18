@@ -19,6 +19,7 @@ export interface BookingDetails {
     customerPhone?: string | null;
     quotationType?: string | null;
     requiresInspection?: boolean;
+    quoteAmount?: number | null;
     statusHistory?: BookingStatusHistoryItem[];
 }
 

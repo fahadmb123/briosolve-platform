@@ -261,6 +261,7 @@ export class PrismaBookingRepository implements IBookingRepository {
 
                 let quotationType: string | null = null;
                 let requiresInspection = false;
+                let quoteAmount: number | null = null;
 
                 const quote = await db.orm.public.quotations
                     .where({ id: booking.quotation_id as never })
@@ -270,6 +271,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                     requiresInspection =
                         quote.quotation_type === "INSPECTION_REQUIRED" ||
                         quote.quotation_type === "ESTIMATED";
+                    quoteAmount = Number(quote.amount);
                 }
 
                 return {
@@ -284,7 +286,8 @@ export class PrismaBookingRepository implements IBookingRepository {
                     customerName,
                     customerPhone,
                     quotationType,
-                    requiresInspection
+                    requiresInspection,
+                    quoteAmount
                 };
             })
         );

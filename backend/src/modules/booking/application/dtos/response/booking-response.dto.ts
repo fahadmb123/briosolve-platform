@@ -39,5 +39,7 @@ export interface BookingResponseDto {
     customerPhone?: string | null;
     quotationType?: string | null;
     requiresInspection?: boolean;
+    quoteAmount?: number | null;
+    isFinalConfirmed?: boolean;
     statusHistory?: BookingStatusHistoryItem[];
 }

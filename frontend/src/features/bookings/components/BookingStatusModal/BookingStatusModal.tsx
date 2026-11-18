@@ -33,7 +33,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   const isFixed = booking.quotationType === "FIXED" || (!booking.quotationType && !booking.requiresInspection);
   const isInspection = booking.quotationType === "INSPECTION_REQUIRED" || booking.requiresInspection;
 
-  const advancePaid = booking.advanceAmount || Math.round(booking.totalAmount * 0.3);
+  const advancePaid = booking.advanceAmount || booking.totalAmount;
   const calculatedBalance = Math.max(0, confirmedAmount - advancePaid);
   const isInvalidAmount =
     targetStatus === "PAYMENT_PENDING" &&

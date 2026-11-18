@@ -40,6 +40,8 @@ export interface BookingItem {
   customerPhone?: string | null;
   quotationType?: "FIXED" | "ESTIMATED" | "INSPECTION_REQUIRED" | string | null;
   requiresInspection?: boolean;
+  quoteAmount?: number | null;
+  isFinalConfirmed?: boolean;
   statusHistory?: BookingStatusHistoryItem[];
 }
 

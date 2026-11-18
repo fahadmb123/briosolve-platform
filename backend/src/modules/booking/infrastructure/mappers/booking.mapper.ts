@@ -108,8 +108,10 @@ export class BookingMapper {
             record.notes ?? null,
             createdDate,
             updatedDate,
-            (record.payment_status as BookingPaymentStatus) || "ADVANCE_PAID",
-            Number(record.advance_amount) || Math.round(Number(record.total_amount) * 0.3)
+            (record.payment_status as BookingPaymentStatus) || (record.status === "COMPLETED" ? "PAID" : "ADVANCE_PAID"),
+            record.advance_amount !== undefined && record.advance_amount !== null && Number(record.advance_amount) > 0
+                ? Number(record.advance_amount)
+                : Number(record.total_amount)
         );
     }
 
@@ -148,13 +150,21 @@ export class BookingMapper {
         }
 
         const isFixed = (details?.quotationType ?? extra?.quotationType) === "FIXED";
+        const isFinalConfirmed = isFixed || entity.status === "PAYMENT_PENDING" || entity.status === "COMPLETED";
+
         const resolvedAdvance = isFixed
             ? entity.total_amount
-            : (entity.advance_amount || Math.round(entity.total_amount * 0.3));
+            : (details?.quoteAmount
+                ? Math.round(Number(details.quoteAmount) * 1.1)
+                : (entity.advance_amount && entity.advance_amount > 0 ? entity.advance_amount : entity.total_amount));
+
         const resolvedRemaining = isFixed
             ? 0
-            : Math.max(0, entity.total_amount - resolvedAdvance);
-        const resolvedPaymentStatus = isFixed
+            : isFinalConfirmed
+                ? Math.max(0, entity.total_amount - resolvedAdvance)
+                : 0;
+
+        const resolvedPaymentStatus = isFixed || entity.status === "COMPLETED"
             ? "PAID"
             : (entity.payment_status || "ADVANCE_PAID");
 
@@ -189,6 +199,8 @@ export class BookingMapper {
             customerPhone: details?.customerPhone ?? null,
             quotationType: details?.quotationType ?? extra?.quotationType ?? null,
             requiresInspection: details?.requiresInspection ?? extra?.requiresInspection ?? false,
+            quoteAmount: details?.quoteAmount ?? null,
+            isFinalConfirmed,
             statusHistory: parsedHistory || details?.statusHistory
         };
     }
