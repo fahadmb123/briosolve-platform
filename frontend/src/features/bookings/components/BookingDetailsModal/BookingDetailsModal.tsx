@@ -58,6 +58,20 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             <span>Confirmed</span>
           </span>
         );
+      case "EN_ROUTE":
+        return (
+          <span className="bkmodal-badge en-route">
+            <i className="fas fa-route"></i>
+            <span>On The Way</span>
+          </span>
+        );
+      case "INSPECTION":
+        return (
+          <span className="bkmodal-badge inspection">
+            <i className="fas fa-clipboard-check"></i>
+            <span>Inspection</span>
+          </span>
+        );
       case "IN_PROGRESS":
         return (
           <span className="bkmodal-badge in-progress">
@@ -261,14 +275,42 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           {role === "PROVIDER" && booking.status === "CONFIRMED" && onUpdateStatus && (
             <button
               type="button"
+              className="bkmodal-btn-action-route"
+              onClick={() => {
+                onClose();
+                onUpdateStatus(booking, "EN_ROUTE");
+              }}
+            >
+              <i className="fas fa-route"></i>
+              <span>On The Way</span>
+            </button>
+          )}
+
+          {role === "PROVIDER" && booking.status === "EN_ROUTE" && onUpdateStatus && (
+            <button
+              type="button"
+              className="bkmodal-btn-action-inspection"
+              onClick={() => {
+                onClose();
+                onUpdateStatus(booking, "INSPECTION");
+              }}
+            >
+              <i className="fas fa-clipboard-check"></i>
+              <span>Start Inspection</span>
+            </button>
+          )}
+
+          {role === "PROVIDER" && booking.status === "INSPECTION" && onUpdateStatus && (
+            <button
+              type="button"
               className="bkmodal-btn-action-primary"
               onClick={() => {
                 onClose();
                 onUpdateStatus(booking, "IN_PROGRESS");
               }}
             >
-              <i className="fas fa-play"></i>
-              <span>Start Job</span>
+              <i className="fas fa-tools"></i>
+              <span>Start Work</span>
             </button>
           )}
 

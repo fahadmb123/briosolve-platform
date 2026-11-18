@@ -79,6 +79,8 @@ export class PrismaBookingRepository implements IBookingRepository {
         const counts: BookingCountsDto = {
             ALL: allUserRecords.length,
             CONFIRMED: allUserRecords.filter((b: any) => b.status === "CONFIRMED").length,
+            EN_ROUTE: allUserRecords.filter((b: any) => b.status === "EN_ROUTE").length,
+            INSPECTION: allUserRecords.filter((b: any) => b.status === "INSPECTION").length,
             IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
             COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
             CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length
@@ -136,6 +138,8 @@ export class PrismaBookingRepository implements IBookingRepository {
         const counts: BookingCountsDto = {
             ALL: allUserRecords.length,
             CONFIRMED: allUserRecords.filter((b: any) => b.status === "CONFIRMED").length,
+            EN_ROUTE: allUserRecords.filter((b: any) => b.status === "EN_ROUTE").length,
+            INSPECTION: allUserRecords.filter((b: any) => b.status === "INSPECTION").length,
             IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
             COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
             CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length

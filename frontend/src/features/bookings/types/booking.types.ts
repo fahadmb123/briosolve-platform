@@ -1,4 +1,4 @@
-export type BookingStatus = "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+export type BookingStatus = "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 
 export interface BookingItem {
   id: string;
@@ -31,6 +31,8 @@ export interface BookingItem {
 export interface BookingCounts {
   ALL: number;
   CONFIRMED: number;
+  EN_ROUTE?: number;
+  INSPECTION?: number;
   IN_PROGRESS: number;
   COMPLETED: number;
   CANCELLED: number;
@@ -60,4 +62,4 @@ export interface UpdateBookingStatusPayload {
   notes?: string | null;
 }
 
-export type BookingFilterTab = "ALL" | "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+export type BookingFilterTab = "ALL" | "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";

@@ -100,6 +100,18 @@
   border: 1px solid #a7f3d0;
 }
 
+.bkmodal-badge.en-route {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.bkmodal-badge.inspection {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+
 .bkmodal-badge.in-progress {
   background: #eff6ff;
   color: #1d4ed8;
@@ -434,6 +446,46 @@
 
 .bkmodal-btn-action-outline:hover {
   background: #e2e8f0;
+}
+
+.bkmodal-btn-action-route {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25);
+  transition: all 0.15s ease;
+}
+
+.bkmodal-btn-action-route:hover {
+  background: #0369a1;
+}
+
+.bkmodal-btn-action-inspection {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  background: #7c3aed;
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.25);
+  transition: all 0.15s ease;
+}
+
+.bkmodal-btn-action-inspection:hover {
+  background: #6d28d9;
 }
 
 .bkmodal-btn-action-primary {

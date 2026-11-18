@@ -81,6 +81,18 @@
   border: 1px solid #a7f3d0;
 }
 
+.bkcard-badge.en-route {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.bkcard-badge.inspection {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+
 .bkcard-badge.in-progress {
   background: #eff6ff;
   color: #1d4ed8;
@@ -253,6 +265,26 @@
   cursor: pointer;
   border: none;
   transition: all 0.15s ease;
+}
+
+.bkcard-btn-action.route {
+  background: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(2, 132, 199, 0.2);
+}
+
+.bkcard-btn-action.route:hover {
+  background: #0369a1;
+}
+
+.bkcard-btn-action.inspection {
+  background: #7c3aed;
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(124, 58, 237, 0.2);
+}
+
+.bkcard-btn-action.inspection:hover {
+  background: #6d28d9;
 }
 
 .bkcard-btn-action.primary {

@@ -41,6 +41,20 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             <span>Confirmed</span>
           </span>
         );
+      case "EN_ROUTE":
+        return (
+          <span className="bkcard-badge en-route">
+            <i className="fas fa-route"></i>
+            <span>On The Way</span>
+          </span>
+        );
+      case "INSPECTION":
+        return (
+          <span className="bkcard-badge inspection">
+            <i className="fas fa-clipboard-check"></i>
+            <span>Inspection</span>
+          </span>
+        );
       case "IN_PROGRESS":
         return (
           <span className="bkcard-badge in-progress">
@@ -152,11 +166,33 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           {role === "PROVIDER" && booking.status === "CONFIRMED" && onUpdateStatus && (
             <button
               type="button"
+              className="bkcard-btn-action route"
+              onClick={() => onUpdateStatus(booking, "EN_ROUTE")}
+            >
+              <i className="fas fa-route"></i>
+              <span>On The Way</span>
+            </button>
+          )}
+
+          {role === "PROVIDER" && booking.status === "EN_ROUTE" && onUpdateStatus && (
+            <button
+              type="button"
+              className="bkcard-btn-action inspection"
+              onClick={() => onUpdateStatus(booking, "INSPECTION")}
+            >
+              <i className="fas fa-clipboard-check"></i>
+              <span>Start Inspection</span>
+            </button>
+          )}
+
+          {role === "PROVIDER" && booking.status === "INSPECTION" && onUpdateStatus && (
+            <button
+              type="button"
               className="bkcard-btn-action primary"
               onClick={() => onUpdateStatus(booking, "IN_PROGRESS")}
             >
-              <i className="fas fa-play"></i>
-              <span>Start Job</span>
+              <i className="fas fa-tools"></i>
+              <span>Start Work</span>
             </button>
           )}
 

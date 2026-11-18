@@ -23,20 +23,57 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
 
   if (!isOpen || !booking || !targetStatus) return null;
 
-  const isStarting = targetStatus === "IN_PROGRESS";
-  const isCompleting = targetStatus === "COMPLETED";
+  const getStatusConfig = () => {
+    switch (targetStatus) {
+      case "EN_ROUTE":
+        return {
+          title: "Technician On The Way?",
+          description: `You are about to notify the customer that you are en route to their address for "${booking.serviceRequestTitle || "this booking"}".`,
+          placeholder: "e.g., On my way, estimated arrival in 25 minutes...",
+          confirmText: "I am On The Way",
+          confirmIcon: "fas fa-route",
+          variant: "route"
+        };
+      case "INSPECTION":
+        return {
+          title: "Start Inspection / Diagnostics?",
+          description: `You are about to mark "${booking.serviceRequestTitle || "this booking"}" as under Inspection. The customer will be informed that on-site diagnostic or inspection has begun.`,
+          placeholder: "e.g., Arrived on site, checking components and reviewing requirements...",
+          confirmText: "Start Inspection",
+          confirmIcon: "fas fa-clipboard-check",
+          variant: "inspection"
+        };
+      case "IN_PROGRESS":
+        return {
+          title: "Start Job Execution?",
+          description: `You are about to mark "${booking.serviceRequestTitle || "this booking"}" as In Progress. The customer will be informed that work has commenced.`,
+          placeholder: "e.g., Commencing work and repairs as per agreement...",
+          confirmText: "Start Work",
+          confirmIcon: "fas fa-tools",
+          variant: "primary"
+        };
+      case "COMPLETED":
+        return {
+          title: "Confirm Job Completion?",
+          description: `Confirm that all deliverables for "${booking.serviceRequestTitle || "this job"}" have been completed to satisfaction. The customer will be notified to review and release escrow.`,
+          placeholder: "e.g., Work finished, all test runs completed successfully...",
+          confirmText: "Mark Completed",
+          confirmIcon: "fas fa-check-double",
+          variant: "success"
+        };
+      default:
+        return {
+          title: "Update Booking Status",
+          description: `Update status for booking ${booking.bookingNumber}.`,
+          placeholder: "Optional notes...",
+          confirmText: "Update Status",
+          confirmIcon: "fas fa-check",
+          variant: "primary"
+        };
+    }
+  };
 
-  const title = isStarting
-    ? "Start Job Execution?"
-    : isCompleting
-    ? "Confirm Job Completion?"
-    : "Update Booking Status";
-
-  const description = isStarting
-    ? `You are about to mark "${booking.serviceRequestTitle || "this booking"}" as In Progress. The customer will be informed that work has commenced.`
-    : isCompleting
-    ? `Confirm that all deliverables for "${booking.serviceRequestTitle || "this job"}" have been completed to satisfaction. The customer will be notified to review and release escrow.`
-    : `Update status for booking ${booking.bookingNumber}.`;
+  const config = getStatusConfig();
 
   const handleConfirm = () => {
     onConfirm(booking, targetStatus, notes.trim() || undefined);
@@ -51,11 +88,11 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
         aria-modal="true"
       >
         <div className="bkstatus-modal-header">
-          <div className={`bkstatus-icon-box ${isCompleting ? "success" : "primary"}`}>
-            <i className={isCompleting ? "fas fa-check-double" : "fas fa-play"}></i>
+          <div className={`bkstatus-icon-box ${config.variant}`}>
+            <i className={config.confirmIcon}></i>
           </div>
-          <h3 className="bkstatus-title">{title}</h3>
-          <p className="bkstatus-desc">{description}</p>
+          <h3 className="bkstatus-title">{config.title}</h3>
+          <p className="bkstatus-desc">{config.description}</p>
         </div>
 
         <div className="bkstatus-modal-body">
@@ -66,11 +103,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
             id="status-notes"
             className="bkstatus-textarea"
             rows={3}
-            placeholder={
-              isStarting
-                ? "e.g., Arrived at location, commencing diagnostic inspection..."
-                : "e.g., Work finished, all test runs completed successfully..."
-            }
+            placeholder={config.placeholder}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
@@ -87,7 +120,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
           </button>
           <button
             type="button"
-            className={`bkstatus-btn-confirm ${isCompleting ? "success" : "primary"}`}
+            className={`bkstatus-btn-confirm ${config.variant}`}
             onClick={handleConfirm}
             disabled={isLoading}
           >
@@ -96,15 +129,10 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
                 <i className="fas fa-spinner fa-spin"></i>
                 <span>Updating...</span>
               </>
-            ) : isCompleting ? (
-              <>
-                <i className="fas fa-check"></i>
-                <span>Mark Completed</span>
-              </>
             ) : (
               <>
-                <i className="fas fa-play"></i>
-                <span>Start Job</span>
+                <i className={config.confirmIcon}></i>
+                <span>{config.confirmText}</span>
               </>
             )}
           </button>

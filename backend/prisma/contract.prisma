@@ -530,6 +530,8 @@ model quotations {
 
 enum booking_status {
   CONFIRMED
+  EN_ROUTE
+  INSPECTION
   IN_PROGRESS
   COMPLETED
   CANCELLED

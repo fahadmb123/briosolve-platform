@@ -117,7 +117,11 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
       {
         onSuccess: () => {
           toast.success(
-            newStatus === "IN_PROGRESS"
+            newStatus === "EN_ROUTE"
+              ? "Technician marked as On The Way"
+              : newStatus === "INSPECTION"
+              ? "Inspection / Diagnostic started"
+              : newStatus === "IN_PROGRESS"
               ? "Job marked as In Progress"
               : newStatus === "COMPLETED"
               ? "Job marked as Completed"
@@ -203,10 +207,20 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     : null;
 
   const isConfirmed = booking.status === "CONFIRMED";
+  const isEnRoute = booking.status === "EN_ROUTE";
+  const isInspection = booking.status === "INSPECTION";
   const isInProgress = booking.status === "IN_PROGRESS";
   const isCompleted = booking.status === "COMPLETED";
 
-  const stepProgressPercent = isCompleted ? 100 : isInProgress ? 50 : 0;
+  const stepProgressPercent = isCompleted
+    ? 100
+    : isInProgress
+    ? 75
+    : isInspection
+    ? 50
+    : isEnRoute
+    ? 25
+    : 0;
 
   return (
     <div className={`bkdet-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
@@ -242,19 +256,29 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </span>
             )}
 
-            <span className={`bkdet-status-badge ${booking.status.toLowerCase().replace("_", "-")}`}>
+            <span className={`bkdet-status-badge ${booking.status.toLowerCase().replace(/_/g, "-")}`}>
               <i
                 className={`fas ${
                   isConfirmed
                     ? "fa-check-circle"
+                    : isEnRoute
+                    ? "fa-route"
+                    : isInspection
+                    ? "fa-clipboard-check"
                     : isInProgress
-                    ? "fa-clock"
+                    ? "fa-tools"
                     : isCompleted
-                    ? "fa-badge-check"
+                    ? "fa-award"
                     : "fa-times-circle"
                 }`}
               />
-              <span>{booking.status.replace("_", " ")}</span>
+              <span>
+                {booking.status === "EN_ROUTE"
+                  ? "On The Way"
+                  : booking.status === "INSPECTION"
+                  ? "Inspection"
+                  : booking.status.replace(/_/g, " ")}
+              </span>
             </span>
           </div>
 
@@ -283,11 +307,33 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           {isProvider && isConfirmed && (
             <button
               type="button"
+              className="bkdet-action-btn route"
+              onClick={() => handleTriggerStatusChange("EN_ROUTE")}
+            >
+              <i className="fas fa-route" />
+              <span>On The Way</span>
+            </button>
+          )}
+
+          {isProvider && isEnRoute && (
+            <button
+              type="button"
+              className="bkdet-action-btn inspection"
+              onClick={() => handleTriggerStatusChange("INSPECTION")}
+            >
+              <i className="fas fa-clipboard-check" />
+              <span>Start Inspection</span>
+            </button>
+          )}
+
+          {isProvider && isInspection && (
+            <button
+              type="button"
               className="bkdet-action-btn primary"
               onClick={() => handleTriggerStatusChange("IN_PROGRESS")}
             >
-              <i className="fas fa-play" />
-              <span>Start Job</span>
+              <i className="fas fa-tools" />
+              <span>Start Work</span>
             </button>
           )}
 
@@ -335,14 +381,28 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <div className="bkdet-step-line-fill" style={{ width: `${stepProgressPercent}%` }} />
               </div>
 
-              <div className={`bkdet-step-item ${isConfirmed || isInProgress || isCompleted ? "done" : ""}`}>
+              <div className={`bkdet-step-item ${isEnRoute || isInspection || isInProgress || isCompleted ? "done" : isConfirmed ? "active" : ""}`}>
                 <div className="bkdet-step-circle">
                   <i className="fas fa-check" />
                 </div>
                 <span className="bkdet-step-label">Confirmed</span>
               </div>
 
-              <div className={`bkdet-step-item ${isInProgress || isCompleted ? "done" : isConfirmed ? "active" : ""}`}>
+              <div className={`bkdet-step-item ${isInspection || isInProgress || isCompleted ? "done" : isEnRoute ? "active" : ""}`}>
+                <div className="bkdet-step-circle">
+                  <i className="fas fa-route" />
+                </div>
+                <span className="bkdet-step-label">On The Way</span>
+              </div>
+
+              <div className={`bkdet-step-item ${isInProgress || isCompleted ? "done" : isInspection ? "active" : ""}`}>
+                <div className="bkdet-step-circle">
+                  <i className="fas fa-clipboard-check" />
+                </div>
+                <span className="bkdet-step-label">Inspection</span>
+              </div>
+
+              <div className={`bkdet-step-item ${isCompleted ? "done" : isInProgress ? "active" : ""}`}>
                 <div className="bkdet-step-circle">
                   <i className="fas fa-tools" />
                 </div>
@@ -351,7 +411,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
               <div className={`bkdet-step-item ${isCompleted ? "done" : ""}`}>
                 <div className="bkdet-step-circle">
-                  <i className="fas fa-star" />
+                  <i className="fas fa-award" />
                 </div>
                 <span className="bkdet-step-label">Completed</span>
               </div>

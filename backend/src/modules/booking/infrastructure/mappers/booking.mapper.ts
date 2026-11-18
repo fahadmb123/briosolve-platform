@@ -148,6 +148,8 @@ export class BookingMapper {
             const counts: BookingCountsDto = {
                 ALL: input.length,
                 CONFIRMED: input.filter((b) => b.booking.status === "CONFIRMED").length,
+                EN_ROUTE: input.filter((b) => b.booking.status === "EN_ROUTE").length,
+                INSPECTION: input.filter((b) => b.booking.status === "INSPECTION").length,
                 IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
                 COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
                 CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length
@@ -172,6 +174,8 @@ export class BookingMapper {
             const counts: BookingCountsDto = {
                 ALL: input.length,
                 CONFIRMED: input.filter((b) => b.booking.status === "CONFIRMED").length,
+                EN_ROUTE: input.filter((b) => b.booking.status === "EN_ROUTE").length,
+                INSPECTION: input.filter((b) => b.booking.status === "INSPECTION").length,
                 IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
                 COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
                 CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length

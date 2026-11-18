@@ -42,6 +42,18 @@
   margin-bottom: 4px;
 }
 
+.bkstatus-icon-box.route {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.bkstatus-icon-box.inspection {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+
 .bkstatus-icon-box.primary {
   background: #fff7ed;
   color: #ea580c;
@@ -134,6 +146,22 @@
   cursor: pointer;
   color: #ffffff;
   transition: all 0.15s ease;
+}
+
+.bkstatus-btn-confirm.route {
+  background: #0284c7;
+}
+
+.bkstatus-btn-confirm.route:hover:not(:disabled) {
+  background: #0369a1;
+}
+
+.bkstatus-btn-confirm.inspection {
+  background: #7c3aed;
+}
+
+.bkstatus-btn-confirm.inspection:hover:not(:disabled) {
+  background: #6d28d9;
 }
 
 .bkstatus-btn-confirm.primary {

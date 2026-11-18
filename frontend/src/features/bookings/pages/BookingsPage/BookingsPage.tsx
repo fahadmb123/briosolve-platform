@@ -65,6 +65,8 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
     return {
       ALL: bookings.length,
       CONFIRMED: bookings.filter((b) => b.status === "CONFIRMED").length,
+      EN_ROUTE: bookings.filter((b) => b.status === "EN_ROUTE").length,
+      INSPECTION: bookings.filter((b) => b.status === "INSPECTION").length,
       IN_PROGRESS: bookings.filter((b) => b.status === "IN_PROGRESS").length,
       COMPLETED: bookings.filter((b) => b.status === "COMPLETED").length,
       CANCELLED: bookings.filter((b) => b.status === "CANCELLED").length
@@ -140,7 +142,11 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
       {
         onSuccess: () => {
           toast.success(
-            newStatus === "IN_PROGRESS"
+            newStatus === "EN_ROUTE"
+              ? "Technician marked as On The Way"
+              : newStatus === "INSPECTION"
+              ? "Inspection / Diagnostic started"
+              : newStatus === "IN_PROGRESS"
               ? "Job marked as In Progress"
               : newStatus === "COMPLETED"
               ? "Job marked as Completed"
@@ -199,6 +205,24 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
           >
             <span>Confirmed</span>
             <span className="bk-tab-count">{counts.CONFIRMED}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`bk-tab-btn ${activeTab === "EN_ROUTE" ? "active" : ""}`}
+            onClick={() => setActiveTab("EN_ROUTE")}
+          >
+            <span>On The Way</span>
+            <span className="bk-tab-count">{counts.EN_ROUTE ?? 0}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`bk-tab-btn ${activeTab === "INSPECTION" ? "active" : ""}`}
+            onClick={() => setActiveTab("INSPECTION")}
+          >
+            <span>Inspection</span>
+            <span className="bk-tab-count">{counts.INSPECTION ?? 0}</span>
           </button>
 
           <button
