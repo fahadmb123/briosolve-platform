@@ -1,51 +1,65 @@
 const NOTIFICATION_SOUND_PATH = "/sounds/notification.mp3";
 
-let hasUnlocked = false;
+let sharedAudioContext: AudioContext | null = null;
+let cachedAudioBuffer: AudioBuffer | null = null;
+let cachedAudioElement: HTMLAudioElement | null = null;
 
-const unlockAudio = (): void => {
-  if (hasUnlocked) return;
-  hasUnlocked = true;
-
-  try {
+const getAudioContext = (): AudioContext | null => {
+  if (typeof window === "undefined") return null;
+  if (!sharedAudioContext) {
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     if (AudioCtx) {
-      const dummyCtx = new AudioCtx();
-      if (dummyCtx.state === "suspended") {
-        dummyCtx.resume().catch(() => {});
-      }
-      setTimeout(() => {
-        dummyCtx.close().catch(() => {});
-      }, 150);
+      sharedAudioContext = new AudioCtx();
     }
+  }
+  return sharedAudioContext;
+};
+
+const preloadAudioBuffer = async (): Promise<void> => {
+  const ctx = getAudioContext();
+  if (!ctx || cachedAudioBuffer) return;
+
+  try {
+    const response = await fetch(NOTIFICATION_SOUND_PATH);
+    const arrayBuffer = await response.arrayBuffer();
+    cachedAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
   } catch {
-    return;
+    cachedAudioBuffer = null;
+  }
+};
+
+const unlockAudio = (): void => {
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === "suspended") {
+    ctx.resume().catch(() => {});
   }
 
-  if (typeof window !== "undefined") {
-    window.removeEventListener("pointerdown", unlockAudio);
-    window.removeEventListener("click", unlockAudio);
-    window.removeEventListener("keydown", unlockAudio);
-    window.removeEventListener("touchstart", unlockAudio);
+  if (typeof Audio !== "undefined" && !cachedAudioElement) {
+    try {
+      cachedAudioElement = new Audio(NOTIFICATION_SOUND_PATH);
+      cachedAudioElement.preload = "auto";
+      cachedAudioElement.load();
+    } catch {}
+  }
+
+  if (!cachedAudioBuffer) {
+    preloadAudioBuffer().catch(() => {});
   }
 };
 
 if (typeof window !== "undefined") {
-  window.addEventListener("pointerdown", unlockAudio, { once: true, passive: true });
-  window.addEventListener("click", unlockAudio, { once: true, passive: true });
-  window.addEventListener("keydown", unlockAudio, { once: true, passive: true });
-  window.addEventListener("touchstart", unlockAudio, { once: true, passive: true });
+  window.addEventListener("pointerdown", unlockAudio, { passive: true });
+  window.addEventListener("click", unlockAudio, { passive: true });
+  window.addEventListener("keydown", unlockAudio, { passive: true });
+  window.addEventListener("touchstart", unlockAudio, { passive: true });
+
+  setTimeout(() => {
+    preloadAudioBuffer().catch(() => {});
+  }, 100);
 }
 
-const playSyntheticChime = (): void => {
+const playSyntheticChime = (ctx: AudioContext): void => {
   try {
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtx) return;
-
-    const ctx = new AudioCtx();
-    if (ctx.state === "suspended") {
-      ctx.resume().catch(() => {});
-    }
-
     const now = ctx.currentTime;
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
@@ -70,30 +84,60 @@ const playSyntheticChime = (): void => {
     osc2.start(now);
     osc1.stop(now + 0.45);
     osc2.stop(now + 0.45);
-
-    setTimeout(() => {
-      ctx.close().catch(() => {});
-    }, 550);
-  } catch {
-    return;
-  }
+  } catch {}
 };
 
 export const playNotificationSound = (): void => {
-  if (typeof window === "undefined" || typeof Audio === "undefined") return;
+  if (typeof window === "undefined") return;
+
+  const ctx = getAudioContext();
+
+  if (ctx && ctx.state === "running" && cachedAudioBuffer) {
+    try {
+      const source = ctx.createBufferSource();
+      source.buffer = cachedAudioBuffer;
+      const gain = ctx.createGain();
+      gain.gain.value = 1.0;
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      source.start(0);
+      return;
+    } catch {}
+  }
+
+  if (cachedAudioElement) {
+    try {
+      cachedAudioElement.currentTime = 0;
+      const promise = cachedAudioElement.play();
+      if (promise !== undefined) {
+        promise.catch(() => {
+          if (ctx) {
+            if (ctx.state === "suspended") {
+              ctx.resume().then(() => playSyntheticChime(ctx)).catch(() => {});
+            } else {
+              playSyntheticChime(ctx);
+            }
+          }
+        });
+        return;
+      }
+    } catch {}
+  }
 
   try {
     const audio = new Audio(NOTIFICATION_SOUND_PATH);
-    audio.preload = "auto";
     audio.volume = 1.0;
-
     const playPromise = audio.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
-        playSyntheticChime();
+        if (ctx) {
+          playSyntheticChime(ctx);
+        }
       });
     }
   } catch {
-    playSyntheticChime();
+    if (ctx) {
+      playSyntheticChime(ctx);
+    }
   }
 };
