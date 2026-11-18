@@ -6,6 +6,7 @@ export interface BookingCountsDto {
     EN_ROUTE?: number;
     INSPECTION?: number;
     IN_PROGRESS: number;
+    PAYMENT_PENDING?: number;
     COMPLETED: number;
     CANCELLED: number;
 }

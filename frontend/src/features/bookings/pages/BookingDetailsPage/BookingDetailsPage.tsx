@@ -104,14 +104,16 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const handleConfirmStatusChange = (
     item: BookingItem,
     newStatus: BookingStatus,
-    notes?: string
+    notes?: string,
+    totalAmount?: number
   ) => {
     updateStatusMutation.mutate(
       {
         id: item.id,
         payload: {
           status: newStatus,
-          notes
+          notes,
+          totalAmount
         }
       },
       {
@@ -123,9 +125,11 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 ? "Inspection / Diagnostic started"
                 : newStatus === "IN_PROGRESS"
                   ? "Job marked as In Progress"
-                  : newStatus === "COMPLETED"
-                    ? "Job marked as Completed"
-                    : "Booking status updated"
+                  : newStatus === "PAYMENT_PENDING"
+                    ? "Total payment confirmed and sent to customer"
+                    : newStatus === "COMPLETED"
+                      ? "Job marked as Completed"
+                      : "Booking status updated"
           );
           handleCloseStatusModal();
           refetch();
@@ -149,6 +153,8 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         return { label: "Inspection", icon: "fas fa-clipboard-check", variant: "inspection" };
       case "IN_PROGRESS":
         return { label: "In Progress", icon: "fas fa-tools", variant: "in-progress" };
+      case "PAYMENT_PENDING":
+        return { label: "Payment Pending", icon: "fas fa-file-invoice-dollar", variant: "warning" };
       case "COMPLETED":
         return { label: "Completed", icon: "fas fa-award", variant: "completed" };
       case "CANCELLED":
@@ -260,6 +266,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const isEnRoute = booking.status === "EN_ROUTE";
   const isInspection = booking.status === "INSPECTION";
   const isInProgress = booking.status === "IN_PROGRESS";
+  const isPaymentPending = booking.status === "PAYMENT_PENDING";
   const isCompleted = booking.status === "COMPLETED";
 
   const totalAmount = booking.totalAmount || 0;
@@ -280,20 +287,24 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const stepProgressPercent = requiresInspection
     ? isCompleted
       ? 100
-      : isInProgress
+      : isPaymentPending
+        ? 80
+        : isInProgress
+          ? 60
+          : isInspection
+            ? 40
+            : isEnRoute
+              ? 20
+              : 0
+    : isCompleted
+      ? 100
+      : isPaymentPending
         ? 75
-        : isInspection
+        : isInProgress
           ? 50
           : isEnRoute
             ? 25
-            : 0
-    : isCompleted
-      ? 100
-      : isInProgress
-        ? 66.6
-        : isEnRoute
-          ? 33.3
-          : 0;
+            : 0;
 
   return (
     <div className={`bkdet-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
@@ -344,9 +355,11 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                       ? "fa-clipboard-check"
                       : isInProgress
                         ? "fa-tools"
-                        : isCompleted
-                          ? "fa-award"
-                          : "fa-times-circle"
+                        : isPaymentPending
+                          ? "fa-file-invoice-dollar"
+                          : isCompleted
+                            ? "fa-award"
+                            : "fa-times-circle"
                   }`}
               />
               <span>
@@ -354,7 +367,9 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   ? "On The Way"
                   : booking.status === "INSPECTION"
                     ? "Inspection"
-                    : booking.status.replace(/_/g, " ")}
+                    : booking.status === "PAYMENT_PENDING"
+                      ? "Payment Pending"
+                      : booking.status.replace(/_/g, " ")}
               </span>
             </span>
           </div>
@@ -428,15 +443,76 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           {isProvider && isInProgress && (
             <button
               type="button"
+              className="bkdet-action-btn primary"
+              onClick={() => handleTriggerStatusChange("PAYMENT_PENDING")}
+            >
+              <i className="fas fa-file-invoice-dollar" />
+              <span>Confirm Total & Request Payment</span>
+            </button>
+          )}
+
+          {isProvider && isPaymentPending && (
+            <button
+              type="button"
               className="bkdet-action-btn success"
               onClick={() => handleTriggerStatusChange("COMPLETED")}
             >
               <i className="fas fa-check-circle" />
-              <span>Complete Job</span>
+              <span>Mark as Paid & Complete</span>
             </button>
           )}
         </div>
       </div>
+
+      {isPaymentPending && (
+        <div className="bkdet-payment-pending-banner">
+          <div className="bkdet-ppb-left">
+            <div className="bkdet-ppb-icon">
+              <i className="fas fa-file-invoice-dollar" />
+            </div>
+            <div>
+              <h4 className="bkdet-ppb-title">
+                {isProvider
+                  ? "Final Total Confirmed — Awaiting Customer Settlement"
+                  : "Work Completed — Final Payment Due"}
+              </h4>
+              <p className="bkdet-ppb-desc">
+                {isProvider
+                  ? `You confirmed the final total of ${formatCurrency(totalAmount)}. The customer has been requested to settle the remaining balance of ${formatCurrency(remainingAmount)}.`
+                  : `The provider completed the work and confirmed the final total of ${formatCurrency(totalAmount)}. Please settle the remaining balance of ${formatCurrency(remainingAmount)} to conclude the booking.`}
+              </p>
+            </div>
+          </div>
+          <div className="bkdet-ppb-actions">
+            {!isProvider && (
+              <button
+                type="button"
+                className="bkdet-action-btn success"
+                onClick={() =>
+                  handleConfirmStatusChange(
+                    booking,
+                    "COMPLETED",
+                    "Final balance payment confirmed by client. Escrow released."
+                  )
+                }
+              >
+                <i className="fas fa-lock" />
+                <span>Pay Balance ({formatCurrency(remainingAmount)}) & Complete</span>
+              </button>
+            )}
+            {isProvider && (
+              <button
+                type="button"
+                className="bkdet-action-btn success"
+                onClick={() => handleTriggerStatusChange("COMPLETED")}
+              >
+                <i className="fas fa-check-circle" />
+                <span>Mark Paid & Complete</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="bkdet-layout-grid">
         <div className="bkdet-col-main">
@@ -469,14 +545,14 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <div className="bkdet-step-line-fill" style={{ width: `${stepProgressPercent}%` }} />
               </div>
 
-              <div className={`bkdet-step-item ${isEnRoute || isInspection || isInProgress || isCompleted ? "done" : isConfirmed ? "active" : ""}`}>
+              <div className={`bkdet-step-item ${isEnRoute || isInspection || isInProgress || isPaymentPending || isCompleted ? "done" : isConfirmed ? "active" : ""}`}>
                 <div className="bkdet-step-circle">
                   <i className="fas fa-check" />
                 </div>
                 <span className="bkdet-step-label">Confirmed</span>
               </div>
 
-              <div className={`bkdet-step-item ${(requiresInspection ? (isInspection || isInProgress || isCompleted) : (isInProgress || isCompleted)) ? "done" : isEnRoute ? "active" : ""}`}>
+              <div className={`bkdet-step-item ${(requiresInspection ? (isInspection || isInProgress || isPaymentPending || isCompleted) : (isInProgress || isPaymentPending || isCompleted)) ? "done" : isEnRoute ? "active" : ""}`}>
                 <div className="bkdet-step-circle">
                   <i className="fas fa-route" />
                 </div>
@@ -484,7 +560,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </div>
 
               {requiresInspection && (
-                <div className={`bkdet-step-item ${isInProgress || isCompleted ? "done" : isInspection ? "active" : ""}`}>
+                <div className={`bkdet-step-item ${isInProgress || isPaymentPending || isCompleted ? "done" : isInspection ? "active" : ""}`}>
                   <div className="bkdet-step-circle">
                     <i className="fas fa-clipboard-check" />
                   </div>
@@ -492,11 +568,18 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 </div>
               )}
 
-              <div className={`bkdet-step-item ${isCompleted ? "done" : isInProgress ? "active" : ""}`}>
+              <div className={`bkdet-step-item ${isPaymentPending || isCompleted ? "done" : isInProgress ? "active" : ""}`}>
                 <div className="bkdet-step-circle">
                   <i className="fas fa-tools" />
                 </div>
                 <span className="bkdet-step-label">In Progress</span>
+              </div>
+
+              <div className={`bkdet-step-item ${isCompleted ? "done" : isPaymentPending ? "active" : ""}`}>
+                <div className="bkdet-step-circle">
+                  <i className="fas fa-file-invoice-dollar" />
+                </div>
+                <span className="bkdet-step-label">Payment Due</span>
               </div>
 
               <div className={`bkdet-step-item ${isCompleted ? "done" : ""}`}>
@@ -667,21 +750,20 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <h3 className="bkdet-section-title">Payment & Billing</h3>
               </div>
               <span
-                className={`bkdet-milestone-pill ${
-                  isFullyPaid
-                    ? "paid"
-                    : isAdvancePaid
+                className={`bkdet-milestone-pill ${isFullyPaid
+                  ? "paid"
+                  : isAdvancePaid
                     ? "pending"
                     : ""
-                }`}
+                  }`}
               >
                 {isFullyPaid
                   ? "Fully Paid"
                   : isAdvancePaid
-                  ? "Advance Paid"
-                  : booking.paymentStatus === "REFUNDED"
-                  ? "Refunded"
-                  : "Pending"}
+                    ? "Advance Paid"
+                    : booking.paymentStatus === "REFUNDED"
+                      ? "Refunded"
+                      : "Pending"}
               </span>
             </div>
 
@@ -694,18 +776,16 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
             <div className="bkdet-payment-stages">
               <div
-                className={`bkdet-stage-item ${
-                  isAdvancePaid || isFullyPaid ? "paid" : "pending"
-                }`}
+                className={`bkdet-stage-item ${isAdvancePaid || isFullyPaid ? "paid" : "pending"
+                  }`}
               >
                 <div className="bkdet-stage-left">
                   <div className="bkdet-stage-icon">
                     <i
-                      className={`fas ${
-                        isAdvancePaid || isFullyPaid
-                          ? "fa-check"
-                          : "fa-hourglass-start"
-                      }`}
+                      className={`fas ${isAdvancePaid || isFullyPaid
+                        ? "fa-check"
+                        : "fa-hourglass-start"
+                        }`}
                     />
                   </div>
                   <div className="bkdet-stage-info">
@@ -720,9 +800,8 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                     {formatCurrency(advanceAmount)}
                   </span>
                   <span
-                    className={`bkdet-milestone-pill ${
-                      isAdvancePaid || isFullyPaid ? "paid" : "pending"
-                    }`}
+                    className={`bkdet-milestone-pill ${isAdvancePaid || isFullyPaid ? "paid" : "pending"
+                      }`}
                   >
                     {isAdvancePaid || isFullyPaid ? "Paid" : "Pending"}
                   </span>
@@ -735,9 +814,8 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <div className="bkdet-stage-left">
                   <div className="bkdet-stage-icon">
                     <i
-                      className={`fas ${
-                        isFullyPaid ? "fa-check" : "fa-clock"
-                      }`}
+                      className={`fas ${isFullyPaid ? "fa-check" : "fa-clock"
+                        }`}
                     />
                   </div>
                   <div className="bkdet-stage-info">
@@ -754,9 +832,8 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                     {formatCurrency(remainingAmount)}
                   </span>
                   <span
-                    className={`bkdet-milestone-pill ${
-                      isFullyPaid ? "paid" : "pending"
-                    }`}
+                    className={`bkdet-milestone-pill ${isFullyPaid ? "paid" : "pending"
+                      }`}
                   >
                     {isFullyPaid ? "Settled" : "Pending"}
                   </span>

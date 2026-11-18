@@ -62,6 +62,13 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             <span>In Progress</span>
           </span>
         );
+      case "PAYMENT_PENDING":
+        return (
+          <span className="bkcard-badge payment-pending">
+            <i className="fas fa-file-invoice-dollar"></i>
+            <span>Payment Pending</span>
+          </span>
+        );
       case "COMPLETED":
         return (
           <span className="bkcard-badge completed">

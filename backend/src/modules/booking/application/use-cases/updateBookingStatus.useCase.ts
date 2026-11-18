@@ -75,7 +75,8 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         const updated = await this._bookingRepository.update(details.booking.id, {
             status: input.status,
             notes: serializedNotes,
-            paymentStatus: nextPaymentStatus
+            paymentStatus: nextPaymentStatus,
+            totalAmount: input.totalAmount
         });
 
         if (!updated) {

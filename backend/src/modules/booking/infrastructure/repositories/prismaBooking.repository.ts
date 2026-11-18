@@ -89,6 +89,7 @@ export class PrismaBookingRepository implements IBookingRepository {
             EN_ROUTE: allUserRecords.filter((b: any) => b.status === "EN_ROUTE").length,
             INSPECTION: allUserRecords.filter((b: any) => b.status === "INSPECTION").length,
             IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
+            PAYMENT_PENDING: allUserRecords.filter((b: any) => b.status === "PAYMENT_PENDING").length,
             COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
             CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length
         };
@@ -148,6 +149,7 @@ export class PrismaBookingRepository implements IBookingRepository {
             EN_ROUTE: allUserRecords.filter((b: any) => b.status === "EN_ROUTE").length,
             INSPECTION: allUserRecords.filter((b: any) => b.status === "INSPECTION").length,
             IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
+            PAYMENT_PENDING: allUserRecords.filter((b: any) => b.status === "PAYMENT_PENDING").length,
             COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
             CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length
         };

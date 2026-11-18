@@ -99,6 +99,12 @@
   border: 1px solid #bfdbfe;
 }
 
+.bkcard-badge.payment-pending {
+  background: #fefce8;
+  color: #a16207;
+  border: 1px solid #fef08a;
+}
+
 .bkcard-badge.completed {
   background: #f0fdf4;
   color: #15803d;

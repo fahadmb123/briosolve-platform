@@ -6,10 +6,12 @@ export interface UpdateBookingStatusInputDto {
     status: BookingStatus;
     notes?: string | null;
     paymentStatus?: BookingPaymentStatus;
+    totalAmount?: number;
 }
 
 export interface UpdateBookingRepoDto {
     status?: BookingStatus;
     notes?: string | null;
     paymentStatus?: BookingPaymentStatus;
+    totalAmount?: number;
 }

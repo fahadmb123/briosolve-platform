@@ -8,7 +8,7 @@ interface BookingStatusModalProps {
   isOpen: boolean;
   isLoading: boolean;
   onClose: () => void;
-  onConfirm: (booking: BookingItem, newStatus: BookingStatus, notes?: string) => void;
+  onConfirm: (booking: BookingItem, newStatus: BookingStatus, notes?: string, totalAmount?: number) => void;
 }
 
 export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
@@ -20,6 +20,13 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   onConfirm
 }) => {
   const [notes, setNotes] = useState("");
+  const [confirmedAmount, setConfirmedAmount] = useState<number>(() => booking?.totalAmount || 0);
+
+  React.useEffect(() => {
+    if (booking?.totalAmount) {
+      setConfirmedAmount(booking.totalAmount);
+    }
+  }, [booking?.totalAmount, isOpen]);
 
   if (!isOpen || !booking || !targetStatus) return null;
 
@@ -52,6 +59,15 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
           confirmIcon: "fas fa-tools",
           variant: "primary"
         };
+      case "PAYMENT_PENDING":
+        return {
+          title: "Confirm Total Payment Amount?",
+          description: `Confirm the final total amount for "${booking.serviceRequestTitle || "this job"}". The customer will be notified to review and settle the remaining balance.`,
+          placeholder: "e.g., Job executed completely. Final price verified and ready for settlement...",
+          confirmText: "Confirm Total & Request Payment",
+          confirmIcon: "fas fa-file-invoice-dollar",
+          variant: "warning"
+        };
       case "COMPLETED":
         return {
           title: "Confirm Job Completion?",
@@ -76,7 +92,12 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   const config = getStatusConfig();
 
   const handleConfirm = () => {
-    onConfirm(booking, targetStatus, notes.trim() || undefined);
+    onConfirm(
+      booking,
+      targetStatus,
+      notes.trim() || undefined,
+      targetStatus === "PAYMENT_PENDING" ? confirmedAmount : undefined
+    );
   };
 
   return (
@@ -96,6 +117,25 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
         </div>
 
         <div className="bkstatus-modal-body">
+          {targetStatus === "PAYMENT_PENDING" && (
+            <div className="bkstatus-amount-section">
+              <label className="bkstatus-label" htmlFor="status-total-amount">
+                Confirmed Total Amount (₹)
+              </label>
+              <input
+                id="status-total-amount"
+                type="number"
+                min="1"
+                className="bkstatus-amount-input"
+                value={confirmedAmount}
+                onChange={(e) => setConfirmedAmount(Number(e.target.value))}
+              />
+              <span className="bkstatus-amount-helper">
+                Current Quote Total: ₹{booking.totalAmount.toLocaleString("en-IN")}. You can adjust this amount if parts, materials, or on-site changes altered the final bill.
+              </span>
+            </div>
+          )}
+
           <label className="bkstatus-label" htmlFor="status-notes">
             Optional Notes / Updates for Client
           </label>

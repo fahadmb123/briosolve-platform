@@ -66,6 +66,12 @@
   border: 1px solid #bbf7d0;
 }
 
+.bkstatus-icon-box.warning {
+  background: #fefce8;
+  color: #ca8a04;
+  border: 1px solid #fef08a;
+}
+
 .bkstatus-title {
   font-size: 1.15rem;
   font-weight: 700;
@@ -178,6 +184,45 @@
 
 .bkstatus-btn-confirm.success:hover:not(:disabled) {
   background: #15803d;
+}
+
+.bkstatus-btn-confirm.warning {
+  background: #d97706;
+}
+
+.bkstatus-btn-confirm.warning:hover:not(:disabled) {
+  background: #b45309;
+}
+
+.bkstatus-amount-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.bkstatus-amount-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.bkstatus-amount-input:focus {
+  border-color: #d97706;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+}
+
+.bkstatus-amount-helper {
+  font-size: 0.74rem;
+  color: #64748b;
+  line-height: 1.4;
 }
 
 .bkstatus-btn-confirm:disabled,

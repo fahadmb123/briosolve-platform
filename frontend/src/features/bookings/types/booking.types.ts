@@ -1,4 +1,4 @@
-export type BookingStatus = "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+export type BookingStatus = "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "PAYMENT_PENDING" | "COMPLETED" | "CANCELLED";
 
 export type BookingPaymentStatus = "PENDING" | "ADVANCE_PAID" | "PAID" | "REFUNDED";
 
@@ -47,6 +47,7 @@ export interface BookingCounts {
   EN_ROUTE?: number;
   INSPECTION?: number;
   IN_PROGRESS: number;
+  PAYMENT_PENDING?: number;
   COMPLETED: number;
   CANCELLED: number;
 }
@@ -74,6 +75,7 @@ export interface UpdateBookingStatusPayload {
   status: BookingStatus;
   notes?: string | null;
   paymentStatus?: BookingPaymentStatus;
+  totalAmount?: number;
 }
 
-export type BookingFilterTab = "ALL" | "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+export type BookingFilterTab = "ALL" | "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "PAYMENT_PENDING" | "COMPLETED" | "CANCELLED";

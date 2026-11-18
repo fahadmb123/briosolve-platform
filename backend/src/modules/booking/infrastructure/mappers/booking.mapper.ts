@@ -12,6 +12,7 @@ export const BookingStatusToTitle = {
     "EN_ROUTE": "On the way",
     "INSPECTION": "Inspection finished",
     "IN_PROGRESS": "In the progress",
+    "PAYMENT_PENDING": "Payment Pending",
     "COMPLETED": "Completed",
     "CANCELLED": "Cancelled"
 }
@@ -186,6 +187,7 @@ export class BookingMapper {
                 EN_ROUTE: input.filter((b) => b.booking.status === "EN_ROUTE").length,
                 INSPECTION: input.filter((b) => b.booking.status === "INSPECTION").length,
                 IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
+                PAYMENT_PENDING: input.filter((b) => b.booking.status === "PAYMENT_PENDING").length,
                 COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
                 CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length
             };
@@ -212,6 +214,7 @@ export class BookingMapper {
                 EN_ROUTE: input.filter((b) => b.booking.status === "EN_ROUTE").length,
                 INSPECTION: input.filter((b) => b.booking.status === "INSPECTION").length,
                 IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
+                PAYMENT_PENDING: input.filter((b) => b.booking.status === "PAYMENT_PENDING").length,
                 COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
                 CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length
             };
@@ -260,6 +263,10 @@ export class BookingMapper {
         }
         if (data.paymentStatus) {
             payload.payment_status = data.paymentStatus;
+        }
+        if (data.totalAmount !== undefined) {
+            payload.total_amount = data.totalAmount.toString();
+            payload.platform_fee = Math.round(data.totalAmount * 0.1).toString();
         }
         if (data.notes !== undefined) {
             payload.notes = data.notes;
