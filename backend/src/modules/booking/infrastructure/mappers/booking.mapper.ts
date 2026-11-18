@@ -3,11 +3,9 @@ import { Booking, BookingStatus } from "../../domain/entities/booking.entity";
 import { BookingDetails, BookingListResult } from "../../domain/repositories/IBookingRepository";
 import { CreateBookingInputDto, CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
-import { BookingResponseDto } from "../../application/dtos/response/booking-response.dto";
+import { BookingResponseDto, BookingStatusHistoryItem } from "../../application/dtos/response/booking-response.dto";
 import { CustomerBookingsResponseDto, BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
-
-export type BookingStatus = "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 
 export const BookingStatusToTitle = {
     "CONFIRMED":"Confirmed",
@@ -119,11 +117,29 @@ export class BookingMapper {
             customerName?: string | null;
             quotationType?: string | null;
             requiresInspection?: boolean;
+            statusHistory?: BookingStatusHistoryItem[];
         }
     ): BookingResponseDto {
         const isDetails = "booking" in source;
         const entity: Booking = isDetails ? source.booking : source;
         const details = isDetails ? source : null;
+
+        let parsedHistory: BookingStatusHistoryItem[] | undefined = undefined;
+        let displayNotes = entity.notes;
+
+        if (entity.notes) {
+            try {
+                const parsed = JSON.parse(entity.notes);
+                if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === "object" && "status" in parsed[0]) {
+                    parsedHistory = parsed;
+                    const latest = parsed[parsed.length - 1];
+                    displayNotes = latest.note;
+                }
+            } catch {
+                parsedHistory = undefined;
+                displayNotes = entity.notes;
+            }
+        }
 
         return {
             id: entity.id,
@@ -139,7 +155,7 @@ export class BookingMapper {
             scheduledTime: entity.scheduled_time,
             paymentId: entity.payment_id,
             orderId: entity.order_id,
-            notes: entity.notes,
+            notes: displayNotes,
             createdAt: entity.created_at.toISOString(),
             updatedAt: entity.updated_at.toISOString(),
             serviceRequestTitle: details?.serviceRequestTitle ?? extra?.serviceRequestTitle ?? null,
@@ -152,7 +168,8 @@ export class BookingMapper {
             customerName: details?.customerName ?? extra?.customerName ?? null,
             customerPhone: details?.customerPhone ?? null,
             quotationType: details?.quotationType ?? extra?.quotationType ?? null,
-            requiresInspection: details?.requiresInspection ?? extra?.requiresInspection ?? false
+            requiresInspection: details?.requiresInspection ?? extra?.requiresInspection ?? false,
+            statusHistory: parsedHistory || details?.statusHistory
         };
     }
 

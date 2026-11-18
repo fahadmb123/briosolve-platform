@@ -401,6 +401,46 @@
   line-height: 1.5;
 }
 
+.bkmodal-updates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bkmodal-update-row {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bkmodal-update-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bkmodal-update-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0369a1;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: capitalize;
+}
+
+.bkmodal-update-time {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
 .bkmodal-footer {
   display: flex;
   align-items: center;

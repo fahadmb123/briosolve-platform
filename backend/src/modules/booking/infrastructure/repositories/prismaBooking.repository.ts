@@ -33,7 +33,8 @@ export class PrismaBookingRepository implements IBookingRepository {
             providerName: null,
             customerName: null,
             quotationType: null,
-            requiresInspection: false
+            requiresInspection: false,
+            statusHistory: undefined
         };
     }
 

@@ -3,7 +3,7 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IBookingRepository } from "../../domain/repositories/IBookingRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { UpdateBookingStatusInputDto } from "../dtos/request/update-booking-status.dto";
-import { BookingResponseDto } from "../dtos/response/booking-response.dto";
+import { BookingResponseDto, BookingStatusHistoryItem } from "../dtos/response/booking-response.dto";
 import { BookingMapper, BookingStatusToTitle } from "../../infrastructure/mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
@@ -31,9 +31,48 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             throw new ApplicationError("FORBIDDEN", "You are not authorized to update this booking", "AUTHENTICATION");
         }
 
+        let history: BookingStatusHistoryItem[] = [];
+        if (details.booking.notes) {
+            try {
+                const parsed = JSON.parse(details.booking.notes);
+                if (Array.isArray(parsed)) {
+                    history = parsed;
+                } else if (typeof parsed === "object" && parsed !== null) {
+                    history = [parsed];
+                } else if (typeof details.booking.notes === "string" && details.booking.notes.trim()) {
+                    history = [{
+                        status: details.booking.status,
+                        note: details.booking.notes,
+                        timestamp: details.booking.updated_at.toISOString(),
+                        authorName: providerProfile?.business_name || null
+                    }];
+                }
+            } catch {
+                if (details.booking.notes.trim()) {
+                    history = [{
+                        status: details.booking.status,
+                        note: details.booking.notes,
+                        timestamp: details.booking.updated_at.toISOString(),
+                        authorName: providerProfile?.business_name || null
+                    }];
+                }
+            }
+        }
+
+        if (input.notes && input.notes.trim()) {
+            history.push({
+                status: input.status,
+                note: input.notes.trim(),
+                timestamp: new Date().toISOString(),
+                authorName: providerProfile?.business_name || null
+            });
+        }
+
+        const serializedNotes = history.length > 0 ? JSON.stringify(history) : details.booking.notes;
+
         const updated = await this._bookingRepository.update(details.booking.id, {
             status: input.status,
-            notes: input.notes !== undefined ? input.notes : details.booking.notes
+            notes: serializedNotes
         });
 
         if (!updated) {

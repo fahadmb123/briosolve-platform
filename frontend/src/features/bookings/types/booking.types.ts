@@ -1,5 +1,12 @@
 export type BookingStatus = "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 
+export interface BookingStatusHistoryItem {
+  status: BookingStatus;
+  note: string;
+  timestamp: string;
+  authorName?: string | null;
+}
+
 export interface BookingItem {
   id: string;
   bookingNumber: string;
@@ -28,6 +35,7 @@ export interface BookingItem {
   customerPhone?: string | null;
   quotationType?: "FIXED" | "ESTIMATED" | "INSPECTION_REQUIRED" | string | null;
   requiresInspection?: boolean;
+  statusHistory?: BookingStatusHistoryItem[];
 }
 
 export interface BookingCounts {

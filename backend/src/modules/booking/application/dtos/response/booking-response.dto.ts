@@ -1,5 +1,12 @@
 import { BookingStatus } from "../../../domain/entities/booking.entity";
 
+export interface BookingStatusHistoryItem {
+    status: BookingStatus;
+    note: string;
+    timestamp: string;
+    authorName?: string | null;
+}
+
 export interface BookingResponseDto {
     id: string;
     bookingNumber: string;
@@ -28,4 +35,5 @@ export interface BookingResponseDto {
     customerPhone?: string | null;
     quotationType?: string | null;
     requiresInspection?: boolean;
+    statusHistory?: BookingStatusHistoryItem[];
 }

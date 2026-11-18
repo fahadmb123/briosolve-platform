@@ -793,6 +793,250 @@
   margin: 0 0 16px;
 }
 
+.bkdet-timeline-card {
+  position: relative;
+}
+
+.bkdet-timeline-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+}
+
+.bkdet-timeline-flow {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.bkdet-tl-item {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+
+.bkdet-tl-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.bkdet-tl-bullet {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  z-index: 2;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  color: #64748b;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.bkdet-tl-bullet.confirmed {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #047857;
+}
+
+.bkdet-tl-bullet.route {
+  background: #f0f9ff;
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+.bkdet-tl-bullet.inspection {
+  background: #faf5ff;
+  border-color: #8b5cf6;
+  color: #7c3aed;
+}
+
+.bkdet-tl-bullet.in-progress {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.bkdet-tl-bullet.completed {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #15803d;
+}
+
+.bkdet-tl-bullet.cancelled {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #b91c1c;
+}
+
+.bkdet-tl-connector {
+  width: 2px;
+  flex: 1;
+  min-height: 28px;
+  background: #e2e8f0;
+  margin: 4px 0;
+}
+
+.bkdet-tl-content {
+  flex: 1;
+  padding-bottom: 22px;
+}
+
+.bkdet-tl-meta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.bkdet-tl-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bkdet-tl-status-pill {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+
+.bkdet-tl-status-pill.confirmed {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.bkdet-tl-status-pill.route {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.bkdet-tl-status-pill.inspection {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+
+.bkdet-tl-status-pill.in-progress {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.bkdet-tl-status-pill.completed {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.bkdet-tl-status-pill.cancelled {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.bkdet-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ea580c;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bkdet-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ea580c;
+  box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.7);
+  animation: bkdetPulse 1.6s infinite;
+}
+
+@keyframes bkdetPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(234, 88, 12, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(234, 88, 12, 0);
+  }
+}
+
+.bkdet-tl-time {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.bkdet-tl-note-bubble {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 4px;
+  position: relative;
+}
+
+.bkdet-tl-item.latest .bkdet-tl-note-bubble {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.06);
+}
+
+.bkdet-tl-note-text {
+  font-size: 0.88rem;
+  color: #1e293b;
+  line-height: 1.55;
+  margin: 0;
+  word-break: break-word;
+}
+
+.bkdet-tl-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  color: #64748b;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.bkdet-tl-author i {
+  color: #16a34a;
+  font-size: 0.7rem;
+}
+
 @media (max-width: 1024px) {
   .bkdet-layout-grid {
     grid-template-columns: 1fr;

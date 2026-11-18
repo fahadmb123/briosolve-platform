@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useGetBookingById, useUpdateBookingStatus } from "../../hooks/useBookingMutations";
-import type { BookingItem, BookingStatus } from "../../types/booking.types";
+import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
 import { BookingStatusModal } from "../../components";
 import "./BookingDetailsPage.css";
 
@@ -138,6 +138,56 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
       }
     );
   };
+
+  const getStatusMeta = (status: BookingStatus) => {
+    switch (status) {
+      case "CONFIRMED":
+        return { label: "Confirmed", icon: "fas fa-check-circle", variant: "confirmed" };
+      case "EN_ROUTE":
+        return { label: "On The Way", icon: "fas fa-route", variant: "route" };
+      case "INSPECTION":
+        return { label: "Inspection", icon: "fas fa-clipboard-check", variant: "inspection" };
+      case "IN_PROGRESS":
+        return { label: "In Progress", icon: "fas fa-tools", variant: "in-progress" };
+      case "COMPLETED":
+        return { label: "Completed", icon: "fas fa-award", variant: "completed" };
+      case "CANCELLED":
+        return { label: "Cancelled", icon: "fas fa-ban", variant: "cancelled" };
+      default:
+        return { label: status, icon: "fas fa-info-circle", variant: "confirmed" };
+    }
+  };
+
+  const timelineItems = useMemo<BookingStatusHistoryItem[]>(() => {
+    if (!booking) return [];
+    if (booking.statusHistory && booking.statusHistory.length > 0) {
+      return booking.statusHistory;
+    }
+    const items: BookingStatusHistoryItem[] = [
+      {
+        status: "CONFIRMED",
+        note: "Booking confirmed and payment escrow secured.",
+        timestamp: booking.createdAt,
+        authorName: "System"
+      }
+    ];
+    if (booking.notes && booking.notes.trim()) {
+      try {
+        const parsed = JSON.parse(booking.notes);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch {
+        items.push({
+          status: booking.status,
+          note: booking.notes,
+          timestamp: booking.updatedAt,
+          authorName: booking.providerBusinessName || booking.providerName || "Service Provider"
+        });
+      }
+    }
+    return items;
+  }, [booking]);
 
   if (isLoading && !booking) {
     return (
@@ -450,6 +500,73 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </div>
           </div>
 
+          <div className="bkdet-section-card bkdet-timeline-card">
+            <div className="bkdet-section-header">
+              <div className="bkdet-section-title-wrap">
+                <div className="bkdet-section-icon">
+                  <i className="fas fa-stream" />
+                </div>
+                <h3 className="bkdet-section-title">Execution Updates & Status Log</h3>
+              </div>
+              <span className="bkdet-timeline-count-badge">
+                {timelineItems.length} {timelineItems.length === 1 ? "Update" : "Updates"}
+              </span>
+            </div>
+
+            <div className="bkdet-timeline-flow">
+              {timelineItems.map((item, idx) => {
+                const isLatest = idx === timelineItems.length - 1;
+                const statusMeta = getStatusMeta(item.status);
+                const formattedTime = new Date(item.timestamp).toLocaleString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                });
+
+                return (
+                  <div key={idx} className={`bkdet-tl-item ${isLatest ? "latest" : ""}`}>
+                    <div className="bkdet-tl-left">
+                      <div className={`bkdet-tl-bullet ${statusMeta.variant}`}>
+                        <i className={statusMeta.icon} />
+                      </div>
+                      {idx < timelineItems.length - 1 && <div className="bkdet-tl-connector" />}
+                    </div>
+
+                    <div className="bkdet-tl-content">
+                      <div className="bkdet-tl-meta-header">
+                        <div className="bkdet-tl-title-group">
+                          <span className={`bkdet-tl-status-pill ${statusMeta.variant}`}>
+                            {statusMeta.label}
+                          </span>
+                          {isLatest && (
+                            <span className="bkdet-live-badge">
+                              <span className="bkdet-live-dot" />
+                              Latest Update
+                            </span>
+                          )}
+                        </div>
+                        <span className="bkdet-tl-time">{formattedTime}</span>
+                      </div>
+
+                      {item.note && (
+                        <div className="bkdet-tl-note-bubble">
+                          <p className="bkdet-tl-note-text">{item.note}</p>
+                          {item.authorName && (
+                            <div className="bkdet-tl-author">
+                              <i className="fas fa-user-check" />
+                              <span>Shared by {item.authorName}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="bkdet-section-card">
             <div className="bkdet-section-header">
               <div className="bkdet-section-title-wrap">
@@ -489,15 +606,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 </div>
               </div>
             </div>
-
-            {booking.notes && (
-              <div>
-                <h4 style={{ margin: "0 0 6px", fontSize: "0.9rem", color: "#475569" }}>
-                  Job Notes & Instructions
-                </h4>
-                <p className="bkdet-scope-text">{booking.notes}</p>
-              </div>
-            )}
 
             <button type="button" className="bkdet-link-btn" onClick={handleViewServiceRequest}>
               <i className="fas fa-external-link-alt" />

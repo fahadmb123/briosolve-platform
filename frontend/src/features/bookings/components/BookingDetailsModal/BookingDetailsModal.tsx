@@ -55,6 +55,29 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.addressText)}`
     : null;
 
+  const timelineItems = React.useMemo(() => {
+    if (!booking) return [];
+    if (booking.statusHistory && booking.statusHistory.length > 0) {
+      return booking.statusHistory;
+    }
+    if (booking.notes && booking.notes.trim()) {
+      try {
+        const parsed = JSON.parse(booking.notes);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {
+        return [
+          {
+            status: booking.status,
+            note: booking.notes,
+            timestamp: booking.updatedAt,
+            authorName: booking.providerBusinessName || booking.providerName || "Service Provider"
+          }
+        ];
+      }
+    }
+    return [];
+  }, [booking]);
+
   const renderStatusBadge = () => {
     switch (booking.status) {
       case "CONFIRMED":
@@ -248,13 +271,30 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             </div>
           </div>
 
-          {booking.notes && (
+          {timelineItems.length > 0 && (
             <div className="bkmodal-section">
               <h4 className="bkmodal-section-title">
-                <i className="fas fa-sticky-note"></i>
-                <span>Work Scope & Notes</span>
+                <i className="fas fa-stream"></i>
+                <span>Execution Updates & Notes</span>
               </h4>
-              <p className="bkmodal-notes-text">{booking.notes}</p>
+              <div className="bkmodal-updates-list">
+                {timelineItems.map((item, idx) => (
+                  <div key={idx} className="bkmodal-update-row">
+                    <div className="bkmodal-update-top">
+                      <span className="bkmodal-update-status">{item.status.replace("_", " ")}</span>
+                      <span className="bkmodal-update-time">
+                        {new Date(item.timestamp).toLocaleString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        })}
+                      </span>
+                    </div>
+                    <p className="bkmodal-notes-text">{item.note}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
