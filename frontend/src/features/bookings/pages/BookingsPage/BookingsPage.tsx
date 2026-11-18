@@ -158,11 +158,13 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
   const cardRole: "CUSTOMER" | "PROVIDER" = isProvider ? "PROVIDER" : "CUSTOMER";
 
   return (
-    <div className="bk-page-container">
+    <div className={`bk-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
       <div className="bk-hero-section">
         <div className="bk-hero-content">
           <div className="bk-breadcrumb">
-            <span>{isProvider ? "Provider Portal" : "Home"}</span>
+            <span className={`bk-role-badge ${isProvider ? "provider" : "customer"}`}>
+              {isProvider ? "Provider Portal" : "Customer"}
+            </span>
             <span className="sep">/</span>
             <span className="active">Bookings</span>
           </div>
@@ -178,30 +180,6 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
       </div>
 
       <div className="bk-toolbar">
-        <div className="bk-search-box">
-          <i className="fas fa-search bk-search-icon"></i>
-          <input
-            type="text"
-            className="bk-search-input"
-            placeholder={
-              isProvider
-                ? "Search by booking #, requirement title, or customer name..."
-                : "Search by booking #, service title, or provider name..."
-            }
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              className="bk-search-clear"
-              onClick={() => setSearchQuery("")}
-            >
-              <i className="fas fa-times"></i>
-            </button>
-          )}
-        </div>
-
         <div className="bk-tabs-bar">
           <button
             type="button"
@@ -247,6 +225,30 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
             <span>Cancelled</span>
             <span className="bk-tab-count">{counts.CANCELLED}</span>
           </button>
+        </div>
+
+        <div className="bk-search-box">
+          <i className="fas fa-search bk-search-icon"></i>
+          <input
+            type="text"
+            className="bk-search-input"
+            placeholder={
+              isProvider
+                ? "Search booking #, title, customer..."
+                : "Search booking #, title, provider..."
+            }
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="bk-search-clear"
+              onClick={() => setSearchQuery("")}
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          )}
         </div>
       </div>
 
