@@ -17,6 +17,7 @@ export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
   if (!isOpen) return null;
 
   const isProvider = currentRole === "PROVIDER";
+  const participantName = participant?.name || "User";
 
   return (
     <aside className="chat-info-sidebar">
@@ -38,32 +39,32 @@ export const ChatInfoDrawer: React.FC<ChatInfoDrawerProps> = ({
         <div className="chat-info-provider-card">
           <img
             src={
-              participant.avatar ||
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(participant.name)}&background=FF7900&color=fff`
+              participant?.avatar ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(participantName)}&background=FF7900&color=fff`
             }
-            alt={participant.name}
+            alt={participantName}
             className="chat-info-avatar"
           />
-          <h4 className="chat-info-provider-name">{participant.name}</h4>
+          <h4 className="chat-info-provider-name">{participantName}</h4>
           <p className="chat-info-business-title">
             {isProvider
               ? "Verified Client"
-              : participant.businessName || "Verified Professional"}
+              : participant?.businessName || "Verified Professional"}
           </p>
 
           <div className="chat-info-stats-row">
             <div className="chat-info-stat-box">
               <span className="chat-info-stat-value">
-                <i className="fas fa-star" /> {participant.rating || "5.0"}
+                <i className="fas fa-star" /> {participant?.rating != null && !isNaN(Number(participant.rating)) ? Number(participant.rating).toFixed(1) : "5.0"}
               </span>
               <span className="chat-info-stat-label">
-                {participant.reviewsCount || 0} reviews
+                {participant?.reviewsCount || 0} reviews
               </span>
             </div>
             <div className="chat-info-stat-divider" />
             <div className="chat-info-stat-box">
               <span className="chat-info-stat-value">
-                {participant.isVerified ? (
+                {participant?.isVerified ? (
                   <span className="text-success font-semibold">
                     <i className="fas fa-shield-alt" /> Verified
                   </span>

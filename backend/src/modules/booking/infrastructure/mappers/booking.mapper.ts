@@ -104,6 +104,7 @@ export class BookingMapper {
             serviceRequestTitle?: string | null;
             providerBusinessName?: string | null;
             providerName?: string | null;
+            providerUserId?: string | null;
             customerName?: string | null;
         }
     ): BookingResponseDto {
@@ -134,6 +135,7 @@ export class BookingMapper {
             providerBusinessName: details?.providerBusinessName ?? extra?.providerBusinessName ?? null,
             providerName: details?.providerName ?? extra?.providerName ?? null,
             providerPhone: details?.providerPhone ?? null,
+            providerUserId: details?.providerUserId ?? extra?.providerUserId ?? null,
             customerName: details?.customerName ?? extra?.customerName ?? null,
             customerPhone: details?.customerPhone ?? null
         };

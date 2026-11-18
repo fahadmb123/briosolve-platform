@@ -81,7 +81,7 @@ export default function CustomerChat() {
             if (curr && mapped.some((m) => m.id === curr)) return curr;
             if (queryRecipientId) {
               const matched = mapped.find(
-                (m) => m.participant.id === queryRecipientId
+                (m) => String(m.participant?.id || "").trim() === queryRecipientId.trim()
               );
               if (matched) return matched.id;
               return queryRecipientId;
@@ -110,12 +110,12 @@ export default function CustomerChat() {
 
     if (queryRecipientId) {
       const matched = conversations.find(
-        (m) => m.participant.id === queryRecipientId
+        (m) => String(m.participant?.id || "").trim() === queryRecipientId.trim()
       );
       if (matched) {
         setSelectedId(matched.id);
         initialSelectionResolvedRef.current = true;
-      } else if (conversations.length > 0) {
+      } else {
         setSelectedId(queryRecipientId);
         initialSelectionResolvedRef.current = true;
       }
@@ -137,12 +137,14 @@ export default function CustomerChat() {
   const selectedConversation = useMemo(() => {
     const existing = conversations.find((c) => c.id === selectedId);
     if (existing) {
-      const pId = String(existing.participant.id).trim();
-      const isOnline = presenceMap[pId] ?? existing.participant.isOnline ?? false;
+      const pId = String(existing?.participant?.id || "").trim();
+      const isOnline = pId ? (presenceMap[pId] ?? existing?.participant?.isOnline ?? false) : false;
       return {
         ...existing,
         participant: {
           ...existing.participant,
+          id: pId || existing.id,
+          name: existing?.participant?.name || "Provider",
           isOnline,
         },
       };
@@ -337,13 +339,13 @@ export default function CustomerChat() {
       });
       setConversations((prev) => {
         const target = prev.find(
-          (c) => String(c.participant.id).trim() === normalizedUserId
+          (c) => String(c?.participant?.id || "").trim() === normalizedUserId
         );
-        if (!target || target.participant.isOnline === isOnline) {
+        if (!target || target.participant?.isOnline === isOnline) {
           return prev;
         }
         return prev.map((c) =>
-          String(c.participant.id).trim() === normalizedUserId
+          String(c?.participant?.id || "").trim() === normalizedUserId
             ? { ...c, participant: { ...c.participant, isOnline } }
             : c
         );
@@ -363,13 +365,13 @@ export default function CustomerChat() {
       });
       setConversations((prev) => {
         const target = prev.find(
-          (c) => String(c.participant.id).trim() === targetId
+          (c) => String(c?.participant?.id || "").trim() === targetId
         );
-        if (!target || target.participant.isOnline === isOnline) {
+        if (!target || target.participant?.isOnline === isOnline) {
           return prev;
         }
         return prev.map((c) =>
-          String(c.participant.id).trim() === targetId
+          String(c?.participant?.id || "").trim() === targetId
             ? { ...c, participant: { ...c.participant, isOnline } }
             : c
         );
@@ -427,16 +429,16 @@ export default function CustomerChat() {
 
   const filteredConversations = useMemo(() => {
     return conversations.filter((conv) => {
-      if (filter === "UNREAD" && conv.unreadCount === 0) return false;
+      if (filter === "UNREAD" && (conv.unreadCount || 0) === 0) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const nameMatch = conv.participant.name.toLowerCase().includes(q);
-        const bizMatch = (conv.participant.businessName || "")
+        const nameMatch = (conv.participant?.name || "").toLowerCase().includes(q);
+        const bizMatch = (conv.participant?.businessName || "")
           .toLowerCase()
           .includes(q);
-        const requestMatch = conv.linkedRequest.title.toLowerCase().includes(q);
-        const msgMatch = conv.lastMessage.text.toLowerCase().includes(q);
+        const requestMatch = (conv.linkedRequest?.title || "").toLowerCase().includes(q);
+        const msgMatch = (conv.lastMessage?.text || "").toLowerCase().includes(q);
         return nameMatch || bizMatch || requestMatch || msgMatch;
       }
       return true;

@@ -23,6 +23,7 @@ export interface BookingResponseDto {
     providerBusinessName?: string | null;
     providerName?: string | null;
     providerPhone?: string | null;
+    providerUserId?: string | null;
     customerName?: string | null;
     customerPhone?: string | null;
 }

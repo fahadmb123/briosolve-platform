@@ -81,21 +81,34 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
 
   const handleChat = (booking: BookingItem) => {
     if (isProvider) {
+      if (!booking.customerId) {
+        toast.error("Customer details are unavailable for this booking");
+        return;
+      }
       navigate(`/provider/messages?recipientId=${booking.customerId}`, {
         state: {
           recipientId: booking.customerId,
           recipientName: booking.customerName || "Customer",
           requestId: booking.serviceRequestId,
-          requestTitle: booking.serviceRequestTitle || "Service Job"
+          requestTitle: booking.serviceRequestTitle || "Service Job",
+          categoryName: booking.categoryName || undefined,
+          location: booking.addressText || undefined
         }
       });
     } else {
-      navigate(`/messages?recipientId=${booking.providerId}`, {
+      const targetProviderId = booking.providerUserId || booking.providerId;
+      if (!targetProviderId) {
+        toast.error("Provider details are unavailable for this booking");
+        return;
+      }
+      navigate(`/messages?recipientId=${targetProviderId}`, {
         state: {
-          recipientId: booking.providerId,
+          recipientId: targetProviderId,
           recipientName: booking.providerBusinessName || booking.providerName || "Service Provider",
           requestId: booking.serviceRequestId,
-          requestTitle: booking.serviceRequestTitle || "Service Booking"
+          requestTitle: booking.serviceRequestTitle || "Service Booking",
+          categoryName: booking.categoryName || undefined,
+          location: booking.addressText || undefined
         }
       });
     }

@@ -13,6 +13,7 @@ export interface BookingDetails {
     providerBusinessName: string | null;
     providerName: string | null;
     providerPhone?: string | null;
+    providerUserId?: string | null;
     customerName: string | null;
     customerPhone?: string | null;
 }

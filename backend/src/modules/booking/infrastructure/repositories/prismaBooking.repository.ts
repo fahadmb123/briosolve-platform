@@ -204,6 +204,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                 let providerBusinessName: string | null = null;
                 let providerName: string | null = null;
                 let providerPhone: string | null = null;
+                let providerUserId: string | null = null;
                 let customerName: string | null = null;
                 let customerPhone: string | null = null;
 
@@ -227,6 +228,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                     .first();
                 if (providerProfile) {
                     providerBusinessName = providerProfile.business_name;
+                    providerUserId = providerProfile.user_id;
                     const pUser = await db.orm.public.users
                         .where({ id: providerProfile.user_id as never })
                         .first();
@@ -252,6 +254,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                     providerBusinessName,
                     providerName,
                     providerPhone,
+                    providerUserId,
                     customerName,
                     customerPhone
                 };
