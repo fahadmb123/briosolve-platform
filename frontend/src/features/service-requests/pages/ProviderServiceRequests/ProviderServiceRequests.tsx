@@ -105,7 +105,8 @@ export default function ProviderServiceRequests() {
       const customEvent = e as CustomEvent;
       if (
         customEvent.detail?.title_code === "SERVICE_REQUEST_CANCELLED" ||
-        customEvent.detail?.title_code === "NEW_SERVICE_REQUEST"
+        customEvent.detail?.title_code === "NEW_SERVICE_REQUEST" ||
+        customEvent.detail?.title_code === "SERVICE_REQUEST_UPDATED"
       ) {
         setPage(1);
         fetchRequests(1, true);

@@ -62,10 +62,19 @@ export const getProviderServiceRequestsUseCase = new GetProviderServiceRequestsU
     providerRepository
 );
 
-export const updateServiceRequestUseCase = new UpdateServiceRequestUseCase(
-    serviceRequestRepository,
-    imageUploadService
-);
+export function createUpdateServiceRequestUseCase(
+    createBulkNotificationUseCase: IUseCase<CreateBulkNotificationRequestDto, NotificationResponseDto[]>
+): UpdateServiceRequestUseCase {
+    return new UpdateServiceRequestUseCase(
+        serviceRequestRepository,
+        imageUploadService,
+        createBulkNotificationUseCase,
+        serviceRequestProviderRepository,
+        userRepository,
+        addressRepository,
+        providerSelectionService
+    );
+}
 
 export const getAdminServiceRequestsUseCase = new GetAdminServiceRequestsUseCase(
     serviceRequestRepository
