@@ -13,6 +13,8 @@ interface PaymentSuccessLocationState {
   providerBusinessName?: string;
   serviceTitle?: string;
   requestItem?: CustomerServiceRequestItem | null;
+  bookingId?: string;
+  bookingNumber?: string;
 }
 
 export const PaymentSuccessPage: React.FC = () => {
@@ -67,6 +69,15 @@ export const PaymentSuccessPage: React.FC = () => {
             <div className="paysuccess-detail-row">
               <span className="paysuccess-detail-label">Service</span>
               <span className="paysuccess-detail-value">{state.serviceTitle}</span>
+            </div>
+          )}
+
+          {state.bookingNumber && (
+            <div className="paysuccess-detail-row">
+              <span className="paysuccess-detail-label">Booking Reference</span>
+              <span className="paysuccess-detail-value mono" style={{ color: "#ea580c", fontWeight: 700 }}>
+                {state.bookingNumber}
+              </span>
             </div>
           )}
 

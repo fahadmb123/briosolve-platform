@@ -203,11 +203,13 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                     razorpaySignature: paymentResponse.razorpay_signature
                   },
                   {
-                    onSuccess: () => {
+                    onSuccess: (res: any) => {
                       setConfirmAcceptQuote(null);
                       setIsProcessingPayment(false);
                       refetch();
                       onQuotationAccepted?.();
+
+                      const bookingData = res?.data;
 
                       setRedirectOverlay({
                         show: true,
@@ -231,7 +233,9 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                               serviceRequestId: requestId,
                               providerName: quoteAccepted.provider.name,
                               providerBusinessName: quoteAccepted.provider.businessName,
-                              requestItem: requestItem || null
+                              requestItem: requestItem || null,
+                              bookingId: bookingData?.bookingId,
+                              bookingNumber: bookingData?.bookingNumber
                             }
                           });
                         } else {
