@@ -4,6 +4,7 @@ import { NotificationResponseDto } from "../../../notification/application/dtos/
 import { quotationRepository } from "../../../quotation-submission/infrastructure/composition/repositories";
 import { serviceRequestRepository } from "../../../service-request/infrastructure/composition/repositories";
 import { bookingRepository } from "../../../booking/infrastructure/composition/repositories";
+import { userRepository, providerRepository } from "../../../user-management/infrastructure/composition/repositories";
 import { razorpayService } from "./services";
 import { CreatePaymentOrderUseCase } from "../../application/use-cases/createPaymentOrder.useCase";
 import { VerifyPaymentUseCase } from "../../application/use-cases/verifyPayment.useCase";
@@ -12,6 +13,7 @@ export function createCreatePaymentOrderUseCase(): CreatePaymentOrderUseCase {
     return new CreatePaymentOrderUseCase(
         quotationRepository,
         serviceRequestRepository,
+        userRepository,
         razorpayService
     );
 }
@@ -23,6 +25,7 @@ export function createVerifyPaymentUseCase(
         quotationRepository,
         serviceRequestRepository,
         bookingRepository,
+        providerRepository,
         razorpayService,
         createNotificationUseCase
     );

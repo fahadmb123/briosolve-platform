@@ -1,12 +1,60 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Booking, BookingStatus } from "../../domain/entities/booking.entity";
-import { CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
+import { BookingDetails } from "../../domain/repositories/IBookingRepository";
+import { CreateBookingInputDto, CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
 import { BookingResponseDto } from "../../application/dtos/response/booking-response.dto";
 import { CustomerBookingsResponseDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
 
 export class BookingMapper {
+    static toCreateRepoDto(data: {
+        serviceRequestId: string;
+        quotationId: string;
+        customerId: string;
+        providerId: string;
+        totalAmount?: number;
+        amount?: number;
+        platformFee?: number;
+        scheduledDate?: Date | string | null;
+        scheduledTime?: string | null;
+        paymentId?: string | null;
+        orderId?: string | null;
+        notes?: string | null;
+    }): CreateBookingRepoDto {
+        const baseAmount = data.amount ?? (data.totalAmount ? Math.round(data.totalAmount / 1.1) : 0);
+        const platformFee = data.platformFee ?? Math.round(baseAmount * 0.1);
+        const totalAmount = data.totalAmount ?? (baseAmount + platformFee);
+
+        const dateSuffix = Date.now().toString(36).toUpperCase();
+        const randomPart = Math.floor(1000 + Math.random() * 9000);
+        const bookingNumber = `BK-${dateSuffix}-${randomPart}`;
+
+        const scheduledDateObj = data.scheduledDate
+            ? (data.scheduledDate instanceof Date ? data.scheduledDate : new Date(data.scheduledDate))
+            : null;
+
+        return {
+            bookingNumber,
+            serviceRequestId: data.serviceRequestId,
+            quotationId: data.quotationId,
+            customerId: data.customerId,
+            providerId: data.providerId,
+            totalAmount,
+            platformFee,
+            status: "CONFIRMED",
+            scheduledDate: scheduledDateObj,
+            scheduledTime: data.scheduledTime ?? null,
+            paymentId: data.paymentId ?? null,
+            orderId: data.orderId ?? null,
+            notes: data.notes ?? null
+        };
+    }
+
+    static fromInputToCreateRepoDto(input: CreateBookingInputDto): CreateBookingRepoDto {
+        return this.toCreateRepoDto(input);
+    }
+
     static toDomain(record: any): Booking {
         const parseDate = (val: any): Date => {
             if (!val) return new Date();
@@ -51,7 +99,7 @@ export class BookingMapper {
     }
 
     static toResponseDto(
-        entity: Booking,
+        source: BookingDetails | Booking,
         extra?: {
             serviceRequestTitle?: string | null;
             providerBusinessName?: string | null;
@@ -59,6 +107,10 @@ export class BookingMapper {
             customerName?: string | null;
         }
     ): BookingResponseDto {
+        const isDetails = "booking" in source;
+        const entity: Booking = isDetails ? source.booking : source;
+        const details = isDetails ? source : null;
+
         return {
             id: entity.id,
             bookingNumber: entity.booking_number,
@@ -76,23 +128,23 @@ export class BookingMapper {
             notes: entity.notes,
             createdAt: entity.created_at.toISOString(),
             updatedAt: entity.updated_at.toISOString(),
-            serviceRequestTitle: extra?.serviceRequestTitle ?? null,
-            providerBusinessName: extra?.providerBusinessName ?? null,
-            providerName: extra?.providerName ?? null,
-            customerName: extra?.customerName ?? null
+            serviceRequestTitle: details?.serviceRequestTitle ?? extra?.serviceRequestTitle ?? null,
+            providerBusinessName: details?.providerBusinessName ?? extra?.providerBusinessName ?? null,
+            providerName: details?.providerName ?? extra?.providerName ?? null,
+            customerName: details?.customerName ?? extra?.customerName ?? null
         };
     }
 
-    static toCustomerBookingsResponseDto(items: BookingResponseDto[]): CustomerBookingsResponseDto {
+    static toCustomerBookingsResponseDto(items: BookingDetails[]): CustomerBookingsResponseDto {
         return {
-            bookings: items,
+            bookings: items.map((item) => this.toResponseDto(item)),
             total: items.length
         };
     }
 
-    static toProviderBookingsResponseDto(items: BookingResponseDto[]): ProviderBookingsResponseDto {
+    static toProviderBookingsResponseDto(items: BookingDetails[]): ProviderBookingsResponseDto {
         return {
-            bookings: items,
+            bookings: items.map((item) => this.toResponseDto(item)),
             total: items.length
         };
     }

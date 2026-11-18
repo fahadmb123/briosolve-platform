@@ -3,19 +3,21 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { IBookingRepository } from "../../../booking/domain/repositories/IBookingRepository";
+import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { IRazorpayService } from "../../domain/services/IRazorpayService";
 import { VerifyPaymentInputDto } from "../dtos/request/verify-payment.dto";
 import { VerifyPaymentResponseDto } from "../dtos/response/verify-payment-response.dto";
 import { PaymentMapper } from "../../infrastructure/mappers/payment.mapper";
+import { BookingMapper } from "../../../booking/infrastructure/mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
-import { db } from "../../../../shared/database/client";
 
 export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, VerifyPaymentResponseDto> {
     constructor(
         private readonly _quotationRepository: IQuotationRepository,
         private readonly _serviceRequestRepository: IServiceRequestRepository,
         private readonly _bookingRepository: IBookingRepository,
+        private readonly _providerRepository: IProviderRepository,
         private readonly _razorpayService: IRazorpayService,
         private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
@@ -60,37 +62,25 @@ export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, Ver
 
         await this._serviceRequestRepository.updateStatus(serviceRequest.id, "ACCEPTED");
 
-        const quoteAmount = quotation.amount;
-        const platformFee = Math.round(quoteAmount * 0.1);
-        const totalAmount = Math.round(quoteAmount * 1.1);
-
         let booking = await this._bookingRepository.findByQuotationId(quotation.id);
         if (!booking) {
-            const dateSuffix = Date.now().toString(36).toUpperCase();
-            const randomPart = Math.floor(1000 + Math.random() * 9000);
-            const bookingNumber = `BK-${dateSuffix}-${randomPart}`;
-
-            booking = await this._bookingRepository.create({
-                bookingNumber,
+            const createBookingDto = BookingMapper.toCreateRepoDto({
                 serviceRequestId: serviceRequest.id,
                 quotationId: quotation.id,
                 customerId: input.customerId,
                 providerId: quotation.provider_id,
-                totalAmount,
-                platformFee,
-                status: "CONFIRMED",
-                scheduledDate: quotation.valid_until_date || serviceRequest.specific_date || null,
-                scheduledTime: quotation.available_date_time || null,
+                amount: quotation.amount,
+                scheduledDate: quotation.valid_until_date || serviceRequest.specific_date,
+                scheduledTime: quotation.available_date_time,
                 paymentId: input.razorpayPaymentId,
                 orderId: input.razorpayOrderId,
                 notes: quotation.work_description
             });
+            booking = await this._bookingRepository.create(createBookingDto);
         }
 
         if (this._createNotificationUseCase) {
-            const providerProfile = await db.orm.public.provider_profiles
-                .where({ id: quotation.provider_id as never })
-                .first();
+            const providerProfile = await this._providerRepository.findById(quotation.provider_id);
 
             if (providerProfile) {
                 await this._createNotificationUseCase.execute({
@@ -98,7 +88,7 @@ export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, Ver
                     type: "BOOKING_CREATED",
                     title: "New Booking Confirmed!",
                     title_code: "BOOKING_CREATED",
-                    message: `Customer payment of ₹${totalAmount} is secured in escrow. Booking #${booking?.booking_number || ""} confirmed for "${serviceRequest.title}".`
+                    message: `Customer payment is secured in escrow. Booking #${booking?.booking_number || ""} confirmed for "${serviceRequest.title}".`
                 }).catch(() => null);
             }
 
@@ -111,9 +101,7 @@ export class VerifyPaymentUseCase implements IUseCase<VerifyPaymentInputDto, Ver
             }).catch(() => null);
 
             for (const other of otherQuotes) {
-                const otherProfile = await db.orm.public.provider_profiles
-                    .where({ id: other.provider_id as never })
-                    .first();
+                const otherProfile = await this._providerRepository.findById(other.provider_id);
 
                 if (otherProfile) {
                     await this._createNotificationUseCase.execute({

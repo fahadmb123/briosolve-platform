@@ -2,17 +2,18 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IQuotationRepository } from "../../domain/repositories/IQuotationRepository";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
+import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { RejectQuotationInputDto } from "../dtos/request/reject-quotation.dto";
 import { RejectQuotationResponseDto } from "../dtos/response/reject-quotation-response.dto";
 import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
-import { db } from "../../../../shared/database/client";
 
 export class RejectQuotationUseCase implements IUseCase<RejectQuotationInputDto, RejectQuotationResponseDto> {
     constructor(
         private readonly _quotationRepository: IQuotationRepository,
         private readonly _serviceRequestRepository: IServiceRequestRepository,
+        private readonly _providerRepository: IProviderRepository,
         private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
 
@@ -40,9 +41,7 @@ export class RejectQuotationUseCase implements IUseCase<RejectQuotationInputDto,
         });
 
         if (this._createNotificationUseCase) {
-            const providerProfile = await db.orm.public.provider_profiles
-                .where({ id: quotation.provider_id as never })
-                .first();
+            const providerProfile = await this._providerRepository.findById(quotation.provider_id);
 
             if (providerProfile) {
                 await this._createNotificationUseCase.execute({

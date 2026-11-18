@@ -2,6 +2,7 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { bookingRepository } from "./repositories";
+import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
 import { CreateBookingUseCase } from "../../application/use-cases/createBooking.useCase";
 import { GetBookingByIdUseCase } from "../../application/use-cases/getBookingById.useCase";
 import { GetCustomerBookingsUseCase } from "../../application/use-cases/getCustomerBookings.useCase";
@@ -11,11 +12,11 @@ import { UpdateBookingStatusUseCase } from "../../application/use-cases/updateBo
 export function createCreateBookingUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
 ): CreateBookingUseCase {
-    return new CreateBookingUseCase(bookingRepository, createNotificationUseCase);
+    return new CreateBookingUseCase(bookingRepository, providerRepository, createNotificationUseCase);
 }
 
 export function createGetBookingByIdUseCase(): GetBookingByIdUseCase {
-    return new GetBookingByIdUseCase(bookingRepository);
+    return new GetBookingByIdUseCase(bookingRepository, providerRepository);
 }
 
 export function createGetCustomerBookingsUseCase(): GetCustomerBookingsUseCase {
@@ -23,11 +24,11 @@ export function createGetCustomerBookingsUseCase(): GetCustomerBookingsUseCase {
 }
 
 export function createGetProviderBookingsUseCase(): GetProviderBookingsUseCase {
-    return new GetProviderBookingsUseCase(bookingRepository);
+    return new GetProviderBookingsUseCase(bookingRepository, providerRepository);
 }
 
 export function createUpdateBookingStatusUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
 ): UpdateBookingStatusUseCase {
-    return new UpdateBookingStatusUseCase(bookingRepository, createNotificationUseCase);
+    return new UpdateBookingStatusUseCase(bookingRepository, providerRepository, createNotificationUseCase);
 }

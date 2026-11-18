@@ -2,16 +2,17 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
+import { IUserRepository } from "../../../user-management/domain/repositories/IUserRepository";
 import { IRazorpayService } from "../../domain/services/IRazorpayService";
 import { CreatePaymentOrderInputDto } from "../dtos/request/create-payment-order.dto";
 import { CreatePaymentOrderResponseDto } from "../dtos/response/create-payment-order-response.dto";
 import { PaymentMapper } from "../../infrastructure/mappers/payment.mapper";
-import { db } from "../../../../shared/database/client";
 
 export class CreatePaymentOrderUseCase implements IUseCase<CreatePaymentOrderInputDto, CreatePaymentOrderResponseDto> {
     constructor(
         private readonly _quotationRepository: IQuotationRepository,
         private readonly _serviceRequestRepository: IServiceRequestRepository,
+        private readonly _userRepository: IUserRepository,
         private readonly _razorpayService: IRazorpayService
     ) {}
 
@@ -43,9 +44,7 @@ export class CreatePaymentOrderUseCase implements IUseCase<CreatePaymentOrderInp
         const totalAmount = baseAmount + platformFee;
         const amountInPaise = Math.round(totalAmount * 100);
 
-        const customerUser = await db.orm.public.users
-            .where({ id: input.customerId as never })
-            .first();
+        const customerUser = await this._userRepository.findById(input.customerId);
 
         const order = await this._razorpayService.createOrder({
             amountInPaise,
@@ -60,10 +59,12 @@ export class CreatePaymentOrderUseCase implements IUseCase<CreatePaymentOrderInp
             }
         });
 
+        const keyId = this._razorpayService.getKeyId();
+
         return PaymentMapper.toCreatePaymentOrderResponseDto(
             order,
             { totalAmount, baseAmount, platformFee },
-            this._razorpayService.getKeyId(),
+            keyId,
             quotation.id,
             serviceRequest.id,
             customerUser

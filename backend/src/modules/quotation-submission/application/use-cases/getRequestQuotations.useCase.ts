@@ -2,15 +2,18 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IQuotationRepository } from "../../domain/repositories/IQuotationRepository";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
+import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
+import { IUserRepository } from "../../../user-management/domain/repositories/IUserRepository";
 import { GetRequestQuotationsInputDto } from "../dtos/request/get-request-quotations.dto";
 import { RequestQuotationsResponseDto, RequestQuotationItemDto } from "../dtos/response/request-quotations-response.dto";
 import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
-import { db } from "../../../../shared/database/client";
 
 export class GetRequestQuotationsUseCase implements IUseCase<GetRequestQuotationsInputDto, RequestQuotationsResponseDto> {
     constructor(
         private readonly _quotationRepository: IQuotationRepository,
-        private readonly _serviceRequestRepository: IServiceRequestRepository
+        private readonly _serviceRequestRepository: IServiceRequestRepository,
+        private readonly _providerRepository: IProviderRepository,
+        private readonly _userRepository: IUserRepository
     ) {}
 
     async execute(input: GetRequestQuotationsInputDto): Promise<RequestQuotationsResponseDto> {
@@ -32,15 +35,11 @@ export class GetRequestQuotationsUseCase implements IUseCase<GetRequestQuotation
                     acceptedQuotationId = q.id;
                 }
 
-                const providerProfile = await db.orm.public.provider_profiles
-                    .where({ id: q.provider_id as never })
-                    .first();
+                const providerProfile = await this._providerRepository.findById(q.provider_id);
 
                 let providerUser: any = null;
                 if (providerProfile) {
-                    providerUser = await db.orm.public.users
-                        .where({ id: providerProfile.user_id as never })
-                        .first();
+                    providerUser = await this._userRepository.findById(providerProfile.user_id);
                 }
 
                 return QuotationMapper.toRequestQuotationItemDto(q, providerProfile, providerUser);

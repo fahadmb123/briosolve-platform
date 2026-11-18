@@ -3,7 +3,7 @@ import { CreateNotificationRequestDto } from "../../../notification/application/
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { quotationRepository } from "./repositories";
 import { serviceRequestRepository, serviceRequestProviderRepository } from "../../../service-request/infrastructure/composition/repositories";
-import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
+import { providerRepository, userRepository } from "../../../user-management/infrastructure/composition/repositories";
 import { SubmitQuotationUseCase } from "../../application/use-cases/submitQuotation.useCase";
 import { GetProviderQuotationsUseCase } from "../../application/use-cases/getProviderQuotations.useCase";
 import { UpdateQuotationUseCase } from "../../application/use-cases/updateQuotation.useCase";
@@ -45,7 +45,9 @@ export function createUpdateQuotationUseCase(
 export function createGetRequestQuotationsUseCase(): GetRequestQuotationsUseCase {
     return new GetRequestQuotationsUseCase(
         quotationRepository,
-        serviceRequestRepository
+        serviceRequestRepository,
+        providerRepository,
+        userRepository
     );
 }
 
@@ -55,6 +57,7 @@ export function createAcceptQuotationUseCase(
     return new AcceptQuotationUseCase(
         quotationRepository,
         serviceRequestRepository,
+        providerRepository,
         createNotificationUseCase
     );
 }
@@ -65,6 +68,7 @@ export function createRejectQuotationUseCase(
     return new RejectQuotationUseCase(
         quotationRepository,
         serviceRequestRepository,
+        providerRepository,
         createNotificationUseCase
     );
 }
