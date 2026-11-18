@@ -363,9 +363,14 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
 
         {quotations.length === 0 ? (
           <div className="reqquotes-empty">
-            <div className="reqquotes-empty-icon">
-              <i className="fas fa-paper-plane"></i>
-            </div>
+            <img
+              src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+              alt="No quotations found"
+              className="reqquotes-empty-img"
+              onError={(e) => {
+                e.currentTarget.src = "/images/no-data.png";
+              }}
+            />
             <h4 className="reqquotes-empty-title">Awaiting Provider Quotations</h4>
             <p className="reqquotes-empty-subtitle">
               Verified service providers in your area have been notified and are reviewing your service request.

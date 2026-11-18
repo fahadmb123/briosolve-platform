@@ -261,6 +261,16 @@
   margin-top: 8px;
 }
 
+.bk-empty-img {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  max-height: 160px;
+  object-fit: contain;
+  margin-bottom: 1.25rem;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.08));
+}
+
 .bk-empty-icon-wrap {
   width: 64px;
   height: 64px;

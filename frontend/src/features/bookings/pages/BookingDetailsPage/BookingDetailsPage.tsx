@@ -133,7 +133,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     );
   }
 
-  if (error && !booking) {
+  if ((error && !booking) || (!booking && !isLoading)) {
     return (
       <div className={`bkdet-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
         <button type="button" className="bkdet-back-link" onClick={handleBack}>
@@ -141,8 +141,15 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           <span>Back to Bookings</span>
         </button>
         <div className="bkdet-error-box">
-          <i className="fas fa-exclamation-triangle bkdet-error-icon" />
-          <h3 className="bkdet-error-title">Failed to load booking</h3>
+          <img
+            src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+            alt="No booking found"
+            className="bkdet-empty-img"
+            onError={(e) => {
+              e.currentTarget.src = "/images/no-data.png";
+            }}
+          />
+          <h3 className="bkdet-error-title">No Booking Record Found</h3>
           <p className="bkdet-error-desc">
             We could not find or retrieve this booking record.
           </p>

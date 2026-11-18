@@ -266,9 +266,14 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
           </div>
         ) : bookings.length === 0 ? (
           <div className="bk-empty-card">
-            <div className="bk-empty-icon-wrap">
-              <i className="fas fa-calendar-check"></i>
-            </div>
+            <img
+              src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+              alt="No bookings found"
+              className="bk-empty-img"
+              onError={(e) => {
+                e.currentTarget.src = "/images/no-data.png";
+              }}
+            />
             <h3 className="bk-empty-title">
               {searchQuery
                 ? "No matching bookings found"
