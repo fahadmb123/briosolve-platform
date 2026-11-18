@@ -18,24 +18,28 @@ export class PrismaBookingRepository implements IBookingRepository {
     }
 
     async findDetailsById(id: string): Promise<BookingDetails | null> {
-        const record = await db.orm.public.bookings
-            .where({ id: id as never })
-            .first();
+        try {
+            const record = await db.orm.public.bookings
+                .where({ id: id as never })
+                .first();
 
-        if (!record) return null;
-        const booking = BookingMapper.toDomain(record);
+            if (!record) return null;
+            const booking = BookingMapper.toDomain(record);
 
-        const details = await this.populateDetails([booking]);
-        return details[0] || {
-            booking,
-            serviceRequestTitle: null,
-            providerBusinessName: null,
-            providerName: null,
-            customerName: null,
-            quotationType: null,
-            requiresInspection: false,
-            statusHistory: undefined
-        };
+            const details = await this.populateDetails([booking]);
+            return details[0] || {
+                booking,
+                serviceRequestTitle: null,
+                providerBusinessName: null,
+                providerName: null,
+                customerName: null,
+                quotationType: null,
+                requiresInspection: false,
+                statusHistory: undefined
+            };
+        } catch {
+            return null;
+        }
     }
 
     async findByBookingNumber(bookingNumber: string): Promise<Booking | null> {
