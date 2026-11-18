@@ -261,8 +261,8 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
             <div className="bkmodal-meta-grid">
               <div className="bkmodal-meta-item">
-                <span className="bkmodal-meta-k">Payment ID</span>
-                <span className="bkmodal-meta-v mono">{booking.paymentId || "rzp_verified"}</span>
+                <span className="bkmodal-meta-k">Payment Security</span>
+                <span className="bkmodal-meta-v">100% Escrow Secured</span>
               </div>
               <div className="bkmodal-meta-item">
                 <span className="bkmodal-meta-k">Booked On</span>

@@ -23,7 +23,6 @@ export const PaymentSuccessPage: React.FC = () => {
   const state = (location.state as PaymentSuccessLocationState) || {};
 
   const amount = state.amount || 0;
-  const paymentId = state.paymentId || "rzp_simulated_success";
   const serviceRequestId = state.serviceRequestId || "";
   const providerDisplay = state.providerBusinessName || state.providerName || "Service Provider";
 
@@ -82,8 +81,10 @@ export const PaymentSuccessPage: React.FC = () => {
           )}
 
           <div className="paysuccess-detail-row">
-            <span className="paysuccess-detail-label">Payment ID</span>
-            <span className="paysuccess-detail-value mono">{paymentId}</span>
+            <span className="paysuccess-detail-label">Payment Security</span>
+            <span className="paysuccess-detail-value">
+              <i className="fas fa-shield-alt" style={{ marginRight: "4px", color: "#16a34a" }}></i> 100% Escrow Protected
+            </span>
           </div>
 
           <div className="paysuccess-detail-row">

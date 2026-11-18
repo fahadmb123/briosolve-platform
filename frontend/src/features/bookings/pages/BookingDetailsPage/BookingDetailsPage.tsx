@@ -684,9 +684,9 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </div>
 
               <div className="bkdet-meta-box">
-                <div className="bkdet-meta-box-label">Quotation Ref</div>
-                <div className="bkdet-meta-box-value" style={{ fontFamily: "monospace" }}>
-                  {booking.quotationId.slice(0, 8)}...
+                <div className="bkdet-meta-box-label">Service Warranty</div>
+                <div className="bkdet-meta-box-value" style={{ color: "#16a34a", fontWeight: 600 }}>
+                  15-Day Protection Active
                 </div>
               </div>
 
@@ -859,21 +859,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <span>Total Amount</span>
                 <span>{formatCurrency(totalAmount)}</span>
               </div>
-            </div>
-
-            <div className="bkdet-transaction-card">
-              {booking.orderId && (
-                <div className="bkdet-tx-row">
-                  <span className="bkdet-tx-label">Razorpay Order ID</span>
-                  <span className="bkdet-tx-val">{booking.orderId}</span>
-                </div>
-              )}
-              {booking.paymentId && (
-                <div className="bkdet-tx-row">
-                  <span className="bkdet-tx-label">Payment ID</span>
-                  <span className="bkdet-tx-val">{booking.paymentId}</span>
-                </div>
-              )}
             </div>
 
             <div className="bkdet-escrow-badge">
