@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
@@ -51,6 +51,14 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   });
 
   const quotations: RequestQuotationItem[] = responseData?.data?.quotations || [];
+  const activeQuotations = useMemo(
+    () => quotations.filter((q) => q.status === "PENDING" || q.status === "ACCEPTED"),
+    [quotations]
+  );
+  const pastQuotations = useMemo(
+    () => quotations.filter((q) => q.status === "WITHDRAWN" || q.status === "REJECTED" || q.status === "EXPIRED"),
+    [quotations]
+  );
   const acceptedQuoteId = responseData?.data?.acceptedQuotationId;
   const isRequestClosed =
     requestStatus === "CANCELLED" ||
@@ -356,13 +364,17 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
           <span className={`reqquotes-count-badge ${acceptedQuoteId ? "has-accepted" : ""}`}>
             {acceptedQuoteId
               ? "Provider Selected"
-              : quotations.length === 1
-              ? "1 Quote Received"
-              : `${quotations.length} Quotes Received`}
+              : activeQuotations.length === 1
+              ? "1 Active Quote"
+              : activeQuotations.length > 1
+              ? `${activeQuotations.length} Active Quotes`
+              : pastQuotations.length > 0
+              ? "Awaiting New Quotes"
+              : "0 Quotes"}
           </span>
         </div>
 
-        {quotations.length === 0 ? (
+        {activeQuotations.length === 0 ? (
           <div className="reqquotes-empty">
             <img
               src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
@@ -372,10 +384,15 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 e.currentTarget.src = "/images/no-data.png";
               }}
             />
-            <h4 className="reqquotes-empty-title">Awaiting Provider Quotations</h4>
+            <h4 className="reqquotes-empty-title">
+              {pastQuotations.length > 0
+                ? "Awaiting New Provider Quotations"
+                : "Awaiting Provider Quotations"}
+            </h4>
             <p className="reqquotes-empty-subtitle">
-              Verified service providers in your area have been notified and are reviewing your service request.
-              Their estimates and quotations will appear here as soon as they submit.
+              {pastQuotations.length > 0
+                ? "Your service request is active for new quotes. Verified local technicians have been alerted and their new estimates will appear here."
+                : "Verified service providers in your area have been notified and are reviewing your service request. Their estimates and quotations will appear here as soon as they submit."}
             </p>
             <div className="reqquotes-empty-status-tag">
               <span className="reqquotes-pulse-dot" />
@@ -384,18 +401,15 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
           </div>
         ) : (
           <div className="reqquotes-list">
-            {quotations.map((quote) => {
+            {activeQuotations.map((quote) => {
               const typeConfig = getTypeLabel(quote.quotationType);
               const isAccepted = quote.status === "ACCEPTED";
-              const isRejected = quote.status === "REJECTED";
               const isPending = quote.status === "PENDING";
 
               return (
                 <div
                   key={quote.id}
-                  className={`reqquotes-item ${
-                    isAccepted ? "status-accepted" : isRejected ? "status-rejected" : ""
-                  }`}
+                  className={`reqquotes-item ${isAccepted ? "status-accepted" : ""}`}
                 >
                   <div className="reqquotes-item-header">
                     <div className="reqquotes-provider-info">
@@ -540,12 +554,6 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                         </div>
                       )}
 
-                      {isRejected && (
-                        <span className="reqquotes-rejected-badge">
-                          Declined
-                        </span>
-                      )}
-
                       {isPending && (
                         <>
                           <button
@@ -573,6 +581,155 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {pastQuotations.length > 0 && (
+          <div className="reqquotes-past-section">
+            <div className="reqquotes-past-header">
+              <div className="reqquotes-past-title-wrap">
+                <i className="fas fa-history reqquotes-past-icon"></i>
+                <h4 className="reqquotes-past-title">Previous Quotations & Cancelled Bookings</h4>
+              </div>
+              <span className="reqquotes-past-count-badge">
+                {pastQuotations.length} {pastQuotations.length === 1 ? "Past Quote" : "Past Quotes"}
+              </span>
+            </div>
+            <p className="reqquotes-past-desc">
+              These quotations were withdrawn due to booking cancellation, expired, or declined. They cannot be accepted again.
+            </p>
+            <div className="reqquotes-list reqquotes-past-list">
+              {pastQuotations.map((quote) => {
+                const typeConfig = getTypeLabel(quote.quotationType);
+                const isWithdrawn = quote.status === "WITHDRAWN";
+                const isRejected = quote.status === "REJECTED";
+                const isExpired = quote.status === "EXPIRED";
+                const cancelReason = isWithdrawn
+                  ? requestItem?.latest_booking?.cancellation_reason
+                  : null;
+
+                return (
+                  <div
+                    key={quote.id}
+                    className={`reqquotes-item ${
+                      isWithdrawn
+                        ? "status-withdrawn"
+                        : isRejected
+                        ? "status-rejected"
+                        : isExpired
+                        ? "status-expired"
+                        : ""
+                    }`}
+                  >
+                    <div className="reqquotes-item-header">
+                      <div className="reqquotes-provider-info">
+                        {quote.provider.profileImage ? (
+                          <img
+                            src={quote.provider.profileImage}
+                            alt={quote.provider.businessName}
+                            className="reqquotes-avatar"
+                          />
+                        ) : (
+                          <div className="reqquotes-avatar-fallback">
+                            {(quote.provider.businessName || quote.provider.name || "P").charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="reqquotes-provider-details">
+                          <div className="reqquotes-provider-name-row">
+                            <span className="reqquotes-business-name">
+                              {quote.provider.businessName || quote.provider.name}
+                            </span>
+                            <i className="fas fa-check-circle reqquotes-verified-badge" title="Verified Provider"></i>
+                          </div>
+                          <div className="reqquotes-provider-sub">
+                            {quote.provider.experience && (
+                              <span className="reqquotes-sub-pill">{quote.provider.experience}</span>
+                            )}
+                            <span className="reqquotes-sub-date">
+                              Quoted{" "}
+                              {new Date(quote.createdAt).toLocaleDateString("en-IN", {
+                                month: "short",
+                                day: "numeric"
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="reqquotes-price-container">
+                        <span className="reqquotes-price-val">
+                          ₹{quote.amount.toLocaleString("en-IN")}
+                        </span>
+                        <span className={`reqquotes-price-type-pill ${typeConfig.className}`}>
+                          {typeConfig.label}
+                        </span>
+                      </div>
+                    </div>
+
+                    {cancelReason && (
+                      <div className="reqquotes-cancellation-callout">
+                        <i className="fas fa-ban"></i>
+                        <span>Technician Cancellation Reason: <strong>"{cancelReason}"</strong></span>
+                      </div>
+                    )}
+
+                    <div className="reqquotes-work-box">
+                      <div className="reqquotes-work-icon">
+                        <i className="fas fa-quote-left"></i>
+                      </div>
+                      <p className="reqquotes-work-text">{quote.workDescription}</p>
+                    </div>
+
+                    <div className="reqquotes-meta-grid">
+                      {quote.availableDateTime && (
+                        <div className="reqquotes-meta-pill">
+                          <i className="far fa-calendar-alt"></i>
+                          <span>Available: <strong>{quote.availableDateTime}</strong></span>
+                        </div>
+                      )}
+                      {quote.estimatedDuration && (
+                        <div className="reqquotes-meta-pill">
+                          <i className="far fa-clock"></i>
+                          <span>Duration: <strong>{quote.estimatedDuration}</strong></span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="reqquotes-card-footer">
+                      <button
+                        type="button"
+                        className="reqquotes-btn-chat"
+                        onClick={() => handleChat(quote)}
+                      >
+                        <i className="far fa-comment-dots"></i>
+                        <span>Chat with Provider</span>
+                      </button>
+
+                      <div className="reqquotes-actions-group">
+                        {isWithdrawn && (
+                          <div className="reqquotes-withdrawn-badge">
+                            <i className="fas fa-undo-alt"></i>
+                            <span>Withdrawn & Refunded</span>
+                          </div>
+                        )}
+
+                        {isRejected && (
+                          <span className="reqquotes-rejected-badge">
+                            Declined
+                          </span>
+                        )}
+
+                        {isExpired && (
+                          <span className="reqquotes-expired-badge">
+                            Expired
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
