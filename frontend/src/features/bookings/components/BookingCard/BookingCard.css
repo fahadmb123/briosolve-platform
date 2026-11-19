@@ -137,6 +137,26 @@
   color: #ea580c;
 }
 
+.bkcard-cancel-reason-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-top: 6px;
+  max-width: 100%;
+}
+
+.bkcard-cancel-reason-pill strong {
+  font-weight: 600;
+  color: #7f1d1d;
+  font-style: italic;
+}
+
 .bkcard-meta-row {
   display: flex;
   flex-wrap: wrap;

@@ -197,6 +197,28 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     return items;
   }, [booking]);
 
+  const cancellationReason = useMemo<string | null>(() => {
+    if (!booking) return null;
+    if (timelineItems.length > 0) {
+      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED");
+      if (cancelItem?.note && cancelItem.note.trim()) {
+        return cancelItem.note.trim();
+      }
+    }
+    if (booking.notes && booking.notes.trim()) {
+      try {
+        const parsed = JSON.parse(booking.notes);
+        if (Array.isArray(parsed)) {
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+          if (cancelItem?.note && cancelItem.note.trim()) return cancelItem.note.trim();
+        }
+      } catch {
+        return booking.notes.trim();
+      }
+    }
+    return null;
+  }, [booking, timelineItems]);
+
   if (isLoading && !booking) {
     return (
       <div className={`bkdet-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
@@ -519,6 +541,14 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   ? `You cancelled this booking before dispatch. A 100% full refund of ${formatCurrency(advanceAmount)} secured in Escrow has been processed for the customer.`
                   : `This booking was cancelled by the provider before dispatch. Your full payment of ${formatCurrency(advanceAmount)} held safely in Escrow has been 100% refunded.`}
               </p>
+              {cancellationReason && (
+                <div className="bkdet-cb-reason-box">
+                  <span className="bkdet-cb-reason-badge">
+                    <i className="fas fa-comment-alt" /> Reason
+                  </span>
+                  <span className="bkdet-cb-reason-text">"{cancellationReason}"</span>
+                </div>
+              )}
             </div>
           </div>
           {!isProvider && (

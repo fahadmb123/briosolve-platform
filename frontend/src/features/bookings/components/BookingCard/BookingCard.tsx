@@ -32,6 +32,26 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     year: "numeric"
   });
 
+  const cancellationReason = React.useMemo<string | null>(() => {
+    if (booking.status !== "CANCELLED") return null;
+    if (booking.statusHistory && booking.statusHistory.length > 0) {
+      const cancelItem = booking.statusHistory.slice().reverse().find((item) => item.status === "CANCELLED");
+      if (cancelItem?.note && cancelItem.note.trim()) return cancelItem.note.trim();
+    }
+    if (booking.notes && booking.notes.trim()) {
+      try {
+        const parsed = JSON.parse(booking.notes);
+        if (Array.isArray(parsed)) {
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+          if (cancelItem?.note && cancelItem.note.trim()) return cancelItem.note.trim();
+        }
+      } catch {
+        return booking.notes.trim();
+      }
+    }
+    return null;
+  }, [booking]);
+
   const renderStatusBadge = () => {
     switch (booking.status) {
       case "CONFIRMED":
@@ -122,6 +142,13 @@ export const BookingCard: React.FC<BookingCardProps> = ({
         <h3 className="bkcard-title" onClick={() => onViewDetails(booking)}>
           {booking.serviceRequestTitle || "Service Requirement"}
         </h3>
+
+        {booking.status === "CANCELLED" && cancellationReason && (
+          <div className="bkcard-cancel-reason-pill">
+            <i className="fas fa-ban"></i>
+            <span>Cancellation Reason: <strong>"{cancellationReason}"</strong></span>
+          </div>
+        )}
 
         <div className="bkcard-meta-row">
           <div className="bkcard-meta-tag counterparty">
