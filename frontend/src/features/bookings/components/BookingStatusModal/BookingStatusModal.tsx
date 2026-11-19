@@ -40,6 +40,18 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
     !isFixed &&
     (confirmedAmount < advancePaid || isNaN(confirmedAmount) || confirmedAmount <= 0);
 
+  const isCancellation = targetStatus === "CANCELLED";
+  const isInvalidReason = isCancellation && (!notes || !notes.trim());
+
+  const cancellationReasons = [
+    "Vehicle breakdown / Transportation issue",
+    "Personal / Medical emergency",
+    "Schedule conflict / Unexpected delay",
+    "Location unreachable / Safety concern",
+    "Customer requested cancellation",
+    "Other operational reason"
+  ];
+
   const getStatusConfig = () => {
     switch (targetStatus) {
       case "EN_ROUTE":
@@ -96,6 +108,15 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
           confirmText: "Mark Completed",
           confirmIcon: "fas fa-check-double",
           variant: "success"
+        };
+      case "CANCELLED":
+        return {
+          title: "Cancel Booking (Pre-Dispatch)?",
+          description: `Are you sure you want to cancel this booking before travelling? The customer will receive a 100% full refund of the payment secured in Escrow.`,
+          placeholder: "Select a reason above or write specific details...",
+          confirmText: "Yes, Cancel & Refund Customer",
+          confirmIcon: "fas fa-times-circle",
+          variant: "danger"
         };
       default:
         return {
@@ -203,12 +224,42 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
             )
           )}
 
+          {isCancellation && (
+            <div className="bkstatus-cancel-notice">
+              <i className="fas fa-shield-alt" />
+              <div>
+                <strong>Automatic 100% Refund:</strong>
+                <span>
+                  The full payment of ₹{advancePaid.toLocaleString("en-IN")} held in Escrow will be released back to the customer.
+                </span>
+              </div>
+            </div>
+          )}
+
+          {isCancellation && (
+            <div className="bkstatus-reason-chips-wrap">
+              <span className="bkstatus-label">Select Cancellation Reason:</span>
+              <div className="bkstatus-reason-chips">
+                {cancellationReasons.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    className={`bkstatus-chip ${notes === r ? "active" : ""}`}
+                    onClick={() => setNotes(r)}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <label className="bkstatus-label" htmlFor="status-notes">
-            Optional Notes / Updates for Client
+            {isCancellation ? "Cancellation Reason (Required)" : "Optional Notes / Updates for Client"}
           </label>
           <textarea
             id="status-notes"
-            className="bkstatus-textarea"
+            className={`bkstatus-textarea ${isInvalidReason ? "error" : ""}`}
             rows={3}
             placeholder={config.placeholder}
             value={notes}
@@ -229,7 +280,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
             type="button"
             className={`bkstatus-btn-confirm ${config.variant}`}
             onClick={handleConfirm}
-            disabled={isLoading || isInvalidAmount}
+            disabled={isLoading || isInvalidAmount || isInvalidReason}
           >
             {isLoading ? (
               <>

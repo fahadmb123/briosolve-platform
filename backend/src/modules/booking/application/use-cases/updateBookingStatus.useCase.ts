@@ -23,12 +23,22 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
 
         const providerProfile = await this._providerRepository.findProfileByUserId(input.userId);
 
-        const isAuthorized =
-            details.booking.customer_id === input.userId ||
-            (providerProfile && providerProfile.id === details.booking.provider_id);
+        const isProviderAction = Boolean(providerProfile && providerProfile.id === details.booking.provider_id);
+        const isCustomerAction = details.booking.customer_id === input.userId;
+
+        const isAuthorized = isCustomerAction || isProviderAction;
 
         if (!isAuthorized) {
             throw new ApplicationError("FORBIDDEN", "You are not authorized to update this booking", "AUTHENTICATION");
+        }
+
+        if (input.status === "CANCELLED" && isProviderAction) {
+            if (details.booking.status !== "CONFIRMED") {
+                throw new ApplicationError("CANNOT_CANCEL", "Booking can only be cancelled before dispatching or travelling.", "VALIDATION");
+            }
+            if (!input.notes || !input.notes.trim()) {
+                throw new ApplicationError("CANCELLATION_REASON_REQUIRED", "Please provide a reason for cancelling this booking.", "VALIDATION");
+            }
         }
 
         let history: BookingStatusHistoryItem[] = [];
@@ -64,13 +74,19 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
                 status: input.status,
                 note: input.notes.trim(),
                 timestamp: new Date().toISOString(),
-                authorName: providerProfile?.business_name || null
+                authorName: isProviderAction ? (providerProfile?.business_name || "Provider") : "Customer"
             });
         }
 
         const serializedNotes = history.length > 0 ? JSON.stringify(history) : details.booking.notes;
 
-        const nextPaymentStatus = input.paymentStatus || (input.status === "COMPLETED" ? "PAID" : details.booking.payment_status);
+        const nextPaymentStatus = input.paymentStatus || (
+            input.status === "COMPLETED"
+                ? "PAID"
+                : input.status === "CANCELLED"
+                    ? "REFUNDED"
+                    : details.booking.payment_status
+        );
 
         const isFixedQuote = details.quotationType === "FIXED";
         let resolvedTotalAmount: number | undefined = undefined;
@@ -94,7 +110,6 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         const updatedDetails = await this._bookingRepository.findDetailsById(updated.id);
 
         if (this._createNotificationUseCase) {
-            const isCustomerAction = details.booking.customer_id === input.userId;
             let targetRecipientId: string | null = null;
 
             if (isCustomerAction) {
@@ -105,15 +120,30 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             }
 
             if (targetRecipientId) {
-                const message = input.status === "PAYMENT_PENDING"
-                    ? `Booking #${details.booking.booking_number} total confirmed at ₹${(resolvedTotalAmount || details.booking.total_amount).toLocaleString("en-IN")}. Please review and settle the remaining balance.`
-                    : `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" has been marked as ${input.status}.`;
+                let message: string;
+                let title = `Booking ${BookingStatusToTitle[input.status] || input.status}`;
+                let type = "BOOKING_STATUS_UPDATED";
+
+                if (input.status === "CANCELLED") {
+                    type = "BOOKING_CANCELLED";
+                    if (isProviderAction) {
+                        title = "Booking Cancelled by Provider";
+                        message = `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" was cancelled by the provider. Reason: ${input.notes || "Emergency / Schedule conflict"}. A full refund has been initiated to your account.`;
+                    } else {
+                        title = "Booking Cancelled by Customer";
+                        message = `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" was cancelled by the customer.`;
+                    }
+                } else if (input.status === "PAYMENT_PENDING") {
+                    message = `Booking #${details.booking.booking_number} total confirmed at ₹${(resolvedTotalAmount || details.booking.total_amount).toLocaleString("en-IN")}. Please review and settle the remaining balance.`;
+                } else {
+                    message = `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" has been marked as ${input.status}.`;
+                }
 
                 await this._createNotificationUseCase.execute({
                     recipientId: targetRecipientId,
-                    type: "BOOKING_STATUS_UPDATED",
-                    title: `Booking ${BookingStatusToTitle[input.status]}`,
-                    title_code: "BOOKING_STATUS_UPDATED",
+                    type,
+                    title,
+                    title_code: type,
                     message
                 }).catch(() => null);
             }

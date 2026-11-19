@@ -108,7 +108,7 @@ export class BookingMapper {
             record.notes ?? null,
             createdDate,
             updatedDate,
-            (record.payment_status as BookingPaymentStatus) || (record.status === "COMPLETED" ? "PAID" : "ADVANCE_PAID"),
+            (record.payment_status as BookingPaymentStatus) || (record.status === "COMPLETED" ? "PAID" : record.status === "CANCELLED" ? "REFUNDED" : "ADVANCE_PAID"),
             record.advance_amount !== undefined && record.advance_amount !== null && Number(record.advance_amount) > 0
                 ? Number(record.advance_amount)
                 : Number(record.total_amount)

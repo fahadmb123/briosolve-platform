@@ -129,7 +129,9 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                     ? "Total payment confirmed and sent to customer"
                     : newStatus === "COMPLETED"
                       ? "Job marked as Completed"
-                      : "Booking status updated"
+                      : newStatus === "CANCELLED"
+                        ? "Booking cancelled. 100% refund initiated to customer."
+                        : "Booking status updated"
           );
           handleCloseStatusModal();
           refetch();
@@ -268,6 +270,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const isInProgress = booking.status === "IN_PROGRESS";
   const isPaymentPending = booking.status === "PAYMENT_PENDING";
   const isCompleted = booking.status === "COMPLETED";
+  const isCancelled = booking.status === "CANCELLED";
 
   const totalAmount = booking.totalAmount || 0;
   const advanceAmount = booking.advanceAmount || totalAmount;
@@ -413,14 +416,24 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           </button>
 
           {isProvider && isConfirmed && (
-            <button
-              type="button"
-              className="bkdet-action-btn route"
-              onClick={() => handleTriggerStatusChange("EN_ROUTE")}
-            >
-              <i className="fas fa-route" />
-              <span>On The Way</span>
-            </button>
+            <>
+              <button
+                type="button"
+                className="bkdet-action-btn danger-outline"
+                onClick={() => handleTriggerStatusChange("CANCELLED")}
+              >
+                <i className="fas fa-times-circle" />
+                <span>Cancel Booking</span>
+              </button>
+              <button
+                type="button"
+                className="bkdet-action-btn route"
+                onClick={() => handleTriggerStatusChange("EN_ROUTE")}
+              >
+                <i className="fas fa-route" />
+                <span>On The Way</span>
+              </button>
+            </>
           )}
 
           {isProvider && isEnRoute && (
@@ -490,6 +503,36 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           )}
         </div>
       </div>
+
+      {isCancelled && (
+        <div className="bkdet-cancelled-banner">
+          <div className="bkdet-cb-left">
+            <div className="bkdet-cb-icon">
+              <i className="fas fa-ban" />
+            </div>
+            <div>
+              <h4 className="bkdet-cb-title">
+                Booking Cancelled Before Service Dispatch
+              </h4>
+              <p className="bkdet-cb-desc">
+                {isProvider
+                  ? `You cancelled this booking before dispatch. A 100% full refund of ${formatCurrency(advanceAmount)} secured in Escrow has been processed for the customer.`
+                  : `This booking was cancelled by the provider before dispatch. Your full payment of ${formatCurrency(advanceAmount)} held safely in Escrow has been 100% refunded.`}
+              </p>
+            </div>
+          </div>
+          {!isProvider && (
+            <button
+              type="button"
+              className="bkdet-cb-btn"
+              onClick={handleViewServiceRequest}
+            >
+              <i className="fas fa-redo-alt" />
+              <span>Find Another Provider</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {!isFixedQuote && isPaymentPending && (
         <div className="bkdet-payment-pending-banner">
@@ -794,21 +837,23 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   </span>
                 )}
                 <span
-                  className={`bkdet-milestone-pill ${isFixedQuote || isFullyPaid
-                    ? "paid"
-                    : isAdvancePaid
-                      ? "pending"
-                      : ""
+                  className={`bkdet-milestone-pill ${isCancelled || booking.paymentStatus === "REFUNDED"
+                    ? "cancelled"
+                    : isFixedQuote || isFullyPaid
+                      ? "paid"
+                      : isAdvancePaid
+                        ? "pending"
+                        : ""
                     }`}
                 >
-                  {isFixedQuote
-                    ? "100% Paid & Secured"
-                    : isFullyPaid
-                      ? "Fully Paid & Settled"
-                      : isAdvancePaid
-                        ? isInspectionQuote ? "Inspection Fee Secured" : "Advance Paid & Secured"
-                        : booking.paymentStatus === "REFUNDED"
-                          ? "Refunded"
+                  {isCancelled || booking.paymentStatus === "REFUNDED"
+                    ? "100% Refunded"
+                    : isFixedQuote
+                      ? "100% Paid & Secured"
+                      : isFullyPaid
+                        ? "Fully Paid & Settled"
+                        : isAdvancePaid
+                          ? isInspectionQuote ? "Inspection Fee Secured" : "Advance Paid & Secured"
                           : "Pending"}
                 </span>
               </div>
@@ -816,20 +861,34 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
             <div className="bkdet-price-wrapper">
               <span className="bkdet-price-sublabel">
-                {isFixedQuote
-                  ? "Total Fixed Amount Paid"
-                  : (isPaymentPending || isCompleted)
-                    ? "Final Confirmed Total"
-                    : isInspectionQuote
-                      ? "Inspection Fee Paid"
-                      : "Initial Advance Paid"}
+                {isCancelled
+                  ? "100% Refund Amount"
+                  : isFixedQuote
+                    ? "Total Fixed Amount Paid"
+                    : (isPaymentPending || isCompleted)
+                      ? "Final Confirmed Total"
+                      : isInspectionQuote
+                        ? "Inspection Fee Paid"
+                        : "Initial Advance Paid"}
               </span>
               <div className="bkdet-price-huge">
                 {formatCurrency((isPaymentPending || isCompleted || isFixedQuote) ? totalAmount : advanceAmount)}
               </div>
             </div>
 
-            {isFixedQuote ? (
+            {isCancelled ? (
+              <div className="bkdet-cancelled-tile">
+                <div className="bkdet-fpt-icon" style={{ color: "#dc2626" }}>
+                  <i className="fas fa-undo-alt" />
+                </div>
+                <div className="bkdet-fpt-content">
+                  <span className="bkdet-fpt-title" style={{ color: "#991b1b" }}>100% Refund Processed</span>
+                  <p className="bkdet-fpt-desc" style={{ color: "#b91c1c" }}>
+                    The booking was cancelled before dispatch. The full payment of {formatCurrency(advanceAmount)} held in Escrow has been released back to the customer.
+                  </p>
+                </div>
+              </div>
+            ) : isFixedQuote ? (
               <div className="bkdet-fixed-paid-tile">
                 <div className="bkdet-fpt-icon">
                   <i className="fas fa-check-circle" />

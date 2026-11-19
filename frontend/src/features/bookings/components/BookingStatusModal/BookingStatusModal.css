@@ -72,6 +72,12 @@
   border: 1px solid #fef08a;
 }
 
+.bkstatus-icon-box.danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
 .bkstatus-title {
   font-size: 1.15rem;
   font-weight: 700;
@@ -192,6 +198,92 @@
 
 .bkstatus-btn-confirm.warning:hover:not(:disabled) {
   background: #b45309;
+}
+
+.bkstatus-btn-confirm.danger {
+  background: #dc2626;
+}
+
+.bkstatus-btn-confirm.danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.bkstatus-cancel-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.bkstatus-cancel-notice i {
+  color: #dc2626;
+  font-size: 1.1rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bkstatus-cancel-notice div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bkstatus-cancel-notice strong {
+  font-size: 0.82rem;
+  color: #991b1b;
+}
+
+.bkstatus-cancel-notice span {
+  font-size: 0.78rem;
+  color: #b91c1c;
+  line-height: 1.4;
+}
+
+.bkstatus-reason-chips-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.bkstatus-reason-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bkstatus-chip {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.bkstatus-chip:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.bkstatus-chip.active {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.bkstatus-textarea.error {
+  border-color: #f87171;
+  background: #fffdfd;
 }
 
 .bkstatus-amount-section {
