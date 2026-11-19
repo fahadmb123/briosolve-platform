@@ -1,11 +1,9 @@
-import { useMutation } from "@tanstack/react-query";
-import { getNearbyProviders } from "../../services/nearbyProviders.service";
-import { toast } from 'react-hot-toast';
-import type { ApiError } from "../../../../shared/api/ApiError";
+import { useQuery } from "@tanstack/react-query";
+import { getNearbyProviders, type GetNearbyProvidersInput } from "../../services/nearbyProviders.service";
 
-export const useGetNearbyProviders = () => {
-    return useMutation({
-        mutationFn: getNearbyProviders,
-        onError: (error: ApiError) => toast.error(error.message || 'Failed to load providers'),
+export const useGetNearbyProviders = (params: GetNearbyProvidersInput = {}) => {
+    return useQuery({
+        queryKey: ["nearbyProviders", params],
+        queryFn: () => getNearbyProviders(params),
     });
 };

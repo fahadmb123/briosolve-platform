@@ -13,6 +13,8 @@ interface PaymentSuccessLocationState {
   providerBusinessName?: string;
   serviceTitle?: string;
   requestItem?: CustomerServiceRequestItem | null;
+  bookingId?: string;
+  bookingNumber?: string;
 }
 
 export const PaymentSuccessPage: React.FC = () => {
@@ -21,7 +23,6 @@ export const PaymentSuccessPage: React.FC = () => {
   const state = (location.state as PaymentSuccessLocationState) || {};
 
   const amount = state.amount || 0;
-  const paymentId = state.paymentId || "rzp_simulated_success";
   const serviceRequestId = state.serviceRequestId || "";
   const providerDisplay = state.providerBusinessName || state.providerName || "Service Provider";
 
@@ -70,9 +71,20 @@ export const PaymentSuccessPage: React.FC = () => {
             </div>
           )}
 
+          {state.bookingNumber && (
+            <div className="paysuccess-detail-row">
+              <span className="paysuccess-detail-label">Booking Reference</span>
+              <span className="paysuccess-detail-value mono" style={{ color: "#ea580c", fontWeight: 700 }}>
+                {state.bookingNumber}
+              </span>
+            </div>
+          )}
+
           <div className="paysuccess-detail-row">
-            <span className="paysuccess-detail-label">Payment ID</span>
-            <span className="paysuccess-detail-value mono">{paymentId}</span>
+            <span className="paysuccess-detail-label">Payment Security</span>
+            <span className="paysuccess-detail-value">
+              <i className="fas fa-shield-alt" style={{ marginRight: "4px", color: "#16a34a" }}></i> 100% Escrow Protected
+            </span>
           </div>
 
           <div className="paysuccess-detail-row">
@@ -84,6 +96,21 @@ export const PaymentSuccessPage: React.FC = () => {
         </div>
 
         <div className="paysuccess-actions">
+          {state.bookingId ? (
+            <Link
+              to={`/bookings/${state.bookingId}`}
+              className="paysuccess-btn-booking"
+            >
+              <i className="fas fa-calendar-check"></i>
+              <span>View Booking Details</span>
+            </Link>
+          ) : (
+            <Link to="/bookings" className="paysuccess-btn-booking">
+              <i className="fas fa-calendar-check"></i>
+              <span>View Bookings</span>
+            </Link>
+          )}
+
           {serviceRequestId ? (
             <button
               type="button"
@@ -91,12 +118,14 @@ export const PaymentSuccessPage: React.FC = () => {
               onClick={() =>
                 navigate(`/my-requests/${serviceRequestId}`, {
                   state: {
-                    request: state.requestItem || null
+                    request: state.requestItem
+                      ? { ...state.requestItem, status: "ACCEPTED" }
+                      : null
                   }
                 })
               }
             >
-              <i className="fas fa-arrow-left"></i>
+              <i className="fas fa-file-alt"></i>
               <span>View Service Request</span>
             </button>
           ) : (
@@ -108,7 +137,7 @@ export const PaymentSuccessPage: React.FC = () => {
 
           <Link to="/dashboard" className="paysuccess-btn-secondary">
             <i className="fas fa-home"></i>
-            <span>Customer Dashboard</span>
+            <span>Dashboard</span>
           </Link>
         </div>
       </div>

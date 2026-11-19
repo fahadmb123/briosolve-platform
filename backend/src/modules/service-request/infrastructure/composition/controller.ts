@@ -8,7 +8,7 @@ import {
     getCustomerServiceRequestsUseCase,
     createCancelServiceRequestUseCase,
     createReopenServiceRequestUseCase,
-    updateServiceRequestUseCase,
+    createUpdateServiceRequestUseCase,
     getProviderServiceRequestsUseCase,
     getAdminServiceRequestsUseCase,
     adminCancelServiceRequestUseCase
@@ -24,6 +24,9 @@ export function createServiceRequestController(
         createBulkNotificationUseCase
     );
     const reopenServiceRequestUseCase = createReopenServiceRequestUseCase(
+        createBulkNotificationUseCase
+    );
+    const updateServiceRequestUseCase = createUpdateServiceRequestUseCase(
         createBulkNotificationUseCase
     );
 

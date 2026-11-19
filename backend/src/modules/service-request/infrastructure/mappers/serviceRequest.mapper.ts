@@ -119,6 +119,39 @@ export class ServiceRequestMapper {
         const providers = Array.isArray(record.providers) ? record.providers : [];
         const quotationsCount = providers.filter((p: any) => p.status === "QUOTED").length;
 
+        let latestBookingDto: any = null;
+        if (Array.isArray(record.bookings) && record.bookings.length > 0) {
+            const sorted = [...record.bookings].sort((a: any, b: any) => {
+                const bTime = b.created_at ? new Date(b.created_at.toString()).getTime() : 0;
+                const aTime = a.created_at ? new Date(a.created_at.toString()).getTime() : 0;
+                return bTime - aTime;
+            });
+            const latest = sorted[0];
+            let cancelReason: string | null = null;
+            if (latest.status === "CANCELLED" && latest.notes) {
+                try {
+                    const parsed = JSON.parse(latest.notes);
+                    if (Array.isArray(parsed)) {
+                        const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+                        if (cancelItem && cancelItem.note) {
+                            cancelReason = cancelItem.note;
+                        }
+                    }
+                } catch {
+                    cancelReason = typeof latest.notes === "string" ? latest.notes : null;
+                }
+            }
+            latestBookingDto = {
+                id: latest.id,
+                booking_number: latest.booking_number,
+                status: latest.status,
+                payment_status: latest.payment_status,
+                advance_amount: Number(latest.advance_amount || 0),
+                total_amount: Number(latest.total_amount || 0),
+                cancellation_reason: cancelReason
+            };
+        }
+
         return {
             ...dto,
             category_name: record.category?.name,
@@ -129,7 +162,8 @@ export class ServiceRequestMapper {
             customer_details: customerDetails,
             distance_km: distanceKm !== undefined ? distanceKm : null,
             matched_providers_count: providers.length,
-            quotations_count: quotationsCount
+            quotations_count: quotationsCount,
+            latest_booking: latestBookingDto
         };
     }
 

@@ -1,47 +1,54 @@
 const NOTIFICATION_SOUND_PATH = "/sounds/notification.mp3";
 
-let hasUnlocked = false;
+let sharedAudioContext: AudioContext | null = null;
+let isAudioUnlocked = false;
+
+const getAudioContext = (): AudioContext | null => {
+  if (typeof window === "undefined") return null;
+  if (!sharedAudioContext) {
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (AudioCtx) {
+      sharedAudioContext = new AudioCtx();
+    }
+  }
+  return sharedAudioContext;
+};
 
 const unlockAudio = (): void => {
-  if (hasUnlocked) return;
-  hasUnlocked = true;
+  if (isAudioUnlocked) return;
+  isAudioUnlocked = true;
 
-  try {
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    if (AudioCtx) {
-      const dummyCtx = new AudioCtx();
-      if (dummyCtx.state === "suspended") {
-        dummyCtx.resume().catch(() => {});
-      }
-      setTimeout(() => {
-        dummyCtx.close().catch(() => {});
-      }, 150);
-    }
-  } catch {
-    return;
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === "suspended") {
+    ctx.resume().catch(() => {});
   }
 
-  if (typeof window !== "undefined") {
-    window.removeEventListener("pointerdown", unlockAudio);
-    window.removeEventListener("click", unlockAudio);
-    window.removeEventListener("keydown", unlockAudio);
-    window.removeEventListener("touchstart", unlockAudio);
+  const silentAudio = new Audio();
+  silentAudio.play().catch(() => {});
+
+  cleanupUnlockListeners();
+};
+
+const unlockEvents = ["pointerdown", "click", "keydown", "touchstart"] as const;
+
+const cleanupUnlockListeners = (): void => {
+  if (typeof window === "undefined") return;
+  for (const event of unlockEvents) {
+    window.removeEventListener(event, unlockAudio);
   }
 };
 
 if (typeof window !== "undefined") {
-  window.addEventListener("pointerdown", unlockAudio, { once: true, passive: true });
-  window.addEventListener("click", unlockAudio, { once: true, passive: true });
-  window.addEventListener("keydown", unlockAudio, { once: true, passive: true });
-  window.addEventListener("touchstart", unlockAudio, { once: true, passive: true });
+  for (const event of unlockEvents) {
+    window.addEventListener(event, unlockAudio, { passive: true, once: true });
+  }
 }
 
 const playSyntheticChime = (): void => {
-  try {
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtx) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
 
-    const ctx = new AudioCtx();
+  try {
     if (ctx.state === "suspended") {
       ctx.resume().catch(() => {});
     }
@@ -70,24 +77,17 @@ const playSyntheticChime = (): void => {
     osc2.start(now);
     osc1.stop(now + 0.45);
     osc2.stop(now + 0.45);
-
-    setTimeout(() => {
-      ctx.close().catch(() => {});
-    }, 550);
-  } catch {
-    return;
-  }
+  } catch {}
 };
 
 export const playNotificationSound = (): void => {
-  if (typeof window === "undefined" || typeof Audio === "undefined") return;
+  if (typeof window === "undefined") return;
 
   try {
     const audio = new Audio(NOTIFICATION_SOUND_PATH);
-    audio.preload = "auto";
     audio.volume = 1.0;
-
     const playPromise = audio.play();
+
     if (playPromise !== undefined) {
       playPromise.catch(() => {
         playSyntheticChime();

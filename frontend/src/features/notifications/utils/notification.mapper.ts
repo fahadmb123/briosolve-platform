@@ -166,7 +166,7 @@ export function mapNotificationToUnified(
             category = "booking";
             primaryAction = {
                 label: "View Bookings",
-                link: "/dashboard#bookings",
+                link: "/bookings",
                 icon: "fa-calendar-check",
                 variant: "primary",
             };
@@ -207,9 +207,9 @@ export function mapNotificationToUnified(
         ) {
             category = "booking";
             primaryAction = {
-                label: "View Schedule",
-                link: "/provider/dashboard#bookings",
-                icon: "fa-calendar",
+                label: "View Bookings",
+                link: "/provider/bookings",
+                icon: "fa-calendar-check",
                 variant: "primary",
             };
         } else if (

@@ -69,66 +69,65 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   const isExpired = request.status === "EXPIRED";
 
   const renderStatusBadge = () => {
-    if (isExpired) {
-      return (
-        <span className="myreq-badge-pill myreq-badge-expired">
-          <span className="myreq-dot-indicator"></span>
-          <span>Expired</span>
-        </span>
-      );
+    switch (request.status) {
+      case "EXPIRED":
+        return (
+          <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+            <span className="myreq-badge-pill myreq-badge-expired">
+              <span className="myreq-dot-indicator"></span>
+              <span>Expired</span>
+            </span>
+            {request.latest_booking?.payment_status === "REFUNDED" && (
+              <span className="myreq-badge-pill" style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+                <i className="fas fa-undo-alt" style={{ fontSize: "0.65rem", marginRight: "3px" }}></i>
+                <span>100% Refunded</span>
+              </span>
+            )}
+          </div>
+        );
+      case "COMPLETED":
+        return (
+          <span className="myreq-badge-pill myreq-badge-completed">
+            <span className="myreq-dot-indicator"></span>
+            <span>Completed</span>
+          </span>
+        );
+      case "IN_PROGRESS":
+        return (
+          <span className="myreq-badge-pill myreq-badge-progress">
+            <span className="myreq-dot-indicator"></span>
+            <span>In Progress</span>
+          </span>
+        );
+      case "ACCEPTED":
+        return (
+          <span className="myreq-badge-pill myreq-badge-accepted">
+            <span className="myreq-dot-indicator"></span>
+            <span>Accepted</span>
+          </span>
+        );
+      case "ACTIVE":
+        return (
+          <span className="myreq-badge-pill myreq-badge-active">
+            <span className="myreq-dot-indicator"></span>
+            <span>Active</span>
+          </span>
+        );
+      case "CANCELLED":
+        return (
+          <span className="myreq-badge-pill myreq-badge-cancelled">
+            <span className="myreq-dot-indicator"></span>
+            <span>Cancelled</span>
+          </span>
+        );
+      default:
+        return (
+          <span className="myreq-badge-pill myreq-badge-pending">
+            <span className="myreq-dot-indicator"></span>
+            <span>Pending</span>
+          </span>
+        );
     }
-
-    if (quotesCount > 0) {
-      return (
-        <span className="myreq-badge-pill myreq-badge-quotes">
-          <i className="fas fa-bolt"></i>
-          <span>{quotesCount} {quotesCount === 1 ? "quote" : "quotes"} arriving</span>
-        </span>
-      );
-    }
-
-    if (notifiedCount > 0) {
-      return (
-        <span className="myreq-badge-pill myreq-badge-notified">
-          <i className="fas fa-user-friends"></i>
-          <span>{notifiedCount} {notifiedCount === 1 ? "professional" : "professionals"} notified</span>
-        </span>
-      );
-    }
-
-    if (request.status === "COMPLETED") {
-      return (
-        <span className="myreq-badge-pill myreq-badge-completed">
-          <span className="myreq-dot-indicator"></span>
-          <span>Completed</span>
-        </span>
-      );
-    }
-
-    if (request.status === "IN_PROGRESS") {
-      return (
-        <span className="myreq-badge-pill myreq-badge-progress">
-          <span className="myreq-dot-indicator"></span>
-          <span>In Progress</span>
-        </span>
-      );
-    }
-
-    if (request.status === "CANCELLED") {
-      return (
-        <span className="myreq-badge-pill myreq-badge-cancelled">
-          <span className="myreq-dot-indicator"></span>
-          <span>Cancelled</span>
-        </span>
-      );
-    }
-
-    return (
-      <span className="myreq-badge-pill myreq-badge-pending">
-        <span className="myreq-dot-indicator"></span>
-        <span>Pending</span>
-      </span>
-    );
   };
 
   const attachedPhoto = request.images && request.images.length > 0 ? request.images[0].image_key : null;
@@ -141,42 +140,50 @@ export const RequestCard: React.FC<RequestCardProps> = ({
 
   return (
     <div className="myreq-row-card">
-      {showServiceImage ? (
-        <div
-          className="myreq-category-avatar has-image"
-          onClick={() => onViewDetails(request)}
-          title={request.subservice_name || request.category_name || "Service"}
-        >
-          <img
-            src={serviceImageUrl!}
-            alt={request.subservice_name || request.category_name || "Service"}
-            className="myreq-avatar-img"
-            onError={() => setImageError(true)}
-          />
-        </div>
-      ) : (
-        <div
-          className="myreq-category-avatar"
-          style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
-          aria-hidden="true"
-        >
-          <i className={visual.icon}></i>
-        </div>
-      )}
-
-      <div className="myreq-row-center">
-        <div className="myreq-row-breadcrumbs">
-          <span className="myreq-crumb-category">{request.category_name || "General Service"}</span>
-          {request.subservice_name && (
-            <>
-              <span className="myreq-crumb-sep">/</span>
-              <span className="myreq-crumb-sub">{request.subservice_name}</span>
-            </>
+      <div className="myreq-card-header">
+        <div className="myreq-header-left">
+          {showServiceImage ? (
+            <div
+              className="myreq-category-avatar has-image"
+              onClick={() => onViewDetails(request)}
+              title={request.subservice_name || request.category_name || "Service"}
+            >
+              <img
+                src={serviceImageUrl!}
+                alt={request.subservice_name || request.category_name || "Service"}
+                className="myreq-avatar-img"
+                onError={() => setImageError(true)}
+              />
+            </div>
+          ) : (
+            <div
+              className="myreq-category-avatar"
+              style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
+              aria-hidden="true"
+            >
+              <i className={visual.icon}></i>
+            </div>
           )}
-          <span className="myreq-crumb-bullet">•</span>
-          <span className="myreq-crumb-date">Posted {formattedDate}</span>
+
+          <div className="myreq-row-breadcrumbs">
+            <span className="myreq-crumb-category">{request.category_name || "General Service"}</span>
+            {request.subservice_name && (
+              <>
+                <span className="myreq-crumb-sep">/</span>
+                <span className="myreq-crumb-sub">{request.subservice_name}</span>
+              </>
+            )}
+            <span className="myreq-crumb-bullet">•</span>
+            <span className="myreq-crumb-date">Posted {formattedDate}</span>
+          </div>
         </div>
 
+        <div className="myreq-header-right">
+          {renderStatusBadge()}
+        </div>
+      </div>
+
+      <div className="myreq-card-body">
         <h3 className="myreq-row-title" onClick={() => onViewDetails(request)}>
           {request.title}
         </h3>
@@ -200,23 +207,36 @@ export const RequestCard: React.FC<RequestCardProps> = ({
             <i className="fas fa-map-marker-alt"></i>
             <span className="myreq-meta-location-text">{addressText}</span>
           </div>
+
+          {quotesCount > 0 ? (
+            <div className="myreq-meta-tag quotes-received">
+              <i className="far fa-file-alt"></i>
+              <span>{quotesCount} {quotesCount === 1 ? "Quotation" : "Quotations"} Received</span>
+            </div>
+          ) : notifiedCount > 0 ? (
+            <div className="myreq-meta-tag notified-providers">
+              <i className="far fa-paper-plane"></i>
+              <span>{notifiedCount} {notifiedCount === 1 ? "provider" : "providers"} notified</span>
+            </div>
+          ) : null}
         </div>
       </div>
 
-      <div className="myreq-row-right">
-        {renderStatusBadge()}
+      <div className="myreq-card-footer">
+        <div className="myreq-footer-left">
+          {attachedPhoto && (
+            <div
+              className="myreq-attachment-preview"
+              onClick={() => onViewDetails(request)}
+              title="View attachment"
+            >
+              <img src={attachedPhoto} alt="Attachment thumbnail" className="myreq-attachment-thumb" />
+              <span className="myreq-attachment-label">Photo attached</span>
+            </div>
+          )}
+        </div>
 
-        {attachedPhoto && (
-          <div
-            className="myreq-row-thumb"
-            onClick={() => onViewDetails(request)}
-            title="View attachment"
-          >
-            <img src={attachedPhoto} alt="Attachment thumbnail" />
-          </div>
-        )}
-
-        <div className="myreq-row-actions">
+        <div className="myreq-footer-right">
           {permission.canEdit && !isExpired && (
             <button
               type="button"
@@ -234,7 +254,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({
               className="myreq-action-link danger"
               onClick={() => onCancelRequest(request)}
             >
-              Cancel
+              Cancel Request
             </button>
           )}
 
@@ -251,10 +271,10 @@ export const RequestCard: React.FC<RequestCardProps> = ({
 
           <button
             type="button"
-            className="myreq-btn-view-details"
+            className={`myreq-btn-view-details ${quotesCount > 0 ? "has-quotes" : ""}`}
             onClick={() => onViewDetails(request)}
           >
-            <span>View Details</span>
+            <span>{quotesCount > 0 ? `View Quotations (${quotesCount})` : "View Details"}</span>
             <i className="fas fa-arrow-right"></i>
           </button>
         </div>

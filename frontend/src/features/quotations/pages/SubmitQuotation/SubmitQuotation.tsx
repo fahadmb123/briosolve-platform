@@ -33,42 +33,28 @@ export default function SubmitQuotation() {
 
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
 
-  const getRequestsMutation = useGetProviderServiceRequests();
-  const getMyQuotationsMutation = useGetMyQuotations();
+  const { data: requestsRes } = useGetProviderServiceRequests({ page: 1, limit: 50 });
+  const { data: quotationsRes } = useGetMyQuotations({ page: 1, limit: 50 });
   const submitQuotationMutation = useSubmitQuotation();
   const updateQuotationMutation = useUpdateQuotation();
 
   useEffect(() => {
-    if (!request && requestId) {
-      getRequestsMutation.mutate(
-        { page: 1, limit: 50 },
-        {
-          onSuccess: (res) => {
-            const found = res.data?.requests?.find((r) => r.id === requestId);
-            if (found) {
-              setRequest(found);
-            }
-          }
-        }
-      );
+    if (!request && requestId && requestsRes?.data?.requests) {
+      const found = requestsRes.data.requests.find((r) => r.id === requestId);
+      if (found) {
+        setRequest(found);
+      }
     }
-  }, [requestId, request]);
+  }, [requestId, request, requestsRes]);
 
   useEffect(() => {
-    if (!quotationToEdit && requestId && locationState?.isEditing) {
-      getMyQuotationsMutation.mutate(
-        { page: 1, limit: 50 },
-        {
-          onSuccess: (res) => {
-            const found = res.data?.quotations?.find((q) => q.serviceRequestId === requestId);
-            if (found) {
-              setQuotationToEdit(found);
-            }
-          }
-        }
-      );
+    if (!quotationToEdit && requestId && locationState?.isEditing && quotationsRes?.data?.quotations) {
+      const found = quotationsRes.data.quotations.find((q) => q.serviceRequestId === requestId);
+      if (found) {
+        setQuotationToEdit(found);
+      }
     }
-  }, [requestId, quotationToEdit, locationState?.isEditing]);
+  }, [requestId, locationState?.isEditing, quotationToEdit, quotationsRes]);
 
   const handleChatClick = () => {
     if (!request?.customer_id) {
@@ -207,22 +193,58 @@ export default function SubmitQuotation() {
             {isEditing
               ? `Update your proposal terms and pricing for "${request?.title || "service request"}"`
               : request?.title
-              ? `Submit your proposal and pricing for "${request.title}"`
-              : "Submit your proposal, deliverables, and terms directly to the customer."}
+                ? `Submit your proposal and pricing for "${request.title}"`
+                : "Submit your proposal, deliverables, and terms directly to the customer."}
           </p>
         </div>
       </div>
 
       <div className="quote-grid-container">
         <div className="quote-main-column">
-          <QuotationForm
-            initialValues={formInitialValues}
-            isEditing={isEditing}
-            onSubmit={handleFormSubmit}
-            isSubmitting={submitQuotationMutation.isPending || updateQuotationMutation.isPending}
-            onCancel={handleBack}
-            onChat={handleChatClick}
-          />
+          {!isEditing && (request?.has_quoted || request?.my_quotation_status === "WITHDRAWN") ? (
+            <div className="quote-cancelled-blocked-card">
+              <div className="quote-blocked-icon">
+                <i className="fas fa-ban"></i>
+              </div>
+              <h2 className="quote-blocked-title">
+                {request?.my_quotation_status === "WITHDRAWN"
+                  ? "Booking Cancelled — Cannot Re-quote"
+                  : "Quotation Already Submitted"}
+              </h2>
+              <p className="quote-blocked-desc">
+                {request?.my_quotation_status === "WITHDRAWN"
+                  ? "A previous booking or quotation for this request was cancelled. Marketplace policies do not permit submitting a new quotation for the same service request."
+                  : "You have already submitted a quotation for this service request. You can check its status under My Quotations."}
+              </p>
+              <div className="quote-blocked-actions">
+                <button
+                  type="button"
+                  className="quote-blocked-primary-btn"
+                  onClick={() => navigate("/provider/service-requests")}
+                >
+                  <i className="fas fa-arrow-left"></i>
+                  <span>Browse Available Requests</span>
+                </button>
+                <button
+                  type="button"
+                  className="quote-blocked-secondary-btn"
+                  onClick={() => navigate("/provider/quotations")}
+                >
+                  <i className="fas fa-file-alt"></i>
+                  <span>View My Quotations</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <QuotationForm
+              initialValues={formInitialValues}
+              isEditing={isEditing}
+              onSubmit={handleFormSubmit}
+              isSubmitting={submitQuotationMutation.isPending || updateQuotationMutation.isPending}
+              onCancel={handleBack}
+              onChat={handleChatClick}
+            />
+          )}
         </div>
 
         <div className="quote-sidebar-column">

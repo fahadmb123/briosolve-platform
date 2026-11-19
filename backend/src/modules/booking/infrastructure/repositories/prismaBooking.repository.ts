@@ -1,0 +1,295 @@
+import { db } from "../../../../shared/database/client";
+import { Booking } from "../../domain/entities/booking.entity";
+import { IBookingRepository, BookingDetails, BookingListResult } from "../../domain/repositories/IBookingRepository";
+import { CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
+import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
+import { GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
+import { BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
+import { BookingMapper } from "../mappers/booking.mapper";
+
+export class PrismaBookingRepository implements IBookingRepository {
+    async findById(id: string): Promise<Booking | null> {
+        const record = await db.orm.public.bookings
+            .where({ id: id as never })
+            .first();
+
+        if (!record) return null;
+        return BookingMapper.toDomain(record);
+    }
+
+    async findDetailsById(id: string): Promise<BookingDetails | null> {
+        try {
+            const record = await db.orm.public.bookings
+                .where({ id: id as never })
+                .first();
+
+            if (!record) return null;
+            const booking = BookingMapper.toDomain(record);
+
+            const details = await this.populateDetails([booking]);
+            return details[0] || {
+                booking,
+                serviceRequestTitle: null,
+                providerBusinessName: null,
+                providerName: null,
+                customerName: null,
+                quotationType: null,
+                requiresInspection: false,
+                statusHistory: undefined
+            };
+        } catch {
+            return null;
+        }
+    }
+
+    async findByBookingNumber(bookingNumber: string): Promise<Booking | null> {
+        const record = await db.orm.public.bookings
+            .where({ booking_number: bookingNumber as never })
+            .first();
+
+        if (!record) return null;
+        return BookingMapper.toDomain(record);
+    }
+
+    async findByQuotationId(quotationId: string): Promise<Booking | null> {
+        const record = await db.orm.public.bookings
+            .where({ quotation_id: quotationId as never })
+            .first();
+
+        if (!record) return null;
+        return BookingMapper.toDomain(record);
+    }
+
+    async findByServiceRequestId(serviceRequestId: string): Promise<Booking | null> {
+        const record = await db.orm.public.bookings
+            .where({ service_request_id: serviceRequestId as never })
+            .first();
+
+        if (!record) return null;
+        return BookingMapper.toDomain(record);
+    }
+
+    async findByCustomerId(
+        input: GetCustomerBookingsInputDto | string
+    ): Promise<BookingListResult> {
+        const customerId = typeof input === "string" ? input : input.customerId;
+        const page = typeof input === "object" && input.page ? Number(input.page) : 1;
+        const limit = typeof input === "object" && input.limit ? Number(input.limit) : 50;
+        const search = typeof input === "object" ? input.search : undefined;
+        const status = typeof input === "object" ? input.status : undefined;
+        const skip = (page - 1) * limit;
+
+        const allUserRecords = await db.orm.public.bookings
+            .where({ customer_id: customerId as never })
+            .all();
+
+        const counts: BookingCountsDto = {
+            ALL: allUserRecords.length,
+            CONFIRMED: allUserRecords.filter((b: any) => b.status === "CONFIRMED").length,
+            EN_ROUTE: allUserRecords.filter((b: any) => b.status === "EN_ROUTE").length,
+            INSPECTION: allUserRecords.filter((b: any) => b.status === "INSPECTION").length,
+            IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
+            PAYMENT_PENDING: allUserRecords.filter((b: any) => b.status === "PAYMENT_PENDING").length,
+            COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
+            CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length
+        };
+
+        let query = db.orm.public.bookings.where({ customer_id: customerId as never });
+
+        if (status && status !== "ALL") {
+            query = query.where({ status: status as never });
+        }
+
+        query = query.orderBy((b) => b.updated_at.desc());
+
+        const records = await query.all();
+        const bookings = records.map((r: any) => BookingMapper.toDomain(r));
+        let detailed = await this.populateDetails(bookings);
+
+        if (search && search.trim()) {
+            const q = search.trim().toLowerCase();
+            detailed = detailed.filter((item) => {
+                return (
+                    (item.booking.booking_number && item.booking.booking_number.toLowerCase().includes(q)) ||
+                    (item.serviceRequestTitle && item.serviceRequestTitle.toLowerCase().includes(q)) ||
+                    (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
+                    (item.providerBusinessName && item.providerBusinessName.toLowerCase().includes(q)) ||
+                    (item.providerName && item.providerName.toLowerCase().includes(q))
+                );
+            });
+        }
+
+        const total = detailed.length;
+        const paged = detailed.slice(skip, skip + limit);
+
+        return {
+            bookings: paged,
+            total,
+            counts
+        };
+    }
+
+    async findByProviderProfileId(
+        input: (GetProviderBookingsInputDto & { providerProfileId: string }) | string
+    ): Promise<BookingListResult> {
+        const providerProfileId = typeof input === "string" ? input : input.providerProfileId;
+        const page = typeof input === "object" && input.page ? Number(input.page) : 1;
+        const limit = typeof input === "object" && input.limit ? Number(input.limit) : 50;
+        const search = typeof input === "object" ? input.search : undefined;
+        const status = typeof input === "object" ? input.status : undefined;
+        const skip = (page - 1) * limit;
+
+        const allUserRecords = await db.orm.public.bookings
+            .where({ provider_id: providerProfileId as never })
+            .all();
+
+        const counts: BookingCountsDto = {
+            ALL: allUserRecords.length,
+            CONFIRMED: allUserRecords.filter((b: any) => b.status === "CONFIRMED").length,
+            EN_ROUTE: allUserRecords.filter((b: any) => b.status === "EN_ROUTE").length,
+            INSPECTION: allUserRecords.filter((b: any) => b.status === "INSPECTION").length,
+            IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
+            PAYMENT_PENDING: allUserRecords.filter((b: any) => b.status === "PAYMENT_PENDING").length,
+            COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
+            CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length
+        };
+
+        let query = db.orm.public.bookings.where({ provider_id: providerProfileId as never });
+
+        if (status && status !== "ALL") {
+            query = query.where({ status: status as never });
+        }
+
+        query = query.orderBy((b) => b.updated_at.desc());
+
+        const records = await query.all();
+        const bookings = records.map((r: any) => BookingMapper.toDomain(r));
+        let detailed = await this.populateDetails(bookings);
+
+        if (search && search.trim()) {
+            const q = search.trim().toLowerCase();
+            detailed = detailed.filter((item) => {
+                return (
+                    (item.booking.booking_number && item.booking.booking_number.toLowerCase().includes(q)) ||
+                    (item.serviceRequestTitle && item.serviceRequestTitle.toLowerCase().includes(q)) ||
+                    (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
+                    (item.customerName && item.customerName.toLowerCase().includes(q))
+                );
+            });
+        }
+
+        const total = detailed.length;
+        const paged = detailed.slice(skip, skip + limit);
+
+        return {
+            bookings: paged,
+            total,
+            counts
+        };
+    }
+
+    async create(data: CreateBookingRepoDto): Promise<Booking | null> {
+        const persistence = BookingMapper.toPersistence(data);
+        const created = await db.orm.public.bookings.create(persistence as never);
+
+        if (!created) return null;
+        return BookingMapper.toDomain(created);
+    }
+
+    async update(id: string, data: UpdateBookingRepoDto): Promise<Booking | null> {
+        const persistence = BookingMapper.toUpdatePersistence(data);
+        const updated = await db.orm.public.bookings
+            .where({ id: id as never })
+            .update(persistence as never);
+
+        if (!updated) return null;
+        return BookingMapper.toDomain(updated);
+    }
+
+    private async populateDetails(bookings: Booking[]): Promise<BookingDetails[]> {
+        if (bookings.length === 0) return [];
+
+        return Promise.all(
+            bookings.map(async (booking) => {
+                let serviceRequestTitle: string | null = null;
+                let categoryName: string | null = null;
+                let addressText: string | null = null;
+                let providerBusinessName: string | null = null;
+                let providerName: string | null = null;
+                let providerPhone: string | null = null;
+                let providerUserId: string | null = null;
+                let customerName: string | null = null;
+                let customerPhone: string | null = null;
+
+                const sr = await db.orm.public.service_requests
+                    .where({ id: booking.service_request_id as never })
+                    .include("category")
+                    .include("address")
+                    .first();
+                if (sr) {
+                    serviceRequestTitle = sr.title;
+                    categoryName = sr.category?.name || null;
+                    if (sr.address) {
+                        addressText = [sr.address.house_no, sr.address.area, sr.address.city]
+                            .filter(Boolean)
+                            .join(", ");
+                    }
+                }
+
+                const providerProfile = await db.orm.public.provider_profiles
+                    .where({ id: booking.provider_id as never })
+                    .first();
+                if (providerProfile) {
+                    providerBusinessName = providerProfile.business_name;
+                    providerUserId = providerProfile.user_id;
+                    const pUser = await db.orm.public.users
+                        .where({ id: providerProfile.user_id as never })
+                        .first();
+                    if (pUser) {
+                        providerName = pUser.name;
+                        providerPhone = pUser.phone;
+                    }
+                }
+
+                const cUser = await db.orm.public.users
+                    .where({ id: booking.customer_id as never })
+                    .first();
+                if (cUser) {
+                    customerName = cUser.name;
+                    customerPhone = cUser.phone;
+                }
+
+                let quotationType: string | null = null;
+                let requiresInspection = false;
+                let quoteAmount: number | null = null;
+
+                const quote = await db.orm.public.quotations
+                    .where({ id: booking.quotation_id as never })
+                    .first();
+                if (quote) {
+                    quotationType = quote.quotation_type;
+                    requiresInspection =
+                        quote.quotation_type === "INSPECTION_REQUIRED" ||
+                        quote.quotation_type === "ESTIMATED";
+                    quoteAmount = Number(quote.amount);
+                }
+
+                return {
+                    booking,
+                    serviceRequestTitle,
+                    categoryName,
+                    addressText,
+                    providerBusinessName,
+                    providerName,
+                    providerPhone,
+                    providerUserId,
+                    customerName,
+                    customerPhone,
+                    quotationType,
+                    requiresInspection,
+                    quoteAmount
+                };
+            })
+        );
+    }
+}

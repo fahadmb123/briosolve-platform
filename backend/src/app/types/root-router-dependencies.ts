@@ -16,4 +16,5 @@ export interface RootRouterDependencies {
     communicationRoutes: ExpressRouter;
     quotationRoutes: ExpressRouter;
     paymentRoutes?: ExpressRouter;
+    bookingRoutes?: ExpressRouter;
 }

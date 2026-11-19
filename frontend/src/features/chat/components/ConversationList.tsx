@@ -24,7 +24,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   onFilterChange,
   isLoading = false,
 }) => {
-  const unreadTotal = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
+  const unreadTotal = conversations.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
 
   return (
     <div className="chat-sidebar-panel">

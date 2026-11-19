@@ -76,34 +76,57 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
   const isExpired = request.status === "EXPIRED";
 
   const renderStatusBadge = () => {
-    if (isCancelled) {
-      return (
-        <span className="provreq-badge-pill provreq-badge-cancelled">
-          <span className="provreq-dot-indicator"></span>
-          <span>Cancelled</span>
-        </span>
-      );
+    switch (request.status) {
+      case "CANCELLED":
+        return (
+          <span className="provreq-badge-pill provreq-badge-cancelled">
+            <span className="provreq-dot-indicator"></span>
+            <span>Cancelled</span>
+          </span>
+        );
+      case "EXPIRED":
+        return (
+          <span className="provreq-badge-pill provreq-badge-expired">
+            <span className="provreq-dot-indicator"></span>
+            <span>Expired</span>
+          </span>
+        );
+      case "COMPLETED":
+        return (
+          <span className="provreq-badge-pill provreq-badge-completed">
+            <span className="provreq-dot-indicator"></span>
+            <span>Completed</span>
+          </span>
+        );
+      case "IN_PROGRESS":
+        return (
+          <span className="provreq-badge-pill provreq-badge-progress">
+            <span className="provreq-dot-indicator"></span>
+            <span>In Progress</span>
+          </span>
+        );
+      case "ACCEPTED":
+        return (
+          <span className="provreq-badge-pill provreq-badge-accepted">
+            <span className="provreq-dot-indicator"></span>
+            <span>Accepted</span>
+          </span>
+        );
+      case "ACTIVE":
+        return (
+          <span className="provreq-badge-pill provreq-badge-active">
+            <span className="provreq-dot-indicator"></span>
+            <span>Active</span>
+          </span>
+        );
+      default:
+        return (
+          <span className="provreq-badge-pill provreq-badge-open">
+            <span className="provreq-dot-indicator"></span>
+            <span>Open Request</span>
+          </span>
+        );
     }
-
-    if (isExpired) {
-      return (
-        <span className="provreq-badge-pill provreq-badge-expired">
-          <span className="provreq-dot-indicator"></span>
-          <span>Expired</span>
-        </span>
-      );
-    }
-
-    if (quotationsCount > 0) {
-      return (
-        <span className="provreq-badge-pill provreq-badge-quotes">
-          <i className="fas fa-bolt"></i>
-          <span>{quotationsCount} {quotationsCount === 1 ? "quote" : "quotes"} submitted</span>
-        </span>
-      );
-    }
-
-    return null;
   };
 
   const attachedPhoto = request.images && request.images.length > 0 ? request.images[0].image_key : null;
@@ -112,42 +135,50 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
 
   return (
     <div className="provreq-row-card">
-      {showServiceImage ? (
-        <div
-          className="provreq-category-avatar has-image"
-          onClick={() => onViewDetails(request)}
-          title={request.subservice_name || request.category_name || "Service"}
-        >
-          <img
-            src={serviceImageUrl!}
-            alt={request.subservice_name || request.category_name || "Service"}
-            className="provreq-avatar-img"
-            onError={() => setImageError(true)}
-          />
-        </div>
-      ) : (
-        <div
-          className="provreq-category-avatar"
-          style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
-          aria-hidden="true"
-        >
-          <i className={visual.icon}></i>
-        </div>
-      )}
-
-      <div className="provreq-row-center">
-        <div className="provreq-row-breadcrumbs">
-          <span className="provreq-crumb-category">{request.category_name || "General Service"}</span>
-          {request.subservice_name && (
-            <>
-              <span className="provreq-crumb-sep">/</span>
-              <span className="provreq-crumb-sub">{request.subservice_name}</span>
-            </>
+      <div className="provreq-card-header">
+        <div className="provreq-header-left">
+          {showServiceImage ? (
+            <div
+              className="provreq-category-avatar has-image"
+              onClick={() => onViewDetails(request)}
+              title={request.subservice_name || request.category_name || "Service"}
+            >
+              <img
+                src={serviceImageUrl!}
+                alt={request.subservice_name || request.category_name || "Service"}
+                className="provreq-avatar-img"
+                onError={() => setImageError(true)}
+              />
+            </div>
+          ) : (
+            <div
+              className="provreq-category-avatar"
+              style={{ backgroundColor: visual.bgColor, color: visual.textColor }}
+              aria-hidden="true"
+            >
+              <i className={visual.icon}></i>
+            </div>
           )}
-          <span className="provreq-crumb-bullet">•</span>
-          <span className="provreq-crumb-date">Posted {formattedDate}</span>
+
+          <div className="provreq-row-breadcrumbs">
+            <span className="provreq-crumb-category">{request.category_name || "General Service"}</span>
+            {request.subservice_name && (
+              <>
+                <span className="provreq-crumb-sep">/</span>
+                <span className="provreq-crumb-sub">{request.subservice_name}</span>
+              </>
+            )}
+            <span className="provreq-crumb-bullet">•</span>
+            <span className="provreq-crumb-date">Posted {formattedDate}</span>
+          </div>
         </div>
 
+        <div className="provreq-header-right">
+          {renderStatusBadge()}
+        </div>
+      </div>
+
+      <div className="provreq-card-body">
         <h3 className="provreq-row-title" onClick={() => onViewDetails(request)}>
           {request.title}
         </h3>
@@ -185,23 +216,43 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
               <span>{request.customer_details.name}</span>
             </div>
           )}
+
+          {quotationsCount > 0 ? (
+            <div className="provreq-meta-tag quotes-count">
+              <i className="far fa-file-alt"></i>
+              <span>{quotationsCount} {quotationsCount === 1 ? "Quote Submitted" : "Quotes Submitted"}</span>
+            </div>
+          ) : null}
+
+          {request.my_quotation_status === "WITHDRAWN" ? (
+            <div className="provreq-meta-tag cancelled" style={{ color: "#ef4444" }}>
+              <i className="fas fa-times-circle"></i>
+              <span>Cancelled Booking</span>
+            </div>
+          ) : request.has_quoted ? (
+            <div className="provreq-meta-tag has-quoted">
+              <i className="fas fa-check-circle"></i>
+              <span>You Quoted</span>
+            </div>
+          ) : null}
         </div>
       </div>
 
-      <div className="provreq-row-right">
-        {renderStatusBadge()}
+      <div className="provreq-card-footer">
+        <div className="provreq-footer-left">
+          {attachedPhoto && (
+            <div
+              className="provreq-attachment-preview"
+              onClick={() => onSelectPhoto(attachedPhoto)}
+              title="Click to view photo"
+            >
+              <img src={attachedPhoto} alt="Attachment thumbnail" className="provreq-attachment-thumb" />
+              <span className="provreq-attachment-label">Photo attached</span>
+            </div>
+          )}
+        </div>
 
-        {attachedPhoto && (
-          <div
-            className="provreq-row-thumb"
-            onClick={() => onSelectPhoto(attachedPhoto)}
-            title="Click to view photo"
-          >
-            <img src={attachedPhoto} alt="Attachment thumbnail" />
-          </div>
-        )}
-
-        <div className="provreq-row-actions">
+        <div className="provreq-footer-right">
           {!isCancelled && onChat && (
             <button
               type="button"
@@ -238,6 +289,16 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
             >
               <span>Expired</span>
             </button>
+          ) : request.my_quotation_status === "WITHDRAWN" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="Your booking or quotation for this request was cancelled"
+            >
+              <i className="fas fa-ban"></i>
+              <span>Booking Cancelled</span>
+            </button>
           ) : request.has_quoted ? (
             <button
               type="button"
@@ -246,7 +307,7 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
               title="You have already quoted on this request"
             >
               <i className="fas fa-check-circle"></i>
-              <span>Quoted</span>
+              <span>View Your Quote</span>
             </button>
           ) : (
             <button

@@ -36,8 +36,8 @@ export default function RequestService() {
   const user = useAuthStore((s) => s.user);
   const isVerified =
     verifications !== null && Object.values(verifications).every(Boolean);
-  const getCategories = useGetCategoriesService();
-  const getAddresses = useGetAddresses();
+  const { data: categoriesRes, isLoading: isLoadingCategories } = useGetCategoriesService({ page: 1, limit: 100, filter: "ACTIVE" });
+  const { data: addressesRes, isLoading: isLoadingAddresses } = useGetAddresses({ page: 1, search: "", limit: 100 });
   const [categories, setCategories] = useState<Category[]>([]);
   const [currentLevel, setCurrentLevel] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -103,53 +103,43 @@ export default function RequestService() {
   }, [currentLevel]);
 
   useEffect(() => {
-    getCategories.mutate(
-      { page: 1, limit: 100, filter: "ACTIVE" },
-      {
-        onSuccess: (res) => {
-          const rawCats = (res.data?.categories || []) as Category[];
-          const cats = rawCats.map((cat) => ({
-            ...cat,
-            services: (cat.services || []).filter(
-              (srv) => srv.status !== "INACTIVE"
-            ),
-          }));
-          setCategories(cats);
-          if (cats.length > 0) {
-            const firstCat = cats[0];
-            setSelectedCategory(firstCat);
-            setValue("categoryId", firstCat.id, { shouldValidate: true });
-            if (firstCat.services && firstCat.services.length > 0) {
-              setSelectedSubservice(firstCat.services[0]);
-              setValue("subserviceId", firstCat.services[0].id, { shouldValidate: true });
-              if (!watch("title")) {
-                setValue("title", firstCat.services[0].name, { shouldValidate: true });
-              }
-            } else {
-              setSelectedSubservice(null);
-              setValue("subserviceId", "", { shouldValidate: true });
-            }
+    if (categoriesRes?.data?.categories) {
+      const rawCats = (categoriesRes.data.categories || []) as Category[];
+      const cats = rawCats.map((cat) => ({
+        ...cat,
+        services: (cat.services || []).filter(
+          (srv) => srv.status !== "INACTIVE"
+        ),
+      }));
+      setCategories(cats);
+      if (cats.length > 0) {
+        const firstCat = cats[0];
+        setSelectedCategory(firstCat);
+        setValue("categoryId", firstCat.id, { shouldValidate: true });
+        if (firstCat.services && firstCat.services.length > 0) {
+          setSelectedSubservice(firstCat.services[0]);
+          setValue("subserviceId", firstCat.services[0].id, { shouldValidate: true });
+          if (!watch("title")) {
+            setValue("title", firstCat.services[0].name, { shouldValidate: true });
           }
-        },
+        } else {
+          setSelectedSubservice(null);
+          setValue("subserviceId", "", { shouldValidate: true });
+        }
       }
-    );
-  }, []);
+    }
+  }, [categoriesRes, setValue, watch]);
 
   useEffect(() => {
-    getAddresses.mutate(
-      { page: 1, search: "", limit: 100 },
-      {
-        onSuccess: (response) => {
-          const addrList = (response.data.addresses || []) as AddressPayload[];
-          setAddresses(addrList);
-          if (addrList.length > 0 && !watch("selectedAddressId")) {
-            const defaultId = (customerAddress?.id as string) || addrList[0].id || "";
-            setValue("selectedAddressId", defaultId, { shouldValidate: true });
-          }
-        },
+    if (addressesRes?.data?.addresses) {
+      const addrList = (addressesRes.data.addresses || []) as AddressPayload[];
+      setAddresses(addrList);
+      if (addrList.length > 0 && !watch("selectedAddressId")) {
+        const defaultId = (customerAddress?.id as string) || addrList[0].id || "";
+        setValue("selectedAddressId", defaultId, { shouldValidate: true });
       }
-    );
-  }, []);
+    }
+  }, [addressesRes, customerAddress, setValue, watch]);
 
   const handleCategorySelect = (category: Category) => {
     const activeServices = (category.services || []).filter(
@@ -355,12 +345,12 @@ export default function RequestService() {
 
     const formattedAnswers = selectedSubservice?.questions
       ? selectedSubservice.questions
-          .filter((q) => answers[q.id] !== undefined && answers[q.id] !== null && answers[q.id] !== "")
-          .map((q) => ({
-            question_id: q.id,
-            question_label: q.label,
-            answer: answers[q.id]
-          }))
+        .filter((q) => answers[q.id] !== undefined && answers[q.id] !== null && answers[q.id] !== "")
+        .map((q) => ({
+          question_id: q.id,
+          question_label: q.label,
+          answer: answers[q.id]
+        }))
       : [];
 
     createServiceRequestMutation.mutate(
@@ -431,7 +421,7 @@ export default function RequestService() {
     );
   }
 
-  if (!getCategories.isPending && (!hasAnyActiveServices || categories.length === 0)) {
+  if (!isLoadingCategories && (!hasAnyActiveServices || categories.length === 0)) {
     return (
       <div className="app-content request-service-container no-services-fullscreen-container">
         <div className="no-services-fallback-card">
@@ -502,7 +492,7 @@ export default function RequestService() {
                 categories={categories}
                 selectedCategory={selectedCategory}
                 selectedSubservice={selectedSubservice}
-                isLoading={getCategories.isPending}
+                isLoading={isLoadingCategories}
                 errorCategoryId={errors.categoryId?.message}
                 errorSubserviceId={errors.subserviceId?.message}
                 onSelectCategory={handleCategorySelect}
@@ -539,7 +529,7 @@ export default function RequestService() {
               <Level3ScheduleStep
                 addresses={addresses}
                 selectedAddressId={selectedAddressId}
-                isLoadingAddresses={getAddresses.isPending}
+                isLoadingAddresses={isLoadingAddresses}
                 register={register}
                 errors={errors}
                 onSelectAddress={(id) => setValue("selectedAddressId", id, { shouldValidate: true })}

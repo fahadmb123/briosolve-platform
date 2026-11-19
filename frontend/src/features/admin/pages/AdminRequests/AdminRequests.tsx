@@ -12,31 +12,20 @@ export default function AdminRequests() {
     const [verificationsCount, setVerificationsCount] = useState<number | undefined>(undefined);
     const [reactivationsCount, setReactivationsCount] = useState<number | undefined>(undefined);
 
-    const getVerifications = useGetAdminVerifications();
-    const getReactivations = useGetReactivations();
+    const { data: verificationsRes } = useGetAdminVerifications({ page: 1, limit: 1 });
+    const { data: reactivationsRes } = useGetReactivations({ page: 1, limit: 1 });
 
     useEffect(() => {
-        getVerifications.mutate(
-            { page: 1, limit: 1 },
-            {
-                onSuccess: (res) => {
-                    if (typeof res?.data?.stats?.total === 'number') {
-                        setVerificationsCount(res.data.stats.total);
-                    }
-                }
-            }
-        );
-        getReactivations.mutate(
-            { page: 1, limit: 1 },
-            {
-                onSuccess: (res) => {
-                    if (typeof res?.data?.total === 'number') {
-                        setReactivationsCount(res.data.total);
-                    }
-                }
-            }
-        );
-    }, []);
+        if (typeof verificationsRes?.data?.stats?.total === 'number') {
+            setVerificationsCount(verificationsRes.data.stats.total);
+        }
+    }, [verificationsRes?.data?.stats?.total]);
+
+    useEffect(() => {
+        if (typeof reactivationsRes?.data?.total === 'number') {
+            setReactivationsCount(reactivationsRes.data.total);
+        }
+    }, [reactivationsRes?.data?.total]);
 
     const handleTabChange = (tab: 'verifications' | 'reactivations') => {
         setSearchParams({ tab });

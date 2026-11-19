@@ -1,0 +1,40 @@
+import { apiClient } from "../../../shared/api/Client";
+import type { response } from "../../../shared/types/Dtos";
+import type {
+  BookingItem,
+  CustomerBookingsResponse,
+  ProviderBookingsResponse,
+  GetBookingsQueryParams,
+  UpdateBookingStatusPayload
+} from "../types/booking.types";
+
+export const getCustomerBookings = async (
+  params?: GetBookingsQueryParams
+): Promise<response<CustomerBookingsResponse>> => {
+  const res = await apiClient.get<response<CustomerBookingsResponse>>("/api/booking/customer", {
+    params
+  });
+  return res.data;
+};
+
+export const getProviderBookings = async (
+  params?: GetBookingsQueryParams
+): Promise<response<ProviderBookingsResponse>> => {
+  const res = await apiClient.get<response<ProviderBookingsResponse>>("/api/booking/provider", {
+    params
+  });
+  return res.data;
+};
+
+export const getBookingById = async (id: string): Promise<response<BookingItem>> => {
+  const res = await apiClient.get<response<BookingItem>>(`/api/booking/${id}`);
+  return res.data;
+};
+
+export const updateBookingStatus = async (
+  id: string,
+  payload: UpdateBookingStatusPayload
+): Promise<response<BookingItem>> => {
+  const res = await apiClient.patch<response<BookingItem>>(`/api/booking/${id}/status`, payload);
+  return res.data;
+};

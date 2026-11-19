@@ -23,28 +23,20 @@ export default function CategoriesTab({ onTotalChange }: CategoriesTabProps) {
   const addCategory = useAddCategoryService();
   const updateCategory = useUpdateCategoryService();
   const deleteCategory = useDeleteCategoryService();
-  const getCategories = useGetCategoriesService();
+  const { data: categoriesRes, isLoading, refetch } = useGetCategoriesService({ page, limit: 10, search, filter });
   const getFormData = useCategoryFormData();
 
   const [categories, setCategories] = useState<Category[]>([]);
 
-  const getCategoriesFn = useCallback(() => {
-    getCategories.mutate({ page, limit: 10, search, filter }, {
-      onSuccess: (res) => {
-        if (res?.data?.categories) {
-          setCategories(res.data.categories);
-          setTotalPages(res.data.totalPages || 1);
-          if (onTotalChange && !search && !filter && typeof res.data.total === 'number') {
-            onTotalChange(res.data.total);
-          }
-        }
-      }
-    });
-  }, [page, search, filter]);
-  
   useEffect(() => {
-    getCategoriesFn();
-  }, [page, search, filter]);
+    if (categoriesRes?.data?.categories) {
+      setCategories(categoriesRes.data.categories);
+      setTotalPages(categoriesRes.data.totalPages || 1);
+      if (onTotalChange && !search && !filter && typeof categoriesRes.data.total === 'number') {
+        onTotalChange(categoriesRes.data.total);
+      }
+    }
+  }, [categoriesRes, onTotalChange, search, filter]);
 
   const handleAddCategory = useCallback(async (data: { name: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null }) => {
     const formData = getFormData(data.name, data.description, data.status, data.imageFile);
@@ -85,11 +77,11 @@ export default function CategoriesTab({ onTotalChange }: CategoriesTabProps) {
         if (categories.length === 1 && page > 1) {
           setPage(page - 1);
         } else {
-          getCategoriesFn();
+          refetch();
         }
       }
     });
-  }, [categoryToDelete, deleteCategory, categories.length, page, getCategoriesFn]);
+  }, [categoryToDelete, deleteCategory, categories.length, page, refetch]);
 
   const handleReset = useCallback(() => {
     setSearch("");
@@ -166,13 +158,13 @@ export default function CategoriesTab({ onTotalChange }: CategoriesTabProps) {
       width: '15%',
       render: (item) => (
         <div className="flex items-center gap-2">
-          <button 
+          <button
             className="btn btn-secondary text-xs py-1 px-2"
             onClick={() => setEditingCategory(item)}
           >
             Edit
           </button>
-          <button 
+          <button
             className="btn btn-danger text-xs py-1 px-2"
             onClick={() => setCategoryToDelete(item)}
           >
@@ -188,21 +180,21 @@ export default function CategoriesTab({ onTotalChange }: CategoriesTabProps) {
       <div className="admin-filter-bar mb-6">
         <div className="admin-search-input">
           <i className="fas fa-search"></i>
-          <input 
+          <input
             value={search}
-            onChange={(e)=>{
+            onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            type="text" 
-            placeholder="Search categories..." 
+            type="text"
+            placeholder="Search categories..."
           />
         </div>
 
         <div className="admin-filters-group">
           <select
             value={filter}
-            onChange={(e)=>{
+            onChange={(e) => {
               setFilter(e.target.value);
               setPage(1);
             }}
@@ -223,38 +215,38 @@ export default function CategoriesTab({ onTotalChange }: CategoriesTabProps) {
         </div>
       </div>
 
-      <AdminTable 
+      <AdminTable
         columns={columns}
         data={categories}
-        isLoading={getCategories.isPending}
+        isLoading={isLoading}
         loadingMessage="Searching for categories..."
         keyExtractor={keyExtractor}
         emptyMessage="No data found matching this."
       />
 
-      <AdminPagination 
+      <AdminPagination
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
       />
 
-      <AddCategoryModal 
-        isOpen={isAddModalOpen || !!editingCategory} 
+      <AddCategoryModal
+        isOpen={isAddModalOpen || !!editingCategory}
         initialData={editingCategory}
-        onClose={handleCloseAddModal} 
-        onAdd={editingCategory ? handleEditCategory : handleAddCategory} 
+        onClose={handleCloseAddModal}
+        onAdd={editingCategory ? handleEditCategory : handleAddCategory}
         isLoading={addCategory.isPending || updateCategory.isPending}
       />
 
       {categoryToDelete && (
-        <ConfirmModal 
-          isOpen={!!categoryToDelete} 
-          title="Delete Category" 
-          message={`Are you sure you want to delete the category "${categoryToDelete.name}"? This action cannot be undone.`} 
-          confirmText="Delete" 
-          cancelText="Cancel" 
-          onConfirm={confirmDelete} 
-          onCancel={handleCancelDelete} 
+        <ConfirmModal
+          isOpen={!!categoryToDelete}
+          title="Delete Category"
+          message={`Are you sure you want to delete the category "${categoryToDelete.name}"? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          onConfirm={confirmDelete}
+          onCancel={handleCancelDelete}
           isDanger={true}
           isLoading={deleteCategory.isPending}
         />

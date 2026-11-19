@@ -360,26 +360,47 @@
 
 .myreq-row-card {
     background: #ffffff;
-    border: 1px solid #f1f1f4;
+    border: 1px solid #e4e4e7;
     border-radius: 14px;
-    padding: 1.15rem 1.4rem;
+    padding: 1.25rem 1.4rem;
     display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    flex-direction: column;
+    gap: 0.85rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .myreq-row-card:hover {
     border-color: #cbd5e1;
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.myreq-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.myreq-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.myreq-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
 
 .myreq-category-avatar {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -441,6 +462,12 @@
     color: #94a3b8;
 }
 
+.myreq-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
 .myreq-row-title {
     font-size: 1.0625rem;
     font-weight: 700;
@@ -488,6 +515,32 @@
     color: #94a3b8;
 }
 
+.myreq-meta-tag.quotes-received {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #ffedd5;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    font-weight: 600;
+}
+
+.myreq-meta-tag.quotes-received i {
+    color: #ea580c;
+}
+
+.myreq-meta-tag.notified-providers {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #dcfce7;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+.myreq-meta-tag.notified-providers i {
+    color: #16a34a;
+}
+
 .myreq-meta-location-text {
     max-width: 280px;
     white-space: nowrap;
@@ -495,10 +548,28 @@
     text-overflow: ellipsis;
 }
 
-.myreq-row-right {
+.myreq-card-footer {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 0.25rem;
+}
+
+.myreq-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.myreq-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
     flex-shrink: 0;
 }
 
@@ -518,17 +589,6 @@
     color: #991b1b;
 }
 
-.myreq-badge-quotes {
-    background: #fef3c7;
-    color: #b45309;
-    border: 1px solid rgba(245, 158, 11, 0.25);
-}
-
-.myreq-badge-notified {
-    background: #e0f2fe;
-    color: #0369a1;
-}
-
 .myreq-badge-completed {
     background: #dcfce7;
     color: #15803d;
@@ -537,6 +597,18 @@
 .myreq-badge-progress {
     background: #e0e7ff;
     color: #4338ca;
+}
+
+.myreq-badge-accepted {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.myreq-badge-active {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
 }
 
 .myreq-badge-cancelled {
@@ -554,6 +626,34 @@
     height: 6px;
     border-radius: 50%;
     background: currentColor;
+}
+
+.myreq-attachment-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    transition: background 0.15s ease;
+}
+
+.myreq-attachment-preview:hover {
+    background: #f8fafc;
+}
+
+.myreq-attachment-thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+}
+
+.myreq-attachment-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
 }
 
 .myreq-row-thumb {
@@ -648,19 +748,20 @@
     box-shadow: 0 4px 10px rgba(255, 121, 0, 0.35);
 }
 
-@media (max-width: 960px) {
-    .myreq-row-card {
+.myreq-btn-view-details.has-quotes {
+    background: #ea580c;
+}
+
+@media (max-width: 640px) {
+    .myreq-card-footer {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
+        align-items: stretch;
+        gap: 0.75rem;
     }
 
-    .myreq-row-right {
+    .myreq-footer-right {
         width: 100%;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        padding-top: 0.85rem;
-        border-top: 1px solid #f1f1f4;
+        justify-content: flex-end;
     }
 }
 

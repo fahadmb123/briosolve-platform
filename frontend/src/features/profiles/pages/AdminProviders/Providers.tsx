@@ -26,21 +26,19 @@ export default function Providers({ onTotalChange }: ProvidersProps) {
     const [, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
-    const getProviders = useGetProviders();
+    const { data: providersRes, isLoading } = useGetProviders({ page, search, filter, limit });
     const updateStatus = useUpdateStatus();
 
     useEffect(() => {
-        getProviders.mutate({ page, search, filter, limit }, {
-            onSuccess: (res: response<{ users: User[]; total: number; totalPages: number }>) => {
-                setProviders(res.data.users);
-                setTotal(res.data.total);
-                setTotalPages(res.data.totalPages);
-                if (onTotalChange && !search && !filter) {
-                    onTotalChange(res.data.total);
-                }
+        if (providersRes?.data) {
+            setProviders(providersRes.data.users);
+            setTotal(providersRes.data.total);
+            setTotalPages(providersRes.data.totalPages);
+            if (onTotalChange && !search && !filter) {
+                onTotalChange(providersRes.data.total);
             }
-        });
-    }, [filter, search, page]);
+        }
+    }, [providersRes, onTotalChange, search, filter]);
 
     const handleStatusButton = useCallback((id: string, status: string) => {
         const target = providers.find((u) => u.id === id);
@@ -77,7 +75,7 @@ export default function Providers({ onTotalChange }: ProvidersProps) {
             reason: pendingBlockConfirmation.reason
         }, {
             onSuccess: (res: response<{ users: User[] }>) => {
-                setProviders((users: User[]) => 
+                setProviders((users: User[]) =>
                     users.map((user) => user.id === pendingBlockConfirmation.id ? { ...user, status: "BLOCKED" } : user)
                 );
                 setPendingBlockConfirmation(null);
@@ -93,7 +91,7 @@ export default function Providers({ onTotalChange }: ProvidersProps) {
             status: "ACTIVE"
         }, {
             onSuccess: (res: response<{ users: User[] }>) => {
-                setProviders((users: User[]) => 
+                setProviders((users: User[]) =>
                     users.map((user) => user.id === providerToActivate.id ? { ...user, status: "ACTIVE" } : user)
                 );
                 setProviderToActivate(null);
@@ -116,58 +114,58 @@ export default function Providers({ onTotalChange }: ProvidersProps) {
         <>
             <div className="admin-filter-bar">
                 <div className="admin-search-input">
-                        <i className="fas fa-search"></i>
-                        <input
-                            value={search}
-                            onChange={(e) => {
-                                setSearch(e.target.value);
-                                setPage(1);
-                            }}
-                            type="text"
-                            placeholder="Search by email..."
-                            id="providerSearchInput"
-                        />
-                    </div>
-
-                    <div className="admin-filters-group">
-                        <select
-                            value={filter}
-                            onChange={(e) => {
-                                setFilter(e.target.value);
-                                setPage(1);
-                            }}
-                            className="admin-select"
-                            id="statusFilter"
-                        >
-                            <option value="">All Statuses</option>
-                            <option value="ACTIVE">Active</option>
-                            <option value="BLOCKED">Suspended</option>
-                        </select>
-
-                        <button className="btn btn-secondary text-xs py-2" onClick={handleReset}>
-                            <i className="fas fa-undo mr-1"></i>Reset
-                        </button>
-                    </div>
+                    <i className="fas fa-search"></i>
+                    <input
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setPage(1);
+                        }}
+                        type="text"
+                        placeholder="Search by email..."
+                        id="providerSearchInput"
+                    />
                 </div>
 
-                <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
-                    
-                    <div className="table-responsive">
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th style={{ width: '25%' }}>Provider &amp; Business</th>
-                                    <th style={{ width: '20%' }}>Email Address</th>
-                                    <th style={{ width: '15%' }}>Phone</th>
-                                    <th style={{ width: '10%' }}>Jobs</th>
-                                    <th style={{ width: '12%' }}>KYC Status</th>
-                                    <th style={{ width: '10%' }}>Account Status</th>
-                                    <th className="text-right" style={{ width: '8%' }}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {getProviders.isPending ? (
-                                    Array.from({ length: 8 }).map((_, i) => (
+                <div className="admin-filters-group">
+                    <select
+                        value={filter}
+                        onChange={(e) => {
+                            setFilter(e.target.value);
+                            setPage(1);
+                        }}
+                        className="admin-select"
+                        id="statusFilter"
+                    >
+                        <option value="">All Statuses</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="BLOCKED">Suspended</option>
+                    </select>
+
+                    <button className="btn btn-secondary text-xs py-2" onClick={handleReset}>
+                        <i className="fas fa-undo mr-1"></i>Reset
+                    </button>
+                </div>
+            </div>
+
+            <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
+
+                <div className="table-responsive">
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '25%' }}>Provider &amp; Business</th>
+                                <th style={{ width: '20%' }}>Email Address</th>
+                                <th style={{ width: '15%' }}>Phone</th>
+                                <th style={{ width: '10%' }}>Jobs</th>
+                                <th style={{ width: '12%' }}>KYC Status</th>
+                                <th style={{ width: '10%' }}>Account Status</th>
+                                <th className="text-right" style={{ width: '8%' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {isLoading ? (
+                                Array.from({ length: 8 }).map((_, i) => (
                                         <tr key={`provider-skel-${i}`} className="skeleton-row" style={{ opacity: 1 - i * 0.08 }}>
                                             <td className="skeleton-shimmer-cell">
                                                 <div className="flex items-center gap-3">
@@ -178,70 +176,70 @@ export default function Providers({ onTotalChange }: ProvidersProps) {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="skeleton-shimmer-cell"><Skeleton width="80%" height={14} borderRadius={6} /></td>
-                                            <td className="skeleton-shimmer-cell"><Skeleton width="65%" height={14} borderRadius={6} /></td>
-                                            <td className="skeleton-shimmer-cell"><Skeleton width={55} height={14} borderRadius={6} /></td>
-                                            <td className="skeleton-shimmer-cell"><Skeleton width={88} height={24} borderRadius={20} /></td>
-                                            <td className="skeleton-shimmer-cell"><Skeleton width={70} height={24} borderRadius={20} /></td>
-                                            <td className="skeleton-shimmer-cell text-right">
-                                                <Skeleton width={54} height={28} borderRadius={6} />
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : providers.length > 0 ? (
-                                    providers.map((provider) => (
-                                        <ProviderRow
-                                            key={provider.id}
-                                            provider={provider}
-                                            onView={handleViewProvider}
-                                            onToggleStatus={handleStatusButton}
-                                        />
-                                    ))
-                                ) : (
-                                    <tr className="admin-empty-row">
-                                        <td colSpan={7} className="admin-empty-table-cell">
-                                            <AdminNoData />
+                                        <td className="skeleton-shimmer-cell"><Skeleton width="80%" height={14} borderRadius={6} /></td>
+                                        <td className="skeleton-shimmer-cell"><Skeleton width="65%" height={14} borderRadius={6} /></td>
+                                        <td className="skeleton-shimmer-cell"><Skeleton width={55} height={14} borderRadius={6} /></td>
+                                        <td className="skeleton-shimmer-cell"><Skeleton width={88} height={24} borderRadius={20} /></td>
+                                        <td className="skeleton-shimmer-cell"><Skeleton width={70} height={24} borderRadius={20} /></td>
+                                        <td className="skeleton-shimmer-cell text-right">
+                                            <Skeleton width={54} height={28} borderRadius={6} />
                                         </td>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                        ))
+                            ) : providers.length > 0 ? (
+                                providers.map((provider) => (
+                        <ProviderRow
+                            key={provider.id}
+                            provider={provider}
+                            onView={handleViewProvider}
+                            onToggleStatus={handleStatusButton}
+                        />
+                        ))
+                        ) : (
+                        <tr className="admin-empty-row">
+                            <td colSpan={7} className="admin-empty-table-cell">
+                                <AdminNoData />
+                            </td>
+                        </tr>
+                            )}
+                    </tbody>
+                </table>
+            </div>
 
-                    <div className="admin-pagination">
-                        <div>
-                            Showing <strong>{` ${page} of ${totalPages || 1} pages`}</strong>
-                        </div>
-
-                        <div className="pagination-controls">
-                            <button
-                                className="page-btn"
-                                disabled={page <= 1}
-                                onClick={() => setPage(page - 1)}
-                            >
-                                <i className="fas fa-chevron-left"></i>
-                            </button>
-
-                            {pageNumbers.map((pageNumber) => (
-                                <button
-                                    key={pageNumber}
-                                    className={`page-btn ${page === pageNumber ? "active" : ""}`}
-                                    onClick={() => setPage(pageNumber)}
-                                >
-                                    {pageNumber}
-                                </button>
-                            ))}
-
-                            <button
-                                className="page-btn"
-                                disabled={page >= totalPages}
-                                onClick={() => setPage(page + 1)}
-                            >
-                                <i className="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
+            <div className="admin-pagination">
+                <div>
+                    Showing <strong>{` ${page} of ${totalPages || 1} pages`}</strong>
                 </div>
+
+                <div className="pagination-controls">
+                    <button
+                        className="page-btn"
+                        disabled={page <= 1}
+                        onClick={() => setPage(page - 1)}
+                    >
+                        <i className="fas fa-chevron-left"></i>
+                    </button>
+
+                    {pageNumbers.map((pageNumber) => (
+                        <button
+                            key={pageNumber}
+                            className={`page-btn ${page === pageNumber ? "active" : ""}`}
+                            onClick={() => setPage(pageNumber)}
+                        >
+                            {pageNumber}
+                        </button>
+                    ))}
+
+                    <button
+                        className="page-btn"
+                        disabled={page >= totalPages}
+                        onClick={() => setPage(page + 1)}
+                    >
+                        <i className="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div >
 
             <div className={`admin-modal-overlay ${selectedProvider ? 'active' : ''}`} id="providerDetailsModal">
                 <div className="admin-modal">

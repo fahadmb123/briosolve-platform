@@ -1,0 +1,488 @@
+[
+  {
+    "id": "table.bookings",
+    "label": "Create table \"bookings\"",
+    "summary": "Creates table \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"bookings\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"bookings\"",
+        "sql": "CREATE TABLE \"public\".\"bookings\" (\n  \"booking_number\" character varying(50) NOT NULL,\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"customer_id\" uuid NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"notes\" character varying(1000),\n  \"order_id\" character varying(255),\n  \"payment_id\" character varying(255),\n  \"platform_fee\" numeric(12,2) NOT NULL,\n  \"provider_id\" uuid NOT NULL,\n  \"quotation_id\" uuid NOT NULL,\n  \"scheduled_date\" timestamptz,\n  \"scheduled_time\" character varying(80),\n  \"service_request_id\" uuid NOT NULL,\n  \"status\" text DEFAULT 'CONFIRMED' NOT NULL,\n  \"total_amount\" numeric(12,2) NOT NULL,\n  \"updated_at\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"bookings_status_check_9a77072c\" CHECK (\"status\" IN ('CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"bookings\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.bookings.bookings_booking_number_key",
+    "label": "Add unique constraint on \"bookings\" (booking_number)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "bookings_booking_number_key",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bookings_booking_number_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_booking_number_key",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"bookings_booking_number_key\"",
+        "sql": "ALTER TABLE \"public\".\"bookings\" ADD CONSTRAINT \"bookings_booking_number_key\" UNIQUE (\"booking_number\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bookings_booking_number_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_booking_number_key",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.bookings.bookings_quotation_id_key",
+    "label": "Add unique constraint on \"bookings\" (quotation_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "bookings_quotation_id_key",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"bookings_quotation_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_quotation_id_key",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"bookings_quotation_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"bookings\" ADD CONSTRAINT \"bookings_quotation_id_key\" UNIQUE (\"quotation_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"bookings_quotation_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_quotation_id_key",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bookings.bookings_customer_id_idx_e16dfa6b",
+    "label": "Create index \"bookings_customer_id_idx_e16dfa6b\" on \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bookings_customer_id_idx_e16dfa6b",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bookings_customer_id_idx_e16dfa6b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_customer_id_idx_e16dfa6b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bookings_customer_id_idx_e16dfa6b\"",
+        "sql": "CREATE INDEX \"bookings_customer_id_idx_e16dfa6b\" ON \"public\".\"bookings\" (\"customer_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bookings_customer_id_idx_e16dfa6b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_customer_id_idx_e16dfa6b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bookings.bookings_provider_id_idx_d89e110d",
+    "label": "Create index \"bookings_provider_id_idx_d89e110d\" on \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bookings_provider_id_idx_d89e110d",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bookings_provider_id_idx_d89e110d\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_provider_id_idx_d89e110d\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bookings_provider_id_idx_d89e110d\"",
+        "sql": "CREATE INDEX \"bookings_provider_id_idx_d89e110d\" ON \"public\".\"bookings\" (\"provider_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bookings_provider_id_idx_d89e110d\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_provider_id_idx_d89e110d\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bookings.bookings_quotation_id_idx_617d3967",
+    "label": "Create index \"bookings_quotation_id_idx_617d3967\" on \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bookings_quotation_id_idx_617d3967",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bookings_quotation_id_idx_617d3967\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_quotation_id_idx_617d3967\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bookings_quotation_id_idx_617d3967\"",
+        "sql": "CREATE INDEX \"bookings_quotation_id_idx_617d3967\" ON \"public\".\"bookings\" (\"quotation_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bookings_quotation_id_idx_617d3967\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_quotation_id_idx_617d3967\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bookings.bookings_service_request_id_idx_8060a003",
+    "label": "Create index \"bookings_service_request_id_idx_8060a003\" on \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bookings_service_request_id_idx_8060a003",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bookings_service_request_id_idx_8060a003\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_service_request_id_idx_8060a003\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bookings_service_request_id_idx_8060a003\"",
+        "sql": "CREATE INDEX \"bookings_service_request_id_idx_8060a003\" ON \"public\".\"bookings\" (\"service_request_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bookings_service_request_id_idx_8060a003\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_service_request_id_idx_8060a003\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.bookings.bookings_status_idx_e98638ab",
+    "label": "Create index \"bookings_status_idx_e98638ab\" on \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "bookings_status_idx_e98638ab",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"bookings_status_idx_e98638ab\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_status_idx_e98638ab\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"bookings_status_idx_e98638ab\"",
+        "sql": "CREATE INDEX \"bookings_status_idx_e98638ab\" ON \"public\".\"bookings\" (\"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"bookings_status_idx_e98638ab\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"bookings_status_idx_e98638ab\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bookings.bookings_service_request_id_fkey",
+    "label": "Add foreign key \"bookings_service_request_id_fkey\" on \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bookings_service_request_id_fkey",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bookings_service_request_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_service_request_id_fkey",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bookings_service_request_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bookings\"\nADD CONSTRAINT \"bookings_service_request_id_fkey\"\nFOREIGN KEY (\"service_request_id\")\nREFERENCES \"public\".\"service_requests\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bookings_service_request_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_service_request_id_fkey",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bookings.bookings_quotation_id_fkey",
+    "label": "Add foreign key \"bookings_quotation_id_fkey\" on \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bookings_quotation_id_fkey",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bookings_quotation_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_quotation_id_fkey",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bookings_quotation_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bookings\"\nADD CONSTRAINT \"bookings_quotation_id_fkey\"\nFOREIGN KEY (\"quotation_id\")\nREFERENCES \"public\".\"quotations\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bookings_quotation_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_quotation_id_fkey",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bookings.bookings_customer_id_fkey",
+    "label": "Add foreign key \"bookings_customer_id_fkey\" on \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bookings_customer_id_fkey",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bookings_customer_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_customer_id_fkey",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bookings_customer_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bookings\"\nADD CONSTRAINT \"bookings_customer_id_fkey\"\nFOREIGN KEY (\"customer_id\")\nREFERENCES \"public\".\"users\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bookings_customer_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_customer_id_fkey",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.bookings.bookings_provider_id_fkey",
+    "label": "Add foreign key \"bookings_provider_id_fkey\" on \"bookings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "bookings_provider_id_fkey",
+        "table": "bookings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"bookings_provider_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_provider_id_fkey",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"bookings_provider_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"bookings\"\nADD CONSTRAINT \"bookings_provider_id_fkey\"\nFOREIGN KEY (\"provider_id\")\nREFERENCES \"public\".\"provider_profiles\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"bookings_provider_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "bookings_provider_id_fkey",
+          "public",
+          "\"public\".\"bookings\""
+        ]
+      }
+    ]
+  }
+]

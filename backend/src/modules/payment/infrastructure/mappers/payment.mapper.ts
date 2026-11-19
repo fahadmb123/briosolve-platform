@@ -29,14 +29,18 @@ export class PaymentMapper {
         quotationId: string,
         serviceRequestId: string,
         paymentId: string,
-        status: string
+        status: string,
+        bookingId?: string,
+        bookingNumber?: string
     ): VerifyPaymentResponseDto {
         return {
             success: true,
             quotationId,
             serviceRequestId,
             paymentId,
-            status
+            status,
+            bookingId,
+            bookingNumber
         };
     }
 }

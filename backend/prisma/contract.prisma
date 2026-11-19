@@ -55,6 +55,7 @@ model users {
   notifications                  notifications[]
   push_subscriptions             push_subscriptions[]
   service_requests               service_requests[]              @relation("CustomerServiceRequests")
+  bookings                       bookings[]                      @relation("CustomerBookings")
   conversation_participants      conversation_participants[]
   messages                       messages[]
 }
@@ -115,6 +116,7 @@ model provider_profiles {
   verification_documents provider_verification_documents[]
   service_requests       service_request_providers[]
   quotations             quotations[]
+  bookings               bookings[]
 }
 
 model provider_verification_documents {
@@ -372,6 +374,7 @@ model service_requests {
   images              service_request_images[]
   providers           service_request_providers[]
   quotations          quotations[]
+  bookings            bookings[]
 }
 
 model service_request_images {
@@ -497,29 +500,84 @@ enum quotation_status {
 }
 
 model quotations {
-  id                  Uuid                @id @default(uuid())
+  id                  Uuid                 @id @default(uuid())
   service_request_id  Uuid
   provider_id         Uuid
 
   amount              Numeric(12, 2)
-  quotation_type      quotation_type      @default(FIXED)
+  quotation_type      quotation_type       @default(FIXED)
   work_description    VarChar(1000)
   included_items      Json
   excluded_items      Json
   estimated_duration  VarChar(60)?
   available_date_time VarChar(80)?
-  valid_until         quotation_validity  @default(HOURS_24)
+  valid_until         quotation_validity   @default(HOURS_24)
   valid_until_date    DateTime
   extra_charge_policy VarChar(300)
-  status              quotation_status    @default(PENDING)
+  status              quotation_status     @default(PENDING)
 
-  created_at          DateTime            @default(now())
+  created_at          DateTime             @default(now())
   updated_at          temporal.updatedAt()
 
-  service_request     service_requests    @relation(fields:[service_request_id], references:[id], onDelete: Cascade)
-  provider            provider_profiles   @relation(fields:[provider_id], references:[id], onDelete: Cascade)
+  service_request     service_requests     @relation(fields:[service_request_id], references:[id], onDelete: Cascade)
+  provider            provider_profiles    @relation(fields:[provider_id], references:[id], onDelete: Cascade)
+  booking             bookings?
 
   @@index([service_request_id])
+  @@index([provider_id])
+  @@index([status])
+}
+
+enum booking_status {
+  CONFIRMED
+  EN_ROUTE
+  INSPECTION
+  IN_PROGRESS
+  PAYMENT_PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum booking_payment_status {
+  PENDING
+  ADVANCE_PAID
+  PAID
+  REFUNDED
+}
+
+model bookings {
+  id                 Uuid                   @id @default(uuid())
+  booking_number     VarChar(50)            @unique
+  service_request_id Uuid
+  quotation_id       Uuid                   @unique
+  customer_id        Uuid
+  provider_id        Uuid
+
+  total_amount       Numeric(12, 2)
+  platform_fee       Numeric(12, 2)
+  advance_amount     Numeric(12, 2)?        @default(0)
+  status             booking_status         @default(CONFIRMED)
+  payment_status     booking_payment_status @default(ADVANCE_PAID)
+
+  scheduled_date     DateTime?
+  scheduled_time     VarChar(80)?
+
+  payment_id         VarChar(255)?
+  order_id           VarChar(255)?
+
+  notes              VarChar(1000)?
+
+  created_at         DateTime             @default(now())
+  updated_at         temporal.updatedAt()
+
+  service_request    service_requests     @relation(fields:[service_request_id], references:[id], onDelete: Cascade)
+  quotation          quotations           @relation(fields:[quotation_id], references:[id], onDelete: Cascade)
+  customer           users                @relation("CustomerBookings", fields:[customer_id], references:[id])
+  provider           provider_profiles    @relation(fields:[provider_id], references:[id], onDelete: Cascade)
+
+  @@index([service_request_id])
+  @@index([quotation_id])
+  @@index([customer_id])
   @@index([provider_id])
   @@index([status])
 }

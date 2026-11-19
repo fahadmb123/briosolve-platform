@@ -99,6 +99,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             .include("address")
             .include("customer", (c) => c.include("customer_profile"))
             .include("providers")
+            .include("bookings")
             .first();
 
         if (!record) return null;
@@ -135,6 +136,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             .include("address")
             .include("customer", (c) => c.include("customer_profile"))
             .include("providers")
+            .include("bookings")
             .offset(skip)
             .limit(limit)
             .all();
@@ -286,6 +288,7 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             .include("address")
             .include("customer", (c) => c.include("customer_profile"))
             .include("providers")
+            .include("bookings")
             .offset(skip)
             .limit(limit)
             .all();

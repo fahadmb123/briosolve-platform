@@ -2,17 +2,18 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IQuotationRepository } from "../../domain/repositories/IQuotationRepository";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
+import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { AcceptQuotationInputDto } from "../dtos/request/accept-quotation.dto";
 import { AcceptQuotationResponseDto } from "../dtos/response/accept-quotation-response.dto";
 import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
-import { db } from "../../../../shared/database/client";
 
 export class AcceptQuotationUseCase implements IUseCase<AcceptQuotationInputDto, AcceptQuotationResponseDto> {
     constructor(
         private readonly _quotationRepository: IQuotationRepository,
         private readonly _serviceRequestRepository: IServiceRequestRepository,
+        private readonly _providerRepository: IProviderRepository,
         private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
 
@@ -55,9 +56,7 @@ export class AcceptQuotationUseCase implements IUseCase<AcceptQuotationInputDto,
         await this._serviceRequestRepository.updateStatus(serviceRequest.id, "ACCEPTED");
 
         if (this._createNotificationUseCase) {
-            const acceptedProfile = await db.orm.public.provider_profiles
-                .where({ id: quotation.provider_id as never })
-                .first();
+            const acceptedProfile = await this._providerRepository.findById(quotation.provider_id);
 
             if (acceptedProfile) {
                 await this._createNotificationUseCase.execute({
@@ -70,9 +69,7 @@ export class AcceptQuotationUseCase implements IUseCase<AcceptQuotationInputDto,
             }
 
             for (const other of otherQuotes) {
-                const otherProfile = await db.orm.public.provider_profiles
-                    .where({ id: other.provider_id as never })
-                    .first();
+                const otherProfile = await this._providerRepository.findById(other.provider_id);
 
                 if (otherProfile) {
                     await this._createNotificationUseCase.execute({

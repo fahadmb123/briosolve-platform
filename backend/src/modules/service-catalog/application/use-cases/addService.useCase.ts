@@ -11,11 +11,11 @@ export class AddServiceUseCase implements IUseCase<AddServiceUseCaseInputDto, Se
     constructor(
         private readonly _serviceRepository: IServiceRepository,
         private readonly _imageUploadService: ImageUploadService,
-        private readonly _categoryRepository?: ICategoryRepository
+        private readonly _categoryRepository: ICategoryRepository
     ) {}
 
     async execute(input: AddServiceUseCaseInputDto): Promise<ServiceResponseDto> {
-        if (this._categoryRepository && input.category_id) {
+        if (input.category_id) {
             const category = await this._categoryRepository.findById(input.category_id);
             if (!category) {
                 throw new ApplicationError("NOT_FOUND", "Category not found", "NOT_FOUND");

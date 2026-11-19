@@ -1,0 +1,85 @@
+.bkcard-skeleton {
+  pointer-events: none;
+}
+
+.bkcard-sk-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.7) 0%,
+    rgba(241, 245, 249, 0.9) 50%,
+    rgba(226, 232, 240, 0.7) 100%
+  );
+  background-size: 200% 100%;
+  animation: bkcardShimmer 1.5s infinite linear;
+  border-radius: 6px;
+}
+
+@keyframes bkcardShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.bkcard-sk-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.bkcard-sk-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bkcard-sk-line-sm {
+  width: 140px;
+  height: 14px;
+}
+
+.bkcard-sk-line-xs {
+  width: 90px;
+  height: 11px;
+}
+
+.bkcard-sk-badge {
+  width: 90px;
+  height: 26px;
+  border-radius: 9999px;
+}
+
+.bkcard-sk-line-md {
+  width: 60%;
+  height: 20px;
+  margin-bottom: 12px;
+}
+
+.bkcard-sk-tags {
+  display: flex;
+  gap: 10px;
+}
+
+.bkcard-sk-tag {
+  width: 110px;
+  height: 26px;
+  border-radius: 6px;
+}
+
+.bkcard-sk-price {
+  width: 120px;
+  height: 24px;
+}
+
+.bkcard-sk-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bkcard-sk-btn {
+  width: 100px;
+  height: 36px;
+  border-radius: 8px;
+}

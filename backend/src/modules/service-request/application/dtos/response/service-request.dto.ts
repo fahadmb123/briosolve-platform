@@ -44,6 +44,16 @@ export interface ServiceRequestCustomerDto {
     profile_image?: string | null;
 }
 
+export interface ServiceRequestBookingSummaryDto {
+    id: string;
+    booking_number: string;
+    status: string;
+    payment_status: string;
+    advance_amount: number;
+    total_amount: number;
+    cancellation_reason?: string | null;
+}
+
 export interface ServiceRequestDetailsDto extends ServiceRequestResponseDto {
     category_name?: string;
     category_image?: string | null;
@@ -55,6 +65,9 @@ export interface ServiceRequestDetailsDto extends ServiceRequestResponseDto {
     matched_providers_count?: number;
     quotations_count?: number;
     has_quoted?: boolean;
+    my_quotation_status?: string | null;
+    my_quotation_id?: string | null;
+    latest_booking?: ServiceRequestBookingSummaryDto | null;
 }
 
 export interface GetCustomerRequestsOutputDto {

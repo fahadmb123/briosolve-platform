@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
@@ -30,47 +30,25 @@ export default function CustomerServiceRequestDetails() {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState<boolean>(false);
   const [isReopenModalOpen, setIsReopenModalOpen] = useState<boolean>(false);
 
-  const getRequestsMutation = useGetMyServiceRequests();
+  const { data: requestsRes, refetch } = useGetMyServiceRequests({ page: 1, limit: 50 });
   const cancelMutation = useCancelServiceRequest();
   const reopenMutation = useReopenServiceRequest();
-  const hasFetchedRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (stateRequest) {
       setRequest(stateRequest);
-      return;
     }
+  }, [stateRequest]);
 
-    if (!request && requestId && !hasFetchedRef.current) {
-      hasFetchedRef.current = true;
-      getRequestsMutation.mutate(
-        { page: 1, limit: 50 },
-        {
-          onSuccess: (res: any) => {
-            const raw = res?.data || res;
-            const list = Array.isArray(raw)
-              ? raw
-              : Array.isArray(raw?.requests)
-              ? raw.requests
-              : Array.isArray(res)
-              ? res
-              : [];
-            const found = list.find((r: CustomerServiceRequestItem) => r.id === requestId);
-            if (found) {
-              setRequest(found);
-            } else {
-              toast.error("Service request not found");
-              navigate("/my-requests");
-            }
-          },
-          onError: () => {
-            toast.error("Failed to load service request details");
-            navigate("/my-requests");
-          }
-        }
-      );
+  useEffect(() => {
+    if (requestId && requestsRes?.data) {
+      const list = requestsRes.data.requests || [];
+      const found = list.find((r: CustomerServiceRequestItem) => r.id === requestId);
+      if (found) {
+        setRequest(found);
+      }
     }
-  }, [requestId, request, stateRequest, navigate]);
+  }, [requestId, requestsRes]);
 
   const permission = request ? checkRequestEditPermission(request) : { canEdit: false };
   const canCancel = request ? request.status === "PENDING" || request.status === "ACTIVE" : false;
@@ -118,8 +96,8 @@ export default function CustomerServiceRequestDetails() {
         onError: (err: any) => {
           toast.error(
             err?.response?.data?.message ||
-              err?.message ||
-              "Failed to reopen service request"
+            err?.message ||
+            "Failed to reopen service request"
           );
         }
       }
@@ -129,18 +107,7 @@ export default function CustomerServiceRequestDetails() {
   const handleQuotationAccepted = () => {
     setRequest((prev) => (prev ? { ...prev, status: "ACCEPTED" } : null));
     if (requestId) {
-      getRequestsMutation.mutate(
-        { page: 1, limit: 50 },
-        {
-          onSuccess: (res) => {
-            const list = Array.isArray(res.data) ? res.data : res.data?.requests || [];
-            const found = list.find((r: CustomerServiceRequestItem) => r.id === requestId);
-            if (found) {
-              setRequest(found);
-            }
-          }
-        }
-      );
+      refetch();
     }
   };
 

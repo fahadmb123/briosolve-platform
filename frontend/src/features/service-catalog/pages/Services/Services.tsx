@@ -29,14 +29,14 @@ export default function Services({ onTotalChange }: ServicesProps) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
   const [totalPages, setTotalPages] = useState(1);
-  
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
-  
-  const getCategories = useGetCategoriesService();
-  const getServicesMut = useGetServices();
+
+  const { data: categoriesRes } = useGetCategoriesService({ page: 1, limit: 100, search: "", filter: "ACTIVE" });
+  const { data: servicesRes, isLoading, refetch } = useGetServices({ page, limit: 10, search, filter });
   const addService = useAddServiceMut();
   const updateService = useUpdateServiceMut();
   const deleteService = useDeleteServiceMut();
@@ -45,32 +45,20 @@ export default function Services({ onTotalChange }: ServicesProps) {
   const [services, setServices] = useState<Service[]>([]);
 
   useEffect(() => {
-    getCategories.mutate({ page: 1, limit: 100, search: "", filter: "ACTIVE" }, {
-      onSuccess: (res) => {
-        if (res?.data?.categories) {
-          setCategories(res.data.categories);
-        }
-      }
-    });
-  }, []);
-
-  const getServicesFn = useCallback(() => {
-    getServicesMut.mutate({ page, limit: 10, search, filter }, {
-      onSuccess: (res) => {
-        if (res?.data?.services) {
-          setServices(res.data.services);
-          setTotalPages(res.data.totalPages || 1);
-          if (onTotalChange && !search && !filter && typeof res.data.total === 'number') {
-            onTotalChange(res.data.total);
-          }
-        }
-      }
-    });
-  }, [page, search, filter]);
+    if (categoriesRes?.data?.categories) {
+      setCategories(categoriesRes.data.categories);
+    }
+  }, [categoriesRes]);
 
   useEffect(() => {
-    getServicesFn();
-  }, [page, search, filter]);
+    if (servicesRes?.data?.services) {
+      setServices(servicesRes.data.services);
+      setTotalPages(servicesRes.data.totalPages || 1);
+      if (onTotalChange && !search && !filter && typeof servicesRes.data.total === 'number') {
+        onTotalChange(servicesRes.data.total);
+      }
+    }
+  }, [servicesRes, onTotalChange, search, filter]);
 
   const handleAddService = useCallback(async (data: { name: string; categoryId: string; categoryName: string; description: string; status: 'ACTIVE' | 'INACTIVE'; imageFile: File | null; questions?: ServiceQuestion[] | null }) => {
     const formData = getFormData(data.name, data.categoryId, data.description, data.status, data.imageFile, data.questions);
@@ -109,11 +97,11 @@ export default function Services({ onTotalChange }: ServicesProps) {
         if (services.length === 1 && page > 1) {
           setPage(page - 1);
         } else {
-          getServicesFn();
+          refetch();
         }
       }
     });
-  }, [serviceToDelete, deleteService, services.length, page, getServicesFn]);
+  }, [serviceToDelete, deleteService, services.length, page, refetch]);
 
   const handleReset = useCallback(() => {
     setSearch("");
@@ -213,13 +201,13 @@ export default function Services({ onTotalChange }: ServicesProps) {
       width: '10%',
       render: (item) => (
         <div className="flex items-center gap-2">
-          <button 
+          <button
             className="btn btn-secondary text-xs py-1 px-2"
             onClick={() => setEditingService(item)}
           >
             Edit
           </button>
-          <button 
+          <button
             className="btn btn-danger text-xs py-1 px-2"
             onClick={() => setServiceToDelete(item)}
           >
@@ -235,21 +223,21 @@ export default function Services({ onTotalChange }: ServicesProps) {
       <div className="admin-filter-bar mb-6">
         <div className="admin-search-input">
           <i className="fas fa-search"></i>
-          <input 
+          <input
             value={search}
-            onChange={(e)=>{
+            onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            type="text" 
-            placeholder="Search services..." 
+            type="text"
+            placeholder="Search services..."
           />
         </div>
 
         <div className="admin-filters-group">
           <select
             value={filter}
-            onChange={(e)=>{
+            onChange={(e) => {
               setFilter(e.target.value);
               setPage(1);
             }}
@@ -270,39 +258,39 @@ export default function Services({ onTotalChange }: ServicesProps) {
         </div>
       </div>
 
-      <AdminTable 
+      <AdminTable
         columns={columns}
         data={services}
-        isLoading={getServicesMut.isPending}
+        isLoading={isLoading}
         loadingMessage="Searching for services..."
         keyExtractor={keyExtractor}
         emptyMessage="No data found matching this."
       />
 
-      <AdminPagination 
+      <AdminPagination
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
       />
 
-      <AddServiceModal 
-        isOpen={isAddModalOpen || !!editingService} 
+      <AddServiceModal
+        isOpen={isAddModalOpen || !!editingService}
         initialData={modalInitialData}
-        onClose={handleCloseAddModal} 
-        onAdd={editingService ? handleEditService : handleAddService} 
+        onClose={handleCloseAddModal}
+        onAdd={editingService ? handleEditService : handleAddService}
         categories={categories}
         isLoading={addService.isPending || updateService.isPending}
       />
-      
+
       {serviceToDelete && (
-        <ConfirmModal 
-          isOpen={!!serviceToDelete} 
-          title="Delete Service" 
-          message={`Are you sure you want to delete the service "${serviceToDelete.name}"? This action cannot be undone.`} 
-          confirmText="Delete" 
-          cancelText="Cancel" 
-          onConfirm={confirmDelete} 
-          onCancel={handleCancelDelete} 
+        <ConfirmModal
+          isOpen={!!serviceToDelete}
+          title="Delete Service"
+          message={`Are you sure you want to delete the service "${serviceToDelete.name}"? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          onConfirm={confirmDelete}
+          onCancel={handleCancelDelete}
           isDanger={true}
           isLoading={deleteService.isPending}
         />

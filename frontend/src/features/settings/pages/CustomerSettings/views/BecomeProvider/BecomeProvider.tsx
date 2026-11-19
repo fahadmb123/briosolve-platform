@@ -27,22 +27,20 @@ export function BecomeProvider() {
 
     const sendOtpMut = useSendBecomeProviderOtp();
     const becomeProviderMut = useBecomeProvider();
-    const getCategories = useGetCategoriesService();   
+    const { data: categoriesRes, isLoading: isLoadingCategories } = useGetCategoriesService({ page: 1, limit: 100, filter: 'ACTIVE' });   
 
     useEffect(() => {
-        getCategories.mutate({ page: 1, limit: 100, filter: 'ACTIVE' }, {
-            onSuccess: (res) => {
-                const activeCats: Category[] = (res.data?.categories || []).map((cat) => ({
-                    id: cat.id,
-                    name: cat.name,
-                    services: (cat.services || [])
-                        .filter((s) => s.status === 'ACTIVE')
-                        .map((s) => ({ id: s.id, name: s.name }))
-                }));
-                setCategories(activeCats);
-            }
-        });
-    }, []);
+        if (categoriesRes?.data?.categories) {
+            const activeCats: Category[] = (categoriesRes.data.categories || []).map((cat) => ({
+                id: cat.id,
+                name: cat.name,
+                services: (cat.services || [])
+                    .filter((s) => s.status === 'ACTIVE')
+                    .map((s) => ({ id: s.id, name: s.name }))
+            }));
+            setCategories(activeCats);
+        }
+    }, [categoriesRes]);
 
     const {
         register,
@@ -177,7 +175,7 @@ export function BecomeProvider() {
                             <span className="text-danger text-xs mb-3 block">{serviceError}</span>
                         )}
 
-                        {getCategories.isPending ? (
+                        {isLoadingCategories ? (
                             <div className="text-center py-6 text-secondary text-sm">
                                 <i className="fas fa-spinner fa-spin mr-2 text-primary" />
                                 Loading services...

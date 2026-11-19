@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import { resetRazorpay } from "../utils/razorpay.utils";
 import type { CustomerServiceRequestItem } from "../../service-requests/types/serviceRequest.types";
 import "./PaymentCancelledPage.css";
 
@@ -17,6 +18,13 @@ export const PaymentCancelledPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = (location.state as PaymentCancelledLocationState) || {};
+
+  useEffect(() => {
+    resetRazorpay();
+    return () => {
+      resetRazorpay();
+    };
+  }, []);
 
   const amount = state.amount || 0;
   const serviceRequestId = state.serviceRequestId || "";

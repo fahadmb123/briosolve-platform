@@ -3,6 +3,7 @@ import { CreateBulkNotificationRequestDto } from "../../../notification/applicat
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { addressRepository, userRepository, providerRepository } from "../../../user-management/infrastructure/composition/repositories";
+import { quotationRepository } from "../../../quotation-submission/infrastructure/composition/repositories";
 import { CreateServiceRequestUseCase } from "../../application/use-cases/createServiceRequest.useCase";
 import { GetCustomerServiceRequestsUseCase } from "../../application/use-cases/getCustomerServiceRequests.useCase";
 import { GetProviderServiceRequestsUseCase } from "../../application/use-cases/getProviderServiceRequests.useCase";
@@ -49,7 +50,8 @@ export function createReopenServiceRequestUseCase(
         userRepository,
         addressRepository,
         providerSelectionService,
-        serviceRequestProviderRepository
+        serviceRequestProviderRepository,
+        quotationRepository
     );
 }
 
@@ -62,10 +64,19 @@ export const getProviderServiceRequestsUseCase = new GetProviderServiceRequestsU
     providerRepository
 );
 
-export const updateServiceRequestUseCase = new UpdateServiceRequestUseCase(
-    serviceRequestRepository,
-    imageUploadService
-);
+export function createUpdateServiceRequestUseCase(
+    createBulkNotificationUseCase: IUseCase<CreateBulkNotificationRequestDto, NotificationResponseDto[]>
+): UpdateServiceRequestUseCase {
+    return new UpdateServiceRequestUseCase(
+        serviceRequestRepository,
+        imageUploadService,
+        createBulkNotificationUseCase,
+        serviceRequestProviderRepository,
+        userRepository,
+        addressRepository,
+        providerSelectionService
+    );
+}
 
 export const getAdminServiceRequestsUseCase = new GetAdminServiceRequestsUseCase(
     serviceRequestRepository

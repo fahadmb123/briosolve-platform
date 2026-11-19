@@ -12,27 +12,20 @@ export default function Users() {
     const [customersCount, setCustomersCount] = useState<number | undefined>(undefined);
     const [providersCount, setProvidersCount] = useState<number | undefined>(undefined);
 
-    const getCustomers = useGetCustomers();
-    const getProviders = useGetProviders();
+    const { data: customersRes } = useGetCustomers({ page: 1, limit: 1, search: "", filter: "" });
+    const { data: providersRes } = useGetProviders({ page: 1, limit: 1, search: "", filter: "" });
 
     useEffect(() => {
-        getCustomers.mutate(
-            { page: 1, limit: 1, search: "", filter: "" },
-            {
-                onSuccess: (res) => {
-                    setCustomersCount(res.data.total);
-                },
-            }
-        );
-        getProviders.mutate(
-            { page: 1, limit: 1, search: "", filter: "" },
-            {
-                onSuccess: (res) => {
-                    setProvidersCount(res.data.total);
-                },
-            }
-        );
-    }, []);
+        if (customersRes?.data?.total !== undefined) {
+            setCustomersCount(customersRes.data.total);
+        }
+    }, [customersRes]);
+
+    useEffect(() => {
+        if (providersRes?.data?.total !== undefined) {
+            setProvidersCount(providersRes.data.total);
+        }
+    }, [providersRes]);
 
     const handleTabChange = (tab: 'customers' | 'providers') => {
         setSearchParams({ tab });

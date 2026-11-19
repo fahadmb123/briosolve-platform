@@ -9,7 +9,7 @@ import "./Home.css";
 export default function Home() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
-  const getCategories = useGetCategoriesService();
+  const { data: categoriesRes } = useGetCategoriesService({ page: 1, limit: 100, filter: "ACTIVE" });
   const [catalogCategories, setCatalogCategories] = useState<Category[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<string>("");
   const tabsNavRef = useRef<HTMLDivElement>(null);
@@ -28,23 +28,16 @@ export default function Home() {
   }, [user]);
 
   useEffect(() => {
-    getCategories.mutate(
-      { page: 1, limit: 100, filter: "ACTIVE" },
-      {
-        onSuccess: (res) => {
-          if (res?.data?.categories && res.data.categories.length > 0) {
-            setCatalogCategories(res.data.categories);
-            setActiveCategoryId((prev) => {
-              const matched = res.data.categories.find(
-                (c) => c.id === prev || c.name.toLowerCase().includes(prev.toLowerCase())
-              );
-              return matched ? matched.id : res.data.categories[0].id;
-            });
-          }
-        },
-      }
-    );
-  }, []);
+    if (categoriesRes?.data?.categories && categoriesRes.data.categories.length > 0) {
+      setCatalogCategories(categoriesRes.data.categories);
+      setActiveCategoryId((prev) => {
+        const matched = categoriesRes.data.categories.find(
+          (c) => c.id === prev || c.name.toLowerCase().includes(prev.toLowerCase())
+        );
+        return matched ? matched.id : categoriesRes.data.categories[0].id;
+      });
+    }
+  }, [categoriesRes]);
 
   const categories = useMemo(() => {
     return catalogCategories.map((cat) => {
@@ -264,69 +257,19 @@ export default function Home() {
           </div>
         </section>
 
-      <section id="services" className="home-section home-services-section">
-        <div className="home-section-container">
-          <div className="home-services-intro">
-            <span className="home-section-label">Service Directory</span>
-            <h2 className="home-section-title">Popular Service Categories</h2>
-            <p className="home-section-desc">
-              Browse qualified professionals ready to assist with common home
-              and trade maintenance requirements.
-            </p>
-          </div>
-
-          {categories.length === 0 ? (
-            <div className="home-folder-wrapper home-folder-skeleton-wrapper" aria-hidden="true">
-              <div className="home-services-worker-wrapper" aria-hidden="true">
-                <img
-                  src="https://res.cloudinary.com/zjhxcdmi/image/upload/e_trim,f_auto,q_auto:good/v1794656365/worker-man-standing-background-removed.png"
-                  alt="Service Professional"
-                  className="home-services-worker-img"
-                />
-              </div>
-              <div className="home-folder-tabs">
-                <div className="home-folder-tab-skeleton is-active">
-                  <div className="home-folder-skel-bar is-active-bar" />
-                </div>
-                <div className="home-folder-tab-skeleton">
-                  <div className="home-folder-skel-bar" />
-                </div>
-                <div className="home-folder-tab-skeleton">
-                  <div className="home-folder-skel-bar" />
-                </div>
-                <div className="home-folder-tab-skeleton">
-                  <div className="home-folder-skel-bar" />
-                </div>
-                <div className="home-folder-tab-skeleton">
-                  <div className="home-folder-skel-bar" />
-                </div>
-              </div>
-
-              <div className="home-folder-box is-skeleton">
-                <div className="home-folder-box-header">
-                  <div className="home-folder-box-info">
-                    <div className="home-folder-box-icon is-skeleton" />
-                    <div>
-                      <div className="home-folder-skel-title" />
-                      <div className="home-folder-skel-desc" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="home-folder-grid">
-                  {[0, 1, 2, 3].map((i) => (
-                    <div key={i} className="home-folder-card is-skeleton">
-                      <div className="home-folder-card-content">
-                        <div className="home-folder-skel-card-title" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+        <section id="services" className="home-section home-services-section">
+          <div className="home-section-container">
+            <div className="home-services-intro">
+              <span className="home-section-label">Service Directory</span>
+              <h2 className="home-section-title">Popular Service Categories</h2>
+              <p className="home-section-desc">
+                Browse qualified professionals ready to assist with common home
+                and trade maintenance requirements.
+              </p>
             </div>
-          ) : (
-            currentCategory && (
-              <div className="home-folder-wrapper">
+
+            {categories.length === 0 ? (
+              <div className="home-folder-wrapper home-folder-skeleton-wrapper" aria-hidden="true">
                 <div className="home-services-worker-wrapper" aria-hidden="true">
                   <img
                     src="https://res.cloudinary.com/zjhxcdmi/image/upload/e_trim,f_auto,q_auto:good/v1794656365/worker-man-standing-background-removed.png"
@@ -334,12 +277,62 @@ export default function Home() {
                     className="home-services-worker-img"
                   />
                 </div>
-                <div
-                  className="home-folder-tabs"
-                  role="tablist"
-                  aria-label="Service Categories"
-                  ref={tabsNavRef}
-                >
+                <div className="home-folder-tabs">
+                  <div className="home-folder-tab-skeleton is-active">
+                    <div className="home-folder-skel-bar is-active-bar" />
+                  </div>
+                  <div className="home-folder-tab-skeleton">
+                    <div className="home-folder-skel-bar" />
+                  </div>
+                  <div className="home-folder-tab-skeleton">
+                    <div className="home-folder-skel-bar" />
+                  </div>
+                  <div className="home-folder-tab-skeleton">
+                    <div className="home-folder-skel-bar" />
+                  </div>
+                  <div className="home-folder-tab-skeleton">
+                    <div className="home-folder-skel-bar" />
+                  </div>
+                </div>
+
+                <div className="home-folder-box is-skeleton">
+                  <div className="home-folder-box-header">
+                    <div className="home-folder-box-info">
+                      <div className="home-folder-box-icon is-skeleton" />
+                      <div>
+                        <div className="home-folder-skel-title" />
+                        <div className="home-folder-skel-desc" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="home-folder-grid">
+                    {[0, 1, 2, 3].map((i) => (
+                      <div key={i} className="home-folder-card is-skeleton">
+                        <div className="home-folder-card-content">
+                          <div className="home-folder-skel-card-title" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              currentCategory && (
+                <div className="home-folder-wrapper">
+                  <div className="home-services-worker-wrapper" aria-hidden="true">
+                    <img
+                      src="https://res.cloudinary.com/zjhxcdmi/image/upload/e_trim,f_auto,q_auto:good/v1794656365/worker-man-standing-background-removed.png"
+                      alt="Service Professional"
+                      className="home-services-worker-img"
+                    />
+                  </div>
+                  <div
+                    className="home-folder-tabs"
+                    role="tablist"
+                    aria-label="Service Categories"
+                    ref={tabsNavRef}
+                  >
                     <div
                       className={`home-folder-active-indicator ${hasMounted ? "is-animated" : ""}`}
                       style={{

@@ -34,15 +34,18 @@ export const useUpdateQuotation = () => {
   });
 };
 
-export const useGetQuotationByRequestId = () => {
-  return useMutation({
-    mutationFn: (requestId: string) => getQuotationByRequestId(requestId)
+export const useGetQuotationByRequestId = (requestId?: string) => {
+  return useQuery({
+    queryKey: ["quotationByRequestId", requestId],
+    queryFn: () => (requestId ? getQuotationByRequestId(requestId) : Promise.reject("No requestId")),
+    enabled: Boolean(requestId)
   });
 };
 
-export const useGetMyQuotations = () => {
-  return useMutation({
-    mutationFn: (params?: GetMyQuotationsParams) => getMyQuotationsService(params)
+export const useGetMyQuotations = (params?: GetMyQuotationsParams) => {
+  return useQuery({
+    queryKey: ["myQuotations", params],
+    queryFn: () => getMyQuotationsService(params)
   });
 };
 

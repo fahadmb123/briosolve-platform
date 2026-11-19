@@ -23,7 +23,7 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
   },
   {
     label: "Bookings",
-    to: "/provider/dashboard#bookings",
+    to: "/provider/bookings",
     icon: "fas fa-calendar-check",
   },
   {
@@ -98,6 +98,7 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/provider/service-requests") ||
     location.pathname.startsWith("/provider/requests") ||
     location.pathname.startsWith("/provider/messages") ||
+    location.pathname.startsWith("/provider/bookings") ||
     location.pathname.startsWith("/provider/chat");
 
   const activeSubnavItems = isSettingsSection

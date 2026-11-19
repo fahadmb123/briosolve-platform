@@ -19,23 +19,16 @@ export default function ProviderServiceRequestDetails() {
   );
 
   const user = useAuthStore((s) => s.user);
-  const getRequestsMutation = useGetProviderServiceRequests();
+  const { data: requestsRes } = useGetProviderServiceRequests({ page: 1, limit: 100 });
 
   useEffect(() => {
-    if (!request && requestId) {
-      getRequestsMutation.mutate(
-        { page: 1, limit: 100 },
-        {
-          onSuccess: (res) => {
-            const found = res.data?.requests?.find((r) => r.id === requestId);
-            if (found) {
-              setRequest(found);
-            }
-          }
-        }
-      );
+    if (!request && requestId && requestsRes?.data?.requests) {
+      const found = requestsRes.data.requests.find((r) => r.id === requestId);
+      if (found) {
+        setRequest(found);
+      }
     }
-  }, [requestId, request]);
+  }, [requestId, request, requestsRes]);
 
   const providerAddress = user?.current_address_id;
   const providerLat = providerAddress?.latitude != null ? Number(providerAddress.latitude) : null;

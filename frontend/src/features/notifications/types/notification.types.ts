@@ -18,7 +18,7 @@ export const NOTIFICATION_ROUTES = {
     ADMIN: "/admin/notifications",
 } as const;
 
-export const MAX_DROPDOWN_BADGE_COUNT = 9;
+export const MAX_DROPDOWN_BADGE_COUNT = 99;
 
 export const TIME_GROUPS: NotificationTimeGroup[] = [
     "Today",

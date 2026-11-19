@@ -172,6 +172,7 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
                     .include("address")
                     .include("customer", (c) => c.include("customer_profile"))
                     .include("providers")
+                    .include("quotations")
                     .first();
             })
         );
@@ -197,7 +198,10 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
             }
             const dto = ServiceRequestMapper.toDetailsDto(record, distanceKm);
             const providerRecord = record.providers?.find((p: any) => p.provider_id === providerProfileId);
-            dto.has_quoted = providerRecord?.status === "QUOTED";
+            const myQuotation = record.quotations?.find((q: any) => q.provider_id === providerProfileId);
+            dto.has_quoted = Boolean(myQuotation) || providerRecord?.status === "QUOTED";
+            dto.my_quotation_status = myQuotation?.status ? String(myQuotation.status) : null;
+            dto.my_quotation_id = myQuotation?.id || null;
             return dto;
         });
 

@@ -14,23 +14,30 @@ export const ServiceRequestCardSkeleton: React.FC<ServiceRequestCardSkeletonProp
 
   return (
     <div className={cardClass} aria-hidden="true" style={{ pointerEvents: "none" }}>
-      <Skeleton circle width={48} height={48} />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <Skeleton circle width={44} height={44} />
+          <Skeleton width={180} height={13} borderRadius={4} />
+        </div>
+        <Skeleton width={85} height={24} borderRadius={9999} />
+      </div>
 
-      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: "0.45rem" }}>
-        <Skeleton width={180} height={13} borderRadius={4} />
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
         <Skeleton width="55%" height={20} borderRadius={4} />
         <Skeleton width="85%" height={14} borderRadius={4} />
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.25rem" }}>
-          <Skeleton width={115} height={16} borderRadius={4} />
-          <Skeleton width={125} height={16} borderRadius={4} />
-          <Skeleton width={150} height={16} borderRadius={4} />
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.25rem", flexWrap: "wrap" }}>
+          <Skeleton width={120} height={16} borderRadius={4} />
+          <Skeleton width={110} height={16} borderRadius={4} />
+          <Skeleton width={140} height={16} borderRadius={4} />
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexShrink: 0 }}>
-        <Skeleton width={110} height={26} borderRadius={9999} />
-        <Skeleton width={48} height={48} borderRadius={8} />
-        <Skeleton width={110} height={34} borderRadius={9999} />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "0.85rem", borderTop: "1px solid #f1f5f9" }}>
+        <Skeleton width={110} height={24} borderRadius={6} />
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <Skeleton width={60} height={28} borderRadius={6} />
+          <Skeleton width={110} height={34} borderRadius={9999} />
+        </div>
       </div>
     </div>
   );
