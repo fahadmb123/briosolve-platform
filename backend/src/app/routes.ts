@@ -19,16 +19,12 @@ export function createRootRouter(route: RootRouterDependencies) {
     router.use("/chat", route.chatRoutes);
     router.use("/communication", route.communicationRoutes);
     router.use("/quotation", route.quotationRoutes);
-    if (route.paymentRoutes) {
-        router.use("/payment", route.paymentRoutes);
-    }
+    if (route.paymentRoutes) router.use("/payment", route.paymentRoutes)
     if (route.bookingRoutes) {
         router.use("/booking", route.bookingRoutes);
         router.use("/bookings", route.bookingRoutes);
     }
-    if (route.walletRoutes) {
-        router.use("/wallet", route.walletRoutes);
-    }
+    if (route.walletRoutes) router.use("/wallet", route.walletRoutes)
 
     return router;
 }
