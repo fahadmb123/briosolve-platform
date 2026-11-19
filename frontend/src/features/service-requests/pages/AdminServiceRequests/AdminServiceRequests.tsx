@@ -25,7 +25,12 @@ export default function AdminServiceRequests() {
   const [, setTotal] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
 
-  const getRequests = useGetAdminServiceRequests();
+  const { data: requestsRes, isLoading } = useGetAdminServiceRequests({
+    page,
+    limit,
+    search: debouncedSearch.trim() || undefined,
+    status: filter || undefined
+  });
   const cancelMutation = useAdminCancelServiceRequest();
 
   useEffect(() => {
@@ -35,32 +40,13 @@ export default function AdminServiceRequests() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const fetchRequests = useCallback(() => {
-    getRequests.mutate(
-      {
-        page,
-        limit,
-        search: debouncedSearch.trim() || undefined,
-        status: filter || undefined
-      },
-      {
-        onSuccess: (res) => {
-          if (res.data) {
-            setRequests(res.data.requests || []);
-            setTotal(res.data.total || 0);
-            setTotalPages(res.data.totalPages || 0);
-          }
-        },
-        onError: () => {
-          toast.error("Failed to load service requests");
-        }
-      }
-    );
-  }, [page, limit, debouncedSearch, filter]);
-
   useEffect(() => {
-    fetchRequests();
-  }, [fetchRequests]);
+    if (requestsRes?.data) {
+      setRequests(requestsRes.data.requests || []);
+      setTotal(requestsRes.data.total || 0);
+      setTotalPages(requestsRes.data.totalPages || 0);
+    }
+  }, [requestsRes]);
 
   const handleReset = useCallback(() => {
     setSearch("");
@@ -163,10 +149,10 @@ export default function AdminServiceRequests() {
         </div>
 
         <div className="admin-table-card" style={{ position: "relative", overflow: "hidden" }}>
-          {getRequests.isPending && <div className="skeleton-progress-bar" />}
+          {isLoading && <div className="skeleton-progress-bar" />}
           <div className="admin-table-header">
             <div className="text-sm font-semibold text-text">
-              {getRequests.isPending && (
+              {isLoading && (
                 <span className="skeleton-loading-label">
                   <span className="skeleton-dot" />
                   <span className="skeleton-dot" />
@@ -194,7 +180,7 @@ export default function AdminServiceRequests() {
                 </tr>
               </thead>
               <tbody>
-                {getRequests.isPending ? (
+                {isLoading ? (
                   Array.from({ length: 8 }).map((_, i) => (
                     <tr key={`sr-skel-${i}`} className="skeleton-row" style={{ opacity: 1 - i * 0.08 }}>
                       <td className="skeleton-shimmer-cell">
@@ -384,8 +370,8 @@ export default function AdminServiceRequests() {
                           {Array.isArray(ans.answer)
                             ? ans.answer.join(", ")
                             : typeof ans.answer === "boolean"
-                            ? ans.answer ? "Yes" : "No"
-                            : String(ans.answer ?? "N/A")}
+                              ? ans.answer ? "Yes" : "No"
+                              : String(ans.answer ?? "N/A")}
                         </span>
                       </div>
                     ))}

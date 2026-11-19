@@ -41,9 +41,21 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const [addresses, setAddresses] = useState<AddressPayload[]>([]);
 
-  const getCategoriesMutation = useGetCategoriesService();
-  const getAddressesMutation = useGetAddresses();
+  const { data: categoriesRes } = useGetCategoriesService({ page: 1, limit: 100, filter: "ACTIVE" });
+  const { data: addressesRes } = useGetAddresses({ page: 1, search: "", limit: 100 });
   const updateMutation = useUpdateServiceRequest();
+
+  useEffect(() => {
+    if (categoriesRes?.data?.categories) {
+      setCategories((categoriesRes.data.categories || []) as Category[]);
+    }
+  }, [categoriesRes]);
+
+  useEffect(() => {
+    if (addressesRes?.data?.addresses) {
+      setAddresses((addressesRes.data.addresses || []) as AddressPayload[]);
+    }
+  }, [addressesRes]);
 
   useEffect(() => {
     if (!isOpen || !request) return;
@@ -73,29 +85,6 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
     }
     setAnswers(initialAnswers);
     setQuestionErrors({});
-
-    getCategoriesMutation.mutate(
-      { page: 1, limit: 100, filter: "ACTIVE" },
-      {
-        onSuccess: (res) => {
-          const rawCats = (res.data?.categories || []) as Category[];
-          setCategories(rawCats);
-        }
-      }
-    );
-
-    const permission = checkRequestEditPermission(request);
-    if (!permission.isRestricted) {
-      getAddressesMutation.mutate(
-        { page: 1, search: "", limit: 100 },
-        {
-          onSuccess: (res) => {
-            const list = (res.data.addresses || []) as AddressPayload[];
-            setAddresses(list);
-          }
-        }
-      );
-    }
   }, [isOpen, request]);
 
   if (!isOpen || !request) return null;
@@ -284,18 +273,18 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
 
     const formattedAnswers = currentQuestions.length > 0
       ? currentQuestions
-          .filter(
-            (q) =>
-              answers[q.id] !== undefined &&
-              answers[q.id] !== null &&
-              answers[q.id] !== "" &&
-              (!Array.isArray(answers[q.id]) || answers[q.id].length > 0)
-          )
-          .map((q) => ({
-            question_id: q.id,
-            question_label: q.label,
-            answer: answers[q.id]
-          }))
+        .filter(
+          (q) =>
+            answers[q.id] !== undefined &&
+            answers[q.id] !== null &&
+            answers[q.id] !== "" &&
+            (!Array.isArray(answers[q.id]) || answers[q.id].length > 0)
+        )
+        .map((q) => ({
+          question_id: q.id,
+          question_label: q.label,
+          answer: answers[q.id]
+        }))
       : [];
 
     const payload = {
@@ -544,16 +533,14 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                                       handleAnswerChange(q.id, [...selectedArray, opt]);
                                     }
                                   }}
-                                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                                    isChecked
-                                      ? "bg-primary text-white border-primary"
-                                      : "bg-surface hover:bg-surface-hover border-border text-text"
-                                  }`}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${isChecked
+                                    ? "bg-primary text-white border-primary"
+                                    : "bg-surface hover:bg-surface-hover border-border text-text"
+                                    }`}
                                 >
                                   <i
-                                    className={`fas ${
-                                      isChecked ? "fa-check-square mr-1.5" : "fa-square mr-1.5 opacity-40"
-                                    }`}
+                                    className={`fas ${isChecked ? "fa-check-square mr-1.5" : "fa-square mr-1.5 opacity-40"
+                                      }`}
                                   ></i>
                                   {opt}
                                 </button>
@@ -567,11 +554,10 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                             <button
                               type="button"
                               onClick={() => handleAnswerChange(q.id, true)}
-                              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-colors flex items-center justify-center gap-1.5 ${
-                                currentVal === true
-                                  ? "bg-primary text-white border-primary"
-                                  : "bg-surface hover:bg-surface-hover border-border text-text"
-                              }`}
+                              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-colors flex items-center justify-center gap-1.5 ${currentVal === true
+                                ? "bg-primary text-white border-primary"
+                                : "bg-surface hover:bg-surface-hover border-border text-text"
+                                }`}
                             >
                               <i className="fas fa-check"></i>
                               <span>Yes</span>
@@ -579,11 +565,10 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                             <button
                               type="button"
                               onClick={() => handleAnswerChange(q.id, false)}
-                              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-colors flex items-center justify-center gap-1.5 ${
-                                currentVal === false
-                                  ? "bg-primary text-white border-primary"
-                                  : "bg-surface hover:bg-surface-hover border-border text-text"
-                              }`}
+                              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-colors flex items-center justify-center gap-1.5 ${currentVal === false
+                                ? "bg-primary text-white border-primary"
+                                : "bg-surface hover:bg-surface-hover border-border text-text"
+                                }`}
                             >
                               <i className="fas fa-times"></i>
                               <span>No</span>
@@ -638,9 +623,8 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                   <button
                     key={item.key}
                     type="button"
-                    className={`myreq-urgency-tab-btn ${
-                      urgency === item.key ? "active" : ""
-                    }`}
+                    className={`myreq-urgency-tab-btn ${urgency === item.key ? "active" : ""
+                      }`}
                     onClick={() => handleUrgencyChange(item.key)}
                   >
                     {item.label}

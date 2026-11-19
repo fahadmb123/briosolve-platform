@@ -12,7 +12,6 @@ import {
 import type {
   AdminKycDossier,
   AdminKycDocument,
-  AdminKycStats,
 } from "../../types/adminVerification.types";
 
 interface AdminVerificationProps {
@@ -20,18 +19,10 @@ interface AdminVerificationProps {
 }
 
 export default function Verification({ onTotalChange }: AdminVerificationProps = {}) {
-  const [dossiers, setDossiers] = useState<AdminKycDossier[]>([]);
-  const [, setStats] = useState<AdminKycStats>({
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-    total: 0,
-  });
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("PENDING");
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [selectedDossier, setSelectedDossier] = useState<AdminKycDossier | null>(
     null
   );
@@ -44,38 +35,24 @@ export default function Verification({ onTotalChange }: AdminVerificationProps =
     doc: AdminKycDocument;
   } | null>(null);
 
-  const getVerifications = useGetAdminVerifications();
   const updateKycStatus = useUpdateKycStatus();
 
-  const fetchVerifications = useCallback(() => {
-    getVerifications.mutate(
-      {
-        page,
-        limit: 10,
-        search: search.trim() || undefined,
-        status: statusFilter !== "ALL" ? statusFilter : undefined,
-        sort: sortOrder,
-      },
-      {
-        onSuccess: (res) => {
-          if (res?.data) {
-            setDossiers(res.data.dossiers || []);
-            setTotalPages(res.data.totalPages || 1);
-            if (res.data.stats) {
-              setStats(res.data.stats);
-              if (onTotalChange && typeof res.data.stats.total === 'number') {
-                onTotalChange(res.data.stats.total);
-              }
-            }
-          }
-        },
-      }
-    );
-  }, [page, search, statusFilter, sortOrder]);
+  const { data: verificationsRes, isLoading, refetch } = useGetAdminVerifications({
+    page,
+    limit: 10,
+    search: search.trim() || undefined,
+    status: statusFilter !== "ALL" ? statusFilter : undefined,
+    sort: sortOrder,
+  });
+
+  const dossiers = verificationsRes?.data?.dossiers || [];
+  const totalPages = verificationsRes?.data?.totalPages || 1;
 
   useEffect(() => {
-    fetchVerifications();
-  }, [fetchVerifications]);
+    if (onTotalChange && typeof verificationsRes?.data?.stats?.total === 'number') {
+      onTotalChange(verificationsRes.data.stats.total);
+    }
+  }, [verificationsRes?.data?.stats?.total, onTotalChange]);
 
 
   useEffect(() => {
@@ -102,11 +79,11 @@ export default function Verification({ onTotalChange }: AdminVerificationProps =
           toast.success(res?.message || "Document approved successfully.");
           setDocToApprove(null);
           setSelectedDossier(null);
-          fetchVerifications();
+          refetch();
         },
       }
     );
-  }, [docToApprove, updateKycStatus, fetchVerifications]);
+  }, [docToApprove, updateKycStatus, refetch]);
 
   const handleRejectDocument = useCallback(
     (dossier: AdminKycDossier, doc: AdminKycDocument) => {
@@ -130,12 +107,12 @@ export default function Verification({ onTotalChange }: AdminVerificationProps =
             toast.success(res?.message || "Document rejected successfully.");
             setDocToReject(null);
             setSelectedDossier(null);
-            fetchVerifications();
+            refetch();
           },
         }
       );
     },
-    [docToReject, updateKycStatus, fetchVerifications]
+    [docToReject, updateKycStatus, refetch]
   );
 
   const handleResetFilters = useCallback(() => {
@@ -210,10 +187,10 @@ export default function Verification({ onTotalChange }: AdminVerificationProps =
         render: (item) => (
           <span
             className={`badge text-xs uppercase px-2.5 py-1 rounded font-semibold ${item.kyc_status === "APPROVED"
-                ? "bg-success/15 text-success border border-success/20"
-                : item.kyc_status === "REJECTED"
-                  ? "bg-danger/15 text-danger border border-danger/20"
-                  : "bg-warning/15 text-warning border border-warning/20"
+              ? "bg-success/15 text-success border border-success/20"
+              : item.kyc_status === "REJECTED"
+                ? "bg-danger/15 text-danger border border-danger/20"
+                : "bg-warning/15 text-warning border border-warning/20"
               }`}
           >
             {item.kyc_status}
@@ -241,71 +218,71 @@ export default function Verification({ onTotalChange }: AdminVerificationProps =
   return (
     <>
       <div className="admin-filter-bar mb-6">
-          <div className="admin-search-input">
-            <i className="fas fa-search"></i>
-            <input
-              type="text"
-              placeholder="Search by specialist name, business, or email..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-
-          <div className="admin-filters-group">
-            <select
-              className="admin-select"
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setPage(1);
-              }}
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="PENDING">Pending Review</option>
-              <option value="APPROVED">Approved / Verified</option>
-              <option value="REJECTED">Rejected</option>
-            </select>
-
-            <select
-              className="admin-select"
-              value={sortOrder}
-              onChange={(e) => {
-                setSortOrder(e.target.value as "desc" | "asc");
-                setPage(1);
-              }}
-            >
-              <option value="desc">Newest First</option>
-              <option value="asc">Oldest First</option>
-            </select>
-
-            {(search || statusFilter !== "PENDING" || sortOrder !== "desc") && (
-              <button
-                type="button"
-                className="btn btn-secondary text-xs py-2"
-                onClick={handleResetFilters}
-              >
-                <i className="fas fa-undo mr-1"></i>Reset
-              </button>
-            )}
-          </div>
+        <div className="admin-search-input">
+          <i className="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Search by specialist name, business, or email..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+          />
         </div>
+
+        <div className="admin-filters-group">
+          <select
+            className="admin-select"
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="ALL">All Statuses</option>
+            <option value="PENDING">Pending Review</option>
+            <option value="APPROVED">Approved / Verified</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+
+          <select
+            className="admin-select"
+            value={sortOrder}
+            onChange={(e) => {
+              setSortOrder(e.target.value as "desc" | "asc");
+              setPage(1);
+            }}
+          >
+            <option value="desc">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
+
+          {(search || statusFilter !== "PENDING" || sortOrder !== "desc") && (
+            <button
+              type="button"
+              className="btn btn-secondary text-xs py-2"
+              onClick={handleResetFilters}
+            >
+              <i className="fas fa-undo mr-1"></i>Reset
+            </button>
+          )}
+        </div>
+      </div>
 
         <AdminTable
           columns={columns}
           data={dossiers}
-          isLoading={getVerifications.isPending}
+          isLoading={isLoading}
           emptyMessage="No data found matching this."
           keyExtractor={(item) => item.id}
         />
 
-        <AdminPagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-        />
+      <AdminPagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
 
       <VerificationReviewModal
         isOpen={!!selectedDossier}

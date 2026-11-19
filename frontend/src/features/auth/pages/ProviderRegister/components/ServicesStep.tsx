@@ -10,38 +10,32 @@ interface ServicesStepProps {
 }
 
 interface ServiceItem {
-  id: string;
-  name: string;
+    id: string;
+    name: string;
 }
 
 interface Category {
-  id: string;
-  name: string;
-  services: ServiceItem[];
+    id: string;
+    name: string;
+    services: ServiceItem[];
 }
 
 export function ServicesStep({ isActive, onNext, onBack }: ServicesStepProps) {
     const { register, formState: { errors }, trigger, watch } = useFormContext<ProviderRegistrationInputType>();
-    const getCategories = useGetCategoriesService();
+    const { data: categoriesRes, isLoading } = useGetCategoriesService({ page: 1, limit: 100, filter: 'ACTIVE' });
     const [categories, setCategories] = useState<Category[]>([]);
-    const [hasFetched, setHasFetched] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const selectedServices = watch("services") || [];
 
     useEffect(() => {
-        if (isActive && !hasFetched) {
-            setHasFetched(true);
-            getCategories.mutate({ page: 1, limit: 100, filter: 'ACTIVE' }, {
-                onSuccess: (res) => {
-                    const activeCats = (res.data?.categories || []).map((cat: any) => ({
-                        ...cat,
-                        services: (cat.services || []).filter((s: any) => s.status === 'ACTIVE')
-                    }));
-                    setCategories(activeCats);
-                }
-            });
+        if (categoriesRes?.data?.categories) {
+            const activeCats = (categoriesRes.data.categories || []).map((cat: any) => ({
+                ...cat,
+                services: (cat.services || []).filter((s: any) => s.status === 'ACTIVE')
+            }));
+            setCategories(activeCats);
         }
-    }, [isActive, hasFetched]);
+    }, [categoriesRes]);
 
     const filteredCategories = useMemo(() => {
         if (!searchQuery.trim()) return categories;
@@ -86,7 +80,7 @@ export function ServicesStep({ isActive, onNext, onBack }: ServicesStepProps) {
             </div>
 
             <div className="pro-services-scrollable">
-                {getCategories.isPending ? (
+                {isLoading ? (
                     <div className="pro-services-loading">
                         <i className="fas fa-spinner fa-spin"></i>
                         <span>Loading available services...</span>
@@ -99,10 +93,10 @@ export function ServicesStep({ isActive, onNext, onBack }: ServicesStepProps) {
                                 <div className="modern-chips-wrapper">
                                     {category.services.map((service) => (
                                         <label key={service.id} className="modern-service-chip">
-                                            <input 
-                                                type="checkbox" 
-                                                value={service.id} 
-                                                {...register("services")} 
+                                            <input
+                                                type="checkbox"
+                                                value={service.id}
+                                                {...register("services")}
                                                 className="hidden-checkbox"
                                             />
                                             <span className="chip-content">

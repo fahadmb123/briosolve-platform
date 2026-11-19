@@ -22,73 +22,71 @@ export default function Settings() {
   const providerProfile = profile as ProviderProfile | null;
   const [activeSection, setActiveSection] = useState((location.state as { activeSection?: string })?.activeSection || 'grid');
   const [tradeServicesInfo, setTradeServicesInfo] = useState<{ total: number; active: number } | null>(null);
-  const getProviderServices = useGetProviderServices();
+  const { data: providerServicesRes } = useGetProviderServices();
 
   useEffect(() => {
-    getProviderServices.mutate(undefined, {
-      onSuccess: (res) => {
-        const services = res.data || [];
-        const active = services.filter(
-          (s) => s.service?.status === 'ACTIVE' && s.service?.category?.status === 'ACTIVE'
-        ).length;
-        setTradeServicesInfo({ total: services.length, active });
-      }
-    });
-  }, []);
-
-  const tradeServicesBadge = useMemo(() => {
-    if (!tradeServicesInfo) return undefined;
-    if (tradeServicesInfo.active > 0) {
-      return { text: `${tradeServicesInfo.active} Active`, type: 'success' as const };
+    if (providerServicesRes?.data) {
+      const services = providerServicesRes.data || [];
+      const active = services.filter(
+        (s) => s.service?.status === 'ACTIVE' && s.service?.category?.status === 'ACTIVE'
+      ).length;
+      setTradeServicesInfo({ total: services.length, active });
     }
-    if (tradeServicesInfo.total > 0) {
-      return { text: 'Inactive', type: 'warning' as const };
-    }
-    return { text: 'Action Required', type: 'warning' as const };
-  }, [tradeServicesInfo]);
+  }, [providerServicesRes]);
 
-  useEffect(() => {
-    (()=>{
-        if ((location.state as { activeSection?: string })?.activeSection) {
-            setActiveSection((location.state as { activeSection?: string }).activeSection!);
+    const tradeServicesBadge = useMemo(() => {
+        if (!tradeServicesInfo) return undefined;
+        if (tradeServicesInfo.active > 0) {
+            return { text: `${tradeServicesInfo.active} Active`, type: 'success' as const };
         }
-    })()
-  }, [location.state])
+        if (tradeServicesInfo.total > 0) {
+            return { text: 'Inactive', type: 'warning' as const };
+        }
+        return { text: 'Action Required', type: 'warning' as const };
+    }, [tradeServicesInfo]);
 
-  const isContactVerified = Boolean(user?.email_verified && user?.phone_verified);
-  const isAddressVerified = Boolean(user?.current_address_id);
+    useEffect(() => {
+        (() => {
+            if ((location.state as { activeSection?: string })?.activeSection) {
+                setActiveSection((location.state as { activeSection?: string }).activeSection!);
+            }
+        })()
+    }, [location.state])
 
-  const contactBadge = useMemo(() => (
-    isContactVerified ? { text: 'Verified', type: 'success' as const } : { text: 'Action Required', type: 'warning' as const }
-  ), [isContactVerified]);
+    const isContactVerified = Boolean(user?.email_verified && user?.phone_verified);
+    const isAddressVerified = Boolean(user?.current_address_id);
 
-  const addressBadge = useMemo(() => (
-    isAddressVerified ? { text: 'Verified', type: 'success' as const } : { text: 'Action Required', type: 'warning' as const }
-  ), [isAddressVerified]);
+    const contactBadge = useMemo(() => (
+        isContactVerified ? { text: 'Verified', type: 'success' as const } : { text: 'Action Required', type: 'warning' as const }
+    ), [isContactVerified]);
 
-  const handleSelectAccount = useCallback(() => setActiveSection('account'), []);
-  const handleSelectBusiness = useCallback(() => setActiveSection('business'), []);
-  const radiusBadge = useMemo(() => ({
-    text: `${providerProfile?.service_radius_km || 20} km`,
-    type: 'info' as const
-  }), [providerProfile?.service_radius_km]);
+    const addressBadge = useMemo(() => (
+        isAddressVerified ? { text: 'Verified', type: 'success' as const } : { text: 'Action Required', type: 'warning' as const }
+    ), [isAddressVerified]);
 
-  const handleSelectServices = useCallback(() => setActiveSection('services'), []);
-  const handleSelectServiceArea = useCallback(() => setActiveSection('service-area'), []);
-  const handleSelectAvailability = useCallback(() => setActiveSection('availability'), []);
-  const handleSelectNotifications = useCallback(() => setActiveSection('notifications'), []);
-  const handleSelectAddresses = useCallback(() => setActiveSection('addresses'), []);
-  const handleBackToGrid = useCallback(() => setActiveSection('grid'), []);
-  const handleBecomeCustomer = useCallback(() => setActiveSection('become-customer'), []);
+    const handleSelectAccount = useCallback(() => setActiveSection('account'), []);
+    const handleSelectBusiness = useCallback(() => setActiveSection('business'), []);
+    const radiusBadge = useMemo(() => ({
+        text: `${providerProfile?.service_radius_km || 20} km`,
+        type: 'info' as const
+    }), [providerProfile?.service_radius_km]);
 
-  const handleServicesChange = useCallback((info: { total: number; active: number }) => {
-    setTradeServicesInfo(info);
-  }, []);
+    const handleSelectServices = useCallback(() => setActiveSection('services'), []);
+    const handleSelectServiceArea = useCallback(() => setActiveSection('service-area'), []);
+    const handleSelectAvailability = useCallback(() => setActiveSection('availability'), []);
+    const handleSelectNotifications = useCallback(() => setActiveSection('notifications'), []);
+    const handleSelectAddresses = useCallback(() => setActiveSection('addresses'), []);
+    const handleBackToGrid = useCallback(() => setActiveSection('grid'), []);
+    const handleBecomeCustomer = useCallback(() => setActiveSection('become-customer'), []);
 
-  return (
-    <>
+    const handleServicesChange = useCallback((info: { total: number; active: number }) => {
+        setTradeServicesInfo(info);
+    }, []);
+
+    return (
+        <>
             <div className="app-content">
-                
+
                 <div className="flex justify-between items-end flex-wrap gap-4 mb-5">
                     <div>
                         <h1 className="h2 mb-1">Provider Settings</h1>
@@ -98,165 +96,165 @@ export default function Settings() {
                     </div>
                 </div>
 
-                
+
                 {activeSection === 'grid' && (
-                <div id="settings-grid-view" className="flex flex-col gap-6">
-                    <div className="settings-group-box settings-verification-box">
-                        <div className="settings-group-header">
-                            <div className="settings-group-title-area">
-                                <div className="settings-group-icon verification">
-                                    <i className="fas fa-shield-alt"></i>
+                    <div id="settings-grid-view" className="flex flex-col gap-6">
+                        <div className="settings-group-box settings-verification-box">
+                            <div className="settings-group-header">
+                                <div className="settings-group-title-area">
+                                    <div className="settings-group-icon verification">
+                                        <i className="fas fa-shield-alt"></i>
+                                    </div>
+                                    <div>
+                                        <h2 className="settings-group-title">Required Verifications</h2>
+                                        <p className="settings-group-desc">Mandatory credentials, service qualification, and location coverage to operate.</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h2 className="settings-group-title">Required Verifications</h2>
-                                    <p className="settings-group-desc">Mandatory credentials, service qualification, and location coverage to operate.</p>
+                                <div className="settings-group-badge">
+                                    <span className={`badge ${isContactVerified && isAddressVerified ? 'badge-success' : 'badge-warning'} text-xs font-semibold px-2.5 py-1`}>
+                                        <i className={`fas ${isContactVerified && isAddressVerified ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-1`}></i>
+                                        {isContactVerified && isAddressVerified ? 'Verified' : 'Action Required'}
+                                    </span>
                                 </div>
                             </div>
-                            <div className="settings-group-badge">
-                                <span className={`badge ${isContactVerified && isAddressVerified ? 'badge-success' : 'badge-warning'} text-xs font-semibold px-2.5 py-1`}>
-                                    <i className={`fas ${isContactVerified && isAddressVerified ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-1`}></i>
-                                    {isContactVerified && isAddressVerified ? 'Verified' : 'Action Required'}
-                                </span>
+
+                            <div className="settings-glass-grid">
+                                <SettingsMenuCard
+                                    icon="fas fa-user-shield"
+                                    title="Account & Security"
+                                    description="Configure your sign-in credentials and two-factor auth."
+                                    onClick={handleSelectAccount}
+                                    badge={contactBadge}
+                                />
+                                <SettingsMenuCard
+                                    icon="fas fa-map-pin"
+                                    title="Manage Addresses"
+                                    description="Save your business addresses for accurate local search matching."
+                                    onClick={handleSelectAddresses}
+                                    badge={addressBadge}
+                                />
+                                <SettingsMenuCard
+                                    icon="fas fa-wrench"
+                                    title="Trade Services"
+                                    description="Manage the service categories you specialize in."
+                                    onClick={handleSelectServices}
+                                    badge={tradeServicesBadge}
+                                />
+                                <SettingsMenuCard
+                                    icon="fas fa-crosshairs"
+                                    title="Service Area & Radius"
+                                    description="Define your dispatch location and travel perimeter for receiving job leads."
+                                    onClick={handleSelectServiceArea}
+                                    badge={radiusBadge}
+                                />
                             </div>
                         </div>
 
-                        <div className="settings-glass-grid">
-                            <SettingsMenuCard
-                                icon="fas fa-user-shield"
-                                title="Account & Security"
-                                description="Configure your sign-in credentials and two-factor auth."
-                                onClick={handleSelectAccount}
-                                badge={contactBadge}
-                            />
-                            <SettingsMenuCard
-                                icon="fas fa-map-pin"
-                                title="Manage Addresses"
-                                description="Save your business addresses for accurate local search matching."
-                                onClick={handleSelectAddresses}
-                                badge={addressBadge}
-                            />
-                            <SettingsMenuCard
-                                icon="fas fa-wrench"
-                                title="Trade Services"
-                                description="Manage the service categories you specialize in."
-                                onClick={handleSelectServices}
-                                badge={tradeServicesBadge}
-                            />
-                            <SettingsMenuCard
-                                icon="fas fa-crosshairs"
-                                title="Service Area & Radius"
-                                description="Define your dispatch location and travel perimeter for receiving job leads."
-                                onClick={handleSelectServiceArea}
-                                badge={radiusBadge}
-                            />
+                        <div className="settings-group-box">
+                            <div className="settings-group-header">
+                                <div className="settings-group-title-area">
+                                    <div className="settings-group-icon preferences">
+                                        <i className="fas fa-sliders-h"></i>
+                                    </div>
+                                    <div>
+                                        <h2 className="settings-group-title">General Preferences & Operations</h2>
+                                        <p className="settings-group-desc">Manage public business identity, working schedule availability, and operational triggers.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="settings-glass-grid">
+                                <SettingsMenuCard
+                                    icon="fas fa-briefcase"
+                                    title="Business Profile"
+                                    description="Update your business name, bio, and years of experience."
+                                    onClick={handleSelectBusiness}
+                                />
+                                <SettingsMenuCard
+                                    icon="fas fa-calendar-alt"
+                                    title="Working Availability"
+                                    description="Configure your daily business hours and specific days off."
+                                    onClick={handleSelectAvailability}
+                                />
+                                <SettingsMenuCard
+                                    icon="fas fa-bell"
+                                    title="Notification Triggers"
+                                    description="Choose which marketplace events send you push alerts."
+                                    onClick={handleSelectNotifications}
+                                />
+                                <SettingsMenuCard
+                                    icon="fas fa-store"
+                                    title="Become a Customer"
+                                    description="Switch your account and start requesting for the services on the marketplace."
+                                    onClick={handleBecomeCustomer}
+                                />
+                            </div>
                         </div>
                     </div>
-
-                    <div className="settings-group-box">
-                        <div className="settings-group-header">
-                            <div className="settings-group-title-area">
-                                <div className="settings-group-icon preferences">
-                                    <i className="fas fa-sliders-h"></i>
-                                </div>
-                                <div>
-                                    <h2 className="settings-group-title">General Preferences & Operations</h2>
-                                    <p className="settings-group-desc">Manage public business identity, working schedule availability, and operational triggers.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="settings-glass-grid">
-                            <SettingsMenuCard
-                                icon="fas fa-briefcase"
-                                title="Business Profile"
-                                description="Update your business name, bio, and years of experience."
-                                onClick={handleSelectBusiness}
-                            />
-                            <SettingsMenuCard
-                                icon="fas fa-calendar-alt"
-                                title="Working Availability"
-                                description="Configure your daily business hours and specific days off."
-                                onClick={handleSelectAvailability}
-                            />
-                            <SettingsMenuCard
-                                icon="fas fa-bell"
-                                title="Notification Triggers"
-                                description="Choose which marketplace events send you push alerts."
-                                onClick={handleSelectNotifications}
-                            />
-                            <SettingsMenuCard
-                                icon="fas fa-store"
-                                title="Become a Customer"
-                                description="Switch your account and start requesting for the services on the marketplace."
-                                onClick={handleBecomeCustomer}
-                            />
-                        </div>
-                    </div>
-                </div>
                 )}
 
-                
+
                 {activeSection !== 'grid' && (
-                <div id="settings-detail-view">
-                    <div className="settings-header-back" onClick={handleBackToGrid}>
-                        <i className="fas fa-arrow-left"></i>
-                        <span>Back to Settings Menu</span>
-                    </div>
-                    
+                    <div id="settings-detail-view">
+                        <div className="settings-header-back" onClick={handleBackToGrid}>
+                            <i className="fas fa-arrow-left"></i>
+                            <span>Back to Settings Menu</span>
+                        </div>
+
                         {activeSection === 'account' && (
-                        <div className="settings-card-panel" id="sec-account">
-                            <div className="mb-5 flex justify-between items-center">
-                                <div>
-                                    <h2 className="h5 mb-1">Account &amp; Security</h2>
-                                    <p className="text-xs text-secondary">Manage your verified contact info, mobile alerts, and sign-in credentials.</p>
+                            <div className="settings-card-panel" id="sec-account">
+                                <div className="mb-5 flex justify-between items-center">
+                                    <div>
+                                        <h2 className="h5 mb-1">Account &amp; Security</h2>
+                                        <p className="text-xs text-secondary">Manage your verified contact info, mobile alerts, and sign-in credentials.</p>
+                                    </div>
+                                    <span className={`badge badge-${isContactVerified ? 'success' : 'warning'} text-xs font-semibold px-2.5 py-1`}>
+                                        {isContactVerified ? 'Verified' : 'Action Required'}
+                                    </span>
                                 </div>
-                                <span className={`badge badge-${isContactVerified ? 'success' : 'warning'} text-xs font-semibold px-2.5 py-1`}>
-                                    {isContactVerified ? 'Verified' : 'Action Required'}
-                                </span>
-                            </div>
 
-                            
-                            <ContactInfo />
 
-                            
-                            <div className="pt-4 border-top">
-                                <h3 className="h6 mb-4 font-bold">Change Account Password</h3>
-                                <ChangePasswordForm />
+                                <ContactInfo />
+
+
+                                <div className="pt-4 border-top">
+                                    <h3 className="h6 mb-4 font-bold">Change Account Password</h3>
+                                    <ChangePasswordForm />
+                                </div>
                             </div>
-                        </div>
                         )}
 
-                        
+
                         {activeSection === 'business' && (
-                        <div className="settings-card-panel" id="sec-business">
-                            <div className="mb-5">
-                                <h2 className="h5 mb-1">Business Profile</h2>
-                                <p className="text-xs text-secondary">Manage your public business identity, trade credentials, and client pitch.</p>
+                            <div className="settings-card-panel" id="sec-business">
+                                <div className="mb-5">
+                                    <h2 className="h5 mb-1">Business Profile</h2>
+                                    <p className="text-xs text-secondary">Manage your public business identity, trade credentials, and client pitch.</p>
+                                </div>
+                                <BusinessProfileForm />
                             </div>
-                            <BusinessProfileForm />
-                        </div>
                         )}
 
-                        
+
                         {activeSection === 'services' && (
-                        <div className="settings-card-panel" id="sec-services">
-                            <TradeServices onServicesChange={handleServicesChange} />
-                        </div>
+                            <div className="settings-card-panel" id="sec-services">
+                                <TradeServices onServicesChange={handleServicesChange} />
+                            </div>
                         )}
 
-                        
+
                         {activeSection === 'availability' && (
                             <AvailabilitySettings />
                         )}
 
-                        
-                        {activeSection === 'notifications' && (
-                        <div className="settings-card-panel" id="sec-notifications">
-                            <h2 className="h5 mb-2">Notification Preferences</h2>
-                            <p className="text-xs text-secondary mb-4">Choose which marketplace events trigger real-time push alerts</p>
 
-                            <BrowserPushNotificationToggle />
-                        </div>
+                        {activeSection === 'notifications' && (
+                            <div className="settings-card-panel" id="sec-notifications">
+                                <h2 className="h5 mb-2">Notification Preferences</h2>
+                                <p className="text-xs text-secondary mb-4">Choose which marketplace events trigger real-time push alerts</p>
+
+                                <BrowserPushNotificationToggle />
+                            </div>
                         )}
 
                         {activeSection === 'service-area' && (
@@ -273,10 +271,10 @@ export default function Settings() {
                                 <BecomeCustomer />
                             </Suspense>
                         )}
-                        
-                </div>
+
+                    </div>
                 )}
             </div>
-    </>
-  );
+        </>
+    );
 }

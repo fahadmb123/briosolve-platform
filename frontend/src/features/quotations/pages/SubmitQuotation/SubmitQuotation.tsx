@@ -33,42 +33,28 @@ export default function SubmitQuotation() {
 
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
 
-  const getRequestsMutation = useGetProviderServiceRequests();
-  const getMyQuotationsMutation = useGetMyQuotations();
+  const { data: requestsRes } = useGetProviderServiceRequests({ page: 1, limit: 50 });
+  const { data: quotationsRes } = useGetMyQuotations({ page: 1, limit: 50 });
   const submitQuotationMutation = useSubmitQuotation();
   const updateQuotationMutation = useUpdateQuotation();
 
   useEffect(() => {
-    if (!request && requestId) {
-      getRequestsMutation.mutate(
-        { page: 1, limit: 50 },
-        {
-          onSuccess: (res) => {
-            const found = res.data?.requests?.find((r) => r.id === requestId);
-            if (found) {
-              setRequest(found);
-            }
-          }
-        }
-      );
+    if (!request && requestId && requestsRes?.data?.requests) {
+      const found = requestsRes.data.requests.find((r) => r.id === requestId);
+      if (found) {
+        setRequest(found);
+      }
     }
-  }, [requestId, request]);
+  }, [requestId, request, requestsRes]);
 
   useEffect(() => {
-    if (!quotationToEdit && requestId && locationState?.isEditing) {
-      getMyQuotationsMutation.mutate(
-        { page: 1, limit: 50 },
-        {
-          onSuccess: (res) => {
-            const found = res.data?.quotations?.find((q) => q.serviceRequestId === requestId);
-            if (found) {
-              setQuotationToEdit(found);
-            }
-          }
-        }
-      );
+    if (!quotationToEdit && requestId && locationState?.isEditing && quotationsRes?.data?.quotations) {
+      const found = quotationsRes.data.quotations.find((q) => q.serviceRequestId === requestId);
+      if (found) {
+        setQuotationToEdit(found);
+      }
     }
-  }, [requestId, quotationToEdit, locationState?.isEditing]);
+  }, [requestId, locationState?.isEditing, quotationToEdit, quotationsRes]);
 
   const handleChatClick = () => {
     if (!request?.customer_id) {
@@ -207,8 +193,8 @@ export default function SubmitQuotation() {
             {isEditing
               ? `Update your proposal terms and pricing for "${request?.title || "service request"}"`
               : request?.title
-              ? `Submit your proposal and pricing for "${request.title}"`
-              : "Submit your proposal, deliverables, and terms directly to the customer."}
+                ? `Submit your proposal and pricing for "${request.title}"`
+                : "Submit your proposal, deliverables, and terms directly to the customer."}
           </p>
         </div>
       </div>

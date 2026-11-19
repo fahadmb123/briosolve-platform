@@ -12,31 +12,20 @@ export default function Categories() {
     const [categoriesCount, setCategoriesCount] = useState<number | undefined>(undefined);
     const [servicesCount, setServicesCount] = useState<number | undefined>(undefined);
 
-    const getCategories = useGetCategoriesService();
-    const getServices = useGetServices();
+    const { data: categoriesRes } = useGetCategoriesService({ page: 1, limit: 1 });
+    const { data: servicesRes } = useGetServices({ page: 1, limit: 1 });
 
     useEffect(() => {
-        getCategories.mutate(
-            { page: 1, limit: 1 },
-            {
-                onSuccess: (res) => {
-                    if (typeof res?.data?.total === 'number') {
-                        setCategoriesCount(res.data.total);
-                    }
-                }
-            }
-        );
-        getServices.mutate(
-            { page: 1, limit: 1 },
-            {
-                onSuccess: (res) => {
-                    if (typeof res?.data?.total === 'number') {
-                        setServicesCount(res.data.total);
-                    }
-                }
-            }
-        );
-    }, []);
+        if (typeof categoriesRes?.data?.total === 'number') {
+            setCategoriesCount(categoriesRes.data.total);
+        }
+    }, [categoriesRes]);
+
+    useEffect(() => {
+        if (typeof servicesRes?.data?.total === 'number') {
+            setServicesCount(servicesRes.data.total);
+        }
+    }, [servicesRes]);
 
     const handleTabChange = (tab: 'categories' | 'services') => {
         setSearchParams({ tab });

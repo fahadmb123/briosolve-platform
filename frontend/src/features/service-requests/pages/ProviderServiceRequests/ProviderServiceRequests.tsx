@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMutations";
@@ -23,13 +23,18 @@ export default function ProviderServiceRequests() {
   const [limit] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(false);
-  const isLoadingMoreRef = useRef<boolean>(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const [selectedRequest, setSelectedRequest] = useState<CustomerServiceRequestItem | null>(null);
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
 
-  const getRequestsMutation = useGetProviderServiceRequests();
+  const { data: requestsRes, isLoading: isQueryLoading, isFetching, refetch } = useGetProviderServiceRequests({
+    page,
+    limit,
+    search: debouncedSearch.trim() || undefined,
+    urgency: urgencyFilter !== "ALL" ? urgencyFilter : undefined,
+    sortBy,
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -38,46 +43,23 @@ export default function ProviderServiceRequests() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const fetchRequests = useCallback((pageNum: number, isReset: boolean = false) => {
-    if (pageNum > 1) {
-      isLoadingMoreRef.current = true;
+  useEffect(() => {
+    if (requestsRes?.data) {
+      const newItems = requestsRes.data.requests || [];
+      setRequests((prev) => {
+        if (page === 1) return newItems;
+        const existingIds = new Set(prev.map((r) => r.id));
+        const uniqueNewItems = newItems.filter((r) => !existingIds.has(r.id));
+        return [...prev, ...uniqueNewItems];
+      });
+      setTotalPages(requestsRes.data.totalPages || 0);
+      setHasMore(page < (requestsRes.data.totalPages || 0));
     }
-    getRequestsMutation.mutate(
-      {
-        page: pageNum,
-        limit,
-        search: debouncedSearch.trim() || undefined,
-        urgency: urgencyFilter !== "ALL" ? urgencyFilter : undefined,
-        sortBy,
-      },
-      {
-        onSuccess: (res) => {
-          isLoadingMoreRef.current = false;
-          if (res.data) {
-            const newItems = res.data.requests || [];
-            setRequests((prev) => {
-              if (isReset || pageNum === 1) return newItems;
-              const existingIds = new Set(prev.map((r) => r.id));
-              const uniqueNewItems = newItems.filter((r) => !existingIds.has(r.id));
-              return [...prev, ...uniqueNewItems];
-            });
-            setTotalPages(res.data.totalPages || 0);
-            setHasMore(pageNum < (res.data.totalPages || 0));
-          }
-        },
-        onError: () => {
-          isLoadingMoreRef.current = false;
-          toast.error("Failed to load service requests");
-        },
-      }
-    );
-  }, [limit, debouncedSearch, urgencyFilter, sortBy]);
+  }, [requestsRes, page]);
 
   useEffect(() => {
-    if (!isVerified) return;
     setPage(1);
-    fetchRequests(1, true);
-  }, [isVerified, debouncedSearch, urgencyFilter, sortBy]);
+  }, [debouncedSearch, urgencyFilter, sortBy]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -85,12 +67,8 @@ export default function ProviderServiceRequests() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoadingMoreRef.current && !getRequestsMutation.isPending) {
-          setPage((prev) => {
-            const next = prev + 1;
-            fetchRequests(next, false);
-            return next;
-          });
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          setPage((prev) => prev + 1);
         }
       },
       { rootMargin: "400px" }
@@ -98,7 +76,7 @@ export default function ProviderServiceRequests() {
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasMore, fetchRequests, getRequestsMutation.isPending]);
+  }, [hasMore, isFetching]);
 
   useEffect(() => {
     const handleNotification = (e: Event) => {
@@ -109,7 +87,7 @@ export default function ProviderServiceRequests() {
         customEvent.detail?.title_code === "SERVICE_REQUEST_UPDATED"
       ) {
         setPage(1);
-        fetchRequests(1, true);
+        refetch();
       }
     };
 
@@ -117,7 +95,7 @@ export default function ProviderServiceRequests() {
     return () => {
       window.removeEventListener("app:notification", handleNotification);
     };
-  }, [fetchRequests]);
+  }, [refetch]);
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
@@ -209,12 +187,12 @@ export default function ProviderServiceRequests() {
             className="provreq-btn-refresh"
             onClick={() => {
               setPage(1);
-              fetchRequests(1, true);
+              refetch();
             }}
-            disabled={getRequestsMutation.isPending}
+            disabled={isFetching}
           >
-            <i className={`fas fa-sync-alt ${getRequestsMutation.isPending && page === 1 ? "fa-spin" : ""}`}></i>
-            <span>{getRequestsMutation.isPending && page === 1 ? "Refreshing..." : "Refresh Leads"}</span>
+            <i className={`fas fa-sync-alt ${isFetching && page === 1 ? "fa-spin" : ""}`}></i>
+            <span>{isFetching && page === 1 ? "Refreshing..." : "Refresh Leads"}</span>
           </button>
         </div>
       </div>
@@ -275,7 +253,7 @@ export default function ProviderServiceRequests() {
         </div>
       </div>
 
-      {getRequestsMutation.isPending && requests.length === 0 ? (
+      {isQueryLoading && requests.length === 0 ? (
         <div className="provreq-cards-stack">
           {Array.from({ length: 4 }).map((_, idx) => (
             <ServiceRequestCardSkeleton key={idx} variant="provider" />
@@ -307,7 +285,7 @@ export default function ProviderServiceRequests() {
                 onChat={handleChatClick}
               />
             ))}
-            {getRequestsMutation.isPending && page > 1 &&
+            {isFetching && page > 1 &&
               Array.from({ length: 2 }).map((_, idx) => (
                 <ServiceRequestCardSkeleton key={`skeleton-${idx}`} variant="provider" />
               ))}

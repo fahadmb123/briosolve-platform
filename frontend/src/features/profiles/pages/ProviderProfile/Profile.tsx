@@ -130,8 +130,8 @@ export default function Profile() {
 
   const { mutate: updateProfileImage, isPending: isImageUploading } = useUpdateProfileImage();
   const { mutate: deleteProfileImage, isPending: isImageDeleting } = useDeleteProfileImage();
-  const getProviderServices = useGetProviderServices();
-  const getProviderVerifications = useGetProviderVerifications();
+  const { data: providerServicesRes, isLoading: isLoadingServices } = useGetProviderServices();
+  const { data: verificationsRes } = useGetProviderVerifications();
 
   useEffect(() => {
     if (!user || !profile) {
@@ -140,22 +140,18 @@ export default function Profile() {
   }, [user, profile, fetchUser]);
 
   useEffect(() => {
-    getProviderServices.mutate(undefined, {
-      onSuccess: (res) => {
-        if (res.data) {
-          setServices(res.data);
-        }
-      }
-    });
+    if (providerServicesRes?.data) {
+      setServices(providerServicesRes.data);
+    }
+  }, [providerServicesRes]);
 
-    getProviderVerifications.mutate(undefined, {
-      onSuccess: (res: response<VerificationDocument[]>) => {
-        if (res.data) {
-          setDocuments(res.data);
-        }
-      }
-    });
+  useEffect(() => {
+    if (verificationsRes?.data) {
+      setDocuments(verificationsRes.data);
+    }
+  }, [verificationsRes]);
 
+  useEffect(() => {
     if (!address) {
       getAddresses({ page: 1, limit: 5, search: '' })
         .then((res: response<{ addresses: Address[]; total: number; totalPages: number }>) => {
@@ -163,12 +159,12 @@ export default function Profile() {
             setAddress(res.data.addresses[0]);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
-  }, []);
+  }, [address]);
 
   useEffect(() => {
-    (()=>{
+    (() => {
       if (user?.current_address_id && typeof user.current_address_id === 'object') {
         setAddress(user.current_address_id as Address);
       }
@@ -176,7 +172,7 @@ export default function Profile() {
   }, [user?.current_address_id]);
 
   useEffect(() => {
-    (()=>{
+    (() => {
       if (providerProfile?.profile_image) {
         setProfileImage(providerProfile.profile_image);
       } else {
@@ -248,10 +244,10 @@ export default function Profile() {
   const kycStatus = documents.length === 0
     ? (providerProfile?.kyc_status || 'NOT_SUBMITTED')
     : bothKycApproved
-    ? 'APPROVED'
-    : allDocsRejected
-    ? 'REJECTED'
-    : 'PENDING';
+      ? 'APPROVED'
+      : allDocsRejected
+        ? 'REJECTED'
+        : 'PENDING';
 
   const isAllVerified = Boolean(
     user?.email_verified &&
@@ -272,7 +268,7 @@ export default function Profile() {
     <>
       <div className="profile-premium-wrapper">
         <div className="profile-banner flex items-start justify-end p-4">
-          
+
         </div>
 
         <div className="profile-content-grid">
@@ -406,9 +402,8 @@ export default function Profile() {
 
                 <div className="verification-item-row">
                   <div className="verification-item-left">
-                    <div className={`verification-item-icon-box ${
-                      kycStatus === 'APPROVED' ? 'verified' : kycStatus === 'REJECTED' ? 'rejected' : kycStatus === 'PENDING' ? 'pending' : 'empty'
-                    }`}>
+                    <div className={`verification-item-icon-box ${kycStatus === 'APPROVED' ? 'verified' : kycStatus === 'REJECTED' ? 'rejected' : kycStatus === 'PENDING' ? 'pending' : 'empty'
+                      }`}>
                       <i className="fas fa-id-card"></i>
                     </div>
                     <div className="verification-item-text">
@@ -416,17 +411,16 @@ export default function Profile() {
                     </div>
                   </div>
                   <div
-                    className={`verification-checkbox ${
-                      kycStatus === 'APPROVED' ? 'checked' : kycStatus === 'REJECTED' ? 'rejected' : kycStatus === 'PENDING' ? 'pending' : 'unchecked'
-                    }`}
+                    className={`verification-checkbox ${kycStatus === 'APPROVED' ? 'checked' : kycStatus === 'REJECTED' ? 'rejected' : kycStatus === 'PENDING' ? 'pending' : 'unchecked'
+                      }`}
                     title={
                       kycStatus === 'APPROVED'
                         ? 'KYC Verified'
                         : kycStatus === 'REJECTED'
-                        ? 'KYC Rejected'
-                        : kycStatus === 'PENDING'
-                        ? 'KYC In Review'
-                        : 'KYC Not Submitted'
+                          ? 'KYC Rejected'
+                          : kycStatus === 'PENDING'
+                            ? 'KYC In Review'
+                            : 'KYC Not Submitted'
                     }
                   >
                     {kycStatus === 'APPROVED' ? (
@@ -459,9 +453,8 @@ export default function Profile() {
                         </div>
                       </div>
                       <div
-                        className={`verification-checkbox ${
-                          doc.status === 'APPROVED' ? 'checked' : doc.status === 'REJECTED' ? 'rejected' : 'pending'
-                        }`}
+                        className={`verification-checkbox ${doc.status === 'APPROVED' ? 'checked' : doc.status === 'REJECTED' ? 'rejected' : 'pending'
+                          }`}
                         style={{ width: '22px', height: '22px', minWidth: '22px', borderRadius: '6px', fontSize: '0.7rem' }}
                         title={doc.status === 'APPROVED' ? 'Verified' : doc.status === 'REJECTED' ? 'Rejected' : 'Pending'}
                       >
@@ -647,7 +640,7 @@ export default function Profile() {
                   <h3 className="h4 mb-0">Services Offered</h3>
                 </div>
                 <div className="flex items-center gap-2">
-                  {getProviderServices.isPending ? (
+                  {isLoadingServices ? (
                     <Skeleton width={80} height={24} borderRadius={9999} />
                   ) : (
                     <>
@@ -662,7 +655,7 @@ export default function Profile() {
                 </div>
               </div>
 
-              {getProviderServices.isPending ? (
+              {isLoadingServices ? (
                 <div className="profile-services-grid">
                   {Array.from({ length: 3 }).map((_, index) => (
                     <ProfileServiceCardSkeleton key={`service-skeleton-${index}`} />

@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import type {VerificationDocument,VerificationDocumentType,KycSubmissionPayload,KycEditSubmissionPayload,} from '../../types/kyc.types';
+import type { VerificationDocument, VerificationDocumentType, KycSubmissionPayload, KycEditSubmissionPayload, } from '../../types/kyc.types';
 import { KycStatusBanner } from '../../components/KycStatusBanner';
 import { KycDocumentCard } from '../../components/KycDocumentCard';
 import { DocumentCardSkeleton } from '../../components/DocumentCardSkeleton';
@@ -30,21 +30,17 @@ export default function Verification() {
   const [previewImage, setPreviewImage] = useState<{ url: string; title?: string } | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
 
-  const getVerificationsMut = useGetProviderVerifications();
+  const { data: verificationsRes, isLoading } = useGetProviderVerifications();
   const uploadDocMut = useUploadVerificationDocument();
   const updateDocMut = useUpdateVerificationDocument();
   const deleteDocMut = useDeleteVerificationDocument();
-  const {fetchUser} = useAuthStore.getState()
+  const { fetchUser } = useAuthStore.getState()
 
   useEffect(() => {
-    getVerificationsMut.mutate(undefined, {
-      onSuccess: (res) => {
-        if (res?.data) {
-          setDocuments(res.data);
-        }
-      },
-    });
-  }, []);
+    if (verificationsRes?.data) {
+      setDocuments(verificationsRes.data);
+    }
+  }, [verificationsRes]);
 
   /*const docAllPending = useMemo(()=>{
     return documents.length >= 2 && documents.every((doc) => doc.status === 'PENDING');
@@ -129,7 +125,7 @@ export default function Verification() {
         `${savedDoc.document_name} Submitted!`
       );
     }
-  }, [uploadDocMut,fetchUser]);
+  }, [uploadDocMut, fetchUser]);
 
   const handleEditSubmission = useCallback(async (payload: KycEditSubmissionPayload) => {
     const formData = new FormData();
@@ -158,7 +154,7 @@ export default function Verification() {
         `${updatedDoc.document_name} Updated!`
       );
     }
-  }, [updateDocMut,fetchUser]);
+  }, [updateDocMut, fetchUser]);
 
   const handleDeleteSubmission = useCallback(async (id: string) => {
     try {
@@ -172,7 +168,7 @@ export default function Verification() {
       console.log(err);
       throw err;
     }
-  }, [deleteDocMut,fetchUser]);
+  }, [deleteDocMut, fetchUser]);
 
   const handleConfirmDelete = useCallback(async () => {
     if (!documentToDelete) return;
@@ -218,7 +214,7 @@ export default function Verification() {
 
         <KycStatusBanner documents={documents} />
 
-        {getVerificationsMut.isPending && documents.length === 0 ? (
+        {isLoading && documents.length === 0 ? (
           <div className="kyc-categories-grid">
             <DocumentCardSkeleton count={2} />
           </div>

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createServiceRequest,
   getMyServiceRequests,
@@ -8,7 +8,9 @@ import {
   cancelServiceRequest,
   adminCancelServiceRequest,
   reopenServiceRequest,
-  type ReopenServiceRequestPayload
+  type ReopenServiceRequestPayload,
+  type GetCustomerRequestsParams,
+  type GetProviderRequestsParams
 } from "../services/serviceRequest.service";
 import type { UpdateServiceRequestPayload } from "../types/serviceRequest.types";
 
@@ -22,21 +24,24 @@ export const useCreateServiceRequest = () => {
   });
 };
 
-export const useGetMyServiceRequests = () => {
-  return useMutation({
-    mutationFn: getMyServiceRequests
+export const useGetMyServiceRequests = (params?: GetCustomerRequestsParams) => {
+  return useQuery({
+    queryKey: ["myServiceRequests", params],
+    queryFn: () => getMyServiceRequests(params)
   });
 };
 
-export const useGetProviderServiceRequests = () => {
-  return useMutation({
-    mutationFn: getProviderServiceRequests
+export const useGetProviderServiceRequests = (params?: GetProviderRequestsParams) => {
+  return useQuery({
+    queryKey: ["providerServiceRequests", params],
+    queryFn: () => getProviderServiceRequests(params)
   });
 };
 
-export const useGetAdminServiceRequests = () => {
-  return useMutation({
-    mutationFn: getAdminServiceRequests
+export const useGetAdminServiceRequests = (params?: GetCustomerRequestsParams) => {
+  return useQuery({
+    queryKey: ["adminServiceRequests", params],
+    queryFn: () => getAdminServiceRequests(params)
   });
 };
 
@@ -78,8 +83,6 @@ export const useReopenServiceRequest = () => {
       reopenServiceRequest(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myServiceRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["adminServiceRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["providerServiceRequests"] });
     }
   });
 };

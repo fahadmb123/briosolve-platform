@@ -28,21 +28,19 @@ export default function Customers({ onTotalChange }: CustomersProps) {
     const [, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
-    const getCustomers = useGetCustomers();
+    const { data: customersRes, isLoading } = useGetCustomers({ page, search, filter, limit });
     const updateStatus = useUpdateStatus();
 
     useEffect(() => {
-        getCustomers.mutate({ page, search, filter, limit }, {
-            onSuccess: (res: response<{ users: User[]; total: number; totalPages: number }>) => {
-                setCustomers(res.data.users);
-                setTotal(res.data.total);
-                setTotalPages(res.data.totalPages);
-                if (onTotalChange && !search && !filter) {
-                    onTotalChange(res.data.total);
-                }
+        if (customersRes?.data) {
+            setCustomers(customersRes.data.users);
+            setTotal(customersRes.data.total);
+            setTotalPages(customersRes.data.totalPages);
+            if (onTotalChange && !search && !filter) {
+                onTotalChange(customersRes.data.total);
             }
-        });
-    }, [filter, search, page]);
+        }
+    }, [customersRes, onTotalChange, search, filter]);
 
     const handleStatusButton = useCallback((id: string, status: string) => {
         const target = customers.find((u) => u.id === id);
@@ -79,7 +77,7 @@ export default function Customers({ onTotalChange }: CustomersProps) {
             reason: pendingBlockConfirmation.reason
         }, {
             onSuccess: (res: response<{ users: User[] }>) => {
-                setCustomers((users: User[]) => 
+                setCustomers((users: User[]) =>
                     users.map((user) => user.id === pendingBlockConfirmation.id ? { ...user, status: "BLOCKED" } : user)
                 );
                 setPendingBlockConfirmation(null);
@@ -95,7 +93,7 @@ export default function Customers({ onTotalChange }: CustomersProps) {
             status: "ACTIVE"
         }, {
             onSuccess: (res: response<{ users: User[] }>) => {
-                setCustomers((users: User[]) => 
+                setCustomers((users: User[]) =>
                     users.map((user) => user.id === customerToActivate.id ? { ...user, status: "ACTIVE" } : user)
                 );
                 setCustomerToActivate(null);
@@ -115,43 +113,43 @@ export default function Customers({ onTotalChange }: CustomersProps) {
     }, [totalPages]);
     return (
         <>
-        <div className="admin-filter-bar">
-            <div className="admin-search-input">
-                <i className="fas fa-search"></i>
-                <input 
-                    onChange={(e)=>{
-                        setSearch(e.target.value)
-                        setPage(1)
-                    }}
-                    type="text" placeholder="Search for email..." id="userSearchInput" 
-                 />
+            <div className="admin-filter-bar">
+                <div className="admin-search-input">
+                    <i className="fas fa-search"></i>
+                    <input
+                        onChange={(e) => {
+                            setSearch(e.target.value)
+                            setPage(1)
+                        }}
+                        type="text" placeholder="Search for email..." id="userSearchInput"
+                    />
+                </div>
+
+                <div className="admin-filters-group">
+
+
+                    <select
+                        value={filter}
+                        onChange={(e) => {
+                            setFilter(e.target.value)
+                            setPage(1)
+                        }}
+                        className="admin-select" id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="BLOCKED">Suspended</option>
+                    </select>
+
+                    <button className="btn btn-secondary text-xs py-2" onClick={() => handleReset()}>
+                        <i className="fas fa-undo mr-1"></i>Reset
+                    </button>
+                </div>
             </div>
 
-            <div className="admin-filters-group">
 
-
-                <select
-                    value={filter}
-                    onChange={(e)=>{
-                        setFilter(e.target.value)
-                        setPage(1)
-                    }}
-                     className="admin-select" id="statusFilter">
-                    <option value="">All Statuses</option>
-                    <option value="ACTIVE">Active</option>
-                    <option value="BLOCKED">Suspended</option>
-                </select>
-
-                <button  className="btn btn-secondary text-xs py-2" onClick={() => handleReset()}>
-                    <i className="fas fa-undo mr-1"></i>Reset
-                </button>
-            </div>
-        </div>
-
-    
-        <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
-            <div className="table-responsive">
-                <table className="admin-table">
+            <div className="admin-table-card" style={{ position: 'relative', overflow: 'hidden' }}>
+                <div className="table-responsive">
+                    <table className="admin-table">
                         <thead>
                             <tr>
                                 <th style={{ width: '20%' }}>Customer Name</th>
@@ -163,7 +161,7 @@ export default function Customers({ onTotalChange }: CustomersProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {getCustomers.isPending ? (
+                            {isLoading ? (
                                 Array.from({ length: 8 }).map((_, i) => (
                                     <tr key={`customer-skel-${i}`} className="skeleton-row" style={{ opacity: 1 - i * 0.08 }}>
                                         <td className="skeleton-shimmer-cell">
@@ -202,9 +200,9 @@ export default function Customers({ onTotalChange }: CustomersProps) {
                             )}
                         </tbody>
                     </table>
-            </div>
+                </div>
 
-                
+
                 <div className="admin-pagination">
                     <div>
                         Showing <strong>{` ${page} of ${totalPages || 1} pages`}</strong>
@@ -223,9 +221,8 @@ export default function Customers({ onTotalChange }: CustomersProps) {
                         {pageNumbers.map((pageNumber) => (
                             <button
                                 key={pageNumber}
-                                className={`page-btn ${
-                                    page === pageNumber ? "active" : ""
-                                }`}
+                                className={`page-btn ${page === pageNumber ? "active" : ""
+                                    }`}
                                 onClick={() => setPage(pageNumber)}
                             >
                                 {pageNumber}
@@ -240,70 +237,70 @@ export default function Customers({ onTotalChange }: CustomersProps) {
                             <i className="fas fa-chevron-right"></i>
                         </button>
 
-                </div>
-                </div>
-            </div>
-            
-        
-
-        
-        <div className={`admin-modal-overlay ${selectedCustomer ? 'active' : ''}`} id="userDetailsModal">
-            <div className="admin-modal">
-                <div className="admin-modal-header">
-                    <div className="flex items-center gap-2">
-                        <i className="fas fa-id-card text-primary"></i>
-                        <h3 className="h6 mb-0">Platform User Dossier</h3>
                     </div>
-                    <button className="btn-icon" onClick={handleCloseCustomerModal}><i className="fas fa-times"></i></button>
-                </div>
-                <div className="admin-modal-body">
-                    {selectedCustomer && (
-                        <>
-                            <div className="text-center mb-6">
-                                <img
-                                    src={selectedCustomer.customer_profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedCustomer.name)}&background=6366F1&color=fff`}
-                                    className="avatar avatar-lg mx-auto mb-3 border border-border rounded-full"
-                                    alt="Avatar"
-                                    style={{ width: '80px', height: '80px', objectFit: 'cover' }}
-                                />
-                                <h4 className="h5 mb-1 text-text">{selectedCustomer.name}</h4>
-                                <span className={`badge ${selectedCustomer.status === 'ACTIVE' ? 'badge-verified' : selectedCustomer.status === 'BLOCKED' ? 'badge-danger-alert' : 'badge-pending'} text-xs`}>
-                                    {selectedCustomer.status}
-                                </span>
-                            </div>
-                            
-                            <div className="flex flex-col gap-3">
-                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
-                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Email Address</span>
-                                    <span className="text-sm font-semibold text-text">{selectedCustomer.email}</span>
-                                </div>
-                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
-                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Phone Number</span>
-                                    <span className="text-sm font-semibold text-text">{selectedCustomer.phone || 'N/A'}</span>
-                                </div>
-                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
-                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Location</span>
-                                    <span className="text-sm font-semibold text-text">N/A</span>
-                                </div>
-                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
-                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Joined Date</span>
-                                    <span className="text-sm font-semibold text-text">{new Date(selectedCustomer.created_at.toString()).toLocaleDateString()}</span>
-                                </div>
-                                <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
-                                    <span className="text-xs text-secondary font-medium uppercase tracking-wider">Internal ID</span>
-                                    <span className="text-xs font-mono text-muted">{selectedCustomer.id}</span>
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </div>
-                <div className="admin-modal-footer">
-                    <button className="btn btn-secondary text-xs" onClick={handleCloseCustomerModal}>Close</button>
                 </div>
             </div>
-        </div>
 
-        
+
+
+
+            <div className={`admin-modal-overlay ${selectedCustomer ? 'active' : ''}`} id="userDetailsModal">
+                <div className="admin-modal">
+                    <div className="admin-modal-header">
+                        <div className="flex items-center gap-2">
+                            <i className="fas fa-id-card text-primary"></i>
+                            <h3 className="h6 mb-0">Platform User Dossier</h3>
+                        </div>
+                        <button className="btn-icon" onClick={handleCloseCustomerModal}><i className="fas fa-times"></i></button>
+                    </div>
+                    <div className="admin-modal-body">
+                        {selectedCustomer && (
+                            <>
+                                <div className="text-center mb-6">
+                                    <img
+                                        src={selectedCustomer.customer_profile?.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedCustomer.name)}&background=6366F1&color=fff`}
+                                        className="avatar avatar-lg mx-auto mb-3 border border-border rounded-full"
+                                        alt="Avatar"
+                                        style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                                    />
+                                    <h4 className="h5 mb-1 text-text">{selectedCustomer.name}</h4>
+                                    <span className={`badge ${selectedCustomer.status === 'ACTIVE' ? 'badge-verified' : selectedCustomer.status === 'BLOCKED' ? 'badge-danger-alert' : 'badge-pending'} text-xs`}>
+                                        {selectedCustomer.status}
+                                    </span>
+                                </div>
+
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                        <span className="text-xs text-secondary font-medium uppercase tracking-wider">Email Address</span>
+                                        <span className="text-sm font-semibold text-text">{selectedCustomer.email}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                        <span className="text-xs text-secondary font-medium uppercase tracking-wider">Phone Number</span>
+                                        <span className="text-sm font-semibold text-text">{selectedCustomer.phone || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                        <span className="text-xs text-secondary font-medium uppercase tracking-wider">Location</span>
+                                        <span className="text-sm font-semibold text-text">N/A</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                        <span className="text-xs text-secondary font-medium uppercase tracking-wider">Joined Date</span>
+                                        <span className="text-sm font-semibold text-text">{new Date(selectedCustomer.created_at.toString()).toLocaleDateString()}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3 border border-border rounded bg-surface-elevated">
+                                        <span className="text-xs text-secondary font-medium uppercase tracking-wider">Internal ID</span>
+                                        <span className="text-xs font-mono text-muted">{selectedCustomer.id}</span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    <div className="admin-modal-footer">
+                        <button className="btn btn-secondary text-xs" onClick={handleCloseCustomerModal}>Close</button>
+                    </div>
+                </div>
+            </div>
+
+
             <BlockReasonModal
                 isOpen={!!customerToBlock}
                 userName={customerToBlock?.name || "Customer"}

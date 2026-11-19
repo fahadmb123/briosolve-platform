@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import "./MyRequests.css";
@@ -56,64 +56,48 @@ export default function MyRequests() {
   const [isReopenModalOpen, setIsReopenModalOpen] = useState<boolean>(false);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const isLoadingMoreRef = useRef<boolean>(false);
 
-  const getRequestsMutation = useGetMyServiceRequests();
   const cancelMutation = useCancelServiceRequest();
   const reopenMutation = useReopenServiceRequest();
 
-  const fetchRequests = useCallback((pageNum: number, isInitial: boolean = false) => {
-    if (pageNum > 1) {
-      isLoadingMoreRef.current = true;
-    }
-    getRequestsMutation.mutate(
-      {
-        page: pageNum,
-        limit: 10,
-        search: searchQuery.trim() || undefined,
-        status: selectedStatus !== "ALL" ? selectedStatus : undefined,
-        sortBy
-      },
-      {
-        onSuccess: (res) => {
-          isLoadingMoreRef.current = false;
-          if (res.data) {
-            const data = res.data;
-            if (Array.isArray(data)) {
-              setRequests((prev) => {
-                if (isInitial || pageNum === 1) return data;
-                const existingIds = new Set(prev.map((r) => r.id));
-                const newItems = data.filter((r) => !existingIds.has(r.id));
-                return [...prev, ...newItems];
-              });
-            } else {
-              const incoming = data.requests || [];
-              setRequests((prev) => {
-                if (isInitial || pageNum === 1) return incoming;
-                const existingIds = new Set(prev.map((r) => r.id));
-                const newItems = incoming.filter((r) => !existingIds.has(r.id));
-                return [...prev, ...newItems];
-              });
-              if (data.counts) {
-                setCounts((prev) => ({ ...prev, ...data.counts }));
-              }
-              if (data.total !== undefined) setTotal(data.total);
-              if (data.totalPages !== undefined) setTotalPages(data.totalPages);
-            }
-          }
-        },
-        onError: () => {
-          isLoadingMoreRef.current = false;
-          toast.error("Failed to load your service requests");
+  const { data: requestsRes, isLoading: isQueryLoading, isFetching, refetch } = useGetMyServiceRequests({
+    page,
+    limit: 10,
+    search: searchQuery.trim() || undefined,
+    status: selectedStatus !== "ALL" ? selectedStatus : undefined,
+    sortBy
+  });
+
+  useEffect(() => {
+    if (requestsRes?.data) {
+      const data = requestsRes.data;
+      if (Array.isArray(data)) {
+        setRequests((prev) => {
+          if (page === 1) return data;
+          const existingIds = new Set(prev.map((r) => r.id));
+          const newItems = data.filter((r) => !existingIds.has(r.id));
+          return [...prev, ...newItems];
+        });
+      } else {
+        const incoming = data.requests || [];
+        setRequests((prev) => {
+          if (page === 1) return incoming;
+          const existingIds = new Set(prev.map((r) => r.id));
+          const newItems = incoming.filter((r) => !existingIds.has(r.id));
+          return [...prev, ...newItems];
+        });
+        if (data.counts) {
+          setCounts((prev) => ({ ...prev, ...data.counts }));
         }
+        if (data.total !== undefined) setTotal(data.total);
+        if (data.totalPages !== undefined) setTotalPages(data.totalPages);
       }
-    );
-  }, [searchQuery, selectedStatus, sortBy]);
+    }
+  }, [requestsRes, page]);
 
   useEffect(() => {
     setPage(1);
-    fetchRequests(1, true);
-  }, [fetchRequests]);
+  }, [searchQuery, selectedStatus, sortBy]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -121,12 +105,8 @@ export default function MyRequests() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && page < totalPages && !isLoadingMoreRef.current && !getRequestsMutation.isPending) {
-          setPage((prev) => {
-            const nextPage = prev + 1;
-            fetchRequests(nextPage, false);
-            return nextPage;
-          });
+        if (entries[0].isIntersecting && page < totalPages && !isFetching) {
+          setPage((prev) => prev + 1);
         }
       },
       { rootMargin: "400px" }
@@ -134,7 +114,7 @@ export default function MyRequests() {
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [page, totalPages, getRequestsMutation.isPending, fetchRequests]);
+  }, [page, totalPages, isFetching]);
 
   const handleStatusChange = (status: StatusFilterType) => {
     setSelectedStatus(status);
@@ -211,13 +191,14 @@ export default function MyRequests() {
               prev.map((r) => (r.id === res.data.id ? { ...r, ...res.data } : r))
             );
           }
-          fetchRequests(1, true);
+          setPage(1);
+          refetch();
         },
         onError: (err: any) => {
           toast.error(
             err?.response?.data?.message ||
-              err?.message ||
-              "Failed to reopen service request"
+            err?.message ||
+            "Failed to reopen service request"
           );
         }
       }
@@ -231,7 +212,8 @@ export default function MyRequests() {
     if (selectedRequestForDetails?.id === updated.id) {
       setSelectedRequestForDetails(updated);
     }
-    fetchRequests(1, true);
+    setPage(1);
+    refetch();
   };
 
   const handleConfirmCancel = () => {
@@ -241,7 +223,8 @@ export default function MyRequests() {
       onSuccess: () => {
         toast.success("Service request cancelled");
         handleCloseCancel();
-        fetchRequests(1, true);
+        setPage(1);
+        refetch();
       },
       onError: (err: any) => {
         toast.error(err?.response?.data?.message || err?.message || "Failed to cancel request");
@@ -249,7 +232,7 @@ export default function MyRequests() {
     });
   };
 
-  const isLoading = getRequestsMutation.isPending && requests.length === 0;
+  const isLoading = isQueryLoading && requests.length === 0;
 
   return (
     <div className="app-content myreq-wrapper">
@@ -339,7 +322,7 @@ export default function MyRequests() {
                 onReopenRequest={handleOpenReopen}
               />
             ))}
-            {getRequestsMutation.isPending && page > 1 &&
+            {isFetching && page > 1 &&
               Array.from({ length: 2 }).map((_, idx) => (
                 <ServiceRequestCardSkeleton key={`skeleton-${idx}`} variant="customer" />
               ))}

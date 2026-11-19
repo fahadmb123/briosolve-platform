@@ -38,11 +38,11 @@ const AvailabilitySettingsComponent: React.FC = () => {
     const { profile, fetchUser } = useAuthStore();
     const providerProfile = profile as ProviderProfile | null;
 
-    const getAvailability = useGetProviderAvailability();
+    const { data: availabilityRes, isLoading: isAvailabilityLoading } = useGetProviderAvailability();
     const setAvailability = useSetProviderAvailability();
     const updateTravelBuffer = useUpdateTravelBuffer();
     const updateAcceptingLeads = useUpdateAcceptingLeads();
-    const getOverrides = useGetProviderAvailabilityOverrides();
+    const { data: overridesRes } = useGetProviderAvailabilityOverrides();
     const createOverride = useCreateProviderAvailabilityOverride();
     const deleteOverride = useDeleteProviderAvailabilityOverride();
 
@@ -66,7 +66,7 @@ const AvailabilitySettingsComponent: React.FC = () => {
     }, [profile, fetchUser]);
 
     useEffect(() => {
-        (()=>{
+        (() => {
             if (providerProfile) {
                 if (providerProfile.accepting_leads !== undefined) {
                     setAcceptingLeads(providerProfile.accepting_leads);
@@ -79,39 +79,35 @@ const AvailabilitySettingsComponent: React.FC = () => {
     }, [providerProfile]);
 
     useEffect(() => {
-        getAvailability.mutate(undefined, {
-            onSuccess: (res) => {
-                const slots = res.data || [];
-                setSchedule((prev) =>
-                    prev.map((dayItem) => {
-                        const matched = slots.find(
-                            (s) => s.day_of_week === (dayItem.day.toUpperCase() as Weekday)
-                        );
-                        if (matched) {
-                            return {
-                                ...dayItem,
-                                isEnabled: true,
-                                startTime: matched.start_time,
-                                endTime: matched.end_time
-                            };
-                        }
+        if (availabilityRes?.data) {
+            const slots = availabilityRes.data || [];
+            setSchedule((prev) =>
+                prev.map((dayItem) => {
+                    const matched = slots.find(
+                        (s) => s.day_of_week === (dayItem.day.toUpperCase() as Weekday)
+                    );
+                    if (matched) {
                         return {
                             ...dayItem,
-                            isEnabled: false
+                            isEnabled: true,
+                            startTime: matched.start_time,
+                            endTime: matched.end_time
                         };
-                    })
-                );
-            }
-        });
-    }, []);
+                    }
+                    return {
+                        ...dayItem,
+                        isEnabled: false
+                    };
+                })
+            );
+        }
+    }, [availabilityRes]);
 
     useEffect(() => {
-        getOverrides.mutate(undefined, {
-            onSuccess: (res) => {
-                setDateOverrides(res.data || []);
-            }
-        });
-    }, []);
+        if (overridesRes?.data) {
+            setDateOverrides(overridesRes.data || []);
+        }
+    }, [overridesRes]);
 
     const handleToggleDay = useCallback((idx: number) => {
         setSchedule((prev) =>
@@ -244,7 +240,7 @@ const AvailabilitySettingsComponent: React.FC = () => {
 
     const isSavingSchedule = setAvailability.isPending || updateAcceptingLeads.isPending;
     const isSavingBuffer = updateTravelBuffer.isPending;
-    const isLoadingAvailability = getAvailability.isPending;
+    const isLoadingAvailability = isAvailabilityLoading;
 
     const handleSaveSchedule = useCallback(() => {
         const enabledSlots = schedule
@@ -477,52 +473,52 @@ const AvailabilitySettingsComponent: React.FC = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                            <td className="py-3.5 px-4 align-middle">
-                                                {override.type === 'DAY_OFF' ? (
-                                                    <span
-                                                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
-                                                        style={{ backgroundColor: 'rgba(239, 68, 68, 0.12)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.25)' }}
-                                                    >
-                                                        <i className="fas fa-bed text-[10px]"></i> Day Off
-                                                    </span>
-                                                ) : (
-                                                    <span
-                                                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
-                                                        style={{ backgroundColor: 'rgba(212, 172, 119, 0.15)', color: 'var(--primary)', border: '1px solid rgba(212, 172, 119, 0.3)' }}
-                                                    >
-                                                        <i className="fas fa-business-time text-[10px]"></i> Custom Hours
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="py-3.5 px-4 align-middle">
-                                                {override.type === 'CUSTOM_HOURS' && override.start_time && override.end_time ? (
-                                                    <div className="flex items-center gap-1.5 text-xs font-semibold text-text">
-                                                        <i className="far fa-clock text-secondary text-[11px]"></i>
-                                                        <span>{override.start_time} - {override.end_time}</span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-xs text-secondary italic">All Day Off</span>
-                                                )}
-                                            </td>
-                                            <td className="py-3.5 px-4 align-middle text-xs text-secondary">
-                                                {override.reason ? (
-                                                    <span className="text-text font-medium">{override.reason}</span>
-                                                ) : (
-                                                    <span className="text-muted">—</span>
-                                                )}
-                                            </td>
-                                            <td className="py-3.5 px-4 align-middle text-right">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setOverrideToDelete(override.id)}
-                                                    disabled={deleteOverride.isPending}
-                                                    className="btn-icon text-danger hover:text-red-500 cursor-pointer"
-                                                    title="Delete override"
+                                        <td className="py-3.5 px-4 align-middle">
+                                            {override.type === 'DAY_OFF' ? (
+                                                <span
+                                                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+                                                    style={{ backgroundColor: 'rgba(239, 68, 68, 0.12)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.25)' }}
                                                 >
-                                                    <i className="fas fa-trash-alt text-xs"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                                    <i className="fas fa-bed text-[10px]"></i> Day Off
+                                                </span>
+                                            ) : (
+                                                <span
+                                                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+                                                    style={{ backgroundColor: 'rgba(212, 172, 119, 0.15)', color: 'var(--primary)', border: '1px solid rgba(212, 172, 119, 0.3)' }}
+                                                >
+                                                    <i className="fas fa-business-time text-[10px]"></i> Custom Hours
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="py-3.5 px-4 align-middle">
+                                            {override.type === 'CUSTOM_HOURS' && override.start_time && override.end_time ? (
+                                                <div className="flex items-center gap-1.5 text-xs font-semibold text-text">
+                                                    <i className="far fa-clock text-secondary text-[11px]"></i>
+                                                    <span>{override.start_time} - {override.end_time}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-secondary italic">All Day Off</span>
+                                            )}
+                                        </td>
+                                        <td className="py-3.5 px-4 align-middle text-xs text-secondary">
+                                            {override.reason ? (
+                                                <span className="text-text font-medium">{override.reason}</span>
+                                            ) : (
+                                                <span className="text-muted">—</span>
+                                            )}
+                                        </td>
+                                        <td className="py-3.5 px-4 align-middle text-right">
+                                            <button
+                                                type="button"
+                                                onClick={() => setOverrideToDelete(override.id)}
+                                                disabled={deleteOverride.isPending}
+                                                className="btn-icon text-danger hover:text-red-500 cursor-pointer"
+                                                title="Delete override"
+                                            >
+                                                <i className="fas fa-trash-alt text-xs"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
                                 ))}
                             </tbody>
                         </table>
@@ -616,11 +612,10 @@ const AvailabilitySettingsComponent: React.FC = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setNewOverrideIsOff(true)}
-                                                className={`p-2.5 rounded-lg border text-xs font-medium text-center transition-all cursor-pointer ${
-                                                    newOverrideIsOff
-                                                        ? 'text-primary font-semibold'
-                                                        : 'text-secondary hover:text-text'
-                                                }`}
+                                                className={`p-2.5 rounded-lg border text-xs font-medium text-center transition-all cursor-pointer ${newOverrideIsOff
+                                                    ? 'text-primary font-semibold'
+                                                    : 'text-secondary hover:text-text'
+                                                    }`}
                                                 style={
                                                     newOverrideIsOff
                                                         ? { borderColor: 'var(--primary)', backgroundColor: 'rgba(212, 172, 119, 0.15)' }
@@ -632,11 +627,10 @@ const AvailabilitySettingsComponent: React.FC = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setNewOverrideIsOff(false)}
-                                                className={`p-2.5 rounded-lg border text-xs font-medium text-center transition-all cursor-pointer ${
-                                                    !newOverrideIsOff
-                                                        ? 'text-primary font-semibold'
-                                                        : 'text-secondary hover:text-text'
-                                                }`}
+                                                className={`p-2.5 rounded-lg border text-xs font-medium text-center transition-all cursor-pointer ${!newOverrideIsOff
+                                                    ? 'text-primary font-semibold'
+                                                    : 'text-secondary hover:text-text'
+                                                    }`}
                                                 style={
                                                     !newOverrideIsOff
                                                         ? { borderColor: 'var(--primary)', backgroundColor: 'rgba(212, 172, 119, 0.15)' }

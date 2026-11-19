@@ -37,7 +37,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
 
     const targetId = providerId || initialProvider?.id;
     const [profileData, setProfileData] = useState<ProviderPublicProfileData | null>(null);
-    const getProfileMut = useGetProviderPublicProfile();
+    const { data: profileRes, isLoading: isQueryLoading } = useGetProviderPublicProfile(targetId);
 
     const state = location.state as { from?: string; returnUrl?: string } | null;
     const isFromChat = state?.from === 'chat' || Boolean(state?.returnUrl && (state.returnUrl.includes('messages') || state.returnUrl.includes('chat')));
@@ -60,17 +60,12 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
     };
 
     useEffect(() => {
-        if (!targetId) return;
-        getProfileMut.mutate(targetId, {
-            onSuccess: (res) => {
-                if (res.data) {
-                    setProfileData(res.data);
-                }
-            }
-        });
-    }, [targetId]);
+        if (profileRes?.data) {
+            setProfileData(profileRes.data);
+        }
+    }, [profileRes]);
 
-    const isLoading = getProfileMut.isPending && !profileData;
+    const isLoading = isQueryLoading && !profileData;
 
     const activeProviderName = profileData?.name || initialProvider?.name || 'Provider';
     const profile = profileData?.provider_profile || initialProvider?.provider_profile;

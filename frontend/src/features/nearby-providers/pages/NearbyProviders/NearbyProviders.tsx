@@ -7,9 +7,8 @@ import { ProviderCard } from '../../components/ProviderCard';
 import { ProviderCardSkeleton } from '../../components/ProviderCardSkeleton';
 import { ProviderProfileView } from '../../components/ProviderProfileView/ProviderProfileView';
 import { useAuthStore } from '../../../auth/stores/auth.store';
-import type { User, response } from '../../../../shared/types/Dtos';
+import type { User } from '../../../../shared/types/Dtos';
 import type { Address } from '../../../addresses';
-import type { NearbyProvidersResponseData } from '../../services/nearbyProviders.service';
 
 export default function NearbyProviders() {
     const navigate = useNavigate();
@@ -33,42 +32,33 @@ export default function NearbyProviders() {
     const [activeRadiusKm, setActiveRadiusKm] = useState(20);
     const limit = 12;
     const sentinelRef = useRef<HTMLDivElement | null>(null);
-    const isLoadingMoreRef = useRef<boolean>(false);
 
-    const getProvidersMut = useGetNearbyProviders();
+    const { data: providersRes, isLoading, isFetching } = useGetNearbyProviders({
+        page,
+        limit,
+        search,
+        radius: appliedRadius,
+    });
 
-    const fetchProviders = useCallback((currentPage: number, currentSearch: string, radiusFilter?: number, isReset: boolean = false) => {
-        if (currentPage > 1) {
-            isLoadingMoreRef.current = true;
+    useEffect(() => {
+        if (providersRes?.data) {
+            const incoming = providersRes.data.users || [];
+            setProviders((prev) => {
+                if (page === 1) return incoming;
+                const existingIds = new Set(prev.map((p) => p.id));
+                const uniqueNew = incoming.filter((p) => !existingIds.has(p.id));
+                return [...prev, ...uniqueNew];
+            });
+            setTotal(providersRes.data.total);
+            setTotalPages(providersRes.data.totalPages);
+            setHasLocation(providersRes.data.hasCustomerLocation);
+            setActiveRadiusKm(providersRes.data.customerRadius);
         }
-        getProvidersMut.mutate(
-            { page: currentPage, limit, search: currentSearch, radius: radiusFilter },
-            {
-                onSuccess: (res: response<NearbyProvidersResponseData>) => {
-                    isLoadingMoreRef.current = false;
-                    const incoming = res.data.users || [];
-                    setProviders((prev) => {
-                        if (isReset || currentPage === 1) return incoming;
-                        const existingIds = new Set(prev.map((p) => p.id));
-                        const uniqueNew = incoming.filter((p) => !existingIds.has(p.id));
-                        return [...prev, ...uniqueNew];
-                    });
-                    setTotal(res.data.total);
-                    setTotalPages(res.data.totalPages);
-                    setHasLocation(res.data.hasCustomerLocation);
-                    setActiveRadiusKm(res.data.customerRadius);
-                },
-                onError: () => {
-                    isLoadingMoreRef.current = false;
-                }
-            }
-        );
-    }, []);
+    }, [providersRes, page]);
 
     useEffect(() => {
         setPage(1);
-        fetchProviders(1, search, appliedRadius, true);
-    }, [search, appliedRadius, fetchProviders]);
+    }, [search, appliedRadius]);
 
     useEffect(() => {
         const sentinel = sentinelRef.current;
@@ -76,12 +66,8 @@ export default function NearbyProviders() {
 
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && page < totalPages && !isLoadingMoreRef.current && !getProvidersMut.isPending) {
-                    setPage((prev) => {
-                        const nextPage = prev + 1;
-                        fetchProviders(nextPage, search, appliedRadius, false);
-                        return nextPage;
-                    });
+                if (entries[0].isIntersecting && page < totalPages && !isFetching) {
+                    setPage((prev) => prev + 1);
                 }
             },
             { rootMargin: '400px' }
@@ -89,7 +75,7 @@ export default function NearbyProviders() {
 
         observer.observe(sentinel);
         return () => observer.disconnect();
-    }, [page, totalPages, search, appliedRadius, getProvidersMut.isPending, fetchProviders]);
+    }, [page, totalPages, isFetching]);
 
     const activeProvider = useMemo(() => {
         if (selectedProvider && (!providerId || selectedProvider.id === providerId)) {
@@ -265,7 +251,7 @@ export default function NearbyProviders() {
 
                     <div className="flex justify-between items-center mb-4">
                         <span className="text-xs text-secondary font-medium">
-                            {getProvidersMut.isPending ? (
+                            {isLoading ? (
                                 <Skeleton width={180} height={14} />
                             ) : (
                                 `Showing ${displayedProviders.length} of ${total} mutual-coverage providers`
@@ -273,7 +259,7 @@ export default function NearbyProviders() {
                         </span>
                     </div>
 
-                    {getProvidersMut.isPending && providers.length === 0 ? (
+                    {isLoading && providers.length === 0 ? (
                         <div className="providers-grid" aria-busy="true" aria-label="Loading providers">
                             {Array.from({ length: 8 }).map((_, idx) => (
                                 <ProviderCardSkeleton key={idx} />
@@ -290,7 +276,7 @@ export default function NearbyProviders() {
                                         onViewDetails={handleViewDetails}
                                     />
                                 ))}
-                                {getProvidersMut.isPending && page > 1 &&
+                                {isFetching && page > 1 &&
                                     Array.from({ length: 4 }).map((_, idx) => (
                                         <ProviderCardSkeleton key={`skeleton-${idx}`} />
                                     ))}

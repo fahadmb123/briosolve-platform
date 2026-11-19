@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ApiError } from "../../../shared/api/ApiError";
 import { toast } from 'react-hot-toast';
 import {
@@ -11,15 +11,19 @@ import {
 import * as SettingsService from "../../settings/services/providerSettings.service";
 
 export const useGetProviderAvailability = () => {
-    return useMutation({
-        mutationFn: getProviderAvailability,
-        onError: (error: ApiError) => toast.error(error.message)
+    return useQuery({
+        queryKey: ["providerAvailability"],
+        queryFn: getProviderAvailability,
     });
 };
 
 export const useSetProviderAvailability = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: setProviderAvailability,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["providerAvailability"] });
+        },
         onError: (error: ApiError) => toast.error(error.message)
     });
 };
@@ -39,22 +43,30 @@ export const useUpdateAcceptingLeads = () => {
 };
 
 export const useGetProviderAvailabilityOverrides = () => {
-    return useMutation({
-        mutationFn: getProviderAvailabilityOverrides,
-        onError: (error: ApiError) => toast.error(error.message)
+    return useQuery({
+        queryKey: ["providerAvailabilityOverrides"],
+        queryFn: getProviderAvailabilityOverrides,
     });
 };
 
 export const useCreateProviderAvailabilityOverride = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: createProviderAvailabilityOverride,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["providerAvailabilityOverrides"] });
+        },
         onError: (error: ApiError) => toast.error(error.message)
     });
 };
 
 export const useDeleteProviderAvailabilityOverride = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: deleteProviderAvailabilityOverride,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["providerAvailabilityOverrides"] });
+        },
         onError: (error: ApiError) => toast.error(error.message)
     });
 };

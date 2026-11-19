@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import type { ApiError } from "../../../shared/api/ApiError";
 import {
@@ -11,9 +11,9 @@ import {
 } from "../services/chat.service";
 
 export const useGetConversations = () => {
-    return useMutation({
-        mutationFn: getConversations,
-        onError: (error: ApiError) => toast.error(error.message),
+    return useQuery({
+        queryKey: ["chatConversations"],
+        queryFn: getConversations,
     });
 };
 

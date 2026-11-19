@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getConversations,
   startConversation,
@@ -9,8 +9,9 @@ import {
 } from "../services/chat.service";
 
 export const useGetConversations = () => {
-  return useMutation({
-    mutationFn: getConversations,
+  return useQuery({
+    queryKey: ["chatConversations"],
+    queryFn: getConversations,
   });
 };
 

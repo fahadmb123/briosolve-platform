@@ -1,6 +1,5 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
 import { useGetMyQuotations } from "../../hooks/useQuotationMutations";
 import type { ProviderQuotationItem } from "../../types/quotation.types";
 import QuotationCard from "../../components/QuotationCard/QuotationCard";
@@ -26,50 +25,33 @@ export default function MyQuotations() {
   const [limit] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(false);
-  const isLoadingMoreRef = useRef<boolean>(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const [selectedQuotation, setSelectedQuotation] = useState<ProviderQuotationItem | null>(null);
 
-  const getMyQuotationsMutation = useGetMyQuotations();
+  const { data: quotationsRes, isLoading: isQueryLoading, isFetching, refetch } = useGetMyQuotations({
+    page,
+    limit,
+    status: activeStatus,
+    sortBy
+  });
 
-  const fetchQuotations = useCallback((pageNum: number, isReset: boolean = false) => {
-    if (pageNum > 1) {
-      isLoadingMoreRef.current = true;
+  useEffect(() => {
+    if (quotationsRes?.data) {
+      const newItems = quotationsRes.data.quotations || [];
+      setQuotations((prev) => {
+        if (page === 1) return newItems;
+        const existingIds = new Set(prev.map((q) => q.id));
+        return [...prev, ...newItems.filter((q) => !existingIds.has(q.id))];
+      });
+      setCounts(quotationsRes.data.counts || {});
+      setTotalPages(quotationsRes.data.totalPages || 0);
+      setHasMore(page < (quotationsRes.data.totalPages || 0));
     }
-    getMyQuotationsMutation.mutate(
-      {
-        page: pageNum,
-        limit,
-        status: activeStatus,
-        sortBy
-      },
-      {
-        onSuccess: (res) => {
-          isLoadingMoreRef.current = false;
-          if (res.data) {
-            const newItems = res.data.quotations || [];
-            setQuotations((prev) => {
-              if (isReset || pageNum === 1) return newItems;
-              const existingIds = new Set(prev.map((q) => q.id));
-              return [...prev, ...newItems.filter((q) => !existingIds.has(q.id))];
-            });
-            setCounts(res.data.counts || {});
-            setTotalPages(res.data.totalPages || 0);
-            setHasMore(pageNum < (res.data.totalPages || 0));
-          }
-        },
-        onError: () => {
-          isLoadingMoreRef.current = false;
-          toast.error("Failed to load quotations");
-        }
-      }
-    );
-  }, [limit, activeStatus, sortBy]);
+  }, [quotationsRes, page]);
 
   useEffect(() => {
     setPage(1);
-    fetchQuotations(1, true);
   }, [activeStatus, sortBy]);
 
   useEffect(() => {
@@ -78,12 +60,8 @@ export default function MyQuotations() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoadingMoreRef.current && !getMyQuotationsMutation.isPending) {
-          setPage((prev) => {
-            const next = prev + 1;
-            fetchQuotations(next, false);
-            return next;
-          });
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          setPage((prev) => prev + 1);
         }
       },
       { rootMargin: "400px" }
@@ -91,7 +69,7 @@ export default function MyQuotations() {
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasMore, fetchQuotations, getMyQuotationsMutation.isPending]);
+  }, [hasMore, isFetching]);
 
   const handleViewRequest = (serviceRequestId: string) => {
     navigate(`/provider/service-requests/${serviceRequestId}`);
@@ -106,7 +84,7 @@ export default function MyQuotations() {
     });
   };
 
-  const isInitialLoading = getMyQuotationsMutation.isPending && quotations.length === 0;
+  const isInitialLoading = isQueryLoading && quotations.length === 0;
 
   return (
     <div className="myquote-page-container">
@@ -127,12 +105,12 @@ export default function MyQuotations() {
             className="myquote-btn-refresh"
             onClick={() => {
               setPage(1);
-              fetchQuotations(1, true);
+              refetch();
             }}
-            disabled={getMyQuotationsMutation.isPending}
+            disabled={isFetching}
           >
-            <i className={`fas fa-sync-alt ${getMyQuotationsMutation.isPending && page === 1 ? "fa-spin" : ""}`} />
-            <span>{getMyQuotationsMutation.isPending && page === 1 ? "Refreshing..." : "Refresh"}</span>
+            <i className={`fas fa-sync-alt ${isFetching && page === 1 ? "fa-spin" : ""}`} />
+            <span>{isFetching && page === 1 ? "Refreshing..." : "Refresh"}</span>
           </button>
         </div>
       </div>
@@ -230,7 +208,7 @@ export default function MyQuotations() {
                 onEdit={handleEditQuotation}
               />
             ))}
-            {getMyQuotationsMutation.isPending && page > 1 &&
+            {isFetching && page > 1 &&
               Array.from({ length: 2 }).map((_, idx) => (
                 <div key={`skeleton-${idx}`} className="myquote-skeleton-row-card">
                   <div className="myquote-skeleton-block myquote-sk-avatar" />

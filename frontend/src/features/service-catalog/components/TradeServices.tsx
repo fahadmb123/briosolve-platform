@@ -43,8 +43,8 @@ interface TradeServicesProps {
 }
 
 const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange }) => {
-    const getCategories = useGetCategoriesService();
-    const getProviderServices = useGetProviderServices();
+    const { data: categoriesRes, isLoading: isLoadingCategories } = useGetCategoriesService({ page: 1, limit: 100, filter: 'ACTIVE' });
+    const { data: providerServicesRes, isLoading: isLoadingProviderServices } = useGetProviderServices();
     const addProviderServices = useAddProviderServices();
     const deleteProviderService = useDeleteProviderService();
     const deleteProviderCategory = useDeleteProviderCategory();
@@ -61,12 +61,16 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
     const [serviceToDelete, setServiceToDelete] = useState<{ id: string; name: string } | null>(null);
 
     useEffect(() => {
-        getProviderServices.mutate(undefined, {
-            onSuccess: (res) => {
-                setProviderServices(res.data || []);
-            }
-        });
-    }, []);
+        if (categoriesRes?.data?.categories) {
+            setCatalogCategories(categoriesRes.data.categories as CatalogCategory[]);
+        }
+    }, [categoriesRes]);
+
+    useEffect(() => {
+        if (providerServicesRes?.data) {
+            setProviderServices(providerServicesRes.data || []);
+        }
+    }, [providerServicesRes]);
 
     const activeServicesCount = useMemo(() => {
         return providerServices.filter(
@@ -135,15 +139,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
     const handleOpenAddCategoryModal = useCallback(() => {
         setSelectedServiceIds([]);
         setIsAddCategoryModalOpen(true);
-        getCategories.mutate(
-            { page: 1, limit: 100, filter: 'ACTIVE' },
-            {
-                onSuccess: (res) => {
-                    setCatalogCategories((res.data?.categories || []) as CatalogCategory[]);
-                }
-            }
-        );
-    }, [getCategories]);
+    }, []);
 
     const toggleService = useCallback((serviceId: string) => {
         setSelectedServiceIds((prev) =>
@@ -183,17 +179,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
     const handleOpenAddServiceModal = useCallback((cat: { id: string; name: string }) => {
         setServiceModalCategory(cat);
         setSelectedServiceIdsToAdd([]);
-        if (catalogCategories.length === 0) {
-            getCategories.mutate(
-                { page: 1, limit: 100, filter: 'ACTIVE' },
-                {
-                    onSuccess: (res) => {
-                        setCatalogCategories((res.data?.categories || []) as CatalogCategory[]);
-                    }
-                }
-            );
-        }
-    }, [catalogCategories.length, getCategories]);
+    }, []);
 
     const toggleServiceCheckboxToAdd = useCallback((serviceId: string) => {
         setSelectedServiceIdsToAdd((prev) =>
@@ -253,7 +239,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <h2 className="h5 mb-0 font-bold">My Trade &amp; Services</h2>
-                            {!getProviderServices.isPending && (
+                            {!isLoadingProviderServices && (
                                 <span className={`badge badge-${activeServicesCount > 0 ? 'success' : 'warning'} text-xs font-semibold px-2 py-0.5`}>
                                     {activeServicesCount > 0
                                         ? `${activeServicesCount} Active`
@@ -269,14 +255,14 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                     <button
                         type="button"
                         onClick={handleOpenAddCategoryModal}
-                        disabled={getCategories.isPending}
+                        disabled={isLoadingCategories}
                         className="btn btn-primary btn-sm"
                     >
                         <i className="fas fa-plus mr-1.5"></i> Add Trade Category
                     </button>
                 </div>
 
-                {getProviderServices.isPending ? (
+                {isLoadingProviderServices ? (
                     <TradeServicesSkeleton count={2} />
                 ) : groupedCategories.length === 0 ? (
                     <div className="text-center py-10 px-4 border border-dashed rounded-xl my-4" style={{ borderColor: 'var(--border)' }}>
@@ -292,7 +278,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                         <button
                             type="button"
                             onClick={handleOpenAddCategoryModal}
-                            disabled={getCategories.isPending}
+                            disabled={isLoadingCategories}
                             className="btn btn-outline btn-xs"
                         >
                             <i className="fas fa-plus mr-1"></i> Add Category
@@ -425,7 +411,7 @@ const TradeServicesComponent: React.FC<TradeServicesProps> = ({ onServicesChange
                         </div>
 
                         <div className="trade-modal-scroll-area">
-                            {getCategories.isPending ? (
+                            {isLoadingCategories ? (
                                 <div className="flex flex-col gap-3 py-2">
                                     {Array.from({ length: 3 }).map((_, i) => (
                                         <div key={`modal-skel-${i}`} className="border rounded-xl p-3.5 flex flex-col gap-2.5" style={{ borderColor: 'rgba(255, 121, 0, 0.15)', backgroundColor: 'var(--surface)' }}>
