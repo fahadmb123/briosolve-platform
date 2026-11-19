@@ -355,6 +355,17 @@
   background: #15803d;
 }
 
+.bkcard-btn-action.danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.bkcard-btn-action.danger:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
 .bkcard-btn-request {
   display: inline-flex;
   align-items: center;

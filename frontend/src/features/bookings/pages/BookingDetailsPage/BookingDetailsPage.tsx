@@ -219,6 +219,24 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     return null;
   }, [booking, timelineItems]);
 
+  const cancellationAuthor = useMemo<string | null>(() => {
+    if (!booking) return null;
+    if (timelineItems.length > 0) {
+      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED");
+      if (cancelItem?.authorName) return cancelItem.authorName;
+    }
+    if (booking.notes && booking.notes.trim()) {
+      try {
+        const parsed = JSON.parse(booking.notes);
+        if (Array.isArray(parsed)) {
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+          if (cancelItem?.authorName) return cancelItem.authorName;
+        }
+      } catch {}
+    }
+    return null;
+  }, [booking, timelineItems]);
+
   if (isLoading && !booking) {
     return (
       <div className={`bkdet-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
@@ -458,6 +476,17 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </>
           )}
 
+          {!isProvider && isConfirmed && (
+            <button
+              type="button"
+              className="bkdet-action-btn danger-outline"
+              onClick={() => handleTriggerStatusChange("CANCELLED")}
+            >
+              <i className="fas fa-times-circle" />
+              <span>Cancel Booking</span>
+            </button>
+          )}
+
           {isProvider && isEnRoute && (
             requiresInspection ? (
               <button
@@ -538,8 +567,12 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </h4>
               <p className="bkdet-cb-desc">
                 {isProvider
-                  ? `You cancelled this booking before dispatch. A 100% full refund of ${formatCurrency(advanceAmount)} secured in Escrow has been processed for the customer.`
-                  : `This booking was cancelled by the provider before dispatch. Your full payment of ${formatCurrency(advanceAmount)} held safely in Escrow has been 100% refunded.`}
+                  ? cancellationAuthor === "Customer"
+                    ? `This booking was cancelled by the customer before dispatch. Escrow advance has been refunded to the customer.`
+                    : `You cancelled this booking before dispatch. A 100% full refund of ${formatCurrency(advanceAmount)} secured in Escrow has been processed for the customer.`
+                  : cancellationAuthor === "Customer"
+                    ? `You cancelled this booking before dispatch. Your full payment of ${formatCurrency(advanceAmount)} held safely in Escrow has been 100% refunded.`
+                    : `This booking was cancelled by the provider before dispatch. Your full payment of ${formatCurrency(advanceAmount)} held safely in Escrow has been 100% refunded.`}
               </p>
               {cancellationReason && (
                 <div className="bkdet-cb-reason-box">
@@ -1150,11 +1183,12 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         </div>
       </div>
 
-      {isProvider && (
+      {(isProvider || (!isProvider && targetStatus === "CANCELLED")) && (
         <BookingStatusModal
           booking={statusModalBooking}
           targetStatus={targetStatus}
           isOpen={Boolean(statusModalBooking && targetStatus)}
+          role={isProvider ? "PROVIDER" : "CUSTOMER"}
           onClose={handleCloseStatusModal}
           onConfirm={handleConfirmStatusChange}
           isLoading={updateStatusMutation.isPending}

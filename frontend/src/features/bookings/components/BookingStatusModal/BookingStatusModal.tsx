@@ -7,6 +7,7 @@ interface BookingStatusModalProps {
   targetStatus: BookingStatus | null;
   isOpen: boolean;
   isLoading: boolean;
+  role?: "CUSTOMER" | "PROVIDER";
   onClose: () => void;
   onConfirm: (booking: BookingItem, newStatus: BookingStatus, notes?: string, totalAmount?: number) => void;
 }
@@ -16,6 +17,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   targetStatus,
   isOpen,
   isLoading,
+  role,
   onClose,
   onConfirm
 }) => {
@@ -43,7 +45,14 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   const isCancellation = targetStatus === "CANCELLED";
   const isInvalidReason = isCancellation && (!notes || !notes.trim());
 
-  const cancellationReasons = [
+  const cancellationReasons = role === "CUSTOMER" ? [
+    "Change of plans / Service no longer needed",
+    "Personal / Medical emergency",
+    "Found an alternative solution",
+    "Booked incorrect service or date by mistake",
+    "Provider requested cancellation",
+    "Other personal reason"
+  ] : [
     "Vehicle breakdown / Transportation issue",
     "Personal / Medical emergency",
     "Schedule conflict / Unexpected delay",
@@ -112,9 +121,11 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
       case "CANCELLED":
         return {
           title: "Cancel Booking (Pre-Dispatch)?",
-          description: `Are you sure you want to cancel this booking before travelling? The customer will receive a 100% full refund of the payment secured in Escrow.`,
+          description: role === "CUSTOMER"
+            ? `Are you sure you want to cancel this booking before the provider travels? You will receive a 100% full refund of ₹${advancePaid.toLocaleString("en-IN")} secured in Escrow back to your account.`
+            : `Are you sure you want to cancel this booking before travelling? The customer will receive a 100% full refund of the payment secured in Escrow.`,
           placeholder: "Select a reason above or write specific details...",
-          confirmText: "Yes, Cancel & Refund Customer",
+          confirmText: role === "CUSTOMER" ? "Yes, Cancel Booking & Receive Refund" : "Yes, Cancel & Refund Customer",
           confirmIcon: "fas fa-times-circle",
           variant: "danger"
         };

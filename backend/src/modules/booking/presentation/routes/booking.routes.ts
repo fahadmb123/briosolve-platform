@@ -9,7 +9,7 @@ export function buildBookingRoute(controller: BookingRouteDependencies): Router 
     router.get("/customer", authMiddleware, requireRole(["CUSTOMER"]), controller.booking.getCustomerBookings);
     router.get("/provider", authMiddleware, requireRole(["PROVIDER"]), controller.booking.getProviderBookings);
     router.get("/:id", authMiddleware, controller.booking.getById);
-    router.patch("/:id/status", authMiddleware, requireRole(["PROVIDER"]), controller.booking.updateStatus);
+    router.patch("/:id/status", authMiddleware, requireRole(["PROVIDER", "CUSTOMER"]), controller.booking.updateStatus);
 
     return router;
 }

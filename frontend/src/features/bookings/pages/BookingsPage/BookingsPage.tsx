@@ -362,18 +362,19 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
                 role={cardRole}
                 onViewDetails={handleOpenDetails}
                 onChat={handleChat}
-                onUpdateStatus={isProvider ? handleRequestStatusChange : undefined}
+                onUpdateStatus={handleRequestStatusChange}
               />
             ))}
           </div>
         )}
       </div>
 
-      {isProvider && (
+      {(isProvider || (!isProvider && targetStatus === "CANCELLED")) && (
         <BookingStatusModal
           booking={statusModalBooking}
           targetStatus={targetStatus}
           isOpen={Boolean(statusModalBooking && targetStatus)}
+          role={isProvider ? "PROVIDER" : "CUSTOMER"}
           onClose={handleCloseStatusModal}
           onConfirm={handleConfirmStatusChange}
           isLoading={updateStatusMutation.isPending}

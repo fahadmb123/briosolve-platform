@@ -216,6 +216,18 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             <span>Booking Details</span>
           </button>
 
+          {role === "CUSTOMER" && booking.status === "CONFIRMED" && onUpdateStatus && (
+            <button
+              type="button"
+              className="bkcard-btn-action danger"
+              onClick={() => onUpdateStatus(booking, "CANCELLED")}
+              title="Cancel booking before technician departs"
+            >
+              <i className="fas fa-times-circle"></i>
+              <span>Cancel</span>
+            </button>
+          )}
+
           {role === "PROVIDER" && booking.status === "CONFIRMED" && onUpdateStatus && (
             <button
               type="button"

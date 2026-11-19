@@ -36,7 +36,11 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             throw new ApplicationError("FORBIDDEN", "You are not authorized to update this booking", "AUTHENTICATION");
         }
 
-        if (input.status === "CANCELLED" && isProviderAction) {
+        if (isCustomerAction && input.status !== "CANCELLED") {
+            throw new ApplicationError("FORBIDDEN", "Customers can only cancel bookings.", "AUTHENTICATION");
+        }
+
+        if (input.status === "CANCELLED") {
             if (details.booking.status !== "CONFIRMED") {
                 throw new ApplicationError("CANNOT_CANCEL", "Booking can only be cancelled before dispatching or travelling.", "VALIDATION");
             }
@@ -140,7 +144,7 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
                         message = `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" was cancelled by the provider. Reason: ${input.notes || "Emergency / Schedule conflict"}. A full refund has been initiated to your account.`;
                     } else {
                         title = "Booking Cancelled by Customer";
-                        message = `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" was cancelled by the customer.`;
+                        message = `Booking #${details.booking.booking_number} for "${details.serviceRequestTitle || "Service"}" was cancelled by the customer before dispatch. Reason: ${input.notes || "Customer requested cancellation"}.`;
                     }
                 } else if (input.status === "PAYMENT_PENDING") {
                     message = `Booking #${details.booking.booking_number} total confirmed at ₹${(resolvedTotalAmount || details.booking.total_amount).toLocaleString("en-IN")}. Please review and settle the remaining balance.`;
