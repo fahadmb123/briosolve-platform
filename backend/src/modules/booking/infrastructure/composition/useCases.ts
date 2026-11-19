@@ -1,6 +1,8 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
+import { CreditWalletInputDto } from "../../../wallet/application/use-cases/creditWallet.useCase";
+import { WalletResponseDto } from "../../../wallet/application/dtos/response/wallet-response.dto";
 import { bookingRepository } from "./repositories";
 import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
 import { serviceRequestRepository } from "../../../service-request/infrastructure/composition/repositories";
@@ -30,13 +32,15 @@ export function createGetProviderBookingsUseCase(): GetProviderBookingsUseCase {
 }
 
 export function createUpdateBookingStatusUseCase(
-    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
+    creditWalletUseCase?: IUseCase<CreditWalletInputDto, WalletResponseDto>
 ): UpdateBookingStatusUseCase {
     return new UpdateBookingStatusUseCase(
         bookingRepository,
         providerRepository,
         serviceRequestRepository,
         quotationRepository,
-        createNotificationUseCase
+        createNotificationUseCase,
+        creditWalletUseCase
     );
 }

@@ -58,6 +58,7 @@ model users {
   bookings                       bookings[]                      @relation("CustomerBookings")
   conversation_participants      conversation_participants[]
   messages                       messages[]
+  wallet                         wallets?
 }
 
 enum weekday {
@@ -574,10 +575,58 @@ model bookings {
   quotation          quotations           @relation(fields:[quotation_id], references:[id], onDelete: Cascade)
   customer           users                @relation("CustomerBookings", fields:[customer_id], references:[id])
   provider           provider_profiles    @relation(fields:[provider_id], references:[id], onDelete: Cascade)
+  wallet_transactions wallet_transactions[]
 
   @@index([service_request_id])
   @@index([quotation_id])
   @@index([customer_id])
   @@index([provider_id])
   @@index([status])
+}
+
+enum wallet_transaction_type {
+  CREDIT
+  DEBIT
+}
+
+enum wallet_transaction_category {
+  REFUND
+  EARNINGS
+  PAYMENT
+  WITHDRAWAL
+  COMMISSION
+}
+
+model wallets {
+  id           Uuid                  @id @default(uuid())
+  user_id      Uuid                  @unique
+  balance      Numeric(12, 2)
+  currency     VarChar(10)           @default("INR")
+  created_at   DateTime              @default(now())
+  updated_at   temporal.updatedAt()
+
+  user         users                 @relation(fields:[user_id], references:[id], onDelete: Cascade)
+  transactions wallet_transactions[]
+
+  @@index([user_id])
+}
+
+model wallet_transactions {
+  id            Uuid                        @id @default(uuid())
+  wallet_id     Uuid
+  booking_id    Uuid?
+  type          wallet_transaction_type
+  category      wallet_transaction_category
+  amount        Numeric(12, 2)
+  balance_after Numeric(12, 2)
+  description   VarChar(500)
+  reference_id  VarChar(100)?
+  created_at    DateTime                    @default(now())
+
+  wallet        wallets                     @relation(fields:[wallet_id], references:[id], onDelete: Cascade)
+  booking       bookings?                   @relation(fields:[booking_id], references:[id], onDelete: SetNull)
+
+  @@index([wallet_id])
+  @@index([booking_id])
+  @@index([created_at])
 }

@@ -26,6 +26,9 @@ export function createRootRouter(route: RootRouterDependencies) {
         router.use("/booking", route.bookingRoutes);
         router.use("/bookings", route.bookingRoutes);
     }
+    if (route.walletRoutes) {
+        router.use("/wallet", route.walletRoutes);
+    }
 
     return router;
 }

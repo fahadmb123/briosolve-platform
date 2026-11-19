@@ -9,6 +9,8 @@ import { CreateNotificationRequestDto } from "../../../notification/application/
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
+import { CreditWalletInputDto } from "../../../wallet/application/use-cases/creditWallet.useCase";
+import { WalletResponseDto } from "../../../wallet/application/dtos/response/wallet-response.dto";
 
 export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusInputDto, BookingResponseDto> {
     constructor(
@@ -16,7 +18,8 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         private readonly _providerRepository: IProviderRepository,
         private readonly _serviceRequestRepository: IServiceRequestRepository,
         private readonly _quotationRepository: IQuotationRepository,
-        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
+        private readonly _creditWalletUseCase?: IUseCase<CreditWalletInputDto, WalletResponseDto>
     ) {}
 
     async execute(input: UpdateBookingStatusInputDto): Promise<BookingResponseDto> {
@@ -118,6 +121,34 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         if (input.status === "CANCELLED") {
             await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "EXPIRED").catch(() => null);
             await this._quotationRepository.update(details.booking.quotation_id, { status: "WITHDRAWN" }).catch(() => null);
+            if (this._creditWalletUseCase && details.booking.advance_amount > 0) {
+                await this._creditWalletUseCase.execute({
+                    userId: details.booking.customer_id,
+                    amount: details.booking.advance_amount,
+                    category: "REFUND",
+                    bookingId: details.booking.id,
+                    description: `Refund for cancelled booking #${details.booking.booking_number}`,
+                    referenceId: details.booking.booking_number
+                }).catch(() => null);
+            }
+        }
+
+        if (input.status === "COMPLETED" && this._creditWalletUseCase) {
+            const profile = await this._providerRepository.findById(details.booking.provider_id);
+            if (profile && profile.user_id) {
+                const finalTotal = resolvedTotalAmount || details.booking.total_amount;
+                const earnings = Math.max(0, finalTotal - (details.booking.platform_fee || 0));
+                if (earnings > 0) {
+                    await this._creditWalletUseCase.execute({
+                        userId: profile.user_id,
+                        amount: earnings,
+                        category: "EARNINGS",
+                        bookingId: details.booking.id,
+                        description: `Earnings for completed booking #${details.booking.booking_number}`,
+                        referenceId: details.booking.booking_number
+                    }).catch(() => null);
+                }
+            }
         }
 
         const updatedDetails = await this._bookingRepository.findDetailsById(updated.id);
