@@ -72,10 +72,18 @@ export const RequestCard: React.FC<RequestCardProps> = ({
     switch (request.status) {
       case "EXPIRED":
         return (
-          <span className="myreq-badge-pill myreq-badge-expired">
-            <span className="myreq-dot-indicator"></span>
-            <span>Expired</span>
-          </span>
+          <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+            <span className="myreq-badge-pill myreq-badge-expired">
+              <span className="myreq-dot-indicator"></span>
+              <span>Expired</span>
+            </span>
+            {request.latest_booking?.payment_status === "REFUNDED" && (
+              <span className="myreq-badge-pill" style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+                <i className="fas fa-undo-alt" style={{ fontSize: "0.65rem", marginRight: "3px" }}></i>
+                <span>100% Refunded</span>
+              </span>
+            )}
+          </div>
         );
       case "COMPLETED":
         return (

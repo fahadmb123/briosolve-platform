@@ -7,12 +7,16 @@ import { BookingResponseDto, BookingStatusHistoryItem } from "../dtos/response/b
 import { BookingMapper, BookingStatusToTitle } from "../../infrastructure/mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
+import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
+import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
 
 export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusInputDto, BookingResponseDto> {
     constructor(
         private readonly _bookingRepository: IBookingRepository,
         private readonly _providerRepository: IProviderRepository,
-        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
+        private readonly _serviceRequestRepository?: IServiceRequestRepository,
+        private readonly _quotationRepository?: IQuotationRepository
     ) {}
 
     async execute(input: UpdateBookingStatusInputDto): Promise<BookingResponseDto> {
@@ -105,6 +109,15 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
 
         if (!updated) {
             throw new ApplicationError("UPDATE_FAILED", "Failed to update booking status", "INTERNAL");
+        }
+
+        if (input.status === "CANCELLED") {
+            if (this._serviceRequestRepository && details.booking.service_request_id) {
+                await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "EXPIRED").catch(() => null);
+            }
+            if (this._quotationRepository && details.booking.quotation_id) {
+                await this._quotationRepository.update(details.booking.quotation_id, { status: "WITHDRAWN" }).catch(() => null);
+            }
         }
 
         const updatedDetails = await this._bookingRepository.findDetailsById(updated.id);

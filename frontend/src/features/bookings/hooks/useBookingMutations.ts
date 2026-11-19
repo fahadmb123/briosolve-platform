@@ -46,6 +46,10 @@ export const useUpdateBookingStatus = () => {
       queryClient.invalidateQueries({ queryKey: ["customerBookings"] });
       queryClient.invalidateQueries({ queryKey: ["providerBookings"] });
       queryClient.invalidateQueries({ queryKey: ["booking", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["myServiceRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["customerServiceRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["quotations"] });
+      queryClient.invalidateQueries({ queryKey: ["myQuotations"] });
     }
   });
 };

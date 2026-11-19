@@ -1017,3 +1017,121 @@
     height: 160px;
     border-radius: 10px;
 }
+
+.srdetails-refund-alert-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.15rem;
+    padding: 1.35rem;
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+}
+
+.srdetails-refund-alert-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #dcfce7;
+    color: #15803d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.srdetails-refund-alert-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.srdetails-refund-alert-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.srdetails-refund-badge {
+    background: #bbf7d0;
+    color: #166534;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.srdetails-refund-booking-ref {
+    font-size: 0.78125rem;
+    font-weight: 600;
+    color: #15803d;
+}
+
+.srdetails-refund-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #14532d;
+    margin: 0;
+    line-height: 1.35;
+}
+
+.srdetails-refund-subtext {
+    font-size: 0.84375rem;
+    color: #166534;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.srdetails-refund-action-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.srdetails-btn-refund-reopen {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1rem;
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 1px 3px rgba(22, 163, 74, 0.25);
+}
+
+.srdetails-btn-refund-reopen:hover {
+    background: #15803d;
+    transform: translateY(-1px);
+}
+
+.srdetails-btn-refund-receipt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.95rem;
+    background: #ffffff;
+    color: #15803d;
+    border: 1px solid #86efac;
+    border-radius: 7px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.srdetails-btn-refund-receipt:hover {
+    background: #dcfce7;
+}

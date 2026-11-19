@@ -3,6 +3,8 @@ import { CreateNotificationRequestDto } from "../../../notification/application/
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { bookingRepository } from "./repositories";
 import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
+import { serviceRequestRepository } from "../../../service-request/infrastructure/composition/repositories";
+import { quotationRepository } from "../../../quotation-submission/infrastructure/composition/repositories";
 import { CreateBookingUseCase } from "../../application/use-cases/createBooking.useCase";
 import { GetBookingByIdUseCase } from "../../application/use-cases/getBookingById.useCase";
 import { GetCustomerBookingsUseCase } from "../../application/use-cases/getCustomerBookings.useCase";
@@ -30,5 +32,11 @@ export function createGetProviderBookingsUseCase(): GetProviderBookingsUseCase {
 export function createUpdateBookingStatusUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
 ): UpdateBookingStatusUseCase {
-    return new UpdateBookingStatusUseCase(bookingRepository, providerRepository, createNotificationUseCase);
+    return new UpdateBookingStatusUseCase(
+        bookingRepository,
+        providerRepository,
+        createNotificationUseCase,
+        serviceRequestRepository,
+        quotationRepository
+    );
 }

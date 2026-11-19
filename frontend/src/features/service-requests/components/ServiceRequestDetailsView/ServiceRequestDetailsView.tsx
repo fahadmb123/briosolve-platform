@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { RequestQuotations } from "../RequestQuotations/RequestQuotations";
 import "./ServiceRequestDetailsView.css";
@@ -42,9 +43,16 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
   serviceRadiusKm = 20,
   isWithinRadius = true
 }) => {
+  const navigate = useNavigate();
   const [copiedId, setCopiedId] = useState<boolean>(false);
   const [copiedAddress, setCopiedAddress] = useState<boolean>(false);
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
+
+  const isRefundedBooking = Boolean(
+    request?.latest_booking &&
+    request.latest_booking.status === "CANCELLED" &&
+    request.latest_booking.payment_status === "REFUNDED"
+  );
 
   const address = request?.address_details;
   const fullAddressString = useMemo(() => {
@@ -209,6 +217,18 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
           </span>
         );
       case "EXPIRED":
+        if (isRefundedBooking) {
+          return (
+            <div style={{ display: "flex", gap: "0.45rem", alignItems: "center" }}>
+              <span className="srdetails-status-pill expired">
+                <i className="fas fa-clock"></i> Expired
+              </span>
+              <span className="srdetails-status-pill" style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+                <i className="fas fa-undo-alt"></i> 100% Refunded
+              </span>
+            </div>
+          );
+        }
         return (
           <span className="srdetails-status-pill expired">
             <i className="fas fa-clock"></i> Expired
@@ -354,6 +374,55 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
 
       <div className="srdetails-layout-grid">
         <div className="srdetails-main-column">
+          {isRefundedBooking && (
+            <div className="srdetails-refund-alert-box">
+              <div className="srdetails-refund-alert-icon">
+                <i className="fas fa-shield-alt"></i>
+              </div>
+              <div className="srdetails-refund-alert-body">
+                <div className="srdetails-refund-alert-header">
+                  <span className="srdetails-refund-badge">100% ESCROW REFUND ISSUED</span>
+                  {request?.latest_booking?.booking_number && (
+                    <span className="srdetails-refund-booking-ref">
+                      Booking #{request.latest_booking.booking_number}
+                    </span>
+                  )}
+                </div>
+                <h3 className="srdetails-refund-heading">
+                  Technician cancelled before dispatch. Your payment has been 100% refunded.
+                </h3>
+                <p className="srdetails-refund-subtext">
+                  {request?.latest_booking?.cancellation_reason
+                    ? `Reason: "${request.latest_booking.cancellation_reason}". `
+                    : ""}
+                  Your advance deposit of ₹{(request?.latest_booking?.advance_amount || 0).toLocaleString("en-IN")} held safely in Escrow has been refunded to your original payment method. You can now reopen this request to receive quotes from other verified providers.
+                </p>
+                <div className="srdetails-refund-action-row">
+                  {canReopen && onReopen && (
+                    <button
+                      type="button"
+                      className="srdetails-btn-refund-reopen"
+                      onClick={onReopen}
+                    >
+                      <i className="fas fa-sync-alt"></i>
+                      <span>Reopen Request for Other Quotes</span>
+                    </button>
+                  )}
+                  {request?.latest_booking?.id && (
+                    <button
+                      type="button"
+                      className="srdetails-btn-refund-receipt"
+                      onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+                    >
+                      <i className="fas fa-receipt"></i>
+                      <span>View Refund Receipt</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="srdetails-card">
             <div className="srdetails-card-header">
               <div className="srdetails-card-header-left">
@@ -742,9 +811,13 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                 </>
               ) : request.status === "EXPIRED" ? (
                 <>
-                  <h4 className="srdetails-cta-title">Request Expired</h4>
+                  <h4 className="srdetails-cta-title" style={isRefundedBooking ? { color: "#065f46" } : undefined}>
+                    {isRefundedBooking ? "Booking Cancelled & Refunded" : "Request Expired"}
+                  </h4>
                   <p className="srdetails-cta-sub">
-                    This request passed its required service date. You can reopen it with an updated timeline.
+                    {isRefundedBooking
+                      ? "The technician cancelled before travelling. Your payment was 100% refunded. Reopen this request to get new quotes."
+                      : "This request passed its required service date. You can reopen it with an updated timeline."}
                   </p>
                   {canReopen && onReopen && (
                     <button
@@ -753,7 +826,7 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                       onClick={onReopen}
                     >
                       <i className="fas fa-sync-alt"></i>
-                      <span>Reopen Request</span>
+                      <span>{isRefundedBooking ? "Reopen for Other Quotes" : "Reopen Request"}</span>
                     </button>
                   )}
                 </>
