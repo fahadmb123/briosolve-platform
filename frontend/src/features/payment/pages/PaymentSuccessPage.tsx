@@ -96,6 +96,21 @@ export const PaymentSuccessPage: React.FC = () => {
         </div>
 
         <div className="paysuccess-actions">
+          {state.bookingId ? (
+            <Link
+              to={`/bookings/${state.bookingId}`}
+              className="paysuccess-btn-booking"
+            >
+              <i className="fas fa-calendar-check"></i>
+              <span>View Booking Details</span>
+            </Link>
+          ) : (
+            <Link to="/bookings" className="paysuccess-btn-booking">
+              <i className="fas fa-calendar-check"></i>
+              <span>View Bookings</span>
+            </Link>
+          )}
+
           {serviceRequestId ? (
             <button
               type="button"
@@ -110,7 +125,7 @@ export const PaymentSuccessPage: React.FC = () => {
                 })
               }
             >
-              <i className="fas fa-arrow-left"></i>
+              <i className="fas fa-file-alt"></i>
               <span>View Service Request</span>
             </button>
           ) : (
@@ -122,7 +137,7 @@ export const PaymentSuccessPage: React.FC = () => {
 
           <Link to="/dashboard" className="paysuccess-btn-secondary">
             <i className="fas fa-home"></i>
-            <span>Customer Dashboard</span>
+            <span>Dashboard</span>
           </Link>
         </div>
       </div>
