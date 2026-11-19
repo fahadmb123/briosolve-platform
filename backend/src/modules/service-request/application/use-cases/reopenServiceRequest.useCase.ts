@@ -12,6 +12,7 @@ import { IAddressRepository } from "../../../user-management/domain/repositories
 import { IProviderSelectionService } from "../interfaces/services/IProviderSelectionService";
 import { NotificationType } from "../../../notification/domain/entities/notification.entity";
 import { logger } from "../../../../shared/logger/logger";
+import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
 
 export class ReopenServiceRequestUseCase implements IUseCase<ReopenServiceRequestInputDto, ServiceRequestResponseDto> {
     constructor(
@@ -20,7 +21,8 @@ export class ReopenServiceRequestUseCase implements IUseCase<ReopenServiceReques
         private readonly _userRepository: IUserRepository,
         private readonly _addressRepository: IAddressRepository,
         private readonly _providerSelectionService: IProviderSelectionService,
-        private readonly _serviceRequestProviderRepository: IServiceRequestProviderRepository
+        private readonly _serviceRequestProviderRepository: IServiceRequestProviderRepository,
+        private readonly _quotationRepository: IQuotationRepository
     ) {}
 
     async execute(input: ReopenServiceRequestInputDto): Promise<ServiceRequestResponseDto> {
@@ -51,12 +53,21 @@ export class ReopenServiceRequestUseCase implements IUseCase<ReopenServiceReques
 
         const providers = await this._userRepository.getActiveProviders();
 
-        const nearestProvidersIds: string[] = await this._providerSelectionService.getNearbyProviderIds({
+        let nearestProvidersIds: string[] = await this._providerSelectionService.getNearbyProviderIds({
             providers,
             customerId: input.customerId,
             customerLat,
             customerLng,
             subServiceId: reopened.subservice_id || ""
+        });
+
+        const quotations = await this._quotationRepository.findByServiceRequestId(input.requestId);
+        const quotedProviderProfileIds = new Set(quotations.map((q) => q.provider_id));
+
+        nearestProvidersIds = nearestProvidersIds.filter((userId) => {
+            const provider = providers.find((p) => p.id === userId);
+            const profileId = provider?.provider_profile?.id;
+            return !profileId || !quotedProviderProfileIds.has(profileId);
         });
 
         const matchedProviderProfileIds = providers
@@ -85,7 +96,11 @@ export class ReopenServiceRequestUseCase implements IUseCase<ReopenServiceReques
 
             const allProviderRecipientIds = Array.from(
                 new Set([...nearestProvidersIds, ...existingProviderUserIds])
-            );
+            ).filter((userId) => {
+                const provider = providers.find((p) => p.id === userId);
+                const profileId = provider?.provider_profile?.id;
+                return !profileId || !quotedProviderProfileIds.has(profileId);
+            });
 
             if (allProviderRecipientIds.length > 0) {
                 const bulkNotification: CreateBulkNotificationRequestDto = {
