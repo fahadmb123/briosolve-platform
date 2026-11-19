@@ -201,14 +201,50 @@ export default function SubmitQuotation() {
 
       <div className="quote-grid-container">
         <div className="quote-main-column">
-          <QuotationForm
-            initialValues={formInitialValues}
-            isEditing={isEditing}
-            onSubmit={handleFormSubmit}
-            isSubmitting={submitQuotationMutation.isPending || updateQuotationMutation.isPending}
-            onCancel={handleBack}
-            onChat={handleChatClick}
-          />
+          {!isEditing && (request?.has_quoted || request?.my_quotation_status === "WITHDRAWN") ? (
+            <div className="quote-cancelled-blocked-card">
+              <div className="quote-blocked-icon">
+                <i className="fas fa-ban"></i>
+              </div>
+              <h2 className="quote-blocked-title">
+                {request?.my_quotation_status === "WITHDRAWN"
+                  ? "Booking Cancelled — Cannot Re-quote"
+                  : "Quotation Already Submitted"}
+              </h2>
+              <p className="quote-blocked-desc">
+                {request?.my_quotation_status === "WITHDRAWN"
+                  ? "A previous booking or quotation for this request was cancelled. Marketplace policies do not permit submitting a new quotation for the same service request."
+                  : "You have already submitted a quotation for this service request. You can check its status under My Quotations."}
+              </p>
+              <div className="quote-blocked-actions">
+                <button
+                  type="button"
+                  className="quote-blocked-primary-btn"
+                  onClick={() => navigate("/provider/service-requests")}
+                >
+                  <i className="fas fa-arrow-left"></i>
+                  <span>Browse Available Requests</span>
+                </button>
+                <button
+                  type="button"
+                  className="quote-blocked-secondary-btn"
+                  onClick={() => navigate("/provider/quotations")}
+                >
+                  <i className="fas fa-file-alt"></i>
+                  <span>View My Quotations</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <QuotationForm
+              initialValues={formInitialValues}
+              isEditing={isEditing}
+              onSubmit={handleFormSubmit}
+              isSubmitting={submitQuotationMutation.isPending || updateQuotationMutation.isPending}
+              onCancel={handleBack}
+              onChat={handleChatClick}
+            />
+          )}
         </div>
 
         <div className="quote-sidebar-column">

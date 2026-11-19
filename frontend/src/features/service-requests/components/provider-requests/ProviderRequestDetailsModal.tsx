@@ -448,6 +448,11 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
               <i className="fas fa-calendar-times mr-1.5"></i>
               <span>Request Expired</span>
             </button>
+          ) : request.my_quotation_status === "WITHDRAWN" ? (
+            <button type="button" className="provreq-btn-quote disabled" disabled>
+              <i className="fas fa-ban mr-1.5"></i>
+              <span>Booking Cancelled</span>
+            </button>
           ) : request.has_quoted ? (
             <button
               type="button"

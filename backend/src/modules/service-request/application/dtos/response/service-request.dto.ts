@@ -65,6 +65,8 @@ export interface ServiceRequestDetailsDto extends ServiceRequestResponseDto {
     matched_providers_count?: number;
     quotations_count?: number;
     has_quoted?: boolean;
+    my_quotation_status?: string | null;
+    my_quotation_id?: string | null;
     latest_booking?: ServiceRequestBookingSummaryDto | null;
 }
 

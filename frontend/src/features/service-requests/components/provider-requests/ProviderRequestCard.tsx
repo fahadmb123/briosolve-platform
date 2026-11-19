@@ -224,7 +224,12 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
             </div>
           ) : null}
 
-          {request.has_quoted ? (
+          {request.my_quotation_status === "WITHDRAWN" ? (
+            <div className="provreq-meta-tag cancelled" style={{ color: "#ef4444" }}>
+              <i className="fas fa-times-circle"></i>
+              <span>Cancelled Booking</span>
+            </div>
+          ) : request.has_quoted ? (
             <div className="provreq-meta-tag has-quoted">
               <i className="fas fa-check-circle"></i>
               <span>You Quoted</span>
@@ -283,6 +288,16 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
               disabled
             >
               <span>Expired</span>
+            </button>
+          ) : request.my_quotation_status === "WITHDRAWN" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="Your booking or quotation for this request was cancelled"
+            >
+              <i className="fas fa-ban"></i>
+              <span>Booking Cancelled</span>
             </button>
           ) : request.has_quoted ? (
             <button
