@@ -35,8 +35,8 @@ export function createUpdateBookingStatusUseCase(
     return new UpdateBookingStatusUseCase(
         bookingRepository,
         providerRepository,
-        createNotificationUseCase,
         serviceRequestRepository,
-        quotationRepository
+        quotationRepository,
+        createNotificationUseCase
     );
 }

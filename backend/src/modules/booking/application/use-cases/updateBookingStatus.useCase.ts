@@ -14,9 +14,9 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
     constructor(
         private readonly _bookingRepository: IBookingRepository,
         private readonly _providerRepository: IProviderRepository,
-        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
-        private readonly _serviceRequestRepository?: IServiceRequestRepository,
-        private readonly _quotationRepository?: IQuotationRepository
+        private readonly _serviceRequestRepository: IServiceRequestRepository,
+        private readonly _quotationRepository: IQuotationRepository,
+        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
 
     async execute(input: UpdateBookingStatusInputDto): Promise<BookingResponseDto> {
@@ -112,12 +112,8 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         }
 
         if (input.status === "CANCELLED") {
-            if (this._serviceRequestRepository && details.booking.service_request_id) {
-                await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "EXPIRED").catch(() => null);
-            }
-            if (this._quotationRepository && details.booking.quotation_id) {
-                await this._quotationRepository.update(details.booking.quotation_id, { status: "WITHDRAWN" }).catch(() => null);
-            }
+            await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "EXPIRED").catch(() => null);
+            await this._quotationRepository.update(details.booking.quotation_id, { status: "WITHDRAWN" }).catch(() => null);
         }
 
         const updatedDetails = await this._bookingRepository.findDetailsById(updated.id);

@@ -11,7 +11,7 @@ import { NotificationResponseDto } from "../../../notification/application/dtos/
 export class CreateBookingUseCase implements IUseCase<CreateBookingInputDto, BookingResponseDto> {
     constructor(
         private readonly _bookingRepository: IBookingRepository,
-        private readonly _providerRepository?: IProviderRepository,
+        private readonly _providerRepository: IProviderRepository,
         private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
     ) {}
 
@@ -34,11 +34,9 @@ export class CreateBookingUseCase implements IUseCase<CreateBookingInputDto, Boo
 
         if (this._createNotificationUseCase) {
             let providerUserId: string | null = null;
-            if (this._providerRepository) {
-                const profile = await this._providerRepository.findById(input.providerId);
-                if (profile) {
-                    providerUserId = profile.user_id;
-                }
+            const profile = await this._providerRepository.findById(input.providerId);
+            if (profile) {
+                providerUserId = profile.user_id;
             }
 
             if (providerUserId) {

@@ -11,7 +11,7 @@ export class UpdateServiceUseCase implements IUseCase<UpdateServiceUseCaseDto, S
     constructor(
         private readonly _serviceRepository: IServiceRepository,
         private readonly _imageUploadService: ImageUploadService,
-        private readonly _categoryRepository?: ICategoryRepository
+        private readonly _categoryRepository: ICategoryRepository
     ) {}
 
     async execute(input: UpdateServiceUseCaseDto): Promise<ServiceResponseDto> {
@@ -20,7 +20,7 @@ export class UpdateServiceUseCase implements IUseCase<UpdateServiceUseCaseDto, S
             throw new ApplicationError("NOT_FOUND", "Service not found", "NOT_FOUND");
         }
 
-        if (this._categoryRepository && input.input.category_id) {
+        if (input.input.category_id) {
             const category = await this._categoryRepository.findById(input.input.category_id);
             if (!category) {
                 throw new ApplicationError("NOT_FOUND", "Category not found", "NOT_FOUND");
