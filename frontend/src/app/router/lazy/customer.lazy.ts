@@ -14,3 +14,4 @@ export const CustomerPaymentSuccess = React.lazy(() => import('../../../features
 export const CustomerPaymentCancelled = React.lazy(() => import('../../../features/payment/pages/PaymentCancelledPage'));
 export const CustomerBookings = React.lazy(() => import('../../../features/bookings/pages/BookingsPage/BookingsPage').then(m => ({ default: m.BookingsPage })));
 export const CustomerBookingDetails = React.lazy(() => import('../../../features/bookings/pages/BookingDetailsPage/BookingDetailsPage').then(m => ({ default: m.BookingDetailsPage })));
+export const CustomerWallet = React.lazy(() => import('../../../features/wallet/pages/WalletPage/WalletPage'));
