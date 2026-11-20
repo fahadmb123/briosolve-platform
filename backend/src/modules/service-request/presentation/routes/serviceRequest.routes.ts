@@ -11,12 +11,10 @@ export function buildServiceRequestRoute(controller: ServiceRequestRouteDependen
     const router = Router();
 
     router.get("/", authMiddleware, requireRole(["CUSTOMER"]), controller.serviceRequest.getMyServiceRequests);
-    router.get("/admin", authMiddleware, requireRole(["ADMIN"]), controller.serviceRequest.getAdminServiceRequests)
     router.get("/provider", authMiddleware, requireRole(["PROVIDER"]), controller.serviceRequest.getProviderServiceRequests);
     router.post("/", authMiddleware, requireRole(["CUSTOMER"]), validate(createServiceRequestSchema), controller.serviceRequest.createServiceRequest);
     router.patch("/:id/cancel", authMiddleware, requireRole(["CUSTOMER"]), controller.serviceRequest.cancelServiceRequest)
     router.patch("/:id/reopen", authMiddleware, requireRole(["CUSTOMER"]), validate(reopenServiceRequestSchema), controller.serviceRequest.reopenServiceRequest)
-    router.patch("/:id/admin-cancel", authMiddleware, requireRole(["ADMIN"]), controller.serviceRequest.adminCancelServiceRequest);
 
     router.put("/:id", authMiddleware, requireRole(["CUSTOMER"]), validate(updateServiceRequestSchema), controller.serviceRequest.updateServiceRequest);
 

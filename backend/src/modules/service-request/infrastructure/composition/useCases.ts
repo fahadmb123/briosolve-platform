@@ -10,8 +10,6 @@ import { GetProviderServiceRequestsUseCase } from "../../application/use-cases/g
 import { CancelServiceRequestUseCase } from "../../application/use-cases/cancelServiceRequest.useCase";
 import { ReopenServiceRequestUseCase } from "../../application/use-cases/reopenServiceRequest.useCase";
 import { UpdateServiceRequestUseCase } from "../../application/use-cases/updateServiceRequest.useCase";
-import { GetAdminServiceRequestsUseCase } from "../../application/use-cases/getAdminServiceRequests.useCase";
-import { AdminCancelServiceRequestUseCase } from "../../application/use-cases/adminCancelServiceRequest.useCase";
 import { serviceRequestRepository, serviceRequestProviderRepository } from "./repositories";
 import { imageUploadService, providerSelectionService } from "./services";
 
@@ -77,11 +75,3 @@ export function createUpdateServiceRequestUseCase(
         providerSelectionService
     );
 }
-
-export const getAdminServiceRequestsUseCase = new GetAdminServiceRequestsUseCase(
-    serviceRequestRepository
-);
-
-export const adminCancelServiceRequestUseCase = new AdminCancelServiceRequestUseCase(
-    serviceRequestRepository
-);
