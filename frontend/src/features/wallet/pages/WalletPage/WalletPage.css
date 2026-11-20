@@ -78,8 +78,7 @@
 .wpage-refresh-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 0.6rem 1.1rem;
+  padding: 0.55rem 1.1rem;
   border-radius: 8px;
   background: #ffffff;
   border: 1px solid #cbd5e1;
@@ -117,7 +116,7 @@
 }
 
 .balance-card {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: #0f172a;
   color: #ffffff;
   border: none;
   display: flex;
@@ -129,28 +128,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .wpage-label {
-  font-size: 0.825rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: #94a3b8;
   font-weight: 600;
 }
 
 .wpage-escrow-pill {
   font-size: 0.725rem;
-  background: rgba(34, 197, 94, 0.18);
+  background: rgba(34, 197, 94, 0.15);
   color: #4ade80;
-  padding: 0.25rem 0.6rem;
+  padding: 0.25rem 0.65rem;
   border-radius: 9999px;
   font-weight: 600;
   border: 1px solid rgba(74, 222, 128, 0.3);
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
 }
 
 .wpage-balance-number {
@@ -161,7 +157,7 @@
 }
 
 .wpage-currency {
-  font-size: 1.75rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: #cbd5e1;
 }
@@ -181,46 +177,23 @@
 .wpage-footer-info {
   font-size: 0.775rem;
   color: #94a3b8;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .wpage-stat-card {
   background: #ffffff;
   border-radius: 12px;
-  padding: 1.25rem;
+  padding: 1.5rem;
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.wpage-stat-icon-wrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-.wpage-stat-icon-wrapper.highlight-icon {
-  background: #ecfdf5;
-  color: #059669;
-}
-
-.wpage-stat-icon-wrapper.history-icon {
-  background: #eff6ff;
-  color: #2563eb;
 }
 
 .wpage-stat-details {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .wpage-stat-label {
@@ -228,14 +201,14 @@
   color: #64748b;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
 }
 
 .wpage-stat-val {
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.6rem;
+  font-weight: 800;
   color: #0f172a;
-  margin: 2px 0;
+  letter-spacing: -0.02em;
 }
 
 .wpage-stat-val.text-green {
@@ -243,44 +216,30 @@
 }
 
 .wpage-stat-sub {
-  font-size: 0.75rem;
+  font-size: 0.775rem;
   color: #94a3b8;
 }
 
 .wpage-banner {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 10px;
-  padding: 1rem 1.25rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.wpage-banner-icon {
-  background: #dcfce7;
-  color: #16a34a;
-  width: 36px;
-  height: 36px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #3b82f6;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.75rem;
 }
 
 .wpage-banner-content h4 {
   margin: 0 0 4px 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #166534;
+  color: #1e293b;
 }
 
 .wpage-banner-content p {
   margin: 0;
   font-size: 0.85rem;
-  color: #14532d;
+  color: #475569;
   line-height: 1.45;
 }
 
@@ -305,14 +264,14 @@
 
 .wpage-section-titles h2 {
   margin: 0 0 4px 0;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #0f172a;
 }
 
 .wpage-section-titles p {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   color: #64748b;
 }
 
@@ -351,24 +310,19 @@
 .wpage-search-box {
   display: flex;
   align-items: center;
-  background: #f8fafc;
+  background: #ffffff;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  padding: 0.4rem 0.75rem;
+  padding: 0.35rem 0.75rem;
   gap: 8px;
-  min-width: 240px;
-}
-
-.wpage-search-box i {
-  color: #94a3b8;
-  font-size: 0.85rem;
+  min-width: 220px;
 }
 
 .wpage-search-box input {
   border: none;
   background: transparent;
   outline: none;
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   color: #0f172a;
   width: 100%;
 }
@@ -379,6 +333,7 @@
   color: #94a3b8;
   cursor: pointer;
   padding: 0;
+  font-size: 0.75rem;
 }
 
 .wpage-list {
@@ -399,32 +354,11 @@
   border-bottom: none;
 }
 
-.wpage-item-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.wpage-item-icon.credit {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.wpage-item-icon.debit {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
 .wpage-item-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .wpage-item-header {
@@ -435,10 +369,10 @@
 }
 
 .wpage-badge {
-  font-size: 0.7rem;
+  font-size: 0.675rem;
   font-weight: 700;
   padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -468,11 +402,12 @@
 }
 
 .wpage-item-ref {
-  font-size: 0.75rem;
+  font-size: 0.725rem;
   font-family: monospace;
   color: #64748b;
   background: #f8fafc;
-  padding: 0.15rem 0.4rem;
+  border: 1px solid #e2e8f0;
+  padding: 0.1rem 0.4rem;
   border-radius: 4px;
 }
 
@@ -481,9 +416,6 @@
   color: #2563eb;
   text-decoration: none;
   font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .wpage-item-booking-link:hover {
@@ -510,7 +442,7 @@
 }
 
 .wpage-item-amount {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
 }
 
@@ -523,7 +455,7 @@
 }
 
 .wpage-item-balance-after {
-  font-size: 0.75rem;
+  font-size: 0.725rem;
   color: #94a3b8;
   font-weight: 500;
 }
@@ -533,22 +465,9 @@
   padding: 3rem 1rem;
 }
 
-.wpage-empty-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #f1f5f9;
-  color: #94a3b8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  margin: 0 auto 1rem auto;
-}
-
 .wpage-empty-state h3 {
   margin: 0 0 6px 0;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: #1e293b;
 }
 
@@ -568,11 +487,11 @@
 }
 
 .wpage-shimmer-row {
-  height: 50px;
+  height: 48px;
   background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   background-size: 200% 100%;
   animation: wpageShimmer 1.5s infinite;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 @keyframes wpageShimmer {

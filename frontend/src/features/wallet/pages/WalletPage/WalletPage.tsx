@@ -95,8 +95,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
           </p>
         </div>
         <button className="wpage-refresh-btn" onClick={() => refetch()} title="Refresh Balance">
-          <i className="fas fa-sync-alt" />
-          <span>Refresh</span>
+          Refresh
         </button>
       </div>
 
@@ -104,9 +103,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
         <div className="wpage-card balance-card">
           <div className="wpage-balance-top">
             <span className="wpage-label">Available Balance</span>
-            <span className="wpage-escrow-pill">
-              <i className="fas fa-shield-alt" /> Escrow Protected
-            </span>
+            <span className="wpage-escrow-pill">Escrow Protected</span>
           </div>
           <div className="wpage-balance-number">
             <span className="wpage-currency">₹</span>
@@ -116,7 +113,6 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
           </div>
           <div className="wpage-balance-footer">
             <span className="wpage-footer-info">
-              <i className="fas fa-info-circle" />{" "}
               {isProvider
                 ? "Job earnings are credited immediately upon booking completion"
                 : "Automatic instant credit on pre-dispatch cancellation"}
@@ -125,9 +121,6 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
         </div>
 
         <div className="wpage-stat-card">
-          <div className="wpage-stat-icon-wrapper highlight-icon">
-            <i className={isProvider ? "fas fa-hand-holding-usd" : "fas fa-undo-alt"} />
-          </div>
           <div className="wpage-stat-details">
             <span className="wpage-stat-label">
               {isProvider ? "Total Earnings" : "Total Refunded"}
@@ -145,9 +138,6 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
         </div>
 
         <div className="wpage-stat-card">
-          <div className="wpage-stat-icon-wrapper history-icon">
-            <i className="fas fa-exchange-alt" />
-          </div>
           <div className="wpage-stat-details">
             <span className="wpage-stat-label">Total Activity</span>
             <span className="wpage-stat-val">{stats.count} Transactions</span>
@@ -157,14 +147,11 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
       </div>
 
       <div className="wpage-banner">
-        <div className="wpage-banner-icon">
-          <i className="fas fa-lock" />
-        </div>
         <div className="wpage-banner-content">
-          <h4>{isProvider ? "How Provider Escrow Works" : "How Your Escrow Wallet Works"}</h4>
+          <h4>{isProvider ? "Escrow Payment Protection" : "Escrow Refund Policy"}</h4>
           <p>
             {isProvider
-              ? "When a customer books your service, advance funds are securely locked in escrow. Once you finish the service and mark the booking completed, your net earnings (amount minus platform fee) are credited instantly to your wallet."
+              ? "When a customer books your service, advance funds are securely locked in escrow. Once you finish the service and mark the booking completed, your net earnings (amount minus platform fee) are credited directly to your wallet."
               : "When you book a service, advance payments are held safely. If you or the provider cancels before the provider is dispatched, the advance is immediately credited back into this wallet as a refund."}
           </p>
         </div>
@@ -174,7 +161,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
         <div className="wpage-section-header">
           <div className="wpage-section-titles">
             <h2>Transaction Ledger</h2>
-            <p>Complete historical log of all wallet deposits and deductions</p>
+            <p>Historical log of all wallet deposits and deductions</p>
           </div>
           <div className="wpage-filter-controls">
             <div className="wpage-tabs">
@@ -222,10 +209,9 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
               )}
             </div>
             <div className="wpage-search-box">
-              <i className="fas fa-search" />
               <input
                 type="text"
-                placeholder="Search by description or reference..."
+                placeholder="Search transactions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -235,7 +221,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
                   className="wpage-search-clear"
                   onClick={() => setSearchQuery("")}
                 >
-                  <i className="fas fa-times" />
+                  ✕
                 </button>
               )}
             </div>
@@ -250,15 +236,11 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
           </div>
         ) : error ? (
           <div className="wpage-error-card">
-            <i className="fas fa-exclamation-triangle" />
             <p>Failed to load wallet details. Please try again.</p>
             <button type="button" onClick={() => refetch()}>Retry</button>
           </div>
         ) : filteredTransactions.length === 0 ? (
           <div className="wpage-empty-state">
-            <div className="wpage-empty-icon">
-              <i className="fas fa-wallet" />
-            </div>
             <h3>No Transactions Found</h3>
             <p>
               {searchQuery
@@ -289,9 +271,6 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
 
               return (
                 <div key={tx.id} className="wpage-item">
-                  <div className={`wpage-item-icon ${isCredit ? "credit" : "debit"}`}>
-                    <i className={isCredit ? "fas fa-arrow-down" : "fas fa-arrow-up"} />
-                  </div>
                   <div className="wpage-item-info">
                     <div className="wpage-item-header">
                       <span
@@ -312,7 +291,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
                       )}
                       {tx.bookingId && (
                         <Link to={bookingRoute} className="wpage-item-booking-link">
-                          View Booking <i className="fas fa-external-link-alt" />
+                          View Booking
                         </Link>
                       )}
                     </div>
