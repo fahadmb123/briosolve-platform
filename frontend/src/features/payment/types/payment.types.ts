@@ -36,3 +36,29 @@ export interface RazorpaySuccessResponse {
   razorpay_order_id: string;
   razorpay_signature: string;
 }
+
+export interface CreateBookingPaymentOrderPayload {
+  bookingId: string;
+}
+
+export interface CreateBookingPaymentOrderResponse {
+  orderId: string;
+  amount: number;
+  currency: string;
+  keyId: string;
+  bookingId: string;
+}
+
+export interface VerifyBookingPaymentPayload {
+  bookingId: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+}
+
+export interface VerifyBookingPaymentResponse {
+  success: boolean;
+  bookingId: string;
+  status: string;
+  paymentStatus: string;
+}

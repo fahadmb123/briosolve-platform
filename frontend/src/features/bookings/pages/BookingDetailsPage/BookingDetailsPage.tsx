@@ -1,9 +1,12 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useGetBookingById, useUpdateBookingStatus } from "../../hooks/useBookingMutations";
 import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
 import { BookingStatusModal } from "../../components";
+import { useAuthStore } from "../../../auth/stores/auth.store";
+import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
+import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
 import "./BookingDetailsPage.css";
 
 interface BookingDetailsPageProps {
@@ -19,6 +22,9 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     roleProp || (location.pathname.startsWith("/provider") ? "provider" : "customer");
   const isProvider = role === "provider";
 
+  const user = useAuthStore((state) => state.user);
+  const profile = useAuthStore((state) => state.profile);
+
   const initialBooking = (location.state as { booking?: BookingItem } | null)?.booking || null;
 
   const { data: responseData, isLoading, error, refetch } = useGetBookingById(bookingId);
@@ -28,6 +34,20 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
   const [statusModalBooking, setStatusModalBooking] = useState<BookingItem | null>(null);
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const activeRazorpayRef = useRef<any>(null);
+
+  useEffect(() => {
+    return () => {
+      if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+        try {
+          activeRazorpayRef.current.close();
+        } catch {}
+        activeRazorpayRef.current = null;
+      }
+      resetRazorpay();
+    };
+  }, []);
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("en-IN", {
@@ -143,6 +163,109 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         }
       }
     );
+  };
+
+  const handlePayRemainingBalance = async () => {
+    if (!booking || isProcessingPayment) return;
+    setIsProcessingPayment(true);
+    resetRazorpay();
+
+    const isLoaded = await loadRazorpayScript(true);
+    if (!isLoaded) {
+      toast.error("Unable to load Razorpay payment gateway. Please check your internet connection.");
+      setIsProcessingPayment(false);
+      return;
+    }
+
+    try {
+      const orderRes = await createBookingPaymentOrderService({ bookingId: booking.id });
+      const orderData = orderRes.data;
+      if (!orderData) {
+        toast.error("Failed to generate payment order");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      let rzp: any = null;
+
+      const cleanupRazorpayModal = () => {
+        if (rzp && typeof rzp.close === "function") {
+          try {
+            rzp.close();
+          } catch {}
+        }
+        if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+          try {
+            activeRazorpayRef.current.close();
+          } catch {}
+          activeRazorpayRef.current = null;
+        }
+        resetRazorpay();
+      };
+
+      const options = {
+        key: orderData.keyId,
+        amount: Math.round(orderData.amount * 100),
+        currency: orderData.currency || "INR",
+        name: "Service Settle",
+        description: `Remaining Balance for Booking #${booking.bookingNumber}`,
+        order_id: orderData.orderId,
+        prefill: {
+          name: (profile as any)?.full_name || user?.name || "",
+          email: user?.email || "",
+          contact: (profile as any)?.phone || user?.phone || ""
+        },
+        theme: {
+          color: "#ea580c"
+        },
+        modal: {
+          ondismiss: () => {
+            cleanupRazorpayModal();
+            setIsProcessingPayment(false);
+            toast("Payment window closed. You can settle the remaining balance whenever you are ready.", {
+              icon: "ℹ️"
+            });
+          }
+        },
+        handler: async (paymentResponse: any) => {
+          cleanupRazorpayModal();
+          try {
+            const verifyRes = await verifyBookingPaymentService({
+              bookingId: booking.id,
+              razorpayOrderId: paymentResponse.razorpay_order_id,
+              razorpayPaymentId: paymentResponse.razorpay_payment_id,
+              razorpaySignature: paymentResponse.razorpay_signature
+            });
+
+            if (verifyRes.data?.success) {
+              toast.success("Remaining balance settled successfully! Booking completed.");
+              refetch();
+            } else {
+              toast.error("Payment verification failed. Please contact support.");
+            }
+          } catch (err: any) {
+            toast.error(err?.response?.data?.message || err?.message || "Failed to verify balance payment");
+          } finally {
+            setIsProcessingPayment(false);
+          }
+        }
+      };
+
+      rzp = new (window as any).Razorpay(options);
+      activeRazorpayRef.current = rzp;
+
+      rzp.on("payment.failed", (response: any) => {
+        cleanupRazorpayModal();
+        setIsProcessingPayment(false);
+        toast.error(`Payment failed: ${response?.error?.description || "Transaction declined"}`);
+      });
+
+      rzp.open();
+    } catch (err: any) {
+      setIsProcessingPayment(false);
+      resetRazorpay();
+      toast.error(err?.response?.data?.message || err?.message || "Failed to initiate payment");
+    }
   };
 
   const getStatusMeta = (status: BookingStatus) => {
@@ -712,7 +835,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 className="bkdet-action-btn success"
                 onClick={() => handleTriggerStatusChange("COMPLETED")}
               >
-                <i className="fas fa-check-double" />
+                <i className="fas fa-check-circle" />
                 <span>Mark Completed</span>
               </button>
             ) : (
@@ -722,7 +845,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 onClick={() => handleTriggerStatusChange("PAYMENT_PENDING")}
               >
                 <i className="fas fa-file-invoice-dollar" />
-                <span>Confirm Total & Request Payment</span>
+                <span>Complete Job / Settle Payment</span>
               </button>
             )
           )}
@@ -818,16 +941,20 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               <button
                 type="button"
                 className="bkdet-action-btn success"
-                onClick={() =>
-                  handleConfirmStatusChange(
-                    booking,
-                    "COMPLETED",
-                    "Final balance payment confirmed by client. Escrow released."
-                  )
-                }
+                onClick={handlePayRemainingBalance}
+                disabled={isProcessingPayment}
               >
-                <i className="fas fa-lock" />
-                <span>Pay Balance ({formatCurrency(remainingAmount)}) & Complete</span>
+                {isProcessingPayment ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin" />
+                    <span>Connecting Razorpay...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-lock" />
+                    <span>Pay Balance ({formatCurrency(remainingAmount)}) & Complete</span>
+                  </>
+                )}
               </button>
             )}
             {isProvider && (
@@ -1292,16 +1419,20 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <button
                   type="button"
                   className="bkdet-pay-balance-btn"
-                  onClick={() =>
-                    handleConfirmStatusChange(
-                      booking,
-                      "COMPLETED",
-                      "Final balance payment confirmed by client. Escrow released."
-                    )
-                  }
+                  onClick={handlePayRemainingBalance}
+                  disabled={isProcessingPayment}
                 >
-                  <i className="fas fa-credit-card" />
-                  <span>Pay Remaining Balance ({formatCurrency(remainingAmount)})</span>
+                  {isProcessingPayment ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin" />
+                      <span>Connecting Razorpay...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-credit-card" />
+                      <span>Pay Remaining Balance ({formatCurrency(remainingAmount)})</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}

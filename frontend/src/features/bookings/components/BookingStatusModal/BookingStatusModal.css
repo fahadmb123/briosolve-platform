@@ -391,6 +391,124 @@
   border-radius: 6px;
 }
 
+.bkstatus-paid-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.bkstatus-paid-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bkstatus-paid-info i {
+  color: #16a34a;
+  font-size: 1.1rem;
+}
+
+.bkstatus-paid-info div {
+  display: flex;
+  flex-direction: column;
+}
+
+.bkstatus-paid-info span {
+  font-size: 0.72rem;
+  color: #166534;
+}
+
+.bkstatus-paid-info strong {
+  font-size: 0.95rem;
+  color: #14532d;
+}
+
+.bkstatus-paid-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #15803d;
+  background: #dcfce7;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.bkstatus-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bkstatus-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bkstatus-zero-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bkstatus-zero-toggle-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.bkstatus-zero-toggle-btn.active {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.bkstatus-zero-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.bkstatus-zero-card i {
+  color: #16a34a;
+  font-size: 1.05rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bkstatus-zero-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bkstatus-zero-card strong {
+  font-size: 0.8rem;
+  color: #14532d;
+}
+
+.bkstatus-zero-card span {
+  font-size: 0.74rem;
+  color: #166534;
+  line-height: 1.4;
+}
+
 .bkstatus-amount-input.error {
   border-color: #ef4444;
   background: #fef2f2;
@@ -398,7 +516,7 @@
 
 .bkstatus-amount-calc-preview {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -425,6 +543,14 @@
 
 .bkstatus-calc-item.balance strong {
   color: #ea580c;
+}
+
+.bkstatus-calc-item.total strong {
+  color: #0f172a;
+}
+
+.text-warning {
+  color: #d97706 !important;
 }
 
 .bkstatus-amount-error {
