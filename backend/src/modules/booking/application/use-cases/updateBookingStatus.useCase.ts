@@ -193,20 +193,24 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             }
         }
 
-        if (input.status === "COMPLETED" && this._creditWalletUseCase) {
-            const profile = await this._providerRepository.findById(details.booking.provider_id);
-            if (profile && profile.user_id) {
-                const finalTotal = resolvedTotalAmount || details.booking.total_amount;
-                const earnings = Math.max(0, finalTotal - (details.booking.platform_fee || 0));
-                if (earnings > 0) {
-                    await this._creditWalletUseCase.execute({
-                        userId: profile.user_id,
-                        amount: earnings,
-                        category: "EARNINGS",
-                        bookingId: details.booking.id,
-                        description: `Earnings for completed booking #${details.booking.booking_number}`,
-                        referenceId: details.booking.booking_number
-                    }).catch(() => null);
+        if (input.status === "COMPLETED") {
+            await this._providerRepository.incrementCompletedJobs(details.booking.provider_id).catch(() => null);
+
+            if (this._creditWalletUseCase) {
+                const profile = await this._providerRepository.findById(details.booking.provider_id);
+                if (profile && profile.user_id) {
+                    const finalTotal = resolvedTotalAmount || details.booking.total_amount;
+                    const earnings = Math.max(0, finalTotal - (details.booking.platform_fee || 0));
+                    if (earnings > 0) {
+                        await this._creditWalletUseCase.execute({
+                            userId: profile.user_id,
+                            amount: earnings,
+                            category: "EARNINGS",
+                            bookingId: details.booking.id,
+                            description: `Earnings for completed booking #${details.booking.booking_number}`,
+                            referenceId: details.booking.booking_number
+                        }).catch(() => null);
+                    }
                 }
             }
         }

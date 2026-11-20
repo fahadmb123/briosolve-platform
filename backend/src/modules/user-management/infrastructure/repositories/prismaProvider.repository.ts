@@ -112,4 +112,18 @@ export class ProviderRepository implements IProviderRepository {
             .where({ user_id: userId as Varchar<255> })
             .delete();
     }
+
+    async incrementCompletedJobs(providerProfileId: string): Promise<void> {
+        const profile = await db.orm.public.provider_profiles
+            .where({ id: providerProfileId as never })
+            .first();
+
+        if (profile) {
+            await db.orm.public.provider_profiles
+                .where({ id: providerProfileId as never })
+                .update({
+                    completed_jobs: (profile.completed_jobs || 0) + 1
+                } as never);
+        }
+    }
 }
