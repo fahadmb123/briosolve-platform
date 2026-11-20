@@ -2968,6 +2968,13 @@
                   "plane": "domain"
                 }
               },
+              "rejection_reason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "service_request_id": {
                 "nullable": false,
                 "type": {
@@ -3107,6 +3114,9 @@
                 },
                 "quotation_type": {
                   "column": "quotation_type"
+                },
+                "rejection_reason": {
+                  "column": "rejection_reason"
                 },
                 "service_request_id": {
                   "column": "service_request_id"
@@ -6586,6 +6596,11 @@
                     "plane": "storage"
                   }
                 },
+                "rejection_reason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "service_request_id": {
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
@@ -7957,7 +7972,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "76ede8324323bbef212a6d62110d5a97f2f33bbcc31568ea99ce528f45e5da82"
+    "storageHash": "5b8edb0b28c30c8601d880f6bb38e0491ca7313a4372cfba71a28ad68f3ef0de"
   },
   "execution": {
     "executionHash": "7cfa2bb0c83f838f529dffdf0a4b086424f3d2afeac803eae5a9b22d2fc0418b",

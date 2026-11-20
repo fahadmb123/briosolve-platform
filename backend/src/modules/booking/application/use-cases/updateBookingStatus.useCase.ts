@@ -124,8 +124,12 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         }
 
         if (input.status === "CANCELLED") {
+            const cancelActorName = isProviderAction ? (providerProfile?.business_name || "Provider") : "Customer";
             await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "EXPIRED").catch(() => null);
-            await this._quotationRepository.update(details.booking.quotation_id, { status: "WITHDRAWN" }).catch(() => null);
+            await this._quotationRepository.update(details.booking.quotation_id, {
+                status: "WITHDRAWN",
+                rejectionReason: `Booking cancelled by ${cancelActorName}: ${input.notes || "No cancellation reason provided"}`
+            }).catch(() => null);
             if (this._creditWalletUseCase && details.booking.advance_amount > 0) {
                 await this._creditWalletUseCase.execute({
                     userId: details.booking.customer_id,

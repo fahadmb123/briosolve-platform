@@ -139,21 +139,37 @@
 
 .bkcard-cancel-reason-pill {
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  align-items: flex-start;
+  gap: 8px;
   background: #fef2f2;
   border: 1px solid #fecaca;
   color: #991b1b;
   font-size: 0.78rem;
-  padding: 4px 10px;
-  border-radius: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
   margin-top: 6px;
   max-width: 100%;
 }
 
-.bkcard-cancel-reason-pill strong {
-  font-weight: 600;
+.bkcard-cancel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bkcard-cancel-author {
+  font-weight: 500;
+  color: #991b1b;
+}
+
+.bkcard-cancel-author strong {
+  font-weight: 700;
   color: #7f1d1d;
+}
+
+.bkcard-cancel-reason-text {
+  font-size: 0.74rem;
+  color: #64748b;
   font-style: italic;
 }
 

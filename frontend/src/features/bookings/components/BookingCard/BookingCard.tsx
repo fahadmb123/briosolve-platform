@@ -52,6 +52,24 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     return null;
   }, [booking]);
 
+  const cancellationAuthor = React.useMemo<string | null>(() => {
+    if (booking.status !== "CANCELLED") return null;
+    if (booking.statusHistory && booking.statusHistory.length > 0) {
+      const cancelItem = booking.statusHistory.slice().reverse().find((item) => item.status === "CANCELLED");
+      if (cancelItem?.authorName) return cancelItem.authorName;
+    }
+    if (booking.notes && booking.notes.trim()) {
+      try {
+        const parsed = JSON.parse(booking.notes);
+        if (Array.isArray(parsed)) {
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+          if (cancelItem?.authorName) return cancelItem.authorName;
+        }
+      } catch {}
+    }
+    return null;
+  }, [booking]);
+
   const renderStatusBadge = () => {
     switch (booking.status) {
       case "CONFIRMED":
@@ -143,10 +161,17 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           {booking.serviceRequestTitle || "Service Requirement"}
         </h3>
 
-        {booking.status === "CANCELLED" && cancellationReason && (
+        {booking.status === "CANCELLED" && (
           <div className="bkcard-cancel-reason-pill">
             <i className="fas fa-ban"></i>
-            <span>Cancellation Reason: <strong>"{cancellationReason}"</strong></span>
+            <div className="bkcard-cancel-info">
+              <span className="bkcard-cancel-author">
+                Cancelled by <strong>{cancellationAuthor ? (cancellationAuthor.toLowerCase() === "customer" ? "Customer" : `Provider (${cancellationAuthor})`) : "System"}</strong>
+              </span>
+              {cancellationReason && (
+                <span className="bkcard-cancel-reason-text">Reason: "{cancellationReason}"</span>
+              )}
+            </div>
           </div>
         )}
 

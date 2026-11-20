@@ -237,6 +237,12 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     return null;
   }, [booking, timelineItems]);
 
+  const isCancelledByCustomer = useMemo<boolean>(() => {
+    if (!cancellationAuthor) return false;
+    const lower = cancellationAuthor.toLowerCase();
+    return lower === "customer" || (booking?.customerName ? lower === booking.customerName.toLowerCase() : false);
+  }, [cancellationAuthor, booking]);
+
   if (isLoading && !booking) {
     return (
       <div className={`bkdet-page-container bkdet-skeleton-container ${isProvider ? "is-provider" : "is-customer"}`} aria-hidden="true">
@@ -741,22 +747,26 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               <i className="fas fa-ban" />
             </div>
             <div>
+              <div className="bkdet-cb-author-badge">
+                <i className="fas fa-user-times" />
+                Cancelled by: <strong>{cancellationAuthor ? (isCancelledByCustomer ? "Customer" : `Provider (${cancellationAuthor})`) : "System"}</strong>
+              </div>
               <h4 className="bkdet-cb-title">
                 Booking Cancelled Before Service Dispatch
               </h4>
               <p className="bkdet-cb-desc">
                 {isProvider
-                  ? cancellationAuthor === "Customer"
+                  ? isCancelledByCustomer
                     ? `This booking was cancelled by the customer before dispatch. Escrow advance has been refunded to the customer.`
                     : `You cancelled this booking before dispatch. A 100% full refund of ${formatCurrency(advanceAmount)} secured in Escrow has been processed for the customer.`
-                  : cancellationAuthor === "Customer"
+                  : isCancelledByCustomer
                     ? `You cancelled this booking before dispatch. Your full payment of ${formatCurrency(advanceAmount)} held safely in Escrow has been 100% refunded.`
                     : `This booking was cancelled by the provider before dispatch. Your full payment of ${formatCurrency(advanceAmount)} held safely in Escrow has been 100% refunded.`}
               </p>
               {cancellationReason && (
                 <div className="bkdet-cb-reason-box">
                   <span className="bkdet-cb-reason-badge">
-                    <i className="fas fa-comment-alt" /> Reason
+                    <i className="fas fa-comment-alt" /> Cancellation Reason
                   </span>
                   <span className="bkdet-cb-reason-text">"{cancellationReason}"</span>
                 </div>
@@ -1124,7 +1134,14 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   <i className="fas fa-undo-alt" />
                 </div>
                 <div className="bkdet-fpt-content">
-                  <span className="bkdet-fpt-title" style={{ color: "#991b1b" }}>100% Refund Processed</span>
+                  <span className="bkdet-fpt-title" style={{ color: "#991b1b" }}>
+                    Cancelled {cancellationAuthor ? (isCancelledByCustomer ? "by Customer" : "by Provider") : ""} · 100% Refunded
+                  </span>
+                  {cancellationReason && (
+                    <p className="bkdet-fpt-desc" style={{ color: "#7f1d1d", fontWeight: 600, fontStyle: "italic", margin: "2px 0 4px" }}>
+                      "{cancellationReason}"
+                    </p>
+                  )}
                   <p className="bkdet-fpt-desc" style={{ color: "#b91c1c" }}>
                     The booking was cancelled before dispatch. The full payment of {formatCurrency(advanceAmount)} held in Escrow has been released back to the customer.
                   </p>

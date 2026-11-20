@@ -26,6 +26,7 @@ export interface RequestQuotationItemDto {
     validUntilDate: string;
     extraChargePolicy: string;
     status: string;
+    rejectionReason?: string | null;
     createdAt: string;
     updatedAt: string;
 }

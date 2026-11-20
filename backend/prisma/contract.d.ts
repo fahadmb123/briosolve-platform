@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'76ede8324323bbef212a6d62110d5a97f2f33bbcc31568ea99ce528f45e5da82'>;
+  StorageHashBase<'5b8edb0b28c30c8601d880f6bb38e0491ca7313a4372cfba71a28ad68f3ef0de'>;
 export type ExecutionHash =
   ExecutionHashBase<'7cfa2bb0c83f838f529dffdf0a4b086424f3d2afeac803eae5a9b22d2fc0418b'>;
 export type ProfileHash =
@@ -431,6 +431,7 @@ export type FieldOutputTypes = {
       readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
       readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly extra_charge_policy: Varchar<300>;
+      readonly rejection_reason: CodecTypes['pg/text@1']['output'] | null;
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -716,6 +717,7 @@ export type FieldInputTypes = {
       readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
       readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly extra_charge_policy: CodecTypes['sql/varchar@1']['input'];
+      readonly rejection_reason: CodecTypes['pg/text@1']['input'] | null;
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -998,6 +1000,7 @@ export type StorageColumnTypes = {
       readonly included_items: CodecTypes['pg/json@1']['output'];
       readonly provider_id: CodecTypes['pg/uuid@1']['output'];
       readonly quotation_type: 'FIXED' | 'ESTIMATED' | 'INSPECTION_REQUIRED';
+      readonly rejection_reason: CodecTypes['pg/text@1']['output'] | null;
       readonly service_request_id: CodecTypes['pg/uuid@1']['output'];
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -1283,6 +1286,7 @@ export type StorageColumnInputTypes = {
       readonly included_items: CodecTypes['pg/json@1']['input'];
       readonly provider_id: CodecTypes['pg/uuid@1']['input'];
       readonly quotation_type: 'FIXED' | 'ESTIMATED' | 'INSPECTION_REQUIRED';
+      readonly rejection_reason: CodecTypes['pg/text@1']['input'] | null;
       readonly service_request_id: CodecTypes['pg/uuid@1']['input'];
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -1726,6 +1730,7 @@ export namespace Models {
     valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
     valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
     extra_charge_policy: Varchar<300>;
+    rejection_reason: CodecTypes['pg/text@1']['output'] | null;
     status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -3277,6 +3282,11 @@ type ContractBase = Omit<
                   readonly codecId: 'sql/varchar@1';
                   readonly nullable: false;
                   readonly typeParams: { readonly length: 300 };
+                };
+                readonly rejection_reason: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
                 };
                 readonly status: {
                   readonly nativeType: 'text';
@@ -5959,6 +5969,10 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly length: 300 };
                 };
               };
+              readonly rejection_reason: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly status: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -6033,6 +6047,7 @@ type ContractBase = Omit<
                 readonly valid_until: { readonly column: 'valid_until' };
                 readonly valid_until_date: { readonly column: 'valid_until_date' };
                 readonly extra_charge_policy: { readonly column: 'extra_charge_policy' };
+                readonly rejection_reason: { readonly column: 'rejection_reason' };
                 readonly status: { readonly column: 'status' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };

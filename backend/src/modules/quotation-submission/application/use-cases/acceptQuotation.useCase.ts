@@ -49,7 +49,8 @@ export class AcceptQuotationUseCase implements IUseCase<AcceptQuotationInputDto,
 
         for (const other of otherQuotes) {
             await this._quotationRepository.update(other.id, {
-                status: "REJECTED"
+                status: "REJECTED",
+                rejectionReason: "Another quotation was accepted by the customer"
             });
         }
 

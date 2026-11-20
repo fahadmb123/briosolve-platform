@@ -36,8 +36,11 @@ export class RejectQuotationUseCase implements IUseCase<RejectQuotationInputDto,
             throw new ApplicationError("FORBIDDEN", "You are not authorized to decline quotations for this request", "AUTHENTICATION");
         }
 
+        const resolvedReason = input.reason && input.reason.trim() ? input.reason.trim() : "Declined by customer";
+
         await this._quotationRepository.update(quotation.id, {
-            status: "REJECTED"
+            status: "REJECTED",
+            rejectionReason: resolvedReason
         });
 
         if (this._createNotificationUseCase) {
@@ -49,7 +52,7 @@ export class RejectQuotationUseCase implements IUseCase<RejectQuotationInputDto,
                     type: "QUOTATION_REJECTED",
                     title: "Quotation Declined",
                     title_code: "QUOTATION_REJECTED",
-                    message: `The customer declined your quotation for "${serviceRequest.title}".`
+                    message: `The customer declined your quotation for "${serviceRequest.title}". Reason: ${resolvedReason}`
                 }).catch(() => null);
             }
         }
