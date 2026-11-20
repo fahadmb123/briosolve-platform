@@ -67,7 +67,15 @@ export class VerifyBookingPaymentUseCase implements IUseCase<VerifyBookingPaymen
             }
         }
 
-        const advanceAmount = Number(details.booking.advance_amount || 0);
+        const isFixed = details.quotationType === "FIXED";
+        const advanceAmount = isFixed
+            ? Number(details.booking.total_amount || 0)
+            : (details.quoteAmount
+                ? Math.round(Number(details.quoteAmount) * 1.1)
+                : (details.booking.advance_amount && details.booking.advance_amount > 0
+                    ? Number(details.booking.advance_amount)
+                    : Number(details.booking.total_amount || 0)));
+
         const totalAmount = Number(details.booking.total_amount || 0);
         const remainingAmount = Math.max(0, totalAmount - advanceAmount);
 
