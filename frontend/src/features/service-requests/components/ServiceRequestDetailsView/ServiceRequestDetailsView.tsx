@@ -92,23 +92,120 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
 
   if (!request) {
     return (
-      <div className="srdetails-page-container">
+      <div className="srdetails-page-container srdetails-sk-container" aria-hidden="true">
         <div className="srdetails-top-bar">
           <button type="button" className="srdetails-back-btn" onClick={onBack}>
             <i className="fas fa-arrow-left"></i>
-            <span>{backLabel || "Back to Service Requests"}</span>
+            <span>{backLabel || (role === "CUSTOMER" ? "Back to My Requests" : "Back to Service Requests")}</span>
           </button>
+          <div className="srdetails-top-actions">
+            <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "110px", height: "38px" }} />
+          </div>
         </div>
 
-        <div className="srdetails-hero-card srdetails-shimmer srdetails-sk-hero" />
+        <div className="srdetails-hero-card">
+          <div className="srdetails-hero-main">
+            <div className="srdetails-badge-row">
+              <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "120px" }} />
+              <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "100px" }} />
+              <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "130px" }} />
+            </div>
+            <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "65%", height: "28px", margin: "14px 0 10px" }} />
+            <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+              <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "140px", height: "15px" }} />
+              <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100px", height: "15px" }} />
+            </div>
+          </div>
+          <div className="srdetails-hero-aside">
+            <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "110px", height: "30px", alignSelf: "flex-end" }} />
+            <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "150px", height: "55px", marginTop: "10px", borderRadius: "10px" }} />
+          </div>
+        </div>
 
         <div className="srdetails-layout-grid">
           <div className="srdetails-main-column">
-            <div className="srdetails-card srdetails-shimmer srdetails-sk-card" />
-            <div className="srdetails-card srdetails-shimmer srdetails-sk-card" />
+            <div className="srdetails-card">
+              <div className="srdetails-card-header">
+                <div className="srdetails-card-header-left">
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "20px", height: "20px" }} />
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "190px", height: "20px" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "14px" }}>
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100%", height: "14px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "95%", height: "14px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "70%", height: "14px" }} />
+              </div>
+              <div style={{ display: "flex", gap: "12px", marginTop: "18px" }}>
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100px", height: "100px", borderRadius: "10px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100px", height: "100px", borderRadius: "10px" }} />
+              </div>
+            </div>
+
+            <div className="srdetails-card">
+              <div className="srdetails-card-header">
+                <div className="srdetails-card-header-left">
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "20px", height: "20px" }} />
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "160px", height: "20px" }} />
+                </div>
+                <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "90px", height: "24px" }} />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "14px" }}>
+                <div className="srdetails-sk-quote-box">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                      <div className="srdetails-shimmer" style={{ width: "40px", height: "40px", borderRadius: "50%" }} />
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "120px", height: "14px" }} />
+                        <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "80px", height: "12px" }} />
+                      </div>
+                    </div>
+                    <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "90px", height: "24px" }} />
+                  </div>
+                </div>
+                <div className="srdetails-sk-quote-box">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                      <div className="srdetails-shimmer" style={{ width: "40px", height: "40px", borderRadius: "50%" }} />
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "130px", height: "14px" }} />
+                        <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "70px", height: "12px" }} />
+                      </div>
+                    </div>
+                    <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "90px", height: "24px" }} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+
           <div className="srdetails-sidebar-column">
-            <div className="srdetails-card srdetails-shimmer srdetails-sk-card" />
+            <div className="srdetails-card">
+              <div className="srdetails-card-header">
+                <div className="srdetails-card-header-left">
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "18px", height: "18px" }} />
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "140px", height: "18px" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "14px" }}>
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "85%", height: "18px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "60%", height: "14px" }} />
+              </div>
+            </div>
+
+            <div className="srdetails-card">
+              <div className="srdetails-card-header">
+                <div className="srdetails-card-header-left">
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "18px", height: "18px" }} />
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "130px", height: "18px" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "14px" }}>
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "90%", height: "15px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "70%", height: "14px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100%", height: "130px", borderRadius: "8px", marginTop: "6px" }} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
