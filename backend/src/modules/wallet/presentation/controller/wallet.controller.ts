@@ -1,8 +1,8 @@
 import { BaseController } from "../../../../shared/base/controller/baseController";
 import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
-import { GetWalletDetailsInputDto } from "../../application/use-cases/getWalletDetails.useCase";
 import { WalletResponseDto } from "../../application/dtos/response/wallet-response.dto";
+import { GetWalletDetailsInputDto } from "../../application/dtos/response/get-wallet-details.dto";
 
 export class WalletController extends BaseController {
     constructor(

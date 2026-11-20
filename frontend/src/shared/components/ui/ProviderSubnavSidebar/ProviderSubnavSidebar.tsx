@@ -58,14 +58,14 @@ const FINANCES_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-file-invoice-dollar",
   },
   {
+    label: "Wallet & Earnings",
+    to: "/provider/wallet",
+    icon: "fas fa-wallet",
+  },
+  {
     label: "Invoices & Receipts",
     to: "/provider/quotations#invoices",
     icon: "fas fa-receipt",
-  },
-  {
-    label: "Payout Overview",
-    to: "/provider/dashboard#payouts",
-    icon: "fas fa-wallet",
   },
   {
     label: "Service Rates",
@@ -90,7 +90,8 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/provider/verification");
 
   const isFinancesSection =
-    location.pathname.startsWith("/provider/quotations");
+    location.pathname.startsWith("/provider/quotations") ||
+    location.pathname.startsWith("/provider/wallet");
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||

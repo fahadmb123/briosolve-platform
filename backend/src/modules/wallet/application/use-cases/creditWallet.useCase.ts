@@ -1,18 +1,10 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IWalletRepository } from "../../domain/repositories/IWallet.repository";
-import { WalletTransactionCategory } from "../../domain/entities/wallet-transaction.entity";
 import { WalletResponseDto } from "../dtos/response/wallet-response.dto";
 import { WalletMapper } from "../../infrastructure/mappers/wallet.mapper";
+import { CreditWalletInputDto } from "../dtos/request/credit-wallet.dto";
 
-export interface CreditWalletInputDto {
-    userId: string;
-    amount: number;
-    category: WalletTransactionCategory;
-    bookingId?: string | null;
-    description?: string | null;
-    referenceId?: string | null;
-}
 
 export class CreditWalletUseCase implements IUseCase<CreditWalletInputDto, WalletResponseDto> {
     constructor(private readonly _walletRepository: IWalletRepository) {}
