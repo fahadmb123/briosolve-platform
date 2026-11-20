@@ -1349,28 +1349,33 @@
     width: 100%;
     padding: 0.85rem 1rem;
     border-radius: 12px;
-    background: var(--primary);
-    color: var(--primary-content) !important;
-    font-size: 0.9rem;
+    background: #ffffff;
+    color: #c2410c !important;
+    font-size: 0.92rem;
     font-weight: 700;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.9);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     transition: all var(--transition-fast);
-    box-shadow: 0 3px 12px var(--primary-light);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
 }
 
 .summary-submit-btn i {
-    color: var(--primary-content) !important;
+    color: #c2410c !important;
 }
 
 .summary-submit-btn:hover {
-    background: var(--primary-hover);
-    color: var(--primary-content) !important;
-    transform: translateY(-1px);
+    background: #f8fafc;
+    color: #ea580c !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+}
+
+.summary-submit-btn:hover i {
+    color: #ea580c !important;
 }
 
 .summary-submit-btn:active {
@@ -1378,10 +1383,15 @@
 }
 
 .summary-submit-btn:disabled {
-    opacity: 0.5;
+    background: rgba(255, 255, 255, 0.55);
+    color: rgba(24, 13, 0, 0.4) !important;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+}
+
+.summary-submit-btn:disabled i {
+    color: rgba(24, 13, 0, 0.4) !important;
 }
 
 .summary-draft-btn {
