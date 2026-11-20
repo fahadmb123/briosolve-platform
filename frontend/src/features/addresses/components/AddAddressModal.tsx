@@ -60,7 +60,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
 
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity cursor-pointer"
@@ -68,9 +68,9 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
         ></div>
 
 
-        <div className="relative bg-surface rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] my-auto z-10">
+        <div className="relative bg-surface rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] z-10">
 
-          <div className="flex items-center justify-between px-6 py-5 border-b border-surface-variant">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-surface-variant shrink-0">
             <div className="flex items-center gap-3">
               {step === 2 && (
                 <button
@@ -104,7 +104,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
           </div>
 
 
-          <div className="flex-1 overflow-y-auto flex flex-col">
+          <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
             {step === 1 && (
               <div className="flex flex-col gap-4 p-5 sm:p-6 pb-0 flex-1">
 
@@ -392,48 +392,39 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
                     Save As
                   </label>
                   <div className="flex gap-3">
-                    <label className="cursor-pointer flex-1">
-                      <input
-                        type="radio"
-                        name="addressType"
-                        checked={addressType === "Home"}
-                        onChange={() => setAddressType("Home")}
-                        className="peer sr-only"
-                      />
-                      <div className="flex items-center justify-center gap-2 py-2 px-3 rounded-full border border-surface-variant bg-surface-container-lowest peer-checked:border-primary peer-checked:bg-primary text-on-surface-variant peer-checked:text-on-primary transition-all">
-                        <span className="font-label-md text-label-md font-semibold">
-                          Home
-                        </span>
-                      </div>
-                    </label>
-                    <label className="cursor-pointer flex-1">
-                      <input
-                        type="radio"
-                        name="addressType"
-                        checked={addressType === "Work"}
-                        onChange={() => setAddressType("Work")}
-                        className="peer sr-only"
-                      />
-                      <div className="flex items-center justify-center gap-2 py-2 px-3 rounded-full border border-surface-variant bg-surface-container-lowest peer-checked:border-primary peer-checked:bg-primary text-on-surface-variant peer-checked:text-on-primary transition-all">
-                        <span className="font-label-md text-label-md font-semibold">
-                          Work
-                        </span>
-                      </div>
-                    </label>
-                    <label className="cursor-pointer flex-1">
-                      <input
-                        type="radio"
-                        name="addressType"
-                        checked={addressType === "Other"}
-                        onChange={() => setAddressType("Other")}
-                        className="peer sr-only"
-                      />
-                      <div className="flex items-center justify-center gap-2 py-2 px-3 rounded-full border border-surface-variant bg-surface-container-lowest peer-checked:border-primary peer-checked:bg-primary text-on-surface-variant peer-checked:text-on-primary transition-all">
-                        <span className="font-label-md text-label-md font-semibold">
-                          Other
-                        </span>
-                      </div>
-                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setAddressType("Home")}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-full border transition-all cursor-pointer ${
+                        addressType === "Home"
+                          ? "border-primary bg-primary text-on-primary"
+                          : "border-surface-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container"
+                      }`}
+                    >
+                      <span className="font-label-md text-label-md font-semibold">Home</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAddressType("Work")}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-full border transition-all cursor-pointer ${
+                        addressType === "Work"
+                          ? "border-primary bg-primary text-on-primary"
+                          : "border-surface-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container"
+                      }`}
+                    >
+                      <span className="font-label-md text-label-md font-semibold">Work</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAddressType("Other")}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-full border transition-all cursor-pointer ${
+                        addressType === "Other"
+                          ? "border-primary bg-primary text-on-primary"
+                          : "border-surface-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container"
+                      }`}
+                    >
+                      <span className="font-label-md text-label-md font-semibold">Other</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -441,7 +432,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
           </div>
 
 
-          <div className="p-6 border-t border-surface-variant bg-surface sticky bottom-0 z-10 w-full rounded-b-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+          <div className="p-5 sm:p-6 border-t border-surface-variant bg-surface shrink-0 w-full rounded-b-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
             {step === 1 ? (
               <button
                 onClick={handleConfirmLocation}
