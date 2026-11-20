@@ -169,13 +169,6 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
     <div className={`bk-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
       <div className="bk-hero-section">
         <div className="bk-hero-content">
-          <div className="bk-breadcrumb">
-            <span className={`bk-role-badge ${isProvider ? "provider" : "customer"}`}>
-              {isProvider ? "Provider Portal" : "Customer"}
-            </span>
-            <span className="sep">/</span>
-            <span className="active">Bookings</span>
-          </div>
           <h1 className="bk-title">
             {isProvider ? "Booked Jobs & Schedule" : "My Bookings"}
           </h1>

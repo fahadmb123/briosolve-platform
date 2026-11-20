@@ -24,43 +24,6 @@
   gap: 4px;
 }
 
-.wpage-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  color: #64748b;
-  margin-bottom: 6px;
-}
-
-.wpage-breadcrumb a {
-  color: #3b82f6;
-  text-decoration: none;
-}
-
-.wpage-breadcrumb a:hover {
-  text-decoration: underline;
-}
-
-.wpage-role-badge {
-  padding: 0.2rem 0.65rem;
-  border-radius: 9999px;
-  font-size: 0.725rem;
-  font-weight: 700;
-}
-
-.wpage-role-badge.customer {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
-}
-
-.wpage-role-badge.provider {
-  background: #fef3e7;
-  color: #b45309;
-  border: 1px solid #fed7aa;
-}
-
 .wpage-hero-title {
   font-size: 1.75rem;
   font-weight: 800;

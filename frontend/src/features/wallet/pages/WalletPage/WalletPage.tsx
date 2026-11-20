@@ -72,19 +72,6 @@ export const WalletPage: React.FC<WalletPageProps> = ({ role: roleProp }) => {
     <div className="wpage-container">
       <div className="wpage-hero-section">
         <div className="wpage-hero-content">
-          <div className="wpage-breadcrumb">
-            <Link to={isProvider ? "/provider/dashboard" : "/dashboard"}>
-              {isProvider ? "Provider" : "Dashboard"}
-            </Link>
-            <span className="sep">/</span>
-            <span>{isProvider ? "Finances" : "More"}</span>
-            <span className="sep">/</span>
-            <span>Wallet</span>
-            <span className="sep">•</span>
-            <span className={`wpage-role-badge ${isProvider ? "provider" : "customer"}`}>
-              {isProvider ? "Provider Earnings" : "Customer Escrow"}
-            </span>
-          </div>
           <h1 className="wpage-hero-title">
             {isProvider ? "Wallet & Earnings" : "My Wallet"}
           </h1>

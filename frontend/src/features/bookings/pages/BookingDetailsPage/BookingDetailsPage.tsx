@@ -372,18 +372,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         <span>Back to Bookings</span>
       </button>
 
-      <div className="bkdet-breadcrumb">
-        <span className={`bkdet-role-badge ${isProvider ? "provider" : "customer"}`}>
-          {isProvider ? "Provider Portal" : "Customer"}
-        </span>
-        <span className="sep">/</span>
-        <span className="bkdet-crumb-link" onClick={handleBack} style={{ cursor: "pointer" }}>
-          Bookings
-        </span>
-        <span className="sep">/</span>
-        <span className="active">{booking.bookingNumber}</span>
-      </div>
-
       <div className="bkdet-header-card">
         <div className="bkdet-header-left">
           <div className="bkdet-badge-row">
