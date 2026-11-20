@@ -10,6 +10,9 @@ export function buildBookingRoute(controller: BookingRouteDependencies): Router 
     router.get("/provider", authMiddleware, requireRole(["PROVIDER"]), controller.booking.getProviderBookings);
     router.get("/:id", authMiddleware, controller.booking.getById);
     router.patch("/:id/status", authMiddleware, requireRole(["PROVIDER", "CUSTOMER"]), controller.booking.updateStatus);
+    router.post("/:id/mismatch-report", authMiddleware, requireRole(["PROVIDER"]), controller.booking.reportMismatch);
+    router.post("/:id/mismatch-resolve", authMiddleware, requireRole(["CUSTOMER"]), controller.booking.resolveMismatch);
+    router.post("/:id/reopen-request", authMiddleware, requireRole(["CUSTOMER"]), controller.booking.reopenRequest);
 
     return router;
 }

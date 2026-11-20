@@ -3,7 +3,7 @@ import { Booking, BookingStatus, BookingPaymentStatus } from "../../domain/entit
 import { BookingDetails, BookingListResult, CancellationPolicyDetails } from "../../domain/repositories/IBookingRepository";
 import { CreateBookingInputDto, CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
-import { BookingResponseDto, BookingStatusHistoryItem } from "../../application/dtos/response/booking-response.dto";
+import { BookingResponseDto, BookingStatusHistoryItem, MismatchReport } from "../../application/dtos/response/booking-response.dto";
 import { CustomerBookingsResponseDto, BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
 
@@ -234,6 +234,7 @@ export class BookingMapper {
 
         let parsedHistory: BookingStatusHistoryItem[] | undefined = undefined;
         let displayNotes = entity.notes;
+        let mismatchReport: MismatchReport | null = null;
 
         if (entity.notes) {
             try {
@@ -242,6 +243,15 @@ export class BookingMapper {
                     parsedHistory = parsed;
                     const latest = parsed[parsed.length - 1];
                     displayNotes = latest.note;
+                } else if (typeof parsed === "object" && parsed !== null) {
+                    if (parsed.mismatchReport) {
+                        mismatchReport = parsed.mismatchReport;
+                    }
+                    if (Array.isArray(parsed.history) && parsed.history.length > 0) {
+                        parsedHistory = parsed.history;
+                        const latest = parsed.history[parsed.history.length - 1];
+                        displayNotes = latest?.note || displayNotes;
+                    }
                 }
             } catch {
                 parsedHistory = undefined;
@@ -304,6 +314,7 @@ export class BookingMapper {
             statusHistory: parsedHistory || details?.statusHistory,
             providerCancellationsCount: details?.providerCancellationsCount ?? extra?.providerCancellationsCount ?? 0,
             maxAllowedCancellations: details?.maxAllowedCancellations ?? extra?.maxAllowedCancellations ?? 2,
+            mismatchReport: mismatchReport || details?.mismatchReport || null,
             cancellationPolicy: details?.cancellationPolicy ?? extra?.cancellationPolicy ?? calculateCancellationPolicy({
                 role: "CUSTOMER",
                 status: entity.status,

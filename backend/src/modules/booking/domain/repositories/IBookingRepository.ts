@@ -1,6 +1,6 @@
 import { BaseRepository } from "../../../../shared/base/repository/baseRepository";
 import { Booking } from "../entities/booking.entity";
-import { BookingStatusHistoryItem } from "../../application/dtos/response/booking-response.dto";
+import { BookingStatusHistoryItem, MismatchReport } from "../../application/dtos/response/booking-response.dto";
 import { CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
 import { GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
@@ -35,6 +35,7 @@ export interface BookingDetails {
     providerCancellationsCount?: number;
     maxAllowedCancellations?: number;
     cancellationPolicy?: CancellationPolicyDetails;
+    mismatchReport?: MismatchReport | null;
 }
 
 export interface BookingListResult {

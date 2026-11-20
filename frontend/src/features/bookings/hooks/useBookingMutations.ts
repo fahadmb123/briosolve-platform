@@ -3,7 +3,10 @@ import {
   getCustomerBookings,
   getProviderBookings,
   getBookingById,
-  updateBookingStatus
+  updateBookingStatus,
+  reportBookingMismatch,
+  resolveBookingMismatch,
+  reopenRequestWithDiagnosis
 } from "../services/booking.service";
 import type { GetBookingsQueryParams, UpdateBookingStatusPayload } from "../types/booking.types";
 
@@ -50,6 +53,47 @@ export const useUpdateBookingStatus = () => {
       queryClient.invalidateQueries({ queryKey: ["customerServiceRequests"] });
       queryClient.invalidateQueries({ queryKey: ["quotations"] });
       queryClient.invalidateQueries({ queryKey: ["myQuotations"] });
+    }
+  });
+};
+
+export const useReportBookingMismatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: { diagnosis: string; suggestedCategory?: string | null; suggestedCategoryId?: string | null } }) =>
+      reportBookingMismatch(id, payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["customerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["providerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["booking", variables.id] });
+    }
+  });
+};
+
+export const useResolveBookingMismatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, action }: { id: string; action: "ACCEPT" | "DECLINE" }) =>
+      resolveBookingMismatch(id, action),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["customerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["providerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["booking", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["wallet"] });
+      queryClient.invalidateQueries({ queryKey: ["customerServiceRequests"] });
+    }
+  });
+};
+
+export const useReopenRequestWithDiagnosis = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => reopenRequestWithDiagnosis(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["customerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["booking", id] });
+      queryClient.invalidateQueries({ queryKey: ["myServiceRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["customerServiceRequests"] });
     }
   });
 };

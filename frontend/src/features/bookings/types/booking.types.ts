@@ -20,6 +20,17 @@ export interface CancellationPolicyDetails {
   policyMessage: string;
 }
 
+export interface MismatchReport {
+  status: "PENDING" | "ACCEPTED" | "DECLINED";
+  diagnosis: string;
+  suggestedCategory?: string | null;
+  suggestedCategoryId?: string | null;
+  visitFee: number;
+  refundAmount: number;
+  reportedAt: string;
+  resolvedAt?: string | null;
+}
+
 export interface BookingItem {
   id: string;
   bookingNumber: string;
@@ -57,6 +68,7 @@ export interface BookingItem {
   providerCancellationsCount?: number;
   maxAllowedCancellations?: number;
   cancellationPolicy?: CancellationPolicyDetails;
+  mismatchReport?: MismatchReport | null;
 }
 
 export interface BookingCounts {

@@ -1,9 +1,15 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { useGetBookingById, useUpdateBookingStatus } from "../../hooks/useBookingMutations";
+import {
+  useGetBookingById,
+  useUpdateBookingStatus,
+  useReportBookingMismatch,
+  useResolveBookingMismatch,
+  useReopenRequestWithDiagnosis
+} from "../../hooks/useBookingMutations";
 import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
-import { BookingStatusModal } from "../../components";
+import { BookingStatusModal, ServiceMismatchModal } from "../../components";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
 import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
@@ -29,11 +35,15 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
   const { data: responseData, isLoading, error, refetch } = useGetBookingById(bookingId);
   const updateStatusMutation = useUpdateBookingStatus();
+  const reportMismatchMutation = useReportBookingMismatch();
+  const resolveMismatchMutation = useResolveBookingMismatch();
+  const reopenRequestMutation = useReopenRequestWithDiagnosis();
 
   const booking: BookingItem | null = responseData?.data || initialBooking;
 
   const [statusModalBooking, setStatusModalBooking] = useState<BookingItem | null>(null);
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
+  const [isMismatchModalOpen, setIsMismatchModalOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const activeRazorpayRef = useRef<any>(null);
 
@@ -163,6 +173,60 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         }
       }
     );
+  };
+
+  const handleReportMismatchSubmit = (payload: {
+    diagnosis: string;
+    suggestedCategory?: string | null;
+    suggestedCategoryId?: string | null;
+  }) => {
+    if (!booking) return;
+    reportMismatchMutation.mutate(
+      { id: booking.id, payload },
+      {
+        onSuccess: () => {
+          toast.success("Diagnosis submitted to customer");
+          setIsMismatchModalOpen(false);
+          refetch();
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Failed to submit diagnosis");
+        }
+      }
+    );
+  };
+
+  const handleResolveMismatch = (action: "ACCEPT" | "DECLINE") => {
+    if (!booking) return;
+    resolveMismatchMutation.mutate(
+      { id: booking.id, action },
+      {
+        onSuccess: () => {
+          toast.success(action === "ACCEPT" ? "Diagnosis accepted and booking closed" : "Diagnosis report declined");
+          refetch();
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Failed to respond to report");
+        }
+      }
+    );
+  };
+
+  const handleReopenRequest = () => {
+    if (!booking) return;
+    reopenRequestMutation.mutate(booking.id, {
+      onSuccess: (res) => {
+        toast.success("Request reopened in marketplace with verified diagnosis!");
+        if (res?.data?.serviceRequestId) {
+          navigate(`/my-requests/${res.data.serviceRequestId}`);
+        } else {
+          refetch();
+        }
+      },
+      onError: (err: any) => {
+        toast.error(err?.response?.data?.message || "Failed to reopen request");
+      }
+    });
   };
 
   const handlePayRemainingBalance = async () => {
@@ -631,6 +695,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const isPaymentPending = booking.status === "PAYMENT_PENDING";
   const isCompleted = booking.status === "COMPLETED";
   const isCancelled = booking.status === "CANCELLED";
+  const isMismatchAccepted = booking.mismatchReport?.status === "ACCEPTED";
 
   const totalAmount = booking.totalAmount || 0;
   const advanceAmount = booking.advanceAmount || totalAmount;
@@ -711,31 +776,35 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               <span>{requiresInspection ? "Inspection Required" : "Fixed Price"}</span>
             </span>
 
-            <span className={`bkdet-status-badge ${booking.status.toLowerCase().replace(/_/g, "-")}`}>
+            <span className={`bkdet-status-badge ${isMismatchAccepted ? "closed" : booking.status.toLowerCase().replace(/_/g, "-")}`}>
               <i
-                className={`fas ${isConfirmed
-                  ? "fa-check-circle"
-                  : isEnRoute
-                    ? "fa-route"
-                    : isInspection
-                      ? "fa-clipboard-check"
-                      : isInProgress
-                        ? "fa-tools"
-                        : isPaymentPending
-                          ? "fa-file-invoice-dollar"
-                          : isCompleted
-                            ? "fa-award"
-                            : "fa-times-circle"
+                className={`fas ${isMismatchAccepted
+                  ? "fa-clipboard-check"
+                  : isConfirmed
+                    ? "fa-check-circle"
+                    : isEnRoute
+                      ? "fa-route"
+                      : isInspection
+                        ? "fa-clipboard-check"
+                        : isInProgress
+                          ? "fa-tools"
+                          : isPaymentPending
+                            ? "fa-file-invoice-dollar"
+                            : isCompleted
+                              ? "fa-award"
+                              : "fa-times-circle"
                   }`}
               />
               <span>
-                {booking.status === "EN_ROUTE"
-                  ? "On The Way"
-                  : booking.status === "INSPECTION"
-                    ? "Inspection"
-                    : booking.status === "PAYMENT_PENDING"
-                      ? "Payment Pending"
-                      : booking.status.replace(/_/g, " ")}
+                {isMismatchAccepted
+                  ? "Closed (Diagnosis Done)"
+                  : booking.status === "EN_ROUTE"
+                    ? "On The Way"
+                    : booking.status === "INSPECTION"
+                      ? "Inspection"
+                      : booking.status === "PAYMENT_PENDING"
+                        ? "Payment Pending"
+                        : booking.status.replace(/_/g, " ")}
               </span>
             </span>
           </div>
@@ -859,10 +928,158 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               <span>Mark as Paid & Complete</span>
             </button>
           )}
+
+          {isProvider && (isEnRoute || isInspection) && (!booking.mismatchReport || booking.mismatchReport.status === "DECLINED") && (
+            <button
+              type="button"
+              className="bkdet-btn-mismatch-trigger"
+              onClick={() => setIsMismatchModalOpen(true)}
+            >
+              <i className="fas fa-stethoscope" />
+              <span>Different Problem Found</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {isCancelled && (
+      {booking.mismatchReport && booking.mismatchReport.status === "PENDING" && (
+        <div className="bkdet-mismatch-banner">
+          <div className="bkdet-mismatch-header">
+            <div className="bkdet-mismatch-title-wrap">
+              <i className="fas fa-stethoscope" />
+              <h4 className="bkdet-mismatch-title">
+                {isProvider ? "Scope Mismatch Diagnosis Submitted" : "Technician Diagnosed a Different Issue"}
+              </h4>
+            </div>
+            <span className="bkdet-mismatch-pill pending">
+              {isProvider ? "Awaiting Customer Review" : "Action Required"}
+            </span>
+          </div>
+
+          <div className="bkdet-mismatch-body">
+            <div className="bkdet-mismatch-diag">
+              <strong>Technician Diagnosis:</strong> "{booking.mismatchReport.diagnosis}"
+            </div>
+            {booking.mismatchReport.suggestedCategory && (
+              <div className="bkdet-mismatch-cat">
+                <i className="fas fa-tag" />
+                <span>Recommended Category:</span>
+                <strong>{booking.mismatchReport.suggestedCategory}</strong>
+              </div>
+            )}
+            <div className="bkdet-mismatch-finance">
+              <div className="bkdet-mismatch-fin-row">
+                <span>Visit &amp; Diagnosis Fee to Technician:</span>
+                <strong>{formatCurrency(booking.mismatchReport.visitFee)}</strong>
+              </div>
+              <div className="bkdet-mismatch-fin-row">
+                <span>Deposit Refund to Customer:</span>
+                <strong style={{ color: "#0284c7" }}>{formatCurrency(booking.mismatchReport.refundAmount)}</strong>
+              </div>
+            </div>
+          </div>
+
+          {!isProvider && (
+            <div className="bkdet-mismatch-actions">
+              <button
+                type="button"
+                className="bkdet-mismatch-btn-accept"
+                onClick={() => handleResolveMismatch("ACCEPT")}
+                disabled={resolveMismatchMutation.isPending}
+              >
+                {resolveMismatchMutation.isPending ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-check-circle" />
+                    <span>Accept Diagnosis &amp; Close Booking</span>
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                className="bkdet-mismatch-btn-decline"
+                onClick={() => handleResolveMismatch("DECLINE")}
+                disabled={resolveMismatchMutation.isPending}
+              >
+                <i className="fas fa-times" />
+                <span>Decline / Keep Active</span>
+              </button>
+            </div>
+          )}
+
+          {isProvider && (
+            <div style={{ fontSize: "0.78rem", color: "#64748b" }}>
+              The customer has been notified. Once they accept, ₹{booking.mismatchReport.visitFee.toLocaleString("en-IN")} visit fee will be credited to your wallet.
+            </div>
+          )}
+        </div>
+      )}
+
+      {booking.mismatchReport && booking.mismatchReport.status === "ACCEPTED" && (
+        <div className="bkdet-mismatch-banner accepted">
+          <div className="bkdet-mismatch-header">
+            <div className="bkdet-mismatch-title-wrap">
+              <i className="fas fa-clipboard-check" />
+              <h4 className="bkdet-mismatch-title">
+                Booking Closed (Technician Diagnosis Accepted)
+              </h4>
+            </div>
+            <span className="bkdet-mismatch-pill accepted">Diagnosis Accepted</span>
+          </div>
+
+          <div className="bkdet-mismatch-body">
+            <div className="bkdet-mismatch-diag">
+              <strong>Verified Diagnosis:</strong> "{booking.mismatchReport.diagnosis}"
+            </div>
+            {booking.mismatchReport.suggestedCategory && (
+              <div className="bkdet-mismatch-cat">
+                <i className="fas fa-tag" />
+                <span>Recommended Category:</span>
+                <strong>{booking.mismatchReport.suggestedCategory}</strong>
+              </div>
+            )}
+            <div className="bkdet-mismatch-finance">
+              <div className="bkdet-mismatch-fin-row">
+                <span>Visit Fee Released to Technician:</span>
+                <strong>{formatCurrency(booking.mismatchReport.visitFee)}</strong>
+              </div>
+              <div className="bkdet-mismatch-fin-row">
+                <span>Deposit Refunded to Customer:</span>
+                <strong style={{ color: "#16a34a" }}>{formatCurrency(booking.mismatchReport.refundAmount)}</strong>
+              </div>
+            </div>
+          </div>
+
+          {!isProvider && (
+            <div className="bkdet-mismatch-actions">
+              <button
+                type="button"
+                className="bkdet-mismatch-btn-repost"
+                onClick={handleReopenRequest}
+                disabled={reopenRequestMutation.isPending}
+              >
+                {reopenRequestMutation.isPending ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin" />
+                    <span>Reopening in Marketplace...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-sync-alt" />
+                    <span>Repost Request with Verified Diagnosis</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {isCancelled && !isMismatchAccepted && (
         <div className="bkdet-cancelled-banner">
           <div className="bkdet-cb-left">
             <div className="bkdet-cb-icon">
@@ -1216,34 +1433,51 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                         : "pending"
                 }`}
               >
-                {isCancelled || booking.paymentStatus === "REFUNDED"
-                  ? "Refunded"
-                  : isFullyPaid || isFixedQuote
-                    ? "Fully Paid"
-                    : isAdvancePaid
-                      ? "Advance Paid"
-                      : "Pending"}
+                {isMismatchAccepted
+                  ? "Visit Fee Settled"
+                  : isCancelled || booking.paymentStatus === "REFUNDED"
+                    ? "Refunded"
+                    : isFullyPaid || isFixedQuote
+                      ? "Fully Paid"
+                      : isAdvancePaid
+                        ? "Advance Paid"
+                        : "Pending"}
               </span>
             </div>
 
             <div className="bkdet-billing-hero">
               <span className="bkdet-billing-hero-label">
-                {isCancelled
-                  ? "Refunded Amount"
-                  : isFixedQuote
-                    ? "Total Fixed Price"
-                    : (isPaymentPending || isCompleted)
-                      ? "Final Confirmed Total"
-                      : isInspectionQuote
-                        ? "Inspection Fee Paid"
-                        : "Advance Deposit"}
+                {isMismatchAccepted
+                  ? "Visit & Diagnostic Fee"
+                  : isCancelled
+                    ? "Refunded Amount"
+                    : isFixedQuote
+                      ? "Total Fixed Price"
+                      : (isPaymentPending || isCompleted)
+                        ? "Final Confirmed Total"
+                        : isInspectionQuote
+                          ? "Inspection Fee Paid"
+                          : "Advance Deposit"}
               </span>
               <div className="bkdet-billing-hero-amount">
-                {formatCurrency((isPaymentPending || isCompleted || isFixedQuote) ? totalAmount : advanceAmount)}
+                {formatCurrency(
+                  isMismatchAccepted
+                    ? (booking.mismatchReport?.visitFee || advanceAmount)
+                    : (isPaymentPending || isCompleted || isFixedQuote)
+                      ? totalAmount
+                      : advanceAmount
+                )}
               </div>
             </div>
 
-            {isCancelled && (
+            {isMismatchAccepted && (
+              <div className="bkdet-billing-notice info">
+                <i className="fas fa-check-circle" />
+                <span>Diagnostic visit completed. Visit fee settled to technician and remainder refunded. Exempt from cancellation quotas.</span>
+              </div>
+            )}
+
+            {isCancelled && !isMismatchAccepted && (
               <div className="bkdet-billing-notice cancelled">
                 <i className="fas fa-undo-alt" />
                 <div>
@@ -1398,6 +1632,16 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           onClose={handleCloseStatusModal}
           onConfirm={handleConfirmStatusChange}
           isLoading={updateStatusMutation.isPending}
+        />
+      )}
+
+      {isProvider && (
+        <ServiceMismatchModal
+          isOpen={isMismatchModalOpen}
+          booking={booking}
+          onClose={() => setIsMismatchModalOpen(false)}
+          onSubmit={handleReportMismatchSubmit}
+          isLoading={reportMismatchMutation.isPending}
         />
       )}
     </div>

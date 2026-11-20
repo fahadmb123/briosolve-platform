@@ -9,6 +9,17 @@ export interface BookingStatusHistoryItem {
     authorName?: string | null;
 }
 
+export interface MismatchReport {
+    status: "PENDING" | "ACCEPTED" | "DECLINED";
+    diagnosis: string;
+    suggestedCategory?: string | null;
+    suggestedCategoryId?: string | null;
+    visitFee: number;
+    refundAmount: number;
+    reportedAt: string;
+    resolvedAt?: string | null;
+}
+
 export interface BookingResponseDto {
     id: string;
     bookingNumber: string;
@@ -46,4 +57,5 @@ export interface BookingResponseDto {
     providerCancellationsCount?: number;
     maxAllowedCancellations?: number;
     cancellationPolicy?: CancellationPolicyDetails;
+    mismatchReport?: MismatchReport | null;
 }

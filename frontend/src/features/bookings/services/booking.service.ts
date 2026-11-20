@@ -38,3 +38,26 @@ export const updateBookingStatus = async (
   const res = await apiClient.patch<response<BookingItem>>(`/api/booking/${id}/status`, payload);
   return res.data;
 };
+
+export const reportBookingMismatch = async (
+  id: string,
+  payload: { diagnosis: string; suggestedCategory?: string | null; suggestedCategoryId?: string | null }
+): Promise<response<BookingItem>> => {
+  const res = await apiClient.post<response<BookingItem>>(`/api/booking/${id}/mismatch-report`, payload);
+  return res.data;
+};
+
+export const resolveBookingMismatch = async (
+  id: string,
+  action: "ACCEPT" | "DECLINE"
+): Promise<response<BookingItem>> => {
+  const res = await apiClient.post<response<BookingItem>>(`/api/booking/${id}/mismatch-resolve`, { action });
+  return res.data;
+};
+
+export const reopenRequestWithDiagnosis = async (
+  id: string
+): Promise<response<{ serviceRequestId: string; message: string }>> => {
+  const res = await apiClient.post<response<{ serviceRequestId: string; message: string }>>(`/api/booking/${id}/reopen-request`);
+  return res.data;
+};

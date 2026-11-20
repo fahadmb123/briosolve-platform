@@ -12,6 +12,9 @@ import { GetBookingByIdUseCase } from "../../application/use-cases/getBookingByI
 import { GetCustomerBookingsUseCase } from "../../application/use-cases/getCustomerBookings.useCase";
 import { GetProviderBookingsUseCase } from "../../application/use-cases/getProviderBookings.useCase";
 import { UpdateBookingStatusUseCase } from "../../application/use-cases/updateBookingStatus.useCase";
+import { ReportServiceMismatchUseCase } from "../../application/use-cases/reportServiceMismatch.useCase";
+import { ResolveServiceMismatchUseCase } from "../../application/use-cases/resolveServiceMismatch.useCase";
+import { ReopenRequestWithDiagnosisUseCase } from "../../application/use-cases/reopenRequestWithDiagnosis.useCase";
 
 export function createCreateBookingUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
@@ -42,5 +45,35 @@ export function createUpdateBookingStatusUseCase(
         quotationRepository,
         createNotificationUseCase,
         creditWalletUseCase
+    );
+}
+
+export function createReportServiceMismatchUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): ReportServiceMismatchUseCase {
+    return new ReportServiceMismatchUseCase(
+        bookingRepository,
+        providerRepository,
+        createNotificationUseCase
+    );
+}
+
+export function createResolveServiceMismatchUseCase(
+    creditWalletUseCase?: IUseCase<CreditWalletInputDto, WalletResponseDto>,
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): ResolveServiceMismatchUseCase {
+    return new ResolveServiceMismatchUseCase(
+        bookingRepository,
+        providerRepository,
+        serviceRequestRepository,
+        creditWalletUseCase,
+        createNotificationUseCase
+    );
+}
+
+export function createReopenRequestWithDiagnosisUseCase(): ReopenRequestWithDiagnosisUseCase {
+    return new ReopenRequestWithDiagnosisUseCase(
+        bookingRepository,
+        serviceRequestRepository
     );
 }

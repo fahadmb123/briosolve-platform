@@ -214,14 +214,24 @@ export class PrismaBookingRepository implements IBookingRepository {
                 }
                 try {
                     const parsed = JSON.parse(record.notes);
+                    if (parsed && typeof parsed === "object") {
+                        if (parsed.mismatchReport && parsed.mismatchReport.status === "ACCEPTED") {
+                            continue;
+                        }
+                    }
                     if (Array.isArray(parsed)) {
                         const cancelItem = parsed.find((item: any) => item.status === "CANCELLED");
-                        if (cancelItem && cancelItem.authorName && cancelItem.authorName.toLowerCase() === "customer") {
+                        if (cancelItem && cancelItem.authorName && (cancelItem.authorName.toLowerCase() === "customer" || cancelItem.authorName.toLowerCase().includes("diagnosis closed"))) {
+                            continue;
+                        }
+                    } else if (parsed && typeof parsed === "object" && Array.isArray(parsed.history)) {
+                        const cancelItem = parsed.history.find((item: any) => item.status === "CANCELLED");
+                        if (cancelItem && cancelItem.authorName && (cancelItem.authorName.toLowerCase() === "customer" || cancelItem.authorName.toLowerCase().includes("diagnosis closed"))) {
                             continue;
                         }
                     }
                 } catch {
-                    if (record.notes.toLowerCase().includes("customer")) {
+                    if (record.notes.toLowerCase().includes("customer") || record.notes.toLowerCase().includes("diagnosis closed")) {
                         continue;
                     }
                 }
@@ -249,15 +259,26 @@ export class PrismaBookingRepository implements IBookingRepository {
                 }
                 try {
                     const parsed = JSON.parse(record.notes);
+                    if (parsed && typeof parsed === "object") {
+                        if (parsed.mismatchReport && parsed.mismatchReport.status === "ACCEPTED") {
+                            continue;
+                        }
+                    }
                     if (Array.isArray(parsed)) {
                         const cancelItem = parsed.find((item: any) => item.status === "CANCELLED");
                         if (cancelItem && cancelItem.authorName && cancelItem.authorName.toLowerCase() === "customer") {
                             count++;
                             continue;
                         }
+                    } else if (parsed && typeof parsed === "object" && Array.isArray(parsed.history)) {
+                        const cancelItem = parsed.history.find((item: any) => item.status === "CANCELLED");
+                        if (cancelItem && cancelItem.authorName && cancelItem.authorName.toLowerCase() === "customer") {
+                            count++;
+                            continue;
+                        }
                     }
                 } catch {
-                    if (record.notes.toLowerCase().includes("customer")) {
+                    if (record.notes.toLowerCase().includes("customer") && !record.notes.toLowerCase().includes("diagnosis closed")) {
                         count++;
                         continue;
                     }
