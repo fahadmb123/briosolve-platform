@@ -82,6 +82,11 @@ export default function SubmitQuotation() {
   };
 
   const handleFormSubmit = async (formData: QuotationFormData) => {
+    if (blockedInfo) {
+      toast.error(blockedInfo.desc);
+      return;
+    }
+
     if (!formData.amount || Number(formData.amount) <= 0) {
       toast.error("Please enter a valid quotation amount");
       return;
@@ -168,6 +173,84 @@ export default function SubmitQuotation() {
     };
   }, [isEditing, quotationToEdit]);
 
+  const blockedInfo = useMemo(() => {
+    if (isEditing) {
+      if (request?.status === "ACCEPTED" || request?.status === "IN_PROGRESS") {
+        return {
+          title: "Request Already Accepted",
+          desc: "This service request has already been accepted and quotations cannot be modified.",
+          icon: "fa-user-check"
+        };
+      }
+      if (request?.status === "COMPLETED") {
+        return {
+          title: "Service Request Completed",
+          desc: "This service request has been completed. Quotations cannot be modified.",
+          icon: "fa-check-double"
+        };
+      }
+      if (request?.status === "EXPIRED") {
+        return {
+          title: "Service Request Expired",
+          desc: "This service request has expired. Quotations cannot be modified.",
+          icon: "fa-calendar-times"
+        };
+      }
+      if (request?.status === "CANCELLED") {
+        return {
+          title: "Service Request Cancelled",
+          desc: "This service request was cancelled by the customer. Quotations cannot be modified.",
+          icon: "fa-ban"
+        };
+      }
+      return null;
+    }
+
+    if (request?.my_quotation_status === "WITHDRAWN") {
+      return {
+        title: "Booking Cancelled — Cannot Re-quote",
+        desc: "A previous booking or quotation for this request was cancelled. Marketplace policies do not permit submitting a new quotation for the same service request.",
+        icon: "fa-ban"
+      };
+    }
+    if (request?.has_quoted) {
+      return {
+        title: "Quotation Already Submitted",
+        desc: "You have already submitted a quotation for this service request. You can check its status under My Quotations.",
+        icon: "fa-check-circle"
+      };
+    }
+    if (request?.status === "ACCEPTED" || request?.status === "IN_PROGRESS") {
+      return {
+        title: "Request Already Accepted",
+        desc: "This service request has already been accepted by another service provider and is no longer accepting new quotations.",
+        icon: "fa-user-check"
+      };
+    }
+    if (request?.status === "COMPLETED") {
+      return {
+        title: "Service Request Completed",
+        desc: "This service request has been completed and is closed for further quotations.",
+        icon: "fa-check-double"
+      };
+    }
+    if (request?.status === "EXPIRED") {
+      return {
+        title: "Service Request Expired",
+        desc: "This service request has expired and is no longer open for quotations.",
+        icon: "fa-calendar-times"
+      };
+    }
+    if (request?.status === "CANCELLED") {
+      return {
+        title: "Service Request Cancelled",
+        desc: "This service request has been cancelled by the customer.",
+        icon: "fa-ban"
+      };
+    }
+    return null;
+  }, [isEditing, request]);
+
   return (
     <div className="quote-page">
       <div className="quote-hero-banner">
@@ -201,21 +284,13 @@ export default function SubmitQuotation() {
 
       <div className="quote-grid-container">
         <div className="quote-main-column">
-          {!isEditing && (request?.has_quoted || request?.my_quotation_status === "WITHDRAWN") ? (
+          {blockedInfo ? (
             <div className="quote-cancelled-blocked-card">
               <div className="quote-blocked-icon">
-                <i className="fas fa-ban"></i>
+                <i className={`fas ${blockedInfo.icon}`}></i>
               </div>
-              <h2 className="quote-blocked-title">
-                {request?.my_quotation_status === "WITHDRAWN"
-                  ? "Booking Cancelled — Cannot Re-quote"
-                  : "Quotation Already Submitted"}
-              </h2>
-              <p className="quote-blocked-desc">
-                {request?.my_quotation_status === "WITHDRAWN"
-                  ? "A previous booking or quotation for this request was cancelled. Marketplace policies do not permit submitting a new quotation for the same service request."
-                  : "You have already submitted a quotation for this service request. You can check its status under My Quotations."}
-              </p>
+              <h2 className="quote-blocked-title">{blockedInfo.title}</h2>
+              <p className="quote-blocked-desc">{blockedInfo.desc}</p>
               <div className="quote-blocked-actions">
                 <button
                   type="button"

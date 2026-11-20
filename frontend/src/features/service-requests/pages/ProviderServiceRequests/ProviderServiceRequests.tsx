@@ -121,6 +121,22 @@ export default function ProviderServiceRequests() {
   };
 
   const handleQuoteClick = (req: CustomerServiceRequestItem) => {
+    if (req.status === "ACCEPTED" || req.status === "IN_PROGRESS") {
+      toast.error("This request has already been accepted by another provider");
+      return;
+    }
+    if (req.status === "COMPLETED") {
+      toast.error("This request has already been completed");
+      return;
+    }
+    if (req.status === "EXPIRED") {
+      toast.error("This request has expired");
+      return;
+    }
+    if (req.status === "CANCELLED") {
+      toast.error("This request has been cancelled");
+      return;
+    }
     navigate(`/provider/service-requests/${req.id}/quote`, {
       state: { request: req }
     });

@@ -309,6 +309,26 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
               <i className="fas fa-check-circle"></i>
               <span>View Your Quote</span>
             </button>
+          ) : request.status === "ACCEPTED" || request.status === "IN_PROGRESS" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This request has already been accepted by another provider"
+            >
+              <i className="fas fa-check-circle"></i>
+              <span>Accepted</span>
+            </button>
+          ) : request.status === "COMPLETED" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This service request is completed"
+            >
+              <i className="fas fa-check-double"></i>
+              <span>Completed</span>
+            </button>
           ) : (
             <button
               type="button"

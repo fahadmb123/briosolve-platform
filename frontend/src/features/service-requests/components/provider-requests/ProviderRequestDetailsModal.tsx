@@ -467,6 +467,26 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
               <i className="fas fa-check-circle mr-1.5"></i>
               <span>View Submitted Quotation</span>
             </button>
+          ) : request.status === "ACCEPTED" || request.status === "IN_PROGRESS" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This request has already been accepted by another provider"
+            >
+              <i className="fas fa-check-circle mr-1.5"></i>
+              <span>Request Accepted</span>
+            </button>
+          ) : request.status === "COMPLETED" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This service request is completed"
+            >
+              <i className="fas fa-check-double mr-1.5"></i>
+              <span>Job Completed</span>
+            </button>
           ) : (
             <button
               type="button"

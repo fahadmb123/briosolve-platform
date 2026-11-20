@@ -412,6 +412,26 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                   <i className="fas fa-check-circle"></i>
                   <span>View Submitted Quotation</span>
                 </button>
+              ) : request.status === "ACCEPTED" || request.status === "IN_PROGRESS" ? (
+                <button
+                  type="button"
+                  className="srdetails-btn-quote-top disabled"
+                  disabled
+                  style={{ opacity: 0.6, cursor: "not-allowed" }}
+                >
+                  <i className="fas fa-check-circle"></i>
+                  <span>Accepted by Other Provider</span>
+                </button>
+              ) : request.status === "COMPLETED" ? (
+                <button
+                  type="button"
+                  className="srdetails-btn-quote-top disabled"
+                  disabled
+                  style={{ opacity: 0.6, cursor: "not-allowed" }}
+                >
+                  <i className="fas fa-check-double"></i>
+                  <span>Job Completed</span>
+                </button>
               ) : request.status !== "CANCELLED" && request.status !== "EXPIRED" && onQuote ? (
                 <button
                   type="button"
@@ -865,6 +885,20 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                       <span>Manage My Quotations</span>
                     </button>
                   )}
+                </>
+              ) : request.status === "IN_PROGRESS" ? (
+                <>
+                  <h4 className="srdetails-cta-title">Job In Progress</h4>
+                  <p className="srdetails-cta-sub">
+                    This service request is already in progress and is not accepting new quotations.
+                  </p>
+                </>
+              ) : request.status === "COMPLETED" ? (
+                <>
+                  <h4 className="srdetails-cta-title">Job Completed</h4>
+                  <p className="srdetails-cta-sub">
+                    This service request has been completed.
+                  </p>
                 </>
               ) : (
                 <>

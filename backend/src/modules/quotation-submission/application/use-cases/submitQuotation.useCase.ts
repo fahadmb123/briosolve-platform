@@ -30,8 +30,30 @@ export class SubmitQuotationUseCase implements IUseCase<SubmitQuotationInputDto,
             throw new ApplicationError("REQUEST_NOT_FOUND", "Service request not found", "NOT_FOUND");
         }
 
+        if (serviceRequest.status === "ACCEPTED" || serviceRequest.status === "IN_PROGRESS") {
+            throw new ApplicationError("REQUEST_ACCEPTED", "This service request has already been accepted by another provider and is no longer accepting quotations", "CONFLICT");
+        }
+
+        if (serviceRequest.status === "COMPLETED") {
+            throw new ApplicationError("REQUEST_COMPLETED", "This service request has already been completed and is no longer accepting quotations", "CONFLICT");
+        }
+
+        if (serviceRequest.status === "EXPIRED") {
+            throw new ApplicationError("REQUEST_EXPIRED", "This service request has expired and is no longer accepting quotations", "CONFLICT");
+        }
+
+        if (serviceRequest.status === "CANCELLED") {
+            throw new ApplicationError("REQUEST_CANCELLED", "This service request has been cancelled and is no longer accepting quotations", "CONFLICT");
+        }
+
         if (serviceRequest.status !== "PENDING" && serviceRequest.status !== "ACTIVE") {
             throw new ApplicationError("INVALID_STATE", "Cannot quote on a non-active service request", "VALIDATION");
+        }
+
+        const allExistingQuotes = await this._quotationRepository.findByServiceRequestId(input.serviceRequestId);
+        const acceptedQuote = allExistingQuotes.find((q) => q.status === "ACCEPTED");
+        if (acceptedQuote) {
+            throw new ApplicationError("REQUEST_ACCEPTED", "This service request has already been accepted by another provider and is no longer accepting quotations", "CONFLICT");
         }
 
         const existingQuote = await this._quotationRepository.findByRequestIdAndProviderId(
