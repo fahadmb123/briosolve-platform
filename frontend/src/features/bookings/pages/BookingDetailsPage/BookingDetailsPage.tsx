@@ -239,10 +239,201 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
   if (isLoading && !booking) {
     return (
-      <div className={`bkdet-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
-        <div className="bkdet-loading-box">
-          <div className="bkdet-loading-spinner" />
-          <p>Loading booking details...</p>
+      <div className={`bkdet-page-container bkdet-skeleton-container ${isProvider ? "is-provider" : "is-customer"}`} aria-hidden="true">
+        <button type="button" className="bkdet-back-link" onClick={handleBack}>
+          <i className="fas fa-arrow-left" />
+          <span>Back to Bookings</span>
+        </button>
+
+        <div className="bkdet-header-card">
+          <div className="bkdet-header-left">
+            <div className="bkdet-badge-row">
+              <div className="bkdet-sk-shimmer bkdet-sk-pill" style={{ width: "120px" }} />
+              <div className="bkdet-sk-shimmer bkdet-sk-pill" style={{ width: "100px" }} />
+              <div className="bkdet-sk-shimmer bkdet-sk-pill" style={{ width: "115px" }} />
+              <div className="bkdet-sk-shimmer bkdet-sk-status" style={{ width: "105px" }} />
+            </div>
+
+            <div className="bkdet-sk-shimmer" style={{ width: "65%", height: "30px", borderRadius: "6px", margin: "10px 0 4px" }} />
+            <div className="bkdet-sk-shimmer" style={{ width: "180px", height: "14px", borderRadius: "4px" }} />
+          </div>
+
+          <div className="bkdet-header-actions">
+            <div className="bkdet-sk-shimmer bkdet-sk-btn" style={{ width: "85px" }} />
+            <div className="bkdet-sk-shimmer bkdet-sk-btn" style={{ width: "135px" }} />
+          </div>
+        </div>
+
+        <div className="bkdet-layout-grid">
+          <div className="bkdet-col-main">
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "190px", height: "20px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div className="bkdet-schedule-block">
+                <div className="bkdet-sk-shimmer" style={{ width: "64px", height: "64px", borderRadius: "12px", flexShrink: 0 }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "220px", height: "20px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "150px", height: "15px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "24px", padding: "0 10px" }}>
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <div key={s} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                    <div className="bkdet-sk-shimmer bkdet-sk-stepper-circle" />
+                    <div className="bkdet-sk-shimmer" style={{ width: "60px", height: "12px", borderRadius: "4px" }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "230px", height: "20px", borderRadius: "4px" }} />
+                </div>
+                <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "24px", borderRadius: "9999px" }} />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "14px" }}>
+                <div style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                      <div className="bkdet-sk-shimmer" style={{ width: "110px", height: "22px", borderRadius: "9999px" }} />
+                      <div className="bkdet-sk-shimmer" style={{ width: "90px", height: "14px", borderRadius: "4px" }} />
+                    </div>
+                    <div className="bkdet-sk-tl-bubble">
+                      <div className="bkdet-sk-shimmer" style={{ width: "100%", height: "14px", borderRadius: "4px" }} />
+                      <div className="bkdet-sk-shimmer" style={{ width: "65%", height: "14px", borderRadius: "4px" }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                      <div className="bkdet-sk-shimmer" style={{ width: "100px", height: "22px", borderRadius: "9999px" }} />
+                      <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "14px", borderRadius: "4px" }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "150px", height: "20px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "14px", marginTop: "14px" }}>
+                {[1, 2, 3, 4].map((m) => (
+                  <div key={m} className="bkdet-sk-meta-box">
+                    <div className="bkdet-sk-shimmer" style={{ width: "90px", height: "12px", borderRadius: "4px" }} />
+                    <div className="bkdet-sk-shimmer" style={{ width: "130px", height: "16px", borderRadius: "4px" }} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="bkdet-sk-shimmer" style={{ width: "200px", height: "34px", borderRadius: "8px", marginTop: "16px" }} />
+            </div>
+
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "150px", height: "20px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "14px", alignItems: "flex-start", marginTop: "12px" }}>
+                <div className="bkdet-sk-shimmer" style={{ width: "40px", height: "40px", borderRadius: "10px", flexShrink: 0 }} />
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "120px", height: "16px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "90%", height: "14px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div className="bkdet-sk-shimmer" style={{ width: "100%", height: "42px", borderRadius: "10px", marginTop: "16px" }} />
+            </div>
+          </div>
+
+          <div className="bkdet-col-side">
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "160px", height: "20px", borderRadius: "4px" }} />
+                </div>
+                <div className="bkdet-sk-shimmer" style={{ width: "110px", height: "24px", borderRadius: "9999px" }} />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", margin: "16px 0 20px" }}>
+                <div className="bkdet-sk-shimmer" style={{ width: "120px", height: "14px", borderRadius: "4px" }} />
+                <div className="bkdet-sk-shimmer" style={{ width: "180px", height: "40px", borderRadius: "8px" }} />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "16px" }}>
+                <div className="bkdet-sk-payment-tile">
+                  <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "13px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "100px", height: "22px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "70px", height: "11px", borderRadius: "4px" }} />
+                </div>
+                <div className="bkdet-sk-payment-tile">
+                  <div className="bkdet-sk-shimmer" style={{ width: "90px", height: "13px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "100px", height: "22px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "85px", height: "11px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ border: "1px solid #f1f5f9", borderRadius: "10px", padding: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "110px", height: "14px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "70px", height: "14px", borderRadius: "4px" }} />
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "120px", height: "14px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "50px", height: "14px", borderRadius: "4px" }} />
+                </div>
+                <div style={{ height: "1px", background: "#f1f5f9" }} />
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "140px", height: "18px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "90px", height: "18px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div className="bkdet-sk-shimmer" style={{ width: "100%", height: "54px", borderRadius: "10px", marginTop: "16px" }} />
+            </div>
+
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "140px", height: "20px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", marginTop: "14px" }}>
+                <div className="bkdet-sk-shimmer" style={{ width: "48px", height: "48px", borderRadius: "50%", flexShrink: 0 }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", flex: 1 }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "12px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "140px", height: "18px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div className="bkdet-sk-shimmer" style={{ width: "100%", height: "38px", borderRadius: "8px", marginTop: "16px" }} />
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -1803,3 +1803,81 @@
     padding: 18px 16px;
   }
 }
+
+.bkdet-skeleton-container {
+  pointer-events: none;
+  user-select: none;
+}
+
+.bkdet-sk-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.7) 0%,
+    rgba(241, 245, 249, 0.95) 50%,
+    rgba(226, 232, 240, 0.7) 100%
+  );
+  background-size: 200% 100%;
+  animation: bkdetShimmer 1.5s infinite linear;
+}
+
+@keyframes bkdetShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.bkdet-sk-pill {
+  height: 26px;
+  border-radius: 8px;
+}
+
+.bkdet-sk-status {
+  height: 28px;
+  border-radius: 9999px;
+}
+
+.bkdet-sk-btn {
+  height: 38px;
+  border-radius: 8px;
+}
+
+.bkdet-sk-stepper-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.bkdet-sk-tl-bubble {
+  padding: 12px 14px;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.bkdet-sk-meta-box {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bkdet-sk-payment-tile {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
