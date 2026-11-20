@@ -1,4 +1,5 @@
 import { BookingStatus, BookingPaymentStatus } from "../../../domain/entities/booking.entity";
+import { CancellationPolicyDetails } from "../../../domain/repositories/IBookingRepository";
 
 export interface BookingStatusHistoryItem {
     status: BookingStatus;
@@ -44,4 +45,5 @@ export interface BookingResponseDto {
     statusHistory?: BookingStatusHistoryItem[];
     providerCancellationsCount?: number;
     maxAllowedCancellations?: number;
+    cancellationPolicy?: CancellationPolicyDetails;
 }

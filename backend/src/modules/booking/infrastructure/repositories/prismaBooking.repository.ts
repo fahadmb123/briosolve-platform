@@ -233,6 +233,42 @@ export class PrismaBookingRepository implements IBookingRepository {
         }
     }
 
+    async countCustomerCancellations(customerId: string): Promise<number> {
+        try {
+            const records = await db.orm.public.bookings
+                .where({
+                    customer_id: customerId as never,
+                    status: "CANCELLED" as never
+                })
+                .all();
+
+            let count = 0;
+            for (const record of records) {
+                if (!record.notes) {
+                    continue;
+                }
+                try {
+                    const parsed = JSON.parse(record.notes);
+                    if (Array.isArray(parsed)) {
+                        const cancelItem = parsed.find((item: any) => item.status === "CANCELLED");
+                        if (cancelItem && cancelItem.authorName && cancelItem.authorName.toLowerCase() === "customer") {
+                            count++;
+                            continue;
+                        }
+                    }
+                } catch {
+                    if (record.notes.toLowerCase().includes("customer")) {
+                        count++;
+                        continue;
+                    }
+                }
+            }
+            return count;
+        } catch {
+            return 0;
+        }
+    }
+
     async create(data: CreateBookingRepoDto): Promise<Booking | null> {
         const persistence = BookingMapper.toPersistence(data);
         const created = await db.orm.public.bookings.create(persistence as never);

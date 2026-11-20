@@ -9,6 +9,17 @@ export interface BookingStatusHistoryItem {
   authorName?: string | null;
 }
 
+export interface CancellationPolicyDetails {
+  cancellationsUsed: number;
+  maxAllowedCancellations: number;
+  totalAdvancePaid: number;
+  refundableAmount: number;
+  cancellationFee: number;
+  isFullRefund: boolean;
+  policyStatus: "FREE_CANCELLATION" | "FINAL_FREE_CANCELLATION" | "LIMIT_EXCEEDED" | "EN_ROUTE_FEE";
+  policyMessage: string;
+}
+
 export interface BookingItem {
   id: string;
   bookingNumber: string;
@@ -45,6 +56,7 @@ export interface BookingItem {
   statusHistory?: BookingStatusHistoryItem[];
   providerCancellationsCount?: number;
   maxAllowedCancellations?: number;
+  cancellationPolicy?: CancellationPolicyDetails;
 }
 
 export interface BookingCounts {

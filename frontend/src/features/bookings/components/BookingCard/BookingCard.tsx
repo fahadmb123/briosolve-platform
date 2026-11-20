@@ -241,7 +241,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             <span>Booking Details</span>
           </button>
 
-          {role === "CUSTOMER" && booking.status === "CONFIRMED" && onUpdateStatus && (
+          {role === "CUSTOMER" && (booking.status === "CONFIRMED" || booking.status === "EN_ROUTE") && onUpdateStatus && (
             <button
               type="button"
               className="bkcard-btn-action danger"

@@ -661,7 +661,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </>
           )}
 
-          {!isProvider && isConfirmed && (
+          {!isProvider && (isConfirmed || isEnRoute) && (
             <button
               type="button"
               className="bkdet-action-btn danger-outline"

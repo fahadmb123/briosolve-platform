@@ -1,6 +1,6 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Booking, BookingStatus, BookingPaymentStatus } from "../../domain/entities/booking.entity";
-import { BookingDetails, BookingListResult } from "../../domain/repositories/IBookingRepository";
+import { BookingDetails, BookingListResult, CancellationPolicyDetails } from "../../domain/repositories/IBookingRepository";
 import { CreateBookingInputDto, CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
 import { BookingResponseDto, BookingStatusHistoryItem } from "../../application/dtos/response/booking-response.dto";
@@ -15,6 +15,103 @@ export const BookingStatusToTitle = {
     "PAYMENT_PENDING": "Payment Pending",
     "COMPLETED": "Completed",
     "CANCELLED": "Cancelled"
+};
+
+export function calculateCancellationPolicy(params: {
+    role: "CUSTOMER" | "PROVIDER";
+    status: BookingStatus;
+    quotationType?: string | null;
+    advancePaid: number;
+    cancellationsUsed: number;
+    maxAllowedCancellations?: number;
+}): CancellationPolicyDetails {
+    const maxAllowed = params.maxAllowedCancellations ?? 2;
+    const advance = Math.max(0, params.advancePaid);
+
+    if (params.role === "PROVIDER") {
+        return {
+            cancellationsUsed: params.cancellationsUsed,
+            maxAllowedCancellations: maxAllowed,
+            totalAdvancePaid: advance,
+            refundableAmount: advance,
+            cancellationFee: 0,
+            isFullRefund: true,
+            policyStatus: params.cancellationsUsed >= maxAllowed
+                ? "LIMIT_EXCEEDED"
+                : params.cancellationsUsed === 1
+                    ? "FINAL_FREE_CANCELLATION"
+                    : "FREE_CANCELLATION",
+            policyMessage: params.cancellationsUsed >= maxAllowed
+                ? "You have reached your 2-cancellation limit."
+                : params.cancellationsUsed === 1
+                    ? "This is your final permitted cancellation."
+                    : "This will be recorded as your 1st cancellation (maximum 2 allowed)."
+        };
+    }
+
+    if (params.status === "EN_ROUTE") {
+        const isFixed = params.quotationType === "FIXED";
+        const fee = isFixed
+            ? Math.min(advance, Math.max(100, Math.round(advance * 0.3)))
+            : advance;
+        const refund = Math.max(0, advance - fee);
+        return {
+            cancellationsUsed: params.cancellationsUsed,
+            maxAllowedCancellations: maxAllowed,
+            totalAdvancePaid: advance,
+            refundableAmount: refund,
+            cancellationFee: fee,
+            isFullRefund: refund === advance,
+            policyStatus: "EN_ROUTE_FEE",
+            policyMessage: isFixed
+                ? `Technician is on the way. A travel fee of ₹${fee.toLocaleString("en-IN")} will be deducted, and ₹${refund.toLocaleString("en-IN")} will be refunded to your wallet.`
+                : `Technician is on the way. The visiting fee of ₹${fee.toLocaleString("en-IN")} is non-refundable to compensate the technician's travel.`
+        };
+    }
+
+    if (params.cancellationsUsed >= maxAllowed) {
+        const isFixed = params.quotationType === "FIXED";
+        const fee = isFixed
+            ? Math.round(advance * 0.5)
+            : advance;
+        const refund = Math.max(0, advance - fee);
+        return {
+            cancellationsUsed: params.cancellationsUsed,
+            maxAllowedCancellations: maxAllowed,
+            totalAdvancePaid: advance,
+            refundableAmount: refund,
+            cancellationFee: fee,
+            isFullRefund: false,
+            policyStatus: "LIMIT_EXCEEDED",
+            policyMessage: isFixed
+                ? `You have exceeded your 2 free cancellations. A 50% cancellation fee of ₹${fee.toLocaleString("en-IN")} is deducted, and ₹${refund.toLocaleString("en-IN")} will be refunded.`
+                : `You have exceeded your 2 free cancellations. The advance payment of ₹${advance.toLocaleString("en-IN")} is non-refundable to compensate the technician.`
+        };
+    }
+
+    if (params.cancellationsUsed === 1) {
+        return {
+            cancellationsUsed: 1,
+            maxAllowedCancellations: maxAllowed,
+            totalAdvancePaid: advance,
+            refundableAmount: advance,
+            cancellationFee: 0,
+            isFullRefund: true,
+            policyStatus: "FINAL_FREE_CANCELLATION",
+            policyMessage: `This is your 2nd and final free cancellation. You will receive a 100% full refund of ₹${advance.toLocaleString("en-IN")}. Future cancellations will incur non-refundable deductions.`
+        };
+    }
+
+    return {
+        cancellationsUsed: 0,
+        maxAllowedCancellations: maxAllowed,
+        totalAdvancePaid: advance,
+        refundableAmount: advance,
+        cancellationFee: 0,
+        isFullRefund: true,
+        policyStatus: "FREE_CANCELLATION",
+        policyMessage: `You have 1 free cancellation remaining. You will receive a 100% full refund of ₹${advance.toLocaleString("en-IN")} into your wallet.`
+    };
 }
 
 export class BookingMapper {
@@ -128,6 +225,7 @@ export class BookingMapper {
             statusHistory?: BookingStatusHistoryItem[];
             providerCancellationsCount?: number;
             maxAllowedCancellations?: number;
+            cancellationPolicy?: CancellationPolicyDetails;
         }
     ): BookingResponseDto {
         const isDetails = "booking" in source;
@@ -205,7 +303,15 @@ export class BookingMapper {
             isFinalConfirmed,
             statusHistory: parsedHistory || details?.statusHistory,
             providerCancellationsCount: details?.providerCancellationsCount ?? extra?.providerCancellationsCount ?? 0,
-            maxAllowedCancellations: details?.maxAllowedCancellations ?? extra?.maxAllowedCancellations ?? 2
+            maxAllowedCancellations: details?.maxAllowedCancellations ?? extra?.maxAllowedCancellations ?? 2,
+            cancellationPolicy: details?.cancellationPolicy ?? extra?.cancellationPolicy ?? calculateCancellationPolicy({
+                role: "CUSTOMER",
+                status: entity.status,
+                quotationType: details?.quotationType ?? extra?.quotationType ?? null,
+                advancePaid: resolvedAdvance,
+                cancellationsUsed: details?.providerCancellationsCount ?? extra?.providerCancellationsCount ?? 0,
+                maxAllowedCancellations: details?.maxAllowedCancellations ?? extra?.maxAllowedCancellations ?? 2
+            })
         };
     }
 

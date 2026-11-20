@@ -6,6 +6,17 @@ import { UpdateBookingRepoDto } from "../../application/dtos/request/update-book
 import { GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
 import { BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
 
+export interface CancellationPolicyDetails {
+    cancellationsUsed: number;
+    maxAllowedCancellations: number;
+    totalAdvancePaid: number;
+    refundableAmount: number;
+    cancellationFee: number;
+    isFullRefund: boolean;
+    policyStatus: "FREE_CANCELLATION" | "FINAL_FREE_CANCELLATION" | "LIMIT_EXCEEDED" | "EN_ROUTE_FEE";
+    policyMessage: string;
+}
+
 export interface BookingDetails {
     booking: Booking;
     serviceRequestTitle: string | null;
@@ -23,6 +34,7 @@ export interface BookingDetails {
     statusHistory?: BookingStatusHistoryItem[];
     providerCancellationsCount?: number;
     maxAllowedCancellations?: number;
+    cancellationPolicy?: CancellationPolicyDetails;
 }
 
 export interface BookingListResult {
@@ -41,4 +53,5 @@ export interface IBookingRepository extends BaseRepository<Booking | null> {
     findByCustomerId(input: GetCustomerBookingsInputDto | string): Promise<BookingListResult | BookingDetails[]>;
     findByProviderProfileId(input: (GetProviderBookingsInputDto & { providerProfileId: string }) | string): Promise<BookingListResult | BookingDetails[]>;
     countProviderCancellations(providerProfileId: string): Promise<number>;
+    countCustomerCancellations(customerId: string): Promise<number>;
 }

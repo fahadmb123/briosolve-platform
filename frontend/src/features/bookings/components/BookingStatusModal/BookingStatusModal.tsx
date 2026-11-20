@@ -52,10 +52,15 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
 
   const isCancellation = targetStatus === "CANCELLED";
   const isProviderCancellation = isCancellation && role === "PROVIDER";
+  const isCustomerCancellation = isCancellation && role === "CUSTOMER";
   const cancellationsUsed = booking.providerCancellationsCount ?? 0;
-  const isUntouchable = isProviderCancellation;
+  const isUntouchable = isCancellation;
 
   const isInvalidReason = isCancellation && (!notes || !notes.trim());
+
+  const policy = booking.cancellationPolicy;
+  const refundableAmount = policy?.refundableAmount ?? advancePaid;
+  const cancellationFee = policy?.cancellationFee ?? 0;
 
   const cancellationReasons = role === "CUSTOMER" ? [
     "Change of plans / Service no longer needed",
@@ -132,12 +137,14 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
         };
       case "CANCELLED":
         return {
-          title: "Cancel Booking (Pre-Dispatch)?",
+          title: "Confirm Booking Cancellation",
           description: role === "CUSTOMER"
-            ? `Are you sure you want to cancel this booking before the provider travels? You will receive a 100% full refund of ₹${advancePaid.toLocaleString("en-IN")} secured in Escrow back to your account.`
-            : `Are you sure you want to cancel this booking before travelling? The customer will receive a 100% full refund of the payment secured in Escrow.`,
+            ? `Please select your reason. ${refundableAmount > 0 ? `₹${refundableAmount.toLocaleString("en-IN")} will be refunded to your wallet.` : "Advance payment is non-refundable."}`
+            : `Please provide a reason. The payment secured in Escrow will be released to the customer.`,
           placeholder: "Select a reason above or write specific details...",
-          confirmText: role === "CUSTOMER" ? "Yes, Cancel Booking & Receive Refund" : "Yes, Cancel & Refund Customer",
+          confirmText: role === "CUSTOMER"
+            ? (refundableAmount > 0 ? `Yes, Cancel Booking & Receive ₹${refundableAmount.toLocaleString("en-IN")} Refund` : "Yes, Cancel Booking")
+            : "Yes, Cancel & Refund Customer",
           confirmIcon: "fas fa-times-circle",
           variant: "danger"
         };
@@ -321,6 +328,99 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
     );
   }
 
+  if (isCustomerCancellation && cancellationStep === "WARNING") {
+    const isEnRoute = booking.status === "EN_ROUTE";
+    const isLimit = policy?.policyStatus === "LIMIT_EXCEEDED";
+    const isFinalFree = policy?.policyStatus === "FINAL_FREE_CANCELLATION";
+
+    return (
+      <div className="bkstatus-modal-overlay untouchable" onClick={handleOverlayClick}>
+        <div
+          className="bkstatus-modal-dialog"
+          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bkstatus-modal-header">
+            <div className={`bkstatus-icon-box ${isEnRoute || isLimit ? "danger" : "warning"}`}>
+              <i className={isEnRoute ? "fas fa-route" : isLimit ? "fas fa-exclamation-circle" : "fas fa-info-circle"}></i>
+            </div>
+            <h3 className="bkstatus-title">
+              {isEnRoute
+                ? "Technician Is On The Way"
+                : isLimit
+                  ? "Cancellation Fee Notice"
+                  : isFinalFree
+                    ? "Final Free Cancellation (2 of 2)"
+                    : "Cancellation Policy (1 of 2)"}
+            </h3>
+            <div className={`bkstatus-strike-pill ${isEnRoute || isLimit ? "danger" : isFinalFree ? "warning" : "warning"}`}>
+              <i className={isEnRoute ? "fas fa-car" : isLimit ? "fas fa-exclamation-triangle" : "fas fa-shield-alt"}></i>
+              <span>
+                {isEnRoute
+                  ? "En Route Travel Policy"
+                  : isLimit
+                    ? "Limit Exceeded (Fee Applied)"
+                    : isFinalFree
+                      ? "Final Free Cancellation"
+                      : "Free Cancellation (Strike 1 of 2)"}
+              </span>
+            </div>
+          </div>
+
+          <div className="bkstatus-modal-body">
+            <div className={`bkstatus-warning-box ${isEnRoute || isLimit ? "danger" : ""}`}>
+              <p className="bkstatus-warning-para">
+                {policy?.policyMessage || (
+                  isEnRoute
+                    ? "The technician is already travelling to your location. A cancellation deduction applies to compensate travel time."
+                    : "You are allowed 2 free cancellations across your confirmed bookings. Please review the refund breakdown below."
+                )}
+              </p>
+            </div>
+
+            <div className="bkstatus-refund-breakdown">
+              <div className="bkstatus-rf-row">
+                <span>Advance Paid in Escrow</span>
+                <strong>₹{advancePaid.toLocaleString("en-IN")}</strong>
+              </div>
+              {cancellationFee > 0 && (
+                <div className="bkstatus-rf-row fee">
+                  <span>(-) Travel / Cancellation Fee</span>
+                  <strong className="text-danger">-₹{cancellationFee.toLocaleString("en-IN")}</strong>
+                </div>
+              )}
+              <div className="bkstatus-rf-row refund">
+                <span>(=) Refund to Your Wallet</span>
+                <strong className="text-success">₹{refundableAmount.toLocaleString("en-IN")}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="bkstatus-modal-footer">
+            <button
+              type="button"
+              className="bkstatus-btn-cancel"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Keep Booking
+            </button>
+            <button
+              type="button"
+              className={`bkstatus-btn-confirm ${isEnRoute || isLimit ? "danger" : "warning"}`}
+              onClick={() => setCancellationStep("FORM")}
+              disabled={isLoading}
+            >
+              <span>Continue to Cancel</span>
+              <i className="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`bkstatus-modal-overlay ${isUntouchable ? "untouchable" : ""}`} onClick={handleOverlayClick}>
       <div
@@ -407,9 +507,11 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
             <div className="bkstatus-cancel-notice">
               <i className="fas fa-shield-alt"></i>
               <div>
-                <strong>Automatic 100% Refund:</strong>
+                <strong>Refund Summary:</strong>
                 <span>
-                  The full payment of ₹{advancePaid.toLocaleString("en-IN")} held in Escrow will be released back to the customer.
+                  {refundableAmount > 0
+                    ? `₹${refundableAmount.toLocaleString("en-IN")} will be released back to your wallet.`
+                    : "No refund available for this cancellation."}
                 </span>
               </div>
             </div>
@@ -447,7 +549,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
         </div>
 
         <div className="bkstatus-modal-footer">
-          {isProviderCancellation ? (
+          {isCancellation ? (
             <button
               type="button"
               className="bkstatus-btn-cancel"

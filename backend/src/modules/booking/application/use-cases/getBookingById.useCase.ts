@@ -4,7 +4,7 @@ import { IBookingRepository } from "../../domain/repositories/IBookingRepository
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { GetBookingByIdInputDto } from "../dtos/request/get-booking.dto";
 import { BookingResponseDto } from "../dtos/response/booking-response.dto";
-import { BookingMapper } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper, calculateCancellationPolicy } from "../../infrastructure/mappers/booking.mapper";
 
 export class GetBookingByIdUseCase implements IUseCase<GetBookingByIdInputDto, BookingResponseDto> {
     constructor(
@@ -20,13 +20,35 @@ export class GetBookingByIdUseCase implements IUseCase<GetBookingByIdInputDto, B
 
         const providerProfile = await this._providerRepository.findProfileByUserId(input.userId);
 
-        const isAuthorized =
-            details.booking.customer_id === input.userId ||
-            (providerProfile && providerProfile.id === details.booking.provider_id);
+        const isCustomer = details.booking.customer_id === input.userId;
+        const isProvider = Boolean(providerProfile && providerProfile.id === details.booking.provider_id);
 
-        if (!isAuthorized) {
+        if (!isCustomer && !isProvider) {
             throw new ApplicationError("FORBIDDEN", "You are not authorized to view this booking", "AUTHENTICATION");
         }
+
+        const role = isCustomer ? "CUSTOMER" : "PROVIDER";
+        let cancellationsUsed = 0;
+        if (isCustomer) {
+            cancellationsUsed = await this._bookingRepository.countCustomerCancellations(input.userId);
+        } else {
+            cancellationsUsed = await this._bookingRepository.countProviderCancellations(details.booking.provider_id);
+        }
+
+        const advanceAmount = details.booking.advance_amount && details.booking.advance_amount > 0
+            ? details.booking.advance_amount
+            : details.booking.total_amount;
+
+        details.providerCancellationsCount = cancellationsUsed;
+        details.maxAllowedCancellations = 2;
+        details.cancellationPolicy = calculateCancellationPolicy({
+            role,
+            status: details.booking.status,
+            quotationType: details.quotationType,
+            advancePaid: advanceAmount,
+            cancellationsUsed,
+            maxAllowedCancellations: 2
+        });
 
         return BookingMapper.toResponseDto(details);
     }

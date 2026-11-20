@@ -4,7 +4,7 @@ import { IBookingRepository } from "../../domain/repositories/IBookingRepository
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { UpdateBookingStatusInputDto } from "../dtos/request/update-booking-status.dto";
 import { BookingResponseDto, BookingStatusHistoryItem } from "../dtos/response/booking-response.dto";
-import { BookingMapper, BookingStatusToTitle } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper, BookingStatusToTitle, calculateCancellationPolicy } from "../../infrastructure/mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
@@ -49,17 +49,21 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         }
 
         if (input.status === "CANCELLED") {
-            if (details.booking.status !== "CONFIRMED") {
-                throw new ApplicationError("CANNOT_CANCEL", "Booking can only be cancelled before dispatching or travelling.", "VALIDATION");
-            }
-            if (!input.notes || !input.notes.trim()) {
-                throw new ApplicationError("CANCELLATION_REASON_REQUIRED", "Please provide a reason for cancelling this booking.", "VALIDATION");
-            }
             if (isProviderAction) {
+                if (details.booking.status !== "CONFIRMED") {
+                    throw new ApplicationError("CANNOT_CANCEL", "Provider can only cancel before dispatching or travelling.", "VALIDATION");
+                }
                 const priorCancellations = await this._bookingRepository.countProviderCancellations(details.booking.provider_id);
                 if (priorCancellations >= 2) {
                     throw new ApplicationError("PROVIDER_CANCELLATION_LIMIT_EXCEEDED", "You have already reached the maximum limit of 2 cancellations. You cannot cancel this booking.", "VALIDATION");
                 }
+            } else if (isCustomerAction) {
+                if (details.booking.status !== "CONFIRMED" && details.booking.status !== "EN_ROUTE") {
+                    throw new ApplicationError("CANNOT_CANCEL", "Booking cannot be cancelled once work or inspection has commenced.", "VALIDATION");
+                }
+            }
+            if (!input.notes || !input.notes.trim()) {
+                throw new ApplicationError("CANCELLATION_REASON_REQUIRED", "Please provide a reason for cancelling this booking.", "VALIDATION");
             }
         }
 
@@ -136,15 +140,56 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
                 status: "WITHDRAWN",
                 rejectionReason: `Booking cancelled by ${cancelActorName}: ${input.notes || "No cancellation reason provided"}`
             }).catch(() => null);
-            if (this._creditWalletUseCase && details.booking.advance_amount > 0) {
-                await this._creditWalletUseCase.execute({
-                    userId: details.booking.customer_id,
-                    amount: details.booking.advance_amount,
-                    category: "REFUND",
-                    bookingId: details.booking.id,
-                    description: `Refund for cancelled booking #${details.booking.booking_number}`,
-                    referenceId: details.booking.booking_number
-                }).catch(() => null);
+            const advancePaid = details.booking.advance_amount && details.booking.advance_amount > 0
+                ? details.booking.advance_amount
+                : details.booking.total_amount;
+
+            if (this._creditWalletUseCase && advancePaid > 0) {
+                if (isProviderAction) {
+                    await this._creditWalletUseCase.execute({
+                        userId: details.booking.customer_id,
+                        amount: advancePaid,
+                        category: "REFUND",
+                        bookingId: details.booking.id,
+                        description: `Refund for cancelled booking #${details.booking.booking_number}`,
+                        referenceId: details.booking.booking_number
+                    }).catch(() => null);
+                } else {
+                    const priorCustomerCancellations = await this._bookingRepository.countCustomerCancellations(details.booking.customer_id);
+                    const policy = calculateCancellationPolicy({
+                        role: "CUSTOMER",
+                        status: details.booking.status,
+                        quotationType: details.quotationType,
+                        advancePaid,
+                        cancellationsUsed: priorCustomerCancellations,
+                        maxAllowedCancellations: 2
+                    });
+
+                    if (policy.refundableAmount > 0) {
+                        await this._creditWalletUseCase.execute({
+                            userId: details.booking.customer_id,
+                            amount: policy.refundableAmount,
+                            category: "REFUND",
+                            bookingId: details.booking.id,
+                            description: `Refund for cancelled booking #${details.booking.booking_number}`,
+                            referenceId: details.booking.booking_number
+                        }).catch(() => null);
+                    }
+
+                    if (policy.cancellationFee > 0) {
+                        const providerProfileRecord = await this._providerRepository.findById(details.booking.provider_id);
+                        if (providerProfileRecord && providerProfileRecord.user_id) {
+                            await this._creditWalletUseCase.execute({
+                                userId: providerProfileRecord.user_id,
+                                amount: policy.cancellationFee,
+                                category: "EARNINGS",
+                                bookingId: details.booking.id,
+                                description: `Cancellation compensation fee for booking #${details.booking.booking_number}`,
+                                referenceId: details.booking.booking_number
+                            }).catch(() => null);
+                        }
+                    }
+                }
             }
         }
 
