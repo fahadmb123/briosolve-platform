@@ -186,7 +186,7 @@ export default function SubmitQuotation() {
         return {
           title: "Service Request Completed",
           desc: "This service request has been completed. Quotations cannot be modified.",
-          icon: "fa-check-double"
+          icon: "fa-check-circle"
         };
       }
       if (request?.status === "EXPIRED") {
@@ -231,7 +231,7 @@ export default function SubmitQuotation() {
       return {
         title: "Service Request Completed",
         desc: "This service request has been completed and is closed for further quotations.",
-        icon: "fa-check-double"
+        icon: "fa-check-circle"
       };
     }
     if (request?.status === "EXPIRED") {

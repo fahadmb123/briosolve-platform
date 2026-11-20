@@ -263,6 +263,13 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
         );
       }
       if (request.status === "ACCEPTED") {
+        if (request.latest_booking?.status === "COMPLETED") {
+          return (
+            <span className="srdetails-status-pill completed">
+              <i className="fas fa-check-circle"></i> Completed
+            </span>
+          );
+        }
         return (
           <span className="srdetails-status-pill completed">
             <i className="fas fa-check-circle"></i> Quotation Accepted
@@ -290,6 +297,13 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
           </span>
         );
       case "ACCEPTED":
+        if (request.latest_booking?.status === "COMPLETED") {
+          return (
+            <span className="srdetails-status-pill completed">
+              <i className="fas fa-check-circle"></i> Completed
+            </span>
+          );
+        }
         return (
           <span className="srdetails-status-pill completed">
             <i className="fas fa-check-circle"></i> Quotation Accepted
@@ -429,7 +443,7 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                   disabled
                   style={{ opacity: 0.6, cursor: "not-allowed" }}
                 >
-                  <i className="fas fa-check-double"></i>
+                  <i className="fas fa-check-circle"></i>
                   <span>Job Completed</span>
                 </button>
               ) : request.status !== "CANCELLED" && request.status !== "EXPIRED" && onQuote ? (
@@ -533,6 +547,45 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                     >
                       <i className="fas fa-receipt"></i>
                       <span>View Refund Receipt</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {request.latest_booking?.status === "COMPLETED" && (
+            <div className="srdetails-refund-alert-box" style={{ background: "#f0fdf4", borderColor: "#86efac" }}>
+              <div className="srdetails-refund-alert-icon" style={{ background: "#dcfce7", color: "#16a34a" }}>
+                <i className="fas fa-check-circle"></i>
+              </div>
+              <div className="srdetails-refund-alert-body">
+                <div className="srdetails-refund-alert-header">
+                  <span className="srdetails-refund-badge" style={{ background: "#dcfce7", color: "#15803d" }}>
+                    SERVICE COMPLETED
+                  </span>
+                  {request.latest_booking.booking_number && (
+                    <span className="srdetails-refund-booking-ref" style={{ color: "#166534" }}>
+                      Booking #{request.latest_booking.booking_number}
+                    </span>
+                  )}
+                </div>
+                <h3 className="srdetails-refund-heading" style={{ color: "#14532d" }}>
+                  This service has been completed successfully!
+                </h3>
+                <p className="srdetails-refund-subtext" style={{ color: "#166534" }}>
+                  The provider has finished all work for this booking. You can review the booking details, payment summary, and invoice receipt anytime.
+                </p>
+                <div className="srdetails-refund-action-row">
+                  {request.latest_booking.id && (
+                    <button
+                      type="button"
+                      className="srdetails-btn-refund-receipt"
+                      style={{ background: "#16a34a", color: "#ffffff", borderColor: "#16a34a" }}
+                      onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+                    >
+                      <i className="fas fa-receipt"></i>
+                      <span>View Booking Summary & Invoice</span>
                     </button>
                   )}
                 </div>

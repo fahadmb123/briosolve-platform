@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { checkRequestEditPermission } from "../../utils/serviceRequestEdit.utils";
 import { getCategoryVisualConfig } from "../../utils/categoryIcon.utils";
@@ -18,6 +19,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   onCancelRequest,
   onReopenRequest,
 }) => {
+  const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
   const visual = getCategoryVisualConfig(request.category_name, request.subservice_name);
   const permission = checkRequestEditPermission(request);
@@ -100,6 +102,14 @@ export const RequestCard: React.FC<RequestCardProps> = ({
           </span>
         );
       case "ACCEPTED":
+        if (request.latest_booking?.status === "COMPLETED") {
+          return (
+            <span className="myreq-badge-pill myreq-badge-completed">
+              <span className="myreq-dot-indicator"></span>
+              <span>Completed</span>
+            </span>
+          );
+        }
         return (
           <span className="myreq-badge-pill myreq-badge-accepted">
             <span className="myreq-dot-indicator"></span>
@@ -219,6 +229,40 @@ export const RequestCard: React.FC<RequestCardProps> = ({
               <span>{notifiedCount} {notifiedCount === 1 ? "provider" : "providers"} notified</span>
             </div>
           ) : null}
+
+          {request.latest_booking && request.latest_booking.status === "COMPLETED" ? (
+            <div
+              className="myreq-meta-tag completed"
+              style={{
+                color: "#15803d",
+                background: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+              onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+              title="Click to view completed booking"
+            >
+              <i className="fas fa-check-circle"></i>
+              <span>Booking #{request.latest_booking.booking_number} Completed</span>
+            </div>
+          ) : request.latest_booking && request.latest_booking.status !== "CANCELLED" ? (
+            <div
+              className="myreq-meta-tag"
+              style={{
+                color: "#0369a1",
+                background: "#f0f9ff",
+                border: "1px solid #bae6fd",
+                fontWeight: 500,
+                cursor: "pointer"
+              }}
+              onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+              title="Click to view booking"
+            >
+              <i className="fas fa-calendar-check"></i>
+              <span>Booking #{request.latest_booking.booking_number} ({request.latest_booking.status.replace("_", " ")})</span>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -266,6 +310,21 @@ export const RequestCard: React.FC<RequestCardProps> = ({
             >
               <i className="fas fa-sync-alt"></i>
               <span>Reopen</span>
+            </button>
+          )}
+
+          {request.latest_booking?.id && (
+            <button
+              type="button"
+              className="myreq-action-link"
+              onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+              style={{
+                color: request.latest_booking.status === "COMPLETED" ? "#15803d" : "#c2410c",
+                fontWeight: 600
+              }}
+            >
+              <i className="fas fa-receipt" style={{ marginRight: "4px" }}></i>
+              <span>{request.latest_booking.status === "COMPLETED" ? "View Completed Booking" : "View Booking"}</span>
             </button>
           )}
 

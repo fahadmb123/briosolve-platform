@@ -484,7 +484,7 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
               disabled
               title="This service request is completed"
             >
-              <i className="fas fa-check-double mr-1.5"></i>
+              <i className="fas fa-check-circle mr-1.5"></i>
               <span>Job Completed</span>
             </button>
           ) : (

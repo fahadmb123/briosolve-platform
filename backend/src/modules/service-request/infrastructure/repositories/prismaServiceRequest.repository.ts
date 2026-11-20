@@ -144,7 +144,18 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
         const allRecords = await db.orm.public.service_requests
             .where({ customer_id: customerId as never })
+            .include("bookings")
             .all();
+
+        for (const r of allRecords) {
+            const hasCompletedBooking = Array.isArray(r.bookings) && r.bookings.some((b: any) => b.status === "COMPLETED");
+            if (hasCompletedBooking && r.status !== "COMPLETED") {
+                await db.orm.public.service_requests
+                    .where({ id: r.id as never })
+                    .update({ status: "COMPLETED" as never, updated_at: Temporal.Now.instant() });
+                r.status = "COMPLETED" as never;
+            }
+        }
 
         const counts: Record<string, number> = {
             ALL: allRecords.length,

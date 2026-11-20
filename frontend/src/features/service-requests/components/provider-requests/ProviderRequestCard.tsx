@@ -326,7 +326,7 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
               disabled
               title="This service request is completed"
             >
-              <i className="fas fa-check-double"></i>
+              <i className="fas fa-check-circle"></i>
               <span>Completed</span>
             </button>
           ) : (

@@ -152,8 +152,14 @@ export class ServiceRequestMapper {
             };
         }
 
+        let effectiveStatus = dto.status;
+        if (latestBookingDto?.status === "COMPLETED") {
+            effectiveStatus = "COMPLETED";
+        }
+
         return {
             ...dto,
+            status: effectiveStatus,
             category_name: record.category?.name,
             category_image: StorageUtil.getPublicUrl(record.category?.image) ?? null,
             subservice_name: record.subservice?.name ?? null,

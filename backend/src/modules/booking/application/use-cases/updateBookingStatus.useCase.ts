@@ -194,6 +194,7 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         }
 
         if (input.status === "COMPLETED") {
+            await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "COMPLETED").catch(() => null);
             await this._providerRepository.incrementCompletedJobs(details.booking.provider_id).catch(() => null);
 
             if (this._creditWalletUseCase) {
