@@ -30,7 +30,12 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
 
         const providerProfile = await this._providerRepository.findProfileByUserId(input.userId);
 
-        const isProviderAction = Boolean(providerProfile && providerProfile.id === details.booking.provider_id);
+        const isProviderAction = Boolean(
+            (providerProfile && providerProfile.id === details.booking.provider_id) ||
+            details.booking.provider_id === input.userId ||
+            (providerProfile && providerProfile.user_id === details.booking.provider_id) ||
+            details.providerUserId === input.userId
+        );
         const isCustomerAction = details.booking.customer_id === input.userId;
 
         const isAuthorized = isCustomerAction || isProviderAction;

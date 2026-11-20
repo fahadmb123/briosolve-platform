@@ -998,11 +998,8 @@
               "notes": {
                 "nullable": true,
                 "type": {
-                  "codecId": "sql/varchar@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "length": 1000
-                  }
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               },
               "order_id": {
@@ -4955,12 +4952,9 @@
                   "nullable": false
                 },
                 "notes": {
-                  "codecId": "sql/varchar@1",
-                  "nativeType": "character varying",
-                  "nullable": true,
-                  "typeParams": {
-                    "length": 1000
-                  }
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "order_id": {
                   "codecId": "sql/varchar@1",
@@ -7963,7 +7957,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "1620fdec464c2d1384aa156042dbdaa48f398d21e56c8a0ea558f232d4c03b4a"
+    "storageHash": "76ede8324323bbef212a6d62110d5a97f2f33bbcc31568ea99ce528f45e5da82"
   },
   "execution": {
     "executionHash": "7cfa2bb0c83f838f529dffdf0a4b086424f3d2afeac803eae5a9b22d2fc0418b",

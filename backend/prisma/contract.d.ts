@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'1620fdec464c2d1384aa156042dbdaa48f398d21e56c8a0ea558f232d4c03b4a'>;
+  StorageHashBase<'76ede8324323bbef212a6d62110d5a97f2f33bbcc31568ea99ce528f45e5da82'>;
 export type ExecutionHash =
   ExecutionHashBase<'7cfa2bb0c83f838f529dffdf0a4b086424f3d2afeac803eae5a9b22d2fc0418b'>;
 export type ProfileHash =
@@ -293,7 +293,7 @@ export type FieldOutputTypes = {
       readonly scheduled_time: Varchar<80> | null;
       readonly payment_id: Varchar<255> | null;
       readonly order_id: Varchar<255> | null;
-      readonly notes: Varchar<1000> | null;
+      readonly notes: CodecTypes['pg/text@1']['output'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -578,7 +578,7 @@ export type FieldInputTypes = {
       readonly scheduled_time: CodecTypes['sql/varchar@1']['input'] | null;
       readonly payment_id: CodecTypes['sql/varchar@1']['input'] | null;
       readonly order_id: CodecTypes['sql/varchar@1']['input'] | null;
-      readonly notes: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly notes: CodecTypes['pg/text@1']['input'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -846,7 +846,7 @@ export type StorageColumnTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly customer_id: CodecTypes['pg/uuid@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly notes: Varchar<1000> | null;
+      readonly notes: CodecTypes['pg/text@1']['output'] | null;
       readonly order_id: Varchar<255> | null;
       readonly payment_id: Varchar<255> | null;
       readonly payment_status: 'PENDING' | 'ADVANCE_PAID' | 'PAID' | 'REFUNDED';
@@ -1131,7 +1131,7 @@ export type StorageColumnInputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly customer_id: CodecTypes['pg/uuid@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly notes: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly notes: CodecTypes['pg/text@1']['input'] | null;
       readonly order_id: CodecTypes['sql/varchar@1']['input'] | null;
       readonly payment_id: CodecTypes['sql/varchar@1']['input'] | null;
       readonly payment_status: 'PENDING' | 'ADVANCE_PAID' | 'PAID' | 'REFUNDED';
@@ -1757,7 +1757,7 @@ export namespace Models {
     scheduled_time: Varchar<80> | null;
     payment_id: Varchar<255> | null;
     order_id: Varchar<255> | null;
-    notes: Varchar<1000> | null;
+    notes: CodecTypes['pg/text@1']['output'] | null;
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     customer: public_users;
@@ -2171,10 +2171,9 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly length: 255 };
                 };
                 readonly notes: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
                   readonly nullable: true;
-                  readonly typeParams: { readonly length: 1000 };
                 };
                 readonly created_at: {
                   readonly nativeType: 'timestamptz';
@@ -4684,11 +4683,7 @@ type ContractBase = Omit<
               };
               readonly notes: {
                 readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 1000 };
-                };
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly created_at: {
                 readonly nullable: false;

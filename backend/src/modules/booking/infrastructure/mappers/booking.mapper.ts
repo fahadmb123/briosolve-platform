@@ -288,6 +288,9 @@ export class BookingMapper {
         if (data.status) {
             payload.status = data.status;
         }
+        if (data.paymentStatus) {
+            payload.payment_status = data.paymentStatus;
+        }
         if (data.totalAmount !== undefined) {
             payload.total_amount = data.totalAmount.toString();
             payload.platform_fee = Math.round(data.totalAmount * 0.1).toString();

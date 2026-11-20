@@ -566,7 +566,7 @@ model bookings {
   payment_id         VarChar(255)?
   order_id           VarChar(255)?
 
-  notes              VarChar(1000)?
+  notes              String?
 
   created_at         DateTime             @default(now())
   updated_at         temporal.updatedAt()
