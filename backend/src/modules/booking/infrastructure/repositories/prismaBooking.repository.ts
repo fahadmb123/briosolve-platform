@@ -27,7 +27,8 @@ export class PrismaBookingRepository implements IBookingRepository {
             const booking = BookingMapper.toDomain(record);
 
             const details = await this.populateDetails([booking]);
-            return details[0] || {
+            const cancellationsCount = await this.countProviderCancellations(booking.provider_id);
+            const detail = details[0] || {
                 booking,
                 serviceRequestTitle: null,
                 providerBusinessName: null,
@@ -37,6 +38,9 @@ export class PrismaBookingRepository implements IBookingRepository {
                 requiresInspection: false,
                 statusHistory: undefined
             };
+            detail.providerCancellationsCount = cancellationsCount;
+            detail.maxAllowedCancellations = 2;
+            return detail;
         } catch {
             return null;
         }
@@ -180,12 +184,53 @@ export class PrismaBookingRepository implements IBookingRepository {
 
         const total = detailed.length;
         const paged = detailed.slice(skip, skip + limit);
+        const providerCancellations = await this.countProviderCancellations(providerProfileId);
+        paged.forEach((item) => {
+            item.providerCancellationsCount = providerCancellations;
+            item.maxAllowedCancellations = 2;
+        });
 
         return {
             bookings: paged,
             total,
             counts
         };
+    }
+
+    async countProviderCancellations(providerProfileId: string): Promise<number> {
+        try {
+            const records = await db.orm.public.bookings
+                .where({
+                    provider_id: providerProfileId as never,
+                    status: "CANCELLED" as never
+                })
+                .all();
+
+            let count = 0;
+            for (const record of records) {
+                if (!record.notes) {
+                    count++;
+                    continue;
+                }
+                try {
+                    const parsed = JSON.parse(record.notes);
+                    if (Array.isArray(parsed)) {
+                        const cancelItem = parsed.find((item: any) => item.status === "CANCELLED");
+                        if (cancelItem && cancelItem.authorName && cancelItem.authorName.toLowerCase() === "customer") {
+                            continue;
+                        }
+                    }
+                } catch {
+                    if (record.notes.toLowerCase().includes("customer")) {
+                        continue;
+                    }
+                }
+                count++;
+            }
+            return count;
+        } catch {
+            return 0;
+        }
     }
 
     async create(data: CreateBookingRepoDto): Promise<Booking | null> {

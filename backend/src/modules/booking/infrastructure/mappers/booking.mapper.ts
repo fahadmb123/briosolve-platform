@@ -126,6 +126,8 @@ export class BookingMapper {
             quotationType?: string | null;
             requiresInspection?: boolean;
             statusHistory?: BookingStatusHistoryItem[];
+            providerCancellationsCount?: number;
+            maxAllowedCancellations?: number;
         }
     ): BookingResponseDto {
         const isDetails = "booking" in source;
@@ -201,7 +203,9 @@ export class BookingMapper {
             requiresInspection: details?.requiresInspection ?? extra?.requiresInspection ?? false,
             quoteAmount: details?.quoteAmount ?? null,
             isFinalConfirmed,
-            statusHistory: parsedHistory || details?.statusHistory
+            statusHistory: parsedHistory || details?.statusHistory,
+            providerCancellationsCount: details?.providerCancellationsCount ?? extra?.providerCancellationsCount ?? 0,
+            maxAllowedCancellations: details?.maxAllowedCancellations ?? extra?.maxAllowedCancellations ?? 2
         };
     }
 

@@ -23,12 +23,20 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
 }) => {
   const [notes, setNotes] = useState("");
   const [confirmedAmount, setConfirmedAmount] = useState<number>(() => booking?.totalAmount || 0);
+  const [cancellationStep, setCancellationStep] = useState<"WARNING" | "FORM">("WARNING");
 
   React.useEffect(() => {
     if (booking?.totalAmount) {
       setConfirmedAmount(booking.totalAmount);
     }
   }, [booking?.totalAmount, isOpen]);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setCancellationStep("WARNING");
+      setNotes("");
+    }
+  }, [isOpen, targetStatus]);
 
   if (!isOpen || !booking || !targetStatus) return null;
 
@@ -43,6 +51,10 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
     (confirmedAmount < advancePaid || isNaN(confirmedAmount) || confirmedAmount <= 0);
 
   const isCancellation = targetStatus === "CANCELLED";
+  const isProviderCancellation = isCancellation && role === "PROVIDER";
+  const cancellationsUsed = booking.providerCancellationsCount ?? 0;
+  const isUntouchable = isProviderCancellation;
+
   const isInvalidReason = isCancellation && (!notes || !notes.trim());
 
   const cancellationReasons = role === "CUSTOMER" ? [
@@ -143,6 +155,13 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
 
   const config = getStatusConfig();
 
+  const handleOverlayClick = () => {
+    if (isUntouchable) {
+      return;
+    }
+    onClose();
+  };
+
   const handleConfirm = () => {
     if (isInvalidAmount) return;
     onConfirm(
@@ -153,8 +172,157 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
     );
   };
 
+  if (isProviderCancellation && cancellationStep === "WARNING") {
+    return (
+      <div className="bkstatus-modal-overlay untouchable" onClick={handleOverlayClick}>
+        <div
+          className="bkstatus-modal-dialog"
+          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+        >
+          {cancellationsUsed === 0 && (
+            <>
+              <div className="bkstatus-modal-header">
+                <div className="bkstatus-icon-box warning">
+                  <i className="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 className="bkstatus-title">Cancellation Warning (1 of 2)</h3>
+                <div className="bkstatus-strike-pill warning">
+                  <i className="fas fa-info-circle"></i>
+                  <span>Cancellation Strike 1 of 2</span>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-body">
+                <div className="bkstatus-warning-box">
+                  <p className="bkstatus-warning-para">
+                    As a service provider on this platform, you are allowed a maximum of 2 cancellations across all your confirmed bookings.
+                  </p>
+                  <p className="bkstatus-warning-para">
+                    Proceeding with this cancellation will be recorded as your <strong>1st cancellation</strong>. You will have only <strong>1 cancellation remaining</strong> before reaching your final limit. If you reach your limit, you will no longer be allowed to cancel any bookings.
+                  </p>
+                  <p className="bkstatus-warning-sub">
+                    Repeated cancellations affect customer experience and platform reliability.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-footer">
+                <button
+                  type="button"
+                  className="bkstatus-btn-cancel"
+                  onClick={onClose}
+                  disabled={isLoading}
+                >
+                  Keep Booking
+                </button>
+                <button
+                  type="button"
+                  className="bkstatus-btn-confirm warning"
+                  onClick={() => setCancellationStep("FORM")}
+                  disabled={isLoading}
+                >
+                  <span>Continue</span>
+                  <i className="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </>
+          )}
+
+          {cancellationsUsed === 1 && (
+            <>
+              <div className="bkstatus-modal-header">
+                <div className="bkstatus-icon-box danger">
+                  <i className="fas fa-exclamation-circle"></i>
+                </div>
+                <h3 className="bkstatus-title">Final Cancellation Warning (2 of 2)</h3>
+                <div className="bkstatus-strike-pill danger">
+                  <i className="fas fa-exclamation-triangle"></i>
+                  <span>Final Permitted Cancellation</span>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-body">
+                <div className="bkstatus-warning-box danger">
+                  <p className="bkstatus-warning-para">
+                    You have already used <strong>1 of your 2 permitted cancellations</strong>.
+                  </p>
+                  <p className="bkstatus-warning-para">
+                    If you proceed, this will be your <strong>2nd and final cancellation</strong>. Once completed, your cancellation limit will be completely exhausted. You will <strong>NOT</strong> be allowed to cancel any further bookings in the future.
+                  </p>
+                  <p className="bkstatus-warning-sub">
+                    Please consider keeping this booking if possible to maintain good standing on the platform.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-footer">
+                <button
+                  type="button"
+                  className="bkstatus-btn-cancel"
+                  onClick={onClose}
+                  disabled={isLoading}
+                >
+                  Keep Booking
+                </button>
+                <button
+                  type="button"
+                  className="bkstatus-btn-confirm danger"
+                  onClick={() => setCancellationStep("FORM")}
+                  disabled={isLoading}
+                >
+                  <span>Continue</span>
+                  <i className="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </>
+          )}
+
+          {cancellationsUsed >= 2 && (
+            <>
+              <div className="bkstatus-modal-header">
+                <div className="bkstatus-icon-box danger">
+                  <i className="fas fa-ban"></i>
+                </div>
+                <h3 className="bkstatus-title">Cancellation Not Allowed</h3>
+                <div className="bkstatus-strike-pill locked">
+                  <i className="fas fa-lock"></i>
+                  <span>Limit Reached (2 / 2 Used)</span>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-body">
+                <div className="bkstatus-warning-box locked">
+                  <p className="bkstatus-warning-para">
+                    You have already reached the maximum limit of 2 cancellations permitted for service providers.
+                  </p>
+                  <p className="bkstatus-warning-para">
+                    You cannot cancel this booking. Further cancellations are disabled for your account. You must proceed to fulfill the service as scheduled.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-footer">
+                <button
+                  type="button"
+                  className="bkstatus-btn-confirm primary full-width"
+                  onClick={onClose}
+                  disabled={isLoading}
+                >
+                  <i className="fas fa-arrow-left"></i>
+                  <span>Go Back to Booking</span>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bkstatus-modal-overlay" onClick={onClose}>
+    <div className={`bkstatus-modal-overlay ${isUntouchable ? "untouchable" : ""}`} onClick={handleOverlayClick}>
       <div
         className="bkstatus-modal-dialog"
         onClick={(e) => e.stopPropagation()}
@@ -174,7 +342,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
             isFixed ? (
               <div className="bkstatus-fixed-quote-box">
                 <div className="bkstatus-fq-badge">
-                  <i className="fas fa-lock" />
+                  <i className="fas fa-lock"></i>
                   <span>Fixed Price Agreement</span>
                 </div>
                 <div className="bkstatus-fq-row">
@@ -197,7 +365,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
               <div className="bkstatus-amount-section">
                 <div className="bkstatus-dynamic-header">
                   <span className="bkstatus-dyn-badge">
-                    <i className={isInspection ? "fas fa-clipboard-check" : "fas fa-calculator"} />
+                    <i className={isInspection ? "fas fa-clipboard-check" : "fas fa-calculator"}></i>
                     {isInspection ? "Inspection-Based Final Amount" : "Estimated Quote — Final Amount"}
                   </span>
                 </div>
@@ -237,7 +405,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
 
           {isCancellation && (
             <div className="bkstatus-cancel-notice">
-              <i className="fas fa-shield-alt" />
+              <i className="fas fa-shield-alt"></i>
               <div>
                 <strong>Automatic 100% Refund:</strong>
                 <span>
@@ -279,14 +447,26 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
         </div>
 
         <div className="bkstatus-modal-footer">
-          <button
-            type="button"
-            className="bkstatus-btn-cancel"
-            onClick={onClose}
-            disabled={isLoading}
-          >
-            Cancel
-          </button>
+          {isProviderCancellation ? (
+            <button
+              type="button"
+              className="bkstatus-btn-cancel"
+              onClick={() => setCancellationStep("WARNING")}
+              disabled={isLoading}
+            >
+              <i className="fas fa-arrow-left"></i>
+              <span>Back</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="bkstatus-btn-cancel"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Cancel
+            </button>
+          )}
           <button
             type="button"
             className={`bkstatus-btn-confirm ${config.variant}`}

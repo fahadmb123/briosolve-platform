@@ -55,6 +55,12 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             if (!input.notes || !input.notes.trim()) {
                 throw new ApplicationError("CANCELLATION_REASON_REQUIRED", "Please provide a reason for cancelling this booking.", "VALIDATION");
             }
+            if (isProviderAction) {
+                const priorCancellations = await this._bookingRepository.countProviderCancellations(details.booking.provider_id);
+                if (priorCancellations >= 2) {
+                    throw new ApplicationError("PROVIDER_CANCELLATION_LIMIT_EXCEEDED", "You have already reached the maximum limit of 2 cancellations. You cannot cancel this booking.", "VALIDATION");
+                }
+            }
         }
 
         let history: BookingStatusHistoryItem[] = [];

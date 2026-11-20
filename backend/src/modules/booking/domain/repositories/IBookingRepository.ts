@@ -21,6 +21,8 @@ export interface BookingDetails {
     requiresInspection?: boolean;
     quoteAmount?: number | null;
     statusHistory?: BookingStatusHistoryItem[];
+    providerCancellationsCount?: number;
+    maxAllowedCancellations?: number;
 }
 
 export interface BookingListResult {
@@ -38,4 +40,5 @@ export interface IBookingRepository extends BaseRepository<Booking | null> {
     findByServiceRequestId(serviceRequestId: string): Promise<Booking | null>;
     findByCustomerId(input: GetCustomerBookingsInputDto | string): Promise<BookingListResult | BookingDetails[]>;
     findByProviderProfileId(input: (GetProviderBookingsInputDto & { providerProfileId: string }) | string): Promise<BookingListResult | BookingDetails[]>;
+    countProviderCancellations(providerProfileId: string): Promise<number>;
 }

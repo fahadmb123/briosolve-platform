@@ -42,4 +42,6 @@ export interface BookingResponseDto {
     quoteAmount?: number | null;
     isFinalConfirmed?: boolean;
     statusHistory?: BookingStatusHistoryItem[];
+    providerCancellationsCount?: number;
+    maxAllowedCancellations?: number;
 }

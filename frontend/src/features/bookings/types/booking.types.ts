@@ -43,6 +43,8 @@ export interface BookingItem {
   quoteAmount?: number | null;
   isFinalConfirmed?: boolean;
   statusHistory?: BookingStatusHistoryItem[];
+  providerCancellationsCount?: number;
+  maxAllowedCancellations?: number;
 }
 
 export interface BookingCounts {
