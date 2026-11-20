@@ -435,6 +435,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
           <div className="p-5 sm:p-6 border-t border-surface-variant bg-surface shrink-0 w-full rounded-b-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
             {step === 1 ? (
               <button
+                type="button"
                 onClick={handleConfirmLocation}
                 disabled={!coordinates.lat || isGeocoding}
                 className="w-full py-3.5 rounded-xl bg-primary hover:opacity-90 text-on-primary font-label-lg text-label-lg font-semibold flex items-center justify-center shadow-lg transition-all active:scale-[0.99] border-none cursor-pointer disabled:opacity-50"
@@ -443,6 +444,7 @@ export const AddAddressModal: React.FC<AddAddressModalProps> = ({
               </button>
             ) : (
               <button
+                type="button"
                 onClick={handleSaveAddress}
                 disabled={!hasChanges || isLoading}
                 className="w-full py-3.5 rounded-xl bg-primary hover:opacity-90 text-on-primary font-label-lg text-label-lg font-semibold flex items-center justify-center shadow-lg transition-all active:scale-[0.99] border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"

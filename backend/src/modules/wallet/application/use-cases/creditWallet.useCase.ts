@@ -3,8 +3,9 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IWalletRepository } from "../../domain/repositories/IWallet.repository";
 import { WalletResponseDto } from "../dtos/response/wallet-response.dto";
 import { WalletMapper } from "../../infrastructure/mappers/wallet.mapper";
-import { CreditWalletInputDto } from "../dtos/request/credit-wallet.dto";
+import type { CreditWalletInputDto } from "../dtos/request/credit-wallet.dto";
 
+export type { CreditWalletInputDto };
 
 export class CreditWalletUseCase implements IUseCase<CreditWalletInputDto, WalletResponseDto> {
     constructor(private readonly _walletRepository: IWalletRepository) {}

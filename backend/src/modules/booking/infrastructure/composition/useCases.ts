@@ -1,7 +1,7 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
-import { CreditWalletInputDto } from "../../../wallet/application/use-cases/creditWallet.useCase";
+import type { CreditWalletInputDto } from "../../../wallet/application/use-cases/creditWallet.useCase";
 import { WalletResponseDto } from "../../../wallet/application/dtos/response/wallet-response.dto";
 import { bookingRepository } from "./repositories";
 import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";

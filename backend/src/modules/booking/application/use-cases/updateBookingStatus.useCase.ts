@@ -10,7 +10,7 @@ import { NotificationResponseDto } from "../../../notification/application/dtos/
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
 import { WalletResponseDto } from "../../../wallet/application/dtos/response/wallet-response.dto";
-import { CreditWalletInputDto } from "../../../wallet/application/dtos/request/credit-wallet.dto";
+import type { CreditWalletInputDto } from "../../../wallet/application/dtos/request/credit-wallet.dto";
 
 export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusInputDto, BookingResponseDto> {
     constructor(
