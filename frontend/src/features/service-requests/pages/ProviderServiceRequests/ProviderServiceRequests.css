@@ -250,6 +250,26 @@
     box-shadow: 0 1px 3px rgba(255, 121, 0, 0.3);
 }
 
+.provreq-tab-bubble {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0 0.35rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    background: rgba(100, 116, 139, 0.16);
+    color: var(--text-secondary, #64748b);
+    line-height: 1;
+}
+
+.provreq-status-tab-btn.active .provreq-tab-bubble {
+    background: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+}
+
 .provreq-search-sort-group {
     display: flex;
     align-items: center;

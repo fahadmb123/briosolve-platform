@@ -86,4 +86,5 @@ export interface GetProviderRequestsOutputDto {
     totalPages: number;
     page: number;
     limit: number;
+    counts?: Record<string, number>;
 }

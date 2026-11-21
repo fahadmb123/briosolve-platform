@@ -29,6 +29,7 @@ export interface GetProviderRequestsParams {
   page?: number;
   limit?: number;
   search?: string;
+  status?: string;
   urgency?: string;
   budgetType?: string;
   sortBy?: "NEWEST" | "URGENT" | "BUDGET_HIGH";
@@ -40,6 +41,7 @@ export interface GetProviderRequestsResponse {
   totalPages: number;
   page: number;
   limit: number;
+  counts?: Record<string, number>;
 }
 
 export const createServiceRequest = async (data: CreateServiceRequestPayload): Promise<response<ServiceRequestItem>> => {

@@ -9,12 +9,22 @@ import { useAuthStore } from "../../../auth/stores/auth.store";
 import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
 import "./ProviderServiceRequests.css";
 
+const STATUS_TABS: { id: string; label: string }[] = [
+  { id: "ALL", label: "All Leads" },
+  { id: "OPEN", label: "Open" },
+  { id: "CLOSED", label: "Closed" },
+  { id: "CANCELLED", label: "Cancelled" },
+  { id: "EXPIRED", label: "Expired" }
+];
+
 export default function ProviderServiceRequests() {
   const navigate = useNavigate();
   const verifications = useAuthStore((state) => state.verifications);
   const isVerified =
     verifications !== null && Object.values(verifications).every(Boolean);
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("ALL");
@@ -31,6 +41,7 @@ export default function ProviderServiceRequests() {
   const { data: requestsRes, isLoading: isQueryLoading, isFetching, refetch } = useGetProviderServiceRequests({
     page,
     limit,
+    status: statusFilter !== "ALL" ? statusFilter : undefined,
     search: debouncedSearch.trim() || undefined,
     urgency: urgencyFilter !== "ALL" ? urgencyFilter : undefined,
     sortBy,
@@ -52,6 +63,7 @@ export default function ProviderServiceRequests() {
         const uniqueNewItems = newItems.filter((r) => !existingIds.has(r.id));
         return [...prev, ...uniqueNewItems];
       });
+      setCounts(requestsRes.data.counts || {});
       setTotalPages(requestsRes.data.totalPages || 0);
       setHasMore(page < (requestsRes.data.totalPages || 0));
     }
@@ -59,7 +71,7 @@ export default function ProviderServiceRequests() {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, urgencyFilter, sortBy]);
+  }, [debouncedSearch, statusFilter, urgencyFilter, sortBy]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -215,20 +227,22 @@ export default function ProviderServiceRequests() {
 
       <div className="provreq-filter-bar-container">
         <div className="provreq-status-tabs-list" role="tablist">
-          {[
-            { id: "ALL", label: "All Leads" },
-            { id: "TODAY", label: "Needed Today" },
-            { id: "THIS_WEEK", label: "This Week" },
-            { id: "SPECIFIC_DATE", label: "Specific Date" },
-            { id: "FLEXIBLE", label: "Flexible Timing" },
-          ].map((pill) => (
+          {STATUS_TABS.map((pill) => (
             <button
               key={pill.id}
               type="button"
-              className={`provreq-status-tab-btn ${urgencyFilter === pill.id ? "active" : ""}`}
-              onClick={() => handleUrgencyChange(pill.id)}
+              className={`provreq-status-tab-btn ${statusFilter === pill.id ? "active" : ""}`}
+              onClick={() => {
+                setStatusFilter(pill.id);
+                setPage(1);
+              }}
             >
               <span>{pill.label}</span>
+              {counts[pill.id] !== undefined && counts[pill.id] > 0 && (
+                <span className={`provreq-tab-bubble ${statusFilter === pill.id ? "active-bubble" : ""}`}>
+                  {counts[pill.id]}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -253,6 +267,21 @@ export default function ProviderServiceRequests() {
                 <i className="fas fa-times"></i>
               </button>
             )}
+          </div>
+
+          <div className="provreq-sort-dropdown-wrapper">
+            <select
+              value={urgencyFilter}
+              onChange={(e) => handleUrgencyChange(e.target.value)}
+              className="provreq-sort-select-input"
+            >
+              <option value="ALL">All Timings</option>
+              <option value="TODAY">Needed Today</option>
+              <option value="THIS_WEEK">This Week</option>
+              <option value="SPECIFIC_DATE">Specific Date</option>
+              <option value="FLEXIBLE">Flexible Timing</option>
+            </select>
+            <i className="fas fa-chevron-down provreq-sort-chevron"></i>
           </div>
 
           <div className="provreq-sort-dropdown-wrapper">

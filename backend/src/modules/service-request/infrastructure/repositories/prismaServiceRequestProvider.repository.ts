@@ -125,9 +125,9 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
     async findByProviderId(
         providerProfileId: string,
         input?: Omit<GetProviderServiceRequestsInputDto, "userId">
-    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number }> {
+    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts?: Record<string, number> }> {
         await this.syncExpiredRequests();
-        const { page = 1, limit = 10, search, urgency, budgetType, sortBy = "NEWEST" } = input || {};
+        const { page = 1, limit = 10, search, status, urgency, budgetType, sortBy = "NEWEST" } = input || {};
         const skip = (page - 1) * limit;
 
         const matches = await db.orm.public.service_request_providers
@@ -137,7 +137,14 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
         if (matches.length === 0) {
             return {
                 requests: [],
-                total: 0
+                total: 0,
+                counts: {
+                    ALL: 0,
+                    OPEN: 0,
+                    CLOSED: 0,
+                    CANCELLED: 0,
+                    EXPIRED: 0
+                }
             };
         }
 
@@ -178,11 +185,7 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
         );
 
         const validRecords = records.filter(
-            (r): r is NonNullable<typeof r> =>
-                r !== null &&
-                r.status !== "EXPIRED" &&
-                r.status !== "CANCELLED" &&
-                (r.status as string) !== "CLOSED"
+            (r): r is NonNullable<typeof r> => r !== null
         );
 
         let dtos = validRecords.map((record) => {
@@ -208,6 +211,22 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
             dto.my_quotation_id = myQuotation?.id || null;
             return dto;
         });
+
+        const counts: Record<string, number> = {
+            ALL: dtos.length,
+            OPEN: dtos.filter((r) => r.status === "PENDING" || r.status === "ACTIVE").length,
+            CLOSED: dtos.filter((r) => (r.status as string) === "CLOSED").length,
+            CANCELLED: dtos.filter((r) => r.status === "CANCELLED").length,
+            EXPIRED: dtos.filter((r) => r.status === "EXPIRED").length
+        };
+
+        if (status && status !== "ALL") {
+            if (status === "OPEN" || status === "PENDING") {
+                dtos = dtos.filter((r) => r.status === "PENDING" || r.status === "ACTIVE");
+            } else {
+                dtos = dtos.filter((r) => (r.status as string) === status);
+            }
+        }
 
         if (urgency && urgency !== "ALL") {
             dtos = dtos.filter((r) => r.urgency === urgency);
@@ -251,7 +270,8 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
 
         return {
             requests: paginated,
-            total
+            total,
+            counts
         };
     }
 
