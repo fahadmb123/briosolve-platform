@@ -514,15 +514,16 @@ export const SupportTicketsPage: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="clean-tickets-table-card">
-              <div className="clean-table-header">
-                <span>Ticket #</span>
-                <span>Category</span>
-                <span>Subject / Summary</span>
-                <span>Status</span>
-                <span>Date</span>
-                <span>Action</span>
-              </div>
+            <div className="clean-table-responsive">
+              <div className="clean-tickets-table-card">
+                <div className="clean-table-header">
+                  <span>Ticket #</span>
+                  <span>Category</span>
+                  <span>Subject / Summary</span>
+                  <span>Status</span>
+                  <span>Date</span>
+                  <span>Action</span>
+                </div>
 
               <div className="clean-table-body">
                 {tickets.map((t) => (
@@ -562,7 +563,8 @@ export const SupportTicketsPage: React.FC = () => {
                 ))}
               </div>
             </div>
-          )}
+          </div>
+        )}
         </div>
       )}
 
