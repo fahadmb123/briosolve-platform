@@ -164,6 +164,65 @@
   color: #475569;
 }
 
+.bkmismatch-settle-row.fee-input-row {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.bkmismatch-fee-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bkmismatch-fee-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+.bkmismatch-fee-sub {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.bkmismatch-fee-input-box {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 4px 8px;
+  width: 110px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bkmismatch-fee-input-box:focus-within {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.15);
+}
+
+.bkmismatch-fee-currency {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-right: 4px;
+}
+
+.bkmismatch-fee-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #16a34a;
+  text-align: right;
+  font-family: inherit;
+}
+
 .bkmismatch-settle-row strong.fee {
   color: #16a34a;
   font-weight: 700;

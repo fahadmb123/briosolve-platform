@@ -116,6 +116,14 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           </span>
         );
       case "CANCELLED":
+        if (booking.mismatchReport?.status === "ACCEPTED") {
+          return (
+            <span className="bkmodal-badge completed">
+              <i className="fas fa-clipboard-check"></i>
+              <span>Diagnosis Closed</span>
+            </span>
+          );
+        }
         return (
           <span className="bkmodal-badge cancelled">
             <i className="fas fa-ban"></i>

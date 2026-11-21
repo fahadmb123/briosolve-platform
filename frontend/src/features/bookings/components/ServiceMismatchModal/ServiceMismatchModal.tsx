@@ -7,7 +7,7 @@ interface ServiceMismatchModalProps {
   isOpen: boolean;
   booking: BookingItem | null;
   onClose: () => void;
-  onSubmit: (payload: { diagnosis: string; suggestedCategory?: string | null; suggestedCategoryId?: string | null }) => void;
+  onSubmit: (payload: { diagnosis: string; visitFee?: number; suggestedCategory?: string | null; suggestedCategoryId?: string | null }) => void;
   isLoading?: boolean;
 }
 
@@ -21,20 +21,35 @@ export const ServiceMismatchModal: React.FC<ServiceMismatchModalProps> = ({
   const [diagnosis, setDiagnosis] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
+  const qType = String(booking?.quotationType || "").toUpperCase();
+  const isFixed = qType === "FIXED" || (!booking?.requiresInspection && qType !== "INSPECTION_REQUIRED" && qType !== "ESTIMATED");
+  const advanceAmount = isFixed
+    ? (booking?.totalAmount || 0)
+    : (booking?.quoteAmount
+      ? Math.round(Number(booking.quoteAmount) * 1.1)
+      : (booking?.advanceAmount || booking?.totalAmount || 0));
+
+  const defaultVisitFee = Math.min(advanceAmount, 250);
+  const [visitFeeInput, setVisitFeeInput] = useState<number | string>(defaultVisitFee);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setDiagnosis("");
+      setSelectedCategoryId("");
+      setVisitFeeInput(defaultVisitFee);
+    }
+  }, [isOpen, defaultVisitFee]);
+
   const { data: categoriesRes } = useGetCategoriesService({ page: 1, limit: 100, filter: "ACTIVE" });
   const categories = categoriesRes?.data?.categories || [];
 
   if (!isOpen || !booking) return null;
 
-  const isFixed = booking.quotationType === "FIXED";
-  const advanceAmount = isFixed
-    ? booking.totalAmount
-    : (booking.quoteAmount
-      ? Math.round(Number(booking.quoteAmount) * 1.1)
-      : (booking.advanceAmount || booking.totalAmount));
-
-  const visitFee = isFixed ? Math.min(advanceAmount, 250) : advanceAmount;
-  const refundAmount = Math.max(0, advanceAmount - visitFee);
+  const parsedFee = visitFeeInput === "" ? 0 : Number(visitFeeInput);
+  const effectiveVisitFee = isNaN(parsedFee) || parsedFee < 0
+    ? 0
+    : Math.min(advanceAmount, parsedFee);
+  const refundAmount = Math.max(0, advanceAmount - effectiveVisitFee);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +58,7 @@ export const ServiceMismatchModal: React.FC<ServiceMismatchModalProps> = ({
     const matchedCat = categories.find((c) => c.id === selectedCategoryId);
     onSubmit({
       diagnosis: diagnosis.trim(),
+      visitFee: effectiveVisitFee,
       suggestedCategoryId: selectedCategoryId || null,
       suggestedCategory: matchedCat ? matchedCat.name : null
     });
@@ -102,9 +118,35 @@ export const ServiceMismatchModal: React.FC<ServiceMismatchModalProps> = ({
                 <i className="fas fa-hand-holding-usd" />
                 <span>Visit Fee &amp; Settlement Terms</span>
               </div>
-              <div className="bkmismatch-settle-row">
-                <span>Visit &amp; Diagnosis Fee Credited to You:</span>
-                <strong className="fee">₹{visitFee.toLocaleString("en-IN")}</strong>
+              <div className="bkmismatch-settle-row fee-input-row">
+                <div className="bkmismatch-fee-meta">
+                  <label htmlFor="bkmismatch-visit-fee" className="bkmismatch-fee-label">
+                    Visit &amp; Diagnosis Fee Credited to You:
+                  </label>
+                  <span className="bkmismatch-fee-sub">Max ₹{advanceAmount.toLocaleString("en-IN")} (paid deposit)</span>
+                </div>
+                <div className="bkmismatch-fee-input-box">
+                  <span className="bkmismatch-fee-currency">₹</span>
+                  <input
+                    id="bkmismatch-visit-fee"
+                    type="number"
+                    min={0}
+                    max={advanceAmount}
+                    step={1}
+                    className="bkmismatch-fee-input"
+                    value={visitFeeInput}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") {
+                        setVisitFeeInput("");
+                      } else {
+                        const num = Number(val);
+                        setVisitFeeInput(isNaN(num) ? 0 : Math.min(advanceAmount, Math.max(0, num)));
+                      }
+                    }}
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
               <div className="bkmismatch-settle-row">
                 <span>Remaining Deposit Refunded to Customer:</span>

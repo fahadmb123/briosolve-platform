@@ -115,6 +115,14 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           </span>
         );
       case "CANCELLED":
+        if (booking.mismatchReport?.status === "ACCEPTED") {
+          return (
+            <span className="bkcard-badge closed">
+              <i className="fas fa-clipboard-check"></i>
+              <span>Diagnosis Closed</span>
+            </span>
+          );
+        }
         return (
           <span className="bkcard-badge cancelled">
             <i className="fas fa-ban"></i>
@@ -161,18 +169,32 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           {booking.serviceRequestTitle || "Service Requirement"}
         </h3>
 
-        {booking.status === "CANCELLED" && (
-          <div className="bkcard-cancel-reason-pill">
-            <i className="fas fa-ban"></i>
+        {booking.mismatchReport?.status === "ACCEPTED" ? (
+          <div className="bkcard-diagnosis-pill">
+            <i className="fas fa-stethoscope"></i>
             <div className="bkcard-cancel-info">
-              <span className="bkcard-cancel-author">
-                Cancelled by <strong>{cancellationAuthor ? (cancellationAuthor.toLowerCase() === "customer" ? "Customer" : `Provider (${cancellationAuthor})`) : "System"}</strong>
+              <span className="bkcard-diagnosis-title">
+                Closed via Diagnosis Agreement <strong>(Exempt from Cancellation Limits)</strong>
               </span>
-              {cancellationReason && (
-                <span className="bkcard-cancel-reason-text">Reason: "{cancellationReason}"</span>
-              )}
+              <span className="bkcard-diagnosis-desc">
+                Technician diagnosis accepted: "{booking.mismatchReport.diagnosis}". Visit fee of ₹{booking.mismatchReport.visitFee} settled and ₹{booking.mismatchReport.refundAmount} refunded.
+              </span>
             </div>
           </div>
+        ) : (
+          booking.status === "CANCELLED" && (
+            <div className="bkcard-cancel-reason-pill">
+              <i className="fas fa-ban"></i>
+              <div className="bkcard-cancel-info">
+                <span className="bkcard-cancel-author">
+                  Cancelled by <strong>{cancellationAuthor ? (cancellationAuthor.toLowerCase() === "customer" ? "Customer" : `Provider (${cancellationAuthor})`) : "System"}</strong>
+                </span>
+                {cancellationReason && (
+                  <span className="bkcard-cancel-reason-text">Reason: "{cancellationReason}"</span>
+                )}
+              </div>
+            </div>
+          )
         )}
 
         <div className="bkcard-meta-row">

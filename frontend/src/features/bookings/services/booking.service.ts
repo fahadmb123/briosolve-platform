@@ -41,7 +41,7 @@ export const updateBookingStatus = async (
 
 export const reportBookingMismatch = async (
   id: string,
-  payload: { diagnosis: string; suggestedCategory?: string | null; suggestedCategoryId?: string | null }
+  payload: { diagnosis: string; visitFee?: number; suggestedCategory?: string | null; suggestedCategoryId?: string | null }
 ): Promise<response<BookingItem>> => {
   const res = await apiClient.post<response<BookingItem>>(`/api/booking/${id}/mismatch-report`, payload);
   return res.data;

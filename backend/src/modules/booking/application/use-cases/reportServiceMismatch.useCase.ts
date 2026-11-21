@@ -35,7 +35,8 @@ export class ReportServiceMismatchUseCase implements IUseCase<ReportServiceMisma
             throw new ApplicationError("DIAGNOSIS_REQUIRED", "Please provide a detailed diagnosis of the issue found on site", "VALIDATION");
         }
 
-        const isFixed = details.quotationType === "FIXED";
+        const qType = String(details.quotationType || "").toUpperCase();
+        const isFixed = qType === "FIXED" || (!details.requiresInspection && qType !== "INSPECTION_REQUIRED" && qType !== "ESTIMATED");
         const advanceAmount = isFixed
             ? Number(details.booking.total_amount || 0)
             : (details.quoteAmount
@@ -44,7 +45,11 @@ export class ReportServiceMismatchUseCase implements IUseCase<ReportServiceMisma
                     ? Number(details.booking.advance_amount)
                     : Number(details.booking.total_amount || 0)));
 
-        const visitFee = isFixed ? Math.min(advanceAmount, 250) : advanceAmount;
+        const defaultVisitFee = Math.min(advanceAmount, 250);
+        let visitFee = defaultVisitFee;
+        if (typeof input.visitFee === "number" && !isNaN(input.visitFee) && input.visitFee >= 0) {
+            visitFee = Math.min(advanceAmount, Math.round(input.visitFee));
+        }
         const refundAmount = Math.max(0, advanceAmount - visitFee);
 
         const mismatchReport: MismatchReport = {

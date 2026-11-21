@@ -177,6 +177,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
   const handleReportMismatchSubmit = (payload: {
     diagnosis: string;
+    visitFee?: number;
     suggestedCategory?: string | null;
     suggestedCategoryId?: string | null;
   }) => {

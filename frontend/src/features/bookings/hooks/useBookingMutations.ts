@@ -60,7 +60,7 @@ export const useUpdateBookingStatus = () => {
 export const useReportBookingMismatch = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: { diagnosis: string; suggestedCategory?: string | null; suggestedCategoryId?: string | null } }) =>
+    mutationFn: ({ id, payload }: { id: string; payload: { diagnosis: string; visitFee?: number; suggestedCategory?: string | null; suggestedCategoryId?: string | null } }) =>
       reportBookingMismatch(id, payload),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["customerBookings"] });

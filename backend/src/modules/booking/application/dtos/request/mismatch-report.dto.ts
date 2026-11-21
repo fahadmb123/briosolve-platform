@@ -2,6 +2,7 @@ export interface ReportServiceMismatchInputDto {
     bookingId: string;
     providerUserId: string;
     diagnosis: string;
+    visitFee?: number;
     suggestedCategory?: string | null;
     suggestedCategoryId?: string | null;
 }

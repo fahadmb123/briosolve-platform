@@ -106,12 +106,13 @@ export class BookingController extends BaseController {
         try {
             const providerUserId = req.user?.userId;
             const bookingId = req.params.id as string;
-            const { diagnosis, suggestedCategory, suggestedCategoryId } = req.body;
+            const { diagnosis, suggestedCategory, suggestedCategoryId, visitFee } = req.body;
 
             const response = await this._reportServiceMismatchUseCase.execute({
                 bookingId,
                 providerUserId: providerUserId!,
                 diagnosis,
+                visitFee: typeof visitFee === "number" ? visitFee : (visitFee ? Number(visitFee) : undefined),
                 suggestedCategory,
                 suggestedCategoryId
             });
