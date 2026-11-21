@@ -130,8 +130,8 @@ export class BookingMapper {
         orderId?: string | null;
         notes?: string | null;
     }): CreateBookingRepoDto {
-        const baseAmount = data.amount ?? (data.totalAmount ? Math.round(data.totalAmount / 1.1) : 0);
-        const platformFee = data.platformFee ?? Math.round(baseAmount * 0.1);
+        const baseAmount = data.amount ?? (data.totalAmount ? Math.round(data.totalAmount / 1.05) : 0);
+        const platformFee = data.platformFee ?? Math.round(baseAmount * 0.05);
         const totalAmount = data.totalAmount ?? (baseAmount + platformFee);
         const advanceAmount = Math.round(totalAmount * 0.3);
 
@@ -266,7 +266,7 @@ export class BookingMapper {
         const resolvedAdvance = isFixed
             ? entity.total_amount
             : (details?.quoteAmount
-                ? Math.round(Number(details.quoteAmount) * 1.1)
+                ? Math.round(Number(details.quoteAmount) * 1.05)
                 : (entity.advance_amount && entity.advance_amount > 0 ? entity.advance_amount : entity.total_amount));
 
         const resolvedRemaining = isFixed
@@ -419,7 +419,7 @@ export class BookingMapper {
         }
         if (data.totalAmount !== undefined) {
             payload.total_amount = data.totalAmount.toString();
-            payload.platform_fee = Math.round(data.totalAmount * 0.1).toString();
+            payload.platform_fee = Math.round(data.totalAmount * (0.05 / 1.05)).toString();
         }
         if (data.notes !== undefined) {
             payload.notes = data.notes;

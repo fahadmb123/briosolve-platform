@@ -26,7 +26,7 @@ export const ServiceMismatchModal: React.FC<ServiceMismatchModalProps> = ({
   const advanceAmount = isFixed
     ? (booking?.totalAmount || 0)
     : (booking?.quoteAmount
-      ? Math.round(Number(booking.quoteAmount) * 1.1)
+      ? Math.round(Number(booking.quoteAmount) * 1.05)
       : (booking?.advanceAmount || booking?.totalAmount || 0));
 
   const defaultVisitFee = Math.min(advanceAmount, 250);

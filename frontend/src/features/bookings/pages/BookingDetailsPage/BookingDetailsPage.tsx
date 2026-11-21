@@ -50,7 +50,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
       if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
         try {
           activeRazorpayRef.current.close();
-        } catch {}
+        } catch { }
         activeRazorpayRef.current = null;
       }
       resetRazorpay();
@@ -238,12 +238,12 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         if (rzp && typeof rzp.close === "function") {
           try {
             rzp.close();
-          } catch {}
+          } catch { }
         }
         if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
           try {
             activeRazorpayRef.current.close();
-          } catch {}
+          } catch { }
           activeRazorpayRef.current = null;
         }
         resetRazorpay();
@@ -403,7 +403,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED" || item.status === "CLOSED");
           if (cancelItem?.authorName) return cancelItem.authorName;
         }
-      } catch {}
+      } catch { }
     }
     return null;
   }, [booking, timelineItems]);
@@ -696,8 +696,10 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const remainingAmount = isFinalConfirmed
     ? (booking.remainingAmount ?? Math.max(0, totalAmount - advanceAmount))
     : 0;
-  const platformFee = booking.platformFee || Math.round((totalAmount / 1.1) * 0.1);
+  const platformFee = booking.platformFee || Math.round((totalAmount / 1.05) * 0.05);
   const baseAmount = Math.max(0, totalAmount - platformFee);
+  const providerCommission = Math.round(baseAmount * 0.05);
+  const providerEarnings = Math.max(0, baseAmount - providerCommission);
 
   const isAdvancePaid = booking.paymentStatus === "ADVANCE_PAID";
   const isFullyPaid = booking.paymentStatus === "PAID";
@@ -1402,15 +1404,14 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <h3 className="bkdet-billing-title">Payment & Billing</h3>
               </div>
               <span
-                className={`bkdet-billing-pill ${
-                  isCancelled || booking.paymentStatus === "REFUNDED"
-                    ? "refunded"
-                    : isFullyPaid || isFixedQuote
-                      ? "paid"
-                      : isAdvancePaid
-                        ? "advance"
-                        : "pending"
-                }`}
+                className={`bkdet-billing-pill ${isCancelled || booking.paymentStatus === "REFUNDED"
+                  ? "refunded"
+                  : isFullyPaid || isFixedQuote
+                    ? "paid"
+                    : isAdvancePaid
+                      ? "advance"
+                      : "pending"
+                  }`}
               >
                 {isMismatchAccepted
                   ? "Visit Fee Settled"
@@ -1471,36 +1472,63 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             )}
 
             <div className="bkdet-billing-breakdown">
-              <div className="bkdet-billing-row">
-                <span>
-                  {isFixedQuote
-                    ? "Base Service Quote"
-                    : (isPaymentPending || isCompleted)
-                      ? "Confirmed Service Amount"
-                      : isInspectionQuote
-                        ? "Inspection / Visit Fee"
-                        : "Initial Base Quote"}
-                </span>
-                <span>{formatCurrency(baseAmount)}</span>
-              </div>
-              <div className="bkdet-billing-row">
-                <span>Platform Fee (10%)</span>
-                <span>+{formatCurrency(platformFee)}</span>
-              </div>
-              <div className="bkdet-billing-row total">
-                <span>
-                  {isFixedQuote
-                    ? "Total Amount Paid"
-                    : (isPaymentPending || isCompleted)
-                      ? "Total Confirmed Amount"
-                      : isInspectionQuote
-                        ? "Inspection Total Paid"
-                        : "Total Advance Paid"}
-                </span>
-                <strong>
-                  {formatCurrency((isPaymentPending || isCompleted || isFixedQuote) ? totalAmount : advanceAmount)}
-                </strong>
-              </div>
+              {isProvider ? (
+                <>
+                  <div className="bkdet-billing-row">
+                    <span>
+                      {isFixedQuote
+                        ? "Service Quote"
+                        : (isPaymentPending || isCompleted)
+                          ? "Confirmed Service Amount"
+                          : isInspectionQuote
+                            ? "Inspection / Visit Fee"
+                            : "Initial Base Quote"}
+                    </span>
+                    <span>{formatCurrency(baseAmount)}</span>
+                  </div>
+                  <div className="bkdet-billing-row">
+                    <span>Platform Commission (5%)</span>
+                    <span>-{formatCurrency(providerCommission)}</span>
+                  </div>
+                  <div className="bkdet-billing-row total">
+                    <span>Take-Home Earnings</span>
+                    <strong>{formatCurrency(providerEarnings)}</strong>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="bkdet-billing-row">
+                    <span>
+                      {isFixedQuote
+                        ? "Base Service Quote"
+                        : (isPaymentPending || isCompleted)
+                          ? "Confirmed Service Amount"
+                          : isInspectionQuote
+                            ? "Inspection / Visit Fee"
+                            : "Initial Base Quote"}
+                    </span>
+                    <span>{formatCurrency(baseAmount)}</span>
+                  </div>
+                  <div className="bkdet-billing-row">
+                    <span>Platform & Escrow Fee (5%)</span>
+                    <span>+{formatCurrency(platformFee)}</span>
+                  </div>
+                  <div className="bkdet-billing-row total">
+                    <span>
+                      {isFixedQuote
+                        ? "Total Amount Paid"
+                        : (isPaymentPending || isCompleted)
+                          ? "Total Confirmed Amount"
+                          : isInspectionQuote
+                            ? "Inspection Total Paid"
+                            : "Total Advance Paid"}
+                    </span>
+                    <strong>
+                      {formatCurrency((isPaymentPending || isCompleted || isFixedQuote) ? totalAmount : advanceAmount)}
+                    </strong>
+                  </div>
+                </>
+              )}
 
               {!isFixedQuote && (
                 <>

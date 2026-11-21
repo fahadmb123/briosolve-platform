@@ -40,7 +40,7 @@ export class CreatePaymentOrderUseCase implements IUseCase<CreatePaymentOrderInp
         }
 
         const baseAmount = Number(quotation.amount);
-        const platformFee = Math.round(baseAmount * 0.1);
+        const platformFee = Math.round(baseAmount * 0.05);
         const totalAmount = baseAmount + platformFee;
         const amountInPaise = Math.round(totalAmount * 100);
 

@@ -170,7 +170,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                     state: {
                       serviceRequestId: requestId,
                       quotationId: quoteCancelled.id,
-                      amount: Math.round(quoteCancelled.amount * 1.1),
+                      amount: Math.round(quoteCancelled.amount * 1.05),
                       providerName: quoteCancelled.provider.name,
                       providerBusinessName: quoteCancelled.provider.businessName,
                       requestItem: requestItem || null
@@ -206,7 +206,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
               handler: (paymentResponse: any) => {
                 cleanupRazorpayModal();
                 const quoteAccepted = confirmAcceptQuote;
-                const totalPaidAmount = Math.round(quoteAccepted.amount * 1.1);
+                const totalPaidAmount = Math.round(quoteAccepted.amount * 1.05);
 
                 verifyPaymentMutation.mutate(
                   {
@@ -797,14 +797,14 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                   <span>₹{confirmAcceptQuote.amount.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="reqquotes-pay-row">
-                  <span>Platform Fee (10%)</span>
-                  <span>+₹{Math.round(confirmAcceptQuote.amount * 0.1).toLocaleString("en-IN")}</span>
+                  <span>Platform Fee (5%)</span>
+                  <span>+₹{Math.round(confirmAcceptQuote.amount * 0.05).toLocaleString("en-IN")}</span>
                 </div>
                 <div className="reqquotes-pay-divider" />
                 <div className="reqquotes-pay-row total">
                   <span>Total Payable Amount</span>
                   <span className="reqquotes-pay-total-val">
-                    ₹{Math.round(confirmAcceptQuote.amount * 1.1).toLocaleString("en-IN")}
+                    ₹{Math.round(confirmAcceptQuote.amount * 1.05).toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
@@ -855,7 +855,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 ) : (
                   <>
                     <i className="fas fa-lock"></i>
-                    <span>Pay ₹{Math.round(confirmAcceptQuote.amount * 1.1).toLocaleString("en-IN")} with Razorpay</span>
+                    <span>Pay ₹{Math.round(confirmAcceptQuote.amount * 1.05).toLocaleString("en-IN")} with Razorpay</span>
                   </>
                 )}
               </button>

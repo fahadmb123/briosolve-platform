@@ -201,14 +201,20 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
                 const profile = await this._providerRepository.findById(details.booking.provider_id);
                 if (profile && profile.user_id) {
                     const finalTotal = resolvedTotalAmount || details.booking.total_amount;
-                    const earnings = Math.max(0, finalTotal - (details.booking.platform_fee || 0));
+                    const baseAmount = details.quoteAmount
+                        ? Number(details.quoteAmount)
+                        : (details.booking.platform_fee && details.booking.platform_fee > 0
+                            ? Math.max(0, finalTotal - details.booking.platform_fee)
+                            : Math.round(finalTotal / 1.05));
+                    const providerCommission = Math.round(baseAmount * 0.05);
+                    const earnings = Math.max(0, baseAmount - providerCommission);
                     if (earnings > 0) {
                         await this._creditWalletUseCase.execute({
                             userId: profile.user_id,
                             amount: earnings,
                             category: "EARNINGS",
                             bookingId: details.booking.id,
-                            description: `Earnings for completed booking #${details.booking.booking_number}`,
+                            description: `Earnings for completed booking #${details.booking.booking_number} (net of 5% platform commission)`,
                             referenceId: details.booking.booking_number
                         }).catch(() => null);
                     }

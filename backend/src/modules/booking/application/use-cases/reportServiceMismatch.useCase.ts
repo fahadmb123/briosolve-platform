@@ -40,7 +40,7 @@ export class ReportServiceMismatchUseCase implements IUseCase<ReportServiceMisma
         const advanceAmount = isFixed
             ? Number(details.booking.total_amount || 0)
             : (details.quoteAmount
-                ? Math.round(Number(details.quoteAmount) * 1.1)
+                ? Math.round(Number(details.quoteAmount) * 1.05)
                 : (details.booking.advance_amount && details.booking.advance_amount > 0
                     ? Number(details.booking.advance_amount)
                     : Number(details.booking.total_amount || 0)));

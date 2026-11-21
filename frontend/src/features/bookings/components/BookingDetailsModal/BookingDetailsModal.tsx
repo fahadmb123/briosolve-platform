@@ -264,18 +264,37 @@ export const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
             </h4>
 
             <div className="bkmodal-pricing-box">
-              <div className="bkmodal-price-row">
-                <span>Agreed Service Amount</span>
-                <span>₹{(booking.totalAmount - booking.platformFee).toLocaleString("en-IN")}</span>
-              </div>
-              <div className="bkmodal-price-row">
-                <span>Platform Assurance & Escrow Fee</span>
-                <span>₹{booking.platformFee.toLocaleString("en-IN")}</span>
-              </div>
-              <div className="bkmodal-price-row total">
-                <span>Total Paid & Escrow Secured</span>
-                <span>₹{booking.totalAmount.toLocaleString("en-IN")}</span>
-              </div>
+              {role === "PROVIDER" ? (
+                <>
+                  <div className="bkmodal-price-row">
+                    <span>Agreed Service Amount</span>
+                    <span>₹{Math.max(0, booking.totalAmount - booking.platformFee).toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bkmodal-price-row">
+                    <span>Platform Commission (5%)</span>
+                    <span>-₹{Math.round(Math.max(0, booking.totalAmount - booking.platformFee) * 0.05).toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bkmodal-price-row total">
+                    <span>Take-Home Earnings</span>
+                    <span>₹{Math.max(0, Math.max(0, booking.totalAmount - booking.platformFee) - Math.round(Math.max(0, booking.totalAmount - booking.platformFee) * 0.05)).toLocaleString("en-IN")}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="bkmodal-price-row">
+                    <span>Agreed Service Amount</span>
+                    <span>₹{(booking.totalAmount - booking.platformFee).toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bkmodal-price-row">
+                    <span>Platform Assurance & Escrow Fee (5%)</span>
+                    <span>₹{booking.platformFee.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bkmodal-price-row total">
+                    <span>Total Paid & Escrow Secured</span>
+                    <span>₹{booking.totalAmount.toLocaleString("en-IN")}</span>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="bkmodal-meta-grid">
