@@ -124,6 +124,7 @@ export class BookingMapper {
         totalAmount?: number;
         amount?: number;
         platformFee?: number;
+        advanceAmount?: number;
         scheduledDate?: Date | string | null;
         scheduledTime?: string | null;
         paymentId?: string | null;
@@ -133,7 +134,7 @@ export class BookingMapper {
         const baseAmount = data.amount ?? (data.totalAmount ? Math.round(data.totalAmount / 1.05) : 0);
         const platformFee = data.platformFee ?? Math.round(baseAmount * 0.05);
         const totalAmount = data.totalAmount ?? (baseAmount + platformFee);
-        const advanceAmount = Math.round(totalAmount * 0.3);
+        const advanceAmount = data.advanceAmount !== undefined ? data.advanceAmount : totalAmount;
 
         const dateSuffix = Date.now().toString(36).toUpperCase();
         const randomPart = Math.floor(1000 + Math.random() * 9000);
@@ -265,9 +266,11 @@ export class BookingMapper {
 
         const resolvedAdvance = isFixed
             ? entity.total_amount
-            : (details?.quoteAmount
-                ? Math.round(Number(details.quoteAmount) * 1.05)
-                : (entity.advance_amount && entity.advance_amount > 0 ? entity.advance_amount : entity.total_amount));
+            : (entity.advance_amount && entity.advance_amount > 0
+                ? entity.advance_amount
+                : (details?.quoteAmount
+                    ? Math.round(Number(details.quoteAmount) * 1.05)
+                    : entity.total_amount));
 
         const resolvedRemaining = isFixed
             ? 0
