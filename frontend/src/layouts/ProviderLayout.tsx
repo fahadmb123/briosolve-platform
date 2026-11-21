@@ -31,6 +31,8 @@ export default function ProviderLayout() {
     location.pathname.startsWith("/provider/requests") ||
     location.pathname.startsWith("/provider/bookings") ||
     location.pathname.startsWith("/provider/messages") ||
+    location.pathname.startsWith("/provider/support") ||
+    location.pathname.startsWith("/provider/tickets") ||
     location.pathname.startsWith("/provider/chat");
 
   const isFinancesSection =

@@ -12,7 +12,8 @@ import {
   ProviderMyQuotations,
   ProviderBookings,
   ProviderBookingDetails,
-  ProviderWallet
+  ProviderWallet,
+  ProviderSupport
 } from '../lazy/provider.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
 import RoleRoute from '../guards/RoleRoute';
@@ -39,6 +40,8 @@ export const providerRoutes = (
       <Route path="verification" element={<Navigate to="/provider/kyc" replace />} />
       <Route path="settings" element={<ProviderSettings />} />
       <Route path="notifications" element={<ProviderNotifications />} />
+      <Route path="support" element={<ProviderSupport />} />
+      <Route path="tickets" element={<ProviderSupport />} />
     </Route>
   </Route>
   </>

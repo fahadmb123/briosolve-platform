@@ -9,6 +9,7 @@ import {
 } from "../../hooks/useBookingMutations";
 import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
 import { BookingStatusModal, ServiceMismatchModal } from "../../components";
+import { RaiseDisputeModal } from "../../../support";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
 import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
@@ -42,6 +43,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const [statusModalBooking, setStatusModalBooking] = useState<BookingItem | null>(null);
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
   const [isMismatchModalOpen, setIsMismatchModalOpen] = useState(false);
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const activeRazorpayRef = useRef<any>(null);
 
@@ -820,6 +822,15 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           <button type="button" className="bkdet-action-btn outline" onClick={handleChat}>
             <i className="fas fa-comment-dots" />
             <span>Chat</span>
+          </button>
+          <button
+            type="button"
+            className="bkdet-action-btn outline"
+            onClick={() => setIsDisputeModalOpen(true)}
+            title="Report an issue or concern regarding this booking"
+          >
+            <i className="fas fa-life-ring" />
+            <span>Need Help?</span>
           </button>
 
           {isProvider && isConfirmed && (
@@ -1649,6 +1660,27 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           onClose={() => setIsMismatchModalOpen(false)}
           onSubmit={handleReportMismatchSubmit}
           isLoading={reportMismatchMutation.isPending}
+        />
+      )}
+
+      {booking && (
+        <RaiseDisputeModal
+          isOpen={isDisputeModalOpen}
+          onClose={() => setIsDisputeModalOpen(false)}
+          booking={{
+            id: booking.id,
+            bookingNumber: booking.bookingNumber,
+            serviceRequestTitle: booking.serviceRequestTitle || undefined,
+            totalAmount: booking.totalAmount,
+            advanceAmount: booking.advanceAmount,
+            providerName: booking.providerName || undefined,
+            customerName: booking.customerName || undefined
+          }}
+          role={isProvider ? "PROVIDER" : "CUSTOMER"}
+          onSubmitConcern={() => {
+            toast.success("Concern submitted successfully. Our resolution team will review it.");
+            navigate(isProvider ? "/provider/support" : "/support");
+          }}
         />
       )}
     </div>

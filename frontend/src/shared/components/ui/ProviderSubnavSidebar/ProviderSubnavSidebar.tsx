@@ -31,6 +31,11 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/provider/messages",
     icon: "fas fa-comments",
   },
+  {
+    label: "Support Tickets",
+    to: "/provider/support",
+    icon: "fas fa-life-ring",
+  },
 ];
 
 const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
@@ -100,6 +105,8 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/provider/requests") ||
     location.pathname.startsWith("/provider/messages") ||
     location.pathname.startsWith("/provider/bookings") ||
+    location.pathname.startsWith("/provider/support") ||
+    location.pathname.startsWith("/provider/tickets") ||
     location.pathname.startsWith("/provider/chat");
 
   const activeSubnavItems = isSettingsSection
