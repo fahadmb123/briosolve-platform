@@ -53,12 +53,20 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   });
 
   const quotations: RequestQuotationItem[] = responseData?.data?.quotations || [];
+  const isQuoteExpired = (q: RequestQuotationItem) => {
+    if (q.status === "EXPIRED") return true;
+    if (q.status === "PENDING" && q.validUntilDate) {
+      return new Date(q.validUntilDate).getTime() < Date.now();
+    }
+    return false;
+  };
+
   const activeQuotations = useMemo(
-    () => quotations.filter((q) => q.status === "PENDING" || q.status === "ACCEPTED"),
+    () => quotations.filter((q) => (q.status === "PENDING" && !isQuoteExpired(q)) || q.status === "ACCEPTED"),
     [quotations]
   );
   const pastQuotations = useMemo(
-    () => quotations.filter((q) => q.status === "WITHDRAWN" || q.status === "REJECTED" || q.status === "EXPIRED"),
+    () => quotations.filter((q) => q.status === "WITHDRAWN" || q.status === "REJECTED" || isQuoteExpired(q)),
     [quotations]
   );
   const acceptedQuoteId = responseData?.data?.acceptedQuotationId;
@@ -611,7 +619,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 const typeConfig = getTypeLabel(quote.quotationType);
                 const isWithdrawn = quote.status === "WITHDRAWN";
                 const isRejected = quote.status === "REJECTED";
-                const isExpired = quote.status === "EXPIRED";
+                const isExpired = isQuoteExpired(quote);
                 const cancelReason = isWithdrawn
                   ? requestItem?.latest_booking?.cancellation_reason
                   : null;
