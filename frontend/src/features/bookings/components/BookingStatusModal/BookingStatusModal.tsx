@@ -55,6 +55,12 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   const finalTotal = advancePaid + safeRemaining;
   const willCompleteDirectly = targetStatus === "PAYMENT_PENDING" && !isFixed && safeRemaining === 0;
 
+  const customerPlatformFee = booking.platformFee || Math.round((advancePaid / 1.05) * 0.05);
+  const baseQuoteAmount = booking.quoteAmount ? Number(booking.quoteAmount) : Math.max(0, advancePaid - customerPlatformFee);
+  const totalServiceCost = isFixed ? baseQuoteAmount : (baseQuoteAmount + safeRemaining);
+  const providerCommission = Math.round(totalServiceCost * 0.05);
+  const providerEarnings = Math.max(0, totalServiceCost - providerCommission);
+
   const isCancellation = targetStatus === "CANCELLED";
   const isProviderCancellation = isCancellation && role === "PROVIDER";
   const isCustomerCancellation = isCancellation && role === "CUSTOMER";
@@ -477,6 +483,25 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
                 <span className="bkstatus-fq-note">
                   This booking was accepted under a fixed price quotation. The total price is agreed and locked.
                 </span>
+
+                <div className="bksettle-earnings-box">
+                  <div className="bksettle-earnings-header">
+                    <i className="fas fa-wallet"></i>
+                    <span>Provider Payout Breakdown</span>
+                  </div>
+                  <div className="bksettle-earnings-row">
+                    <span>Base Service Quote</span>
+                    <span>₹{baseQuoteAmount.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bksettle-earnings-row fee">
+                    <span>(-) Platform Commission (5%)</span>
+                    <span>-₹{providerCommission.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bksettle-earnings-row total">
+                    <span>(=) Your Net Wallet Payout</span>
+                    <strong>₹{providerEarnings.toLocaleString("en-IN")}</strong>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="bksettle-card">
@@ -533,14 +558,43 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
 
                 <div className="bksettle-summary">
                   <div className="bksettle-summary-row">
-                    <span>Total Service Cost</span>
-                    <strong>₹{finalTotal.toLocaleString("en-IN")}</strong>
+                    <span>Base Service Quote</span>
+                    <strong>₹{baseQuoteAmount.toLocaleString("en-IN")}</strong>
+                  </div>
+                  {safeRemaining > 0 && (
+                    <div className="bksettle-summary-row">
+                      <span>(+) Additional Charges</span>
+                      <strong style={{ color: "#ea580c" }}>+₹{safeRemaining.toLocaleString("en-IN")}</strong>
+                    </div>
+                  )}
+                  <div className="bksettle-summary-row">
+                    <span>Total Service Value</span>
+                    <strong>₹{totalServiceCost.toLocaleString("en-IN")}</strong>
                   </div>
                   <div className="bksettle-summary-row due">
-                    <span>Remaining Balance Due</span>
+                    <span>Remaining Balance Due from Customer</span>
                     <strong className={safeRemaining > 0 ? "has-balance" : "no-balance"}>
                       {safeRemaining > 0 ? `₹${safeRemaining.toLocaleString("en-IN")}` : "₹0 (Fully Paid)"}
                     </strong>
+                  </div>
+                </div>
+
+                <div className="bksettle-earnings-box">
+                  <div className="bksettle-earnings-header">
+                    <i className="fas fa-wallet"></i>
+                    <span>Provider Payout Breakdown</span>
+                  </div>
+                  <div className="bksettle-earnings-row">
+                    <span>Total Service Work</span>
+                    <span>₹{totalServiceCost.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bksettle-earnings-row fee">
+                    <span>(-) Platform Commission (5%)</span>
+                    <span>-₹{providerCommission.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bksettle-earnings-row total">
+                    <span>(=) Your Net Wallet Payout</span>
+                    <strong>₹{providerEarnings.toLocaleString("en-IN")}</strong>
                   </div>
                 </div>
               </div>

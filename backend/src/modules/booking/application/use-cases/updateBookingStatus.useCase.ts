@@ -201,10 +201,11 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
                 const profile = await this._providerRepository.findById(details.booking.provider_id);
                 if (profile && profile.user_id) {
                     const finalTotal = resolvedTotalAmount || details.booking.total_amount;
-                    const baseAmount = details.quoteAmount
-                        ? Number(details.quoteAmount)
-                        : (details.booking.platform_fee && details.booking.platform_fee > 0
-                            ? Math.max(0, finalTotal - details.booking.platform_fee)
+                    const customerPlatformFee = Number(details.booking.platform_fee || 0);
+                    const baseAmount = customerPlatformFee > 0
+                        ? Math.max(0, finalTotal - customerPlatformFee)
+                        : (details.quoteAmount && finalTotal <= Number(details.quoteAmount) * 1.06
+                            ? Number(details.quoteAmount)
                             : Math.round(finalTotal / 1.05));
                     const providerCommission = Math.round(baseAmount * 0.05);
                     const earnings = Math.max(0, baseAmount - providerCommission);
