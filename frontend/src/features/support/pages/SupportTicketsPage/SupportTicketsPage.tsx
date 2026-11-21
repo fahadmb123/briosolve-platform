@@ -337,52 +337,6 @@ export const SupportTicketsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="spt-kpi-grid">
-        <div className="spt-kpi-card">
-          <div className="spt-kpi-top">
-            <span className="spt-kpi-label">Total Tickets</span>
-            <div className="spt-kpi-icon default">
-              <i className="fas fa-ticket-alt"></i>
-            </div>
-          </div>
-          <div className="spt-kpi-value">{counts.all}</div>
-          <span className="spt-kpi-hint">All inquiries logged</span>
-        </div>
-
-        <div className="spt-kpi-card">
-          <div className="spt-kpi-top">
-            <span className="spt-kpi-label">Active / Under Review</span>
-            <div className="spt-kpi-icon warning">
-              <i className="fas fa-hourglass-half"></i>
-            </div>
-          </div>
-          <div className="spt-kpi-value">{counts.open + counts.reviewing}</div>
-          <span className="spt-kpi-hint">Awaiting platform action</span>
-        </div>
-
-        <div className="spt-kpi-card">
-          <div className="spt-kpi-top">
-            <span className="spt-kpi-label">Escrow Security</span>
-            <div className="spt-kpi-icon info">
-              <i className="fas fa-shield-alt"></i>
-            </div>
-          </div>
-          <div className="spt-kpi-value">100%</div>
-          <span className="spt-kpi-hint">Funds frozen during disputes</span>
-        </div>
-
-        <div className="spt-kpi-card">
-          <div className="spt-kpi-top">
-            <span className="spt-kpi-label">Resolved Cases</span>
-            <div className="spt-kpi-icon success">
-              <i className="fas fa-check-circle"></i>
-            </div>
-          </div>
-          <div className="spt-kpi-value">{counts.resolved}</div>
-          <span className="spt-kpi-hint">Settled and closed</span>
-        </div>
-      </div>
-
       {activeView === "CREATE" ? (
         <div className="spt-creation-container">
           <div className="spt-creation-header">
