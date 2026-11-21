@@ -328,6 +328,8 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         return { label: "Payment Pending", icon: "fas fa-file-invoice-dollar", variant: "warning" };
       case "COMPLETED":
         return { label: "Completed", icon: "fas fa-award", variant: "completed" };
+      case "CLOSED":
+        return { label: "Diagnosis Closed", icon: "fas fa-stethoscope", variant: "completed" };
       case "CANCELLED":
         return { label: "Cancelled", icon: "fas fa-ban", variant: "cancelled" };
       default:
@@ -369,7 +371,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const cancellationReason = useMemo<string | null>(() => {
     if (!booking) return null;
     if (timelineItems.length > 0) {
-      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED");
+      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED" || item.status === "CLOSED");
       if (cancelItem?.note && cancelItem.note.trim()) {
         return cancelItem.note.trim();
       }
@@ -378,7 +380,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
       try {
         const parsed = JSON.parse(booking.notes);
         if (Array.isArray(parsed)) {
-          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED" || item.status === "CLOSED");
           if (cancelItem?.note && cancelItem.note.trim()) return cancelItem.note.trim();
         }
       } catch {
@@ -391,14 +393,14 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const cancellationAuthor = useMemo<string | null>(() => {
     if (!booking) return null;
     if (timelineItems.length > 0) {
-      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED");
+      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED" || item.status === "CLOSED");
       if (cancelItem?.authorName) return cancelItem.authorName;
     }
     if (booking.notes && booking.notes.trim()) {
       try {
         const parsed = JSON.parse(booking.notes);
         if (Array.isArray(parsed)) {
-          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED" || item.status === "CLOSED");
           if (cancelItem?.authorName) return cancelItem.authorName;
         }
       } catch {}
@@ -677,7 +679,12 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const isPaymentPending = booking.status === "PAYMENT_PENDING";
   const isCompleted = booking.status === "COMPLETED";
   const isCancelled = booking.status === "CANCELLED";
-  const isMismatchAccepted = booking.mismatchReport?.status === "ACCEPTED";
+  const isClosed = booking.status === "CLOSED";
+  const isMismatchAccepted =
+    booking.mismatchReport?.status === "ACCEPTED" ||
+    isClosed ||
+    (cancellationReason?.toLowerCase().includes("diagnosis accepted") ?? false) ||
+    (cancellationAuthor?.toLowerCase().includes("diagnosis") ?? false);
 
   const totalAmount = booking.totalAmount || 0;
   const advanceAmount = booking.advanceAmount || totalAmount;
@@ -1060,7 +1067,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             <div>
               <div className="bkdet-cb-author-badge">
                 <i className="fas fa-user-times" />
-                Cancelled by: <strong>{cancellationAuthor ? (isCancelledByCustomer ? "Customer" : `Provider (${cancellationAuthor})`) : "System"}</strong>
+                Cancelled by: <strong>{cancellationAuthor ? (isCancelledByCustomer ? "Customer" : cancellationAuthor.toLowerCase().includes("provider") ? "Provider" : cancellationAuthor) : "System"}</strong>
               </div>
               <h4 className="bkdet-cb-title">
                 Booking Cancelled Before Service Dispatch

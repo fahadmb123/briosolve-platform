@@ -196,6 +196,13 @@ export default function SubmitQuotation() {
           icon: "fa-calendar-times"
         };
       }
+      if (request?.status === "CLOSED") {
+        return {
+          title: "Service Request Closed",
+          desc: "This service request was closed via on-site diagnosis agreement. Quotations cannot be modified.",
+          icon: "fa-lock"
+        };
+      }
       if (request?.status === "CANCELLED") {
         return {
           title: "Service Request Cancelled",
@@ -239,6 +246,13 @@ export default function SubmitQuotation() {
         title: "Service Request Expired",
         desc: "This service request has expired and is no longer open for quotations.",
         icon: "fa-calendar-times"
+      };
+    }
+    if (request?.status === "CLOSED") {
+      return {
+        title: "Service Request Closed",
+        desc: "This service request has been closed via on-site diagnosis settlement and is no longer accepting quotations.",
+        icon: "fa-lock"
       };
     }
     if (request?.status === "CANCELLED") {

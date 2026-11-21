@@ -50,9 +50,17 @@ export default function CustomerServiceRequestDetails() {
     }
   }, [requestId, requestsRes]);
 
+  const isDiagnosisClosed = Boolean(
+    request?.status === "CLOSED" ||
+    request?.latest_booking?.status === "CLOSED" ||
+    request?.latest_booking?.is_diagnosis_closed ||
+    (request?.latest_booking?.cancellation_reason &&
+     request.latest_booking.cancellation_reason.toLowerCase().includes("diagnosis"))
+  );
+
   const permission = request ? checkRequestEditPermission(request) : { canEdit: false };
-  const canCancel = request ? request.status === "PENDING" || request.status === "ACTIVE" : false;
-  const canReopen = request ? request.status === "CANCELLED" || request.status === "EXPIRED" : false;
+  const canCancel = request ? (request.status === "PENDING" || request.status === "ACTIVE") && !isDiagnosisClosed : false;
+  const canReopen = request ? (request.status === "CANCELLED" || request.status === "EXPIRED") && !isDiagnosisClosed : false;
 
   const handleBack = () => {
     navigate("/my-requests");

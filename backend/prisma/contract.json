@@ -186,6 +186,10 @@
               {
                 "name": "CANCELLED",
                 "value": "CANCELLED"
+              },
+              {
+                "name": "CLOSED",
+                "value": "CLOSED"
               }
             ]
           },
@@ -405,6 +409,10 @@
               {
                 "name": "CANCELLED",
                 "value": "CANCELLED"
+              },
+              {
+                "name": "CLOSED",
+                "value": "CLOSED"
               },
               {
                 "name": "EXPIRED",
@@ -7806,7 +7814,8 @@
                 "IN_PROGRESS",
                 "PAYMENT_PENDING",
                 "COMPLETED",
-                "CANCELLED"
+                "CANCELLED",
+                "CLOSED"
               ]
             },
             "conversation_status": {
@@ -7903,7 +7912,8 @@
                 "IN_PROGRESS",
                 "COMPLETED",
                 "CANCELLED",
-                "EXPIRED"
+                "EXPIRED",
+                "CLOSED"
               ]
             },
             "user_role": {

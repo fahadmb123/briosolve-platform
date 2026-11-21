@@ -346,6 +346,7 @@ enum service_request_status {
   COMPLETED
   CANCELLED
   EXPIRED
+  CLOSED
 }
 
 model service_requests {
@@ -538,6 +539,7 @@ enum booking_status {
   PAYMENT_PENDING
   COMPLETED
   CANCELLED
+  CLOSED
 }
 
 enum booking_payment_status {

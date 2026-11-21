@@ -4127,6 +4127,7 @@ type ContractBase = Omit<
                 'PAYMENT_PENDING',
                 'COMPLETED',
                 'CANCELLED',
+                'CLOSED',
               ];
             };
             readonly conversation_status: {
@@ -4179,6 +4180,7 @@ type ContractBase = Omit<
                 'COMPLETED',
                 'CANCELLED',
                 'EXPIRED',
+                'CLOSED',
               ];
             };
             readonly user_role: {
@@ -7121,6 +7123,7 @@ type ContractBase = Omit<
               { readonly name: 'COMPLETED'; readonly value: 'COMPLETED' },
               { readonly name: 'CANCELLED'; readonly value: 'CANCELLED' },
               { readonly name: 'EXPIRED'; readonly value: 'EXPIRED' },
+              { readonly name: 'CLOSED'; readonly value: 'CLOSED' },
             ];
           };
           readonly service_request_provider_status: {
@@ -7192,6 +7195,7 @@ type ContractBase = Omit<
               { readonly name: 'PAYMENT_PENDING'; readonly value: 'PAYMENT_PENDING' },
               { readonly name: 'COMPLETED'; readonly value: 'COMPLETED' },
               { readonly name: 'CANCELLED'; readonly value: 'CANCELLED' },
+              { readonly name: 'CLOSED'; readonly value: 'CLOSED' },
             ];
           };
           readonly booking_payment_status: {

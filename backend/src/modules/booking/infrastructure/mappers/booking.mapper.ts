@@ -14,7 +14,8 @@ export const BookingStatusToTitle = {
     "IN_PROGRESS": "In the progress",
     "PAYMENT_PENDING": "Payment Pending",
     "COMPLETED": "Completed",
-    "CANCELLED": "Cancelled"
+    "CANCELLED": "Cancelled",
+    "CLOSED": "Closed (Diagnosis Settled)"
 };
 
 export function calculateCancellationPolicy(params: {
@@ -338,6 +339,7 @@ export class BookingMapper {
                 IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
                 PAYMENT_PENDING: input.filter((b) => b.booking.status === "PAYMENT_PENDING").length,
                 COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
+                CLOSED: input.filter((b) => b.booking.status === "CLOSED").length,
                 CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length
             };
             return {
@@ -365,6 +367,7 @@ export class BookingMapper {
                 IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
                 PAYMENT_PENDING: input.filter((b) => b.booking.status === "PAYMENT_PENDING").length,
                 COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
+                CLOSED: input.filter((b) => b.booking.status === "CLOSED").length,
                 CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length
             };
             return {

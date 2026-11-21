@@ -22,7 +22,11 @@ export class CreateBookingPaymentOrderUseCase implements IUseCase<CreateBookingP
         }
 
         if (details.booking.status !== "PAYMENT_PENDING") {
-            throw new ApplicationError("INVALID_STATE", `Cannot pay balance for booking with status ${details.booking.status}`, "VALIDATION");
+            throw new ApplicationError(
+                "INVALID_STATE",
+                `Cannot pay balance for booking with status ${details.booking.status}`,
+                "VALIDATION"
+            );
         }
 
         const isFixed = details.quotationType === "FIXED";

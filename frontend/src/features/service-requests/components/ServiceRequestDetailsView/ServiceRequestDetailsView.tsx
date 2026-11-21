@@ -48,7 +48,16 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
   const [copiedAddress, setCopiedAddress] = useState<boolean>(false);
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
 
+  const isDiagnosisClosed = Boolean(
+    request?.status === "CLOSED" ||
+    request?.latest_booking?.status === "CLOSED" ||
+    request?.latest_booking?.is_diagnosis_closed ||
+    (request?.latest_booking?.cancellation_reason &&
+     request.latest_booking.cancellation_reason.toLowerCase().includes("diagnosis"))
+  );
+
   const isRefundedBooking = Boolean(
+    !isDiagnosisClosed &&
     request?.latest_booking &&
     request.latest_booking.status === "CANCELLED" &&
     request.latest_booking.payment_status === "REFUNDED"
@@ -317,11 +326,24 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
         );
       case "COMPLETED":
         return (
-          <span className="srdetails-status-pill completed">
-            <i className="fas fa-check-circle"></i> Completed
+          <span className="srdetails-status-pill completed" style={isDiagnosisClosed ? { background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" } : undefined}>
+            <i className={`fas ${isDiagnosisClosed ? "fa-stethoscope" : "fa-check-circle"}`}></i> {isDiagnosisClosed ? "Diagnosis Closed" : "Completed"}
+          </span>
+        );
+      case "CLOSED":
+        return (
+          <span className="srdetails-status-pill completed" style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+            <i className="fas fa-stethoscope"></i> Diagnosis Closed
           </span>
         );
       case "CANCELLED":
+        if (isDiagnosisClosed) {
+          return (
+            <span className="srdetails-status-pill completed" style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+              <i className="fas fa-stethoscope"></i> Diagnosis Closed
+            </span>
+          );
+        }
         return (
           <span className="srdetails-status-pill cancelled">
             <i className="fas fa-ban"></i> Cancelled
@@ -436,6 +458,16 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                   <i className="fas fa-check-circle"></i>
                   <span>Accepted by Other Provider</span>
                 </button>
+              ) : request.status === "CLOSED" || isDiagnosisClosed ? (
+                <button
+                  type="button"
+                  className="srdetails-btn-quote-top disabled"
+                  disabled
+                  style={{ opacity: 0.6, cursor: "not-allowed" }}
+                >
+                  <i className="fas fa-lock"></i>
+                  <span>Request Closed</span>
+                </button>
               ) : request.status === "COMPLETED" ? (
                 <button
                   type="button"
@@ -505,6 +537,53 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
 
       <div className="srdetails-layout-grid">
         <div className="srdetails-main-column">
+          {isDiagnosisClosed && (
+            <div className="srdetails-refund-alert-box" style={{ background: "#f0fdf4", borderColor: "#86efac" }}>
+              <div className="srdetails-refund-alert-icon" style={{ background: "#dcfce7", color: "#16a34a" }}>
+                <i className="fas fa-stethoscope"></i>
+              </div>
+              <div className="srdetails-refund-alert-body">
+                <div className="srdetails-refund-alert-header">
+                  <span className="srdetails-refund-badge" style={{ background: "#16a34a", color: "#fff" }}>
+                    DIAGNOSIS AGREED & CLOSED
+                  </span>
+                  {request?.latest_booking?.booking_number && (
+                    <span className="srdetails-refund-booking-ref">
+                      Booking #{request.latest_booking.booking_number}
+                    </span>
+                  )}
+                </div>
+                <h3 className="srdetails-refund-heading" style={{ color: "#15803d" }}>
+                  Service request closed via on-site diagnosis agreement.
+                </h3>
+                <p className="srdetails-refund-subtext">
+                  {request?.latest_booking?.cancellation_reason || "The technician identified an on-site scope mismatch or separate issue. The visit fee was settled and the remaining deposit was refunded."}
+                </p>
+                <div className="srdetails-refund-action-row">
+                  <button
+                    type="button"
+                    className="srdetails-btn-refund-receipt"
+                    onClick={() => navigate("/request-service")}
+                    style={{ background: "#16a34a", color: "#ffffff", borderColor: "#16a34a" }}
+                  >
+                    <i className="fas fa-plus"></i>
+                    <span>Request Another Service</span>
+                  </button>
+                  {request?.latest_booking?.id && (
+                    <button
+                      type="button"
+                      className="srdetails-btn-refund-receipt"
+                      onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+                    >
+                      <i className="fas fa-receipt"></i>
+                      <span>View Booking Details</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {isRefundedBooking && (
             <div className="srdetails-refund-alert-box">
               <div className="srdetails-refund-alert-icon">
@@ -946,6 +1025,13 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                     This service request is already in progress and is not accepting new quotations.
                   </p>
                 </>
+              ) : request.status === "CLOSED" || isDiagnosisClosed ? (
+                <>
+                  <h4 className="srdetails-cta-title">Request Closed</h4>
+                  <p className="srdetails-cta-sub">
+                    This service request has been closed via diagnosis settlement and is not accepting quotations.
+                  </p>
+                </>
               ) : request.status === "COMPLETED" ? (
                 <>
                   <h4 className="srdetails-cta-title">Job Completed</h4>
@@ -976,7 +1062,23 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
 
           {role === "CUSTOMER" && (
             <div className="srdetails-action-cta-card">
-              {request.status === "CANCELLED" ? (
+              {isDiagnosisClosed ? (
+                <>
+                  <h4 className="srdetails-cta-title" style={{ color: "#065f46" }}>Diagnosis Agreed & Closed</h4>
+                  <p className="srdetails-cta-sub">
+                    This request was closed following an accepted on-site diagnosis report. You can submit another service request whenever you are ready.
+                  </p>
+                  <button
+                    type="button"
+                    className="srdetails-btn-cta-primary"
+                    onClick={() => navigate("/request-service")}
+                    style={{ background: "#16a34a", borderColor: "#16a34a" }}
+                  >
+                    <i className="fas fa-plus"></i>
+                    <span>Request Another Service</span>
+                  </button>
+                </>
+              ) : request.status === "CANCELLED" ? (
                 <>
                   <h4 className="srdetails-cta-title">Request Cancelled</h4>
                   <p className="srdetails-cta-sub">

@@ -8,7 +8,8 @@ export type ServiceRequestStatus =
   | "IN_PROGRESS"
   | "COMPLETED"
   | "CANCELLED"
-  | "EXPIRED";
+  | "EXPIRED"
+  | "CLOSED";
 
 export interface ServiceRequestAnswerItem {
   question_id: string;
@@ -85,6 +86,7 @@ export interface ServiceRequestBookingSummary {
   advance_amount: number;
   total_amount: number;
   cancellation_reason?: string | null;
+  is_diagnosis_closed?: boolean;
 }
 
 export interface CustomerServiceRequestItem {

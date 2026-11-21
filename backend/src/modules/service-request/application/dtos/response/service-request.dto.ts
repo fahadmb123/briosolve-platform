@@ -16,7 +16,7 @@ export interface ServiceRequestResponseDto {
     available_time_to: string;
     budget_type?: "OPEN_BID" | "FIXED";
     budget_amount?: number | null;
-    status: "PENDING" | "ACTIVE" | "ACCEPTED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "EXPIRED";
+    status: "PENDING" | "ACTIVE" | "ACCEPTED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "EXPIRED" | "CLOSED";
     created_at: Date;
     updated_at: Date;
     images?: ServiceRequestImage[];
@@ -52,6 +52,7 @@ export interface ServiceRequestBookingSummaryDto {
     advance_amount: number;
     total_amount: number;
     cancellation_reason?: string | null;
+    is_diagnosis_closed?: boolean;
 }
 
 export interface ServiceRequestDetailsDto extends ServiceRequestResponseDto {

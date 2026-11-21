@@ -65,6 +65,10 @@ export class UpdateQuotationUseCase implements IUseCase<UpdateQuotationInputDto,
             throw new ApplicationError("REQUEST_CANCELLED", "This service request has been cancelled and quotations cannot be modified", "CONFLICT");
         }
 
+        if (serviceRequest.status === "CLOSED") {
+            throw new ApplicationError("REQUEST_CLOSED", "This service request has been closed via diagnosis settlement and quotations cannot be modified", "CONFLICT");
+        }
+
         if (serviceRequest.status !== "PENDING" && serviceRequest.status !== "ACTIVE") {
             throw new ApplicationError("INVALID_STATE", "Cannot update quotation on a service request that is no longer active", "VALIDATION");
         }

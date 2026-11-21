@@ -595,6 +595,12 @@
     color: #15803d;
 }
 
+.provreq-badge-closed {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
 .provreq-badge-cancelled {
     background: #f1f5f9;
     color: #64748b;

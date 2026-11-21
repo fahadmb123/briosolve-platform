@@ -120,6 +120,7 @@ export class ServiceRequestMapper {
         const quotationsCount = providers.filter((p: any) => p.status === "QUOTED").length;
 
         let latestBookingDto: any = null;
+        let isDiagnosisClosed = false;
         if (Array.isArray(record.bookings) && record.bookings.length > 0) {
             const sorted = [...record.bookings].sort((a: any, b: any) => {
                 const bTime = b.created_at ? new Date(b.created_at.toString()).getTime() : 0;
@@ -128,13 +129,32 @@ export class ServiceRequestMapper {
             });
             const latest = sorted[0];
             let cancelReason: string | null = null;
-            if (latest.status === "CANCELLED" && latest.notes) {
+            if (latest.status === "CLOSED") {
+                isDiagnosisClosed = true;
+            }
+            if (latest.notes) {
                 try {
-                    const parsed = JSON.parse(latest.notes);
+                    const parsed = typeof latest.notes === "string" ? JSON.parse(latest.notes) : latest.notes;
                     if (Array.isArray(parsed)) {
-                        const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+                        const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED" || item.status === "CLOSED");
                         if (cancelItem && cancelItem.note) {
                             cancelReason = cancelItem.note;
+                            if (cancelItem.authorName === "System (Diagnosis Closed)" || cancelItem.note.toLowerCase().includes("diagnosis accepted")) {
+                                isDiagnosisClosed = true;
+                            }
+                        }
+                    } else if (typeof parsed === "object" && parsed !== null) {
+                        if (parsed.mismatchReport && parsed.mismatchReport.status === "ACCEPTED") {
+                            isDiagnosisClosed = true;
+                        }
+                        if (Array.isArray(parsed.history)) {
+                            const cancelItem = parsed.history.slice().reverse().find((item: any) => item.status === "CANCELLED" || item.status === "CLOSED");
+                            if (cancelItem && cancelItem.note) {
+                                cancelReason = cancelItem.note;
+                                if (cancelItem.authorName === "System (Diagnosis Closed)" || cancelItem.note.toLowerCase().includes("diagnosis accepted")) {
+                                    isDiagnosisClosed = true;
+                                }
+                            }
                         }
                     }
                 } catch {
@@ -148,12 +168,15 @@ export class ServiceRequestMapper {
                 payment_status: latest.payment_status,
                 advance_amount: Number(latest.advance_amount || 0),
                 total_amount: Number(latest.total_amount || 0),
-                cancellation_reason: cancelReason
+                cancellation_reason: cancelReason,
+                is_diagnosis_closed: isDiagnosisClosed
             };
         }
 
         let effectiveStatus = dto.status;
-        if (latestBookingDto?.status === "COMPLETED") {
+        if (latestBookingDto?.status === "CLOSED" || isDiagnosisClosed || dto.status === "CLOSED") {
+            effectiveStatus = "CLOSED";
+        } else if (latestBookingDto?.status === "COMPLETED") {
             effectiveStatus = "COMPLETED";
         }
 

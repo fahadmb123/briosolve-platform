@@ -149,6 +149,16 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
             </button>
           </div>
 
+          {request.status === "CLOSED" && (
+            <div className="provreq-cancelled-callout" style={{ background: "#f8fafc", borderColor: "#cbd5e1", color: "#334155" }}>
+              <i className="fas fa-lock" style={{ color: "#64748b" }}></i>
+              <div>
+                <strong>Request Closed</strong>
+                <p>This service request was closed safely via on-site diagnosis settlement. Quotations are closed.</p>
+              </div>
+            </div>
+          )}
+
           {request.status === "CANCELLED" && (
             <div className="provreq-cancelled-callout">
               <i className="fas fa-ban"></i>
@@ -476,6 +486,16 @@ export const ProviderRequestDetailsModal: FC<ProviderRequestDetailsModalProps> =
             >
               <i className="fas fa-check-circle mr-1.5"></i>
               <span>Request Accepted</span>
+            </button>
+          ) : request.status === "CLOSED" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This service request has been closed via diagnosis settlement"
+            >
+              <i className="fas fa-lock mr-1.5"></i>
+              <span>Request Closed</span>
             </button>
           ) : request.status === "COMPLETED" ? (
             <button

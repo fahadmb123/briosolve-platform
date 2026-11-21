@@ -178,7 +178,11 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
         );
 
         const validRecords = records.filter(
-            (r): r is NonNullable<typeof r> => r !== null && r.status !== "EXPIRED" && r.status !== "CANCELLED"
+            (r): r is NonNullable<typeof r> =>
+                r !== null &&
+                r.status !== "EXPIRED" &&
+                r.status !== "CANCELLED" &&
+                (r.status as string) !== "CLOSED"
         );
 
         let dtos = validRecords.map((record) => {

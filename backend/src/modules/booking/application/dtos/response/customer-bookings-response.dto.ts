@@ -8,6 +8,7 @@ export interface BookingCountsDto {
     IN_PROGRESS: number;
     PAYMENT_PENDING?: number;
     COMPLETED: number;
+    CLOSED?: number;
     CANCELLED: number;
 }
 

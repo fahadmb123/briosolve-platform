@@ -46,6 +46,10 @@ export class SubmitQuotationUseCase implements IUseCase<SubmitQuotationInputDto,
             throw new ApplicationError("REQUEST_CANCELLED", "This service request has been cancelled and is no longer accepting quotations", "CONFLICT");
         }
 
+        if (serviceRequest.status === "CLOSED") {
+            throw new ApplicationError("REQUEST_CLOSED", "This service request has been closed via diagnosis settlement and is no longer accepting quotations", "CONFLICT");
+        }
+
         if (serviceRequest.status !== "PENDING" && serviceRequest.status !== "ACTIVE") {
             throw new ApplicationError("INVALID_STATE", "Cannot quote on a non-active service request", "VALIDATION");
         }

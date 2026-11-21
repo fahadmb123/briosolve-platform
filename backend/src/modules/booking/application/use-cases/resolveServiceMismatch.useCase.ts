@@ -82,14 +82,14 @@ export class ResolveServiceMismatchUseCase implements IUseCase<ResolveServiceMis
             }
 
             history.push({
-                status: "CANCELLED",
+                status: "CLOSED",
                 note: `Technician on-site diagnosis accepted: "${mismatchReport.diagnosis}". Booking closed (exempt from cancellation count). Visit fee of ₹${mismatchReport.visitFee} settled and ₹${mismatchReport.refundAmount} refunded.`,
                 timestamp: new Date().toISOString(),
                 authorName: "System (Diagnosis Closed)"
             });
 
             await this._bookingRepository.update(details.booking.id, {
-                status: "CANCELLED",
+                status: "CLOSED",
                 paymentStatus: "REFUNDED",
                 notes: JSON.stringify({
                     history,
@@ -97,7 +97,7 @@ export class ResolveServiceMismatchUseCase implements IUseCase<ResolveServiceMis
                 })
             });
 
-            await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "CANCELLED").catch(() => null);
+            await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "CLOSED").catch(() => null);
 
             if (profile?.user_id && this._createNotificationUseCase) {
                 await this._createNotificationUseCase.execute({

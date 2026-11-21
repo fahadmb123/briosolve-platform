@@ -69,6 +69,10 @@ export default function ProviderServiceRequestDetails() {
       toast.error("This request has expired");
       return;
     }
+    if (request.status === "CLOSED") {
+      toast.error("This request has been closed via diagnosis settlement");
+      return;
+    }
     if (request.status === "CANCELLED") {
       toast.error("This request has been cancelled");
       return;

@@ -147,13 +147,43 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             .include("bookings")
             .all();
 
+        const isBookingDiagnosisClosed = (b: any) => {
+            if (b.status === "CLOSED") return true;
+            if (b.notes) {
+                try {
+                    const parsed = typeof b.notes === "string" ? JSON.parse(b.notes) : b.notes;
+                    if (parsed && typeof parsed === "object") {
+                        if (parsed.mismatchReport && parsed.mismatchReport.status === "ACCEPTED") {
+                            return true;
+                        }
+                        if (Array.isArray(parsed.history)) {
+                            const isDiagItem = parsed.history.some((h: any) => 
+                                h.authorName === "System (Diagnosis Closed)" || 
+                                (h.note && h.note.toLowerCase().includes("diagnosis accepted"))
+                            );
+                            if (isDiagItem) return true;
+                        }
+                    }
+                } catch {}
+            }
+            return false;
+        };
+
         for (const r of allRecords) {
-            const hasCompletedBooking = Array.isArray(r.bookings) && r.bookings.some((b: any) => b.status === "COMPLETED");
-            if (hasCompletedBooking && r.status !== "COMPLETED") {
+            const hasDiagnosisClosedBooking = Array.isArray(r.bookings) && r.bookings.some(isBookingDiagnosisClosed);
+            if (hasDiagnosisClosedBooking && (r.status as string) !== "CLOSED") {
                 await db.orm.public.service_requests
                     .where({ id: r.id as never })
-                    .update({ status: "COMPLETED" as never, updated_at: Temporal.Now.instant() });
-                r.status = "COMPLETED" as never;
+                    .update({ status: "CLOSED" as never, updated_at: Temporal.Now.instant() });
+                r.status = "CLOSED" as never;
+            } else {
+                const hasCompletedBooking = Array.isArray(r.bookings) && r.bookings.some((b: any) => b.status === "COMPLETED");
+                if (hasCompletedBooking && r.status !== "COMPLETED") {
+                    await db.orm.public.service_requests
+                        .where({ id: r.id as never })
+                        .update({ status: "COMPLETED" as never, updated_at: Temporal.Now.instant() });
+                    r.status = "COMPLETED" as never;
+                }
             }
         }
 
@@ -166,12 +196,14 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             IN_PROGRESS: 0,
             COMPLETED: 0,
             CANCELLED: 0,
-            EXPIRED: 0
+            EXPIRED: 0,
+            CLOSED: 0
         };
 
         allRecords.forEach((r) => {
-            if (r.status in counts) {
-                counts[r.status] += 1;
+            const st = r.status as string;
+            if (st in counts) {
+                counts[st] += 1;
             }
         });
 
