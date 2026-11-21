@@ -106,12 +106,6 @@ export default function AdminLayout() {
                     </li>
 
                     <li>
-                        <NavLink to="/admin/service-requests" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-                            <i className="fas fa-file-invoice"></i>
-                            <span>Service Requests</span>
-                        </NavLink>
-                    </li>
-                    <li>
                         <Link to="#" className="sidebar-item">
                             <i className="fas fa-calculator"></i>
                             <span>Quotations</span>

@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'e984a5dff6d3ef63a8920b4aa70d8be5e7a9cd67c9d0ea19dcd4295db0528a17'>;
+  StorageHashBase<'5b8edb0b28c30c8601d880f6bb38e0491ca7313a4372cfba71a28ad68f3ef0de'>;
 export type ExecutionHash =
-  ExecutionHashBase<'80f20cd258a9b67e141022463b45697108bf2abd0e87c87c3c6b67a379f32796'>;
+  ExecutionHashBase<'7cfa2bb0c83f838f529dffdf0a4b086424f3d2afeac803eae5a9b22d2fc0418b'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -279,12 +279,21 @@ export type FieldOutputTypes = {
       readonly provider_id: CodecTypes['pg/uuid@1']['output'];
       readonly total_amount: Numeric<12, 2>;
       readonly platform_fee: Numeric<12, 2>;
-      readonly status: 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+      readonly advance_amount: Numeric<12, 2> | null;
+      readonly status:
+        | 'CONFIRMED'
+        | 'EN_ROUTE'
+        | 'INSPECTION'
+        | 'IN_PROGRESS'
+        | 'PAYMENT_PENDING'
+        | 'COMPLETED'
+        | 'CANCELLED';
+      readonly payment_status: 'PENDING' | 'ADVANCE_PAID' | 'PAID' | 'REFUNDED';
       readonly scheduled_date: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly scheduled_time: Varchar<80> | null;
       readonly payment_id: Varchar<255> | null;
       readonly order_id: Varchar<255> | null;
-      readonly notes: Varchar<1000> | null;
+      readonly notes: CodecTypes['pg/text@1']['output'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -422,6 +431,7 @@ export type FieldOutputTypes = {
       readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
       readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly extra_charge_policy: Varchar<300>;
+      readonly rejection_reason: CodecTypes['pg/text@1']['output'] | null;
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -494,6 +504,26 @@ export type FieldOutputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
+    readonly wallet_transactions: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly wallet_id: CodecTypes['pg/uuid@1']['output'];
+      readonly booking_id: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly type: 'CREDIT' | 'DEBIT';
+      readonly category: 'REFUND' | 'EARNINGS' | 'PAYMENT' | 'WITHDRAWAL' | 'COMMISSION';
+      readonly amount: Numeric<12, 2>;
+      readonly balance_after: Numeric<12, 2>;
+      readonly description: Varchar<500>;
+      readonly reference_id: Varchar<100> | null;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
+    readonly wallets: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly user_id: CodecTypes['pg/uuid@1']['output'];
+      readonly balance: Numeric<12, 2>;
+      readonly currency: Varchar<10>;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
   };
 };
 export type FieldInputTypes = {
@@ -535,12 +565,21 @@ export type FieldInputTypes = {
       readonly provider_id: CodecTypes['pg/uuid@1']['input'];
       readonly total_amount: CodecTypes['pg/numeric@1']['input'];
       readonly platform_fee: CodecTypes['pg/numeric@1']['input'];
-      readonly status: 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+      readonly advance_amount: CodecTypes['pg/numeric@1']['input'] | null;
+      readonly status:
+        | 'CONFIRMED'
+        | 'EN_ROUTE'
+        | 'INSPECTION'
+        | 'IN_PROGRESS'
+        | 'PAYMENT_PENDING'
+        | 'COMPLETED'
+        | 'CANCELLED';
+      readonly payment_status: 'PENDING' | 'ADVANCE_PAID' | 'PAID' | 'REFUNDED';
       readonly scheduled_date: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly scheduled_time: CodecTypes['sql/varchar@1']['input'] | null;
       readonly payment_id: CodecTypes['sql/varchar@1']['input'] | null;
       readonly order_id: CodecTypes['sql/varchar@1']['input'] | null;
-      readonly notes: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly notes: CodecTypes['pg/text@1']['input'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -678,6 +717,7 @@ export type FieldInputTypes = {
       readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
       readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly extra_charge_policy: CodecTypes['sql/varchar@1']['input'];
+      readonly rejection_reason: CodecTypes['pg/text@1']['input'] | null;
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -750,6 +790,26 @@ export type FieldInputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
+    readonly wallet_transactions: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly wallet_id: CodecTypes['pg/uuid@1']['input'];
+      readonly booking_id: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly type: 'CREDIT' | 'DEBIT';
+      readonly category: 'REFUND' | 'EARNINGS' | 'PAYMENT' | 'WITHDRAWAL' | 'COMMISSION';
+      readonly amount: CodecTypes['pg/numeric@1']['input'];
+      readonly balance_after: CodecTypes['pg/numeric@1']['input'];
+      readonly description: CodecTypes['sql/varchar@1']['input'];
+      readonly reference_id: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly wallets: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly user_id: CodecTypes['pg/uuid@1']['input'];
+      readonly balance: CodecTypes['pg/numeric@1']['input'];
+      readonly currency: CodecTypes['sql/varchar@1']['input'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
   };
 };
 export type StorageColumnTypes = {
@@ -783,20 +843,29 @@ export type StorageColumnTypes = {
       readonly user_id: CodecTypes['pg/uuid@1']['output'];
     };
     readonly bookings: {
+      readonly advance_amount: Numeric<12, 2> | null;
       readonly booking_number: Varchar<50>;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly customer_id: CodecTypes['pg/uuid@1']['output'];
       readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly notes: Varchar<1000> | null;
+      readonly notes: CodecTypes['pg/text@1']['output'] | null;
       readonly order_id: Varchar<255> | null;
       readonly payment_id: Varchar<255> | null;
+      readonly payment_status: 'PENDING' | 'ADVANCE_PAID' | 'PAID' | 'REFUNDED';
       readonly platform_fee: Numeric<12, 2>;
       readonly provider_id: CodecTypes['pg/uuid@1']['output'];
       readonly quotation_id: CodecTypes['pg/uuid@1']['output'];
       readonly scheduled_date: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly scheduled_time: Varchar<80> | null;
       readonly service_request_id: CodecTypes['pg/uuid@1']['output'];
-      readonly status: 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+      readonly status:
+        | 'CONFIRMED'
+        | 'EN_ROUTE'
+        | 'INSPECTION'
+        | 'IN_PROGRESS'
+        | 'PAYMENT_PENDING'
+        | 'COMPLETED'
+        | 'CANCELLED';
       readonly total_amount: Numeric<12, 2>;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -931,6 +1000,7 @@ export type StorageColumnTypes = {
       readonly included_items: CodecTypes['pg/json@1']['output'];
       readonly provider_id: CodecTypes['pg/uuid@1']['output'];
       readonly quotation_type: 'FIXED' | 'ESTIMATED' | 'INSPECTION_REQUIRED';
+      readonly rejection_reason: CodecTypes['pg/text@1']['output'] | null;
       readonly service_request_id: CodecTypes['pg/uuid@1']['output'];
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -1006,6 +1076,26 @@ export type StorageColumnTypes = {
       readonly status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
+    readonly wallet_transactions: {
+      readonly amount: Numeric<12, 2>;
+      readonly balance_after: Numeric<12, 2>;
+      readonly booking_id: CodecTypes['pg/uuid@1']['output'] | null;
+      readonly category: 'REFUND' | 'EARNINGS' | 'PAYMENT' | 'WITHDRAWAL' | 'COMMISSION';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly description: Varchar<500>;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly reference_id: Varchar<100> | null;
+      readonly type: 'CREDIT' | 'DEBIT';
+      readonly wallet_id: CodecTypes['pg/uuid@1']['output'];
+    };
+    readonly wallets: {
+      readonly balance: Numeric<12, 2>;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly currency: Varchar<10>;
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly user_id: CodecTypes['pg/uuid@1']['output'];
+    };
   };
 };
 export type StorageColumnInputTypes = {
@@ -1039,20 +1129,29 @@ export type StorageColumnInputTypes = {
       readonly user_id: CodecTypes['pg/uuid@1']['input'];
     };
     readonly bookings: {
+      readonly advance_amount: CodecTypes['pg/numeric@1']['input'] | null;
       readonly booking_number: CodecTypes['sql/varchar@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly customer_id: CodecTypes['pg/uuid@1']['input'];
       readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly notes: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly notes: CodecTypes['pg/text@1']['input'] | null;
       readonly order_id: CodecTypes['sql/varchar@1']['input'] | null;
       readonly payment_id: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly payment_status: 'PENDING' | 'ADVANCE_PAID' | 'PAID' | 'REFUNDED';
       readonly platform_fee: CodecTypes['pg/numeric@1']['input'];
       readonly provider_id: CodecTypes['pg/uuid@1']['input'];
       readonly quotation_id: CodecTypes['pg/uuid@1']['input'];
       readonly scheduled_date: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly scheduled_time: CodecTypes['sql/varchar@1']['input'] | null;
       readonly service_request_id: CodecTypes['pg/uuid@1']['input'];
-      readonly status: 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+      readonly status:
+        | 'CONFIRMED'
+        | 'EN_ROUTE'
+        | 'INSPECTION'
+        | 'IN_PROGRESS'
+        | 'PAYMENT_PENDING'
+        | 'COMPLETED'
+        | 'CANCELLED';
       readonly total_amount: CodecTypes['pg/numeric@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -1187,6 +1286,7 @@ export type StorageColumnInputTypes = {
       readonly included_items: CodecTypes['pg/json@1']['input'];
       readonly provider_id: CodecTypes['pg/uuid@1']['input'];
       readonly quotation_type: 'FIXED' | 'ESTIMATED' | 'INSPECTION_REQUIRED';
+      readonly rejection_reason: CodecTypes['pg/text@1']['input'] | null;
       readonly service_request_id: CodecTypes['pg/uuid@1']['input'];
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -1262,6 +1362,26 @@ export type StorageColumnInputTypes = {
       readonly status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
+    readonly wallet_transactions: {
+      readonly amount: CodecTypes['pg/numeric@1']['input'];
+      readonly balance_after: CodecTypes['pg/numeric@1']['input'];
+      readonly booking_id: CodecTypes['pg/uuid@1']['input'] | null;
+      readonly category: 'REFUND' | 'EARNINGS' | 'PAYMENT' | 'WITHDRAWAL' | 'COMMISSION';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly description: CodecTypes['sql/varchar@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly reference_id: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly type: 'CREDIT' | 'DEBIT';
+      readonly wallet_id: CodecTypes['pg/uuid@1']['input'];
+    };
+    readonly wallets: {
+      readonly balance: CodecTypes['pg/numeric@1']['input'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly currency: CodecTypes['sql/varchar@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly user_id: CodecTypes['pg/uuid@1']['input'];
+    };
   };
 };
 
@@ -1293,6 +1413,7 @@ export namespace Models {
     reactivation_requests: public_account_reactivation_requests[];
     reviewed_reactivation_requests: public_account_reactivation_requests[];
     service_requests: public_service_requests[];
+    wallet: public_wallets | null;
     readonly [RelationKeys]?:
       | 'addresses'
       | 'blocked_by_admin'
@@ -1307,7 +1428,8 @@ export namespace Models {
       | 'push_subscriptions'
       | 'reactivation_requests'
       | 'reviewed_reactivation_requests'
-      | 'service_requests';
+      | 'service_requests'
+      | 'wallet';
   };
   export type public_provider_profiles = {
     id: CodecTypes['pg/uuid@1']['output'];
@@ -1608,6 +1730,7 @@ export namespace Models {
     valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
     valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
     extra_charge_policy: Varchar<300>;
+    rejection_reason: CodecTypes['pg/text@1']['output'] | null;
     status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -1625,19 +1748,56 @@ export namespace Models {
     provider_id: CodecTypes['pg/uuid@1']['output'];
     total_amount: Numeric<12, 2>;
     platform_fee: Numeric<12, 2>;
-    status: 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+    advance_amount: Numeric<12, 2> | null;
+    status:
+      | 'CONFIRMED'
+      | 'EN_ROUTE'
+      | 'INSPECTION'
+      | 'IN_PROGRESS'
+      | 'PAYMENT_PENDING'
+      | 'COMPLETED'
+      | 'CANCELLED';
+    payment_status: 'PENDING' | 'ADVANCE_PAID' | 'PAID' | 'REFUNDED';
     scheduled_date: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
     scheduled_time: Varchar<80> | null;
     payment_id: Varchar<255> | null;
     order_id: Varchar<255> | null;
-    notes: Varchar<1000> | null;
+    notes: CodecTypes['pg/text@1']['output'] | null;
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     customer: public_users;
     provider: public_provider_profiles;
     quotation: public_quotations;
     service_request: public_service_requests;
-    readonly [RelationKeys]?: 'customer' | 'provider' | 'quotation' | 'service_request';
+    wallet_transactions: public_wallet_transactions[];
+    readonly [RelationKeys]?:
+      'customer' | 'provider' | 'quotation' | 'service_request' | 'wallet_transactions';
+  };
+  export type public_wallets = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    user_id: CodecTypes['pg/uuid@1']['output'];
+    balance: Numeric<12, 2>;
+    currency: Varchar<10>;
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    transactions: public_wallet_transactions[];
+    user: public_users;
+    readonly [RelationKeys]?: 'transactions' | 'user';
+  };
+  export type public_wallet_transactions = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    wallet_id: CodecTypes['pg/uuid@1']['output'];
+    booking_id: CodecTypes['pg/uuid@1']['output'] | null;
+    type: 'CREDIT' | 'DEBIT';
+    category: 'REFUND' | 'EARNINGS' | 'PAYMENT' | 'WITHDRAWAL' | 'COMMISSION';
+    amount: Numeric<12, 2>;
+    balance_after: Numeric<12, 2>;
+    description: Varchar<500>;
+    reference_id: Varchar<100> | null;
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    booking: public_bookings | null;
+    wallet: public_wallets;
+    readonly [RelationKeys]?: 'booking' | 'wallet';
   };
 }
 
@@ -1666,6 +1826,8 @@ export declare const models: {
     messages: Models.public_messages;
     quotations: Models.public_quotations;
     bookings: Models.public_bookings;
+    wallets: Models.public_wallets;
+    wallet_transactions: Models.public_wallet_transactions;
   };
 };
 
@@ -1962,6 +2124,16 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly typeParams: { readonly precision: 12; readonly scale: 2 };
                 };
+                readonly advance_amount: {
+                  readonly nativeType: 'numeric';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly nullable: true;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/numeric@1', 0>;
+                  };
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
                 readonly status: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
@@ -1969,6 +2141,15 @@ type ContractBase = Omit<
                   readonly default: {
                     readonly kind: 'literal';
                     readonly value: DefaultLiteralValue<'pg/text@1', 'CONFIRMED'>;
+                  };
+                };
+                readonly payment_status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'ADVANCE_PAID'>;
                   };
                 };
                 readonly scheduled_date: {
@@ -1995,10 +2176,9 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly length: 255 };
                 };
                 readonly notes: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
                   readonly nullable: true;
-                  readonly typeParams: { readonly length: 1000 };
                 };
                 readonly created_at: {
                   readonly nativeType: 'timestamptz';
@@ -3103,6 +3283,11 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly typeParams: { readonly length: 300 };
                 };
+                readonly rejection_reason: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
                 readonly status: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
@@ -3746,6 +3931,178 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly wallet_transactions: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly wallet_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly booking_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: true;
+                };
+                readonly type: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly category: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly amount: {
+                  readonly nativeType: 'numeric';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
+                readonly balance_after: {
+                  readonly nativeType: 'numeric';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
+                readonly description: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 500 };
+                };
+                readonly reference_id: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 100 };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'wallet_transactions_wallet_id_idx_f6a7fffd';
+                  readonly prefix: 'wallet_transactions_wallet_id_idx';
+                  readonly columns: readonly ['wallet_id'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'wallet_transactions_booking_id_idx_aeea169b';
+                  readonly prefix: 'wallet_transactions_booking_id_idx';
+                  readonly columns: readonly ['booking_id'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'wallet_transactions_created_at_idx_225d8c0f';
+                  readonly prefix: 'wallet_transactions_created_at_idx';
+                  readonly columns: readonly ['created_at'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'wallet_transactions';
+                    readonly columns: readonly ['wallet_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'wallets';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'wallet_transactions';
+                    readonly columns: readonly ['booking_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bookings';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly wallets: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly user_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly balance: {
+                  readonly nativeType: 'numeric';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
+                readonly currency: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'sql/varchar@1', 'INR'>;
+                  };
+                  readonly typeParams: { readonly length: 10 };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updated_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['user_id'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'wallets_user_id_idx_6c952402';
+                  readonly prefix: 'wallets_user_id_idx';
+                  readonly columns: readonly ['user_id'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'wallets';
+                    readonly columns: readonly ['user_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'users';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
           };
           readonly valueSet: {
             readonly active_status: {
@@ -3756,9 +4113,22 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['DAY_OFF', 'CUSTOM_HOURS'];
             };
+            readonly booking_payment_status: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['PENDING', 'ADVANCE_PAID', 'PAID', 'REFUNDED'];
+            };
             readonly booking_status: {
               readonly kind: 'valueSet';
-              readonly values: readonly ['CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+              readonly values: readonly [
+                'CONFIRMED',
+                'EN_ROUTE',
+                'INSPECTION',
+                'IN_PROGRESS',
+                'PAYMENT_PENDING',
+                'COMPLETED',
+                'CANCELLED',
+                'CLOSED',
+              ];
             };
             readonly conversation_status: {
               readonly kind: 'valueSet';
@@ -3810,6 +4180,7 @@ type ContractBase = Omit<
                 'COMPLETED',
                 'CANCELLED',
                 'EXPIRED',
+                'CLOSED',
               ];
             };
             readonly user_role: {
@@ -3827,6 +4198,20 @@ type ContractBase = Omit<
             readonly verification_document_type: {
               readonly kind: 'valueSet';
               readonly values: readonly ['IDENTITY', 'CERTIFICATE'];
+            };
+            readonly wallet_transaction_category: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'REFUND',
+                'EARNINGS',
+                'PAYMENT',
+                'WITHDRAWAL',
+                'COMMISSION',
+              ];
+            };
+            readonly wallet_transaction_type: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['CREDIT', 'DEBIT'];
             };
             readonly weekday: {
               readonly kind: 'valueSet';
@@ -3928,6 +4313,11 @@ type ContractBase = Omit<
       readonly model: 'quotations';
     };
     readonly bookings: { readonly namespace: 'public' & NamespaceId; readonly model: 'bookings' };
+    readonly wallets: { readonly namespace: 'public' & NamespaceId; readonly model: 'wallets' };
+    readonly wallet_transactions: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'wallet_transactions';
+    };
   };
   readonly domain: {
     readonly namespaces: {
@@ -4256,7 +4646,19 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly precision: 12; readonly scale: 2 };
                 };
               };
+              readonly advance_amount: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
+              };
               readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly payment_status: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
@@ -4293,11 +4695,7 @@ type ContractBase = Omit<
               };
               readonly notes: {
                 readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 1000 };
-                };
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly created_at: {
                 readonly nullable: false;
@@ -4363,6 +4761,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
+              readonly wallet_transactions: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'wallet_transactions';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['booking_id'];
+                };
+              };
             };
             readonly storage: {
               readonly table: 'bookings';
@@ -4376,7 +4785,9 @@ type ContractBase = Omit<
                 readonly provider_id: { readonly column: 'provider_id' };
                 readonly total_amount: { readonly column: 'total_amount' };
                 readonly platform_fee: { readonly column: 'platform_fee' };
+                readonly advance_amount: { readonly column: 'advance_amount' };
                 readonly status: { readonly column: 'status' };
+                readonly payment_status: { readonly column: 'payment_status' };
                 readonly scheduled_date: { readonly column: 'scheduled_date' };
                 readonly scheduled_time: { readonly column: 'scheduled_time' };
                 readonly payment_id: { readonly column: 'payment_id' };
@@ -5560,6 +5971,10 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly length: 300 };
                 };
               };
+              readonly rejection_reason: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly status: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -5634,6 +6049,7 @@ type ContractBase = Omit<
                 readonly valid_until: { readonly column: 'valid_until' };
                 readonly valid_until_date: { readonly column: 'valid_until_date' };
                 readonly extra_charge_policy: { readonly column: 'extra_charge_policy' };
+                readonly rejection_reason: { readonly column: 'rejection_reason' };
                 readonly status: { readonly column: 'status' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
@@ -6396,6 +6812,18 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['customer_id'];
                 };
               };
+              readonly wallet: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'wallets';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['user_id'];
+                };
+              };
             };
             readonly storage: {
               readonly table: 'users';
@@ -6411,6 +6839,190 @@ type ContractBase = Omit<
                 readonly email_verified: { readonly column: 'email_verified' };
                 readonly phone_verified: { readonly column: 'phone_verified' };
                 readonly current_address_id: { readonly column: 'current_address_id' };
+                readonly created_at: { readonly column: 'created_at' };
+                readonly updated_at: { readonly column: 'updated_at' };
+              };
+            };
+          };
+          readonly wallet_transactions: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly wallet_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly booking_id: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly type: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly category: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly amount: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
+              };
+              readonly balance_after: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
+              };
+              readonly description: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 500 };
+                };
+              };
+              readonly reference_id: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 100 };
+                };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly booking: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'bookings';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['booking_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly wallet: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'wallets';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['wallet_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'wallet_transactions';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly wallet_id: { readonly column: 'wallet_id' };
+                readonly booking_id: { readonly column: 'booking_id' };
+                readonly type: { readonly column: 'type' };
+                readonly category: { readonly column: 'category' };
+                readonly amount: { readonly column: 'amount' };
+                readonly balance_after: { readonly column: 'balance_after' };
+                readonly description: { readonly column: 'description' };
+                readonly reference_id: { readonly column: 'reference_id' };
+                readonly created_at: { readonly column: 'created_at' };
+              };
+            };
+          };
+          readonly wallets: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly user_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly balance: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly typeParams: { readonly precision: 12; readonly scale: 2 };
+                };
+              };
+              readonly currency: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 10 };
+                };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly updated_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly transactions: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'wallet_transactions';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['wallet_id'];
+                };
+              };
+              readonly user: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'users';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['user_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'wallets';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly user_id: { readonly column: 'user_id' };
+                readonly balance: { readonly column: 'balance' };
+                readonly currency: { readonly column: 'currency' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
               };
@@ -6511,6 +7123,7 @@ type ContractBase = Omit<
               { readonly name: 'COMPLETED'; readonly value: 'COMPLETED' },
               { readonly name: 'CANCELLED'; readonly value: 'CANCELLED' },
               { readonly name: 'EXPIRED'; readonly value: 'EXPIRED' },
+              { readonly name: 'CLOSED'; readonly value: 'CLOSED' },
             ];
           };
           readonly service_request_provider_status: {
@@ -6576,9 +7189,39 @@ type ContractBase = Omit<
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
               { readonly name: 'CONFIRMED'; readonly value: 'CONFIRMED' },
+              { readonly name: 'EN_ROUTE'; readonly value: 'EN_ROUTE' },
+              { readonly name: 'INSPECTION'; readonly value: 'INSPECTION' },
               { readonly name: 'IN_PROGRESS'; readonly value: 'IN_PROGRESS' },
+              { readonly name: 'PAYMENT_PENDING'; readonly value: 'PAYMENT_PENDING' },
               { readonly name: 'COMPLETED'; readonly value: 'COMPLETED' },
               { readonly name: 'CANCELLED'; readonly value: 'CANCELLED' },
+              { readonly name: 'CLOSED'; readonly value: 'CLOSED' },
+            ];
+          };
+          readonly booking_payment_status: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'PENDING'; readonly value: 'PENDING' },
+              { readonly name: 'ADVANCE_PAID'; readonly value: 'ADVANCE_PAID' },
+              { readonly name: 'PAID'; readonly value: 'PAID' },
+              { readonly name: 'REFUNDED'; readonly value: 'REFUNDED' },
+            ];
+          };
+          readonly wallet_transaction_type: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'CREDIT'; readonly value: 'CREDIT' },
+              { readonly name: 'DEBIT'; readonly value: 'DEBIT' },
+            ];
+          };
+          readonly wallet_transaction_category: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'REFUND'; readonly value: 'REFUND' },
+              { readonly name: 'EARNINGS'; readonly value: 'EARNINGS' },
+              { readonly name: 'PAYMENT'; readonly value: 'PAYMENT' },
+              { readonly name: 'WITHDRAWAL'; readonly value: 'WITHDRAWAL' },
+              { readonly name: 'COMMISSION'; readonly value: 'COMMISSION' },
             ];
           };
         };
@@ -6931,6 +7574,31 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'users';
+            readonly column: 'updated_at';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'wallet_transactions';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'wallets';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'wallets';
             readonly column: 'updated_at';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };

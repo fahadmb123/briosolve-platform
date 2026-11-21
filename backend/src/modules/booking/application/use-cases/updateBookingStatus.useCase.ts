@@ -4,11 +4,13 @@ import { IBookingRepository } from "../../domain/repositories/IBookingRepository
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { UpdateBookingStatusInputDto } from "../dtos/request/update-booking-status.dto";
 import { BookingResponseDto, BookingStatusHistoryItem } from "../dtos/response/booking-response.dto";
-import { BookingMapper, BookingStatusToTitle } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper, BookingStatusToTitle, calculateCancellationPolicy } from "../../infrastructure/mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
+import { WalletResponseDto } from "../../../wallet/application/dtos/response/wallet-response.dto";
+import type { CreditWalletInputDto } from "../../../wallet/application/dtos/request/credit-wallet.dto";
 
 export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusInputDto, BookingResponseDto> {
     constructor(
@@ -16,7 +18,8 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         private readonly _providerRepository: IProviderRepository,
         private readonly _serviceRequestRepository: IServiceRequestRepository,
         private readonly _quotationRepository: IQuotationRepository,
-        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+        private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
+        private readonly _creditWalletUseCase?: IUseCase<CreditWalletInputDto, WalletResponseDto>
     ) {}
 
     async execute(input: UpdateBookingStatusInputDto): Promise<BookingResponseDto> {
@@ -27,7 +30,12 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
 
         const providerProfile = await this._providerRepository.findProfileByUserId(input.userId);
 
-        const isProviderAction = Boolean(providerProfile && providerProfile.id === details.booking.provider_id);
+        const isProviderAction = Boolean(
+            (providerProfile && providerProfile.id === details.booking.provider_id) ||
+            details.booking.provider_id === input.userId ||
+            (providerProfile && providerProfile.user_id === details.booking.provider_id) ||
+            details.providerUserId === input.userId
+        );
         const isCustomerAction = details.booking.customer_id === input.userId;
 
         const isAuthorized = isCustomerAction || isProviderAction;
@@ -41,8 +49,18 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         }
 
         if (input.status === "CANCELLED") {
-            if (details.booking.status !== "CONFIRMED") {
-                throw new ApplicationError("CANNOT_CANCEL", "Booking can only be cancelled before dispatching or travelling.", "VALIDATION");
+            if (isProviderAction) {
+                if (details.booking.status !== "CONFIRMED") {
+                    throw new ApplicationError("CANNOT_CANCEL", "Provider can only cancel before dispatching or travelling.", "VALIDATION");
+                }
+                const priorCancellations = await this._bookingRepository.countProviderCancellations(details.booking.provider_id);
+                if (priorCancellations >= 2) {
+                    throw new ApplicationError("PROVIDER_CANCELLATION_LIMIT_EXCEEDED", "You have already reached the maximum limit of 2 cancellations. You cannot cancel this booking.", "VALIDATION");
+                }
+            } else if (isCustomerAction) {
+                if (details.booking.status !== "CONFIRMED" && details.booking.status !== "EN_ROUTE") {
+                    throw new ApplicationError("CANNOT_CANCEL", "Booking cannot be cancelled once work or inspection has commenced.", "VALIDATION");
+                }
             }
             if (!input.notes || !input.notes.trim()) {
                 throw new ApplicationError("CANCELLATION_REASON_REQUIRED", "Please provide a reason for cancelling this booking.", "VALIDATION");
@@ -116,8 +134,93 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         }
 
         if (input.status === "CANCELLED") {
+            const cancelActorName = isProviderAction ? (providerProfile?.business_name || "Provider") : "Customer";
             await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "EXPIRED").catch(() => null);
-            await this._quotationRepository.update(details.booking.quotation_id, { status: "WITHDRAWN" }).catch(() => null);
+            await this._quotationRepository.update(details.booking.quotation_id, {
+                status: "WITHDRAWN",
+                rejectionReason: `Booking cancelled by ${cancelActorName}: ${input.notes || "No cancellation reason provided"}`
+            }).catch(() => null);
+            const advancePaid = details.booking.advance_amount && details.booking.advance_amount > 0
+                ? details.booking.advance_amount
+                : details.booking.total_amount;
+
+            if (this._creditWalletUseCase && advancePaid > 0) {
+                if (isProviderAction) {
+                    await this._creditWalletUseCase.execute({
+                        userId: details.booking.customer_id,
+                        amount: advancePaid,
+                        category: "REFUND",
+                        bookingId: details.booking.id,
+                        description: `Refund for cancelled booking #${details.booking.booking_number}`,
+                        referenceId: details.booking.booking_number
+                    }).catch(() => null);
+                } else {
+                    const priorCustomerCancellations = await this._bookingRepository.countCustomerCancellations(details.booking.customer_id);
+                    const policy = calculateCancellationPolicy({
+                        role: "CUSTOMER",
+                        status: details.booking.status,
+                        quotationType: details.quotationType,
+                        advancePaid,
+                        cancellationsUsed: priorCustomerCancellations,
+                        maxAllowedCancellations: 2
+                    });
+
+                    if (policy.refundableAmount > 0) {
+                        await this._creditWalletUseCase.execute({
+                            userId: details.booking.customer_id,
+                            amount: policy.refundableAmount,
+                            category: "REFUND",
+                            bookingId: details.booking.id,
+                            description: `Refund for cancelled booking #${details.booking.booking_number}`,
+                            referenceId: details.booking.booking_number
+                        }).catch(() => null);
+                    }
+
+                    if (policy.cancellationFee > 0) {
+                        const providerProfileRecord = await this._providerRepository.findById(details.booking.provider_id);
+                        if (providerProfileRecord && providerProfileRecord.user_id) {
+                            await this._creditWalletUseCase.execute({
+                                userId: providerProfileRecord.user_id,
+                                amount: policy.cancellationFee,
+                                category: "EARNINGS",
+                                bookingId: details.booking.id,
+                                description: `Cancellation compensation fee for booking #${details.booking.booking_number}`,
+                                referenceId: details.booking.booking_number
+                            }).catch(() => null);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (input.status === "COMPLETED") {
+            await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "COMPLETED").catch(() => null);
+            await this._providerRepository.incrementCompletedJobs(details.booking.provider_id).catch(() => null);
+
+            if (this._creditWalletUseCase) {
+                const profile = await this._providerRepository.findById(details.booking.provider_id);
+                if (profile && profile.user_id) {
+                    const finalTotal = resolvedTotalAmount || details.booking.total_amount;
+                    const customerPlatformFee = Number(details.booking.platform_fee || 0);
+                    const baseAmount = customerPlatformFee > 0
+                        ? Math.max(0, finalTotal - customerPlatformFee)
+                        : (details.quoteAmount && finalTotal <= Number(details.quoteAmount) * 1.06
+                            ? Number(details.quoteAmount)
+                            : Math.round(finalTotal / 1.05));
+                    const providerCommission = Math.round(baseAmount * 0.05);
+                    const earnings = Math.max(0, baseAmount - providerCommission);
+                    if (earnings > 0) {
+                        await this._creditWalletUseCase.execute({
+                            userId: profile.user_id,
+                            amount: earnings,
+                            category: "EARNINGS",
+                            bookingId: details.booking.id,
+                            description: `Earnings for completed booking #${details.booking.booking_number} (net of 5% platform commission)`,
+                            referenceId: details.booking.booking_number
+                        }).catch(() => null);
+                    }
+                }
+            }
         }
 
         const updatedDetails = await this._bookingRepository.findDetailsById(updated.id);

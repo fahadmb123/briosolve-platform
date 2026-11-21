@@ -95,6 +95,14 @@
     "users": {
       "model": "users",
       "namespace": "public"
+    },
+    "wallet_transactions": {
+      "model": "wallet_transactions",
+      "namespace": "public"
+    },
+    "wallets": {
+      "model": "wallets",
+      "namespace": "public"
     }
   },
   "domain": {
@@ -127,6 +135,27 @@
               }
             ]
           },
+          "booking_payment_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "ADVANCE_PAID",
+                "value": "ADVANCE_PAID"
+              },
+              {
+                "name": "PAID",
+                "value": "PAID"
+              },
+              {
+                "name": "REFUNDED",
+                "value": "REFUNDED"
+              }
+            ]
+          },
           "booking_status": {
             "codecId": "pg/text@1",
             "members": [
@@ -135,8 +164,20 @@
                 "value": "CONFIRMED"
               },
               {
+                "name": "EN_ROUTE",
+                "value": "EN_ROUTE"
+              },
+              {
+                "name": "INSPECTION",
+                "value": "INSPECTION"
+              },
+              {
                 "name": "IN_PROGRESS",
                 "value": "IN_PROGRESS"
+              },
+              {
+                "name": "PAYMENT_PENDING",
+                "value": "PAYMENT_PENDING"
               },
               {
                 "name": "COMPLETED",
@@ -145,6 +186,10 @@
               {
                 "name": "CANCELLED",
                 "value": "CANCELLED"
+              },
+              {
+                "name": "CLOSED",
+                "value": "CLOSED"
               }
             ]
           },
@@ -366,6 +411,10 @@
                 "value": "CANCELLED"
               },
               {
+                "name": "CLOSED",
+                "value": "CLOSED"
+              },
+              {
                 "name": "EXPIRED",
                 "value": "EXPIRED"
               }
@@ -432,6 +481,44 @@
               {
                 "name": "CERTIFICATE",
                 "value": "CERTIFICATE"
+              }
+            ]
+          },
+          "wallet_transaction_category": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "REFUND",
+                "value": "REFUND"
+              },
+              {
+                "name": "EARNINGS",
+                "value": "EARNINGS"
+              },
+              {
+                "name": "PAYMENT",
+                "value": "PAYMENT"
+              },
+              {
+                "name": "WITHDRAWAL",
+                "value": "WITHDRAWAL"
+              },
+              {
+                "name": "COMMISSION",
+                "value": "COMMISSION"
+              }
+            ]
+          },
+          "wallet_transaction_type": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "CREDIT",
+                "value": "CREDIT"
+              },
+              {
+                "name": "DEBIT",
+                "value": "DEBIT"
               }
             ]
           },
@@ -874,6 +961,17 @@
           },
           "bookings": {
             "fields": {
+              "advance_amount": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
               "booking_number": {
                 "nullable": false,
                 "type": {
@@ -908,11 +1006,8 @@
               "notes": {
                 "nullable": true,
                 "type": {
-                  "codecId": "sql/varchar@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "length": 1000
-                  }
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               },
               "order_id": {
@@ -933,6 +1028,19 @@
                   "typeParams": {
                     "length": 255
                   }
+                }
+              },
+              "payment_status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "booking_payment_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
                 }
               },
               "platform_fee": {
@@ -1080,10 +1188,28 @@
                   "model": "service_requests",
                   "namespace": "public"
                 }
+              },
+              "wallet_transactions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "booking_id"
+                  ]
+                },
+                "to": {
+                  "model": "wallet_transactions",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
               "fields": {
+                "advance_amount": {
+                  "column": "advance_amount"
+                },
                 "booking_number": {
                   "column": "booking_number"
                 },
@@ -1104,6 +1230,9 @@
                 },
                 "payment_id": {
                   "column": "payment_id"
+                },
+                "payment_status": {
+                  "column": "payment_status"
                 },
                 "platform_fee": {
                   "column": "platform_fee"
@@ -2847,6 +2976,13 @@
                   "plane": "domain"
                 }
               },
+              "rejection_reason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "service_request_id": {
                 "nullable": false,
                 "type": {
@@ -2986,6 +3122,9 @@
                 },
                 "quotation_type": {
                   "column": "quotation_type"
+                },
+                "rejection_reason": {
+                  "column": "rejection_reason"
                 },
                 "service_request_id": {
                   "column": "service_request_id"
@@ -4119,6 +4258,22 @@
                   "model": "service_requests",
                   "namespace": "public"
                 }
+              },
+              "wallet": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "user_id"
+                  ]
+                },
+                "to": {
+                  "model": "wallets",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -4162,6 +4317,286 @@
               },
               "namespaceId": "public",
               "table": "users"
+            }
+          },
+          "wallet_transactions": {
+            "fields": {
+              "amount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
+              "balance_after": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
+              "booking_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "category": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "wallet_transaction_category",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "description": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 500
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "reference_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "wallet_transaction_type",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "wallet_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "booking": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "booking_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "bookings",
+                  "namespace": "public"
+                }
+              },
+              "wallet": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "wallet_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "wallets",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "amount": {
+                  "column": "amount"
+                },
+                "balance_after": {
+                  "column": "balance_after"
+                },
+                "booking_id": {
+                  "column": "booking_id"
+                },
+                "category": {
+                  "column": "category"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "description": {
+                  "column": "description"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "reference_id": {
+                  "column": "reference_id"
+                },
+                "type": {
+                  "column": "type"
+                },
+                "wallet_id": {
+                  "column": "wallet_id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "wallet_transactions"
+            }
+          },
+          "wallets": {
+            "fields": {
+              "balance": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "currency": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 10
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "updated_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "user_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "transactions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "wallet_id"
+                  ]
+                },
+                "to": {
+                  "model": "wallet_transactions",
+                  "namespace": "public"
+                }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "user_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "users",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "balance": {
+                  "column": "balance"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "currency": {
+                  "column": "currency"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "updated_at": {
+                  "column": "updated_at"
+                },
+                "user_id": {
+                  "column": "user_id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "wallets"
             }
           }
         }
@@ -4483,12 +4918,30 @@
             "bookings": {
               "checks": [
                 {
-                  "expression": "\"status\" IN ('CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')",
-                  "name": "bookings_status_check_9a77072c",
+                  "expression": "\"payment_status\" IN ('PENDING', 'ADVANCE_PAID', 'PAID', 'REFUNDED')",
+                  "name": "bookings_payment_status_check_2ad2f3ef",
+                  "prefix": "bookings_payment_status_check"
+                },
+                {
+                  "expression": "\"status\" IN ('CONFIRMED', 'EN_ROUTE', 'INSPECTION', 'IN_PROGRESS', 'PAYMENT_PENDING', 'COMPLETED', 'CANCELLED')",
+                  "name": "bookings_status_check_25f1c553",
                   "prefix": "bookings_status_check"
                 }
               ],
               "columns": {
+                "advance_amount": {
+                  "codecId": "pg/numeric@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "numeric",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
                 "booking_number": {
                   "codecId": "sql/varchar@1",
                   "nativeType": "character varying",
@@ -4517,12 +4970,9 @@
                   "nullable": false
                 },
                 "notes": {
-                  "codecId": "sql/varchar@1",
-                  "nativeType": "character varying",
-                  "nullable": true,
-                  "typeParams": {
-                    "length": 1000
-                  }
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "order_id": {
                   "codecId": "sql/varchar@1",
@@ -4538,6 +4988,21 @@
                   "nullable": true,
                   "typeParams": {
                     "length": 255
+                  }
+                },
+                "payment_status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "ADVANCE_PAID"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "booking_payment_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
                   }
                 },
                 "platform_fee": {
@@ -6139,6 +6604,11 @@
                     "plane": "storage"
                   }
                 },
+                "rejection_reason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "service_request_id": {
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
@@ -7055,6 +7525,260 @@
                   ]
                 }
               ]
+            },
+            "wallet_transactions": {
+              "checks": [
+                {
+                  "expression": "\"category\" IN ('REFUND', 'EARNINGS', 'PAYMENT', 'WITHDRAWAL', 'COMMISSION')",
+                  "name": "wallet_transactions_category_check_2b236405",
+                  "prefix": "wallet_transactions_category_check"
+                },
+                {
+                  "expression": "\"type\" IN ('CREDIT', 'DEBIT')",
+                  "name": "wallet_transactions_type_check_e3a9320e",
+                  "prefix": "wallet_transactions_type_check"
+                }
+              ],
+              "columns": {
+                "amount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
+                "balance_after": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
+                "booking_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
+                },
+                "category": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "wallet_transaction_category",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "description": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 500
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "reference_id": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 100
+                  }
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "wallet_transaction_type",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "wallet_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "wallet_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "wallet_transactions"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "wallets"
+                  }
+                },
+                {
+                  "onDelete": "setNull",
+                  "source": {
+                    "columns": [
+                      "booking_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "wallet_transactions"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bookings"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "booking_id"
+                  ],
+                  "name": "wallet_transactions_booking_id_idx_aeea169b",
+                  "prefix": "wallet_transactions_booking_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "created_at"
+                  ],
+                  "name": "wallet_transactions_created_at_idx_225d8c0f",
+                  "prefix": "wallet_transactions_created_at_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "wallet_id"
+                  ],
+                  "name": "wallet_transactions_wallet_id_idx_f6a7fffd",
+                  "prefix": "wallet_transactions_wallet_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "wallets": {
+              "columns": {
+                "balance": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "currency": {
+                  "codecId": "sql/varchar@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "INR"
+                  },
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 10
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "user_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "user_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "wallets"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "user_id"
+                  ],
+                  "name": "wallets_user_id_idx_6c952402",
+                  "prefix": "wallets_user_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "user_id"
+                  ]
+                }
+              ]
             }
           },
           "valueSet": {
@@ -7072,13 +7796,26 @@
                 "CUSTOM_HOURS"
               ]
             },
+            "booking_payment_status": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "ADVANCE_PAID",
+                "PAID",
+                "REFUNDED"
+              ]
+            },
             "booking_status": {
               "kind": "valueSet",
               "values": [
                 "CONFIRMED",
+                "EN_ROUTE",
+                "INSPECTION",
                 "IN_PROGRESS",
+                "PAYMENT_PENDING",
                 "COMPLETED",
-                "CANCELLED"
+                "CANCELLED",
+                "CLOSED"
               ]
             },
             "conversation_status": {
@@ -7175,7 +7912,8 @@
                 "IN_PROGRESS",
                 "COMPLETED",
                 "CANCELLED",
-                "EXPIRED"
+                "EXPIRED",
+                "CLOSED"
               ]
             },
             "user_role": {
@@ -7209,6 +7947,23 @@
                 "CERTIFICATE"
               ]
             },
+            "wallet_transaction_category": {
+              "kind": "valueSet",
+              "values": [
+                "REFUND",
+                "EARNINGS",
+                "PAYMENT",
+                "WITHDRAWAL",
+                "COMMISSION"
+              ]
+            },
+            "wallet_transaction_type": {
+              "kind": "valueSet",
+              "values": [
+                "CREDIT",
+                "DEBIT"
+              ]
+            },
             "weekday": {
               "kind": "valueSet",
               "values": [
@@ -7227,10 +7982,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "e984a5dff6d3ef63a8920b4aa70d8be5e7a9cd67c9d0ea19dcd4295db0528a17"
+    "storageHash": "5b8edb0b28c30c8601d880f6bb38e0491ca7313a4372cfba71a28ad68f3ef0de"
   },
   "execution": {
-    "executionHash": "80f20cd258a9b67e141022463b45697108bf2abd0e87c87c3c6b67a379f32796",
+    "executionHash": "7cfa2bb0c83f838f529dffdf0a4b086424f3d2afeac803eae5a9b22d2fc0418b",
     "mutations": {
       "defaults": [
         {
@@ -7724,6 +8479,43 @@
             "column": "updated_at",
             "namespace": "public",
             "table": "users"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "wallet_transactions"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "wallets"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "wallets"
           }
         }
       ]

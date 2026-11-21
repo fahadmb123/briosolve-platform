@@ -91,6 +91,13 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
             <span>Expired</span>
           </span>
         );
+      case "CLOSED":
+        return (
+          <span className="provreq-badge-pill provreq-badge-closed">
+            <span className="provreq-dot-indicator"></span>
+            <span>Closed</span>
+          </span>
+        );
       case "COMPLETED":
         return (
           <span className="provreq-badge-pill provreq-badge-completed">
@@ -308,6 +315,36 @@ export const ProviderRequestCard: FC<ProviderRequestCardProps> = ({
             >
               <i className="fas fa-check-circle"></i>
               <span>View Your Quote</span>
+            </button>
+          ) : request.status === "ACCEPTED" || request.status === "IN_PROGRESS" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This request has already been accepted by another provider"
+            >
+              <i className="fas fa-check-circle"></i>
+              <span>Accepted</span>
+            </button>
+          ) : request.status === "CLOSED" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This service request has been closed via diagnosis settlement"
+            >
+              <i className="fas fa-lock"></i>
+              <span>Closed</span>
+            </button>
+          ) : request.status === "COMPLETED" ? (
+            <button
+              type="button"
+              className="provreq-btn-quote disabled"
+              disabled
+              title="This service request is completed"
+            >
+              <i className="fas fa-check-circle"></i>
+              <span>Completed</span>
             </button>
           ) : (
             <button

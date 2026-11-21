@@ -1,4 +1,5 @@
 import { BookingStatus, BookingPaymentStatus } from "../../../domain/entities/booking.entity";
+import { CancellationPolicyDetails } from "../../../domain/repositories/IBookingRepository";
 
 export interface BookingStatusHistoryItem {
     status: BookingStatus;
@@ -6,6 +7,17 @@ export interface BookingStatusHistoryItem {
     note: string;
     timestamp: string;
     authorName?: string | null;
+}
+
+export interface MismatchReport {
+    status: "PENDING" | "ACCEPTED" | "DECLINED";
+    diagnosis: string;
+    suggestedCategory?: string | null;
+    suggestedCategoryId?: string | null;
+    visitFee: number;
+    refundAmount: number;
+    reportedAt: string;
+    resolvedAt?: string | null;
 }
 
 export interface BookingResponseDto {
@@ -42,4 +54,8 @@ export interface BookingResponseDto {
     quoteAmount?: number | null;
     isFinalConfirmed?: boolean;
     statusHistory?: BookingStatusHistoryItem[];
+    providerCancellationsCount?: number;
+    maxAllowedCancellations?: number;
+    cancellationPolicy?: CancellationPolicyDetails;
+    mismatchReport?: MismatchReport | null;
 }

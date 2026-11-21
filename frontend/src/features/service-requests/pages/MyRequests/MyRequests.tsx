@@ -36,7 +36,8 @@ export default function MyRequests() {
     IN_PROGRESS: 0,
     COMPLETED: 0,
     CANCELLED: 0,
-    EXPIRED: 0
+    EXPIRED: 0,
+    CLOSED: 0
   });
 
   const [searchQuery, setSearchQuery] = useState<string>("");

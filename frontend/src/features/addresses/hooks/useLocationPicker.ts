@@ -33,7 +33,7 @@ export const useLocationPicker = (
     lat: number | null;
     lng: number | null;
   }>({ lat: initialData?.latitude || null, lng: initialData?.longitude || null });
-  
+
   const form = useForm<AddressInputType>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
@@ -135,10 +135,10 @@ export const useLocationPicker = (
 
     const area = props.name || props.street;
     if (area) form.setValue("area", area, { shouldValidate: true });
-    
+
     const city = props.city || props.county;
     if (city) form.setValue("city", city, { shouldValidate: true });
-    
+
     if (props.district) form.setValue("district", props.district, { shouldValidate: true });
     if (props.state) form.setValue("state", props.state, { shouldValidate: true });
     if (props.country) form.setValue("country", props.country, { shouldValidate: true });
@@ -224,7 +224,7 @@ export const useLocationPicker = (
 
   const isEditing = !!initialData;
   const hasChanges = isEditing ? (
-    form.formState.isDirty || 
+    form.formState.isDirty ||
     addressType !== initialData.type ||
     Number(coordinates.lat) !== Number(initialData.latitude) ||
     Number(coordinates.lng) !== Number(initialData.longitude)

@@ -1,6 +1,5 @@
 import React from "react";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+import "./ServiceRequestCardSkeleton.css";
 
 interface ServiceRequestCardSkeletonProps {
   variant?: "customer" | "provider";
@@ -10,33 +9,68 @@ export const ServiceRequestCardSkeleton: React.FC<ServiceRequestCardSkeletonProp
   variant = "customer",
 }) => {
   const isProvider = variant === "provider";
-  const cardClass = isProvider ? "provreq-row-card" : "myreq-row-card";
+  const cardClass = isProvider
+    ? "provreq-row-card sr-card-skeleton"
+    : "myreq-row-card sr-card-skeleton";
+  const headerClass = isProvider ? "provreq-card-header" : "myreq-card-header";
+  const headerLeftClass = isProvider ? "provreq-header-left" : "myreq-header-left";
+  const headerRightClass = isProvider ? "provreq-header-right" : "myreq-header-right";
+  const bodyClass = isProvider ? "provreq-card-body" : "myreq-card-body";
+  const footerClass = isProvider ? "provreq-card-footer" : "myreq-card-footer";
+  const footerLeftClass = isProvider ? "provreq-footer-left" : "myreq-footer-left";
+  const footerRightClass = isProvider ? "provreq-footer-right" : "myreq-footer-right";
 
   return (
-    <div className={cardClass} aria-hidden="true" style={{ pointerEvents: "none" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <Skeleton circle width={44} height={44} />
-          <Skeleton width={180} height={13} borderRadius={4} />
+    <div className={cardClass} aria-hidden="true">
+      <div className={headerClass}>
+        <div className={headerLeftClass}>
+          <div className="sr-sk-shimmer sr-sk-avatar" />
+          <div className="sr-sk-meta">
+            <div className="sr-sk-shimmer sr-sk-crumb-main" />
+            <div className="sr-sk-shimmer sr-sk-crumb-sub" />
+          </div>
         </div>
-        <Skeleton width={85} height={24} borderRadius={9999} />
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
-        <Skeleton width="55%" height={20} borderRadius={4} />
-        <Skeleton width="85%" height={14} borderRadius={4} />
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.25rem", flexWrap: "wrap" }}>
-          <Skeleton width={120} height={16} borderRadius={4} />
-          <Skeleton width={110} height={16} borderRadius={4} />
-          <Skeleton width={140} height={16} borderRadius={4} />
+        <div className={headerRightClass}>
+          <div className="sr-sk-shimmer sr-sk-badge" />
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "0.85rem", borderTop: "1px solid #f1f5f9" }}>
-        <Skeleton width={110} height={24} borderRadius={6} />
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <Skeleton width={60} height={28} borderRadius={6} />
-          <Skeleton width={110} height={34} borderRadius={9999} />
+      <div className={bodyClass}>
+        <div className="sr-sk-shimmer sr-sk-title" />
+        <div className="sr-sk-shimmer sr-sk-desc-1" />
+        <div className="sr-sk-shimmer sr-sk-desc-2" />
+        <div className="sr-sk-tags">
+          <div className="sr-sk-shimmer sr-sk-tag sr-sk-tag-calendar" />
+          <div className="sr-sk-shimmer sr-sk-tag sr-sk-tag-clock" />
+          <div className="sr-sk-shimmer sr-sk-tag sr-sk-tag-location" />
+          {isProvider ? (
+            <>
+              <div className="sr-sk-shimmer sr-sk-tag sr-sk-tag-distance" />
+              <div className="sr-sk-shimmer sr-sk-tag sr-sk-tag-budget" />
+            </>
+          ) : (
+            <div className="sr-sk-shimmer sr-sk-tag sr-sk-tag-quotes" />
+          )}
+        </div>
+      </div>
+
+      <div className={footerClass}>
+        <div className={footerLeftClass}>
+          <div className="sr-sk-shimmer sr-sk-photo-placeholder" />
+        </div>
+        <div className={footerRightClass}>
+          {!isProvider ? (
+            <>
+              <div className="sr-sk-shimmer sr-sk-btn-link" />
+              <div className="sr-sk-shimmer sr-sk-btn-danger" />
+              <div className="sr-sk-shimmer sr-sk-btn-primary" />
+            </>
+          ) : (
+            <>
+              <div className="sr-sk-shimmer sr-sk-btn-link" />
+              <div className="sr-sk-shimmer sr-sk-btn-primary" />
+            </>
+          )}
         </div>
       </div>
     </div>

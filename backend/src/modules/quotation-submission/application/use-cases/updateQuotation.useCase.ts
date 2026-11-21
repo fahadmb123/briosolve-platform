@@ -44,6 +44,35 @@ export class UpdateQuotationUseCase implements IUseCase<UpdateQuotationInputDto,
             );
         }
 
+        const serviceRequest = await this._serviceRequestRepository.findById(existingQuote.service_request_id);
+        if (!serviceRequest) {
+            throw new ApplicationError("REQUEST_NOT_FOUND", "Service request not found", "NOT_FOUND");
+        }
+
+        if (serviceRequest.status === "ACCEPTED" || serviceRequest.status === "IN_PROGRESS") {
+            throw new ApplicationError("REQUEST_ACCEPTED", "This service request has already been accepted and quotations cannot be modified", "CONFLICT");
+        }
+
+        if (serviceRequest.status === "COMPLETED") {
+            throw new ApplicationError("REQUEST_COMPLETED", "This service request has already been completed and quotations cannot be modified", "CONFLICT");
+        }
+
+        if (serviceRequest.status === "EXPIRED") {
+            throw new ApplicationError("REQUEST_EXPIRED", "This service request has expired and quotations cannot be modified", "CONFLICT");
+        }
+
+        if (serviceRequest.status === "CANCELLED") {
+            throw new ApplicationError("REQUEST_CANCELLED", "This service request has been cancelled and quotations cannot be modified", "CONFLICT");
+        }
+
+        if (serviceRequest.status === "CLOSED") {
+            throw new ApplicationError("REQUEST_CLOSED", "This service request has been closed via diagnosis settlement and quotations cannot be modified", "CONFLICT");
+        }
+
+        if (serviceRequest.status !== "PENDING" && serviceRequest.status !== "ACTIVE") {
+            throw new ApplicationError("INVALID_STATE", "Cannot update quotation on a service request that is no longer active", "VALIDATION");
+        }
+
         const { providerUserId, quotationId, ...updateData } = input;
         const updated = await this._quotationRepository.update(quotationId, updateData);
 

@@ -210,6 +210,12 @@
   border: 1px solid #bbf7d0;
 }
 
+.bkdet-status-badge.closed {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
 .bkdet-status-badge.cancelled {
   background: #fef2f2;
   color: #b91c1c;
@@ -332,6 +338,25 @@
   color: #b91c1c;
   margin: 0;
   line-height: 1.45;
+}
+
+.bkdet-cb-author-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #7f1d1d;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+.bkdet-cb-author-badge strong {
+  font-weight: 800;
+  color: #991b1b;
 }
 
 .bkdet-cb-reason-box {
@@ -781,6 +806,429 @@
 .bkdet-directions-btn:hover {
   background: #f8fafc;
   border-color: #94a3b8;
+}
+
+.bkdet-billing-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.bkdet-billing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bkdet-billing-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bkdet-billing-title-wrap i {
+  color: #0284c7;
+  font-size: 1rem;
+}
+
+.bkdet-billing-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.bkdet-billing-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bkdet-billing-pill.paid {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.bkdet-billing-pill.advance {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.bkdet-billing-pill.pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.bkdet-billing-pill.refunded {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.bkdet-billing-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.bkdet-billing-hero-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+.bkdet-billing-hero-amount {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.bkdet-billing-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bkdet-billing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.bkdet-billing-row.total {
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.bkdet-billing-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 2px 0;
+}
+
+.bkdet-billing-row.advance .paid-tag {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.bkdet-billing-row.balance {
+  padding-top: 6px;
+  border-top: 1px dashed #cbd5e1;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.bkdet-billing-row.balance strong.due {
+  color: #ea580c;
+  font-size: 0.95rem;
+}
+
+.bkdet-billing-row.balance strong.settled {
+  color: #16a34a;
+  font-size: 0.88rem;
+}
+
+.bkdet-billing-pay-wrap {
+  margin-top: 2px;
+}
+
+.bkdet-billing-pay-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #ea580c;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bkdet-billing-pay-btn:hover:not(:disabled) {
+  background: #c2410c;
+}
+
+.bkdet-billing-pay-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.bkdet-billing-escrow-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: #64748b;
+  padding-top: 6px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.bkdet-billing-escrow-footer i {
+  color: #16a34a;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.bkdet-billing-notice {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  padding: 9px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.bkdet-billing-notice i {
+  font-size: 0.85rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bkdet-billing-notice.info {
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.bkdet-billing-notice.warning {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.bkdet-billing-notice.cancelled {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.bkdet-mismatch-banner {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.08);
+  margin-bottom: 20px;
+}
+
+.bkdet-mismatch-banner.accepted {
+  border-color: #bbf7d0;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.08);
+}
+
+.bkdet-mismatch-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bkdet-mismatch-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bkdet-mismatch-title-wrap i {
+  color: #ea580c;
+  font-size: 1.1rem;
+}
+
+.bkdet-mismatch-banner.accepted .bkdet-mismatch-title-wrap i {
+  color: #16a34a;
+}
+
+.bkdet-mismatch-title {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.bkdet-mismatch-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.bkdet-mismatch-pill.pending {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #ffedd5;
+}
+
+.bkdet-mismatch-pill.accepted {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #dcfce7;
+}
+
+.bkdet-mismatch-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fffaf5;
+  border: 1px solid #ffedd5;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.bkdet-mismatch-banner.accepted .bkdet-mismatch-body {
+  background: #f8fafc;
+  border-color: #f1f5f9;
+}
+
+.bkdet-mismatch-diag {
+  font-size: 0.86rem;
+  color: #1e293b;
+  line-height: 1.45;
+}
+
+.bkdet-mismatch-cat {
+  font-size: 0.78rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bkdet-mismatch-cat strong {
+  color: #0f172a;
+}
+
+.bkdet-mismatch-finance {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed #fed7aa;
+  font-size: 0.8rem;
+}
+
+.bkdet-mismatch-banner.accepted .bkdet-mismatch-finance {
+  border-top-color: #e2e8f0;
+}
+
+.bkdet-mismatch-fin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bkdet-mismatch-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bkdet-mismatch-btn-accept {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bkdet-mismatch-btn-accept:hover:not(:disabled) {
+  background: #15803d;
+}
+
+.bkdet-mismatch-btn-decline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bkdet-mismatch-btn-decline:hover:not(:disabled) {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.bkdet-mismatch-btn-repost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bkdet-mismatch-btn-repost:hover:not(:disabled) {
+  background: #0369a1;
+}
+
+.bkdet-btn-mismatch-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #ffffff;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bkdet-btn-mismatch-trigger:hover {
+  background: #fffbeb;
+  border-color: #f59e0b;
 }
 
 .bkdet-escrow-card {
@@ -1802,4 +2250,82 @@
   .bkdet-section-card {
     padding: 18px 16px;
   }
+}
+
+.bkdet-skeleton-container {
+  pointer-events: none;
+  user-select: none;
+}
+
+.bkdet-sk-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.7) 0%,
+    rgba(241, 245, 249, 0.95) 50%,
+    rgba(226, 232, 240, 0.7) 100%
+  );
+  background-size: 200% 100%;
+  animation: bkdetShimmer 1.5s infinite linear;
+}
+
+@keyframes bkdetShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.bkdet-sk-pill {
+  height: 26px;
+  border-radius: 8px;
+}
+
+.bkdet-sk-status {
+  height: 28px;
+  border-radius: 9999px;
+}
+
+.bkdet-sk-btn {
+  height: 38px;
+  border-radius: 8px;
+}
+
+.bkdet-sk-stepper-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.bkdet-sk-tl-bubble {
+  padding: 12px 14px;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.bkdet-sk-meta-box {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bkdet-sk-payment-tile {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }

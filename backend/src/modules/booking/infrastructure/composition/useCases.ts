@@ -1,6 +1,8 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
+import type { CreditWalletInputDto } from "../../../wallet/application/use-cases/creditWallet.useCase";
+import { WalletResponseDto } from "../../../wallet/application/dtos/response/wallet-response.dto";
 import { bookingRepository } from "./repositories";
 import { providerRepository } from "../../../user-management/infrastructure/composition/repositories";
 import { serviceRequestRepository } from "../../../service-request/infrastructure/composition/repositories";
@@ -10,6 +12,8 @@ import { GetBookingByIdUseCase } from "../../application/use-cases/getBookingByI
 import { GetCustomerBookingsUseCase } from "../../application/use-cases/getCustomerBookings.useCase";
 import { GetProviderBookingsUseCase } from "../../application/use-cases/getProviderBookings.useCase";
 import { UpdateBookingStatusUseCase } from "../../application/use-cases/updateBookingStatus.useCase";
+import { ReportServiceMismatchUseCase } from "../../application/use-cases/reportServiceMismatch.useCase";
+import { ResolveServiceMismatchUseCase } from "../../application/use-cases/resolveServiceMismatch.useCase";
 
 export function createCreateBookingUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
@@ -30,13 +34,38 @@ export function createGetProviderBookingsUseCase(): GetProviderBookingsUseCase {
 }
 
 export function createUpdateBookingStatusUseCase(
-    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
+    creditWalletUseCase?: IUseCase<CreditWalletInputDto, WalletResponseDto>
 ): UpdateBookingStatusUseCase {
     return new UpdateBookingStatusUseCase(
         bookingRepository,
         providerRepository,
         serviceRequestRepository,
         quotationRepository,
+        createNotificationUseCase,
+        creditWalletUseCase
+    );
+}
+
+export function createReportServiceMismatchUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): ReportServiceMismatchUseCase {
+    return new ReportServiceMismatchUseCase(
+        bookingRepository,
+        providerRepository,
+        createNotificationUseCase
+    );
+}
+
+export function createResolveServiceMismatchUseCase(
+    creditWalletUseCase?: IUseCase<CreditWalletInputDto, WalletResponseDto>,
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): ResolveServiceMismatchUseCase {
+    return new ResolveServiceMismatchUseCase(
+        bookingRepository,
+        providerRepository,
+        serviceRequestRepository,
+        creditWalletUseCase,
         createNotificationUseCase
     );
 }

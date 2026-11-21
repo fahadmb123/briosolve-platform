@@ -88,6 +88,32 @@ export const QuotationDetailsModal: FC<QuotationDetailsModalProps> = ({
         </div>
 
         <div className="quote-modal-body">
+          {(quotation.status === "REJECTED" || quotation.status === "WITHDRAWN" || quotation.status === "EXPIRED") && (
+            <div className={`quote-modal-status-notice ${quotation.status.toLowerCase()}`}>
+              <div className="quote-modal-notice-icon">
+                <i className={quotation.status === "REJECTED" ? "fas fa-times-circle" : quotation.status === "WITHDRAWN" ? "fas fa-ban" : "fas fa-clock"} />
+              </div>
+              <div className="quote-modal-notice-content">
+                <div className="quote-modal-notice-title">
+                  {quotation.status === "REJECTED"
+                    ? "Quotation Declined by Customer"
+                    : quotation.status === "WITHDRAWN"
+                    ? "Quotation Withdrawn"
+                    : "Quotation Expired"}
+                </div>
+                <div className="quote-modal-notice-text">
+                  {quotation.rejectionReason || (
+                    quotation.status === "REJECTED"
+                      ? "The customer declined this quotation."
+                      : quotation.status === "WITHDRAWN"
+                      ? "This quotation was withdrawn due to a booking cancellation."
+                      : "The validity period for this quotation ended before acceptance."
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="quote-modal-highlight-box">
             <div className="quote-modal-highlight-amount">
               <span className="quote-modal-currency">₹</span>

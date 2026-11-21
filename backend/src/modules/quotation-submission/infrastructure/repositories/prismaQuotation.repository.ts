@@ -6,7 +6,41 @@ import { UpdateQuotationRepoDto } from "../../application/dtos/request/update-qu
 import { QuotationMapper } from "../mappers/quotation.mapper";
 
 export class PrismaQuotationRepository implements IQuotationRepository {
+    private async syncExpiredQuotations(): Promise<void> {
+        try {
+            const now = new Date();
+            const pendingRecords = await db.orm.public.quotations
+                .where({ status: "PENDING" as never })
+                .all();
+
+            const expiredIds: string[] = [];
+            for (const record of pendingRecords) {
+                if (!record.valid_until_date) continue;
+                const rawDate: any = record.valid_until_date;
+                const dateVal = rawDate?.epochMilliseconds
+                    ? new Date(Number(rawDate.epochMilliseconds))
+                    : new Date(rawDate);
+
+                if (!isNaN(dateVal.getTime()) && now.getTime() > dateVal.getTime()) {
+                    expiredIds.push(record.id);
+                }
+            }
+
+            if (expiredIds.length > 0) {
+                await db.orm.public.quotations
+                    .where((q) => q.id.in(expiredIds))
+                    .updateAll({
+                        status: "EXPIRED" as never,
+                        rejection_reason: "Quotation validity expired" as never
+                    } as never);
+            }
+        } catch {
+            return;
+        }
+    }
+
     async findById(id: string): Promise<Quotation | null> {
+        await this.syncExpiredQuotations();
         const record = await db.orm.public.quotations
             .where({ id: id as never })
             .first();
@@ -19,6 +53,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
         serviceRequestId: string,
         providerId: string
     ): Promise<Quotation | null> {
+        await this.syncExpiredQuotations();
         const record = await db.orm.public.quotations
             .where({
                 service_request_id: serviceRequestId as never,
@@ -31,6 +66,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     }
 
     async findByServiceRequestId(serviceRequestId: string): Promise<Quotation[]> {
+        await this.syncExpiredQuotations();
         const records = await db.orm.public.quotations
             .where({ service_request_id: serviceRequestId as never })
             .all();
@@ -57,6 +93,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     }
 
     async findByProviderId(providerId: string, params: GetProviderQuotationsParams): Promise<ProviderQuotationsResult> {
+        await this.syncExpiredQuotations();
         const { page, limit, status, sortBy } = params;
 
         const whereClause: Record<string, any> = { provider_id: providerId as never };

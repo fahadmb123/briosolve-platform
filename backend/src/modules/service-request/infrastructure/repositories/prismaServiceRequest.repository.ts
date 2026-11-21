@@ -6,8 +6,7 @@ import { CreateServiceRequestRepoDto } from "../../application/dtos/request/crea
 import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/update-service-request.dto";
 import {
     ServiceRequestDetailsDto,
-    GetCustomerRequestsOutputDto,
-    GetAdminServiceRequestsInputDto
+    GetCustomerRequestsOutputDto
 } from "../../application/dtos/response/service-request.dto";
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
 import { ServiceRequestMapper } from "../mappers/serviceRequest.mapper";
@@ -145,7 +144,48 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
         const allRecords = await db.orm.public.service_requests
             .where({ customer_id: customerId as never })
+            .include("bookings")
             .all();
+
+        const isBookingDiagnosisClosed = (b: any) => {
+            if (b.status === "CLOSED") return true;
+            if (b.notes) {
+                try {
+                    const parsed = typeof b.notes === "string" ? JSON.parse(b.notes) : b.notes;
+                    if (parsed && typeof parsed === "object") {
+                        if (parsed.mismatchReport && parsed.mismatchReport.status === "ACCEPTED") {
+                            return true;
+                        }
+                        if (Array.isArray(parsed.history)) {
+                            const isDiagItem = parsed.history.some((h: any) => 
+                                h.authorName === "System (Diagnosis Closed)" || 
+                                (h.note && h.note.toLowerCase().includes("diagnosis accepted"))
+                            );
+                            if (isDiagItem) return true;
+                        }
+                    }
+                } catch {}
+            }
+            return false;
+        };
+
+        for (const r of allRecords) {
+            const hasDiagnosisClosedBooking = Array.isArray(r.bookings) && r.bookings.some(isBookingDiagnosisClosed);
+            if (hasDiagnosisClosedBooking && (r.status as string) !== "CLOSED") {
+                await db.orm.public.service_requests
+                    .where({ id: r.id as never })
+                    .update({ status: "CLOSED" as never, updated_at: Temporal.Now.instant() });
+                r.status = "CLOSED" as never;
+            } else {
+                const hasCompletedBooking = Array.isArray(r.bookings) && r.bookings.some((b: any) => b.status === "COMPLETED");
+                if (hasCompletedBooking && r.status !== "COMPLETED") {
+                    await db.orm.public.service_requests
+                        .where({ id: r.id as never })
+                        .update({ status: "COMPLETED" as never, updated_at: Temporal.Now.instant() });
+                    r.status = "COMPLETED" as never;
+                }
+            }
+        }
 
         const counts: Record<string, number> = {
             ALL: allRecords.length,
@@ -156,12 +196,14 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
             IN_PROGRESS: 0,
             COMPLETED: 0,
             CANCELLED: 0,
-            EXPIRED: 0
+            EXPIRED: 0,
+            CLOSED: 0
         };
 
         allRecords.forEach((r) => {
-            if (r.status in counts) {
-                counts[r.status] += 1;
+            const st = r.status as string;
+            if (st in counts) {
+                counts[st] += 1;
             }
         });
 
@@ -255,84 +297,6 @@ export class ServiceRequestRepository implements IServiceRequestRepository {
 
             if (!finalRecord) return null;
             return ServiceRequestMapper.toDomain(finalRecord);
-        });
-    }
-
-    async findAdminRequests(
-        input: GetAdminServiceRequestsInputDto
-    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts: Record<string, number> }> {
-        await this.syncExpiredRequests();
-        const { page = 1, limit = 10, search, status, sortBy = "NEWEST" } = input;
-        const skip = (page - 1) * limit;
-
-        let query = db.orm.public.service_requests;
-
-        if (status && status !== "ALL") {
-            query = query.where({ status: status as never });
-        }
-
-        if (search && search.trim()) {
-            query = query.where((req) => req.title.ilike(`%${search.trim()}%`));
-        }
-
-        if (sortBy === "OLDEST") {
-            query = query.orderBy((req) => req.updated_at.asc());
-        } else {
-            query = query.orderBy((req) => req.updated_at.desc());
-        }
-
-        const records = await query
-            .include("images")
-            .include("category")
-            .include("subservice")
-            .include("address")
-            .include("customer", (c) => c.include("customer_profile"))
-            .include("providers")
-            .include("bookings")
-            .offset(skip)
-            .limit(limit)
-            .all();
-
-        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
-
-        const allRecords = await db.orm.public.service_requests.all();
-
-        const counts: Record<string, number> = {
-            ALL: allRecords.length,
-            DRAFT: 0,
-            PENDING: 0,
-            ACTIVE: 0,
-            ACCEPTED: 0,
-            IN_PROGRESS: 0,
-            COMPLETED: 0,
-            CANCELLED: 0,
-            EXPIRED: 0
-        };
-
-        allRecords.forEach((r) => {
-            if (r.status in counts) {
-                counts[r.status] += 1;
-            }
-        });
-
-        return {
-            requests: records.map((record) => ServiceRequestMapper.toDetailsDto(record)),
-            total: totalResult.total,
-            counts
-        };
-    }
-
-    async adminCancel(id: string): Promise<ServiceRequest | null> {
-        return await db.transaction(async (tx) => {
-            const updated = await tx.orm.public.service_requests
-                .where({ id: id as never })
-                .update({
-                    status: "CANCELLED" as never,
-                    updated_at: Temporal.Now.instant()
-                } as never);
-
-            if (!updated) return null;
-            return ServiceRequestMapper.toDomain(updated);
         });
     }
 

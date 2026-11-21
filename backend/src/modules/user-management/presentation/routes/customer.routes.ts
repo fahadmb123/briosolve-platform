@@ -12,13 +12,14 @@ import { CustomerRouteDependencies } from "../types/customer.route.dependencies"
 export function buildCustomerRoute(controller: CustomerRouteDependencies): Router {
     const router = Router();
 
+    router.get("/providers/:id", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.getProviderPublicProfile);
+    router.get("/nearby-providers", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.getNearbyProviders);
+
     router.post("/register", rateLimiter({ windowSeconds: 300, maxRequests: 5, prefix: "customer-reg" }), validate(customerRegistrationSchema), controller.customer.register);
     router.post("/profile/image", authMiddleware, requireRole(["CUSTOMER"]), upload.single("image"), validateFile(imageFileSchema), controller.customer.uploadProfileImage);
     router.post("/become-provider/send-otp", authMiddleware, requireRole(["CUSTOMER"]), rateLimiter({ windowSeconds: 300, maxRequests: 3, prefix: "customer-otp" }), controller.customer.sendBecomeProviderOtp);
     router.post("/become-provider", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.becomeProvider);
 
-    router.get("/nearby-providers", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.getNearbyProviders);
-    router.get("/providers/:id", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.getProviderPublicProfile);
     router.patch("/profile", validate(profileSchema), authMiddleware, requireRole(["CUSTOMER"]), controller.customer.updateProfile);
     router.delete("/profile/image", authMiddleware, requireRole(["CUSTOMER"]), controller.customer.deleteProfileImage);
 

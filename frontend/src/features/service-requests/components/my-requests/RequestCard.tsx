@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { checkRequestEditPermission } from "../../utils/serviceRequestEdit.utils";
 import { getCategoryVisualConfig } from "../../utils/categoryIcon.utils";
@@ -18,10 +19,18 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   onCancelRequest,
   onReopenRequest,
 }) => {
+  const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
+  const isDiagnosisClosed = Boolean(
+    request.status === "CLOSED" ||
+    request.latest_booking?.status === "CLOSED" ||
+    request.latest_booking?.is_diagnosis_closed ||
+    (request.latest_booking?.cancellation_reason &&
+     request.latest_booking.cancellation_reason.toLowerCase().includes("diagnosis"))
+  );
   const visual = getCategoryVisualConfig(request.category_name, request.subservice_name);
   const permission = checkRequestEditPermission(request);
-  const canCancel = request.status === "PENDING" || request.status === "ACTIVE";
+  const canCancel = (request.status === "PENDING" || request.status === "ACTIVE") && !isDiagnosisClosed;
 
   const getUrgencyText = () => {
     if (request.status === "EXPIRED") {
@@ -87,9 +96,16 @@ export const RequestCard: React.FC<RequestCardProps> = ({
         );
       case "COMPLETED":
         return (
-          <span className="myreq-badge-pill myreq-badge-completed">
-            <span className="myreq-dot-indicator"></span>
-            <span>Completed</span>
+          <span className="myreq-badge-pill myreq-badge-completed" style={isDiagnosisClosed ? { background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" } : undefined}>
+            <span className="myreq-dot-indicator" style={isDiagnosisClosed ? { background: "#10b981" } : undefined}></span>
+            <span>{isDiagnosisClosed ? "Diagnosis Closed" : "Completed"}</span>
+          </span>
+        );
+      case "CLOSED":
+        return (
+          <span className="myreq-badge-pill myreq-badge-completed" style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+            <span className="myreq-dot-indicator" style={{ background: "#10b981" }}></span>
+            <span>Diagnosis Closed</span>
           </span>
         );
       case "IN_PROGRESS":
@@ -100,6 +116,14 @@ export const RequestCard: React.FC<RequestCardProps> = ({
           </span>
         );
       case "ACCEPTED":
+        if (request.latest_booking?.status === "COMPLETED" || isDiagnosisClosed) {
+          return (
+            <span className="myreq-badge-pill myreq-badge-completed" style={isDiagnosisClosed ? { background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" } : undefined}>
+              <span className="myreq-dot-indicator" style={isDiagnosisClosed ? { background: "#10b981" } : undefined}></span>
+              <span>{isDiagnosisClosed ? "Diagnosis Closed" : "Completed"}</span>
+            </span>
+          );
+        }
         return (
           <span className="myreq-badge-pill myreq-badge-accepted">
             <span className="myreq-dot-indicator"></span>
@@ -114,6 +138,14 @@ export const RequestCard: React.FC<RequestCardProps> = ({
           </span>
         );
       case "CANCELLED":
+        if (isDiagnosisClosed) {
+          return (
+            <span className="myreq-badge-pill myreq-badge-completed" style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+              <span className="myreq-dot-indicator" style={{ background: "#10b981" }}></span>
+              <span>Diagnosis Closed</span>
+            </span>
+          );
+        }
         return (
           <span className="myreq-badge-pill myreq-badge-cancelled">
             <span className="myreq-dot-indicator"></span>
@@ -219,6 +251,56 @@ export const RequestCard: React.FC<RequestCardProps> = ({
               <span>{notifiedCount} {notifiedCount === 1 ? "provider" : "providers"} notified</span>
             </div>
           ) : null}
+
+          {isDiagnosisClosed && request.latest_booking ? (
+            <div
+              className="myreq-meta-tag completed"
+              style={{
+                color: "#15803d",
+                background: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+              onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+              title="Click to view diagnosis closed booking"
+            >
+              <i className="fas fa-stethoscope"></i>
+              <span>Booking #{request.latest_booking.booking_number} Diagnosis Closed</span>
+            </div>
+          ) : request.latest_booking && request.latest_booking.status === "COMPLETED" ? (
+            <div
+              className="myreq-meta-tag completed"
+              style={{
+                color: "#15803d",
+                background: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+              onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+              title="Click to view completed booking"
+            >
+              <i className="fas fa-check-circle"></i>
+              <span>Booking #{request.latest_booking.booking_number} Completed</span>
+            </div>
+          ) : request.latest_booking && request.latest_booking.status !== "CANCELLED" ? (
+            <div
+              className="myreq-meta-tag"
+              style={{
+                color: "#0369a1",
+                background: "#f0f9ff",
+                border: "1px solid #bae6fd",
+                fontWeight: 500,
+                cursor: "pointer"
+              }}
+              onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+              title="Click to view booking"
+            >
+              <i className="fas fa-calendar-check"></i>
+              <span>Booking #{request.latest_booking.booking_number} ({request.latest_booking.status.replace("_", " ")})</span>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -258,7 +340,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({
             </button>
           )}
 
-          {isExpired && onReopenRequest && (
+          {isExpired && !isDiagnosisClosed && onReopenRequest && (
             <button
               type="button"
               className="myreq-action-reopen-link"
@@ -266,6 +348,21 @@ export const RequestCard: React.FC<RequestCardProps> = ({
             >
               <i className="fas fa-sync-alt"></i>
               <span>Reopen</span>
+            </button>
+          )}
+
+          {request.latest_booking?.id && (
+            <button
+              type="button"
+              className="myreq-action-link"
+              onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+              style={{
+                color: (request.latest_booking.status === "COMPLETED" || isDiagnosisClosed) ? "#15803d" : "#c2410c",
+                fontWeight: 600
+              }}
+            >
+              <i className="fas fa-receipt" style={{ marginRight: "4px" }}></i>
+              <span>{isDiagnosisClosed ? "View Diagnosis Booking" : (request.latest_booking.status === "COMPLETED" ? "View Completed Booking" : "View Booking")}</span>
             </button>
           )}
 

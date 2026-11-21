@@ -8,6 +8,8 @@ export function buildPaymentRoute(controller: PaymentRouteDependencies): Router 
 
     router.post("/create-order", authMiddleware, requireRole(["CUSTOMER"]), controller.payment.createOrder);
     router.post("/verify-and-accept", authMiddleware, requireRole(["CUSTOMER"]), controller.payment.verifyAndAccept);
+    router.post("/create-booking-order", authMiddleware, requireRole(["CUSTOMER"]), controller.payment.createBookingOrder);
+    router.post("/verify-booking-payment", authMiddleware, requireRole(["CUSTOMER"]), controller.payment.verifyBookingPayment);
 
     return router;
 }

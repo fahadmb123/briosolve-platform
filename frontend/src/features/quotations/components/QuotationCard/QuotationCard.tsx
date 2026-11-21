@@ -87,6 +87,24 @@ export const QuotationCard: FC<QuotationCardProps> = ({
 
         <p className="myquote-row-desc">{quotation.workDescription}</p>
 
+        {(quotation.status === "REJECTED" || quotation.status === "WITHDRAWN") && (
+          <div className={`myquote-cancelled-box ${quotation.status.toLowerCase()}`}>
+            <div className="myquote-cancelled-header">
+              <i className={quotation.status === "REJECTED" ? "fas fa-times-circle" : "fas fa-ban"} />
+              <span>
+                {quotation.status === "REJECTED"
+                  ? "Declined by Customer"
+                  : "Withdrawn / Cancelled"}
+              </span>
+            </div>
+            {quotation.rejectionReason && (
+              <div className="myquote-cancelled-reason">
+                Reason: <strong>"{quotation.rejectionReason}"</strong>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="myquote-row-meta">
           <div className="myquote-meta-pill">
             <i className="fas fa-tag" />

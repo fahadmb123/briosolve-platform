@@ -33,16 +33,16 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   });
 
   const cancellationReason = React.useMemo<string | null>(() => {
-    if (booking.status !== "CANCELLED") return null;
+    if (booking.status !== "CANCELLED" && booking.status !== "CLOSED") return null;
     if (booking.statusHistory && booking.statusHistory.length > 0) {
-      const cancelItem = booking.statusHistory.slice().reverse().find((item) => item.status === "CANCELLED");
+      const cancelItem = booking.statusHistory.slice().reverse().find((item) => item.status === "CANCELLED" || item.status === "CLOSED");
       if (cancelItem?.note && cancelItem.note.trim()) return cancelItem.note.trim();
     }
     if (booking.notes && booking.notes.trim()) {
       try {
         const parsed = JSON.parse(booking.notes);
         if (Array.isArray(parsed)) {
-          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED" || item.status === "CLOSED");
           if (cancelItem?.note && cancelItem.note.trim()) return cancelItem.note.trim();
         }
       } catch {
@@ -51,6 +51,44 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     }
     return null;
   }, [booking]);
+
+  const cancellationAuthor = React.useMemo<string | null>(() => {
+    if (booking.status !== "CANCELLED" && booking.status !== "CLOSED") return null;
+    if (booking.statusHistory && booking.statusHistory.length > 0) {
+      const cancelItem = booking.statusHistory.slice().reverse().find((item) => item.status === "CANCELLED" || item.status === "CLOSED");
+      if (cancelItem?.authorName) return cancelItem.authorName;
+    }
+    if (booking.notes && booking.notes.trim()) {
+      try {
+        const parsed = JSON.parse(booking.notes);
+        if (Array.isArray(parsed)) {
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED" || item.status === "CLOSED");
+          if (cancelItem?.authorName) return cancelItem.authorName;
+        }
+      } catch {}
+    }
+    return null;
+  }, [booking]);
+
+  const isDiagnosisClosed = React.useMemo<boolean>(() => {
+    if (booking.status === "CLOSED") return true;
+    if (booking.mismatchReport?.status === "ACCEPTED") return true;
+    if (cancellationAuthor && cancellationAuthor.toLowerCase().includes("diagnosis")) return true;
+    if (cancellationReason && (
+      cancellationReason.toLowerCase().includes("diagnosis accepted") ||
+      cancellationReason.toLowerCase().includes("scope mismatch")
+    )) return true;
+    return false;
+  }, [booking, cancellationAuthor, cancellationReason]);
+
+  const displayAuthor = React.useMemo<string>(() => {
+    if (!cancellationAuthor) return "System";
+    const lower = cancellationAuthor.toLowerCase();
+    if (lower === "customer") return "Customer";
+    if (lower.includes("diagnosis")) return "System (Diagnosis Closed)";
+    if (lower.includes("provider")) return "Provider";
+    return cancellationAuthor;
+  }, [cancellationAuthor]);
 
   const renderStatusBadge = () => {
     switch (booking.status) {
@@ -96,7 +134,22 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             <span>Completed</span>
           </span>
         );
+      case "CLOSED":
+        return (
+          <span className="bkcard-badge closed">
+            <i className="fas fa-clipboard-check"></i>
+            <span>Diagnosis Closed</span>
+          </span>
+        );
       case "CANCELLED":
+        if (isDiagnosisClosed) {
+          return (
+            <span className="bkcard-badge closed">
+              <i className="fas fa-clipboard-check"></i>
+              <span>Diagnosis Closed</span>
+            </span>
+          );
+        }
         return (
           <span className="bkcard-badge cancelled">
             <i className="fas fa-ban"></i>
@@ -143,11 +196,34 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           {booking.serviceRequestTitle || "Service Requirement"}
         </h3>
 
-        {booking.status === "CANCELLED" && cancellationReason && (
-          <div className="bkcard-cancel-reason-pill">
-            <i className="fas fa-ban"></i>
-            <span>Cancellation Reason: <strong>"{cancellationReason}"</strong></span>
+        {isDiagnosisClosed ? (
+          <div className="bkcard-diagnosis-pill">
+            <i className="fas fa-stethoscope"></i>
+            <div className="bkcard-cancel-info">
+              <span className="bkcard-diagnosis-title">
+                Closed via Diagnosis Agreement <strong>(Exempt from Cancellation Limits)</strong>
+              </span>
+              <span className="bkcard-diagnosis-desc">
+                {booking.mismatchReport
+                  ? `Technician diagnosis accepted: "${booking.mismatchReport.diagnosis}". Visit fee of ₹${booking.mismatchReport.visitFee} settled and ₹${booking.mismatchReport.refundAmount} refunded.`
+                  : cancellationReason || "Booking closed safely via on-site diagnosis agreement."}
+              </span>
+            </div>
           </div>
+        ) : (
+          booking.status === "CANCELLED" && (
+            <div className="bkcard-cancel-reason-pill">
+              <i className="fas fa-ban"></i>
+              <div className="bkcard-cancel-info">
+                <span className="bkcard-cancel-author">
+                  Cancelled by <strong>{displayAuthor}</strong>
+                </span>
+                {cancellationReason && (
+                  <span className="bkcard-cancel-reason-text">Reason: "{cancellationReason}"</span>
+                )}
+              </div>
+            </div>
+          )
         )}
 
         <div className="bkcard-meta-row">
@@ -216,7 +292,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             <span>Booking Details</span>
           </button>
 
-          {role === "CUSTOMER" && booking.status === "CONFIRMED" && onUpdateStatus && (
+          {role === "CUSTOMER" && (booking.status === "CONFIRMED" || booking.status === "EN_ROUTE") && onUpdateStatus && (
             <button
               type="button"
               className="bkcard-btn-action danger"

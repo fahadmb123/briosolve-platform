@@ -34,7 +34,8 @@ export default function ProviderLayout() {
     location.pathname.startsWith("/provider/chat");
 
   const isFinancesSection =
-    location.pathname.startsWith("/provider/quotations");
+    location.pathname.startsWith("/provider/quotations") ||
+    location.pathname.startsWith("/provider/wallet");
 
   const hasSubnav = isSettingsSection || isWorkspaceSection || isFinancesSection;
 
