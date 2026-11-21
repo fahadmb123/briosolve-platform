@@ -3,8 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { GetBookingByIdInputDto, GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
 import { UpdateBookingStatusInputDto } from "../../application/dtos/request/update-booking-status.dto";
-import { ReportServiceMismatchInputDto, ResolveServiceMismatchInputDto, ReopenRequestWithDiagnosisInputDto } from "../../application/dtos/request/mismatch-report.dto";
-import { ReopenRequestWithDiagnosisResponseDto } from "../../application/use-cases/reopenRequestWithDiagnosis.useCase";
+import { ReportServiceMismatchInputDto, ResolveServiceMismatchInputDto } from "../../application/dtos/request/mismatch-report.dto";
 import { BookingResponseDto } from "../../application/dtos/response/booking-response.dto";
 import { CustomerBookingsResponseDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
@@ -16,8 +15,7 @@ export class BookingController extends BaseController {
         private readonly _getProviderBookingsUseCase: IUseCase<GetProviderBookingsInputDto, ProviderBookingsResponseDto>,
         private readonly _updateBookingStatusUseCase: IUseCase<UpdateBookingStatusInputDto, BookingResponseDto>,
         private readonly _reportServiceMismatchUseCase: IUseCase<ReportServiceMismatchInputDto, BookingResponseDto>,
-        private readonly _resolveServiceMismatchUseCase: IUseCase<ResolveServiceMismatchInputDto, BookingResponseDto>,
-        private readonly _reopenRequestWithDiagnosisUseCase: IUseCase<ReopenRequestWithDiagnosisInputDto, ReopenRequestWithDiagnosisResponseDto>
+        private readonly _resolveServiceMismatchUseCase: IUseCase<ResolveServiceMismatchInputDto, BookingResponseDto>
     ) {
         super();
     }
@@ -136,22 +134,6 @@ export class BookingController extends BaseController {
             });
 
             return this.sendSuccess(res, action === "ACCEPT" ? "Diagnosis accepted and booking closed" : "Diagnosis report declined", response, 200);
-        } catch (error) {
-            next(error);
-        }
-    };
-
-    reopenRequest = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const customerId = req.user?.userId;
-            const bookingId = req.params.id as string;
-
-            const response = await this._reopenRequestWithDiagnosisUseCase.execute({
-                bookingId,
-                customerId: customerId!
-            });
-
-            return this.sendSuccess(res, "Service request reopened successfully", response, 200);
         } catch (error) {
             next(error);
         }

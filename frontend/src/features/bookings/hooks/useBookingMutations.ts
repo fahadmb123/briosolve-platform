@@ -5,8 +5,7 @@ import {
   getBookingById,
   updateBookingStatus,
   reportBookingMismatch,
-  resolveBookingMismatch,
-  reopenRequestWithDiagnosis
+  resolveBookingMismatch
 } from "../services/booking.service";
 import type { GetBookingsQueryParams, UpdateBookingStatusPayload } from "../types/booking.types";
 
@@ -80,19 +79,6 @@ export const useResolveBookingMismatch = () => {
       queryClient.invalidateQueries({ queryKey: ["providerBookings"] });
       queryClient.invalidateQueries({ queryKey: ["booking", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["wallet"] });
-      queryClient.invalidateQueries({ queryKey: ["customerServiceRequests"] });
-    }
-  });
-};
-
-export const useReopenRequestWithDiagnosis = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => reopenRequestWithDiagnosis(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ["customerBookings"] });
-      queryClient.invalidateQueries({ queryKey: ["booking", id] });
-      queryClient.invalidateQueries({ queryKey: ["myServiceRequests"] });
       queryClient.invalidateQueries({ queryKey: ["customerServiceRequests"] });
     }
   });

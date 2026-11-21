@@ -14,7 +14,6 @@ import { GetProviderBookingsUseCase } from "../../application/use-cases/getProvi
 import { UpdateBookingStatusUseCase } from "../../application/use-cases/updateBookingStatus.useCase";
 import { ReportServiceMismatchUseCase } from "../../application/use-cases/reportServiceMismatch.useCase";
 import { ResolveServiceMismatchUseCase } from "../../application/use-cases/resolveServiceMismatch.useCase";
-import { ReopenRequestWithDiagnosisUseCase } from "../../application/use-cases/reopenRequestWithDiagnosis.useCase";
 
 export function createCreateBookingUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
@@ -68,12 +67,5 @@ export function createResolveServiceMismatchUseCase(
         serviceRequestRepository,
         creditWalletUseCase,
         createNotificationUseCase
-    );
-}
-
-export function createReopenRequestWithDiagnosisUseCase(): ReopenRequestWithDiagnosisUseCase {
-    return new ReopenRequestWithDiagnosisUseCase(
-        bookingRepository,
-        serviceRequestRepository
     );
 }

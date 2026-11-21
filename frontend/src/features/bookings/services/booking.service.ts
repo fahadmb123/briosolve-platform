@@ -54,10 +54,3 @@ export const resolveBookingMismatch = async (
   const res = await apiClient.post<response<BookingItem>>(`/api/booking/${id}/mismatch-resolve`, { action });
   return res.data;
 };
-
-export const reopenRequestWithDiagnosis = async (
-  id: string
-): Promise<response<{ serviceRequestId: string; message: string }>> => {
-  const res = await apiClient.post<response<{ serviceRequestId: string; message: string }>>(`/api/booking/${id}/reopen-request`);
-  return res.data;
-};

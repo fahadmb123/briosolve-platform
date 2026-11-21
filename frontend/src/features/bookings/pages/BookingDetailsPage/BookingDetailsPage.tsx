@@ -5,8 +5,7 @@ import {
   useGetBookingById,
   useUpdateBookingStatus,
   useReportBookingMismatch,
-  useResolveBookingMismatch,
-  useReopenRequestWithDiagnosis
+  useResolveBookingMismatch
 } from "../../hooks/useBookingMutations";
 import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
 import { BookingStatusModal, ServiceMismatchModal } from "../../components";
@@ -37,7 +36,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const updateStatusMutation = useUpdateBookingStatus();
   const reportMismatchMutation = useReportBookingMismatch();
   const resolveMismatchMutation = useResolveBookingMismatch();
-  const reopenRequestMutation = useReopenRequestWithDiagnosis();
 
   const booking: BookingItem | null = responseData?.data || initialBooking;
 
@@ -211,23 +209,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         }
       }
     );
-  };
-
-  const handleReopenRequest = () => {
-    if (!booking) return;
-    reopenRequestMutation.mutate(booking.id, {
-      onSuccess: (res) => {
-        toast.success("Request reopened in marketplace with verified diagnosis!");
-        if (res?.data?.serviceRequestId) {
-          navigate(`/my-requests/${res.data.serviceRequestId}`);
-        } else {
-          refetch();
-        }
-      },
-      onError: (err: any) => {
-        toast.error(err?.response?.data?.message || "Failed to reopen request");
-      }
-    });
   };
 
   const handlePayRemainingBalance = async () => {
@@ -1060,20 +1041,10 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               <button
                 type="button"
                 className="bkdet-mismatch-btn-repost"
-                onClick={handleReopenRequest}
-                disabled={reopenRequestMutation.isPending}
+                onClick={() => navigate("/request-service")}
               >
-                {reopenRequestMutation.isPending ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin" />
-                    <span>Reopening in Marketplace...</span>
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-sync-alt" />
-                    <span>Repost Request with Verified Diagnosis</span>
-                  </>
-                )}
+                <i className="fas fa-plus-circle" />
+                <span>Request Another Service</span>
               </button>
             </div>
           )}

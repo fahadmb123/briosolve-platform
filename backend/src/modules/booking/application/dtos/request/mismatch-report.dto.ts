@@ -12,8 +12,3 @@ export interface ResolveServiceMismatchInputDto {
     customerId: string;
     action: "ACCEPT" | "DECLINE";
 }
-
-export interface ReopenRequestWithDiagnosisInputDto {
-    bookingId: string;
-    customerId: string;
-}
