@@ -823,15 +823,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             <i className="fas fa-comment-dots" />
             <span>Chat</span>
           </button>
-          <button
-            type="button"
-            className="bkdet-action-btn outline"
-            onClick={() => setIsDisputeModalOpen(true)}
-            title="Report an issue or concern regarding this booking"
-          >
-            <i className="fas fa-life-ring" />
-            <span>Need Help?</span>
-          </button>
 
           {isProvider && isConfirmed && (
             <>

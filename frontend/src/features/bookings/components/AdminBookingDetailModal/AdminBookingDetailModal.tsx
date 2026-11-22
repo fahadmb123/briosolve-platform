@@ -358,46 +358,33 @@ export const AdminBookingDetailModal: React.FC<AdminBookingDetailModalProps> = (
             Direct intervention controls for customer refunds, provider escrow releases, and status overrides.
           </p>
 
-          <div className="admin-bk-quick-actions">
-            {!isTerminalState && (
-              <>
-                <button
-                  type="button"
-                  className="admin-bk-btn-cancel"
-                  onClick={() => {
-                    setActiveConfirmAction(activeConfirmAction === "CANCEL" ? null : "CANCEL");
-                    setActionReason("Forced cancellation and wallet refund initiated by administrator.");
-                  }}
-                >
-                  <i className="fas fa-ban"></i>
-                  <span>Force Cancel & Refund</span>
-                </button>
+          {!isTerminalState && (
+            <div className="admin-bk-quick-actions">
+              <button
+                type="button"
+                className="admin-bk-btn-cancel"
+                onClick={() => {
+                  setActiveConfirmAction(activeConfirmAction === "CANCEL" ? null : "CANCEL");
+                  setActionReason("Forced cancellation and wallet refund initiated by administrator.");
+                }}
+              >
+                <i className="fas fa-ban"></i>
+                <span>Force Cancel & Refund</span>
+              </button>
 
-                <button
-                  type="button"
-                  className="admin-bk-btn-release"
-                  onClick={() => {
-                    setActiveConfirmAction(activeConfirmAction === "RELEASE" ? null : "RELEASE");
-                    setActionReason("Escrow funds released to provider by administrator.");
-                  }}
-                >
-                  <i className="fas fa-hand-holding-usd"></i>
-                  <span>Release Escrow to Provider</span>
-                </button>
-              </>
-            )}
-
-            <a
-              href={`/admin/support?search=${encodeURIComponent(currentBooking.bookingNumber)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="admin-bk-btn-support"
-            >
-              <i className="fas fa-life-ring"></i>
-              <span>Dispute & Support Desk</span>
-              <i className="fas fa-external-link-alt text-xs" style={{ opacity: 0.6 }}></i>
-            </a>
-          </div>
+              <button
+                type="button"
+                className="admin-bk-btn-release"
+                onClick={() => {
+                  setActiveConfirmAction(activeConfirmAction === "RELEASE" ? null : "RELEASE");
+                  setActionReason("Escrow funds released to provider by administrator.");
+                }}
+              >
+                <i className="fas fa-hand-holding-usd"></i>
+                <span>Release Escrow to Provider</span>
+              </button>
+            </div>
+          )}
 
           {activeConfirmAction === "CANCEL" && (
             <div className="admin-bk-confirm-box admin-bk-confirm-danger">
