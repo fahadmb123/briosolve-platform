@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetCustomerBookings, useGetProviderBookings } from "../../../bookings/hooks/useBookingMutations";
 import { useSupportStore } from "../../stores/support.store";
@@ -520,6 +522,18 @@ export const SupportTicketsPage: React.FC = () => {
                 value={ticketSearch}
                 onChange={(e) => setTicketSearch(e.target.value)}
               />
+              {ticketSearch && (
+                <button
+                  type="button"
+                  className="clean-search-clear"
+                  onClick={() => {
+                    setTicketSearch("");
+                    setDebouncedSearch("");
+                  }}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              )}
             </div>
 
             <div className="clean-filter-pills">
@@ -547,25 +561,90 @@ export const SupportTicketsPage: React.FC = () => {
             </div>
           </div>
 
-          {tickets.length === 0 ? (
-            <div className="clean-empty-state">
-              <div className="clean-empty-icon">
-                <i className="fas fa-inbox"></i>
+          {myTicketsQuery.isLoading ? (
+            <div className="clean-table-responsive">
+              <div className="clean-tickets-table-card">
+                <div className="clean-table-header">
+                  <span>Ticket ID</span>
+                  <span>Category</span>
+                  <span>Subject</span>
+                  <span>Submitted</span>
+                  <span>Status</span>
+                  <span style={{ textAlign: "right" }}>Action</span>
+                </div>
+                <div className="clean-table-body">
+                  {Array.from({ length: 4 }).map((_, idx) => (
+                    <div key={`ticket-skeleton-${idx}`} className="clean-table-row clean-skeleton-row">
+                      <div className="clean-col-id">
+                        <Skeleton width={100} height={16} borderRadius={4} />
+                        <Skeleton width={120} height={12} borderRadius={4} />
+                      </div>
+                      <div className="clean-col-cat">
+                        <Skeleton width={110} height={22} borderRadius={6} />
+                      </div>
+                      <div className="clean-col-subject">
+                        <Skeleton width="65%" height={16} borderRadius={4} />
+                        <Skeleton width="90%" height={12} borderRadius={4} />
+                      </div>
+                      <div className="clean-col-date">
+                        <Skeleton width={60} height={14} borderRadius={4} />
+                      </div>
+                      <div className="clean-col-status">
+                        <Skeleton width={75} height={22} borderRadius={9999} />
+                      </div>
+                      <div className="clean-col-action" style={{ textAlign: "right" }}>
+                        <Skeleton width={80} height={28} borderRadius={6} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <h3>No tickets found</h3>
+            </div>
+          ) : tickets.length === 0 ? (
+            <div className="clean-empty-state">
+              <img
+                src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                alt="No support tickets found"
+                className="clean-empty-img"
+                onError={(e) => {
+                  e.currentTarget.src = "/images/no-data.png";
+                }}
+              />
+              <h3>
+                {debouncedSearch
+                  ? "No matching tickets found"
+                  : ticketFilter !== "ALL"
+                  ? `No ${ticketFilter.toLowerCase()} tickets`
+                  : "No tickets found"}
+              </h3>
               <p>
-                {ticketSearch
-                  ? "No support tickets match your search criteria."
-                  : "You do not have any open support or dispute tickets."}
+                {debouncedSearch
+                  ? `No support tickets match "${debouncedSearch}". Clear your search query or switch filters.`
+                  : ticketFilter !== "ALL"
+                  ? `You do not have any ${ticketFilter.toLowerCase()} support or dispute tickets.`
+                  : "You do not have any open support or dispute tickets. Need help with an appointment or transaction?"}
               </p>
-              <button
-                type="button"
-                className="clean-btn-primary"
-                onClick={() => setActiveTab("NEW_TICKET")}
-              >
-                <i className="fas fa-plus"></i>
-                <span>Raise a Concern</span>
-              </button>
+              {debouncedSearch ? (
+                <button
+                  type="button"
+                  className="clean-btn-secondary"
+                  onClick={() => {
+                    setTicketSearch("");
+                    setDebouncedSearch("");
+                  }}
+                >
+                  Clear Search
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="clean-btn-primary"
+                  onClick={() => setActiveTab("NEW_TICKET")}
+                >
+                  <i className="fas fa-plus"></i>
+                  <span>Raise a Concern</span>
+                </button>
+              )}
             </div>
           ) : (
             <div className="clean-table-responsive">
