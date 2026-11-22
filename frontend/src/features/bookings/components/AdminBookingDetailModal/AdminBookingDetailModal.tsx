@@ -61,19 +61,8 @@ export const AdminBookingDetailModal: React.FC<AdminBookingDetailModalProps> = (
     return [];
   }, [currentBooking]);
 
-  if (!currentBooking) return null;
-
-  const isTerminalState =
-    currentBooking.status === "COMPLETED" ||
-    currentBooking.status === "CANCELLED" ||
-    currentBooking.status === "CLOSED";
-
-  const canReleaseEscrow =
-    currentBooking.status === "IN_PROGRESS" ||
-    currentBooking.status === "PAYMENT_PENDING";
-  const canForceCancel = !isTerminalState;
-
   const availableStatuses: BookingStatus[] = useMemo(() => {
+    if (!currentBooking) return [];
     switch (currentBooking.status) {
       case "CONFIRMED":
         return ["CONFIRMED", "EN_ROUTE", "IN_PROGRESS", "CANCELLED"];
@@ -88,7 +77,19 @@ export const AdminBookingDetailModal: React.FC<AdminBookingDetailModalProps> = (
       default:
         return [currentBooking.status];
     }
-  }, [currentBooking.status]);
+  }, [currentBooking?.status]);
+
+  if (!currentBooking) return null;
+
+  const isTerminalState =
+    currentBooking.status === "COMPLETED" ||
+    currentBooking.status === "CANCELLED" ||
+    currentBooking.status === "CLOSED";
+
+  const canReleaseEscrow =
+    currentBooking.status === "IN_PROGRESS" ||
+    currentBooking.status === "PAYMENT_PENDING";
+  const canForceCancel = !isTerminalState;
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -600,7 +601,7 @@ export const AdminBookingDetailModal: React.FC<AdminBookingDetailModalProps> = (
                 <div key={idx} className="admin-bk-timeline-item">
                   <div className="admin-bk-timeline-dot"></div>
                   <div className="admin-bk-timeline-header">
-                    <span className="admin-bk-timeline-status">{item.status.replace("_", " ")}</span>
+                    <span className="admin-bk-timeline-status">{(item.status || "UPDATE").replace("_", " ")}</span>
                     <span className="admin-bk-timeline-time">
                       {new Date(item.timestamp).toLocaleDateString("en-IN", {
                         day: "numeric",

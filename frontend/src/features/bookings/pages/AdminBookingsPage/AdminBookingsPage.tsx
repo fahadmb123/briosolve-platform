@@ -42,50 +42,52 @@ export const AdminBookingsPage: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "CONFIRMED":
-        return <span className="admin-bk-pill confirmed"><i className="fas fa-check-circle text-xs"></i>Confirmed</span>;
+        return <span className="badge badge-confirmed text-xs">Confirmed</span>;
       case "EN_ROUTE":
       case "INSPECTION":
       case "IN_PROGRESS":
-        return <span className="admin-bk-pill progress"><i className="fas fa-spinner text-xs"></i>{status.replace("_", " ")}</span>;
+        return <span className="badge badge-pending text-xs">{status.replace("_", " ")}</span>;
       case "PAYMENT_PENDING":
-        return <span className="admin-bk-pill progress"><i className="fas fa-clock text-xs"></i>Payment Pending</span>;
+        return <span className="badge badge-pending text-xs">Payment Pending</span>;
       case "COMPLETED":
-        return <span className="admin-bk-pill completed"><i className="fas fa-check-double text-xs"></i>Completed</span>;
+        return <span className="badge badge-verified text-xs">Completed</span>;
       case "CLOSED":
-        return <span className="admin-bk-pill closed"><i className="fas fa-archive text-xs"></i>Closed</span>;
+        return <span className="badge badge-neutral text-xs">Closed</span>;
       case "CANCELLED":
-        return <span className="admin-bk-pill cancelled"><i className="fas fa-ban text-xs"></i>Cancelled</span>;
+        return <span className="badge badge-danger-alert text-xs">Cancelled</span>;
       default:
-        return <span className="admin-bk-pill closed">{status.replace("_", " ")}</span>;
+        return <span className="badge badge-neutral text-xs">{status.replace("_", " ")}</span>;
     }
   };
 
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
       case "PAID":
-        return <span className="admin-bk-pill pay-paid">Paid</span>;
+        return <span className="badge badge-verified text-xs mt-1">Paid</span>;
       case "ADVANCE_PAID":
-        return <span className="admin-bk-pill pay-advance">Advance Paid</span>;
+        return <span className="badge badge-advance text-xs mt-1">Advance Paid</span>;
       case "REFUNDED":
-        return <span className="admin-bk-pill pay-refunded">Refunded</span>;
+        return <span className="badge badge-danger-alert text-xs mt-1">Refunded</span>;
       default:
-        return <span className="admin-bk-pill pay-pending">Pending</span>;
+        return <span className="badge badge-neutral text-xs mt-1">Pending</span>;
     }
   };
 
   return (
-    <div className="admin-bookings-container">
-      <div className="admin-bookings-header">
-        <h1 className="admin-bookings-title">
-          Bookings Management
-        </h1>
-        <p className="admin-bookings-subtitle">
-          Monitor marketplace bookings, service milestones, payment escrow, and fulfillment statuses.
-        </p>
+    <div className="app-content">
+      <div className="flex justify-between items-center flex-wrap gap-4 mb-4">
+        <div>
+          <h1 className="font-extrabold tracking-tight mb-1" style={{ fontSize: "2rem" }}>
+            Bookings Management
+          </h1>
+          <p className="text-secondary text-sm mb-0">
+            Monitor marketplace bookings, service milestones, payment escrow, and fulfillment statuses.
+          </p>
+        </div>
       </div>
 
-      <div className="admin-bookings-filter-bar">
-        <div className="admin-search-input" style={{ flex: "1 1 280px" }}>
+      <div className="admin-filter-bar">
+        <div className="admin-search-input">
           <i className="fas fa-search"></i>
           <input
             type="text"
@@ -136,18 +138,18 @@ export const AdminBookingsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="admin-bookings-table-card">
+      <div className="admin-table-card" style={{ position: "relative", overflow: "hidden" }}>
         <div className="table-responsive">
-          <table className="admin-bookings-table">
+          <table className="admin-table">
             <thead>
               <tr>
-                <th style={{ width: "16%", minWidth: "150px" }}>Booking Ref</th>
-                <th style={{ width: "18%", minWidth: "170px" }}>Customer</th>
-                <th style={{ width: "20%", minWidth: "180px" }}>Provider</th>
-                <th style={{ width: "20%", minWidth: "180px" }}>Service & Schedule</th>
-                <th style={{ width: "12%", minWidth: "110px" }}>Amounts</th>
-                <th style={{ width: "14%", minWidth: "130px" }}>Status</th>
-                <th className="text-right" style={{ width: "8%", minWidth: "90px" }}>Action</th>
+                <th style={{ width: "14%" }}>Booking Ref</th>
+                <th style={{ width: "17%" }}>Customer</th>
+                <th style={{ width: "19%" }}>Provider</th>
+                <th style={{ width: "19%" }}>Service & Schedule</th>
+                <th style={{ width: "11%" }}>Amounts</th>
+                <th style={{ width: "11%" }}>Status</th>
+                <th className="text-right" style={{ width: "9%" }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -175,10 +177,11 @@ export const AdminBookingsPage: React.FC = () => {
                       <div className="admin-skel-line" style={{ width: "40%", height: "12px" }}></div>
                     </td>
                     <td>
-                      <div className="admin-skel-line" style={{ width: "70px", height: "20px", borderRadius: "12px" }}></div>
+                      <div className="admin-skel-line" style={{ width: "70px", height: "20px", borderRadius: "4px" }}></div>
+                      <div className="admin-skel-line mt-1" style={{ width: "60px", height: "18px", borderRadius: "4px" }}></div>
                     </td>
                     <td className="text-right">
-                      <div className="admin-skel-line ml-auto" style={{ width: "60px", height: "28px", borderRadius: "6px" }}></div>
+                      <div className="admin-skel-line ml-auto" style={{ width: "75px", height: "28px", borderRadius: "6px" }}></div>
                     </td>
                   </tr>
                 ))
@@ -205,81 +208,75 @@ export const AdminBookingsPage: React.FC = () => {
                 bookings.map((b) => (
                   <tr key={b.id}>
                     <td>
-                      <div className="admin-bk-ref-cell">
-                        <span className="admin-bk-ref-code">#{b.bookingNumber}</span>
-                        <span className="admin-bk-ref-date">
-                          <i className="far fa-clock"></i>
-                          {new Date(b.createdAt).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit"
-                          })}
-                        </span>
-                      </div>
+                      <strong className="text-sm font-semibold block">#{b.bookingNumber}</strong>
+                      <span className="text-xs text-secondary block mt-0.5">
+                        {new Date(b.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        })}
+                      </span>
                     </td>
                     <td>
-                      <div className="admin-bk-user-cell">
-                        <div className="admin-bk-avatar customer">
-                          <i className="fas fa-user"></i>
-                        </div>
-                        <div className="admin-bk-user-meta">
-                          <span className="admin-bk-user-name" title={b.customerName || "Customer"}>
-                            {b.customerName || "Customer"}
-                          </span>
-                          <span className="admin-bk-user-sub" title={b.customerEmail || b.customerPhone || ""}>
-                            {b.customerPhone || b.customerEmail || "N/A"}
-                          </span>
-                        </div>
-                      </div>
+                      <strong className="text-sm block">{b.customerName || "Customer"}</strong>
+                      {(b.customerPhone || b.customerEmail) && (
+                        <span
+                          className="text-xs text-secondary block truncate"
+                          style={{ maxWidth: "160px" }}
+                          title={b.customerEmail || b.customerPhone || ""}
+                        >
+                          {b.customerPhone || b.customerEmail}
+                        </span>
+                      )}
                     </td>
                     <td>
-                      <div className="admin-bk-user-cell">
-                        <div className="admin-bk-avatar provider">
-                          <i className="fas fa-store"></i>
-                        </div>
-                        <div className="admin-bk-user-meta">
-                          <span
-                            className="admin-bk-user-name"
-                            title={b.providerBusinessName || b.providerName || "Assigned Provider"}
-                          >
-                            {b.providerBusinessName || b.providerName || "Assigned Provider"}
-                          </span>
-                          <span className="admin-bk-user-sub" title={b.providerPhone || b.providerEmail || ""}>
-                            {b.providerPhone || b.providerEmail || "N/A"}
-                          </span>
-                        </div>
-                      </div>
+                      <strong
+                        className="text-sm block truncate"
+                        style={{ maxWidth: "180px" }}
+                        title={b.providerBusinessName || b.providerName || "Assigned Provider"}
+                      >
+                        {b.providerBusinessName || b.providerName || "Assigned Provider"}
+                      </strong>
+                      {(b.providerPhone || b.providerEmail) && (
+                        <span
+                          className="text-xs text-secondary block truncate"
+                          style={{ maxWidth: "180px" }}
+                          title={b.providerEmail || b.providerPhone || ""}
+                        >
+                          {b.providerPhone || b.providerEmail}
+                        </span>
+                      )}
                     </td>
                     <td>
-                      <div className="admin-bk-service-cell">
-                        <span className="admin-bk-service-title" title={b.serviceRequestTitle || "Service Requirement"}>
-                          {b.serviceRequestTitle || "Service Requirement"}
-                        </span>
-                        <span className="admin-bk-schedule-tag">
-                          <i className="far fa-calendar-alt"></i>
-                          {b.scheduledDate
-                            ? new Date(b.scheduledDate).toLocaleDateString("en-IN", {
-                                day: "numeric",
-                                month: "short"
-                              })
-                            : "Flexible"}
-                          {b.scheduledTime ? ` · ${b.scheduledTime}` : ""}
-                        </span>
-                      </div>
+                      <strong
+                        className="text-sm block truncate"
+                        style={{ maxWidth: "190px" }}
+                        title={b.serviceRequestTitle || "Service Requirement"}
+                      >
+                        {b.serviceRequestTitle || "Service Requirement"}
+                      </strong>
+                      <span className="text-xs text-secondary block mt-0.5">
+                        <i className="far fa-calendar-alt mr-1"></i>
+                        {b.scheduledDate
+                          ? new Date(b.scheduledDate).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short"
+                            })
+                          : "Flexible"}
+                        {b.scheduledTime ? ` · ${b.scheduledTime}` : ""}
+                      </span>
                     </td>
                     <td>
-                      <div className="admin-bk-amount-cell">
-                        <span className="admin-bk-amount-total">
-                          ₹{Number(b.totalAmount).toLocaleString("en-IN")}
-                        </span>
-                        <span className="admin-bk-amount-fee">
-                          Fee: ₹{Number(b.platformFee).toLocaleString("en-IN")}
-                        </span>
-                      </div>
+                      <strong className="text-sm block">
+                        ₹{Number(b.totalAmount).toLocaleString("en-IN")}
+                      </strong>
+                      <span className="text-xs text-secondary block mt-0.5">
+                        Fee: ₹{Number(b.platformFee).toLocaleString("en-IN")}
+                      </span>
                     </td>
                     <td>
-                      <div className="admin-bk-status-stack">
+                      <div className="flex flex-col items-start">
                         {getStatusBadge(b.status)}
                         {getPaymentStatusBadge(b.paymentStatus)}
                       </div>
@@ -287,11 +284,11 @@ export const AdminBookingsPage: React.FC = () => {
                     <td className="text-right">
                       <button
                         type="button"
-                        className="admin-bk-inspect-btn"
+                        className="btn btn-secondary text-xs py-1.5 px-3"
                         title="Inspect Booking Details"
                         onClick={() => setSelectedBooking(b)}
                       >
-                        <i className="fas fa-eye"></i>
+                        <i className="fas fa-eye mr-1"></i>
                         <span>Inspect</span>
                       </button>
                     </td>
