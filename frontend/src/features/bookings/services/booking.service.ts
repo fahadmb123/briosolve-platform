@@ -4,7 +4,9 @@ import type {
   BookingItem,
   CustomerBookingsResponse,
   ProviderBookingsResponse,
+  AdminBookingsResponse,
   GetBookingsQueryParams,
+  GetAdminBookingsQueryParams,
   UpdateBookingStatusPayload
 } from "../types/booking.types";
 
@@ -52,5 +54,14 @@ export const resolveBookingMismatch = async (
   action: "ACCEPT" | "DECLINE"
 ): Promise<response<BookingItem>> => {
   const res = await apiClient.post<response<BookingItem>>(`/api/booking/${id}/mismatch-resolve`, { action });
+  return res.data;
+};
+
+export const getAdminBookings = async (
+  params?: GetAdminBookingsQueryParams
+): Promise<response<AdminBookingsResponse>> => {
+  const res = await apiClient.get<response<AdminBookingsResponse>>("/api/booking/admin", {
+    params
+  });
   return res.data;
 };
