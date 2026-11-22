@@ -5,7 +5,6 @@ import { useTheme } from '../shared/hooks/useTheme';
 import { useAuthStore } from '../features/auth/stores/auth.store';
 import { useLogout } from '../features/auth/hooks/use-otp-varify';
 import NotificationDropdown from '../features/notifications/components/NotificationDropdown';
-import { useGetAdminSupportTickets } from '../features/support/hooks/useSupportTickets';
 
 export default function AdminLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
@@ -15,8 +14,6 @@ export default function AdminLayout() {
     const logout = useLogout();
     const navigate = useNavigate();
     const location = useLocation();
-    const adminTicketsQuery = useGetAdminSupportTickets({ status: "OPEN", limit: 1 });
-    const openTicketsCount = adminTicketsQuery.data?.data?.openCount ?? 0;
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const profileDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -127,7 +124,6 @@ export default function AdminLayout() {
                         >
                             <i className="fas fa-headset"></i>
                             <span>Support Tickets</span>
-                            {openTicketsCount > 0 && <span className="badge badge-danger ml-auto">{openTicketsCount}</span>}
                         </NavLink>
                     </li>
                     <li>
