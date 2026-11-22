@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetCustomerBookings, useGetProviderBookings } from "../../../bookings/hooks/useBookingMutations";
@@ -39,47 +39,38 @@ export const SupportTicketsPage: React.FC = () => {
     }));
   }, [isProvider, customerBookingsQuery.data, providerBookingsQuery.data]);
 
-  const allTickets = useSupportStore((state) => state.tickets || []);
   const addTicketToStore = useSupportStore((state) => state.addTicket);
   const addTicketMessage = useSupportStore((state) => state.addTicketMessage);
 
   const createTicketMutation = useCreateSupportTicket();
-  const myTicketsQuery = useGetMySupportTickets();
 
   const [activeTab, setActiveTab] = useState<"MY_TICKETS" | "NEW_TICKET">("MY_TICKETS");
   const [ticketFilter, setTicketFilter] = useState<"ALL" | "ACTIVE" | "RESOLVED">("ALL");
   const [ticketSearch, setTicketSearch] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [viewTicket, setViewTicket] = useState<SupportTicket | null>(null);
 
-  const combinedTickets = useMemo(() => {
-    const serverTickets = myTicketsQuery.data?.data || [];
-    if (serverTickets.length > 0) {
-      const serverIds = new Set(serverTickets.map((s) => s.id));
-      const localOnly = allTickets.filter((l) => !serverIds.has(l.id));
-      return [...serverTickets, ...localOnly];
-    }
-    return allTickets;
-  }, [myTicketsQuery.data, allTickets]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(ticketSearch.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [ticketSearch]);
+
+  const myTicketsQuery = useGetMySupportTickets({
+    status: ticketFilter,
+    search: debouncedSearch || undefined
+  });
 
   const tickets = useMemo(() => {
-    return combinedTickets.filter((t) => {
-      const isRoleMatch = isProvider ? t.creatorRole === "PROVIDER" : t.creatorRole === "CUSTOMER";
-      const isStatusMatch =
-        ticketFilter === "ALL" ||
-        (ticketFilter === "ACTIVE" && (t.status === "OPEN" || t.status === "UNDER_REVIEW")) ||
-        (ticketFilter === "RESOLVED" && (t.status === "RESOLVED" || t.status === "CLOSED"));
+    return myTicketsQuery.data?.data?.tickets || [];
+  }, [myTicketsQuery.data]);
 
-      const q = ticketSearch.toLowerCase().trim();
-      const isSearchMatch =
-        !q ||
-        t.ticketNumber?.toLowerCase().includes(q) ||
-        t.subject?.toLowerCase().includes(q) ||
-        (t.bookingNumber && t.bookingNumber.toLowerCase().includes(q)) ||
-        (t.serviceTitle && t.serviceTitle.toLowerCase().includes(q));
-
-      return isRoleMatch && isStatusMatch && isSearchMatch;
-    });
-  }, [combinedTickets, isProvider, ticketFilter, ticketSearch]);
+  const ticketCounts = myTicketsQuery.data?.data?.counts || {
+    all: tickets.length,
+    active: 0,
+    resolved: 0
+  };
 
   const [concernType, setConcernType] = useState<ConcernType>("BOOKING");
   const [selectedBookingId, setSelectedBookingId] = useState<string>("");
@@ -243,7 +234,7 @@ export const SupportTicketsPage: React.FC = () => {
             onClick={() => setActiveTab("MY_TICKETS")}
           >
             <i className="fas fa-ticket-alt"></i>
-            <span>My Tickets ({tickets.length})</span>
+            <span>My Tickets ({ticketCounts.all})</span>
           </button>
           <button
             type="button"
@@ -537,21 +528,21 @@ export const SupportTicketsPage: React.FC = () => {
                 className={`clean-filter-pill ${ticketFilter === "ALL" ? "active" : ""}`}
                 onClick={() => setTicketFilter("ALL")}
               >
-                All
+                All ({ticketCounts.all})
               </button>
               <button
                 type="button"
                 className={`clean-filter-pill ${ticketFilter === "ACTIVE" ? "active" : ""}`}
                 onClick={() => setTicketFilter("ACTIVE")}
               >
-                Active
+                Active ({ticketCounts.active})
               </button>
               <button
                 type="button"
                 className={`clean-filter-pill ${ticketFilter === "RESOLVED" ? "active" : ""}`}
                 onClick={() => setTicketFilter("RESOLVED")}
               >
-                Resolved
+                Resolved ({ticketCounts.resolved})
               </button>
             </div>
           </div>

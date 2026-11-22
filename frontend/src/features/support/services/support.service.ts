@@ -18,12 +18,29 @@ export interface CreateTicketPayload {
   authorName?: string;
 }
 
+export interface GetSupportTicketsParams {
+  status?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface UserTicketsData {
+  tickets: SupportTicket[];
+  total: number;
+  counts: {
+    all: number;
+    active: number;
+    resolved: number;
+  };
+}
+
 export const createSupportTicketApi = async (payload: CreateTicketPayload): Promise<response<SupportTicket>> => {
   const res = await apiClient.post<response<SupportTicket>>("/api/support/tickets", payload);
   return res.data;
 };
 
-export const getMySupportTicketsApi = async (): Promise<response<SupportTicket[]>> => {
-  const res = await apiClient.get<response<SupportTicket[]>>("/api/support/tickets/my");
+export const getMySupportTicketsApi = async (params?: GetSupportTicketsParams): Promise<response<UserTicketsData>> => {
+  const res = await apiClient.get<response<UserTicketsData>>("/api/support/tickets/my", { params });
   return res.data;
 };

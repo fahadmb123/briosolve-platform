@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { db } from "../../../../shared/database/client";
 import { SupportTicket, SupportTicketMessage } from "../../domain/entities/support-ticket.entity";
-import { ISupportTicketRepository } from "../../domain/repositories/ISupportTicket.repository";
+import { ISupportTicketRepository, GetUserTicketsParams, UserTicketsResult } from "../../domain/repositories/ISupportTicket.repository";
 import { CreateTicketInputDto } from "../../application/dtos/request/create-ticket.dto";
 import { SupportTicketMapper } from "../mappers/support-ticket.mapper";
 
@@ -36,14 +36,51 @@ export class PrismaSupportTicketRepository implements ISupportTicketRepository {
     return SupportTicketMapper.toDomain(record, messages);
   }
 
-  async findByCreatorId(creatorId: string): Promise<SupportTicket[]> {
-    const records = await db.orm.public.support_tickets
-      .where({ creator_id: creatorId as never })
+  async findByCreatorId(params: GetUserTicketsParams): Promise<UserTicketsResult> {
+    const page = params.page || 1;
+    const limit = params.limit || 50;
+    const skip = (page - 1) * limit;
+
+    const allRecords = await db.orm.public.support_tickets
+      .where({ creator_id: params.userId as never })
       .orderBy((t) => t.created_at.desc())
       .all();
 
+    const counts = {
+      all: allRecords.length,
+      active: allRecords.filter((t: any) => t.status === "OPEN" || t.status === "UNDER_REVIEW").length,
+      resolved: allRecords.filter((t: any) => t.status === "RESOLVED" || t.status === "CLOSED").length
+    };
+
+    let filtered = allRecords;
+
+    if (params.status && params.status !== "ALL") {
+      if (params.status === "ACTIVE") {
+        filtered = filtered.filter((t: any) => t.status === "OPEN" || t.status === "UNDER_REVIEW");
+      } else if (params.status === "RESOLVED") {
+        filtered = filtered.filter((t: any) => t.status === "RESOLVED" || t.status === "CLOSED");
+      } else {
+        filtered = filtered.filter((t: any) => t.status === params.status);
+      }
+    }
+
+    if (params.search && params.search.trim()) {
+      const q = params.search.trim().toLowerCase();
+      filtered = filtered.filter((t: any) => {
+        return (
+          (t.ticket_number && t.ticket_number.toLowerCase().includes(q)) ||
+          (t.subject && t.subject.toLowerCase().includes(q)) ||
+          (t.target_number && t.target_number.toLowerCase().includes(q)) ||
+          (t.description && t.description.toLowerCase().includes(q))
+        );
+      });
+    }
+
+    const total = filtered.length;
+    const paged = filtered.slice(skip, skip + limit);
+
     const tickets: SupportTicket[] = [];
-    for (const r of records) {
+    for (const r of paged) {
       const messages = await db.orm.public.support_ticket_messages
         .where({ ticket_id: r.id as never })
         .orderBy((m) => m.created_at.asc())
@@ -51,7 +88,7 @@ export class PrismaSupportTicketRepository implements ISupportTicketRepository {
       tickets.push(SupportTicketMapper.toDomain(r, messages));
     }
 
-    return tickets;
+    return { tickets, total, counts };
   }
 
   async getAll(status?: string): Promise<SupportTicket[]> {

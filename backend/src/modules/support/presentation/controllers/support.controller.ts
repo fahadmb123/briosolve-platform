@@ -3,12 +3,12 @@ import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateTicketInputDto } from "../../application/dtos/request/create-ticket.dto";
 import { TicketResponseDto } from "../../application/dtos/response/ticket-response.dto";
-import { GetMyTicketsInputDto } from "../../application/use-cases/getMyTickets.useCase";
+import { GetMyTicketsInputDto, UserTicketsResponseDto } from "../../application/use-cases/getMyTickets.useCase";
 
 export class SupportController extends BaseController {
   constructor(
     private readonly _createTicketUseCase: IUseCase<CreateTicketInputDto, TicketResponseDto>,
-    private readonly _getMyTicketsUseCase: IUseCase<GetMyTicketsInputDto, TicketResponseDto[]>
+    private readonly _getMyTicketsUseCase: IUseCase<GetMyTicketsInputDto, UserTicketsResponseDto>
   ) {
     super();
   }
@@ -65,7 +65,19 @@ export class SupportController extends BaseController {
   getMyTickets = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?.userId;
-      const response = await this._getMyTicketsUseCase.execute({ userId: userId! });
+      const status = req.query.status as string | undefined;
+      const search = req.query.search as string | undefined;
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 50;
+
+      const response = await this._getMyTicketsUseCase.execute({
+        userId: userId!,
+        status,
+        search,
+        page,
+        limit
+      });
+
       return this.sendSuccess(res, "Tickets retrieved successfully", response, 200);
     } catch (error) {
       next(error);
