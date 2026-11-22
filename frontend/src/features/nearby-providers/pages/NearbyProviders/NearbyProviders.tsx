@@ -30,8 +30,11 @@ export default function NearbyProviders() {
     const [totalPages, setTotalPages] = useState(0);
     const [hasLocation, setHasLocation] = useState(true);
     const [activeRadiusKm, setActiveRadiusKm] = useState(20);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const limit = 12;
     const sentinelRef = useRef<HTMLDivElement | null>(null);
+    const isLoadingMoreRef = useRef(false);
+    const fetchStartTimeRef = useRef(0);
 
     const { data: providersRes, isLoading, isFetching } = useGetNearbyProviders({
         page,
@@ -40,24 +43,99 @@ export default function NearbyProviders() {
         radius: appliedRadius,
     });
 
+    const isFetchingRef = useRef(isFetching);
+    isFetchingRef.current = isFetching;
+    const hasMore = page < totalPages;
+    const hasMoreRef = useRef(hasMore);
+    hasMoreRef.current = hasMore;
+    const cooldownUntilRef = useRef<number>(0);
+    const lastScrollYRef = useRef<number>(0);
+
+    const triggerLoadMore = useCallback(() => {
+        if (
+            !hasMoreRef.current ||
+            isFetchingRef.current ||
+            isLoadingMoreRef.current ||
+            Date.now() < cooldownUntilRef.current
+        ) {
+            return;
+        }
+
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+
+        const rect = sentinel.getBoundingClientRect();
+        if (rect.top <= window.innerHeight + 150) {
+            isLoadingMoreRef.current = true;
+            setIsLoadingMore(true);
+            fetchStartTimeRef.current = Date.now();
+            setPage((prev) => prev + 1);
+        }
+    }, []);
+
+    useEffect(() => {
+        const handleWheel = (e: WheelEvent) => {
+            if (e.deltaY > 5) {
+                triggerLoadMore();
+            }
+        };
+
+        let touchStartY = 0;
+        const handleTouchStart = (e: TouchEvent) => {
+            touchStartY = e.touches[0].clientY;
+        };
+        const handleTouchMove = (e: TouchEvent) => {
+            if (touchStartY - e.touches[0].clientY > 10) {
+                triggerLoadMore();
+            }
+        };
+
+        const handleScroll = () => {
+            const currentY = window.scrollY || document.documentElement.scrollTop;
+            if (currentY > lastScrollYRef.current + 15) {
+                triggerLoadMore();
+            }
+            lastScrollYRef.current = currentY;
+        };
+
+        window.addEventListener("wheel", handleWheel, { passive: true });
+        window.addEventListener("touchstart", handleTouchStart, { passive: true });
+        window.addEventListener("touchmove", handleTouchMove, { passive: true });
+        window.addEventListener("scroll", handleScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener("wheel", handleWheel);
+            window.removeEventListener("touchstart", handleTouchStart);
+            window.removeEventListener("touchmove", handleTouchMove);
+            window.removeEventListener("scroll", handleScroll);
+        };
+    }, [triggerLoadMore]);
+
     useEffect(() => {
         if (providersRes?.data) {
-            const incoming = providersRes.data.users || [];
+            const data = providersRes.data;
+            isLoadingMoreRef.current = false;
+            setIsLoadingMore(false);
+            lastScrollYRef.current = window.scrollY || document.documentElement.scrollTop;
+            cooldownUntilRef.current = Date.now() + 300;
+            const incoming = data.users || [];
             setProviders((prev) => {
                 if (page === 1) return incoming;
                 const existingIds = new Set(prev.map((p) => p.id));
                 const uniqueNew = incoming.filter((p) => !existingIds.has(p.id));
                 return [...prev, ...uniqueNew];
             });
-            setTotal(providersRes.data.total);
-            setTotalPages(providersRes.data.totalPages);
-            setHasLocation(providersRes.data.hasCustomerLocation);
-            setActiveRadiusKm(providersRes.data.customerRadius);
+            setTotal(data.total);
+            setTotalPages(data.totalPages);
+            setHasLocation(data.hasCustomerLocation);
+            setActiveRadiusKm(data.customerRadius);
         }
     }, [providersRes, page]);
 
     useEffect(() => {
         setPage(1);
+        setIsLoadingMore(false);
+        isLoadingMoreRef.current = false;
     }, [search, appliedRadius]);
 
     useEffect(() => {
@@ -66,16 +144,16 @@ export default function NearbyProviders() {
 
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && page < totalPages && !isFetching) {
-                    setPage((prev) => prev + 1);
+                if (entries[0].isIntersecting) {
+                    triggerLoadMore();
                 }
             },
-            { rootMargin: '400px' }
+            { rootMargin: '150px' }
         );
 
         observer.observe(sentinel);
         return () => observer.disconnect();
-    }, [page, totalPages, isFetching]);
+    }, [triggerLoadMore]);
 
     const activeProvider = useMemo(() => {
         if (selectedProvider && (!providerId || selectedProvider.id === providerId)) {
@@ -276,13 +354,13 @@ export default function NearbyProviders() {
                                         onViewDetails={handleViewDetails}
                                     />
                                 ))}
-                                {isFetching && page > 1 &&
+                                {isLoadingMore &&
                                     Array.from({ length: 4 }).map((_, idx) => (
                                         <ProviderCardSkeleton key={`skeleton-${idx}`} />
                                     ))}
                             </div>
 
-                            {page < totalPages && <div ref={sentinelRef} className="nearby-sentinel" />}
+                            <div ref={sentinelRef} className="nearby-sentinel" />
 
                             {page >= totalPages && displayedProviders.length > 0 && totalPages > 1 && (
                                 <div className="nearby-end-message">

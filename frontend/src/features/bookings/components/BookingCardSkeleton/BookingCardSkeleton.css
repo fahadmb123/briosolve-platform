@@ -10,16 +10,16 @@
     rgba(226, 232, 240, 0.7) 100%
   );
   background-size: 200% 100%;
-  animation: bkcardShimmer 1.5s infinite linear;
+  animation: bkcardShimmer 1.6s infinite ease-in-out;
   border-radius: 6px;
 }
 
 @keyframes bkcardShimmer {
   0% {
-    background-position: -200% 0;
+    background-position: 200% 0;
   }
   100% {
-    background-position: 200% 0;
+    background-position: -200% 0;
   }
 }
 

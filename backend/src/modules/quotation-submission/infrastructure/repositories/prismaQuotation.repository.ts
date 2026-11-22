@@ -6,7 +6,41 @@ import { UpdateQuotationRepoDto } from "../../application/dtos/request/update-qu
 import { QuotationMapper } from "../mappers/quotation.mapper";
 
 export class PrismaQuotationRepository implements IQuotationRepository {
+    private async syncExpiredQuotations(): Promise<void> {
+        try {
+            const now = new Date();
+            const pendingRecords = await db.orm.public.quotations
+                .where({ status: "PENDING" as never })
+                .all();
+
+            const expiredIds: string[] = [];
+            for (const record of pendingRecords) {
+                if (!record.valid_until_date) continue;
+                const rawDate: any = record.valid_until_date;
+                const dateVal = rawDate?.epochMilliseconds
+                    ? new Date(Number(rawDate.epochMilliseconds))
+                    : new Date(rawDate);
+
+                if (!isNaN(dateVal.getTime()) && now.getTime() > dateVal.getTime()) {
+                    expiredIds.push(record.id);
+                }
+            }
+
+            if (expiredIds.length > 0) {
+                await db.orm.public.quotations
+                    .where((q) => q.id.in(expiredIds))
+                    .updateAll({
+                        status: "EXPIRED" as never,
+                        rejection_reason: "Quotation validity expired" as never
+                    } as never);
+            }
+        } catch {
+            return;
+        }
+    }
+
     async findById(id: string): Promise<Quotation | null> {
+        await this.syncExpiredQuotations();
         const record = await db.orm.public.quotations
             .where({ id: id as never })
             .first();
@@ -19,6 +53,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
         serviceRequestId: string,
         providerId: string
     ): Promise<Quotation | null> {
+        await this.syncExpiredQuotations();
         const record = await db.orm.public.quotations
             .where({
                 service_request_id: serviceRequestId as never,
@@ -31,6 +66,7 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     }
 
     async findByServiceRequestId(serviceRequestId: string): Promise<Quotation[]> {
+        await this.syncExpiredQuotations();
         const records = await db.orm.public.quotations
             .where({ service_request_id: serviceRequestId as never })
             .all();
@@ -57,33 +93,38 @@ export class PrismaQuotationRepository implements IQuotationRepository {
     }
 
     async findByProviderId(providerId: string, params: GetProviderQuotationsParams): Promise<ProviderQuotationsResult> {
+        await this.syncExpiredQuotations();
         const { page, limit, status, sortBy } = params;
 
-        const whereClause: Record<string, any> = { provider_id: providerId as never };
+        let query = db.orm.public.quotations.where({ provider_id: providerId as never });
+
         if (status && status !== "ALL") {
-            whereClause.status = status as never;
+            query = query.where({ status: status as never });
         }
 
-        const allRecords = await db.orm.public.quotations
-            .where(whereClause)
+        if (sortBy === "OLDEST") {
+            query = query.orderBy((q) => q.created_at.asc());
+        } else {
+            query = query.orderBy((q) => q.created_at.desc());
+        }
+
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+        const offset = (page - 1) * limit;
+        const paginated = await query.offset(offset).limit(limit).all();
+
+        const statusRows = await db.orm.public.quotations
+            .where({ provider_id: providerId as never })
+            .select("status")
             .all();
 
         const statusList = ["PENDING", "ACCEPTED", "REJECTED", "EXPIRED", "WITHDRAWN"];
-        const counts: Record<string, number> = { ALL: allRecords.length };
+        const counts: Record<string, number> = { ALL: statusRows.length };
         for (const s of statusList) {
-            counts[s] = allRecords.filter((r: any) => r.status === s).length;
+            counts[s] = statusRows.filter((r: any) => r.status === s).length;
         }
 
-        const sorted = [...allRecords].sort((a: any, b: any) => {
-            const aTime = a.created_at ? Number(a.created_at.epochMilliseconds ?? new Date(a.created_at).getTime()) : 0;
-            const bTime = b.created_at ? Number(b.created_at.epochMilliseconds ?? new Date(b.created_at).getTime()) : 0;
-            return sortBy === "OLDEST" ? aTime - bTime : bTime - aTime;
-        });
-
-        const total = sorted.length;
+        const total = totalResult.total;
         const totalPages = Math.ceil(total / limit) || 1;
-        const offset = (page - 1) * limit;
-        const paginated = sorted.slice(offset, offset + limit);
 
         return {
             quotations: paginated.map((r: any) => QuotationMapper.toDomain(r)),

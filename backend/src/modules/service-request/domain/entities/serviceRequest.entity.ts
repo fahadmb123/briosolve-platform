@@ -1,6 +1,6 @@
 export type ServiceRequestUrgency = "TODAY" | "THIS_WEEK" | "SPECIFIC_DATE" | "FLEXIBLE";
 export type ServiceRequestBudgetType = "OPEN_BID" | "FIXED";
-export type ServiceRequestStatus = "PENDING" | "ACTIVE" | "ACCEPTED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "EXPIRED";
+export type ServiceRequestStatus = "PENDING" | "ACTIVE" | "ACCEPTED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "EXPIRED" | "CLOSED";
 
 export interface ServiceRequestImage {
     id: string;

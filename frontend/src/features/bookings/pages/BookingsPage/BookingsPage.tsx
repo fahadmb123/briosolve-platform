@@ -49,7 +49,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
   const providerQuery = useGetProviderBookings(queryParams, { enabled: isProvider });
   const updateStatusMutation = useUpdateBookingStatus();
 
-  const { data: responseData, isLoading, error, refetch, isFetching } = isProvider
+  const { data: responseData, isLoading, error, refetch } = isProvider
     ? providerQuery
     : customerQuery;
 
@@ -69,6 +69,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
       INSPECTION: bookings.filter((b) => b.status === "INSPECTION").length,
       IN_PROGRESS: bookings.filter((b) => b.status === "IN_PROGRESS").length,
       COMPLETED: bookings.filter((b) => b.status === "COMPLETED").length,
+      CLOSED: bookings.filter((b) => b.status === "CLOSED").length,
       CANCELLED: bookings.filter((b) => b.status === "CANCELLED").length
     };
   }, [responseData, bookings]);
@@ -169,13 +170,6 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
     <div className={`bk-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
       <div className="bk-hero-section">
         <div className="bk-hero-content">
-          <div className="bk-breadcrumb">
-            <span className={`bk-role-badge ${isProvider ? "provider" : "customer"}`}>
-              {isProvider ? "Provider Portal" : "Customer"}
-            </span>
-            <span className="sep">/</span>
-            <span className="active">Bookings</span>
-          </div>
           <h1 className="bk-title">
             {isProvider ? "Booked Jobs & Schedule" : "My Bookings"}
           </h1>
@@ -245,6 +239,15 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
 
           <button
             type="button"
+            className={`bk-tab-btn ${activeTab === "CLOSED" ? "active" : ""}`}
+            onClick={() => setActiveTab("CLOSED")}
+          >
+            <span>Closed</span>
+            <span className="bk-tab-count">{counts.CLOSED || 0}</span>
+          </button>
+
+          <button
+            type="button"
             className={`bk-tab-btn ${activeTab === "CANCELLED" ? "active" : ""}`}
             onClick={() => setActiveTab("CANCELLED")}
           >
@@ -279,7 +282,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
       </div>
 
       <div className="bk-content-area">
-        {isLoading || isFetching ? (
+        {(isLoading && bookings.length === 0) ? (
           <div className="bk-cards-stack">
             {Array.from({ length: 3 }).map((_, idx) => (
               <BookingCardSkeleton key={idx} />

@@ -31,6 +31,11 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/provider/messages",
     icon: "fas fa-comments",
   },
+  {
+    label: "Support Tickets",
+    to: "/provider/support",
+    icon: "fas fa-life-ring",
+  },
 ];
 
 const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
@@ -58,14 +63,14 @@ const FINANCES_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-file-invoice-dollar",
   },
   {
+    label: "Wallet & Earnings",
+    to: "/provider/wallet",
+    icon: "fas fa-wallet",
+  },
+  {
     label: "Invoices & Receipts",
     to: "/provider/quotations#invoices",
     icon: "fas fa-receipt",
-  },
-  {
-    label: "Payout Overview",
-    to: "/provider/dashboard#payouts",
-    icon: "fas fa-wallet",
   },
   {
     label: "Service Rates",
@@ -90,7 +95,8 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/provider/verification");
 
   const isFinancesSection =
-    location.pathname.startsWith("/provider/quotations");
+    location.pathname.startsWith("/provider/quotations") ||
+    location.pathname.startsWith("/provider/wallet");
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
@@ -99,6 +105,8 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/provider/requests") ||
     location.pathname.startsWith("/provider/messages") ||
     location.pathname.startsWith("/provider/bookings") ||
+    location.pathname.startsWith("/provider/support") ||
+    location.pathname.startsWith("/provider/tickets") ||
     location.pathname.startsWith("/provider/chat");
 
   const activeSubnavItems = isSettingsSection

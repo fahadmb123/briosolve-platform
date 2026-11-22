@@ -25,4 +25,5 @@ export interface UpdateQuotationRepoDto {
     validUntil?: QuotationValidity;
     extraChargePolicy?: string;
     status?: QuotationStatus;
+    rejectionReason?: string | null;
 }

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import { checkRequestEditPermission } from "../../utils/serviceRequestEdit.utils";
 
@@ -19,11 +20,20 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
   onCancelRequest,
   onReopenRequest,
 }) => {
+  const navigate = useNavigate();
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   if (!isOpen || !request) return null;
 
-  const canCancel = request.status === "PENDING" || request.status === "ACTIVE";
+  const isDiagnosisClosed = Boolean(
+    request.status === "CLOSED" ||
+    request.latest_booking?.status === "CLOSED" ||
+    request.latest_booking?.is_diagnosis_closed ||
+    (request.latest_booking?.cancellation_reason &&
+     request.latest_booking.cancellation_reason.toLowerCase().includes("diagnosis"))
+  );
+
+  const canCancel = (request.status === "PENDING" || request.status === "ACTIVE") && !isDiagnosisClosed;
   const permission = checkRequestEditPermission(request);
 
   const formattedDate = new Date(request.created_at).toLocaleDateString(undefined, {
@@ -55,6 +65,9 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
   };
 
   const getStatusVariant = (status: CustomerServiceRequestItem["status"]) => {
+    if (request.latest_booking?.status === "COMPLETED" || isDiagnosisClosed) {
+      return "completed";
+    }
     switch (status) {
       case "PENDING":
         return "pending";
@@ -66,6 +79,8 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
         return "in-progress";
       case "COMPLETED":
         return "completed";
+      case "CLOSED":
+        return "completed";
       case "CANCELLED":
         return "cancelled";
       case "EXPIRED":
@@ -74,6 +89,12 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
         return "default";
     }
   };
+
+  const displayStatus = isDiagnosisClosed
+    ? "Diagnosis Closed"
+    : request.latest_booking?.status === "COMPLETED"
+    ? "Completed"
+    : request.status.replace("_", " ");
 
   return (
     <div className="myreq-modal-overlay" onClick={onClose}>
@@ -97,9 +118,12 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
                 )}
               </span>
 
-              <span className={`myreq-status-pill ${getStatusVariant(request.status)}`}>
-                <span className="myreq-status-dot"></span>
-                <span>{request.status.replace("_", " ")}</span>
+              <span
+                className={`myreq-status-pill ${getStatusVariant(request.status)}`}
+                style={isDiagnosisClosed ? { background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" } : undefined}
+              >
+                <span className="myreq-status-dot" style={isDiagnosisClosed ? { background: "#10b981" } : undefined}></span>
+                <span>{displayStatus}</span>
               </span>
             </div>
 
@@ -213,6 +237,45 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
             </div>
           )}
 
+          {request.latest_booking && (
+            <div className="myreq-modal-block">
+              <h4 className="myreq-block-heading">Booking Information</h4>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "0.875rem 1rem",
+                  background: (request.latest_booking.status === "COMPLETED" || isDiagnosisClosed) ? "#f0fdf4" : "#f8fafc",
+                  border: (request.latest_booking.status === "COMPLETED" || isDiagnosisClosed) ? "1px solid #bbf7d0" : "1px solid #e2e8f0",
+                  borderRadius: "8px"
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 600, color: "#1e293b", fontSize: "0.875rem" }}>
+                    Booking #{request.latest_booking.booking_number}
+                  </div>
+                  <div style={{ fontSize: "0.8125rem", color: (request.latest_booking.status === "COMPLETED" || isDiagnosisClosed) ? "#16a34a" : "#64748b", marginTop: "2px" }}>
+                    Status: <strong>{isDiagnosisClosed ? "Diagnosis Closed" : request.latest_booking.status.replace("_", " ")}</strong>
+                    {request.latest_booking.total_amount > 0 && ` • ₹${request.latest_booking.total_amount.toLocaleString("en-IN")}`}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="myreq-btn-subtle"
+                  style={{ padding: "0.4rem 0.85rem", fontSize: "0.8125rem" }}
+                  onClick={() => {
+                    onClose();
+                    navigate(`/bookings/${request.latest_booking?.id}`);
+                  }}
+                >
+                  <i className="fas fa-external-link-alt" style={{ marginRight: "4px" }}></i>
+                  <span>View Booking</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {typeof request.matched_providers_count === "number" && (
             <div className="myreq-callout-notice">
               <i className="fas fa-info-circle"></i>
@@ -224,7 +287,24 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
         </div>
 
         <div className="myreq-modal-footer">
-          {request.status === "EXPIRED" && onReopenRequest && (
+          {request.latest_booking?.id && (
+            <button
+              type="button"
+              className="myreq-btn-subtle"
+              onClick={() => {
+                onClose();
+                navigate(`/bookings/${request.latest_booking?.id}`);
+              }}
+              style={{
+                color: (request.latest_booking.status === "COMPLETED" || isDiagnosisClosed) ? "#15803d" : "#c2410c",
+                fontWeight: 600
+              }}
+            >
+              <i className="fas fa-receipt" style={{ marginRight: "4px" }}></i>
+              <span>{isDiagnosisClosed ? "View Diagnosis Booking" : (request.latest_booking.status === "COMPLETED" ? "View Completed Booking" : "View Booking")}</span>
+            </button>
+          )}
+          {request.status === "EXPIRED" && !isDiagnosisClosed && onReopenRequest && (
             <button
               type="button"
               className="myreq-btn-reopen"

@@ -12,7 +12,8 @@ import validate from "../../../../shared/middlewares/validate-request";
 export function createNotificationRouter(notificationController: NotificationController) {
     const router = Router();
 
-    router.get("/unread-count", authMiddleware, notificationController.getUnreadCount);
+    router.get("/unread-count", authMiddleware, notificationController.getUnreadCount)
+    
     router.get("/", authMiddleware, notificationController.getNotifications);
     router.post("/", authMiddleware, validate(createNotificationSchema), notificationController.create);
     router.patch("/", authMiddleware, validate(updateNotificationSchema), notificationController.markAllAsRead);

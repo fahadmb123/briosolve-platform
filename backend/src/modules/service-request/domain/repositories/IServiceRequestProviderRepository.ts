@@ -9,7 +9,7 @@ export interface IServiceRequestProviderRepository {
     findByProviderId(
         providerProfileId: string,
         input?: Omit<GetProviderServiceRequestsInputDto, "userId">
-    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number }>;
+    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts?: Record<string, number> }>;
     findMatchesByProviderId(providerId: string): Promise<ServiceRequestProvider[]>;
     findByRequestAndProviderId(serviceRequestId: string, providerId: string): Promise<ServiceRequestProvider | null>;
     updateStatus(serviceRequestId: string, providerId: string, status: ServiceRequestProviderStatus): Promise<ServiceRequestProvider | null>;

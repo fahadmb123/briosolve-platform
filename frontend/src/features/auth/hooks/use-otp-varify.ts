@@ -14,7 +14,7 @@ export const useOtpVarify = (isInline?: boolean) => {
             if (response.data.path === "reset-password") {
                 useResetFlowStore.getState().setOtpVerified(true);
             }
-            
+
             if (response.data.path && response.data.path.endsWith("settings")) {
                 useResetFlowStore.getState().setOtpFlowStarted(false);
                 let currentUser = useAuthStore.getState().user;

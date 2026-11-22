@@ -48,7 +48,16 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
   const [copiedAddress, setCopiedAddress] = useState<boolean>(false);
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
 
+  const isDiagnosisClosed = Boolean(
+    request?.status === "CLOSED" ||
+    request?.latest_booking?.status === "CLOSED" ||
+    request?.latest_booking?.is_diagnosis_closed ||
+    (request?.latest_booking?.cancellation_reason &&
+     request.latest_booking.cancellation_reason.toLowerCase().includes("diagnosis"))
+  );
+
   const isRefundedBooking = Boolean(
+    !isDiagnosisClosed &&
     request?.latest_booking &&
     request.latest_booking.status === "CANCELLED" &&
     request.latest_booking.payment_status === "REFUNDED"
@@ -92,23 +101,120 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
 
   if (!request) {
     return (
-      <div className="srdetails-page-container">
+      <div className="srdetails-page-container srdetails-sk-container" aria-hidden="true">
         <div className="srdetails-top-bar">
           <button type="button" className="srdetails-back-btn" onClick={onBack}>
             <i className="fas fa-arrow-left"></i>
-            <span>{backLabel || "Back to Service Requests"}</span>
+            <span>{backLabel || (role === "CUSTOMER" ? "Back to My Requests" : "Back to Service Requests")}</span>
           </button>
+          <div className="srdetails-top-actions">
+            <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "110px", height: "38px" }} />
+          </div>
         </div>
 
-        <div className="srdetails-hero-card srdetails-shimmer srdetails-sk-hero" />
+        <div className="srdetails-hero-card">
+          <div className="srdetails-hero-main">
+            <div className="srdetails-badge-row">
+              <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "120px" }} />
+              <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "100px" }} />
+              <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "130px" }} />
+            </div>
+            <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "65%", height: "28px", margin: "14px 0 10px" }} />
+            <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+              <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "140px", height: "15px" }} />
+              <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100px", height: "15px" }} />
+            </div>
+          </div>
+          <div className="srdetails-hero-aside">
+            <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "110px", height: "30px", alignSelf: "flex-end" }} />
+            <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "150px", height: "55px", marginTop: "10px", borderRadius: "10px" }} />
+          </div>
+        </div>
 
         <div className="srdetails-layout-grid">
           <div className="srdetails-main-column">
-            <div className="srdetails-card srdetails-shimmer srdetails-sk-card" />
-            <div className="srdetails-card srdetails-shimmer srdetails-sk-card" />
+            <div className="srdetails-card">
+              <div className="srdetails-card-header">
+                <div className="srdetails-card-header-left">
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "20px", height: "20px" }} />
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "190px", height: "20px" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "14px" }}>
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100%", height: "14px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "95%", height: "14px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "70%", height: "14px" }} />
+              </div>
+              <div style={{ display: "flex", gap: "12px", marginTop: "18px" }}>
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100px", height: "100px", borderRadius: "10px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100px", height: "100px", borderRadius: "10px" }} />
+              </div>
+            </div>
+
+            <div className="srdetails-card">
+              <div className="srdetails-card-header">
+                <div className="srdetails-card-header-left">
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "20px", height: "20px" }} />
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "160px", height: "20px" }} />
+                </div>
+                <div className="srdetails-shimmer srdetails-sk-badge-pill" style={{ width: "90px", height: "24px" }} />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "14px" }}>
+                <div className="srdetails-sk-quote-box">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                      <div className="srdetails-shimmer" style={{ width: "40px", height: "40px", borderRadius: "50%" }} />
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "120px", height: "14px" }} />
+                        <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "80px", height: "12px" }} />
+                      </div>
+                    </div>
+                    <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "90px", height: "24px" }} />
+                  </div>
+                </div>
+                <div className="srdetails-sk-quote-box">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                      <div className="srdetails-shimmer" style={{ width: "40px", height: "40px", borderRadius: "50%" }} />
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "130px", height: "14px" }} />
+                        <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "70px", height: "12px" }} />
+                      </div>
+                    </div>
+                    <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "90px", height: "24px" }} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+
           <div className="srdetails-sidebar-column">
-            <div className="srdetails-card srdetails-shimmer srdetails-sk-card" />
+            <div className="srdetails-card">
+              <div className="srdetails-card-header">
+                <div className="srdetails-card-header-left">
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "18px", height: "18px" }} />
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "140px", height: "18px" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "14px" }}>
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "85%", height: "18px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "60%", height: "14px" }} />
+              </div>
+            </div>
+
+            <div className="srdetails-card">
+              <div className="srdetails-card-header">
+                <div className="srdetails-card-header-left">
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "18px", height: "18px" }} />
+                  <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "130px", height: "18px" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "14px" }}>
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "90%", height: "15px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "70%", height: "14px" }} />
+                <div className="srdetails-shimmer srdetails-sk-line" style={{ width: "100%", height: "130px", borderRadius: "8px", marginTop: "6px" }} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -166,6 +272,13 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
         );
       }
       if (request.status === "ACCEPTED") {
+        if (request.latest_booking?.status === "COMPLETED") {
+          return (
+            <span className="srdetails-status-pill completed">
+              <i className="fas fa-check-circle"></i> Completed
+            </span>
+          );
+        }
         return (
           <span className="srdetails-status-pill completed">
             <i className="fas fa-check-circle"></i> Quotation Accepted
@@ -193,6 +306,13 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
           </span>
         );
       case "ACCEPTED":
+        if (request.latest_booking?.status === "COMPLETED") {
+          return (
+            <span className="srdetails-status-pill completed">
+              <i className="fas fa-check-circle"></i> Completed
+            </span>
+          );
+        }
         return (
           <span className="srdetails-status-pill completed">
             <i className="fas fa-check-circle"></i> Quotation Accepted
@@ -206,11 +326,24 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
         );
       case "COMPLETED":
         return (
-          <span className="srdetails-status-pill completed">
-            <i className="fas fa-check-circle"></i> Completed
+          <span className="srdetails-status-pill completed" style={isDiagnosisClosed ? { background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" } : undefined}>
+            <i className={`fas ${isDiagnosisClosed ? "fa-stethoscope" : "fa-check-circle"}`}></i> {isDiagnosisClosed ? "Diagnosis Closed" : "Completed"}
+          </span>
+        );
+      case "CLOSED":
+        return (
+          <span className="srdetails-status-pill completed" style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+            <i className="fas fa-stethoscope"></i> Diagnosis Closed
           </span>
         );
       case "CANCELLED":
+        if (isDiagnosisClosed) {
+          return (
+            <span className="srdetails-status-pill completed" style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+              <i className="fas fa-stethoscope"></i> Diagnosis Closed
+            </span>
+          );
+        }
         return (
           <span className="srdetails-status-pill cancelled">
             <i className="fas fa-ban"></i> Cancelled
@@ -315,6 +448,36 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                   <i className="fas fa-check-circle"></i>
                   <span>View Submitted Quotation</span>
                 </button>
+              ) : request.status === "ACCEPTED" || request.status === "IN_PROGRESS" ? (
+                <button
+                  type="button"
+                  className="srdetails-btn-quote-top disabled"
+                  disabled
+                  style={{ opacity: 0.6, cursor: "not-allowed" }}
+                >
+                  <i className="fas fa-check-circle"></i>
+                  <span>Accepted by Other Provider</span>
+                </button>
+              ) : request.status === "CLOSED" || isDiagnosisClosed ? (
+                <button
+                  type="button"
+                  className="srdetails-btn-quote-top disabled"
+                  disabled
+                  style={{ opacity: 0.6, cursor: "not-allowed" }}
+                >
+                  <i className="fas fa-lock"></i>
+                  <span>Request Closed</span>
+                </button>
+              ) : request.status === "COMPLETED" ? (
+                <button
+                  type="button"
+                  className="srdetails-btn-quote-top disabled"
+                  disabled
+                  style={{ opacity: 0.6, cursor: "not-allowed" }}
+                >
+                  <i className="fas fa-check-circle"></i>
+                  <span>Job Completed</span>
+                </button>
               ) : request.status !== "CANCELLED" && request.status !== "EXPIRED" && onQuote ? (
                 <button
                   type="button"
@@ -374,6 +537,53 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
 
       <div className="srdetails-layout-grid">
         <div className="srdetails-main-column">
+          {isDiagnosisClosed && (
+            <div className="srdetails-refund-alert-box" style={{ background: "#f0fdf4", borderColor: "#86efac" }}>
+              <div className="srdetails-refund-alert-icon" style={{ background: "#dcfce7", color: "#16a34a" }}>
+                <i className="fas fa-stethoscope"></i>
+              </div>
+              <div className="srdetails-refund-alert-body">
+                <div className="srdetails-refund-alert-header">
+                  <span className="srdetails-refund-badge" style={{ background: "#16a34a", color: "#fff" }}>
+                    DIAGNOSIS AGREED & CLOSED
+                  </span>
+                  {request?.latest_booking?.booking_number && (
+                    <span className="srdetails-refund-booking-ref">
+                      Booking #{request.latest_booking.booking_number}
+                    </span>
+                  )}
+                </div>
+                <h3 className="srdetails-refund-heading" style={{ color: "#15803d" }}>
+                  Service request closed via on-site diagnosis agreement.
+                </h3>
+                <p className="srdetails-refund-subtext">
+                  {request?.latest_booking?.cancellation_reason || "The technician identified an on-site scope mismatch or separate issue. The visit fee was settled and the remaining deposit was refunded."}
+                </p>
+                <div className="srdetails-refund-action-row">
+                  <button
+                    type="button"
+                    className="srdetails-btn-refund-receipt"
+                    onClick={() => navigate("/request-service")}
+                    style={{ background: "#16a34a", color: "#ffffff", borderColor: "#16a34a" }}
+                  >
+                    <i className="fas fa-plus"></i>
+                    <span>Request Another Service</span>
+                  </button>
+                  {request?.latest_booking?.id && (
+                    <button
+                      type="button"
+                      className="srdetails-btn-refund-receipt"
+                      onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+                    >
+                      <i className="fas fa-receipt"></i>
+                      <span>View Booking Details</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {isRefundedBooking && (
             <div className="srdetails-refund-alert-box">
               <div className="srdetails-refund-alert-icon">
@@ -416,6 +626,45 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                     >
                       <i className="fas fa-receipt"></i>
                       <span>View Refund Receipt</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {request.latest_booking?.status === "COMPLETED" && (
+            <div className="srdetails-refund-alert-box" style={{ background: "#f0fdf4", borderColor: "#86efac" }}>
+              <div className="srdetails-refund-alert-icon" style={{ background: "#dcfce7", color: "#16a34a" }}>
+                <i className="fas fa-check-circle"></i>
+              </div>
+              <div className="srdetails-refund-alert-body">
+                <div className="srdetails-refund-alert-header">
+                  <span className="srdetails-refund-badge" style={{ background: "#dcfce7", color: "#15803d" }}>
+                    SERVICE COMPLETED
+                  </span>
+                  {request.latest_booking.booking_number && (
+                    <span className="srdetails-refund-booking-ref" style={{ color: "#166534" }}>
+                      Booking #{request.latest_booking.booking_number}
+                    </span>
+                  )}
+                </div>
+                <h3 className="srdetails-refund-heading" style={{ color: "#14532d" }}>
+                  This service has been completed successfully!
+                </h3>
+                <p className="srdetails-refund-subtext" style={{ color: "#166534" }}>
+                  The provider has finished all work for this booking. You can review the booking details, payment summary, and invoice receipt anytime.
+                </p>
+                <div className="srdetails-refund-action-row">
+                  {request.latest_booking.id && (
+                    <button
+                      type="button"
+                      className="srdetails-btn-refund-receipt"
+                      style={{ background: "#16a34a", color: "#ffffff", borderColor: "#16a34a" }}
+                      onClick={() => navigate(`/bookings/${request.latest_booking?.id}`)}
+                    >
+                      <i className="fas fa-receipt"></i>
+                      <span>View Booking Summary & Invoice</span>
                     </button>
                   )}
                 </div>
@@ -769,6 +1018,27 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
                     </button>
                   )}
                 </>
+              ) : request.status === "IN_PROGRESS" ? (
+                <>
+                  <h4 className="srdetails-cta-title">Job In Progress</h4>
+                  <p className="srdetails-cta-sub">
+                    This service request is already in progress and is not accepting new quotations.
+                  </p>
+                </>
+              ) : request.status === "CLOSED" || isDiagnosisClosed ? (
+                <>
+                  <h4 className="srdetails-cta-title">Request Closed</h4>
+                  <p className="srdetails-cta-sub">
+                    This service request has been closed via diagnosis settlement and is not accepting quotations.
+                  </p>
+                </>
+              ) : request.status === "COMPLETED" ? (
+                <>
+                  <h4 className="srdetails-cta-title">Job Completed</h4>
+                  <p className="srdetails-cta-sub">
+                    This service request has been completed.
+                  </p>
+                </>
               ) : (
                 <>
                   <h4 className="srdetails-cta-title">Ready to take this job?</h4>
@@ -792,7 +1062,23 @@ export const ServiceRequestDetailsView: React.FC<ServiceRequestDetailsViewProps>
 
           {role === "CUSTOMER" && (
             <div className="srdetails-action-cta-card">
-              {request.status === "CANCELLED" ? (
+              {isDiagnosisClosed ? (
+                <>
+                  <h4 className="srdetails-cta-title" style={{ color: "#065f46" }}>Diagnosis Agreed & Closed</h4>
+                  <p className="srdetails-cta-sub">
+                    This request was closed following an accepted on-site diagnosis report. You can submit another service request whenever you are ready.
+                  </p>
+                  <button
+                    type="button"
+                    className="srdetails-btn-cta-primary"
+                    onClick={() => navigate("/request-service")}
+                    style={{ background: "#16a34a", borderColor: "#16a34a" }}
+                  >
+                    <i className="fas fa-plus"></i>
+                    <span>Request Another Service</span>
+                  </button>
+                </>
+              ) : request.status === "CANCELLED" ? (
                 <>
                   <h4 className="srdetails-cta-title">Request Cancelled</h4>
                   <p className="srdetails-cta-sub">

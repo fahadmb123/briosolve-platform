@@ -1,0 +1,72 @@
+export type TicketStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "CLOSED";
+
+export type TicketCategory =
+  | "PROVIDER_NO_SHOW"
+  | "POOR_WORKMANSHIP"
+  | "UNAUTHORIZED_CHARGES"
+  | "SAFETY_CONDUCT"
+  | "PAYMENT_REFUND"
+  | "CUSTOMER_ABSENT"
+  | "PAYMENT_DISPUTE"
+  | "SCOPE_DISPUTE"
+  | "SAFETY_PREMISES"
+  | "GENERAL_INQUIRY";
+
+export interface TicketMessage {
+  id: string;
+  authorName: string;
+  authorRole: "CUSTOMER" | "PROVIDER" | "ADMIN" | "SYSTEM";
+  message: string;
+  createdAt: string;
+  attachments?: string[];
+}
+
+export interface SettlementReceipt {
+  txnId: string;
+  timestamp: string;
+  type: string;
+  customerAmount: number;
+  providerAmount: number;
+  feeAmount: number;
+  ledgerNote: string;
+}
+
+export interface SupportTicket {
+  id: string;
+  ticketNumber: string;
+  creatorId: string;
+  creatorName: string;
+  creatorEmail?: string | null;
+  creatorRole: "CUSTOMER" | "PROVIDER";
+  targetType?: string;
+  targetId?: string;
+  targetNumber?: string;
+  bookingId?: string;
+  bookingNumber?: string;
+  serviceTitle?: string;
+  counterpartyName?: string;
+  category: TicketCategory;
+  categoryLabel: string;
+  subject: string;
+  description: string;
+  metadata?: Record<string, any>;
+  status: TicketStatus;
+  attachments: string[];
+  createdAt: string;
+  updatedAt: string;
+  resolutionNote?: string;
+  settlementDecision?: "FULL_REFUND_CUSTOMER" | "FULL_PAYOUT_PROVIDER" | "SPLIT_SETTLEMENT" | "NO_FINANCIAL_ACTION";
+  settlementDetails?: string;
+  settlementReceipt?: SettlementReceipt;
+  assignedTo?: string;
+  sanctionsApplied?: string[];
+  messages: TicketMessage[];
+}
+
+export interface CreateTicketPayload {
+  bookingId?: string;
+  category: TicketCategory;
+  subject: string;
+  description: string;
+  attachments?: string[];
+}

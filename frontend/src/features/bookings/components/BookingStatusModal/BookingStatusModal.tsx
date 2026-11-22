@@ -22,28 +22,56 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   onConfirm
 }) => {
   const [notes, setNotes] = useState("");
-  const [confirmedAmount, setConfirmedAmount] = useState<number>(() => booking?.totalAmount || 0);
+  const initialAdvancePaid = booking ? (booking.advanceAmount || booking.totalAmount) : 0;
+  const initialRemaining = booking ? Math.max(0, (booking.totalAmount || 0) - initialAdvancePaid) : 0;
+  const [remainingAmount, setRemainingAmount] = useState<number>(() => initialRemaining);
+  const [cancellationStep, setCancellationStep] = useState<"WARNING" | "FORM">("WARNING");
 
   React.useEffect(() => {
-    if (booking?.totalAmount) {
-      setConfirmedAmount(booking.totalAmount);
+    if (booking?.totalAmount !== undefined) {
+      const adv = booking.advanceAmount || booking.totalAmount;
+      setRemainingAmount(Math.max(0, booking.totalAmount - adv));
     }
-  }, [booking?.totalAmount, isOpen]);
+  }, [booking?.totalAmount, booking?.advanceAmount, isOpen]);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setCancellationStep("WARNING");
+      setNotes("");
+    }
+  }, [isOpen, targetStatus]);
 
   if (!isOpen || !booking || !targetStatus) return null;
 
   const isFixed = booking.quotationType === "FIXED" || (!booking.quotationType && !booking.requiresInspection);
-  const isInspection = booking.quotationType === "INSPECTION_REQUIRED" || booking.requiresInspection;
 
   const advancePaid = booking.advanceAmount || booking.totalAmount;
-  const calculatedBalance = Math.max(0, confirmedAmount - advancePaid);
-  const isInvalidAmount =
+  const isInvalidRemaining =
     targetStatus === "PAYMENT_PENDING" &&
     !isFixed &&
-    (confirmedAmount < advancePaid || isNaN(confirmedAmount) || confirmedAmount <= 0);
+    (isNaN(remainingAmount) || remainingAmount < 0);
+
+  const safeRemaining = isNaN(remainingAmount) || remainingAmount < 0 ? 0 : remainingAmount;
+  const finalTotal = advancePaid + safeRemaining;
+  const willCompleteDirectly = targetStatus === "PAYMENT_PENDING" && !isFixed && safeRemaining === 0;
+
+  const customerPlatformFee = booking.platformFee || Math.round((advancePaid / 1.05) * 0.05);
+  const baseQuoteAmount = booking.quoteAmount ? Number(booking.quoteAmount) : Math.max(0, advancePaid - customerPlatformFee);
+  const totalServiceCost = isFixed ? baseQuoteAmount : (baseQuoteAmount + safeRemaining);
+  const providerCommission = Math.round(totalServiceCost * 0.05);
+  const providerEarnings = Math.max(0, totalServiceCost - providerCommission);
 
   const isCancellation = targetStatus === "CANCELLED";
+  const isProviderCancellation = isCancellation && role === "PROVIDER";
+  const isCustomerCancellation = isCancellation && role === "CUSTOMER";
+  const cancellationsUsed = booking.providerCancellationsCount ?? 0;
+  const isUntouchable = isCancellation;
+
   const isInvalidReason = isCancellation && (!notes || !notes.trim());
+
+  const policy = booking.cancellationPolicy;
+  const refundableAmount = policy?.refundableAmount ?? advancePaid;
+  const cancellationFee = policy?.cancellationFee ?? 0;
 
   const cancellationReasons = role === "CUSTOMER" ? [
     "Change of plans / Service no longer needed",
@@ -93,21 +121,31 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
       case "PAYMENT_PENDING":
         if (isFixed) {
           return {
-            title: "Request Final Payment Settlement?",
-            description: `Work is complete for "${booking.serviceRequestTitle || "this job"}". Under this Fixed Price agreement of ₹${booking.totalAmount.toLocaleString("en-IN")}, request the customer to settle the remaining balance of ₹${(booking.totalAmount - advancePaid).toLocaleString("en-IN")}.`,
-            placeholder: "e.g., Job executed completely as agreed. Ready for settlement...",
-            confirmText: `Request Settlement (₹${(booking.totalAmount - advancePaid).toLocaleString("en-IN")})`,
+            title: "Request Final Payment Settlement",
+            description: `Request customer to settle the remaining balance of ₹${(booking.totalAmount - advancePaid).toLocaleString("en-IN")}.`,
+            placeholder: "Optional notes for customer...",
+            confirmText: `Request ₹${(booking.totalAmount - advancePaid).toLocaleString("en-IN")} Settlement`,
             confirmIcon: "fas fa-file-invoice-dollar",
             variant: "warning"
           };
         }
+        if (willCompleteDirectly) {
+          return {
+            title: "Complete Job",
+            description: `The advance deposit covers the entire job. Confirm to complete.`,
+            placeholder: "Optional notes for customer...",
+            confirmText: "Complete Job",
+            confirmIcon: "fas fa-check-circle",
+            variant: "success"
+          };
+        }
         return {
-          title: isInspection ? "Confirm Inspection-Based Final Total?" : "Confirm Estimated Final Total?",
-          description: `Confirm the final total amount for "${booking.serviceRequestTitle || "this job"}". The customer will be requested to pay the balance after deducting the advance paid.`,
-          placeholder: "e.g., Completed all work including extra parts. Final amount confirmed...",
-          confirmText: "Confirm Total & Request Payment",
+          title: "Complete Job & Settle Balance",
+          description: `Customer will be requested to pay the remaining balance online to finalize the booking.`,
+          placeholder: "Optional notes or details for customer...",
+          confirmText: `Request ₹${safeRemaining.toLocaleString("en-IN")} & Complete`,
           confirmIcon: "fas fa-file-invoice-dollar",
-          variant: "warning"
+          variant: "primary"
         };
       case "COMPLETED":
         return {
@@ -115,17 +153,19 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
           description: `Confirm that all deliverables for "${booking.serviceRequestTitle || "this job"}" have been completed to satisfaction. The customer will be notified to review and release escrow.`,
           placeholder: "e.g., Work finished, all test runs completed successfully...",
           confirmText: "Mark Completed",
-          confirmIcon: "fas fa-check-double",
+          confirmIcon: "fas fa-check-circle",
           variant: "success"
         };
       case "CANCELLED":
         return {
-          title: "Cancel Booking (Pre-Dispatch)?",
+          title: "Confirm Booking Cancellation",
           description: role === "CUSTOMER"
-            ? `Are you sure you want to cancel this booking before the provider travels? You will receive a 100% full refund of ₹${advancePaid.toLocaleString("en-IN")} secured in Escrow back to your account.`
-            : `Are you sure you want to cancel this booking before travelling? The customer will receive a 100% full refund of the payment secured in Escrow.`,
+            ? `Please select your reason. ${refundableAmount > 0 ? `₹${refundableAmount.toLocaleString("en-IN")} will be refunded to your wallet.` : "Advance payment is non-refundable."}`
+            : `Please provide a reason. The payment secured in Escrow will be released to the customer.`,
           placeholder: "Select a reason above or write specific details...",
-          confirmText: role === "CUSTOMER" ? "Yes, Cancel Booking & Receive Refund" : "Yes, Cancel & Refund Customer",
+          confirmText: role === "CUSTOMER"
+            ? (refundableAmount > 0 ? `Yes, Cancel Booking & Receive ₹${refundableAmount.toLocaleString("en-IN")} Refund` : "Yes, Cancel Booking")
+            : "Yes, Cancel & Refund Customer",
           confirmIcon: "fas fa-times-circle",
           variant: "danger"
         };
@@ -143,18 +183,269 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
 
   const config = getStatusConfig();
 
+  const handleOverlayClick = () => {
+    if (isUntouchable) {
+      return;
+    }
+    onClose();
+  };
+
   const handleConfirm = () => {
-    if (isInvalidAmount) return;
+    if (isInvalidRemaining) return;
+    const effectiveStatus = willCompleteDirectly ? "COMPLETED" : targetStatus;
+    const effectiveAmount = targetStatus === "PAYMENT_PENDING" && !isFixed ? finalTotal : undefined;
     onConfirm(
       booking,
-      targetStatus,
+      effectiveStatus,
       notes.trim() || undefined,
-      targetStatus === "PAYMENT_PENDING" && !isFixed ? confirmedAmount : undefined
+      effectiveAmount
     );
   };
 
+  if (isProviderCancellation && cancellationStep === "WARNING") {
+    return (
+      <div className="bkstatus-modal-overlay untouchable" onClick={handleOverlayClick}>
+        <div
+          className="bkstatus-modal-dialog"
+          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+        >
+          {cancellationsUsed === 0 && (
+            <>
+              <div className="bkstatus-modal-header">
+                <div className="bkstatus-icon-box warning">
+                  <i className="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 className="bkstatus-title">Cancellation Warning (1 of 2)</h3>
+                <div className="bkstatus-strike-pill warning">
+                  <i className="fas fa-info-circle"></i>
+                  <span>Cancellation Strike 1 of 2</span>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-body">
+                <div className="bkstatus-warning-box">
+                  <p className="bkstatus-warning-para">
+                    As a service provider on this platform, you are allowed a maximum of 2 cancellations across all your confirmed bookings.
+                  </p>
+                  <p className="bkstatus-warning-para">
+                    Proceeding with this cancellation will be recorded as your <strong>1st cancellation</strong>. You will have only <strong>1 cancellation remaining</strong> before reaching your final limit. If you reach your limit, you will no longer be allowed to cancel any bookings.
+                  </p>
+                  <p className="bkstatus-warning-sub">
+                    Repeated cancellations affect customer experience and platform reliability.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-footer">
+                <button
+                  type="button"
+                  className="bkstatus-btn-cancel"
+                  onClick={onClose}
+                  disabled={isLoading}
+                >
+                  Keep Booking
+                </button>
+                <button
+                  type="button"
+                  className="bkstatus-btn-confirm warning"
+                  onClick={() => setCancellationStep("FORM")}
+                  disabled={isLoading}
+                >
+                  <span>Continue</span>
+                  <i className="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </>
+          )}
+
+          {cancellationsUsed === 1 && (
+            <>
+              <div className="bkstatus-modal-header">
+                <div className="bkstatus-icon-box danger">
+                  <i className="fas fa-exclamation-circle"></i>
+                </div>
+                <h3 className="bkstatus-title">Final Cancellation Warning (2 of 2)</h3>
+                <div className="bkstatus-strike-pill danger">
+                  <i className="fas fa-exclamation-triangle"></i>
+                  <span>Final Permitted Cancellation</span>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-body">
+                <div className="bkstatus-warning-box danger">
+                  <p className="bkstatus-warning-para">
+                    You have already used <strong>1 of your 2 permitted cancellations</strong>.
+                  </p>
+                  <p className="bkstatus-warning-para">
+                    If you proceed, this will be your <strong>2nd and final cancellation</strong>. Once completed, your cancellation limit will be completely exhausted. You will <strong>NOT</strong> be allowed to cancel any further bookings in the future.
+                  </p>
+                  <p className="bkstatus-warning-sub">
+                    Please consider keeping this booking if possible to maintain good standing on the platform.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-footer">
+                <button
+                  type="button"
+                  className="bkstatus-btn-cancel"
+                  onClick={onClose}
+                  disabled={isLoading}
+                >
+                  Keep Booking
+                </button>
+                <button
+                  type="button"
+                  className="bkstatus-btn-confirm danger"
+                  onClick={() => setCancellationStep("FORM")}
+                  disabled={isLoading}
+                >
+                  <span>Continue</span>
+                  <i className="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </>
+          )}
+
+          {cancellationsUsed >= 2 && (
+            <>
+              <div className="bkstatus-modal-header">
+                <div className="bkstatus-icon-box danger">
+                  <i className="fas fa-ban"></i>
+                </div>
+                <h3 className="bkstatus-title">Cancellation Not Allowed</h3>
+                <div className="bkstatus-strike-pill locked">
+                  <i className="fas fa-lock"></i>
+                  <span>Limit Reached (2 / 2 Used)</span>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-body">
+                <div className="bkstatus-warning-box locked">
+                  <p className="bkstatus-warning-para">
+                    You have already reached the maximum limit of 2 cancellations permitted for service providers.
+                  </p>
+                  <p className="bkstatus-warning-para">
+                    You cannot cancel this booking. Further cancellations are disabled for your account. You must proceed to fulfill the service as scheduled.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bkstatus-modal-footer">
+                <button
+                  type="button"
+                  className="bkstatus-btn-confirm primary full-width"
+                  onClick={onClose}
+                  disabled={isLoading}
+                >
+                  <i className="fas fa-arrow-left"></i>
+                  <span>Go Back to Booking</span>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (isCustomerCancellation && cancellationStep === "WARNING") {
+    const isEnRoute = booking.status === "EN_ROUTE";
+    const isLimit = policy?.policyStatus === "LIMIT_EXCEEDED";
+    const isFinalFree = policy?.policyStatus === "FINAL_FREE_CANCELLATION";
+
+    return (
+      <div className="bkstatus-modal-overlay untouchable" onClick={handleOverlayClick}>
+        <div
+          className="bkstatus-modal-dialog"
+          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bkstatus-modal-header">
+            <div className={`bkstatus-icon-box ${isEnRoute || isLimit ? "danger" : "warning"}`}>
+              <i className={isEnRoute ? "fas fa-route" : isLimit ? "fas fa-exclamation-circle" : "fas fa-info-circle"}></i>
+            </div>
+            <h3 className="bkstatus-title">
+              {isEnRoute
+                ? "Technician Is On The Way"
+                : isLimit
+                  ? "Cancellation Fee Notice"
+                  : isFinalFree
+                    ? "Final Free Cancellation (2 of 2)"
+                    : "Cancellation Policy (1 of 2)"}
+            </h3>
+            <div className={`bkstatus-strike-pill ${isEnRoute || isLimit ? "danger" : isFinalFree ? "warning" : "warning"}`}>
+              <i className={isEnRoute ? "fas fa-car" : isLimit ? "fas fa-exclamation-triangle" : "fas fa-shield-alt"}></i>
+              <span>
+                {isEnRoute
+                  ? "En Route Travel Policy"
+                  : isLimit
+                    ? "Limit Exceeded (Fee Applied)"
+                    : isFinalFree
+                      ? "Final Free Cancellation"
+                      : "Free Cancellation (Strike 1 of 2)"}
+              </span>
+            </div>
+          </div>
+
+          <div className="bkstatus-modal-body">
+            <div className={`bkstatus-warning-box ${isEnRoute || isLimit ? "danger" : ""}`}>
+              <p className="bkstatus-warning-para">
+                {policy?.policyMessage || (
+                  isEnRoute
+                    ? "The technician is already travelling to your location. A cancellation deduction applies to compensate travel time."
+                    : "You are allowed 2 free cancellations across your confirmed bookings. Please review the refund breakdown below."
+                )}
+              </p>
+            </div>
+
+            <div className="bkstatus-refund-breakdown">
+              <div className="bkstatus-rf-row">
+                <span>Advance Paid in Escrow</span>
+                <strong>₹{advancePaid.toLocaleString("en-IN")}</strong>
+              </div>
+              {cancellationFee > 0 && (
+                <div className="bkstatus-rf-row fee">
+                  <span>(-) Travel / Cancellation Fee</span>
+                  <strong className="text-danger">-₹{cancellationFee.toLocaleString("en-IN")}</strong>
+                </div>
+              )}
+              <div className="bkstatus-rf-row refund">
+                <span>(=) Refund to Your Wallet</span>
+                <strong className="text-success">₹{refundableAmount.toLocaleString("en-IN")}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="bkstatus-modal-footer">
+            <button
+              type="button"
+              className="bkstatus-btn-cancel"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Keep Booking
+            </button>
+            <button
+              type="button"
+              className={`bkstatus-btn-confirm ${isEnRoute || isLimit ? "danger" : "warning"}`}
+              onClick={() => setCancellationStep("FORM")}
+              disabled={isLoading}
+            >
+              <span>Continue to Cancel</span>
+              <i className="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bkstatus-modal-overlay" onClick={onClose}>
+    <div className={`bkstatus-modal-overlay ${isUntouchable ? "untouchable" : ""}`} onClick={handleOverlayClick}>
       <div
         className="bkstatus-modal-dialog"
         onClick={(e) => e.stopPropagation()}
@@ -174,7 +465,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
             isFixed ? (
               <div className="bkstatus-fixed-quote-box">
                 <div className="bkstatus-fq-badge">
-                  <i className="fas fa-lock" />
+                  <i className="fas fa-lock"></i>
                   <span>Fixed Price Agreement</span>
                 </div>
                 <div className="bkstatus-fq-row">
@@ -192,56 +483,133 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
                 <span className="bkstatus-fq-note">
                   This booking was accepted under a fixed price quotation. The total price is agreed and locked.
                 </span>
+
+                <div className="bksettle-earnings-box">
+                  <div className="bksettle-earnings-header">
+                    <i className="fas fa-wallet"></i>
+                    <span>Provider Payout Breakdown</span>
+                  </div>
+                  <div className="bksettle-earnings-row">
+                    <span>Base Service Quote</span>
+                    <span>₹{baseQuoteAmount.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bksettle-earnings-row fee">
+                    <span>(-) Platform Commission (5%)</span>
+                    <span>-₹{providerCommission.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bksettle-earnings-row total">
+                    <span>(=) Your Net Wallet Payout</span>
+                    <strong>₹{providerEarnings.toLocaleString("en-IN")}</strong>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="bkstatus-amount-section">
-                <div className="bkstatus-dynamic-header">
-                  <span className="bkstatus-dyn-badge">
-                    <i className={isInspection ? "fas fa-clipboard-check" : "fas fa-calculator"} />
-                    {isInspection ? "Inspection-Based Final Amount" : "Estimated Quote — Final Amount"}
+              <div className="bksettle-card">
+                <div className="bksettle-row">
+                  <span className="bksettle-label">Advance Paid Online</span>
+                  <span className="bksettle-paid-badge">
+                    <i className="fas fa-check-circle"></i>
+                    ₹{advancePaid.toLocaleString("en-IN")}
                   </span>
                 </div>
-                <label className="bkstatus-label" htmlFor="status-total-amount">
-                  Final Confirmed Total Amount (₹)
+
+                <div className={`bksettle-input-group ${isInvalidRemaining ? "error" : ""}`}>
+                  <div className="bksettle-input-meta">
+                    <label htmlFor="status-remaining-amount">Additional Amount to Collect</label>
+                    <span>Extra parts, diagnostics, or additional labor</span>
+                  </div>
+                  <div className="bksettle-input-box">
+                    <span className="bksettle-currency">₹</span>
+                    <input
+                      id="status-remaining-amount"
+                      type="number"
+                      min={0}
+                      step={1}
+                      placeholder="0"
+                      className="bksettle-amount-input"
+                      value={remainingAmount === 0 ? "" : remainingAmount}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        if (raw === "") {
+                          setRemainingAmount(0);
+                        } else {
+                          const num = Number(raw);
+                          setRemainingAmount(isNaN(num) ? 0 : Math.max(0, num));
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <label className="bksettle-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={safeRemaining === 0}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setRemainingAmount(0);
+                      }
+                    }}
+                  />
+                  <span>No additional charges (advance deposit covers the full service)</span>
                 </label>
-                <input
-                  id="status-total-amount"
-                  type="number"
-                  min={advancePaid}
-                  className={`bkstatus-amount-input ${isInvalidAmount ? "error" : ""}`}
-                  value={confirmedAmount}
-                  onChange={(e) => setConfirmedAmount(Number(e.target.value))}
-                />
-                <div className="bkstatus-amount-calc-preview">
-                  <div className="bkstatus-calc-item">
-                    <span>Advance Paid Online:</span>
-                    <strong>₹{advancePaid.toLocaleString("en-IN")}</strong>
+
+                <div className="bksettle-divider"></div>
+
+                <div className="bksettle-summary">
+                  <div className="bksettle-summary-row">
+                    <span>Base Service Quote</span>
+                    <strong>₹{baseQuoteAmount.toLocaleString("en-IN")}</strong>
                   </div>
-                  <div className="bkstatus-calc-item balance">
-                    <span>Remaining Due:</span>
-                    <strong>₹{calculatedBalance.toLocaleString("en-IN")}</strong>
+                  {safeRemaining > 0 && (
+                    <div className="bksettle-summary-row">
+                      <span>(+) Additional Charges</span>
+                      <strong style={{ color: "#ea580c" }}>+₹{safeRemaining.toLocaleString("en-IN")}</strong>
+                    </div>
+                  )}
+                  <div className="bksettle-summary-row">
+                    <span>Total Service Value</span>
+                    <strong>₹{totalServiceCost.toLocaleString("en-IN")}</strong>
+                  </div>
+                  <div className="bksettle-summary-row due">
+                    <span>Remaining Balance Due from Customer</span>
+                    <strong className={safeRemaining > 0 ? "has-balance" : "no-balance"}>
+                      {safeRemaining > 0 ? `₹${safeRemaining.toLocaleString("en-IN")}` : "₹0 (Fully Paid)"}
+                    </strong>
                   </div>
                 </div>
-                {isInvalidAmount ? (
-                  <span className="bkstatus-amount-error">
-                    Total amount cannot be less than the advance deposit already collected (₹{advancePaid.toLocaleString("en-IN")}).
-                  </span>
-                ) : (
-                  <span className="bkstatus-amount-helper">
-                    Initial Quote: ₹{booking.totalAmount.toLocaleString("en-IN")}. Adjust the total if extra labor, parts, or diagnostic findings changed the final cost.
-                  </span>
-                )}
+
+                <div className="bksettle-earnings-box">
+                  <div className="bksettle-earnings-header">
+                    <i className="fas fa-wallet"></i>
+                    <span>Provider Payout Breakdown</span>
+                  </div>
+                  <div className="bksettle-earnings-row">
+                    <span>Total Service Work</span>
+                    <span>₹{totalServiceCost.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bksettle-earnings-row fee">
+                    <span>(-) Platform Commission (5%)</span>
+                    <span>-₹{providerCommission.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="bksettle-earnings-row total">
+                    <span>(=) Your Net Wallet Payout</span>
+                    <strong>₹{providerEarnings.toLocaleString("en-IN")}</strong>
+                  </div>
+                </div>
               </div>
             )
           )}
 
           {isCancellation && (
             <div className="bkstatus-cancel-notice">
-              <i className="fas fa-shield-alt" />
+              <i className="fas fa-shield-alt"></i>
               <div>
-                <strong>Automatic 100% Refund:</strong>
+                <strong>Refund Summary:</strong>
                 <span>
-                  The full payment of ₹{advancePaid.toLocaleString("en-IN")} held in Escrow will be released back to the customer.
+                  {refundableAmount > 0
+                    ? `₹${refundableAmount.toLocaleString("en-IN")} will be released back to your wallet.`
+                    : "No refund available for this cancellation."}
                 </span>
               </div>
             </div>
@@ -266,7 +634,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
           )}
 
           <label className="bkstatus-label" htmlFor="status-notes">
-            {isCancellation ? "Cancellation Reason (Required)" : "Optional Notes / Updates for Client"}
+            {isCancellation ? "Cancellation Reason (Required)" : "Optional Notes for Customer"}
           </label>
           <textarea
             id="status-notes"
@@ -279,19 +647,31 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
         </div>
 
         <div className="bkstatus-modal-footer">
-          <button
-            type="button"
-            className="bkstatus-btn-cancel"
-            onClick={onClose}
-            disabled={isLoading}
-          >
-            Cancel
-          </button>
+          {isCancellation ? (
+            <button
+              type="button"
+              className="bkstatus-btn-cancel"
+              onClick={() => setCancellationStep("WARNING")}
+              disabled={isLoading}
+            >
+              <i className="fas fa-arrow-left"></i>
+              <span>Back</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="bkstatus-btn-cancel"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Cancel
+            </button>
+          )}
           <button
             type="button"
             className={`bkstatus-btn-confirm ${config.variant}`}
             onClick={handleConfirm}
-            disabled={isLoading || isInvalidAmount || isInvalidReason}
+            disabled={isLoading || isInvalidRemaining || isInvalidReason}
           >
             {isLoading ? (
               <>

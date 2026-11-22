@@ -27,4 +27,5 @@ export interface IProviderRepository extends BaseRepository<ProviderProfile | nu
     updateProfile(data: UpdateProviderProfileInputDto): Promise<void>;
     findProfileByUserId(userId: string): Promise<ProviderProfile | null>;
     deleteByUserId(userId: string): Promise<void>;
+    incrementCompletedJobs(providerProfileId: string): Promise<void>;
 }

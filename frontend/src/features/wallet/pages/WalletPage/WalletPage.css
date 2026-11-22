@@ -1,0 +1,483 @@
+.wpage-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 1.5rem 2rem 3.5rem 2rem;
+  box-sizing: border-box;
+  min-height: calc(100vh - 120px);
+}
+
+.wpage-hero-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+.wpage-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wpage-hero-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.wpage-hero-subtitle {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.wpage-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wpage-refresh-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.wpage-overview-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .wpage-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wpage-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.balance-card {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.wpage-balance-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.wpage-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.wpage-escrow-pill {
+  font-size: 0.725rem;
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.wpage-balance-number {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 1rem;
+}
+
+.wpage-currency {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.wpage-val {
+  font-size: 2.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+}
+
+.wpage-balance-footer {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wpage-footer-info {
+  font-size: 0.775rem;
+  color: #94a3b8;
+}
+
+.wpage-stat-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.wpage-stat-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wpage-stat-label {
+  font-size: 0.775rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wpage-stat-val {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.wpage-stat-val.text-green {
+  color: #059669;
+}
+
+.wpage-stat-sub {
+  font-size: 0.775rem;
+  color: #94a3b8;
+}
+
+.wpage-banner {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #3b82f6;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.wpage-banner-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.wpage-banner-content p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.wpage-transactions-section {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.wpage-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 1rem;
+}
+
+.wpage-section-titles h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.wpage-section-titles p {
+  margin: 0;
+  font-size: 0.825rem;
+  color: #64748b;
+}
+
+.wpage-filter-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.wpage-tabs {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.wpage-tab {
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wpage-tab.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.wpage-search-box {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.wpage-search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.825rem;
+  color: #0f172a;
+  width: 100%;
+}
+
+.wpage-search-clear {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.75rem;
+}
+
+.wpage-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.wpage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 1rem;
+}
+
+.wpage-item:last-child {
+  border-bottom: none;
+}
+
+.wpage-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wpage-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wpage-badge {
+  font-size: 0.675rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wpage-badge.refund {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.wpage-badge.earnings {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.wpage-badge.credit {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.wpage-badge.debit {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.wpage-item-ref {
+  font-size: 0.725rem;
+  font-family: monospace;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.wpage-item-booking-link {
+  font-size: 0.75rem;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.wpage-item-booking-link:hover {
+  text-decoration: underline;
+}
+
+.wpage-item-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.wpage-item-date {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.wpage-item-amount-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.wpage-item-amount {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.wpage-item-amount.positive {
+  color: #16a34a;
+}
+
+.wpage-item-amount.negative {
+  color: #0f172a;
+}
+
+.wpage-item-balance-after {
+  font-size: 0.725rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.wpage-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.wpage-empty-state h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+  color: #1e293b;
+}
+
+.wpage-empty-state p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.wpage-loading-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.wpage-shimmer-row {
+  height: 48px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: wpageShimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+@keyframes wpageShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.wpage-error-card {
+  text-align: center;
+  padding: 2rem;
+  color: #b91c1c;
+}
+
+.wpage-error-card button {
+  margin-top: 0.75rem;
+  padding: 0.4rem 1rem;
+  background: #b91c1c;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}

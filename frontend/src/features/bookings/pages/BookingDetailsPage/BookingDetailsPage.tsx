@@ -1,9 +1,18 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { useGetBookingById, useUpdateBookingStatus } from "../../hooks/useBookingMutations";
+import {
+  useGetBookingById,
+  useUpdateBookingStatus,
+  useReportBookingMismatch,
+  useResolveBookingMismatch
+} from "../../hooks/useBookingMutations";
 import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
-import { BookingStatusModal } from "../../components";
+import { BookingStatusModal, ServiceMismatchModal } from "../../components";
+import { RaiseDisputeModal } from "../../../support";
+import { useAuthStore } from "../../../auth/stores/auth.store";
+import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
+import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
 import "./BookingDetailsPage.css";
 
 interface BookingDetailsPageProps {
@@ -19,15 +28,36 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     roleProp || (location.pathname.startsWith("/provider") ? "provider" : "customer");
   const isProvider = role === "provider";
 
+  const user = useAuthStore((state) => state.user);
+  const profile = useAuthStore((state) => state.profile);
+
   const initialBooking = (location.state as { booking?: BookingItem } | null)?.booking || null;
 
   const { data: responseData, isLoading, error, refetch } = useGetBookingById(bookingId);
   const updateStatusMutation = useUpdateBookingStatus();
+  const reportMismatchMutation = useReportBookingMismatch();
+  const resolveMismatchMutation = useResolveBookingMismatch();
 
   const booking: BookingItem | null = responseData?.data || initialBooking;
 
   const [statusModalBooking, setStatusModalBooking] = useState<BookingItem | null>(null);
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
+  const [isMismatchModalOpen, setIsMismatchModalOpen] = useState(false);
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const activeRazorpayRef = useRef<any>(null);
+
+  useEffect(() => {
+    return () => {
+      if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+        try {
+          activeRazorpayRef.current.close();
+        } catch { }
+        activeRazorpayRef.current = null;
+      }
+      resetRazorpay();
+    };
+  }, []);
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("en-IN", {
@@ -145,6 +175,147 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     );
   };
 
+  const handleReportMismatchSubmit = (payload: {
+    diagnosis: string;
+    visitFee?: number;
+    suggestedCategory?: string | null;
+    suggestedCategoryId?: string | null;
+  }) => {
+    if (!booking) return;
+    reportMismatchMutation.mutate(
+      { id: booking.id, payload },
+      {
+        onSuccess: () => {
+          toast.success("Diagnosis submitted to customer");
+          setIsMismatchModalOpen(false);
+          refetch();
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Failed to submit diagnosis");
+        }
+      }
+    );
+  };
+
+  const handleResolveMismatch = (action: "ACCEPT" | "DECLINE") => {
+    if (!booking) return;
+    resolveMismatchMutation.mutate(
+      { id: booking.id, action },
+      {
+        onSuccess: () => {
+          toast.success(action === "ACCEPT" ? "Diagnosis accepted and booking closed" : "Diagnosis report declined");
+          refetch();
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Failed to respond to report");
+        }
+      }
+    );
+  };
+
+  const handlePayRemainingBalance = async () => {
+    if (!booking || isProcessingPayment) return;
+    setIsProcessingPayment(true);
+    resetRazorpay();
+
+    const isLoaded = await loadRazorpayScript(true);
+    if (!isLoaded) {
+      toast.error("Unable to load Razorpay payment gateway. Please check your internet connection.");
+      setIsProcessingPayment(false);
+      return;
+    }
+
+    try {
+      const orderRes = await createBookingPaymentOrderService({ bookingId: booking.id });
+      const orderData = orderRes.data;
+      if (!orderData) {
+        toast.error("Failed to generate payment order");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      let rzp: any = null;
+
+      const cleanupRazorpayModal = () => {
+        if (rzp && typeof rzp.close === "function") {
+          try {
+            rzp.close();
+          } catch { }
+        }
+        if (activeRazorpayRef.current && typeof activeRazorpayRef.current.close === "function") {
+          try {
+            activeRazorpayRef.current.close();
+          } catch { }
+          activeRazorpayRef.current = null;
+        }
+        resetRazorpay();
+      };
+
+      const options = {
+        key: orderData.keyId,
+        amount: Math.round(orderData.amount * 100),
+        currency: orderData.currency || "INR",
+        name: "Service Settle",
+        description: `Remaining Balance for Booking #${booking.bookingNumber}`,
+        order_id: orderData.orderId,
+        prefill: {
+          name: (profile as any)?.full_name || user?.name || "",
+          email: user?.email || "",
+          contact: (profile as any)?.phone || user?.phone || ""
+        },
+        theme: {
+          color: "#ea580c"
+        },
+        modal: {
+          ondismiss: () => {
+            cleanupRazorpayModal();
+            setIsProcessingPayment(false);
+            toast("Payment window closed. You can settle the remaining balance whenever you are ready.", {
+              icon: "ℹ️"
+            });
+          }
+        },
+        handler: async (paymentResponse: any) => {
+          cleanupRazorpayModal();
+          try {
+            const verifyRes = await verifyBookingPaymentService({
+              bookingId: booking.id,
+              razorpayOrderId: paymentResponse.razorpay_order_id,
+              razorpayPaymentId: paymentResponse.razorpay_payment_id,
+              razorpaySignature: paymentResponse.razorpay_signature
+            });
+
+            if (verifyRes.data?.success) {
+              toast.success("Remaining balance settled successfully! Booking completed.");
+              refetch();
+            } else {
+              toast.error("Payment verification failed. Please contact support.");
+            }
+          } catch (err: any) {
+            toast.error(err?.response?.data?.message || err?.message || "Failed to verify balance payment");
+          } finally {
+            setIsProcessingPayment(false);
+          }
+        }
+      };
+
+      rzp = new (window as any).Razorpay(options);
+      activeRazorpayRef.current = rzp;
+
+      rzp.on("payment.failed", (response: any) => {
+        cleanupRazorpayModal();
+        setIsProcessingPayment(false);
+        toast.error(`Payment failed: ${response?.error?.description || "Transaction declined"}`);
+      });
+
+      rzp.open();
+    } catch (err: any) {
+      setIsProcessingPayment(false);
+      resetRazorpay();
+      toast.error(err?.response?.data?.message || err?.message || "Failed to initiate payment");
+    }
+  };
+
   const getStatusMeta = (status: BookingStatus) => {
     switch (status) {
       case "CONFIRMED":
@@ -159,6 +330,8 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         return { label: "Payment Pending", icon: "fas fa-file-invoice-dollar", variant: "warning" };
       case "COMPLETED":
         return { label: "Completed", icon: "fas fa-award", variant: "completed" };
+      case "CLOSED":
+        return { label: "Diagnosis Closed", icon: "fas fa-stethoscope", variant: "completed" };
       case "CANCELLED":
         return { label: "Cancelled", icon: "fas fa-ban", variant: "cancelled" };
       default:
@@ -200,7 +373,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const cancellationReason = useMemo<string | null>(() => {
     if (!booking) return null;
     if (timelineItems.length > 0) {
-      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED");
+      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED" || item.status === "CLOSED");
       if (cancelItem?.note && cancelItem.note.trim()) {
         return cancelItem.note.trim();
       }
@@ -209,7 +382,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
       try {
         const parsed = JSON.parse(booking.notes);
         if (Array.isArray(parsed)) {
-          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED" || item.status === "CLOSED");
           if (cancelItem?.note && cancelItem.note.trim()) return cancelItem.note.trim();
         }
       } catch {
@@ -222,27 +395,224 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const cancellationAuthor = useMemo<string | null>(() => {
     if (!booking) return null;
     if (timelineItems.length > 0) {
-      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED");
+      const cancelItem = timelineItems.slice().reverse().find((item) => item.status === "CANCELLED" || item.status === "CLOSED");
       if (cancelItem?.authorName) return cancelItem.authorName;
     }
     if (booking.notes && booking.notes.trim()) {
       try {
         const parsed = JSON.parse(booking.notes);
         if (Array.isArray(parsed)) {
-          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED");
+          const cancelItem = parsed.slice().reverse().find((item: any) => item.status === "CANCELLED" || item.status === "CLOSED");
           if (cancelItem?.authorName) return cancelItem.authorName;
         }
-      } catch {}
+      } catch { }
     }
     return null;
   }, [booking, timelineItems]);
 
+  const isCancelledByCustomer = useMemo<boolean>(() => {
+    if (!cancellationAuthor) return false;
+    const lower = cancellationAuthor.toLowerCase();
+    return lower === "customer" || (booking?.customerName ? lower === booking.customerName.toLowerCase() : false);
+  }, [cancellationAuthor, booking]);
+
   if (isLoading && !booking) {
     return (
-      <div className={`bkdet-page-container ${isProvider ? "is-provider" : "is-customer"}`}>
-        <div className="bkdet-loading-box">
-          <div className="bkdet-loading-spinner" />
-          <p>Loading booking details...</p>
+      <div className={`bkdet-page-container bkdet-skeleton-container ${isProvider ? "is-provider" : "is-customer"}`} aria-hidden="true">
+        <button type="button" className="bkdet-back-link" onClick={handleBack}>
+          <i className="fas fa-arrow-left" />
+          <span>Back to Bookings</span>
+        </button>
+
+        <div className="bkdet-header-card">
+          <div className="bkdet-header-left">
+            <div className="bkdet-badge-row">
+              <div className="bkdet-sk-shimmer bkdet-sk-pill" style={{ width: "120px" }} />
+              <div className="bkdet-sk-shimmer bkdet-sk-pill" style={{ width: "100px" }} />
+              <div className="bkdet-sk-shimmer bkdet-sk-pill" style={{ width: "115px" }} />
+              <div className="bkdet-sk-shimmer bkdet-sk-status" style={{ width: "105px" }} />
+            </div>
+
+            <div className="bkdet-sk-shimmer" style={{ width: "65%", height: "30px", borderRadius: "6px", margin: "10px 0 4px" }} />
+            <div className="bkdet-sk-shimmer" style={{ width: "180px", height: "14px", borderRadius: "4px" }} />
+          </div>
+
+          <div className="bkdet-header-actions">
+            <div className="bkdet-sk-shimmer bkdet-sk-btn" style={{ width: "85px" }} />
+            <div className="bkdet-sk-shimmer bkdet-sk-btn" style={{ width: "135px" }} />
+          </div>
+        </div>
+
+        <div className="bkdet-layout-grid">
+          <div className="bkdet-col-main">
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "190px", height: "20px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div className="bkdet-schedule-block">
+                <div className="bkdet-sk-shimmer" style={{ width: "64px", height: "64px", borderRadius: "12px", flexShrink: 0 }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "220px", height: "20px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "150px", height: "15px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "24px", padding: "0 10px" }}>
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <div key={s} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                    <div className="bkdet-sk-shimmer bkdet-sk-stepper-circle" />
+                    <div className="bkdet-sk-shimmer" style={{ width: "60px", height: "12px", borderRadius: "4px" }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "230px", height: "20px", borderRadius: "4px" }} />
+                </div>
+                <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "24px", borderRadius: "9999px" }} />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "14px" }}>
+                <div style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                      <div className="bkdet-sk-shimmer" style={{ width: "110px", height: "22px", borderRadius: "9999px" }} />
+                      <div className="bkdet-sk-shimmer" style={{ width: "90px", height: "14px", borderRadius: "4px" }} />
+                    </div>
+                    <div className="bkdet-sk-tl-bubble">
+                      <div className="bkdet-sk-shimmer" style={{ width: "100%", height: "14px", borderRadius: "4px" }} />
+                      <div className="bkdet-sk-shimmer" style={{ width: "65%", height: "14px", borderRadius: "4px" }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                      <div className="bkdet-sk-shimmer" style={{ width: "100px", height: "22px", borderRadius: "9999px" }} />
+                      <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "14px", borderRadius: "4px" }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "150px", height: "20px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "14px", marginTop: "14px" }}>
+                {[1, 2, 3, 4].map((m) => (
+                  <div key={m} className="bkdet-sk-meta-box">
+                    <div className="bkdet-sk-shimmer" style={{ width: "90px", height: "12px", borderRadius: "4px" }} />
+                    <div className="bkdet-sk-shimmer" style={{ width: "130px", height: "16px", borderRadius: "4px" }} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="bkdet-sk-shimmer" style={{ width: "200px", height: "34px", borderRadius: "8px", marginTop: "16px" }} />
+            </div>
+
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "150px", height: "20px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "14px", alignItems: "flex-start", marginTop: "12px" }}>
+                <div className="bkdet-sk-shimmer" style={{ width: "40px", height: "40px", borderRadius: "10px", flexShrink: 0 }} />
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "120px", height: "16px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "90%", height: "14px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div className="bkdet-sk-shimmer" style={{ width: "100%", height: "42px", borderRadius: "10px", marginTop: "16px" }} />
+            </div>
+          </div>
+
+          <div className="bkdet-col-side">
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "160px", height: "20px", borderRadius: "4px" }} />
+                </div>
+                <div className="bkdet-sk-shimmer" style={{ width: "110px", height: "24px", borderRadius: "9999px" }} />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", margin: "16px 0 20px" }}>
+                <div className="bkdet-sk-shimmer" style={{ width: "120px", height: "14px", borderRadius: "4px" }} />
+                <div className="bkdet-sk-shimmer" style={{ width: "180px", height: "40px", borderRadius: "8px" }} />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "16px" }}>
+                <div className="bkdet-sk-payment-tile">
+                  <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "13px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "100px", height: "22px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "70px", height: "11px", borderRadius: "4px" }} />
+                </div>
+                <div className="bkdet-sk-payment-tile">
+                  <div className="bkdet-sk-shimmer" style={{ width: "90px", height: "13px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "100px", height: "22px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "85px", height: "11px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ border: "1px solid #f1f5f9", borderRadius: "10px", padding: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "110px", height: "14px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "70px", height: "14px", borderRadius: "4px" }} />
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "120px", height: "14px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "50px", height: "14px", borderRadius: "4px" }} />
+                </div>
+                <div style={{ height: "1px", background: "#f1f5f9" }} />
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "140px", height: "18px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "90px", height: "18px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div className="bkdet-sk-shimmer" style={{ width: "100%", height: "54px", borderRadius: "10px", marginTop: "16px" }} />
+            </div>
+
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "6px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "140px", height: "20px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", marginTop: "14px" }}>
+                <div className="bkdet-sk-shimmer" style={{ width: "48px", height: "48px", borderRadius: "50%", flexShrink: 0 }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", flex: 1 }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "12px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "140px", height: "18px", borderRadius: "4px" }} />
+                </div>
+              </div>
+
+              <div className="bkdet-sk-shimmer" style={{ width: "100%", height: "38px", borderRadius: "8px", marginTop: "16px" }} />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -311,20 +681,27 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const isPaymentPending = booking.status === "PAYMENT_PENDING";
   const isCompleted = booking.status === "COMPLETED";
   const isCancelled = booking.status === "CANCELLED";
+  const isClosed = booking.status === "CLOSED";
+  const isMismatchAccepted =
+    booking.mismatchReport?.status === "ACCEPTED" ||
+    isClosed ||
+    (cancellationReason?.toLowerCase().includes("diagnosis accepted") ?? false) ||
+    (cancellationAuthor?.toLowerCase().includes("diagnosis") ?? false);
 
   const totalAmount = booking.totalAmount || 0;
   const advanceAmount = booking.advanceAmount || totalAmount;
   const quotationType =
     booking.quotationType || (booking.requiresInspection ? "INSPECTION_REQUIRED" : "FIXED");
   const isFixedQuote = quotationType === "FIXED";
-  const isEstimatedQuote = quotationType === "ESTIMATED";
   const isInspectionQuote = quotationType === "INSPECTION_REQUIRED";
   const isFinalConfirmed = Boolean(booking.isFinalConfirmed || isFixedQuote || isPaymentPending || isCompleted);
   const remainingAmount = isFinalConfirmed
     ? (booking.remainingAmount ?? Math.max(0, totalAmount - advanceAmount))
     : 0;
-  const platformFee = booking.platformFee || Math.round((totalAmount / 1.1) * 0.1);
+  const platformFee = booking.platformFee || Math.round((totalAmount / 1.05) * 0.05);
   const baseAmount = Math.max(0, totalAmount - platformFee);
+  const providerCommission = Math.round(baseAmount * 0.05);
+  const providerEarnings = Math.max(0, baseAmount - providerCommission);
 
   const isAdvancePaid = booking.paymentStatus === "ADVANCE_PAID";
   const isFullyPaid = booking.paymentStatus === "PAID";
@@ -372,18 +749,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         <span>Back to Bookings</span>
       </button>
 
-      <div className="bkdet-breadcrumb">
-        <span className={`bkdet-role-badge ${isProvider ? "provider" : "customer"}`}>
-          {isProvider ? "Provider Portal" : "Customer"}
-        </span>
-        <span className="sep">/</span>
-        <span className="bkdet-crumb-link" onClick={handleBack} style={{ cursor: "pointer" }}>
-          Bookings
-        </span>
-        <span className="sep">/</span>
-        <span className="active">{booking.bookingNumber}</span>
-      </div>
-
       <div className="bkdet-header-card">
         <div className="bkdet-header-left">
           <div className="bkdet-badge-row">
@@ -404,31 +769,35 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               <span>{requiresInspection ? "Inspection Required" : "Fixed Price"}</span>
             </span>
 
-            <span className={`bkdet-status-badge ${booking.status.toLowerCase().replace(/_/g, "-")}`}>
+            <span className={`bkdet-status-badge ${isMismatchAccepted ? "closed" : booking.status.toLowerCase().replace(/_/g, "-")}`}>
               <i
-                className={`fas ${isConfirmed
-                  ? "fa-check-circle"
-                  : isEnRoute
-                    ? "fa-route"
-                    : isInspection
-                      ? "fa-clipboard-check"
-                      : isInProgress
-                        ? "fa-tools"
-                        : isPaymentPending
-                          ? "fa-file-invoice-dollar"
-                          : isCompleted
-                            ? "fa-award"
-                            : "fa-times-circle"
+                className={`fas ${isMismatchAccepted
+                  ? "fa-clipboard-check"
+                  : isConfirmed
+                    ? "fa-check-circle"
+                    : isEnRoute
+                      ? "fa-route"
+                      : isInspection
+                        ? "fa-clipboard-check"
+                        : isInProgress
+                          ? "fa-tools"
+                          : isPaymentPending
+                            ? "fa-file-invoice-dollar"
+                            : isCompleted
+                              ? "fa-award"
+                              : "fa-times-circle"
                   }`}
               />
               <span>
-                {booking.status === "EN_ROUTE"
-                  ? "On The Way"
-                  : booking.status === "INSPECTION"
-                    ? "Inspection"
-                    : booking.status === "PAYMENT_PENDING"
-                      ? "Payment Pending"
-                      : booking.status.replace(/_/g, " ")}
+                {isMismatchAccepted
+                  ? "Closed (Diagnosis Done)"
+                  : booking.status === "EN_ROUTE"
+                    ? "On The Way"
+                    : booking.status === "INSPECTION"
+                      ? "Inspection"
+                      : booking.status === "PAYMENT_PENDING"
+                        ? "Payment Pending"
+                        : booking.status.replace(/_/g, " ")}
               </span>
             </span>
           </div>
@@ -454,6 +823,15 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             <i className="fas fa-comment-dots" />
             <span>Chat</span>
           </button>
+          <button
+            type="button"
+            className="bkdet-action-btn outline"
+            onClick={() => setIsDisputeModalOpen(true)}
+            title="Report an issue or concern regarding this booking"
+          >
+            <i className="fas fa-life-ring" />
+            <span>Need Help?</span>
+          </button>
 
           {isProvider && isConfirmed && (
             <>
@@ -476,7 +854,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </>
           )}
 
-          {!isProvider && isConfirmed && (
+          {!isProvider && (isConfirmed || isEnRoute) && (
             <button
               type="button"
               className="bkdet-action-btn danger-outline"
@@ -527,7 +905,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 className="bkdet-action-btn success"
                 onClick={() => handleTriggerStatusChange("COMPLETED")}
               >
-                <i className="fas fa-check-double" />
+                <i className="fas fa-check-circle" />
                 <span>Mark Completed</span>
               </button>
             ) : (
@@ -537,7 +915,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 onClick={() => handleTriggerStatusChange("PAYMENT_PENDING")}
               >
                 <i className="fas fa-file-invoice-dollar" />
-                <span>Confirm Total & Request Payment</span>
+                <span>Complete Job / Settle Payment</span>
               </button>
             )
           )}
@@ -552,32 +930,174 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               <span>Mark as Paid & Complete</span>
             </button>
           )}
+
+          {isProvider && (isEnRoute || isInspection) && (!booking.mismatchReport || booking.mismatchReport.status === "DECLINED") && (
+            <button
+              type="button"
+              className="bkdet-btn-mismatch-trigger"
+              onClick={() => setIsMismatchModalOpen(true)}
+            >
+              <i className="fas fa-stethoscope" />
+              <span>Different Problem Found</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {isCancelled && (
+      {booking.mismatchReport && booking.mismatchReport.status === "PENDING" && (
+        <div className="bkdet-mismatch-banner">
+          <div className="bkdet-mismatch-header">
+            <div className="bkdet-mismatch-title-wrap">
+              <i className="fas fa-stethoscope" />
+              <h4 className="bkdet-mismatch-title">
+                {isProvider ? "Scope Mismatch Diagnosis Submitted" : "Technician Diagnosed a Different Issue"}
+              </h4>
+            </div>
+            <span className="bkdet-mismatch-pill pending">
+              {isProvider ? "Awaiting Customer Review" : "Action Required"}
+            </span>
+          </div>
+
+          <div className="bkdet-mismatch-body">
+            <div className="bkdet-mismatch-diag">
+              <strong>Technician Diagnosis:</strong> "{booking.mismatchReport.diagnosis}"
+            </div>
+            {booking.mismatchReport.suggestedCategory && (
+              <div className="bkdet-mismatch-cat">
+                <i className="fas fa-tag" />
+                <span>Recommended Category:</span>
+                <strong>{booking.mismatchReport.suggestedCategory}</strong>
+              </div>
+            )}
+            <div className="bkdet-mismatch-finance">
+              <div className="bkdet-mismatch-fin-row">
+                <span>Visit &amp; Diagnosis Fee to Technician:</span>
+                <strong>{formatCurrency(booking.mismatchReport.visitFee)}</strong>
+              </div>
+              <div className="bkdet-mismatch-fin-row">
+                <span>Deposit Refund to Customer:</span>
+                <strong style={{ color: "#0284c7" }}>{formatCurrency(booking.mismatchReport.refundAmount)}</strong>
+              </div>
+            </div>
+          </div>
+
+          {!isProvider && (
+            <div className="bkdet-mismatch-actions">
+              <button
+                type="button"
+                className="bkdet-mismatch-btn-accept"
+                onClick={() => handleResolveMismatch("ACCEPT")}
+                disabled={resolveMismatchMutation.isPending}
+              >
+                {resolveMismatchMutation.isPending ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-check-circle" />
+                    <span>Accept Diagnosis &amp; Close Booking</span>
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                className="bkdet-mismatch-btn-decline"
+                onClick={() => handleResolveMismatch("DECLINE")}
+                disabled={resolveMismatchMutation.isPending}
+              >
+                <i className="fas fa-times" />
+                <span>Decline / Keep Active</span>
+              </button>
+            </div>
+          )}
+
+          {isProvider && (
+            <div style={{ fontSize: "0.78rem", color: "#64748b" }}>
+              The customer has been notified. Once they accept, ₹{booking.mismatchReport.visitFee.toLocaleString("en-IN")} visit fee will be credited to your wallet.
+            </div>
+          )}
+        </div>
+      )}
+
+      {booking.mismatchReport && booking.mismatchReport.status === "ACCEPTED" && (
+        <div className="bkdet-mismatch-banner accepted">
+          <div className="bkdet-mismatch-header">
+            <div className="bkdet-mismatch-title-wrap">
+              <i className="fas fa-clipboard-check" />
+              <h4 className="bkdet-mismatch-title">
+                Booking Closed (Technician Diagnosis Accepted)
+              </h4>
+            </div>
+            <span className="bkdet-mismatch-pill accepted">Diagnosis Accepted</span>
+          </div>
+
+          <div className="bkdet-mismatch-body">
+            <div className="bkdet-mismatch-diag">
+              <strong>Verified Diagnosis:</strong> "{booking.mismatchReport.diagnosis}"
+            </div>
+            {booking.mismatchReport.suggestedCategory && (
+              <div className="bkdet-mismatch-cat">
+                <i className="fas fa-tag" />
+                <span>Recommended Category:</span>
+                <strong>{booking.mismatchReport.suggestedCategory}</strong>
+              </div>
+            )}
+            <div className="bkdet-mismatch-finance">
+              <div className="bkdet-mismatch-fin-row">
+                <span>Visit Fee Released to Technician:</span>
+                <strong>{formatCurrency(booking.mismatchReport.visitFee)}</strong>
+              </div>
+              <div className="bkdet-mismatch-fin-row">
+                <span>Deposit Refunded to Customer:</span>
+                <strong style={{ color: "#16a34a" }}>{formatCurrency(booking.mismatchReport.refundAmount)}</strong>
+              </div>
+            </div>
+          </div>
+
+          {!isProvider && (
+            <div className="bkdet-mismatch-actions">
+              <button
+                type="button"
+                className="bkdet-mismatch-btn-repost"
+                onClick={() => navigate("/request-service")}
+              >
+                <i className="fas fa-plus-circle" />
+                <span>Request Another Service</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {isCancelled && !isMismatchAccepted && (
         <div className="bkdet-cancelled-banner">
           <div className="bkdet-cb-left">
             <div className="bkdet-cb-icon">
               <i className="fas fa-ban" />
             </div>
             <div>
+              <div className="bkdet-cb-author-badge">
+                <i className="fas fa-user-times" />
+                Cancelled by: <strong>{cancellationAuthor ? (isCancelledByCustomer ? "Customer" : cancellationAuthor.toLowerCase().includes("provider") ? "Provider" : cancellationAuthor) : "System"}</strong>
+              </div>
               <h4 className="bkdet-cb-title">
                 Booking Cancelled Before Service Dispatch
               </h4>
               <p className="bkdet-cb-desc">
                 {isProvider
-                  ? cancellationAuthor === "Customer"
+                  ? isCancelledByCustomer
                     ? `This booking was cancelled by the customer before dispatch. Escrow advance has been refunded to the customer.`
                     : `You cancelled this booking before dispatch. A 100% full refund of ${formatCurrency(advanceAmount)} secured in Escrow has been processed for the customer.`
-                  : cancellationAuthor === "Customer"
+                  : isCancelledByCustomer
                     ? `You cancelled this booking before dispatch. Your full payment of ${formatCurrency(advanceAmount)} held safely in Escrow has been 100% refunded.`
                     : `This booking was cancelled by the provider before dispatch. Your full payment of ${formatCurrency(advanceAmount)} held safely in Escrow has been 100% refunded.`}
               </p>
               {cancellationReason && (
                 <div className="bkdet-cb-reason-box">
                   <span className="bkdet-cb-reason-badge">
-                    <i className="fas fa-comment-alt" /> Reason
+                    <i className="fas fa-comment-alt" /> Cancellation Reason
                   </span>
                   <span className="bkdet-cb-reason-text">"{cancellationReason}"</span>
                 </div>
@@ -629,16 +1149,20 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               <button
                 type="button"
                 className="bkdet-action-btn success"
-                onClick={() =>
-                  handleConfirmStatusChange(
-                    booking,
-                    "COMPLETED",
-                    "Final balance payment confirmed by client. Escrow released."
-                  )
-                }
+                onClick={handlePayRemainingBalance}
+                disabled={isProcessingPayment}
               >
-                <i className="fas fa-lock" />
-                <span>Pay Balance ({formatCurrency(remainingAmount)}) & Complete</span>
+                {isProcessingPayment ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin" />
+                    <span>Connecting Razorpay...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-lock" />
+                    <span>Pay Balance ({formatCurrency(remainingAmount)}) & Complete</span>
+                  </>
+                )}
               </button>
             )}
             {isProvider && (
@@ -884,266 +1408,200 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         </div>
 
         <div className="bkdet-col-side">
-          <div className="bkdet-section-card bkdet-escrow-card">
-            <div className="bkdet-section-header">
-              <div className="bkdet-section-title-wrap">
-                <div className="bkdet-section-icon">
-                  <i className="fas fa-shield-alt" />
-                </div>
-                <h3 className="bkdet-section-title">Payment & Billing</h3>
+          <div className="bkdet-section-card bkdet-billing-card">
+            <div className="bkdet-billing-header">
+              <div className="bkdet-billing-title-wrap">
+                <i className="fas fa-receipt" />
+                <h3 className="bkdet-billing-title">Payment & Billing</h3>
               </div>
-              <div className="bkdet-header-pills-wrap">
-                {!isFixedQuote && (
-                  <span className={`bkdet-quote-type-tag ${isEstimatedQuote ? "type-estimated" : "type-inspection"}`}>
-                    <i className={isEstimatedQuote ? "fas fa-calculator" : "fas fa-clipboard-check"} />
-                    {isEstimatedQuote ? "Estimated Quote" : "Inspection Required"}
-                  </span>
-                )}
-                <span
-                  className={`bkdet-milestone-pill ${isCancelled || booking.paymentStatus === "REFUNDED"
-                    ? "cancelled"
-                    : isFixedQuote || isFullyPaid
-                      ? "paid"
+              <span
+                className={`bkdet-billing-pill ${isCancelled || booking.paymentStatus === "REFUNDED"
+                  ? "refunded"
+                  : isFullyPaid || isFixedQuote
+                    ? "paid"
+                    : isAdvancePaid
+                      ? "advance"
+                      : "pending"
+                  }`}
+              >
+                {isMismatchAccepted
+                  ? "Visit Fee Settled"
+                  : isCancelled || booking.paymentStatus === "REFUNDED"
+                    ? "Refunded"
+                    : isFullyPaid || isFixedQuote
+                      ? "Fully Paid"
                       : isAdvancePaid
-                        ? "pending"
-                        : ""
-                    }`}
-                >
-                  {isCancelled || booking.paymentStatus === "REFUNDED"
-                    ? "100% Refunded"
-                    : isFixedQuote
-                      ? "100% Paid & Secured"
-                      : isFullyPaid
-                        ? "Fully Paid & Settled"
-                        : isAdvancePaid
-                          ? isInspectionQuote ? "Inspection Fee Secured" : "Advance Paid & Secured"
-                          : "Pending"}
-                </span>
-              </div>
-            </div>
-
-            <div className="bkdet-price-wrapper">
-              <span className="bkdet-price-sublabel">
-                {isCancelled
-                  ? "100% Refund Amount"
-                  : isFixedQuote
-                    ? "Total Fixed Amount Paid"
-                    : (isPaymentPending || isCompleted)
-                      ? "Final Confirmed Total"
-                      : isInspectionQuote
-                        ? "Inspection Fee Paid"
-                        : "Initial Advance Paid"}
+                        ? "Advance Paid"
+                        : "Pending"}
               </span>
-              <div className="bkdet-price-huge">
-                {formatCurrency((isPaymentPending || isCompleted || isFixedQuote) ? totalAmount : advanceAmount)}
+            </div>
+
+            <div className="bkdet-billing-hero">
+              <span className="bkdet-billing-hero-label">
+                {isMismatchAccepted
+                  ? "Visit & Diagnostic Fee"
+                  : isCancelled
+                    ? "Refunded Amount"
+                    : isFixedQuote
+                      ? "Total Fixed Price"
+                      : (isPaymentPending || isCompleted)
+                        ? "Final Confirmed Total"
+                        : isInspectionQuote
+                          ? "Inspection Fee Paid"
+                          : "Advance Deposit"}
+              </span>
+              <div className="bkdet-billing-hero-amount">
+                {formatCurrency(
+                  isMismatchAccepted
+                    ? (booking.mismatchReport?.visitFee || advanceAmount)
+                    : (isPaymentPending || isCompleted || isFixedQuote)
+                      ? totalAmount
+                      : advanceAmount
+                )}
               </div>
             </div>
 
-            {isCancelled ? (
-              <div className="bkdet-cancelled-tile">
-                <div className="bkdet-fpt-icon" style={{ color: "#dc2626" }}>
-                  <i className="fas fa-undo-alt" />
-                </div>
-                <div className="bkdet-fpt-content">
-                  <span className="bkdet-fpt-title" style={{ color: "#991b1b" }}>100% Refund Processed</span>
-                  <p className="bkdet-fpt-desc" style={{ color: "#b91c1c" }}>
-                    The booking was cancelled before dispatch. The full payment of {formatCurrency(advanceAmount)} held in Escrow has been released back to the customer.
-                  </p>
-                </div>
+            {isMismatchAccepted && (
+              <div className="bkdet-billing-notice info">
+                <i className="fas fa-check-circle" />
+                <span>Diagnostic visit completed. Visit fee settled to technician and remainder refunded. Exempt from cancellation quotas.</span>
               </div>
-            ) : isFixedQuote ? (
-              <div className="bkdet-fixed-paid-tile">
-                <div className="bkdet-fpt-icon">
-                  <i className="fas fa-check-circle" />
-                </div>
-                <div className="bkdet-fpt-content">
-                  <span className="bkdet-fpt-title">Full Payment Secured in Escrow</span>
-                  <p className="bkdet-fpt-desc">
-                    The entire agreed amount of {formatCurrency(totalAmount)} was paid upfront upon booking. No additional balance or payments are due. Funds will be released to the provider upon completion.
-                  </p>
-                </div>
-              </div>
-            ) : (isPaymentPending || isCompleted) ? (
-              <>
-                <div className="bkdet-payment-grid-two">
-                  <div className="bkdet-payment-tile paid">
-                    <div className="bkdet-tile-header">
-                      <span className="bkdet-tile-k">Initial Advance</span>
-                      <span className="bkdet-milestone-pill paid">Paid (Advance)</span>
+            )}
+
+            {isCancelled && !isMismatchAccepted && (
+              <div className="bkdet-billing-notice cancelled">
+                <i className="fas fa-undo-alt" />
+                <div>
+                  Cancelled {cancellationAuthor ? (isCancelledByCustomer ? "by Customer" : "by Provider") : ""} · Deposit of {formatCurrency(advanceAmount)} released to customer.
+                  {cancellationReason && (
+                    <div style={{ marginTop: "3px", fontStyle: "italic", fontWeight: 600 }}>
+                      "{cancellationReason}"
                     </div>
-                    <div className="bkdet-tile-amount">{formatCurrency(advanceAmount)}</div>
-                    <span className="bkdet-tile-desc">Paid online & held in Escrow</span>
-                  </div>
-
-                  <div className={`bkdet-payment-tile ${isFullyPaid ? "settled" : "due"}`}>
-                    <div className="bkdet-tile-header">
-                      <span className="bkdet-tile-k">Remaining Balance</span>
-                      <span className={`bkdet-milestone-pill ${isFullyPaid ? "paid" : "warning"}`}>
-                        {isFullyPaid ? "Settled" : "Due Now"}
-                      </span>
-                    </div>
-                    <div className="bkdet-tile-amount">{formatCurrency(remainingAmount)}</div>
-                    <span className="bkdet-tile-desc">
-                      {isFullyPaid ? "Settled upon completion" : "Ready for customer payment"}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="bkdet-calc-summary">
-                  <div className="bkdet-calc-title">
-                    <i className="fas fa-calculator" />
-                    <span>Balance Calculation</span>
-                  </div>
-                  <div className="bkdet-calc-row">
-                    <span>Final Confirmed Total</span>
-                    <span>{formatCurrency(totalAmount)}</span>
-                  </div>
-                  <div className="bkdet-calc-row advance">
-                    <span>(-) Advance Paid Online</span>
-                    <span>-{formatCurrency(advanceAmount)}</span>
-                  </div>
-                  <div className={`bkdet-calc-row balance ${isFullyPaid ? "settled" : ""}`}>
-                    <span>
-                      {isFullyPaid ? "(=) Balance Settled" : "(=) Remaining Balance Due Now"}
-                    </span>
-                    <span>{formatCurrency(remainingAmount)}</span>
-                  </div>
-                </div>
-
-                <div className="bkdet-quote-type-notice confirmed">
-                  <i className="fas fa-check-circle" />
-                  <span>
-                    {isInspectionQuote
-                      ? "Final total confirmed by provider after on-site inspection."
-                      : "Final total confirmed by provider upon job completion."}
-                  </span>
-                </div>
-              </>
-            ) : (
-              <div className="bkdet-payment-grid-two">
-                <div className="bkdet-payment-tile paid">
-                  <div className="bkdet-tile-header">
-                    <span className="bkdet-tile-k">
-                      <i className="fas fa-check-circle" style={{ color: "#16a34a" }} />
-                      {isInspectionQuote ? "Inspection Fee Paid" : "Initial Advance Paid"}
-                    </span>
-                    <span className="bkdet-milestone-pill paid">Paid Online</span>
-                  </div>
-                  <div className="bkdet-tile-amount">{formatCurrency(advanceAmount)}</div>
-                  <span className="bkdet-tile-desc">Paid upfront & safely secured in Escrow</span>
-                </div>
-
-                <div className="bkdet-payment-tile pending">
-                  <div className="bkdet-tile-header">
-                    <span className="bkdet-tile-k">
-                      <i className="fas fa-clock" style={{ color: "#d97706" }} />
-                      Final Service Bill
-                    </span>
-                    <span className="bkdet-milestone-pill pending">Pending Quote</span>
-                  </div>
-                  <div className="bkdet-tile-amount pending-val">TBD On Site</div>
-                  <span className="bkdet-tile-desc">
-                    {isInspectionQuote
-                      ? "Technician will diagnose on site and quote final total"
-                      : "Provider will diagnose on site and quote final total"}
-                  </span>
+                  )}
                 </div>
               </div>
             )}
 
-            <div className="bkdet-breakdown-card">
-              <div className="bkdet-breakdown-header">
-                <i className="fas fa-file-invoice-dollar" />
-                <span>Price Details</span>
-              </div>
-              <div className="bkdet-breakdown-row">
-                <span>
-                  {isFixedQuote
-                    ? "Base Service Quote"
-                    : (isPaymentPending || isCompleted)
-                      ? "Confirmed Service Amount"
-                      : isInspectionQuote
-                        ? "Inspection / Visit Fee"
-                        : "Initial Base Quote"}
-                </span>
-                <span>{formatCurrency(baseAmount)}</span>
-              </div>
-              <div className="bkdet-breakdown-row">
-                <span>Platform Fee (10%)</span>
-                <span>+{formatCurrency(platformFee)}</span>
-              </div>
-              <div className="bkdet-breakdown-divider" />
-              <div className="bkdet-breakdown-row total">
-                <span>
-                  {isFixedQuote
-                    ? "Total Amount Paid"
-                    : (isPaymentPending || isCompleted)
-                      ? "Total Confirmed Amount"
-                      : isInspectionQuote
-                        ? "Total Inspection Fee Paid"
-                        : "Total Advance Paid"}
-                </span>
-                <span>{formatCurrency((isPaymentPending || isCompleted || isFixedQuote) ? totalAmount : advanceAmount)}</span>
-              </div>
+            <div className="bkdet-billing-breakdown">
+              {isProvider ? (
+                <>
+                  <div className="bkdet-billing-row">
+                    <span>
+                      {isFixedQuote
+                        ? "Service Quote"
+                        : (isPaymentPending || isCompleted)
+                          ? "Confirmed Service Amount"
+                          : isInspectionQuote
+                            ? "Inspection / Visit Fee"
+                            : "Initial Base Quote"}
+                    </span>
+                    <span>{formatCurrency(baseAmount)}</span>
+                  </div>
+                  <div className="bkdet-billing-row">
+                    <span>Platform Commission (5%)</span>
+                    <span>-{formatCurrency(providerCommission)}</span>
+                  </div>
+                  <div className="bkdet-billing-row total">
+                    <span>Take-Home Earnings</span>
+                    <strong>{formatCurrency(providerEarnings)}</strong>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="bkdet-billing-row">
+                    <span>
+                      {isFixedQuote
+                        ? "Base Service Quote"
+                        : (isPaymentPending || isCompleted)
+                          ? "Confirmed Service Amount"
+                          : isInspectionQuote
+                            ? "Inspection / Visit Fee"
+                            : "Initial Base Quote"}
+                    </span>
+                    <span>{formatCurrency(baseAmount)}</span>
+                  </div>
+                  <div className="bkdet-billing-row">
+                    <span>Platform & Escrow Fee (5%)</span>
+                    <span>+{formatCurrency(platformFee)}</span>
+                  </div>
+                  <div className="bkdet-billing-row total">
+                    <span>
+                      {isFixedQuote
+                        ? "Total Amount Paid"
+                        : (isPaymentPending || isCompleted)
+                          ? "Total Confirmed Amount"
+                          : isInspectionQuote
+                            ? "Inspection Total Paid"
+                            : "Total Advance Paid"}
+                    </span>
+                    <strong>
+                      {formatCurrency((isPaymentPending || isCompleted || isFixedQuote) ? totalAmount : advanceAmount)}
+                    </strong>
+                  </div>
+                </>
+              )}
+
+              {!isFixedQuote && (
+                <>
+                  <div className="bkdet-billing-divider" />
+                  <div className="bkdet-billing-row advance">
+                    <span>Advance Paid Online</span>
+                    <span className="paid-tag">- {formatCurrency(advanceAmount)}</span>
+                  </div>
+                  <div className="bkdet-billing-row balance">
+                    <span>Remaining Balance</span>
+                    <strong className={remainingAmount > 0 ? "due" : "settled"}>
+                      {remainingAmount > 0 ? formatCurrency(remainingAmount) : "₹0 (Settled)"}
+                    </strong>
+                  </div>
+                </>
+              )}
             </div>
 
             {!isFixedQuote && !isProvider && isPaymentPending && (
-              <div className="bkdet-pay-balance-action-box">
-                <div className="bkdet-pba-text">
-                  <strong>Ready to Pay Remaining Balance</strong>
-                  <p>The provider completed the work and confirmed the total. Pay {formatCurrency(remainingAmount)} now to conclude this booking.</p>
-                </div>
+              <div className="bkdet-billing-pay-wrap">
                 <button
                   type="button"
-                  className="bkdet-pay-balance-btn"
-                  onClick={() =>
-                    handleConfirmStatusChange(
-                      booking,
-                      "COMPLETED",
-                      "Final balance payment confirmed by client. Escrow released."
-                    )
-                  }
+                  className="bkdet-billing-pay-btn"
+                  onClick={handlePayRemainingBalance}
+                  disabled={isProcessingPayment}
                 >
-                  <i className="fas fa-credit-card" />
-                  <span>Pay Remaining Balance ({formatCurrency(remainingAmount)})</span>
+                  {isProcessingPayment ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin" />
+                      <span>Connecting Razorpay...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-credit-card" />
+                      <span>Pay Remaining Balance ({formatCurrency(remainingAmount)})</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
 
-            {!isFixedQuote && !isProvider && !isPaymentPending && !isFullyPaid && (
-              <div className="bkdet-pay-balance-info-box">
+            {!isFixedQuote && !isProvider && !isPaymentPending && !isFullyPaid && !isCancelled && (
+              <div className="bkdet-billing-notice info">
                 <i className="fas fa-info-circle" />
                 <span>
                   {isInspectionQuote
-                    ? "The provider will perform the on-site inspection and confirm the final total before any balance is requested."
-                    : "The provider will assess the job on site and confirm the final total before any balance is requested."}
+                    ? "Final balance will be confirmed after on-site inspection."
+                    : "Final balance will be confirmed by provider upon completion."}
                 </span>
               </div>
             )}
 
-            {!isFixedQuote && isFullyPaid && (
-              <div className="bkdet-pay-balance-success-box">
-                <i className="fas fa-check-circle" />
-                <span>Full payment completed. Advance and final balance have been settled.</span>
-              </div>
-            )}
-
             {!isFixedQuote && isProvider && isPaymentPending && (
-              <div className="bkdet-pay-balance-info-box warning">
+              <div className="bkdet-billing-notice warning">
                 <i className="fas fa-clock" />
-                <span>Awaiting customer settlement for remaining balance of {formatCurrency(remainingAmount)}.</span>
+                <span>Awaiting customer payment of {formatCurrency(remainingAmount)} to complete booking.</span>
               </div>
             )}
 
-            <div className="bkdet-escrow-badge">
+            <div className="bkdet-billing-escrow-footer">
               <i className="fas fa-shield-alt" />
-              <div className="bkdet-escrow-badge-text">
-                {isFixedQuote ? (
-                  <><strong>100% Escrow Protection:</strong> Full payment of {formatCurrency(totalAmount)} is held safely in Escrow and released to the provider only after verified service completion.</>
-                ) : (
-                  <><strong>100% Escrow Protection:</strong> Advance deposit of {formatCurrency(advanceAmount)} is safely held in Escrow. Remaining balance will be settled only after final confirmation and completion.</>
-                )}
-              </div>
+              <span>100% Escrow Protected · Released upon service completion</span>
             </div>
           </div>
 
@@ -1192,6 +1650,37 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           onClose={handleCloseStatusModal}
           onConfirm={handleConfirmStatusChange}
           isLoading={updateStatusMutation.isPending}
+        />
+      )}
+
+      {isProvider && (
+        <ServiceMismatchModal
+          isOpen={isMismatchModalOpen}
+          booking={booking}
+          onClose={() => setIsMismatchModalOpen(false)}
+          onSubmit={handleReportMismatchSubmit}
+          isLoading={reportMismatchMutation.isPending}
+        />
+      )}
+
+      {booking && (
+        <RaiseDisputeModal
+          isOpen={isDisputeModalOpen}
+          onClose={() => setIsDisputeModalOpen(false)}
+          booking={{
+            id: booking.id,
+            bookingNumber: booking.bookingNumber,
+            serviceRequestTitle: booking.serviceRequestTitle || undefined,
+            totalAmount: booking.totalAmount,
+            advanceAmount: booking.advanceAmount,
+            providerName: booking.providerName || undefined,
+            customerName: booking.customerName || undefined
+          }}
+          role={isProvider ? "PROVIDER" : "CUSTOMER"}
+          onSubmitConcern={() => {
+            toast.success("Concern submitted successfully. Our resolution team will review it.");
+            navigate(isProvider ? "/provider/support" : "/support");
+          }}
         />
       )}
     </div>

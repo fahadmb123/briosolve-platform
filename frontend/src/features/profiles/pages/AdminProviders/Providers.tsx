@@ -166,16 +166,16 @@ export default function Providers({ onTotalChange }: ProvidersProps) {
                         <tbody>
                             {isLoading ? (
                                 Array.from({ length: 8 }).map((_, i) => (
-                                        <tr key={`provider-skel-${i}`} className="skeleton-row" style={{ opacity: 1 - i * 0.08 }}>
-                                            <td className="skeleton-shimmer-cell">
-                                                <div className="flex items-center gap-3">
-                                                    <Skeleton circle width={38} height={38} />
-                                                    <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                                                        <Skeleton width={120} height={14} borderRadius={6} />
-                                                        <Skeleton width={85} height={12} borderRadius={6} />
-                                                    </div>
+                                    <tr key={`provider-skel-${i}`} className="skeleton-row" style={{ opacity: 1 - i * 0.08 }}>
+                                        <td className="skeleton-shimmer-cell">
+                                            <div className="flex items-center gap-3">
+                                                <Skeleton circle width={38} height={38} />
+                                                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                                                    <Skeleton width={120} height={14} borderRadius={6} />
+                                                    <Skeleton width={85} height={12} borderRadius={6} />
                                                 </div>
-                                            </td>
+                                            </div>
+                                        </td>
                                         <td className="skeleton-shimmer-cell"><Skeleton width="80%" height={14} borderRadius={6} /></td>
                                         <td className="skeleton-shimmer-cell"><Skeleton width="65%" height={14} borderRadius={6} /></td>
                                         <td className="skeleton-shimmer-cell"><Skeleton width={55} height={14} borderRadius={6} /></td>
@@ -185,61 +185,61 @@ export default function Providers({ onTotalChange }: ProvidersProps) {
                                             <Skeleton width={54} height={28} borderRadius={6} />
                                         </td>
                                     </tr>
-                        ))
+                                ))
                             ) : providers.length > 0 ? (
                                 providers.map((provider) => (
-                        <ProviderRow
-                            key={provider.id}
-                            provider={provider}
-                            onView={handleViewProvider}
-                            onToggleStatus={handleStatusButton}
-                        />
-                        ))
-                        ) : (
-                        <tr className="admin-empty-row">
-                            <td colSpan={7} className="admin-empty-table-cell">
-                                <AdminNoData />
-                            </td>
-                        </tr>
+                                    <ProviderRow
+                                        key={provider.id}
+                                        provider={provider}
+                                        onView={handleViewProvider}
+                                        onToggleStatus={handleStatusButton}
+                                    />
+                                ))
+                            ) : (
+                                <tr className="admin-empty-row">
+                                    <td colSpan={7} className="admin-empty-table-cell">
+                                        <AdminNoData />
+                                    </td>
+                                </tr>
                             )}
-                    </tbody>
-                </table>
-            </div>
-
-            <div className="admin-pagination">
-                <div>
-                    Showing <strong>{` ${page} of ${totalPages || 1} pages`}</strong>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div className="pagination-controls">
-                    <button
-                        className="page-btn"
-                        disabled={page <= 1}
-                        onClick={() => setPage(page - 1)}
-                    >
-                        <i className="fas fa-chevron-left"></i>
-                    </button>
+                <div className="admin-pagination">
+                    <div>
+                        Showing <strong>{` ${page} of ${totalPages || 1} pages`}</strong>
+                    </div>
 
-                    {pageNumbers.map((pageNumber) => (
+                    <div className="pagination-controls">
                         <button
-                            key={pageNumber}
-                            className={`page-btn ${page === pageNumber ? "active" : ""}`}
-                            onClick={() => setPage(pageNumber)}
+                            className="page-btn"
+                            disabled={page <= 1}
+                            onClick={() => setPage(page - 1)}
                         >
-                            {pageNumber}
+                            <i className="fas fa-chevron-left"></i>
                         </button>
-                    ))}
 
-                    <button
-                        className="page-btn"
-                        disabled={page >= totalPages}
-                        onClick={() => setPage(page + 1)}
-                    >
-                        <i className="fas fa-chevron-right"></i>
-                    </button>
+                        {pageNumbers.map((pageNumber) => (
+                            <button
+                                key={pageNumber}
+                                className={`page-btn ${page === pageNumber ? "active" : ""}`}
+                                onClick={() => setPage(pageNumber)}
+                            >
+                                {pageNumber}
+                            </button>
+                        ))}
+
+                        <button
+                            className="page-btn"
+                            disabled={page >= totalPages}
+                            onClick={() => setPage(page + 1)}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </div >
+            </div >
 
             <div className={`admin-modal-overlay ${selectedProvider ? 'active' : ''}`} id="providerDetailsModal">
                 <div className="admin-modal">

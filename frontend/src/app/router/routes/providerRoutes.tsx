@@ -11,7 +11,9 @@ import {
   ProviderSubmitQuotation,
   ProviderMyQuotations,
   ProviderBookings,
-  ProviderBookingDetails
+  ProviderBookingDetails,
+  ProviderWallet,
+  ProviderSupport
 } from '../lazy/provider.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
 import RoleRoute from '../guards/RoleRoute';
@@ -30,6 +32,7 @@ export const providerRoutes = (
       <Route path="quotations" element={<ProviderMyQuotations />} />
       <Route path="bookings" element={<ProviderBookings />} />
       <Route path="bookings/:bookingId" element={<ProviderBookingDetails />} />
+      <Route path="wallet" element={<ProviderWallet />} />
       <Route path="messages" element={<ProviderChat />} />
       <Route path="chat" element={<ProviderChat />} />
       <Route path="profile" element={<ProviderProfile />} />
@@ -37,6 +40,8 @@ export const providerRoutes = (
       <Route path="verification" element={<Navigate to="/provider/kyc" replace />} />
       <Route path="settings" element={<ProviderSettings />} />
       <Route path="notifications" element={<ProviderNotifications />} />
+      <Route path="support" element={<ProviderSupport />} />
+      <Route path="tickets" element={<ProviderSupport />} />
     </Route>
   </Route>
   </>

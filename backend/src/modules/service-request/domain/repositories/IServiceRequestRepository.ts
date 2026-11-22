@@ -4,19 +4,16 @@ import { CreateServiceRequestRepoDto } from "../../application/dtos/request/crea
 import { UpdateServiceRequestRepoDto } from "../../application/dtos/request/update-service-request.dto";
 import {
     ServiceRequestDetailsDto,
-    GetCustomerRequestsOutputDto,
-    GetAdminServiceRequestsInputDto
+    GetCustomerRequestsOutputDto
 } from "../../application/dtos/response/service-request.dto";
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
 
 export interface IServiceRequestRepository extends BaseRepository<ServiceRequest | null> {
     create(data: CreateServiceRequestRepoDto): Promise<ServiceRequest | null>;
     findByCustomerId(input: GetCustomerServiceRequestsInputDto): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts: Record<string, number> }>;
-    findAdminRequests(input: GetAdminServiceRequestsInputDto): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts: Record<string, number> }>;
     findDetailsById(id: string, customerId: string): Promise<ServiceRequestDetailsDto | null>;
     update(id: string, customerId: string, data: UpdateServiceRequestRepoDto): Promise<ServiceRequest | null>;
     cancel(id: string, customerId: string): Promise<ServiceRequest | null>;
-    adminCancel(id: string): Promise<ServiceRequest | null>;
     updateStatus(id: string, status: string): Promise<ServiceRequest | null>;
     reopen(
         id: string,

@@ -61,6 +61,7 @@ export class QuotationMapper {
             validUntilDate,
             record.extra_charge_policy,
             record.status as QuotationStatus,
+            record.rejection_reason ?? null,
             createdDate,
             updatedDate
         );
@@ -82,6 +83,7 @@ export class QuotationMapper {
             validUntilDate: entity.valid_until_date.toISOString(),
             extraChargePolicy: entity.extra_charge_policy,
             status: entity.status,
+            rejectionReason: entity.rejection_reason ?? null,
             createdAt: entity.created_at.toISOString(),
             updatedAt: entity.updated_at.toISOString()
         };
@@ -104,6 +106,7 @@ export class QuotationMapper {
             validUntilDate: entity.valid_until_date.toISOString(),
             extraChargePolicy: entity.extra_charge_policy,
             status: entity.status,
+            rejectionReason: entity.rejection_reason ?? null,
             createdAt: entity.created_at.toISOString(),
             updatedAt: entity.updated_at.toISOString()
         };
@@ -140,6 +143,7 @@ export class QuotationMapper {
             validUntilDate: entity.valid_until_date.toISOString(),
             extraChargePolicy: entity.extra_charge_policy,
             status: entity.status,
+            rejectionReason: entity.rejection_reason ?? null,
             createdAt: entity.created_at.toISOString(),
             updatedAt: entity.updated_at.toISOString()
         };
@@ -259,6 +263,7 @@ export class QuotationMapper {
             }),
             ...(data.extraChargePolicy !== undefined && { extra_charge_policy: data.extraChargePolicy }),
             ...(data.status !== undefined && { status: data.status }),
+            ...(data.rejectionReason !== undefined && { rejection_reason: data.rejectionReason }),
             updated_at: Temporal.Now.instant()
         };
     }

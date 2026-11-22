@@ -3,10 +3,8 @@ import {
   createServiceRequest,
   getMyServiceRequests,
   getProviderServiceRequests,
-  getAdminServiceRequests,
   updateServiceRequest,
   cancelServiceRequest,
-  adminCancelServiceRequest,
   reopenServiceRequest,
   type ReopenServiceRequestPayload,
   type GetCustomerRequestsParams,
@@ -38,13 +36,6 @@ export const useGetProviderServiceRequests = (params?: GetProviderRequestsParams
   });
 };
 
-export const useGetAdminServiceRequests = (params?: GetCustomerRequestsParams) => {
-  return useQuery({
-    queryKey: ["adminServiceRequests", params],
-    queryFn: () => getAdminServiceRequests(params)
-  });
-};
-
 export const useUpdateServiceRequest = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -62,16 +53,6 @@ export const useCancelServiceRequest = () => {
     mutationFn: cancelServiceRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myServiceRequests"] });
-    }
-  });
-};
-
-export const useAdminCancelServiceRequest = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: adminCancelServiceRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["adminServiceRequests"] });
     }
   });
 };

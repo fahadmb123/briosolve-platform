@@ -14,3 +14,5 @@ export const ProviderSubmitQuotation = React.lazy(() => import('../../../feature
 export const ProviderMyQuotations = React.lazy(() => import('../../../features/quotations/pages/MyQuotations/MyQuotations'));
 export const ProviderBookings = React.lazy(() => import('../../../features/bookings/pages/BookingsPage/BookingsPage').then(m => ({ default: m.BookingsPage })));
 export const ProviderBookingDetails = React.lazy(() => import('../../../features/bookings/pages/BookingDetailsPage/BookingDetailsPage').then(m => ({ default: m.BookingDetailsPage })));
+export const ProviderWallet = React.lazy(() => import('../../../features/wallet/pages/WalletPage/WalletPage'));
+export const ProviderSupport = React.lazy(() => import('../../../features/support/pages/SupportTicketsPage/SupportTicketsPage').then(m => ({ default: m.SupportTicketsPage })));

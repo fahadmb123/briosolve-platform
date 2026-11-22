@@ -58,6 +58,7 @@ export interface ProviderQuotationItem {
   validUntilDate: string;
   extraChargePolicy: string;
   status: QuotationStatus;
+  rejectionReason?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -90,6 +91,7 @@ export interface RequestQuotationItem {
   validUntilDate: string;
   extraChargePolicy: string;
   status: QuotationStatus;
+  rejectionReason?: string | null;
   createdAt: string;
   updatedAt: string;
 }

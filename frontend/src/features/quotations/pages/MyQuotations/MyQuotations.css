@@ -693,3 +693,37 @@
     background: var(--border, #e4e4e7);
     max-width: 120px;
 }
+
+.myquote-cancelled-box {
+    margin-top: 0.35rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.myquote-cancelled-box.rejected {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.myquote-cancelled-box.withdrawn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+.myquote-cancelled-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+}
+
+.myquote-cancelled-reason {
+    font-size: 0.75rem;
+    color: #475569;
+}

@@ -1,9 +1,9 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { Booking, BookingStatus, BookingPaymentStatus } from "../../domain/entities/booking.entity";
-import { BookingDetails, BookingListResult } from "../../domain/repositories/IBookingRepository";
+import { BookingDetails, BookingListResult, CancellationPolicyDetails } from "../../domain/repositories/IBookingRepository";
 import { CreateBookingInputDto, CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
-import { BookingResponseDto, BookingStatusHistoryItem } from "../../application/dtos/response/booking-response.dto";
+import { BookingResponseDto, BookingStatusHistoryItem, MismatchReport } from "../../application/dtos/response/booking-response.dto";
 import { CustomerBookingsResponseDto, BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
 
@@ -14,7 +14,105 @@ export const BookingStatusToTitle = {
     "IN_PROGRESS": "In the progress",
     "PAYMENT_PENDING": "Payment Pending",
     "COMPLETED": "Completed",
-    "CANCELLED": "Cancelled"
+    "CANCELLED": "Cancelled",
+    "CLOSED": "Closed (Diagnosis Settled)"
+};
+
+export function calculateCancellationPolicy(params: {
+    role: "CUSTOMER" | "PROVIDER";
+    status: BookingStatus;
+    quotationType?: string | null;
+    advancePaid: number;
+    cancellationsUsed: number;
+    maxAllowedCancellations?: number;
+}): CancellationPolicyDetails {
+    const maxAllowed = params.maxAllowedCancellations ?? 2;
+    const advance = Math.max(0, params.advancePaid);
+
+    if (params.role === "PROVIDER") {
+        return {
+            cancellationsUsed: params.cancellationsUsed,
+            maxAllowedCancellations: maxAllowed,
+            totalAdvancePaid: advance,
+            refundableAmount: advance,
+            cancellationFee: 0,
+            isFullRefund: true,
+            policyStatus: params.cancellationsUsed >= maxAllowed
+                ? "LIMIT_EXCEEDED"
+                : params.cancellationsUsed === 1
+                    ? "FINAL_FREE_CANCELLATION"
+                    : "FREE_CANCELLATION",
+            policyMessage: params.cancellationsUsed >= maxAllowed
+                ? "You have reached your 2-cancellation limit."
+                : params.cancellationsUsed === 1
+                    ? "This is your final permitted cancellation."
+                    : "This will be recorded as your 1st cancellation (maximum 2 allowed)."
+        };
+    }
+
+    if (params.status === "EN_ROUTE") {
+        const isFixed = params.quotationType === "FIXED";
+        const fee = isFixed
+            ? Math.min(advance, Math.max(100, Math.round(advance * 0.3)))
+            : advance;
+        const refund = Math.max(0, advance - fee);
+        return {
+            cancellationsUsed: params.cancellationsUsed,
+            maxAllowedCancellations: maxAllowed,
+            totalAdvancePaid: advance,
+            refundableAmount: refund,
+            cancellationFee: fee,
+            isFullRefund: refund === advance,
+            policyStatus: "EN_ROUTE_FEE",
+            policyMessage: isFixed
+                ? `Technician is on the way. A travel fee of ₹${fee.toLocaleString("en-IN")} will be deducted, and ₹${refund.toLocaleString("en-IN")} will be refunded to your wallet.`
+                : `Technician is on the way. The visiting fee of ₹${fee.toLocaleString("en-IN")} is non-refundable to compensate the technician's travel.`
+        };
+    }
+
+    if (params.cancellationsUsed >= maxAllowed) {
+        const isFixed = params.quotationType === "FIXED";
+        const fee = isFixed
+            ? Math.round(advance * 0.5)
+            : advance;
+        const refund = Math.max(0, advance - fee);
+        return {
+            cancellationsUsed: params.cancellationsUsed,
+            maxAllowedCancellations: maxAllowed,
+            totalAdvancePaid: advance,
+            refundableAmount: refund,
+            cancellationFee: fee,
+            isFullRefund: false,
+            policyStatus: "LIMIT_EXCEEDED",
+            policyMessage: isFixed
+                ? `You have exceeded your 2 free cancellations. A 50% cancellation fee of ₹${fee.toLocaleString("en-IN")} is deducted, and ₹${refund.toLocaleString("en-IN")} will be refunded.`
+                : `You have exceeded your 2 free cancellations. The advance payment of ₹${advance.toLocaleString("en-IN")} is non-refundable to compensate the technician.`
+        };
+    }
+
+    if (params.cancellationsUsed === 1) {
+        return {
+            cancellationsUsed: 1,
+            maxAllowedCancellations: maxAllowed,
+            totalAdvancePaid: advance,
+            refundableAmount: advance,
+            cancellationFee: 0,
+            isFullRefund: true,
+            policyStatus: "FINAL_FREE_CANCELLATION",
+            policyMessage: `This is your 2nd and final free cancellation. You will receive a 100% full refund of ₹${advance.toLocaleString("en-IN")}. Future cancellations will incur non-refundable deductions.`
+        };
+    }
+
+    return {
+        cancellationsUsed: 0,
+        maxAllowedCancellations: maxAllowed,
+        totalAdvancePaid: advance,
+        refundableAmount: advance,
+        cancellationFee: 0,
+        isFullRefund: true,
+        policyStatus: "FREE_CANCELLATION",
+        policyMessage: `You have 1 free cancellation remaining. You will receive a 100% full refund of ₹${advance.toLocaleString("en-IN")} into your wallet.`
+    };
 }
 
 export class BookingMapper {
@@ -26,16 +124,17 @@ export class BookingMapper {
         totalAmount?: number;
         amount?: number;
         platformFee?: number;
+        advanceAmount?: number;
         scheduledDate?: Date | string | null;
         scheduledTime?: string | null;
         paymentId?: string | null;
         orderId?: string | null;
         notes?: string | null;
     }): CreateBookingRepoDto {
-        const baseAmount = data.amount ?? (data.totalAmount ? Math.round(data.totalAmount / 1.1) : 0);
-        const platformFee = data.platformFee ?? Math.round(baseAmount * 0.1);
+        const baseAmount = data.amount ?? (data.totalAmount ? Math.round(data.totalAmount / 1.05) : 0);
+        const platformFee = data.platformFee ?? Math.round(baseAmount * 0.05);
         const totalAmount = data.totalAmount ?? (baseAmount + platformFee);
-        const advanceAmount = Math.round(totalAmount * 0.3);
+        const advanceAmount = data.advanceAmount !== undefined ? data.advanceAmount : totalAmount;
 
         const dateSuffix = Date.now().toString(36).toUpperCase();
         const randomPart = Math.floor(1000 + Math.random() * 9000);
@@ -126,6 +225,9 @@ export class BookingMapper {
             quotationType?: string | null;
             requiresInspection?: boolean;
             statusHistory?: BookingStatusHistoryItem[];
+            providerCancellationsCount?: number;
+            maxAllowedCancellations?: number;
+            cancellationPolicy?: CancellationPolicyDetails;
         }
     ): BookingResponseDto {
         const isDetails = "booking" in source;
@@ -134,6 +236,7 @@ export class BookingMapper {
 
         let parsedHistory: BookingStatusHistoryItem[] | undefined = undefined;
         let displayNotes = entity.notes;
+        let mismatchReport: MismatchReport | null = null;
 
         if (entity.notes) {
             try {
@@ -142,6 +245,15 @@ export class BookingMapper {
                     parsedHistory = parsed;
                     const latest = parsed[parsed.length - 1];
                     displayNotes = latest.note;
+                } else if (typeof parsed === "object" && parsed !== null) {
+                    if (parsed.mismatchReport) {
+                        mismatchReport = parsed.mismatchReport;
+                    }
+                    if (Array.isArray(parsed.history) && parsed.history.length > 0) {
+                        parsedHistory = parsed.history;
+                        const latest = parsed.history[parsed.history.length - 1];
+                        displayNotes = latest?.note || displayNotes;
+                    }
                 }
             } catch {
                 parsedHistory = undefined;
@@ -154,9 +266,11 @@ export class BookingMapper {
 
         const resolvedAdvance = isFixed
             ? entity.total_amount
-            : (details?.quoteAmount
-                ? Math.round(Number(details.quoteAmount) * 1.1)
-                : (entity.advance_amount && entity.advance_amount > 0 ? entity.advance_amount : entity.total_amount));
+            : (entity.advance_amount && entity.advance_amount > 0
+                ? entity.advance_amount
+                : (details?.quoteAmount
+                    ? Math.round(Number(details.quoteAmount) * 1.05)
+                    : entity.total_amount));
 
         const resolvedRemaining = isFixed
             ? 0
@@ -201,7 +315,18 @@ export class BookingMapper {
             requiresInspection: details?.requiresInspection ?? extra?.requiresInspection ?? false,
             quoteAmount: details?.quoteAmount ?? null,
             isFinalConfirmed,
-            statusHistory: parsedHistory || details?.statusHistory
+            statusHistory: parsedHistory || details?.statusHistory,
+            providerCancellationsCount: details?.providerCancellationsCount ?? extra?.providerCancellationsCount ?? 0,
+            maxAllowedCancellations: details?.maxAllowedCancellations ?? extra?.maxAllowedCancellations ?? 2,
+            mismatchReport: mismatchReport || details?.mismatchReport || null,
+            cancellationPolicy: details?.cancellationPolicy ?? extra?.cancellationPolicy ?? calculateCancellationPolicy({
+                role: "CUSTOMER",
+                status: entity.status,
+                quotationType: details?.quotationType ?? extra?.quotationType ?? null,
+                advancePaid: resolvedAdvance,
+                cancellationsUsed: details?.providerCancellationsCount ?? extra?.providerCancellationsCount ?? 0,
+                maxAllowedCancellations: details?.maxAllowedCancellations ?? extra?.maxAllowedCancellations ?? 2
+            })
         };
     }
 
@@ -217,6 +342,7 @@ export class BookingMapper {
                 IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
                 PAYMENT_PENDING: input.filter((b) => b.booking.status === "PAYMENT_PENDING").length,
                 COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
+                CLOSED: input.filter((b) => b.booking.status === "CLOSED").length,
                 CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length
             };
             return {
@@ -244,6 +370,7 @@ export class BookingMapper {
                 IN_PROGRESS: input.filter((b) => b.booking.status === "IN_PROGRESS").length,
                 PAYMENT_PENDING: input.filter((b) => b.booking.status === "PAYMENT_PENDING").length,
                 COMPLETED: input.filter((b) => b.booking.status === "COMPLETED").length,
+                CLOSED: input.filter((b) => b.booking.status === "CLOSED").length,
                 CANCELLED: input.filter((b) => b.booking.status === "CANCELLED").length
             };
             return {
@@ -274,7 +401,9 @@ export class BookingMapper {
             provider_id: data.providerId,
             total_amount: data.totalAmount.toString(),
             platform_fee: data.platformFee.toString(),
+            advance_amount: (data.advanceAmount !== undefined ? data.advanceAmount : data.totalAmount).toString(),
             status: data.status || "CONFIRMED",
+            payment_status: data.paymentStatus || "ADVANCE_PAID",
             scheduled_date: scheduledInstant,
             scheduled_time: data.scheduledTime ?? null,
             payment_id: data.paymentId ?? null,
@@ -288,9 +417,12 @@ export class BookingMapper {
         if (data.status) {
             payload.status = data.status;
         }
+        if (data.paymentStatus) {
+            payload.payment_status = data.paymentStatus;
+        }
         if (data.totalAmount !== undefined) {
             payload.total_amount = data.totalAmount.toString();
-            payload.platform_fee = Math.round(data.totalAmount * 0.1).toString();
+            payload.platform_fee = Math.round(data.totalAmount * (0.05 / 1.05)).toString();
         }
         if (data.notes !== undefined) {
             payload.notes = data.notes;

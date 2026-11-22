@@ -88,12 +88,28 @@
       "model": "services",
       "namespace": "public"
     },
+    "support_ticket_messages": {
+      "model": "support_ticket_messages",
+      "namespace": "public"
+    },
+    "support_tickets": {
+      "model": "support_tickets",
+      "namespace": "public"
+    },
     "user_account_blocks": {
       "model": "user_account_blocks",
       "namespace": "public"
     },
     "users": {
       "model": "users",
+      "namespace": "public"
+    },
+    "wallet_transactions": {
+      "model": "wallet_transactions",
+      "namespace": "public"
+    },
+    "wallets": {
+      "model": "wallets",
       "namespace": "public"
     }
   },
@@ -127,6 +143,27 @@
               }
             ]
           },
+          "booking_payment_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "ADVANCE_PAID",
+                "value": "ADVANCE_PAID"
+              },
+              {
+                "name": "PAID",
+                "value": "PAID"
+              },
+              {
+                "name": "REFUNDED",
+                "value": "REFUNDED"
+              }
+            ]
+          },
           "booking_status": {
             "codecId": "pg/text@1",
             "members": [
@@ -135,8 +172,20 @@
                 "value": "CONFIRMED"
               },
               {
+                "name": "EN_ROUTE",
+                "value": "EN_ROUTE"
+              },
+              {
+                "name": "INSPECTION",
+                "value": "INSPECTION"
+              },
+              {
                 "name": "IN_PROGRESS",
                 "value": "IN_PROGRESS"
+              },
+              {
+                "name": "PAYMENT_PENDING",
+                "value": "PAYMENT_PENDING"
               },
               {
                 "name": "COMPLETED",
@@ -145,6 +194,10 @@
               {
                 "name": "CANCELLED",
                 "value": "CANCELLED"
+              },
+              {
+                "name": "CLOSED",
+                "value": "CLOSED"
               }
             ]
           },
@@ -368,6 +421,65 @@
               {
                 "name": "EXPIRED",
                 "value": "EXPIRED"
+              },
+              {
+                "name": "CLOSED",
+                "value": "CLOSED"
+              }
+            ]
+          },
+          "ticket_creator_role": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "CUSTOMER",
+                "value": "CUSTOMER"
+              },
+              {
+                "name": "PROVIDER",
+                "value": "PROVIDER"
+              }
+            ]
+          },
+          "ticket_priority": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "LOW",
+                "value": "LOW"
+              },
+              {
+                "name": "MEDIUM",
+                "value": "MEDIUM"
+              },
+              {
+                "name": "HIGH",
+                "value": "HIGH"
+              },
+              {
+                "name": "URGENT",
+                "value": "URGENT"
+              }
+            ]
+          },
+          "ticket_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "OPEN",
+                "value": "OPEN"
+              },
+              {
+                "name": "UNDER_REVIEW",
+                "value": "UNDER_REVIEW"
+              },
+              {
+                "name": "RESOLVED",
+                "value": "RESOLVED"
+              },
+              {
+                "name": "CLOSED",
+                "value": "CLOSED"
               }
             ]
           },
@@ -432,6 +544,44 @@
               {
                 "name": "CERTIFICATE",
                 "value": "CERTIFICATE"
+              }
+            ]
+          },
+          "wallet_transaction_category": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "REFUND",
+                "value": "REFUND"
+              },
+              {
+                "name": "EARNINGS",
+                "value": "EARNINGS"
+              },
+              {
+                "name": "PAYMENT",
+                "value": "PAYMENT"
+              },
+              {
+                "name": "WITHDRAWAL",
+                "value": "WITHDRAWAL"
+              },
+              {
+                "name": "COMMISSION",
+                "value": "COMMISSION"
+              }
+            ]
+          },
+          "wallet_transaction_type": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "CREDIT",
+                "value": "CREDIT"
+              },
+              {
+                "name": "DEBIT",
+                "value": "DEBIT"
               }
             ]
           },
@@ -874,6 +1024,17 @@
           },
           "bookings": {
             "fields": {
+              "advance_amount": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
               "booking_number": {
                 "nullable": false,
                 "type": {
@@ -908,11 +1069,8 @@
               "notes": {
                 "nullable": true,
                 "type": {
-                  "codecId": "sql/varchar@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "length": 1000
-                  }
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               },
               "order_id": {
@@ -933,6 +1091,19 @@
                   "typeParams": {
                     "length": 255
                   }
+                }
+              },
+              "payment_status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "booking_payment_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
                 }
               },
               "platform_fee": {
@@ -1080,10 +1251,28 @@
                   "model": "service_requests",
                   "namespace": "public"
                 }
+              },
+              "wallet_transactions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "booking_id"
+                  ]
+                },
+                "to": {
+                  "model": "wallet_transactions",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
               "fields": {
+                "advance_amount": {
+                  "column": "advance_amount"
+                },
                 "booking_number": {
                   "column": "booking_number"
                 },
@@ -1104,6 +1293,9 @@
                 },
                 "payment_id": {
                   "column": "payment_id"
+                },
+                "payment_status": {
+                  "column": "payment_status"
                 },
                 "platform_fee": {
                   "column": "platform_fee"
@@ -2847,6 +3039,13 @@
                   "plane": "domain"
                 }
               },
+              "rejection_reason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "service_request_id": {
                 "nullable": false,
                 "type": {
@@ -2986,6 +3185,9 @@
                 },
                 "quotation_type": {
                   "column": "quotation_type"
+                },
+                "rejection_reason": {
+                  "column": "rejection_reason"
                 },
                 "service_request_id": {
                   "column": "service_request_id"
@@ -3653,6 +3855,407 @@
               "table": "services"
             }
           },
+          "support_ticket_messages": {
+            "fields": {
+              "author_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "author_name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 150
+                  }
+                }
+              },
+              "author_role": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 50
+                  }
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "message": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 2000
+                  }
+                }
+              },
+              "ticket_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "ticket": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "ticket_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "support_tickets",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "author_id": {
+                  "column": "author_id"
+                },
+                "author_name": {
+                  "column": "author_name"
+                },
+                "author_role": {
+                  "column": "author_role"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "message": {
+                  "column": "message"
+                },
+                "ticket_id": {
+                  "column": "ticket_id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "support_ticket_messages"
+            }
+          },
+          "support_tickets": {
+            "fields": {
+              "assigned_to": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "category": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 50
+                  }
+                }
+              },
+              "category_label": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "creator_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "creator_role": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "ticket_creator_role",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "description": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 2000
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "metadata": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "priority": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "ticket_priority",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "resolution_note": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 2000
+                  }
+                }
+              },
+              "settlement_decision": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 50
+                  }
+                }
+              },
+              "settlement_details": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 500
+                  }
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "ticket_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "subject": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 255
+                  }
+                }
+              },
+              "target_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              },
+              "target_number": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              },
+              "target_type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 50
+                  }
+                }
+              },
+              "ticket_number": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 50
+                  }
+                }
+              },
+              "updated_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "creator": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "creator_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "users",
+                  "namespace": "public"
+                }
+              },
+              "messages": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "ticket_id"
+                  ]
+                },
+                "to": {
+                  "model": "support_ticket_messages",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "assigned_to": {
+                  "column": "assigned_to"
+                },
+                "category": {
+                  "column": "category"
+                },
+                "category_label": {
+                  "column": "category_label"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "creator_id": {
+                  "column": "creator_id"
+                },
+                "creator_role": {
+                  "column": "creator_role"
+                },
+                "description": {
+                  "column": "description"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "metadata": {
+                  "column": "metadata"
+                },
+                "priority": {
+                  "column": "priority"
+                },
+                "resolution_note": {
+                  "column": "resolution_note"
+                },
+                "settlement_decision": {
+                  "column": "settlement_decision"
+                },
+                "settlement_details": {
+                  "column": "settlement_details"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "subject": {
+                  "column": "subject"
+                },
+                "target_id": {
+                  "column": "target_id"
+                },
+                "target_number": {
+                  "column": "target_number"
+                },
+                "target_type": {
+                  "column": "target_type"
+                },
+                "ticket_number": {
+                  "column": "ticket_number"
+                },
+                "updated_at": {
+                  "column": "updated_at"
+                }
+              },
+              "namespaceId": "public",
+              "table": "support_tickets"
+            }
+          },
           "user_account_blocks": {
             "fields": {
               "blocked_at": {
@@ -4119,6 +4722,37 @@
                   "model": "service_requests",
                   "namespace": "public"
                 }
+              },
+              "support_tickets": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "creator_id"
+                  ]
+                },
+                "to": {
+                  "model": "support_tickets",
+                  "namespace": "public"
+                }
+              },
+              "wallet": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "user_id"
+                  ]
+                },
+                "to": {
+                  "model": "wallets",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -4162,6 +4796,286 @@
               },
               "namespaceId": "public",
               "table": "users"
+            }
+          },
+          "wallet_transactions": {
+            "fields": {
+              "amount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
+              "balance_after": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
+              "booking_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "category": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "wallet_transaction_category",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "description": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 500
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "reference_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 100
+                  }
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "wallet_transaction_type",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "wallet_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "booking": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "booking_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "bookings",
+                  "namespace": "public"
+                }
+              },
+              "wallet": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "wallet_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "wallets",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "amount": {
+                  "column": "amount"
+                },
+                "balance_after": {
+                  "column": "balance_after"
+                },
+                "booking_id": {
+                  "column": "booking_id"
+                },
+                "category": {
+                  "column": "category"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "description": {
+                  "column": "description"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "reference_id": {
+                  "column": "reference_id"
+                },
+                "type": {
+                  "column": "type"
+                },
+                "wallet_id": {
+                  "column": "wallet_id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "wallet_transactions"
+            }
+          },
+          "wallets": {
+            "fields": {
+              "balance": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "currency": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 10
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "updated_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "user_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "transactions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "wallet_id"
+                  ]
+                },
+                "to": {
+                  "model": "wallet_transactions",
+                  "namespace": "public"
+                }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "user_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "users",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "balance": {
+                  "column": "balance"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "currency": {
+                  "column": "currency"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "updated_at": {
+                  "column": "updated_at"
+                },
+                "user_id": {
+                  "column": "user_id"
+                }
+              },
+              "namespaceId": "public",
+              "table": "wallets"
             }
           }
         }
@@ -4483,12 +5397,30 @@
             "bookings": {
               "checks": [
                 {
-                  "expression": "\"status\" IN ('CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')",
-                  "name": "bookings_status_check_9a77072c",
+                  "expression": "\"payment_status\" IN ('PENDING', 'ADVANCE_PAID', 'PAID', 'REFUNDED')",
+                  "name": "bookings_payment_status_check_2ad2f3ef",
+                  "prefix": "bookings_payment_status_check"
+                },
+                {
+                  "expression": "\"status\" IN ('CONFIRMED', 'EN_ROUTE', 'INSPECTION', 'IN_PROGRESS', 'PAYMENT_PENDING', 'COMPLETED', 'CANCELLED', 'CLOSED')",
+                  "name": "bookings_status_check_e46ff589",
                   "prefix": "bookings_status_check"
                 }
               ],
               "columns": {
+                "advance_amount": {
+                  "codecId": "pg/numeric@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "numeric",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
                 "booking_number": {
                   "codecId": "sql/varchar@1",
                   "nativeType": "character varying",
@@ -4517,12 +5449,9 @@
                   "nullable": false
                 },
                 "notes": {
-                  "codecId": "sql/varchar@1",
-                  "nativeType": "character varying",
-                  "nullable": true,
-                  "typeParams": {
-                    "length": 1000
-                  }
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "order_id": {
                   "codecId": "sql/varchar@1",
@@ -4538,6 +5467,21 @@
                   "nullable": true,
                   "typeParams": {
                     "length": 255
+                  }
+                },
+                "payment_status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "ADVANCE_PAID"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "booking_payment_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
                   }
                 },
                 "platform_fee": {
@@ -6139,6 +7083,11 @@
                     "plane": "storage"
                   }
                 },
+                "rejection_reason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "service_request_id": {
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
@@ -6462,8 +7411,8 @@
             "service_requests": {
               "checks": [
                 {
-                  "expression": "\"status\" IN ('PENDING', 'ACTIVE', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'EXPIRED')",
-                  "name": "service_requests_status_check_bada4c1d",
+                  "expression": "\"status\" IN ('PENDING', 'ACTIVE', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'CLOSED')",
+                  "name": "service_requests_status_check_3354bf47",
                   "prefix": "service_requests_status_check"
                 },
                 {
@@ -6795,6 +7744,362 @@
               },
               "uniques": []
             },
+            "support_ticket_messages": {
+              "columns": {
+                "author_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
+                },
+                "author_name": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 150
+                  }
+                },
+                "author_role": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 50
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "message": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 2000
+                  }
+                },
+                "ticket_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "ticket_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "support_ticket_messages"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "support_tickets"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "created_at"
+                  ],
+                  "name": "support_ticket_messages_created_at_idx_225d8c0f",
+                  "prefix": "support_ticket_messages_created_at_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "ticket_id"
+                  ],
+                  "name": "support_ticket_messages_ticket_id_idx_837c90f6",
+                  "prefix": "support_ticket_messages_ticket_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "support_tickets": {
+              "checks": [
+                {
+                  "expression": "\"creator_role\" IN ('CUSTOMER', 'PROVIDER')",
+                  "name": "support_tickets_creator_role_check_0225046a",
+                  "prefix": "support_tickets_creator_role_check"
+                },
+                {
+                  "expression": "\"priority\" IN ('LOW', 'MEDIUM', 'HIGH', 'URGENT')",
+                  "name": "support_tickets_priority_check_8918b779",
+                  "prefix": "support_tickets_priority_check"
+                },
+                {
+                  "expression": "\"status\" IN ('OPEN', 'UNDER_REVIEW', 'RESOLVED', 'CLOSED')",
+                  "name": "support_tickets_status_check_9efe887c",
+                  "prefix": "support_tickets_status_check"
+                }
+              ],
+              "columns": {
+                "assigned_to": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
+                },
+                "category": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 50
+                  }
+                },
+                "category_label": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 100
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "creator_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "creator_role": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "ticket_creator_role",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "description": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 2000
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "metadata": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
+                "priority": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "HIGH"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "ticket_priority",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "resolution_note": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 2000
+                  }
+                },
+                "settlement_decision": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 50
+                  }
+                },
+                "settlement_details": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 500
+                  }
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "OPEN"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "ticket_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "subject": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 255
+                  }
+                },
+                "target_id": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 100
+                  }
+                },
+                "target_number": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 100
+                  }
+                },
+                "target_type": {
+                  "codecId": "sql/varchar@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "GENERAL"
+                  },
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 50
+                  }
+                },
+                "ticket_number": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 50
+                  }
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "creator_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "support_tickets"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "created_at"
+                  ],
+                  "name": "support_tickets_created_at_idx_225d8c0f",
+                  "prefix": "support_tickets_created_at_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "creator_id"
+                  ],
+                  "name": "support_tickets_creator_id_idx_c8bab67a",
+                  "prefix": "support_tickets_creator_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "status"
+                  ],
+                  "name": "support_tickets_status_idx_e98638ab",
+                  "prefix": "support_tickets_status_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "target_id"
+                  ],
+                  "name": "support_tickets_target_id_idx_7e52b3aa",
+                  "prefix": "support_tickets_target_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "target_type"
+                  ],
+                  "name": "support_tickets_target_type_idx_bd346c67",
+                  "prefix": "support_tickets_target_type_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "ticket_number"
+                  ]
+                }
+              ]
+            },
             "user_account_blocks": {
               "columns": {
                 "blocked_at": {
@@ -7055,6 +8360,260 @@
                   ]
                 }
               ]
+            },
+            "wallet_transactions": {
+              "checks": [
+                {
+                  "expression": "\"category\" IN ('REFUND', 'EARNINGS', 'PAYMENT', 'WITHDRAWAL', 'COMMISSION')",
+                  "name": "wallet_transactions_category_check_2b236405",
+                  "prefix": "wallet_transactions_category_check"
+                },
+                {
+                  "expression": "\"type\" IN ('CREDIT', 'DEBIT')",
+                  "name": "wallet_transactions_type_check_e3a9320e",
+                  "prefix": "wallet_transactions_type_check"
+                }
+              ],
+              "columns": {
+                "amount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
+                "balance_after": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
+                "booking_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
+                },
+                "category": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "wallet_transaction_category",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "description": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 500
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "reference_id": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 100
+                  }
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "wallet_transaction_type",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "wallet_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "wallet_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "wallet_transactions"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "wallets"
+                  }
+                },
+                {
+                  "onDelete": "setNull",
+                  "source": {
+                    "columns": [
+                      "booking_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "wallet_transactions"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bookings"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "booking_id"
+                  ],
+                  "name": "wallet_transactions_booking_id_idx_aeea169b",
+                  "prefix": "wallet_transactions_booking_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "created_at"
+                  ],
+                  "name": "wallet_transactions_created_at_idx_225d8c0f",
+                  "prefix": "wallet_transactions_created_at_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "wallet_id"
+                  ],
+                  "name": "wallet_transactions_wallet_id_idx_f6a7fffd",
+                  "prefix": "wallet_transactions_wallet_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "wallets": {
+              "columns": {
+                "balance": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 12,
+                    "scale": 2
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "currency": {
+                  "codecId": "sql/varchar@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "INR"
+                  },
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 10
+                  }
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "user_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "user_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "wallets"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "user_id"
+                  ],
+                  "name": "wallets_user_id_idx_6c952402",
+                  "prefix": "wallets_user_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "user_id"
+                  ]
+                }
+              ]
             }
           },
           "valueSet": {
@@ -7072,13 +8631,26 @@
                 "CUSTOM_HOURS"
               ]
             },
+            "booking_payment_status": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "ADVANCE_PAID",
+                "PAID",
+                "REFUNDED"
+              ]
+            },
             "booking_status": {
               "kind": "valueSet",
               "values": [
                 "CONFIRMED",
+                "EN_ROUTE",
+                "INSPECTION",
                 "IN_PROGRESS",
+                "PAYMENT_PENDING",
                 "COMPLETED",
-                "CANCELLED"
+                "CANCELLED",
+                "CLOSED"
               ]
             },
             "conversation_status": {
@@ -7175,7 +8747,33 @@
                 "IN_PROGRESS",
                 "COMPLETED",
                 "CANCELLED",
-                "EXPIRED"
+                "EXPIRED",
+                "CLOSED"
+              ]
+            },
+            "ticket_creator_role": {
+              "kind": "valueSet",
+              "values": [
+                "CUSTOMER",
+                "PROVIDER"
+              ]
+            },
+            "ticket_priority": {
+              "kind": "valueSet",
+              "values": [
+                "LOW",
+                "MEDIUM",
+                "HIGH",
+                "URGENT"
+              ]
+            },
+            "ticket_status": {
+              "kind": "valueSet",
+              "values": [
+                "OPEN",
+                "UNDER_REVIEW",
+                "RESOLVED",
+                "CLOSED"
               ]
             },
             "user_role": {
@@ -7209,6 +8807,23 @@
                 "CERTIFICATE"
               ]
             },
+            "wallet_transaction_category": {
+              "kind": "valueSet",
+              "values": [
+                "REFUND",
+                "EARNINGS",
+                "PAYMENT",
+                "WITHDRAWAL",
+                "COMMISSION"
+              ]
+            },
+            "wallet_transaction_type": {
+              "kind": "valueSet",
+              "values": [
+                "CREDIT",
+                "DEBIT"
+              ]
+            },
             "weekday": {
               "kind": "valueSet",
               "values": [
@@ -7227,10 +8842,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "e984a5dff6d3ef63a8920b4aa70d8be5e7a9cd67c9d0ea19dcd4295db0528a17"
+    "storageHash": "591aad6c6aeceeb18f7eaf740494daf3fa66e688ad385063f2bca3bb2e142b70"
   },
   "execution": {
-    "executionHash": "80f20cd258a9b67e141022463b45697108bf2abd0e87c87c3c6b67a379f32796",
+    "executionHash": "c9f957c3fe6980f77d61b2f6eba3a6d772da140a60d8b8c809b73b53332e35db",
     "mutations": {
       "defaults": [
         {
@@ -7682,6 +9297,43 @@
           "ref": {
             "column": "id",
             "namespace": "public",
+            "table": "support_ticket_messages"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "support_tickets"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "support_tickets"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
             "table": "user_account_blocks"
           }
         },
@@ -7724,6 +9376,43 @@
             "column": "updated_at",
             "namespace": "public",
             "table": "users"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "wallet_transactions"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "wallets"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "wallets"
           }
         }
       ]

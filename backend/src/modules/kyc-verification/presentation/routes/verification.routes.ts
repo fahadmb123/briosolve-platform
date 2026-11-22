@@ -10,12 +10,13 @@ export function buildVerificationRoute(controller: VerificationRouteDependencies
     const router = Router();
 
     router.get("/admin", authMiddleware, requireRole(["ADMIN"]), controller.verification.getAdminVerifications);
-    router.patch("/admin/:id/status", authMiddleware, requireRole(["ADMIN"]), controller.verification.updateKycStatus);
-
+    
     router.get("/", authMiddleware, requireRole(["PROVIDER"]), controller.verification.getProviderVerifications);
     router.post("/", authMiddleware, requireRole(["PROVIDER"]), upload.array("files"), validate(uploadVerificationSchema), controller.verification.uploadVerification);
     router.patch("/:id", authMiddleware, requireRole(["PROVIDER"]), upload.array("files"), controller.verification.updateVerification);
-    router.delete("/:id", authMiddleware, requireRole(["PROVIDER"]), controller.verification.deleteVerification);
+    router.delete("/:id", authMiddleware, requireRole(["PROVIDER"]), controller.verification.deleteVerification)
+
+    router.patch("/admin/:id/status", authMiddleware, requireRole(["ADMIN"]), controller.verification.updateKycStatus);
 
     return router;
 }

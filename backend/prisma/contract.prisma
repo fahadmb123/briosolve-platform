@@ -58,6 +58,8 @@ model users {
   bookings                       bookings[]                      @relation("CustomerBookings")
   conversation_participants      conversation_participants[]
   messages                       messages[]
+  wallet                         wallets?
+  support_tickets                support_tickets[]
 }
 
 enum weekday {
@@ -345,6 +347,7 @@ enum service_request_status {
   COMPLETED
   CANCELLED
   EXPIRED
+  CLOSED
 }
 
 model service_requests {
@@ -514,6 +517,7 @@ model quotations {
   valid_until         quotation_validity   @default(HOURS_24)
   valid_until_date    DateTime
   extra_charge_policy VarChar(300)
+  rejection_reason    String?
   status              quotation_status     @default(PENDING)
 
   created_at          DateTime             @default(now())
@@ -536,6 +540,7 @@ enum booking_status {
   PAYMENT_PENDING
   COMPLETED
   CANCELLED
+  CLOSED
 }
 
 enum booking_payment_status {
@@ -565,7 +570,7 @@ model bookings {
   payment_id         VarChar(255)?
   order_id           VarChar(255)?
 
-  notes              VarChar(1000)?
+  notes              String?
 
   created_at         DateTime             @default(now())
   updated_at         temporal.updatedAt()
@@ -574,10 +579,124 @@ model bookings {
   quotation          quotations           @relation(fields:[quotation_id], references:[id], onDelete: Cascade)
   customer           users                @relation("CustomerBookings", fields:[customer_id], references:[id])
   provider           provider_profiles    @relation(fields:[provider_id], references:[id], onDelete: Cascade)
+  wallet_transactions wallet_transactions[]
 
   @@index([service_request_id])
   @@index([quotation_id])
   @@index([customer_id])
   @@index([provider_id])
   @@index([status])
+}
+
+enum wallet_transaction_type {
+  CREDIT
+  DEBIT
+}
+
+enum wallet_transaction_category {
+  REFUND
+  EARNINGS
+  PAYMENT
+  WITHDRAWAL
+  COMMISSION
+}
+
+model wallets {
+  id           Uuid                  @id @default(uuid())
+  user_id      Uuid                  @unique
+  balance      Numeric(12, 2)
+  currency     VarChar(10)           @default("INR")
+  created_at   DateTime              @default(now())
+  updated_at   temporal.updatedAt()
+
+  user         users                 @relation(fields:[user_id], references:[id], onDelete: Cascade)
+  transactions wallet_transactions[]
+
+  @@index([user_id])
+}
+
+model wallet_transactions {
+  id            Uuid                        @id @default(uuid())
+  wallet_id     Uuid
+  booking_id    Uuid?
+  type          wallet_transaction_type
+  category      wallet_transaction_category
+  amount        Numeric(12, 2)
+  balance_after Numeric(12, 2)
+  description   VarChar(500)
+  reference_id  VarChar(100)?
+  created_at    DateTime                    @default(now())
+
+  wallet        wallets                     @relation(fields:[wallet_id], references:[id], onDelete: Cascade)
+  booking       bookings?                   @relation(fields:[booking_id], references:[id], onDelete: SetNull)
+
+  @@index([wallet_id])
+  @@index([booking_id])
+  @@index([created_at])
+}
+
+enum ticket_status {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum ticket_priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ticket_creator_role {
+  CUSTOMER
+  PROVIDER
+}
+
+model support_tickets {
+  id                   Uuid                 @id @default(uuid())
+  ticket_number        VarChar(50)          @unique
+  creator_id           Uuid
+  creator_role         ticket_creator_role
+  target_type          VarChar(50)          @default("GENERAL")
+  target_id            VarChar(100)?
+  target_number        VarChar(100)?
+  category             VarChar(50)
+  category_label       VarChar(100)
+  subject              VarChar(255)
+  description          VarChar(2000)
+  metadata             Json?
+  priority             ticket_priority      @default(HIGH)
+  status               ticket_status        @default(OPEN)
+  resolution_note      VarChar(2000)?
+  settlement_decision  VarChar(50)?
+  settlement_details   VarChar(500)?
+  assigned_to          Uuid?
+  created_at           DateTime             @default(now())
+  updated_at           temporal.updatedAt()
+
+  creator              users                @relation(fields:[creator_id], references:[id], onDelete: Cascade)
+  messages             support_ticket_messages[]
+
+  @@index([creator_id])
+  @@index([target_type])
+  @@index([target_id])
+  @@index([status])
+  @@index([created_at])
+}
+
+model support_ticket_messages {
+  id          Uuid                @id @default(uuid())
+  ticket_id   Uuid
+  author_id   Uuid?
+  author_name VarChar(150)
+  author_role VarChar(50)
+  message     VarChar(2000)
+  created_at  DateTime            @default(now())
+
+  ticket      support_tickets     @relation(fields:[ticket_id], references:[id], onDelete: Cascade)
+
+  @@index([ticket_id])
+  @@index([created_at])
 }

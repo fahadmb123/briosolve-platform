@@ -26,6 +26,14 @@ export class CreatePaymentOrderUseCase implements IUseCase<CreatePaymentOrderInp
             throw new ApplicationError("INVALID_STATE", `Quotation is currently ${quotation.status.toLowerCase()}`, "VALIDATION");
         }
 
+        if (quotation.valid_until_date && new Date().getTime() > new Date(quotation.valid_until_date).getTime()) {
+            await this._quotationRepository.update(quotation.id, {
+                status: "EXPIRED",
+                rejectionReason: "Quotation validity expired"
+            });
+            throw new ApplicationError("QUOTATION_EXPIRED", "This quotation has expired and can no longer be accepted", "VALIDATION");
+        }
+
         const serviceRequest = await this._serviceRequestRepository.findById(quotation.service_request_id);
         if (!serviceRequest) {
             throw new ApplicationError("REQUEST_NOT_FOUND", "Service request not found", "NOT_FOUND");
@@ -40,7 +48,7 @@ export class CreatePaymentOrderUseCase implements IUseCase<CreatePaymentOrderInp
         }
 
         const baseAmount = Number(quotation.amount);
-        const platformFee = Math.round(baseAmount * 0.1);
+        const platformFee = Math.round(baseAmount * 0.05);
         const totalAmount = baseAmount + platformFee;
         const amountInPaise = Math.round(totalAmount * 100);
 

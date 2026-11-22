@@ -57,6 +57,26 @@ export default function ProviderServiceRequestDetails() {
 
   const handleQuoteClick = () => {
     if (!request) return;
+    if (request.status === "ACCEPTED" || request.status === "IN_PROGRESS") {
+      toast.error("This request has already been accepted by another provider");
+      return;
+    }
+    if (request.status === "COMPLETED") {
+      toast.error("This request has already been completed");
+      return;
+    }
+    if (request.status === "EXPIRED") {
+      toast.error("This request has expired");
+      return;
+    }
+    if (request.status === "CLOSED") {
+      toast.error("This request has been closed via diagnosis settlement");
+      return;
+    }
+    if (request.status === "CANCELLED") {
+      toast.error("This request has been cancelled");
+      return;
+    }
     navigate(`/provider/service-requests/${request.id}/quote`, {
       state: { request }
     });

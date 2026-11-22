@@ -9,6 +9,7 @@ export interface GetProviderServiceRequestsInputDto {
     page?: number;
     limit?: number;
     search?: string;
+    status?: string;
     urgency?: string;
     budgetType?: string;
     sortBy?: "NEWEST" | "URGENT" | "BUDGET_HIGH";
@@ -50,7 +51,8 @@ export class GetProviderServiceRequestsUseCase implements IUseCase<GetProviderSe
             total: response.total,
             totalPages,
             page,
-            limit
+            limit,
+            counts: response.counts
         };
     }
 }

@@ -36,6 +36,8 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
 
   const [confirmAcceptQuote, setConfirmAcceptQuote] = useState<RequestQuotationItem | null>(null);
   const [confirmRejectQuote, setConfirmRejectQuote] = useState<RequestQuotationItem | null>(null);
+  const [declineReason, setDeclineReason] = useState<string>("Price is higher than expected");
+  const [customDeclineReason, setCustomDeclineReason] = useState<string>("");
   const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
   const activeRazorpayRef = useRef<any>(null);
   const [redirectOverlay, setRedirectOverlay] = useState<{
@@ -51,12 +53,20 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   });
 
   const quotations: RequestQuotationItem[] = responseData?.data?.quotations || [];
+  const isQuoteExpired = (q: RequestQuotationItem) => {
+    if (q.status === "EXPIRED") return true;
+    if (q.status === "PENDING" && q.validUntilDate) {
+      return new Date(q.validUntilDate).getTime() < Date.now();
+    }
+    return false;
+  };
+
   const activeQuotations = useMemo(
-    () => quotations.filter((q) => q.status === "PENDING" || q.status === "ACCEPTED"),
+    () => quotations.filter((q) => (q.status === "PENDING" && !isQuoteExpired(q)) || q.status === "ACCEPTED"),
     [quotations]
   );
   const pastQuotations = useMemo(
-    () => quotations.filter((q) => q.status === "WITHDRAWN" || q.status === "REJECTED" || q.status === "EXPIRED"),
+    () => quotations.filter((q) => q.status === "WITHDRAWN" || q.status === "REJECTED" || isQuoteExpired(q)),
     [quotations]
   );
   const acceptedQuoteId = responseData?.data?.acceptedQuotationId;
@@ -168,7 +178,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                     state: {
                       serviceRequestId: requestId,
                       quotationId: quoteCancelled.id,
-                      amount: Math.round(quoteCancelled.amount * 1.1),
+                      amount: Math.round(quoteCancelled.amount * 1.05),
                       providerName: quoteCancelled.provider.name,
                       providerBusinessName: quoteCancelled.provider.businessName,
                       requestItem: requestItem || null
@@ -204,7 +214,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
               handler: (paymentResponse: any) => {
                 cleanupRazorpayModal();
                 const quoteAccepted = confirmAcceptQuote;
-                const totalPaidAmount = Math.round(quoteAccepted.amount * 1.1);
+                const totalPaidAmount = Math.round(quoteAccepted.amount * 1.05);
 
                 verifyPaymentMutation.mutate(
                   {
@@ -302,12 +312,18 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   const handleConfirmReject = () => {
     if (!confirmRejectQuote) return;
 
+    const resolvedReason = declineReason === "Other"
+      ? (customDeclineReason.trim() || "Declined by customer")
+      : declineReason;
+
     rejectMutation.mutate(
-      { quotationId: confirmRejectQuote.id },
+      { quotationId: confirmRejectQuote.id, reason: resolvedReason },
       {
         onSuccess: () => {
           toast.success("Quotation declined");
           setConfirmRejectQuote(null);
+          setDeclineReason("Price is higher than expected");
+          setCustomDeclineReason("");
           refetch();
         },
         onError: (err: any) => {
@@ -603,7 +619,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 const typeConfig = getTypeLabel(quote.quotationType);
                 const isWithdrawn = quote.status === "WITHDRAWN";
                 const isRejected = quote.status === "REJECTED";
-                const isExpired = quote.status === "EXPIRED";
+                const isExpired = isQuoteExpired(quote);
                 const cancelReason = isWithdrawn
                   ? requestItem?.latest_booking?.cancellation_reason
                   : null;
@@ -709,13 +725,13 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                         {isWithdrawn && (
                           <div className="reqquotes-withdrawn-badge">
                             <i className="fas fa-undo-alt"></i>
-                            <span>Withdrawn & Refunded</span>
+                            <span>Withdrawn / Cancelled</span>
                           </div>
                         )}
 
                         {isRejected && (
                           <span className="reqquotes-rejected-badge">
-                            Declined
+                            Declined by Customer
                           </span>
                         )}
 
@@ -723,6 +739,13 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                           <span className="reqquotes-expired-badge">
                             Expired
                           </span>
+                        )}
+
+                        {quote.rejectionReason && (
+                          <div className="reqquotes-rejected-reason-box">
+                            <i className="fas fa-info-circle"></i>
+                            <span>Reason: {quote.rejectionReason}</span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -782,14 +805,14 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                   <span>₹{confirmAcceptQuote.amount.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="reqquotes-pay-row">
-                  <span>Platform Fee (10%)</span>
-                  <span>+₹{Math.round(confirmAcceptQuote.amount * 0.1).toLocaleString("en-IN")}</span>
+                  <span>Platform Fee (5%)</span>
+                  <span>+₹{Math.round(confirmAcceptQuote.amount * 0.05).toLocaleString("en-IN")}</span>
                 </div>
                 <div className="reqquotes-pay-divider" />
                 <div className="reqquotes-pay-row total">
                   <span>Total Payable Amount</span>
                   <span className="reqquotes-pay-total-val">
-                    ₹{Math.round(confirmAcceptQuote.amount * 1.1).toLocaleString("en-IN")}
+                    ₹{Math.round(confirmAcceptQuote.amount * 1.05).toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
@@ -840,7 +863,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 ) : (
                   <>
                     <i className="fas fa-lock"></i>
-                    <span>Pay ₹{Math.round(confirmAcceptQuote.amount * 1.1).toLocaleString("en-IN")} with Razorpay</span>
+                    <span>Pay ₹{Math.round(confirmAcceptQuote.amount * 1.05).toLocaleString("en-IN")} with Razorpay</span>
                   </>
                 )}
               </button>
@@ -864,6 +887,35 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
                 <strong>₹{confirmRejectQuote.amount.toLocaleString("en-IN")}</strong> from{" "}
                 <strong>{confirmRejectQuote.provider.businessName || confirmRejectQuote.provider.name}</strong>?
               </p>
+              <div className="reqquotes-decline-reasons">
+                <label className="text-xs font-semibold text-slate-600">Select reason for declining:</label>
+                {[
+                  "Price is higher than expected",
+                  "Schedule or timing does not work",
+                  "Scope of work does not match",
+                  "Chose another provider",
+                  "Other"
+                ].map((reasonOption) => (
+                  <button
+                    key={reasonOption}
+                    type="button"
+                    className={`reqquotes-decline-chip ${declineReason === reasonOption ? "selected" : ""}`}
+                    onClick={() => setDeclineReason(reasonOption)}
+                  >
+                    <i className={declineReason === reasonOption ? "fas fa-check-circle" : "far fa-circle"} />
+                    <span>{reasonOption}</span>
+                  </button>
+                ))}
+                {declineReason === "Other" && (
+                  <input
+                    type="text"
+                    className="reqquotes-decline-custom-input"
+                    placeholder="Enter specific reason..."
+                    value={customDeclineReason}
+                    onChange={(e) => setCustomDeclineReason(e.target.value)}
+                  />
+                )}
+              </div>
             </div>
             <div className="reqquotes-modal-actions">
               <button

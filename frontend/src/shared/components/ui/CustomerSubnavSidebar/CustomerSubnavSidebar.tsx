@@ -55,9 +55,19 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-calendar-check",
   },
   {
+    label: "Wallet",
+    to: "/wallet",
+    icon: "fas fa-wallet",
+  },
+  {
     label: "Reviews",
     to: "/dashboard#reviews",
     icon: "fas fa-star",
+  },
+  {
+    label: "Support Tickets",
+    to: "/support",
+    icon: "fas fa-life-ring",
   },
 ];
 
@@ -75,6 +85,9 @@ export const CustomerSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/my-requests") ||
     location.pathname.startsWith("/request-service") ||
     location.pathname.startsWith("/bookings") ||
+    location.pathname.startsWith("/wallet") ||
+    location.pathname.startsWith("/support") ||
+    location.pathname.startsWith("/tickets") ||
     location.pathname.startsWith("/reviews");
 
   const isWorkspaceSection =

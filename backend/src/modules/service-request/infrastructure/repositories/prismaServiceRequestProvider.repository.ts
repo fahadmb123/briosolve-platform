@@ -125,9 +125,9 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
     async findByProviderId(
         providerProfileId: string,
         input?: Omit<GetProviderServiceRequestsInputDto, "userId">
-    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number }> {
+    ): Promise<{ requests: ServiceRequestDetailsDto[]; total: number; counts?: Record<string, number> }> {
         await this.syncExpiredRequests();
-        const { page = 1, limit = 10, search, urgency, budgetType, sortBy = "NEWEST" } = input || {};
+        const { page = 1, limit = 10, search, status, urgency, budgetType, sortBy = "NEWEST" } = input || {};
         const skip = (page - 1) * limit;
 
         const matches = await db.orm.public.service_request_providers
@@ -137,7 +137,14 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
         if (matches.length === 0) {
             return {
                 requests: [],
-                total: 0
+                total: 0,
+                counts: {
+                    ALL: 0,
+                    OPEN: 0,
+                    CLOSED: 0,
+                    CANCELLED: 0,
+                    EXPIRED: 0
+                }
             };
         }
 
@@ -162,26 +169,53 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
 
         const requestIds = matches.map((m) => m.service_request_id);
 
-        const records = await Promise.all(
-            requestIds.map(async (requestId) => {
-                return await db.orm.public.service_requests
-                    .where({ id: requestId as never })
-                    .include("images")
-                    .include("category")
-                    .include("subservice")
-                    .include("address")
-                    .include("customer", (c) => c.include("customer_profile"))
-                    .include("providers")
-                    .include("quotations")
-                    .first();
-            })
-        );
+        let query = db.orm.public.service_requests.where((r) => r.id.in(requestIds));
 
-        const validRecords = records.filter(
-            (r): r is NonNullable<typeof r> => r !== null && r.status !== "EXPIRED" && r.status !== "CANCELLED"
-        );
+        if (status && status !== "ALL") {
+            if (status === "OPEN" || status === "PENDING") {
+                query = query.where((r) => r.status.in(["PENDING", "ACTIVE"] as any));
+            } else {
+                query = query.where({ status: status as never });
+            }
+        }
 
-        let dtos = validRecords.map((record) => {
+        if (urgency && urgency !== "ALL") {
+            query = query.where({ urgency: urgency as never });
+        }
+
+        if (search && search.trim()) {
+            query = query.where((r) => r.title.ilike(`%${search.trim()}%`));
+        }
+
+        query = query.orderBy((r) => r.updated_at.desc());
+
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+        const records = await query
+            .include("images")
+            .include("category")
+            .include("subservice")
+            .include("address")
+            .include("customer", (c) => c.include("customer_profile"))
+            .include("providers")
+            .include("quotations")
+            .offset(skip)
+            .limit(limit)
+            .all();
+
+        const allStatuses = await db.orm.public.service_requests
+            .where((r) => r.id.in(requestIds))
+            .select("status")
+            .all();
+
+        const counts: Record<string, number> = {
+            ALL: allStatuses.length,
+            OPEN: allStatuses.filter((r: any) => r.status === "PENDING" || r.status === "ACTIVE").length,
+            CLOSED: allStatuses.filter((r: any) => (r.status as string) === "CLOSED").length,
+            CANCELLED: allStatuses.filter((r: any) => r.status === "CANCELLED").length,
+            EXPIRED: allStatuses.filter((r: any) => r.status === "EXPIRED").length
+        };
+
+        const dtos = records.map((record) => {
             let distanceKm: number | null = null;
             if (
                 providerLat != null &&
@@ -205,49 +239,10 @@ export class ServiceRequestProviderRepository implements IServiceRequestProvider
             return dto;
         });
 
-        if (urgency && urgency !== "ALL") {
-            dtos = dtos.filter((r) => r.urgency === urgency);
-        }
-
-        if (budgetType && budgetType !== "ALL") {
-            dtos = dtos.filter((r) => r.budget_type === budgetType);
-        }
-
-        if (search && search.trim()) {
-            const q = search.toLowerCase().trim();
-            dtos = dtos.filter((r) => {
-                const matchTitle = r.title.toLowerCase().includes(q);
-                const matchDesc = r.description.toLowerCase().includes(q);
-                const matchCat = (r.category_name || "").toLowerCase().includes(q);
-                const matchSub = (r.subservice_name || "").toLowerCase().includes(q);
-                const matchArea = (r.address_details?.area || "").toLowerCase().includes(q);
-                const matchCity = (r.address_details?.city || "").toLowerCase().includes(q);
-                const matchLandmark = (r.address_details?.landmark || "").toLowerCase().includes(q);
-                return matchTitle || matchDesc || matchCat || matchSub || matchArea || matchCity || matchLandmark;
-            });
-        }
-
-        dtos.sort((a, b) => {
-            if (sortBy === "BUDGET_HIGH") {
-                const aAmt = a.budget_amount ?? 0;
-                const bAmt = b.budget_amount ?? 0;
-                return bAmt - aAmt;
-            }
-            if (sortBy === "URGENT") {
-                const urgencyOrder: Record<string, number> = { TODAY: 1, THIS_WEEK: 2, SPECIFIC_DATE: 3, FLEXIBLE: 4 };
-                return (urgencyOrder[a.urgency] ?? 5) - (urgencyOrder[b.urgency] ?? 5);
-            }
-            const timeA = new Date(a.updated_at).getTime();
-            const timeB = new Date(b.updated_at).getTime();
-            return timeB - timeA;
-        });
-
-        const total = dtos.length;
-        const paginated = dtos.slice(skip, skip + limit);
-
         return {
-            requests: paginated,
-            total
+            requests: dtos,
+            total: totalResult.total,
+            counts
         };
     }
 

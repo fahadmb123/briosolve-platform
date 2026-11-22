@@ -23,6 +23,7 @@ import {
   ROLE_CONFIGS,
   type UserRole,
   type UnifiedNotificationItem,
+  type NotificationResponseDto,
 } from "../../types/notification.types";
 
 export interface NotificationsCenterProps {
@@ -49,77 +50,225 @@ export default function NotificationsCenter({
   const config = ROLE_CONFIGS[activeRole] || ROLE_CONFIGS.CUSTOMER;
 
   const [activeTab, setActiveTab] = useState<NotificationFilterTab>("all");
+  const activeTabRef = useRef<NotificationFilterTab>("all");
+  activeTabRef.current = activeTab;
+
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const isLoadingMoreRef = useRef<boolean>(false);
+  const pageRef = useRef<number>(1);
+  const totalPagesRef = useRef<number>(1);
 
-  const notifications = useNotificationStore((state) => state.notifications);
-  const setNotifications = useNotificationStore(
-    (state) => state.setNotifications,
-  );
-  const updateNotification = useNotificationStore(
+  const [notifications, setNotifications] = useState<NotificationResponseDto[]>([]);
+
+  const updateGlobalNotification = useNotificationStore(
     (state) => state.updateNotification,
   );
-  const removeNotification = useNotificationStore(
+  const removeGlobalNotification = useNotificationStore(
     (state) => state.removeNotification,
+  );
+
+  const updateNotification = useCallback(
+    (id: string, changes: Partial<Pick<NotificationResponseDto, "is_read" | "read_at">>) => {
+      setNotifications((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, ...changes } : item))
+      );
+      updateGlobalNotification(id, changes);
+    },
+    [updateGlobalNotification]
+  );
+
+  const removeNotification = useCallback(
+    (id: string) => {
+      setNotifications((prev) => prev.filter((item) => item.id !== id));
+      removeGlobalNotification(id);
+    },
+    [removeGlobalNotification]
   );
 
   const getNotificationsMutation = useGetNotifications();
   const markAllMutation = useMarkAllNotificationsRead();
   const updateStatusMutation = useUpdateNotificationStatus();
 
-  const fetchPageNotifications = useCallback((pageNum: number, isReset: boolean = false) => {
+  const isPendingRef = useRef<boolean>(false);
+  isPendingRef.current = getNotificationsMutation.isPending;
+  const cooldownUntilRef = useRef<number>(0);
+  const lastScrollYRef = useRef<number>(0);
+
+  useEffect(() => {
+    const handleNewNotification = (e: Event) => {
+      const detail = (e as CustomEvent).detail as NotificationResponseDto;
+      if (detail) {
+        setNotifications((prev) => {
+          if (prev.some((n) => n.id === detail.id)) return prev;
+          return [detail, ...prev];
+        });
+      }
+    };
+    window.addEventListener("app:notification", handleNewNotification);
+    return () => {
+      window.removeEventListener("app:notification", handleNewNotification);
+    };
+  }, []);
+
+  const fetchPageNotifications = useCallback((pageNum: number, isReset: boolean = false, overrideTab?: NotificationFilterTab) => {
+    const tab = overrideTab || activeTabRef.current;
     if (pageNum > 1) {
       isLoadingMoreRef.current = true;
+      setIsLoadingMore(true);
     }
     getNotificationsMutation.mutate(
-      { page: pageNum, limit: 5 },
+      { page: pageNum, limit: 5, unreadOnly: tab === "unread" ? true : undefined },
       {
         onSuccess: (res) => {
           isLoadingMoreRef.current = false;
+          setIsLoadingMore(false);
+          lastScrollYRef.current = window.scrollY || document.documentElement.scrollTop;
+          cooldownUntilRef.current = Date.now() + 500;
           if (res?.data) {
             if (Array.isArray(res.data)) {
               setNotifications(res.data);
+              totalPagesRef.current = 1;
+              setTotalPages(1);
             } else {
               const incoming = res.data.notifications || [];
-              setNotifications(
-                isReset || pageNum === 1
-                  ? incoming
-                  : (() => {
-                      const current = useNotificationStore.getState().notifications;
-                      const existingIds = new Set(current.map((n) => n.id));
-                      const newUnique = incoming.filter((n) => !existingIds.has(n.id));
-                      return [...current, ...newUnique];
-                    })()
-              );
-              setTotalPages(res.data.totalPages || 1);
+              if (incoming.length === 0) {
+                totalPagesRef.current = pageNum;
+                setTotalPages(pageNum);
+                return;
+              }
+              setNotifications((prev) => {
+                if (isReset || pageNum === 1) return incoming;
+                const existingIds = new Set(prev.map((n) => n.id));
+                const newUnique = incoming.filter((n) => !existingIds.has(n.id));
+                if (newUnique.length === 0) {
+                  totalPagesRef.current = pageNum;
+                  setTotalPages(pageNum);
+                  return prev;
+                }
+                return [...prev, ...newUnique];
+              });
+              const pages = res.data.totalPages || 1;
+              setTotalPages(pages);
+              totalPagesRef.current = pages;
             }
           }
         },
         onError: () => {
           isLoadingMoreRef.current = false;
+          setIsLoadingMore(false);
+          cooldownUntilRef.current = Date.now() + 500;
         }
       }
     );
-  }, [setNotifications, getNotificationsMutation]);
+  }, [getNotificationsMutation]);
+
+  const fetchPageNotificationsRef = useRef(fetchPageNotifications);
+  fetchPageNotificationsRef.current = fetchPageNotifications;
+
+  const handleSelectTab = useCallback((tab: NotificationFilterTab) => {
+    setActiveTab(tab);
+    activeTabRef.current = tab;
+    pageRef.current = 1;
+    setPage(1);
+    setNotifications([]);
+    fetchPageNotifications(1, true, tab);
+  }, [fetchPageNotifications]);
+
+  const triggerLoadMore = useCallback(() => {
+    if (
+      pageRef.current >= totalPagesRef.current ||
+      isPendingRef.current ||
+      isLoadingMoreRef.current ||
+      Date.now() < cooldownUntilRef.current
+    ) {
+      return;
+    }
+
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const rect = sentinel.getBoundingClientRect();
+    if (rect.top <= window.innerHeight + 150) {
+      isLoadingMoreRef.current = true;
+      setIsLoadingMore(true);
+      const nextPage = pageRef.current + 1;
+      pageRef.current = nextPage;
+      setPage(nextPage);
+      fetchPageNotificationsRef.current(nextPage, false);
+    }
+  }, []);
 
   useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 5) {
+        triggerLoadMore();
+      }
+    };
+
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      if (touchStartY - e.touches[0].clientY > 10) {
+        triggerLoadMore();
+      }
+    };
+
+    const handleScroll = () => {
+      const currentY = window.scrollY || document.documentElement.scrollTop;
+      if (currentY > lastScrollYRef.current + 15) {
+        triggerLoadMore();
+      }
+      lastScrollYRef.current = currentY;
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [triggerLoadMore]);
+
+  useEffect(() => {
+    pageRef.current = 1;
     setPage(1);
     fetchPageNotifications(1, true);
   }, []);
 
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          triggerLoadMore();
+        }
+      },
+      { rootMargin: "150px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [triggerLoadMore]);
+
   const unifiedNotifications: UnifiedNotificationItem[] = useMemo(() => {
-    const now = Date.now();
-    const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
     const sorted = [...notifications].sort(
       (a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-    return sorted
-      .filter((n) => now - new Date(n.created_at).getTime() <= oneWeekMs)
-      .map((n) => mapNotificationToUnified(n, activeRole));
+    return sorted.map((n) => mapNotificationToUnified(n, activeRole));
   }, [notifications, activeRole]);
 
   const unreadCount = useMemo(
@@ -195,26 +344,7 @@ export default function NotificationsCenter({
     });
   }, [unifiedNotifications, activeTab, searchQuery]);
 
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && page < totalPages && !isLoadingMoreRef.current && !getNotificationsMutation.isPending) {
-          setPage((prev) => {
-            const nextPage = prev + 1;
-            fetchPageNotifications(nextPage, false);
-            return nextPage;
-          });
-        }
-      },
-      { rootMargin: "400px" }
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [page, totalPages, getNotificationsMutation.isPending, fetchPageNotifications]);
 
   const groups = useMemo(() => {
     const result = TIME_GROUPS.map((groupName) => ({
@@ -252,7 +382,7 @@ export default function NotificationsCenter({
 
       <NotificationToolbar
         activeTab={activeTab}
-        onSelectTab={setActiveTab}
+        onSelectTab={handleSelectTab}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         totalCount={unifiedNotifications.length}
@@ -295,7 +425,19 @@ export default function NotificationsCenter({
         ))
       )}
 
-      {page < totalPages && <div ref={sentinelRef} className="notif-sentinel" />}
+      {isLoadingMore && (
+        <div className="notif-group-card">
+          <div className="notif-list">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <NotificationSkeletonItem key={`sk-${idx}`} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {page < totalPages && (
+        <div ref={sentinelRef} className="notif-sentinel" />
+      )}
 
       {page >= totalPages && filteredNotifications.length > 5 && (
         <div className="notif-end-message">

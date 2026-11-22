@@ -18,6 +18,7 @@ export class Quotation {
         public readonly valid_until_date: Date,
         public readonly extra_charge_policy: string,
         public readonly status: QuotationStatus,
+        public readonly rejection_reason: string | null = null,
         public readonly created_at: Date,
         public readonly updated_at: Date
     ) {}

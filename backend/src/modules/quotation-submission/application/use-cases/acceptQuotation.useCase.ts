@@ -27,6 +27,14 @@ export class AcceptQuotationUseCase implements IUseCase<AcceptQuotationInputDto,
             throw new ApplicationError("INVALID_STATE", `Cannot accept a quotation that is ${quotation.status}`, "VALIDATION");
         }
 
+        if (quotation.valid_until_date && new Date().getTime() > new Date(quotation.valid_until_date).getTime()) {
+            await this._quotationRepository.update(quotation.id, {
+                status: "EXPIRED",
+                rejectionReason: "Quotation validity expired"
+            });
+            throw new ApplicationError("QUOTATION_EXPIRED", "This quotation has expired and can no longer be accepted", "VALIDATION");
+        }
+
         const serviceRequest = await this._serviceRequestRepository.findById(quotation.service_request_id);
         if (!serviceRequest) {
             throw new ApplicationError("REQUEST_NOT_FOUND", "Service request not found", "NOT_FOUND");
@@ -49,7 +57,8 @@ export class AcceptQuotationUseCase implements IUseCase<AcceptQuotationInputDto,
 
         for (const other of otherQuotes) {
             await this._quotationRepository.update(other.id, {
-                status: "REJECTED"
+                status: "REJECTED",
+                rejectionReason: "Another quotation was accepted by the customer"
             });
         }
 

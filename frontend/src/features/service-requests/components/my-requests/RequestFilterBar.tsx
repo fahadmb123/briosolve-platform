@@ -30,6 +30,7 @@ export const RequestFilterBar: React.FC<RequestFilterBarProps> = ({
     { key: "ACTIVE", label: "Active" },
     { key: "IN_PROGRESS", label: "In Progress" },
     { key: "COMPLETED", label: "Completed" },
+    { key: "CLOSED", label: "Closed" },
     { key: "CANCELLED", label: "Cancelled" },
   ];
 

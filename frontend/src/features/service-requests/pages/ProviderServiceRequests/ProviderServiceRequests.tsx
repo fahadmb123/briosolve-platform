@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useGetProviderServiceRequests } from "../../hooks/useServiceRequestMutations";
@@ -9,12 +9,22 @@ import { useAuthStore } from "../../../auth/stores/auth.store";
 import { VerificationRequiredCard } from "../../../../shared/components/ui/VerificationRequiredCard/VerificationRequiredCard";
 import "./ProviderServiceRequests.css";
 
+const STATUS_TABS: { id: string; label: string }[] = [
+  { id: "ALL", label: "All Leads" },
+  { id: "OPEN", label: "Open" },
+  { id: "CLOSED", label: "Closed" },
+  { id: "CANCELLED", label: "Cancelled" },
+  { id: "EXPIRED", label: "Expired" }
+];
+
 export default function ProviderServiceRequests() {
   const navigate = useNavigate();
   const verifications = useAuthStore((state) => state.verifications);
   const isVerified =
     verifications !== null && Object.values(verifications).every(Boolean);
   const [requests, setRequests] = useState<CustomerServiceRequestItem[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("ALL");
@@ -23,7 +33,10 @@ export default function ProviderServiceRequests() {
   const [limit] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const isLoadingMoreRef = useRef<boolean>(false);
+  const fetchStartTimeRef = useRef<number>(0);
 
   const [selectedRequest, setSelectedRequest] = useState<CustomerServiceRequestItem | null>(null);
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
@@ -31,10 +44,78 @@ export default function ProviderServiceRequests() {
   const { data: requestsRes, isLoading: isQueryLoading, isFetching, refetch } = useGetProviderServiceRequests({
     page,
     limit,
+    status: statusFilter !== "ALL" ? statusFilter : undefined,
     search: debouncedSearch.trim() || undefined,
     urgency: urgencyFilter !== "ALL" ? urgencyFilter : undefined,
     sortBy,
   });
+
+  const isFetchingRef = useRef<boolean>(isFetching);
+  isFetchingRef.current = isFetching;
+  const hasMoreRef = useRef<boolean>(hasMore);
+  hasMoreRef.current = hasMore;
+  const cooldownUntilRef = useRef<number>(0);
+  const lastScrollYRef = useRef<number>(0);
+
+  const triggerLoadMore = useCallback(() => {
+    if (
+      !hasMoreRef.current ||
+      isFetchingRef.current ||
+      isLoadingMoreRef.current ||
+      Date.now() < cooldownUntilRef.current
+    ) {
+      return;
+    }
+
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const rect = sentinel.getBoundingClientRect();
+    if (rect.top <= window.innerHeight + 150) {
+      isLoadingMoreRef.current = true;
+      setIsLoadingMore(true);
+      fetchStartTimeRef.current = Date.now();
+      setPage((prev) => prev + 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 5) {
+        triggerLoadMore();
+      }
+    };
+
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      if (touchStartY - e.touches[0].clientY > 10) {
+        triggerLoadMore();
+      }
+    };
+
+    const handleScroll = () => {
+      const currentY = window.scrollY || document.documentElement.scrollTop;
+      if (currentY > lastScrollYRef.current + 15) {
+        triggerLoadMore();
+      }
+      lastScrollYRef.current = currentY;
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [triggerLoadMore]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -45,21 +126,29 @@ export default function ProviderServiceRequests() {
 
   useEffect(() => {
     if (requestsRes?.data) {
-      const newItems = requestsRes.data.requests || [];
+      const data = requestsRes.data;
+      isLoadingMoreRef.current = false;
+      setIsLoadingMore(false);
+      lastScrollYRef.current = window.scrollY || document.documentElement.scrollTop;
+      cooldownUntilRef.current = Date.now() + 300;
+      const newItems = data.requests || [];
       setRequests((prev) => {
         if (page === 1) return newItems;
         const existingIds = new Set(prev.map((r) => r.id));
         const uniqueNewItems = newItems.filter((r) => !existingIds.has(r.id));
         return [...prev, ...uniqueNewItems];
       });
-      setTotalPages(requestsRes.data.totalPages || 0);
-      setHasMore(page < (requestsRes.data.totalPages || 0));
+      setCounts(data.counts || {});
+      setTotalPages(data.totalPages || 0);
+      setHasMore(page < (data.totalPages || 0));
     }
   }, [requestsRes, page]);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, urgencyFilter, sortBy]);
+    setIsLoadingMore(false);
+    isLoadingMoreRef.current = false;
+  }, [debouncedSearch, statusFilter, urgencyFilter, sortBy]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -67,16 +156,16 @@ export default function ProviderServiceRequests() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isFetching) {
-          setPage((prev) => prev + 1);
+        if (entries[0].isIntersecting) {
+          triggerLoadMore();
         }
       },
-      { rootMargin: "400px" }
+      { rootMargin: "150px" }
     );
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasMore, isFetching]);
+  }, [triggerLoadMore]);
 
   useEffect(() => {
     const handleNotification = (e: Event) => {
@@ -121,6 +210,22 @@ export default function ProviderServiceRequests() {
   };
 
   const handleQuoteClick = (req: CustomerServiceRequestItem) => {
+    if (req.status === "ACCEPTED" || req.status === "IN_PROGRESS") {
+      toast.error("This request has already been accepted by another provider");
+      return;
+    }
+    if (req.status === "COMPLETED") {
+      toast.error("This request has already been completed");
+      return;
+    }
+    if (req.status === "EXPIRED") {
+      toast.error("This request has expired");
+      return;
+    }
+    if (req.status === "CANCELLED") {
+      toast.error("This request has been cancelled");
+      return;
+    }
     navigate(`/provider/service-requests/${req.id}/quote`, {
       state: { request: req }
     });
@@ -199,20 +304,22 @@ export default function ProviderServiceRequests() {
 
       <div className="provreq-filter-bar-container">
         <div className="provreq-status-tabs-list" role="tablist">
-          {[
-            { id: "ALL", label: "All Leads" },
-            { id: "TODAY", label: "Needed Today" },
-            { id: "THIS_WEEK", label: "This Week" },
-            { id: "SPECIFIC_DATE", label: "Specific Date" },
-            { id: "FLEXIBLE", label: "Flexible Timing" },
-          ].map((pill) => (
+          {STATUS_TABS.map((pill) => (
             <button
               key={pill.id}
               type="button"
-              className={`provreq-status-tab-btn ${urgencyFilter === pill.id ? "active" : ""}`}
-              onClick={() => handleUrgencyChange(pill.id)}
+              className={`provreq-status-tab-btn ${statusFilter === pill.id ? "active" : ""}`}
+              onClick={() => {
+                setStatusFilter(pill.id);
+                setPage(1);
+              }}
             >
               <span>{pill.label}</span>
+              {counts[pill.id] !== undefined && counts[pill.id] > 0 && (
+                <span className={`provreq-tab-bubble ${statusFilter === pill.id ? "active-bubble" : ""}`}>
+                  {counts[pill.id]}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -237,6 +344,21 @@ export default function ProviderServiceRequests() {
                 <i className="fas fa-times"></i>
               </button>
             )}
+          </div>
+
+          <div className="provreq-sort-dropdown-wrapper">
+            <select
+              value={urgencyFilter}
+              onChange={(e) => handleUrgencyChange(e.target.value)}
+              className="provreq-sort-select-input"
+            >
+              <option value="ALL">All Timings</option>
+              <option value="TODAY">Needed Today</option>
+              <option value="THIS_WEEK">This Week</option>
+              <option value="SPECIFIC_DATE">Specific Date</option>
+              <option value="FLEXIBLE">Flexible Timing</option>
+            </select>
+            <i className="fas fa-chevron-down provreq-sort-chevron"></i>
           </div>
 
           <div className="provreq-sort-dropdown-wrapper">
@@ -285,13 +407,13 @@ export default function ProviderServiceRequests() {
                 onChat={handleChatClick}
               />
             ))}
-            {isFetching && page > 1 &&
+            {isLoadingMore &&
               Array.from({ length: 2 }).map((_, idx) => (
                 <ServiceRequestCardSkeleton key={`skeleton-${idx}`} variant="provider" />
               ))}
           </div>
 
-          {hasMore && <div ref={sentinelRef} className="provreq-sentinel" />}
+          <div ref={sentinelRef} className="provreq-sentinel" />
 
           {!hasMore && requests.length > 0 && totalPages > 1 && (
             <div className="provreq-end-message">

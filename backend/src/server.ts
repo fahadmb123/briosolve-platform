@@ -29,6 +29,8 @@ import { communicationRoutes } from "./modules/communication/infrastructure/comp
 import { createQuotationRoutes } from "./modules/quotation-submission/infrastructure/composition";
 import { createPaymentRoutes } from "./modules/payment/infrastructure/composition";
 import { createBookingRoutes } from "./modules/booking/infrastructure/composition";
+import { createWalletRoutes, createCreditWalletUseCase } from "./modules/wallet/infrastructure/composition";
+import { createSupportRoutes } from "./modules/support/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -51,8 +53,11 @@ const startServer = async (): Promise<void> => {
         const serviceRequestRoutes = createServiceRequestRoutes(bulkNotificationUseCase, notificationUseCase);
         const chatRoutes = createChatRoutes(io);
         const quotationRoutes = createQuotationRoutes(notificationUseCase);
-        const paymentRoutes = createPaymentRoutes(notificationUseCase);
-        const bookingRoutes = createBookingRoutes(notificationUseCase);
+        const creditWalletUseCase = createCreditWalletUseCase();
+        const paymentRoutes = createPaymentRoutes(notificationUseCase, creditWalletUseCase);
+        const bookingRoutes = createBookingRoutes(notificationUseCase, creditWalletUseCase);
+        const walletRoutes = createWalletRoutes();
+        const supportRoutes = createSupportRoutes(notificationUseCase);
 
         const rootRouter = createRootRouter({
             authRoutes,
@@ -70,7 +75,9 @@ const startServer = async (): Promise<void> => {
             communicationRoutes,
             quotationRoutes,
             paymentRoutes,
-            bookingRoutes
+            bookingRoutes,
+            walletRoutes,
+            supportRoutes
         });
 
         app.use("/api", rootRouter);

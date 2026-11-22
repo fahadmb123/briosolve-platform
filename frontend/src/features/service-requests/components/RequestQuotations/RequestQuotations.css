@@ -986,3 +986,67 @@
   color: #64748b;
   margin: 0 0 1rem;
 }
+
+.reqquotes-rejected-reason-box {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  margin-top: 0.35rem;
+  max-width: 100%;
+}
+
+.reqquotes-decline-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.reqquotes-decline-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #334155;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.reqquotes-decline-chip:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.reqquotes-decline-chip.selected {
+  background: #fff7ed;
+  border-color: #fb923c;
+  color: #c2410c;
+  font-weight: 600;
+}
+
+.reqquotes-decline-custom-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #0f172a;
+  box-sizing: border-box;
+  margin-top: 0.25rem;
+}
+
+.reqquotes-decline-custom-input:focus {
+  outline: none;
+  border-color: #ea580c;
+}

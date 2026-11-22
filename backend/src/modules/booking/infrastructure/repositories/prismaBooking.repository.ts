@@ -27,7 +27,8 @@ export class PrismaBookingRepository implements IBookingRepository {
             const booking = BookingMapper.toDomain(record);
 
             const details = await this.populateDetails([booking]);
-            return details[0] || {
+            const cancellationsCount = await this.countProviderCancellations(booking.provider_id);
+            const detail = details[0] || {
                 booking,
                 serviceRequestTitle: null,
                 providerBusinessName: null,
@@ -37,6 +38,9 @@ export class PrismaBookingRepository implements IBookingRepository {
                 requiresInspection: false,
                 statusHistory: undefined
             };
+            detail.providerCancellationsCount = cancellationsCount;
+            detail.maxAllowedCancellations = 2;
+            return detail;
         } catch {
             return null;
         }
@@ -79,19 +83,21 @@ export class PrismaBookingRepository implements IBookingRepository {
         const status = typeof input === "object" ? input.status : undefined;
         const skip = (page - 1) * limit;
 
-        const allUserRecords = await db.orm.public.bookings
+        const statusRows = await db.orm.public.bookings
             .where({ customer_id: customerId as never })
+            .select("status")
             .all();
 
         const counts: BookingCountsDto = {
-            ALL: allUserRecords.length,
-            CONFIRMED: allUserRecords.filter((b: any) => b.status === "CONFIRMED").length,
-            EN_ROUTE: allUserRecords.filter((b: any) => b.status === "EN_ROUTE").length,
-            INSPECTION: allUserRecords.filter((b: any) => b.status === "INSPECTION").length,
-            IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
-            PAYMENT_PENDING: allUserRecords.filter((b: any) => b.status === "PAYMENT_PENDING").length,
-            COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
-            CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length
+            ALL: statusRows.length,
+            CONFIRMED: statusRows.filter((b: any) => b.status === "CONFIRMED").length,
+            EN_ROUTE: statusRows.filter((b: any) => b.status === "EN_ROUTE").length,
+            INSPECTION: statusRows.filter((b: any) => b.status === "INSPECTION").length,
+            IN_PROGRESS: statusRows.filter((b: any) => b.status === "IN_PROGRESS").length,
+            PAYMENT_PENDING: statusRows.filter((b: any) => b.status === "PAYMENT_PENDING").length,
+            COMPLETED: statusRows.filter((b: any) => b.status === "COMPLETED").length,
+            CLOSED: statusRows.filter((b: any) => b.status === "CLOSED").length,
+            CANCELLED: statusRows.filter((b: any) => b.status === "CANCELLED").length
         };
 
         let query = db.orm.public.bookings.where({ customer_id: customerId as never });
@@ -100,31 +106,39 @@ export class PrismaBookingRepository implements IBookingRepository {
             query = query.where({ status: status as never });
         }
 
-        query = query.orderBy((b) => b.updated_at.desc());
-
-        const records = await query.all();
-        const bookings = records.map((r: any) => BookingMapper.toDomain(r));
-        let detailed = await this.populateDetails(bookings);
-
         if (search && search.trim()) {
-            const q = search.trim().toLowerCase();
-            detailed = detailed.filter((item) => {
-                return (
-                    (item.booking.booking_number && item.booking.booking_number.toLowerCase().includes(q)) ||
-                    (item.serviceRequestTitle && item.serviceRequestTitle.toLowerCase().includes(q)) ||
-                    (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
-                    (item.providerBusinessName && item.providerBusinessName.toLowerCase().includes(q)) ||
-                    (item.providerName && item.providerName.toLowerCase().includes(q))
-                );
-            });
+            const trimmed = search.trim();
+            const term = `%${trimmed}%`;
+            if (trimmed.toUpperCase().startsWith("BK")) {
+                query = query.where((b) => b.booking_number.ilike(term));
+            } else {
+                const matchingSrs = await db.orm.public.service_requests
+                    .where({ customer_id: customerId as never })
+                    .where((sr) => sr.title.ilike(term))
+                    .select("id")
+                    .all();
+                const srIds = matchingSrs.map((s) => s.id);
+                if (srIds.length > 0) {
+                    query = query.where((b) => b.service_request_id.in(srIds));
+                } else {
+                    query = query.where((b) => b.booking_number.ilike(term));
+                }
+            }
         }
 
-        const total = detailed.length;
-        const paged = detailed.slice(skip, skip + limit);
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+        const records = await query
+            .orderBy((b) => b.updated_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all();
+
+        const bookings = records.map((r: any) => BookingMapper.toDomain(r));
+        const detailed = await this.populateDetails(bookings);
 
         return {
-            bookings: paged,
-            total,
+            bookings: detailed,
+            total: totalResult.total,
             counts
         };
     }
@@ -139,19 +153,21 @@ export class PrismaBookingRepository implements IBookingRepository {
         const status = typeof input === "object" ? input.status : undefined;
         const skip = (page - 1) * limit;
 
-        const allUserRecords = await db.orm.public.bookings
+        const statusRows = await db.orm.public.bookings
             .where({ provider_id: providerProfileId as never })
+            .select("status")
             .all();
 
         const counts: BookingCountsDto = {
-            ALL: allUserRecords.length,
-            CONFIRMED: allUserRecords.filter((b: any) => b.status === "CONFIRMED").length,
-            EN_ROUTE: allUserRecords.filter((b: any) => b.status === "EN_ROUTE").length,
-            INSPECTION: allUserRecords.filter((b: any) => b.status === "INSPECTION").length,
-            IN_PROGRESS: allUserRecords.filter((b: any) => b.status === "IN_PROGRESS").length,
-            PAYMENT_PENDING: allUserRecords.filter((b: any) => b.status === "PAYMENT_PENDING").length,
-            COMPLETED: allUserRecords.filter((b: any) => b.status === "COMPLETED").length,
-            CANCELLED: allUserRecords.filter((b: any) => b.status === "CANCELLED").length
+            ALL: statusRows.length,
+            CONFIRMED: statusRows.filter((b: any) => b.status === "CONFIRMED").length,
+            EN_ROUTE: statusRows.filter((b: any) => b.status === "EN_ROUTE").length,
+            INSPECTION: statusRows.filter((b: any) => b.status === "INSPECTION").length,
+            IN_PROGRESS: statusRows.filter((b: any) => b.status === "IN_PROGRESS").length,
+            PAYMENT_PENDING: statusRows.filter((b: any) => b.status === "PAYMENT_PENDING").length,
+            COMPLETED: statusRows.filter((b: any) => b.status === "COMPLETED").length,
+            CLOSED: statusRows.filter((b: any) => b.status === "CLOSED").length,
+            CANCELLED: statusRows.filter((b: any) => b.status === "CANCELLED").length
         };
 
         let query = db.orm.public.bookings.where({ provider_id: providerProfileId as never });
@@ -160,32 +176,138 @@ export class PrismaBookingRepository implements IBookingRepository {
             query = query.where({ status: status as never });
         }
 
-        query = query.orderBy((b) => b.updated_at.desc());
-
-        const records = await query.all();
-        const bookings = records.map((r: any) => BookingMapper.toDomain(r));
-        let detailed = await this.populateDetails(bookings);
-
         if (search && search.trim()) {
-            const q = search.trim().toLowerCase();
-            detailed = detailed.filter((item) => {
-                return (
-                    (item.booking.booking_number && item.booking.booking_number.toLowerCase().includes(q)) ||
-                    (item.serviceRequestTitle && item.serviceRequestTitle.toLowerCase().includes(q)) ||
-                    (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
-                    (item.customerName && item.customerName.toLowerCase().includes(q))
-                );
-            });
+            const trimmed = search.trim();
+            const term = `%${trimmed}%`;
+            if (trimmed.toUpperCase().startsWith("BK")) {
+                query = query.where((b) => b.booking_number.ilike(term));
+            } else {
+                const matchingSrs = await db.orm.public.service_requests
+                    .where((sr) => sr.title.ilike(term))
+                    .select("id")
+                    .all();
+                const srIds = matchingSrs.map((s) => s.id);
+                if (srIds.length > 0) {
+                    query = query.where((b) => b.service_request_id.in(srIds));
+                } else {
+                    query = query.where((b) => b.booking_number.ilike(term));
+                }
+            }
         }
 
-        const total = detailed.length;
-        const paged = detailed.slice(skip, skip + limit);
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+        const records = await query
+            .orderBy((b) => b.updated_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all();
+
+        const bookings = records.map((r: any) => BookingMapper.toDomain(r));
+        const detailed = await this.populateDetails(bookings);
+        const providerCancellations = await this.countProviderCancellations(providerProfileId);
+        detailed.forEach((item) => {
+            item.providerCancellationsCount = providerCancellations;
+            item.maxAllowedCancellations = 2;
+        });
 
         return {
-            bookings: paged,
-            total,
+            bookings: detailed,
+            total: totalResult.total,
             counts
         };
+    }
+
+    async countProviderCancellations(providerProfileId: string): Promise<number> {
+        try {
+            const records = await db.orm.public.bookings
+                .where({
+                    provider_id: providerProfileId as never,
+                    status: "CANCELLED" as never
+                })
+                .all();
+
+            let count = 0;
+            for (const record of records) {
+                if (!record.notes) {
+                    count++;
+                    continue;
+                }
+                try {
+                    const parsed = JSON.parse(record.notes);
+                    if (parsed && typeof parsed === "object") {
+                        if (parsed.mismatchReport && parsed.mismatchReport.status === "ACCEPTED") {
+                            continue;
+                        }
+                    }
+                    if (Array.isArray(parsed)) {
+                        const cancelItem = parsed.find((item: any) => item.status === "CANCELLED");
+                        if (cancelItem && cancelItem.authorName && (cancelItem.authorName.toLowerCase() === "customer" || cancelItem.authorName.toLowerCase().includes("diagnosis closed"))) {
+                            continue;
+                        }
+                    } else if (parsed && typeof parsed === "object" && Array.isArray(parsed.history)) {
+                        const cancelItem = parsed.history.find((item: any) => item.status === "CANCELLED");
+                        if (cancelItem && cancelItem.authorName && (cancelItem.authorName.toLowerCase() === "customer" || cancelItem.authorName.toLowerCase().includes("diagnosis closed"))) {
+                            continue;
+                        }
+                    }
+                } catch {
+                    if (record.notes.toLowerCase().includes("customer") || record.notes.toLowerCase().includes("diagnosis closed")) {
+                        continue;
+                    }
+                }
+                count++;
+            }
+            return count;
+        } catch {
+            return 0;
+        }
+    }
+
+    async countCustomerCancellations(customerId: string): Promise<number> {
+        try {
+            const records = await db.orm.public.bookings
+                .where({
+                    customer_id: customerId as never,
+                    status: "CANCELLED" as never
+                })
+                .all();
+
+            let count = 0;
+            for (const record of records) {
+                if (!record.notes) {
+                    continue;
+                }
+                try {
+                    const parsed = JSON.parse(record.notes);
+                    if (parsed && typeof parsed === "object") {
+                        if (parsed.mismatchReport && parsed.mismatchReport.status === "ACCEPTED") {
+                            continue;
+                        }
+                    }
+                    if (Array.isArray(parsed)) {
+                        const cancelItem = parsed.find((item: any) => item.status === "CANCELLED");
+                        if (cancelItem && cancelItem.authorName && cancelItem.authorName.toLowerCase() === "customer") {
+                            count++;
+                            continue;
+                        }
+                    } else if (parsed && typeof parsed === "object" && Array.isArray(parsed.history)) {
+                        const cancelItem = parsed.history.find((item: any) => item.status === "CANCELLED");
+                        if (cancelItem && cancelItem.authorName && cancelItem.authorName.toLowerCase() === "customer") {
+                            count++;
+                            continue;
+                        }
+                    }
+                } catch {
+                    if (record.notes.toLowerCase().includes("customer") && !record.notes.toLowerCase().includes("diagnosis closed")) {
+                        count++;
+                        continue;
+                    }
+                }
+            }
+            return count;
+        } catch {
+            return 0;
+        }
     }
 
     async create(data: CreateBookingRepoDto): Promise<Booking | null> {
