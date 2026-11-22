@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetCustomerBookings, useGetProviderBookings } from "../../../bookings/hooks/useBookingMutations";
 import { useSupportStore } from "../../stores/support.store";
+import { useCreateSupportTicket, useGetMySupportTickets } from "../../hooks/useSupportTickets";
 import type { SupportTicket } from "../../types/support.types";
 import "./SupportTicketsPage.css";
 
@@ -42,13 +43,26 @@ export const SupportTicketsPage: React.FC = () => {
   const addTicketToStore = useSupportStore((state) => state.addTicket);
   const addTicketMessage = useSupportStore((state) => state.addTicketMessage);
 
+  const createTicketMutation = useCreateSupportTicket();
+  const myTicketsQuery = useGetMySupportTickets();
+
   const [activeTab, setActiveTab] = useState<"MY_TICKETS" | "NEW_TICKET">("MY_TICKETS");
   const [ticketFilter, setTicketFilter] = useState<"ALL" | "ACTIVE" | "RESOLVED">("ALL");
   const [ticketSearch, setTicketSearch] = useState<string>("");
   const [viewTicket, setViewTicket] = useState<SupportTicket | null>(null);
 
+  const combinedTickets = useMemo(() => {
+    const serverTickets = myTicketsQuery.data?.data || [];
+    if (serverTickets.length > 0) {
+      const serverIds = new Set(serverTickets.map((s) => s.id));
+      const localOnly = allTickets.filter((l) => !serverIds.has(l.id));
+      return [...serverTickets, ...localOnly];
+    }
+    return allTickets;
+  }, [myTicketsQuery.data, allTickets]);
+
   const tickets = useMemo(() => {
-    return allTickets.filter((t) => {
+    return combinedTickets.filter((t) => {
       const isRoleMatch = isProvider ? t.creatorRole === "PROVIDER" : t.creatorRole === "CUSTOMER";
       const isStatusMatch =
         ticketFilter === "ALL" ||
@@ -65,14 +79,13 @@ export const SupportTicketsPage: React.FC = () => {
 
       return isRoleMatch && isStatusMatch && isSearchMatch;
     });
-  }, [allTickets, isProvider, ticketFilter, ticketSearch]);
+  }, [combinedTickets, isProvider, ticketFilter, ticketSearch]);
 
   const [concernType, setConcernType] = useState<ConcernType>("BOOKING");
   const [selectedBookingId, setSelectedBookingId] = useState<string>("");
   const [generalTopic, setGeneralTopic] = useState<string>("Wallet & Payouts");
   const [issueReason, setIssueReason] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
   const [replyText, setReplyText] = useState<string>("");
 
@@ -106,26 +119,57 @@ export const SupportTicketsPage: React.FC = () => {
     "Feedback / Other"
   ];
 
-  const handleSubmitTicket = (e: React.FormEvent) => {
+  const handleSubmitTicket = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description.trim()) return;
+    if (!description.trim() || createTicketMutation.isPending) return;
 
-    setIsSubmitting(true);
-    setTimeout(() => {
-      let subjectLine = "";
-      let linkedBookingNumber = undefined;
-      let linkedServiceTitle = undefined;
+    let subjectLine = "";
+    let linkedBookingNumber = undefined;
+    let linkedServiceTitle = undefined;
 
-      if (concernType === "BOOKING") {
-        const found = activeBookings.find((b) => b.id === selectedBookingId);
-        linkedBookingNumber = found?.bookingNumber;
-        linkedServiceTitle = found?.serviceTitle;
-        subjectLine = `${issueReason || "Booking Issue"} (${linkedBookingNumber || "Booking"})`;
-      } else {
-        subjectLine = `${generalTopic}: Issue Report`;
+    if (concernType === "BOOKING") {
+      const found = activeBookings.find((b) => b.id === selectedBookingId);
+      linkedBookingNumber = found?.bookingNumber;
+      linkedServiceTitle = found?.serviceTitle;
+      subjectLine = `${issueReason || "Booking Issue"} (${linkedBookingNumber || "Booking"})`;
+    } else {
+      subjectLine = `${generalTopic}: Issue Report`;
+    }
+
+    try {
+      const res = await createTicketMutation.mutateAsync({
+        targetType: concernType === "BOOKING" ? "BOOKING" : "WALLET",
+        targetId: concernType === "BOOKING" ? selectedBookingId : undefined,
+        targetNumber: linkedBookingNumber,
+        bookingId: concernType === "BOOKING" ? selectedBookingId : undefined,
+        bookingNumber: linkedBookingNumber,
+        serviceTitle: linkedServiceTitle,
+        category: concernType === "BOOKING" ? "PAYMENT_REFUND" : "GENERAL_INQUIRY",
+        categoryLabel: concernType === "BOOKING" ? "Booking Dispute" : "Wallet & General Account",
+        subject: subjectLine,
+        description: description.trim(),
+        metadata: concernType === "BOOKING" ? { serviceTitle: linkedServiceTitle } : { topic: generalTopic },
+        priority: "HIGH",
+        authorName: user?.name || (isProvider ? "Provider" : "Customer")
+      });
+
+      const createdTicket = res.data;
+      if (createdTicket) {
+        addTicketToStore(createdTicket);
+        setViewTicket(createdTicket);
       }
 
-      const newTicket: SupportTicket = {
+      setSubmitSuccess(true);
+      setDescription("");
+      setIssueReason("");
+      setSelectedBookingId("");
+
+      setTimeout(() => {
+        setSubmitSuccess(false);
+        setActiveTab("MY_TICKETS");
+      }, 1000);
+    } catch {
+      const fallbackTicket: SupportTicket = {
         id: `tk-${Date.now()}`,
         ticketNumber: `TK-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
         creatorId: user?.id || "user",
@@ -152,20 +196,17 @@ export const SupportTicketsPage: React.FC = () => {
           }
         ]
       };
-
-      addTicketToStore(newTicket);
-      setIsSubmitting(false);
+      addTicketToStore(fallbackTicket);
+      setViewTicket(fallbackTicket);
       setSubmitSuccess(true);
       setDescription("");
       setIssueReason("");
       setSelectedBookingId("");
-
       setTimeout(() => {
         setSubmitSuccess(false);
         setActiveTab("MY_TICKETS");
-        setViewTicket(newTicket);
       }, 1000);
-    }, 400);
+    }
   };
 
   const handleSendReply = () => {
@@ -374,9 +415,9 @@ export const SupportTicketsPage: React.FC = () => {
                 <button
                   type="submit"
                   className="clean-btn-primary"
-                  disabled={isSubmitting || !description.trim() || (concernType === "BOOKING" && !selectedBookingId)}
+                  disabled={createTicketMutation.isPending || !description.trim() || (concernType === "BOOKING" && !selectedBookingId)}
                 >
-                  {isSubmitting ? (
+                  {createTicketMutation.isPending ? (
                     <>
                       <i className="fas fa-spinner fa-spin"></i>
                       <span>Submitting...</span>

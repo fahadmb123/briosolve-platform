@@ -59,6 +59,7 @@ model users {
   conversation_participants      conversation_participants[]
   messages                       messages[]
   wallet                         wallets?
+  support_tickets                support_tickets[]
 }
 
 enum weekday {
@@ -631,5 +632,71 @@ model wallet_transactions {
 
   @@index([wallet_id])
   @@index([booking_id])
+  @@index([created_at])
+}
+
+enum ticket_status {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum ticket_priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ticket_creator_role {
+  CUSTOMER
+  PROVIDER
+}
+
+model support_tickets {
+  id                   Uuid                 @id @default(uuid())
+  ticket_number        VarChar(50)          @unique
+  creator_id           Uuid
+  creator_role         ticket_creator_role
+  target_type          VarChar(50)          @default("GENERAL")
+  target_id            VarChar(100)?
+  target_number        VarChar(100)?
+  category             VarChar(50)
+  category_label       VarChar(100)
+  subject              VarChar(255)
+  description          VarChar(2000)
+  metadata             Json?
+  priority             ticket_priority      @default(HIGH)
+  status               ticket_status        @default(OPEN)
+  resolution_note      VarChar(2000)?
+  settlement_decision  VarChar(50)?
+  settlement_details   VarChar(500)?
+  assigned_to          Uuid?
+  created_at           DateTime             @default(now())
+  updated_at           temporal.updatedAt()
+
+  creator              users                @relation(fields:[creator_id], references:[id], onDelete: Cascade)
+  messages             support_ticket_messages[]
+
+  @@index([creator_id])
+  @@index([target_type])
+  @@index([target_id])
+  @@index([status])
+  @@index([created_at])
+}
+
+model support_ticket_messages {
+  id          Uuid                @id @default(uuid())
+  ticket_id   Uuid
+  author_id   Uuid?
+  author_name VarChar(150)
+  author_role VarChar(50)
+  message     VarChar(2000)
+  created_at  DateTime            @default(now())
+
+  ticket      support_tickets     @relation(fields:[ticket_id], references:[id], onDelete: Cascade)
+
+  @@index([ticket_id])
   @@index([created_at])
 }

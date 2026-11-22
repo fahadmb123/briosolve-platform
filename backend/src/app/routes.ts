@@ -22,6 +22,7 @@ export function createRootRouter(route: RootRouterDependencies) {
     router.use("/payment", route.paymentRoutes)
     router.use("/booking", route.bookingRoutes)
     router.use("/wallet", route.walletRoutes)
+    router.use("/support", route.supportRoutes);
 
     return router;
 }

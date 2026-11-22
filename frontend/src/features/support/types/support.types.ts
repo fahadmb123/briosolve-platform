@@ -39,6 +39,9 @@ export interface SupportTicket {
   creatorId: string;
   creatorName: string;
   creatorRole: "CUSTOMER" | "PROVIDER";
+  targetType?: string;
+  targetId?: string;
+  targetNumber?: string;
   bookingId?: string;
   bookingNumber?: string;
   serviceTitle?: string;
@@ -47,6 +50,7 @@ export interface SupportTicket {
   categoryLabel: string;
   subject: string;
   description: string;
+  metadata?: Record<string, any>;
   priority: TicketPriority;
   status: TicketStatus;
   attachments: string[];
