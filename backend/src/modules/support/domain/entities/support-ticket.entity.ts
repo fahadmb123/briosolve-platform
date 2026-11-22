@@ -35,6 +35,7 @@ export class SupportTicket {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
     public readonly messages: SupportTicketMessage[] = [],
-    public readonly creatorName?: string | null
+    public readonly creatorName?: string | null,
+    public readonly creatorEmail?: string | null
   ) {}
 }

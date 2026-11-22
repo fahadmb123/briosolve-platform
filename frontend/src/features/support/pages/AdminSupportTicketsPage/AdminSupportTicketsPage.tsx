@@ -233,6 +233,9 @@ export const AdminSupportTicketsPage: React.FC = () => {
                     </td>
                     <td>
                       <strong className="text-sm block">{t.creatorName || (t.creatorRole === "PROVIDER" ? "Service Provider" : "Customer")}</strong>
+                      {t.creatorEmail && (
+                        <span className="text-xs text-secondary block">{t.creatorEmail}</span>
+                      )}
                       <span className="badge badge-admin text-xs mt-0.5">
                         {t.creatorRole}
                       </span>
@@ -322,6 +325,10 @@ export const AdminSupportTicketsPage: React.FC = () => {
                 <div className="ticket-info-item">
                   <span className="ticket-info-label">Complainant Name</span>
                   <span className="ticket-info-value">{selectedTicket.creatorName}</span>
+                </div>
+                <div className="ticket-info-item">
+                  <span className="ticket-info-label">Email Address</span>
+                  <span className="ticket-info-value">{selectedTicket.creatorEmail || "N/A"}</span>
                 </div>
                 <div className="ticket-info-item">
                   <span className="ticket-info-label">Account Role</span>

@@ -13,6 +13,7 @@ export interface TicketResponseDto {
   ticketNumber: string;
   creatorId: string;
   creatorName?: string | null;
+  creatorEmail?: string | null;
   creatorRole: "CUSTOMER" | "PROVIDER";
   targetType: string;
   targetId?: string | null;

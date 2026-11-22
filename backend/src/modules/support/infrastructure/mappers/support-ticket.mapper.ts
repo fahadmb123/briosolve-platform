@@ -13,7 +13,12 @@ export class SupportTicketMapper {
     return new Date(val);
   }
 
-  static toDomain(record: any, messages: any[] = [], creatorName?: string | null): SupportTicket {
+  static toDomain(
+    record: any,
+    messages: any[] = [],
+    creatorName?: string | null,
+    creatorEmail?: string | null
+  ): SupportTicket {
     let parsedMetadata: Record<string, any> | null = null;
     if (record.metadata) {
       parsedMetadata = typeof record.metadata === "string" ? JSON.parse(record.metadata) : record.metadata;
@@ -40,7 +45,8 @@ export class SupportTicketMapper {
       this.parseDate(record.created_at),
       this.parseDate(record.updated_at),
       messages.map((m) => this.toMessageDomain(m)),
-      creatorName
+      creatorName,
+      creatorEmail
     );
   }
 
@@ -110,6 +116,7 @@ export class SupportTicketMapper {
       ticketNumber: entity.ticketNumber,
       creatorId: entity.creatorId,
       creatorName: entity.creatorName || (entity.creatorRole === "PROVIDER" ? "Service Provider" : "Customer"),
+      creatorEmail: entity.creatorEmail ?? null,
       creatorRole: entity.creatorRole,
       targetType: entity.targetType,
       targetId: entity.targetId,

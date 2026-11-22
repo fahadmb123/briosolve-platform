@@ -36,6 +36,7 @@ export interface SupportTicket {
   ticketNumber: string;
   creatorId: string;
   creatorName: string;
+  creatorEmail?: string | null;
   creatorRole: "CUSTOMER" | "PROVIDER";
   targetType?: string;
   targetId?: string;

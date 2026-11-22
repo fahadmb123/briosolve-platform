@@ -33,7 +33,21 @@ export class PrismaSupportTicketRepository implements ISupportTicketRepository {
       .orderBy((m) => m.created_at.asc())
       .all();
 
-    return SupportTicketMapper.toDomain(record, messages);
+    let creatorName: string | null = null;
+    let creatorEmail: string | null = null;
+    if (record.creator_id) {
+      try {
+        const u = await db.orm.public.users.where({ id: record.creator_id as never }).first();
+        if (u) {
+          creatorName = (u as any).name || (u as any).email || "User";
+          creatorEmail = (u as any).email || null;
+        }
+      } catch {
+        creatorName = "User";
+      }
+    }
+
+    return SupportTicketMapper.toDomain(record, messages, creatorName, creatorEmail);
   }
 
   async findByCreatorId(params: GetUserTicketsParams): Promise<UserTicketsResult> {
@@ -142,15 +156,18 @@ export class PrismaSupportTicketRepository implements ISupportTicketRepository {
       .all();
 
     const userIds = [...new Set(paged.map((r: any) => r.creator_id).filter(Boolean))];
-    const usersMap = new Map<string, string>();
+    const usersMap = new Map<string, { name: string; email: string }>();
     for (const uid of userIds) {
       try {
         const u = await db.orm.public.users.where({ id: uid as never }).first();
         if (u) {
-          usersMap.set(uid, (u as any).name || (u as any).email || "User");
+          usersMap.set(uid, {
+            name: (u as any).name || (u as any).email || "User",
+            email: (u as any).email || ""
+          });
         }
       } catch {
-        usersMap.set(uid, "User");
+        usersMap.set(uid, { name: "User", email: "" });
       }
     }
 
@@ -160,8 +177,8 @@ export class PrismaSupportTicketRepository implements ISupportTicketRepository {
         .where({ ticket_id: r.id as never })
         .orderBy((m) => m.created_at.asc())
         .all();
-      const creatorName = usersMap.get(r.creator_id) || null;
-      tickets.push(SupportTicketMapper.toDomain(r, messages, creatorName));
+      const creatorInfo = usersMap.get(r.creator_id);
+      tickets.push(SupportTicketMapper.toDomain(r, messages, creatorInfo?.name, creatorInfo?.email));
     }
 
     return { tickets, total, openCount };
