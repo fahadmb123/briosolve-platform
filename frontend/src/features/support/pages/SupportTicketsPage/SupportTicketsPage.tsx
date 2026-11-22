@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -7,11 +9,9 @@ import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetCustomerBookings, useGetProviderBookings } from "../../../bookings/hooks/useBookingMutations";
 import { useSupportStore } from "../../stores/support.store";
 import { useCreateSupportTicket, useGetMySupportTickets } from "../../hooks/useSupportTickets";
-import { createSupportTicketFormSchema } from "../../schemas/supportTicket.schema";
+import { supportTicketSchema, type SupportTicketInputType } from "../../schemas/supportTicket.schema";
 import type { SupportTicket } from "../../types/support.types";
 import "./SupportTicketsPage.css";
-
-type ConcernType = "BOOKING" | "GENERAL";
 
 interface MappedBookingItem {
   id: string;
@@ -76,17 +76,32 @@ export const SupportTicketsPage: React.FC = () => {
     resolved: 0
   };
 
-  const [concernType, setConcernType] = useState<ConcernType>("BOOKING");
-  const [selectedBookingId, setSelectedBookingId] = useState<string>("");
-  const [generalTopic, setGeneralTopic] = useState<string>("Wallet & Payouts");
-  const [issueReason, setIssueReason] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [formErrors, setFormErrors] = useState<{
-    booking?: string;
-    reason?: string;
-    topic?: string;
-    description?: string;
-  }>({});
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    setError,
+    clearErrors,
+    formState: { errors }
+  } = useForm<SupportTicketInputType>({
+    resolver: zodResolver(supportTicketSchema),
+    mode: "onChange",
+    defaultValues: {
+      concernType: "BOOKING",
+      selectedBookingId: "",
+      generalTopic: "Wallet & Payouts",
+      issueReason: "",
+      description: ""
+    }
+  });
+
+  const concernType = watch("concernType");
+  const selectedBookingId = watch("selectedBookingId");
+  const generalTopic = watch("generalTopic");
+  const issueReason = watch("issueReason");
+
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
   const [replyText, setReplyText] = useState<string>("");
 
@@ -120,60 +135,35 @@ export const SupportTicketsPage: React.FC = () => {
     "Feedback / Other"
   ];
 
-  const handleSubmitTicket = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmitTicket = async (data: SupportTicketInputType) => {
     if (createTicketMutation.isPending) return;
-
-    setFormErrors({});
-
-    const validation = createSupportTicketFormSchema.safeParse({
-      concernType,
-      selectedBookingId,
-      generalTopic,
-      issueReason,
-      description
-    });
-
-    if (!validation.success) {
-      const errMap = validation.error.flatten().fieldErrors;
-      const newErrors = {
-        booking: errMap.selectedBookingId?.[0],
-        reason: errMap.issueReason?.[0],
-        topic: errMap.generalTopic?.[0],
-        description: errMap.description?.[0]
-      };
-      setFormErrors(newErrors);
-      const msg = newErrors.booking || newErrors.reason || newErrors.topic || newErrors.description || "Please resolve form validation errors";
-      toast.error(msg);
-      return;
-    }
 
     let subjectLine = "";
     let linkedBookingNumber = undefined;
     let linkedServiceTitle = undefined;
 
-    if (concernType === "BOOKING") {
-      const found = activeBookings.find((b) => b.id === selectedBookingId);
+    if (data.concernType === "BOOKING") {
+      const found = activeBookings.find((b) => b.id === data.selectedBookingId);
       linkedBookingNumber = found?.bookingNumber;
       linkedServiceTitle = found?.serviceTitle;
-      subjectLine = `${issueReason || "Booking Issue"} (${linkedBookingNumber || "Booking"})`;
+      subjectLine = `${data.issueReason || "Booking Issue"} (${linkedBookingNumber || "Booking"})`;
     } else {
-      subjectLine = `${generalTopic}: Issue Report`;
+      subjectLine = `${data.generalTopic}: Issue Report`;
     }
 
     try {
       const res = await createTicketMutation.mutateAsync({
-        targetType: concernType === "BOOKING" ? "BOOKING" : "WALLET",
-        targetId: concernType === "BOOKING" ? selectedBookingId : undefined,
+        targetType: data.concernType === "BOOKING" ? "BOOKING" : "WALLET",
+        targetId: data.concernType === "BOOKING" ? data.selectedBookingId : undefined,
         targetNumber: linkedBookingNumber,
-        bookingId: concernType === "BOOKING" ? selectedBookingId : undefined,
+        bookingId: data.concernType === "BOOKING" ? data.selectedBookingId : undefined,
         bookingNumber: linkedBookingNumber,
         serviceTitle: linkedServiceTitle,
-        category: concernType === "BOOKING" ? "PAYMENT_REFUND" : "GENERAL_INQUIRY",
-        categoryLabel: concernType === "BOOKING" ? "Booking Dispute" : "Wallet & General Account",
+        category: data.concernType === "BOOKING" ? "PAYMENT_REFUND" : "GENERAL_INQUIRY",
+        categoryLabel: data.concernType === "BOOKING" ? "Booking Dispute" : "Wallet & General Account",
         subject: subjectLine,
-        description: description.trim(),
-        metadata: concernType === "BOOKING" ? { serviceTitle: linkedServiceTitle } : { topic: generalTopic },
+        description: data.description.trim(),
+        metadata: data.concernType === "BOOKING" ? { serviceTitle: linkedServiceTitle } : { topic: data.generalTopic },
         priority: "HIGH",
         authorName: user?.name || (isProvider ? "Provider" : "Customer")
       });
@@ -186,10 +176,13 @@ export const SupportTicketsPage: React.FC = () => {
 
       toast.success("Support ticket submitted successfully!");
       setSubmitSuccess(true);
-      setDescription("");
-      setIssueReason("");
-      setSelectedBookingId("");
-      setFormErrors({});
+      reset({
+        concernType: "BOOKING",
+        selectedBookingId: "",
+        generalTopic: "Wallet & Payouts",
+        issueReason: "",
+        description: ""
+      });
 
       setTimeout(() => {
         setSubmitSuccess(false);
@@ -198,11 +191,15 @@ export const SupportTicketsPage: React.FC = () => {
     } catch (err: any) {
       const serverErrors = err?.response?.data?.errors;
       if (serverErrors) {
-        setFormErrors({
-          booking: serverErrors.targetId?.[0] || serverErrors.bookingId?.[0],
-          reason: serverErrors.category?.[0] || serverErrors.subject?.[0],
-          description: serverErrors.description?.[0]
-        });
+        if (serverErrors.description?.[0]) {
+          setError("description", { message: serverErrors.description[0] });
+        }
+        if (serverErrors.targetId?.[0] || serverErrors.bookingId?.[0]) {
+          setError("selectedBookingId", { message: serverErrors.targetId?.[0] || serverErrors.bookingId?.[0] });
+        }
+        if (serverErrors.category?.[0] || serverErrors.subject?.[0]) {
+          setError("issueReason", { message: serverErrors.category?.[0] || serverErrors.subject?.[0] });
+        }
         const serverMsg =
           serverErrors.description?.[0] ||
           serverErrors.targetId?.[0] ||
@@ -272,7 +269,7 @@ export const SupportTicketsPage: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmitTicket} className="clean-wizard-form">
+            <form onSubmit={handleSubmit(onSubmitTicket)} className="clean-wizard-form">
               <div className="clean-section-block">
                 <div className="clean-step-header">
                   <span className="clean-step-badge">Step 1</span>
@@ -283,8 +280,8 @@ export const SupportTicketsPage: React.FC = () => {
                   <div
                     className={`clean-type-card ${concernType === "BOOKING" ? "active" : ""}`}
                     onClick={() => {
-                      setConcernType("BOOKING");
-                      setFormErrors({});
+                      setValue("concernType", "BOOKING", { shouldValidate: true });
+                      clearErrors();
                     }}
                   >
                     <div className="clean-type-icon">
@@ -300,8 +297,8 @@ export const SupportTicketsPage: React.FC = () => {
                   <div
                     className={`clean-type-card ${concernType === "GENERAL" ? "active" : ""}`}
                     onClick={() => {
-                      setConcernType("GENERAL");
-                      setFormErrors({});
+                      setValue("concernType", "GENERAL", { shouldValidate: true });
+                      clearErrors();
                     }}
                   >
                     <div className="clean-type-icon">
@@ -326,7 +323,7 @@ export const SupportTicketsPage: React.FC = () => {
 
                 {concernType === "BOOKING" ? (
                   <>
-                    <div className={`clean-selection-box ${formErrors.booking ? "has-error" : ""}`}>
+                    <div className={`clean-selection-box ${errors.selectedBookingId ? "has-error" : ""}`}>
                       {activeBookings.length === 0 ? (
                         <div className="clean-empty-selection">
                           <i className="fas fa-calendar-times"></i>
@@ -341,8 +338,7 @@ export const SupportTicketsPage: React.FC = () => {
                                 key={b.id}
                                 className={`clean-item-row ${isChosen ? "chosen" : ""}`}
                                 onClick={() => {
-                                  setSelectedBookingId(b.id);
-                                  if (formErrors.booking) setFormErrors((prev) => ({ ...prev, booking: undefined }));
+                                  setValue("selectedBookingId", b.id, { shouldValidate: true });
                                 }}
                               >
                                 <div className="clean-item-radio">
@@ -364,10 +360,10 @@ export const SupportTicketsPage: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    {formErrors.booking && (
+                    {errors.selectedBookingId && (
                       <div className="clean-field-error">
                         <i className="fas fa-exclamation-circle"></i>
-                        <span>{formErrors.booking}</span>
+                        <span>{errors.selectedBookingId.message}</span>
                       </div>
                     )}
                   </>
@@ -380,18 +376,17 @@ export const SupportTicketsPage: React.FC = () => {
                           type="button"
                           className={`clean-topic-pill ${generalTopic === top ? "active" : ""}`}
                           onClick={() => {
-                            setGeneralTopic(top);
-                            if (formErrors.topic) setFormErrors((prev) => ({ ...prev, topic: undefined }));
+                            setValue("generalTopic", top, { shouldValidate: true });
                           }}
                         >
                           {top}
                         </button>
                       ))}
                     </div>
-                    {formErrors.topic && (
+                    {errors.generalTopic && (
                       <div className="clean-field-error">
                         <i className="fas fa-exclamation-circle"></i>
-                        <span>{formErrors.topic}</span>
+                        <span>{errors.generalTopic.message}</span>
                       </div>
                     )}
                   </>
@@ -414,18 +409,17 @@ export const SupportTicketsPage: React.FC = () => {
                           type="button"
                           className={`clean-reason-chip ${issueReason === r ? "active" : ""}`}
                           onClick={() => {
-                            setIssueReason(r);
-                            if (formErrors.reason) setFormErrors((prev) => ({ ...prev, reason: undefined }));
+                            setValue("issueReason", r, { shouldValidate: true });
                           }}
                         >
                           {r}
                         </button>
                       ))}
                     </div>
-                    {formErrors.reason && (
+                    {errors.issueReason && (
                       <div className="clean-field-error">
                         <i className="fas fa-exclamation-circle"></i>
-                        <span>{formErrors.reason}</span>
+                        <span>{errors.issueReason.message}</span>
                       </div>
                     )}
                   </div>
@@ -437,22 +431,15 @@ export const SupportTicketsPage: React.FC = () => {
                   </label>
                   <textarea
                     id="clean-description"
-                    required
                     rows={5}
-                    className={`clean-textarea ${formErrors.description ? "has-error" : ""}`}
+                    className={`clean-textarea ${errors.description ? "has-error" : ""}`}
                     placeholder="Tell us what occurred, timing, or any attempts made to contact the other person (at least 15 characters)..."
-                    value={description}
-                    onChange={(e) => {
-                      setDescription(e.target.value);
-                      if (formErrors.description && e.target.value.trim().length >= 15) {
-                        setFormErrors((prev) => ({ ...prev, description: undefined }));
-                      }
-                    }}
+                    {...register("description")}
                   />
-                  {formErrors.description && (
+                  {errors.description && (
                     <div className="clean-field-error">
                       <i className="fas fa-exclamation-circle"></i>
-                      <span>{formErrors.description}</span>
+                      <span>{errors.description.message}</span>
                     </div>
                   )}
                 </div>

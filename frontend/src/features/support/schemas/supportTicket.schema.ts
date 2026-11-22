@@ -39,3 +39,5 @@ export const createSupportTicketFormSchema = z.object({
 });
 
 export type CreateSupportTicketFormData = z.infer<typeof createSupportTicketFormSchema>;
+export const supportTicketSchema = createSupportTicketFormSchema;
+export type SupportTicketInputType = CreateSupportTicketFormData;
