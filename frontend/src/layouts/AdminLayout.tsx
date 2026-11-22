@@ -15,7 +15,7 @@ export default function AdminLayout() {
     const logout = useLogout();
     const navigate = useNavigate();
     const location = useLocation();
-    const openTicketsCount = useSupportStore((state) => state.tickets.filter((t) => t.status === "OPEN").length);
+    const openTicketsCount = useSupportStore((state) => Array.isArray(state.tickets) ? state.tickets.filter((t) => t.status === "OPEN").length : 0);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const profileDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -122,11 +122,21 @@ export default function AdminLayout() {
                     <li>
                         <NavLink 
                             to="/admin/support" 
-                            className={() => `sidebar-item ${location.pathname.startsWith('/admin/support') || location.pathname.startsWith('/admin/investigations') ? 'active' : ''}`}
+                            className={({ isActive }) => `sidebar-item ${isActive || location.pathname.startsWith('/admin/support') ? 'active' : ''}`}
                         >
                             <i className="fas fa-headset"></i>
                             <span>Support Tickets</span>
                             {openTicketsCount > 0 && <span className="badge badge-danger ml-auto">{openTicketsCount}</span>}
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to="/admin/investigations" 
+                            className={({ isActive }) => `sidebar-item ${isActive || location.pathname.startsWith('/admin/investigations') ? 'active' : ''}`}
+                        >
+                            <i className="fas fa-gavel"></i>
+                            <span>Investigations</span>
+                            <span className="badge badge-danger ml-auto">1</span>
                         </NavLink>
                     </li>
                     <li>

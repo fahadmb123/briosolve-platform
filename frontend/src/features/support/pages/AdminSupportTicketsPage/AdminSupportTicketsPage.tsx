@@ -1,59 +1,64 @@
 import React, { useState, useMemo } from "react";
 import { toast } from "react-hot-toast";
+import { Modal } from "../../../../shared/components/ui/Modal";
 import { useSupportStore } from "../../stores/support.store";
 import type { SupportTicket } from "../../types/support.types";
 import "./AdminSupportTicketsPage.css";
 
 export const AdminSupportTicketsPage: React.FC = () => {
-  const tickets = useSupportStore((state) => state.tickets);
+  const tickets = useSupportStore((state) => state.tickets || []);
   const updateTicketStatus = useSupportStore((state) => state.updateTicketStatus);
   const resolveTicket = useSupportStore((state) => state.resolveTicket);
   const addTicketMessage = useSupportStore((state) => state.addTicketMessage);
 
-  const [activeStatusTab, setActiveStatusTab] = useState<string>("ALL");
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
+  const [activeTab, setActiveTab] = useState<"ALL" | "OPEN" | "UNDER_REVIEW" | "RESOLVED">("ALL");
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("");
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
 
-  const [adminReply, setAdminReply] = useState<string>("");
-  const [resolutionNote, setResolutionNote] = useState<string>("");
+  const [adminReply, setAdminReply] = useState("");
+  const [resolutionNote, setResolutionNote] = useState("");
   const [settlementDecision, setSettlementDecision] = useState<
     "FULL_REFUND_CUSTOMER" | "FULL_PAYOUT_PROVIDER" | "SPLIT_SETTLEMENT" | "NO_FINANCIAL_ACTION"
   >("FULL_REFUND_CUSTOMER");
-  const [customSplitCustomer, setCustomSplitCustomer] = useState<string>("");
-  const [customSplitProvider, setCustomSplitProvider] = useState<string>("");
+  const [splitCustomerAmount, setSplitCustomerAmount] = useState("600");
+  const [splitProviderAmount, setSplitProviderAmount] = useState("550");
+  const [isResolving, setIsResolving] = useState(false);
 
-  const stats = useMemo(() => {
-    const total = tickets.length;
-    const openCount = tickets.filter((t) => t.status === "OPEN").length;
-    const reviewCount = tickets.filter((t) => t.status === "UNDER_REVIEW").length;
-    const resolvedCount = tickets.filter((t) => t.status === "RESOLVED" || t.status === "CLOSED").length;
-    return { total, openCount, reviewCount, resolvedCount };
+  const counts = useMemo(() => {
+    const list = Array.isArray(tickets) ? tickets : [];
+    return {
+      all: list.length,
+      open: list.filter((t) => t.status === "OPEN").length,
+      review: list.filter((t) => t.status === "UNDER_REVIEW").length,
+      resolved: list.filter((t) => t.status === "RESOLVED" || t.status === "CLOSED").length,
+    };
   }, [tickets]);
 
   const filteredTickets = useMemo(() => {
-    return tickets.filter((t) => {
-      const matchesStatus =
-        activeStatusTab === "ALL" ||
-        (activeStatusTab === "OPEN" && t.status === "OPEN") ||
-        (activeStatusTab === "UNDER_REVIEW" && t.status === "UNDER_REVIEW") ||
-        (activeStatusTab === "RESOLVED" && (t.status === "RESOLVED" || t.status === "CLOSED"));
+    const list = Array.isArray(tickets) ? tickets : [];
+    return list.filter((t) => {
+      const matchTab =
+        activeTab === "ALL" ||
+        (activeTab === "OPEN" && t.status === "OPEN") ||
+        (activeTab === "UNDER_REVIEW" && t.status === "UNDER_REVIEW") ||
+        (activeTab === "RESOLVED" && (t.status === "RESOLVED" || t.status === "CLOSED"));
 
-      const matchesCategory =
-        categoryFilter === "ALL" || t.category === categoryFilter;
+      const matchCategory = !categoryFilter || t.category === categoryFilter;
+      const matchPriority = !priorityFilter || t.priority === priorityFilter;
 
-      const q = searchQuery.toLowerCase().trim();
-      const matchesSearch =
+      const q = search.toLowerCase().trim();
+      const matchSearch =
         !q ||
-        t.ticketNumber.toLowerCase().includes(q) ||
-        t.subject.toLowerCase().includes(q) ||
-        t.creatorName.toLowerCase().includes(q) ||
-        (t.bookingNumber && t.bookingNumber.toLowerCase().includes(q)) ||
-        (t.serviceTitle && t.serviceTitle.toLowerCase().includes(q));
+        t.ticketNumber?.toLowerCase().includes(q) ||
+        t.subject?.toLowerCase().includes(q) ||
+        t.creatorName?.toLowerCase().includes(q) ||
+        (t.bookingNumber && t.bookingNumber.toLowerCase().includes(q));
 
-      return matchesStatus && matchesCategory && matchesSearch;
+      return matchTab && matchCategory && matchPriority && matchSearch;
     });
-  }, [tickets, activeStatusTab, categoryFilter, searchQuery]);
+  }, [tickets, activeTab, categoryFilter, priorityFilter, search]);
 
   const handleOpenTicket = (ticket: SupportTicket) => {
     setSelectedTicket(ticket);
@@ -62,558 +67,542 @@ export const AdminSupportTicketsPage: React.FC = () => {
     setAdminReply("");
   };
 
+  const handleCloseModal = () => {
+    setSelectedTicket(null);
+    setAdminReply("");
+    setResolutionNote("");
+  };
+
+  const handleResetFilters = () => {
+    setSearch("");
+    setCategoryFilter("");
+    setPriorityFilter("");
+    setActiveTab("ALL");
+  };
+
   const handleStartReview = () => {
     if (!selectedTicket) return;
     updateTicketStatus(selectedTicket.id, "UNDER_REVIEW");
     addTicketMessage(
       selectedTicket.id,
-      "An administrator has commenced formal investigation of this case. Escrow accounts are placed on temporary verification hold.",
+      "Administrator has placed this dispute under active review. Escrow disbursement is locked.",
       "Support Resolution Desk",
       "SYSTEM"
     );
     setSelectedTicket((prev) =>
       prev ? { ...prev, status: "UNDER_REVIEW", updatedAt: new Date().toISOString() } : null
     );
-    toast.success("Ticket marked as Under Review.");
+    toast.success("Case marked as Under Investigation.");
   };
 
-  const handleSendAdminReply = () => {
+  const handleSendReply = () => {
     if (!adminReply.trim() || !selectedTicket) return;
-    addTicketMessage(selectedTicket.id, adminReply.trim(), "Support Admin", "ADMIN");
+    addTicketMessage(selectedTicket.id, adminReply.trim(), "Support Administrator", "ADMIN");
     setAdminReply("");
-    const updated = useSupportStore.getState().tickets.find((t) => t.id === selectedTicket.id);
+    const updated = (useSupportStore.getState().tickets || []).find((t) => t.id === selectedTicket.id);
     if (updated) setSelectedTicket(updated);
-    toast.success("Reply added to case activity.");
+    toast.success("Message posted to case thread.");
   };
 
   const handleExecuteResolution = () => {
     if (!selectedTicket) return;
     if (!resolutionNote.trim()) {
-      toast.error("Please enter a resolution note detailing the decision.");
+      toast.error("Please enter a resolution note.");
       return;
     }
 
-    let splitDetails = "";
-    if (settlementDecision === "SPLIT_SETTLEMENT") {
-      splitDetails = `Customer Refund: ₹${customSplitCustomer || "0"} | Provider Payout: ₹${customSplitProvider || "0"}`;
-    }
+    setIsResolving(true);
+    setTimeout(() => {
+      let custAmt = 0;
+      let provAmt = 0;
+      let details = "";
 
-    resolveTicket(selectedTicket.id, resolutionNote.trim(), settlementDecision, splitDetails);
-    const updated = useSupportStore.getState().tickets.find((t) => t.id === selectedTicket.id);
-    if (updated) setSelectedTicket(updated);
-    toast.success("Case resolved and settlement recorded.");
+      if (settlementDecision === "FULL_REFUND_CUSTOMER") {
+        custAmt = 1150;
+        details = "100% Escrow refund credited to Customer Wallet (₹1,150.00)";
+      } else if (settlementDecision === "FULL_PAYOUT_PROVIDER") {
+        provAmt = 1092.5;
+        details = "Escrow net payout released to Provider Wallet (₹1,092.50 net of 5% fee)";
+      } else if (settlementDecision === "SPLIT_SETTLEMENT") {
+        custAmt = Number(splitCustomerAmount) || 600;
+        provAmt = Number(splitProviderAmount) || 550;
+        details = `Split: Customer Refund ₹${custAmt} | Provider Payout ₹${provAmt}`;
+      } else {
+        details = "Advisory resolution issued without financial transfers.";
+      }
+
+      const receipt = {
+        txnId: `ESCROW-TXN-${Date.now().toString().slice(-6)}`,
+        timestamp: new Date().toISOString(),
+        type: settlementDecision,
+        customerAmount: custAmt,
+        providerAmount: provAmt,
+        feeAmount: 57.5,
+        ledgerNote: resolutionNote.trim(),
+      };
+
+      resolveTicket(selectedTicket.id, resolutionNote.trim(), settlementDecision, details, receipt);
+      setIsResolving(false);
+      handleCloseModal();
+      toast.success("Case resolved and settlement executed successfully!");
+    }, 400);
   };
 
-  const handleCloseTicket = () => {
-    if (!selectedTicket) return;
-    updateTicketStatus(selectedTicket.id, "CLOSED");
-    addTicketMessage(
-      selectedTicket.id,
-      "This support ticket is now officially closed.",
-      "Support Resolution Desk",
-      "SYSTEM"
-    );
-    const updated = useSupportStore.getState().tickets.find((t) => t.id === selectedTicket.id);
-    if (updated) setSelectedTicket(updated);
-    toast.success("Ticket marked as closed.");
+  const getPriorityBadgeClass = (priority?: string) => {
+    switch (priority) {
+      case "URGENT":
+        return "badge-danger-alert";
+      case "HIGH":
+        return "badge-pending";
+      case "LOW":
+        return "badge-neutral";
+      default:
+        return "badge-admin";
+    }
+  };
+
+  const getStatusBadgeClass = (status?: string) => {
+    switch (status) {
+      case "RESOLVED":
+      case "CLOSED":
+        return "badge-verified";
+      case "UNDER_REVIEW":
+        return "badge-pending";
+      default:
+        return "badge-danger-alert";
+    }
   };
 
   return (
-    <div className="admin-spt-container">
-      <div className="admin-spt-header">
+    <div className="app-content">
+      <div className="flex justify-between items-center flex-wrap gap-4 mb-4">
         <div>
-          <div className="admin-spt-badge">
-            <i className="fas fa-gavel"></i>
-            <span>Trust, Safety & Dispute Mediation</span>
-          </div>
-          <h1 className="admin-spt-title">Support & Dispute Resolutions</h1>
-          <p className="admin-spt-subtitle">
-            Review customer and provider dispute tickets, evaluate evidence dossiers, adjudicate financial settlements, and enforce marketplace policies.
+          <h1 className="font-extrabold tracking-tight mb-1" style={{ fontSize: "2rem" }}>
+            Support & Disputes
+          </h1>
+          <p className="text-secondary text-sm mb-0">
+            Review customer and provider dispute tickets, investigate evidence, and execute escrow settlements.
           </p>
         </div>
       </div>
 
-      <div className="admin-spt-kpi-grid">
-        <div
-          className={`admin-kpi-card ${activeStatusTab === "ALL" ? "selected" : ""}`}
-          onClick={() => setActiveStatusTab("ALL")}
-        >
-          <div className="admin-kpi-icon total">
-            <i className="fas fa-ticket-alt"></i>
-          </div>
-          <div className="admin-kpi-info">
-            <span className="admin-kpi-label">Total Disputes</span>
-            <strong className="admin-kpi-val">{stats.total}</strong>
-          </div>
-        </div>
-
-        <div
-          className={`admin-kpi-card ${activeStatusTab === "OPEN" ? "selected" : ""}`}
-          onClick={() => setActiveStatusTab("OPEN")}
-        >
-          <div className="admin-kpi-icon open">
-            <i className="fas fa-exclamation-triangle"></i>
-          </div>
-          <div className="admin-kpi-info">
-            <span className="admin-kpi-label">Needs Review</span>
-            <strong className="admin-kpi-val">{stats.openCount}</strong>
-          </div>
-        </div>
-
-        <div
-          className={`admin-kpi-card ${activeStatusTab === "UNDER_REVIEW" ? "selected" : ""}`}
-          onClick={() => setActiveStatusTab("UNDER_REVIEW")}
-        >
-          <div className="admin-kpi-icon review">
-            <i className="fas fa-search"></i>
-          </div>
-          <div className="admin-kpi-info">
-            <span className="admin-kpi-label">Under Investigation</span>
-            <strong className="admin-kpi-val">{stats.reviewCount}</strong>
-          </div>
-        </div>
-
-        <div
-          className={`admin-kpi-card ${activeStatusTab === "RESOLVED" ? "selected" : ""}`}
-          onClick={() => setActiveStatusTab("RESOLVED")}
-        >
-          <div className="admin-kpi-icon resolved">
-            <i className="fas fa-check-circle"></i>
-          </div>
-          <div className="admin-kpi-info">
-            <span className="admin-kpi-label">Resolved & Settled</span>
-            <strong className="admin-kpi-val">{stats.resolvedCount}</strong>
-          </div>
-        </div>
+      <div className="admin-subnav-container">
+        <nav className="admin-subnav-tabs" aria-label="Dispute Status Filters">
+          <button
+            type="button"
+            className={`admin-subnav-tab ${activeTab === "ALL" ? "active" : ""}`}
+            onClick={() => setActiveTab("ALL")}
+          >
+            <i className="fas fa-ticket-alt text-xs"></i>
+            <span>All Tickets</span>
+            <span className="admin-subnav-badge">{counts.all}</span>
+          </button>
+          <button
+            type="button"
+            className={`admin-subnav-tab ${activeTab === "OPEN" ? "active" : ""}`}
+            onClick={() => setActiveTab("OPEN")}
+          >
+            <i className="fas fa-exclamation-triangle text-xs"></i>
+            <span>Needs Review</span>
+            <span className="admin-subnav-badge">{counts.open}</span>
+          </button>
+          <button
+            type="button"
+            className={`admin-subnav-tab ${activeTab === "UNDER_REVIEW" ? "active" : ""}`}
+            onClick={() => setActiveTab("UNDER_REVIEW")}
+          >
+            <i className="fas fa-search text-xs"></i>
+            <span>Under Investigation</span>
+            <span className="admin-subnav-badge">{counts.review}</span>
+          </button>
+          <button
+            type="button"
+            className={`admin-subnav-tab ${activeTab === "RESOLVED" ? "active" : ""}`}
+            onClick={() => setActiveTab("RESOLVED")}
+          >
+            <i className="fas fa-check-circle text-xs"></i>
+            <span>Resolved</span>
+            <span className="admin-subnav-badge">{counts.resolved}</span>
+          </button>
+        </nav>
       </div>
 
-      <div className="admin-spt-filter-bar">
-        <div className="admin-search-wrap">
+      <div className="admin-filter-bar">
+        <div className="admin-search-input">
           <i className="fas fa-search"></i>
           <input
             type="text"
-            className="admin-search-input"
-            placeholder="Search ticket #, booking #, customer, or provider..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search ticket #, complainant, booking #..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <div className="admin-filter-tabs">
-          <button
-            type="button"
-            className={`admin-tab-btn ${activeStatusTab === "ALL" ? "active" : ""}`}
-            onClick={() => setActiveStatusTab("ALL")}
+        <div className="admin-filters-group">
+          <select
+            className="admin-select"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
           >
-            All ({stats.total})
-          </button>
-          <button
-            type="button"
-            className={`admin-tab-btn ${activeStatusTab === "OPEN" ? "active" : ""}`}
-            onClick={() => setActiveStatusTab("OPEN")}
+            <option value="">All Categories</option>
+            <option value="PROVIDER_NO_SHOW">Provider No-Show</option>
+            <option value="POOR_WORKMANSHIP">Quality / Incomplete Work</option>
+            <option value="PAYMENT_REFUND">Payment & Escrow Discrepancy</option>
+            <option value="CUSTOMER_ABSENT">Customer Absent / Unreachable</option>
+            <option value="SCOPE_DISPUTE">Scope Discrepancy</option>
+            <option value="SAFETY_CONDUCT">Safety / Conduct Violation</option>
+            <option value="GENERAL_INQUIRY">General Inquiry</option>
+          </select>
+
+          <select
+            className="admin-select"
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
           >
-            Open ({stats.openCount})
-          </button>
-          <button
-            type="button"
-            className={`admin-tab-btn ${activeStatusTab === "UNDER_REVIEW" ? "active" : ""}`}
-            onClick={() => setActiveStatusTab("UNDER_REVIEW")}
-          >
-            Under Review ({stats.reviewCount})
-          </button>
-          <button
-            type="button"
-            className={`admin-tab-btn ${activeStatusTab === "RESOLVED" ? "active" : ""}`}
-            onClick={() => setActiveStatusTab("RESOLVED")}
-          >
-            Resolved ({stats.resolvedCount})
+            <option value="">All Priorities</option>
+            <option value="URGENT">Urgent</option>
+            <option value="HIGH">High</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="LOW">Low</option>
+          </select>
+
+          <button className="btn btn-secondary text-xs py-2" onClick={handleResetFilters}>
+            <i className="fas fa-undo mr-1"></i>Reset
           </button>
         </div>
-
-        <select
-          className="admin-select-category"
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="ALL">All Categories</option>
-          <option value="PROVIDER_NO_SHOW">Provider No-Show</option>
-          <option value="POOR_WORKMANSHIP">Quality / Incomplete Work</option>
-          <option value="PAYMENT_REFUND">Payment & Escrow Discrepancy</option>
-          <option value="CUSTOMER_ABSENT">Customer Absent / Unreachable</option>
-          <option value="SCOPE_DISPUTE">Scope Discrepancy</option>
-          <option value="SAFETY_CONDUCT">Safety / Conduct Violation</option>
-          <option value="GENERAL_INQUIRY">General Inquiry</option>
-        </select>
       </div>
 
-      <div className="admin-table-container">
-        {filteredTickets.length === 0 ? (
-          <div className="admin-empty-table">
-            <i className="fas fa-clipboard-check"></i>
-            <h3>No tickets found matching current filters</h3>
-            <p>Try resetting the search or selecting a different status filter.</p>
-          </div>
-        ) : (
-          <div className="admin-spt-table">
-            <div className="admin-table-head">
-              <span>Ticket & Priority</span>
-              <span>Complainant</span>
-              <span>Linked Booking / Subject</span>
-              <span>Category</span>
-              <span>Status</span>
-              <span>Created</span>
-              <span>Action</span>
-            </div>
-
-            <div className="admin-table-body">
-              {filteredTickets.map((t) => (
-                <div key={t.id} className="admin-table-row">
-                  <div className="admin-col-ticket">
-                    <strong>#{t.ticketNumber}</strong>
-                    <span className={`admin-priority-badge ${t.priority.toLowerCase()}`}>
-                      {t.priority}
-                    </span>
-                  </div>
-
-                  <div className="admin-col-complainant">
-                    <strong>{t.creatorName}</strong>
-                    <span className={`admin-role-tag ${t.creatorRole.toLowerCase()}`}>
-                      {t.creatorRole}
-                    </span>
-                  </div>
-
-                  <div className="admin-col-subject">
-                    <strong>{t.subject}</strong>
-                    {t.bookingNumber && (
-                      <span className="admin-linked-booking-pill">
-                        <i className="fas fa-calendar-check"></i> #{t.bookingNumber}
-                        {t.serviceTitle && ` · ${t.serviceTitle}`}
+      <div className="admin-table-card" style={{ position: "relative", overflow: "hidden" }}>
+        <div className="table-responsive">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th style={{ width: "16%" }}>Ticket & Priority</th>
+                <th style={{ width: "18%" }}>Complainant</th>
+                <th style={{ width: "26%" }}>Subject / Linked Booking</th>
+                <th style={{ width: "14%" }}>Category</th>
+                <th style={{ width: "12%" }}>Status</th>
+                <th className="text-right" style={{ width: "14%" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTickets.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-8 text-secondary">
+                    <i className="fas fa-inbox text-2xl mb-2 block"></i>
+                    No support tickets found matching current filters.
+                  </td>
+                </tr>
+              ) : (
+                filteredTickets.map((t) => (
+                  <tr key={t.id}>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <strong className="text-sm font-semibold">#{t.ticketNumber}</strong>
+                        <span className={`badge ${getPriorityBadgeClass(t.priority)} text-xs`}>
+                          {t.priority}
+                        </span>
+                      </div>
+                      <span className="text-xs text-secondary block mt-0.5">
+                        {new Date(t.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </span>
-                    )}
-                  </div>
-
-                  <div className="admin-col-cat">
-                    <span className="admin-cat-pill">{t.categoryLabel}</span>
-                  </div>
-
-                  <div className="admin-col-status">
-                    <span className={`admin-status-badge ${t.status.toLowerCase()}`}>
-                      {t.status.replace("_", " ")}
-                    </span>
-                  </div>
-
-                  <div className="admin-col-date">
-                    {new Date(t.createdAt).toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit"
-                    })}
-                  </div>
-
-                  <div className="admin-col-action">
-                    <button
-                      type="button"
-                      className="admin-review-btn"
-                      onClick={() => handleOpenTicket(t)}
-                    >
-                      <i className="fas fa-sliders-h"></i>
-                      <span>Adjudicate</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                    </td>
+                    <td>
+                      <strong className="text-sm block">{t.creatorName}</strong>
+                      <span className="badge badge-admin text-xs mt-0.5">
+                        {t.creatorRole}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="text-sm font-medium">{t.subject}</div>
+                      {t.bookingNumber && (
+                        <span className="text-xs text-primary inline-flex items-center gap-1 mt-0.5">
+                          <i className="fas fa-calendar-check"></i> #{t.bookingNumber}
+                          {t.serviceTitle && ` · ${t.serviceTitle}`}
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <span className="text-xs font-medium text-secondary">
+                        {t.categoryLabel || t.category}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge ${getStatusBadgeClass(t.status)} text-xs`}>
+                        {(t.status || "OPEN").replace("_", " ")}
+                      </span>
+                    </td>
+                    <td className="text-right">
+                      <button
+                        type="button"
+                        className="btn btn-warning text-xs py-1.5 px-3"
+                        onClick={() => handleOpenTicket(t)}
+                      >
+                        <i className="fas fa-eye mr-1"></i>Review Ticket
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {selectedTicket && (
-        <div className="admin-modal-overlay" onClick={() => setSelectedTicket(null)}>
-          <div className="admin-modal-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="admin-modal-header">
-              <div className="admin-modal-header-left">
-                <div className="admin-modal-meta">
-                  <span className="admin-modal-id">#{selectedTicket.ticketNumber}</span>
-                  <span className={`admin-priority-badge ${selectedTicket.priority.toLowerCase()}`}>
-                    {selectedTicket.priority} Priority
+        <Modal
+          isOpen={Boolean(selectedTicket)}
+          onClose={handleCloseModal}
+          title={`Review Dispute: #${selectedTicket.ticketNumber}`}
+          icon="fas fa-clipboard-check"
+          maxWidth="max-w-2xl"
+          footer={
+            <div className="flex items-center justify-between w-full">
+              <div>
+                {selectedTicket.status === "OPEN" && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary text-xs"
+                    onClick={handleStartReview}
+                  >
+                    <i className="fas fa-search mr-1"></i>Start Formal Review
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  className="btn btn-secondary text-xs"
+                  onClick={handleCloseModal}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary text-xs"
+                  disabled={isResolving || !resolutionNote.trim()}
+                  onClick={handleExecuteResolution}
+                >
+                  {isResolving ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin mr-1"></i>Executing...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-check-circle mr-1"></i>Resolve & Execute
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          }
+        >
+          <div className="space-y-4 text-sm">
+            <div className="p-3 rounded-lg bg-surface-elevated border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <strong>{selectedTicket.creatorName}</strong>
+                  <span className="badge badge-admin text-xs">{selectedTicket.creatorRole}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`badge ${getPriorityBadgeClass(selectedTicket.priority)} text-xs`}>
+                    {selectedTicket.priority}
                   </span>
-                  <span className={`admin-status-badge ${selectedTicket.status.toLowerCase()}`}>
-                    {selectedTicket.status.replace("_", " ")}
+                  <span className={`badge ${getStatusBadgeClass(selectedTicket.status)} text-xs`}>
+                    {(selectedTicket.status || "OPEN").replace("_", " ")}
                   </span>
                 </div>
-                <h2 className="admin-modal-title">{selectedTicket.subject}</h2>
               </div>
-              <button
-                type="button"
-                className="admin-modal-close"
-                onClick={() => setSelectedTicket(null)}
-              >
-                <i className="fas fa-times"></i>
-              </button>
+              <p className="text-secondary mb-0 leading-relaxed">{selectedTicket.description}</p>
             </div>
 
-            <div className="admin-modal-grid">
-              <div className="admin-dossier-column">
-                <div className="admin-dossier-box">
-                  <div className="admin-dossier-header">
-                    <i className="fas fa-user-shield"></i>
-                    <h4>Complainant Statement</h4>
+            {selectedTicket.bookingNumber && (
+              <div className="p-3 rounded-lg bg-surface-elevated border border-border">
+                <h4 className="font-semibold text-xs uppercase tracking-wider text-secondary mb-2">
+                  <i className="fas fa-receipt mr-1"></i>Linked Booking Dossier
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-secondary block">Booking Reference:</span>
+                    <strong>#{selectedTicket.bookingNumber}</strong>
                   </div>
-                  <div className="admin-complainant-meta">
-                    <strong>{selectedTicket.creatorName}</strong>
-                    <span className={`admin-role-tag ${selectedTicket.creatorRole.toLowerCase()}`}>
-                      {selectedTicket.creatorRole}
-                    </span>
+                  <div>
+                    <span className="text-secondary block">Service:</span>
+                    <strong>{selectedTicket.serviceTitle || "Custom Service"}</strong>
                   </div>
-                  <p className="admin-statement-body">{selectedTicket.description}</p>
-                </div>
-
-                {selectedTicket.bookingNumber && (
-                  <div className="admin-dossier-box">
-                    <div className="admin-dossier-header">
-                      <i className="fas fa-receipt"></i>
-                      <h4>Attached Booking Dossier</h4>
-                    </div>
-                    <div className="admin-booking-card">
-                      <div className="admin-bc-row">
-                        <span className="admin-bc-label">Booking Reference</span>
-                        <strong className="admin-bc-val">#{selectedTicket.bookingNumber}</strong>
-                      </div>
-                      <div className="admin-bc-row">
-                        <span className="admin-bc-label">Service Title</span>
-                        <span className="admin-bc-val">{selectedTicket.serviceTitle || "Service Job"}</span>
-                      </div>
-                      {selectedTicket.counterpartyName && (
-                        <div className="admin-bc-row">
-                          <span className="admin-bc-label">Counterparty</span>
-                          <span className="admin-bc-val">{selectedTicket.counterpartyName}</span>
-                        </div>
-                      )}
-                      <div className="admin-bc-row">
-                        <span className="admin-bc-label">Dispute Category</span>
-                        <span className="admin-bc-val highlight">{selectedTicket.categoryLabel}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {selectedTicket.resolutionNote && (
-                  <div className="admin-resolution-callout">
-                    <div className="admin-rc-title">
-                      <i className="fas fa-check-circle"></i>
-                      <span>Official Resolution Decision</span>
-                    </div>
-                    <p className="admin-rc-note">{selectedTicket.resolutionNote}</p>
-                    {selectedTicket.settlementDecision && (
-                      <div className="admin-rc-decision">
-                        <strong>Action: </strong>
-                        <span>{selectedTicket.settlementDecision.replace(/_/g, " ")}</span>
-                        {selectedTicket.settlementDetails && ` · ${selectedTicket.settlementDetails}`}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <div className="admin-thread-box">
-                  <div className="admin-dossier-header">
-                    <i className="fas fa-comments"></i>
-                    <h4>Case Activity & Communications ({selectedTicket.messages.length})</h4>
-                  </div>
-
-                  <div className="admin-thread-messages">
-                    {selectedTicket.messages.map((m) => (
-                      <div
-                        key={m.id}
-                        className={`admin-msg-card ${m.authorRole.toLowerCase()}`}
-                      >
-                        <div className="admin-msg-top">
-                          <strong>{m.authorName}</strong>
-                          <span className={`admin-role-tag ${m.authorRole.toLowerCase()}`}>
-                            {m.authorRole}
-                          </span>
-                          <span className="admin-msg-time">
-                            {new Date(m.createdAt).toLocaleTimeString("en-IN", {
-                              hour: "2-digit",
-                              minute: "2-digit"
-                            })}
-                          </span>
-                        </div>
-                        <p className="admin-msg-text">{m.message}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {selectedTicket.status !== "CLOSED" && (
-                    <div className="admin-reply-box">
-                      <textarea
-                        rows={2}
-                        className="admin-reply-textarea"
-                        placeholder="Type instruction, evidence request, or mediator update..."
-                        value={adminReply}
-                        onChange={(e) => setAdminReply(e.target.value)}
-                      />
-                      <div className="admin-reply-actions">
-                        <button
-                          type="button"
-                          className="admin-btn-secondary"
-                          disabled={!adminReply.trim()}
-                          onClick={handleSendAdminReply}
-                        >
-                          <i className="fas fa-paper-plane"></i>
-                          <span>Post Mediator Note</span>
-                        </button>
-                      </div>
+                  {selectedTicket.counterpartyName && (
+                    <div>
+                      <span className="text-secondary block">Counterparty:</span>
+                      <strong>{selectedTicket.counterpartyName}</strong>
                     </div>
                   )}
+                  <div>
+                    <span className="text-secondary block">Escrow Protection:</span>
+                    <strong className="text-warning">LOCKED IN ESCROW (₹1,150.00)</strong>
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div className="admin-control-column">
-                <div className="admin-control-card">
-                  <div className="admin-cc-header">
-                    <i className="fas fa-balance-scale"></i>
-                    <h4>Adjudication & Settlement</h4>
-                  </div>
-
-                  {selectedTicket.status === "OPEN" && (
-                    <div className="admin-action-row">
-                      <button
-                        type="button"
-                        className="admin-start-investigation-btn"
-                        onClick={handleStartReview}
-                      >
-                        <i className="fas fa-search"></i>
-                        <span>Start Formal Investigation</span>
-                      </button>
+            <div className="p-3 rounded-lg bg-surface-elevated border border-border">
+              <h4 className="font-semibold text-xs uppercase tracking-wider text-secondary mb-2">
+                <i className="fas fa-comments mr-1"></i>Case Messages ({(selectedTicket.messages || []).length})
+              </h4>
+              <div className="max-h-36 overflow-y-auto space-y-2 pr-1 mb-3">
+                {(selectedTicket.messages || []).map((m) => (
+                  <div key={m.id} className="p-2 rounded bg-surface border border-border text-xs">
+                    <div className="flex justify-between items-center mb-1">
+                      <strong className="text-text">{m.authorName}</strong>
+                      <span className="text-secondary text-[11px]">
+                        {new Date(m.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                      </span>
                     </div>
-                  )}
-
-                  <div className="admin-decision-section">
-                    <label className="admin-control-label">Select Settlement Action</label>
-                    <div className="admin-decision-options">
-                      <label
-                        className={`admin-decision-option ${settlementDecision === "FULL_REFUND_CUSTOMER" ? "chosen" : ""}`}
-                      >
-                        <input
-                          type="radio"
-                          name="settlementDecision"
-                          value="FULL_REFUND_CUSTOMER"
-                          checked={settlementDecision === "FULL_REFUND_CUSTOMER"}
-                          onChange={() => setSettlementDecision("FULL_REFUND_CUSTOMER")}
-                        />
-                        <div className="admin-do-text">
-                          <strong>100% Refund to Customer</strong>
-                          <span>Return full escrow advance (Provider default / no-show)</span>
-                        </div>
-                      </label>
-
-                      <label
-                        className={`admin-decision-option ${settlementDecision === "FULL_PAYOUT_PROVIDER" ? "chosen" : ""}`}
-                      >
-                        <input
-                          type="radio"
-                          name="settlementDecision"
-                          value="FULL_PAYOUT_PROVIDER"
-                          checked={settlementDecision === "FULL_PAYOUT_PROVIDER"}
-                          onChange={() => setSettlementDecision("FULL_PAYOUT_PROVIDER")}
-                        />
-                        <div className="admin-do-text">
-                          <strong>Release Escrow to Provider</strong>
-                          <span>Verify service completion and credit provider earnings</span>
-                        </div>
-                      </label>
-
-                      <label
-                        className={`admin-decision-option ${settlementDecision === "SPLIT_SETTLEMENT" ? "chosen" : ""}`}
-                      >
-                        <input
-                          type="radio"
-                          name="settlementDecision"
-                          value="SPLIT_SETTLEMENT"
-                          checked={settlementDecision === "SPLIT_SETTLEMENT"}
-                          onChange={() => setSettlementDecision("SPLIT_SETTLEMENT")}
-                        />
-                        <div className="admin-do-text">
-                          <strong>Split Settlement</strong>
-                          <span>Pro-rate funds between labor performed and customer refund</span>
-                        </div>
-                      </label>
-
-                      {settlementDecision === "SPLIT_SETTLEMENT" && (
-                        <div className="admin-split-inputs">
-                          <input
-                            type="number"
-                            placeholder="Customer Refund (₹)"
-                            value={customSplitCustomer}
-                            onChange={(e) => setCustomSplitCustomer(e.target.value)}
-                          />
-                          <input
-                            type="number"
-                            placeholder="Provider Payout (₹)"
-                            value={customSplitProvider}
-                            onChange={(e) => setCustomSplitProvider(e.target.value)}
-                          />
-                        </div>
-                      )}
-
-                      <label
-                        className={`admin-decision-option ${settlementDecision === "NO_FINANCIAL_ACTION" ? "chosen" : ""}`}
-                      >
-                        <input
-                          type="radio"
-                          name="settlementDecision"
-                          value="NO_FINANCIAL_ACTION"
-                          checked={settlementDecision === "NO_FINANCIAL_ACTION"}
-                          onChange={() => setSettlementDecision("NO_FINANCIAL_ACTION")}
-                        />
-                        <div className="admin-do-text">
-                          <strong>Advisory Only / No Financial Transfer</strong>
-                          <span>General inquiry or mutual cancellation without penalties</span>
-                        </div>
-                      </label>
-                    </div>
+                    <p className="text-secondary mb-0">{m.message}</p>
                   </div>
+                ))}
+              </div>
 
-                  <div className="admin-decision-section">
-                    <label className="admin-control-label">Official Resolution Note *</label>
-                    <textarea
-                      rows={4}
-                      className="admin-resolution-textarea"
-                      placeholder="Explain the mediation ruling, evidence reviewed, and wallet credit instructions..."
-                      value={resolutionNote}
-                      onChange={(e) => setResolutionNote(e.target.value)}
+              <div className="flex gap-1 flex-wrap mb-2">
+                <button
+                  type="button"
+                  className="btn btn-secondary text-[11px] py-1 px-2"
+                  onClick={() => setAdminReply("Please submit clear photo evidence of the incomplete work.")}
+                >
+                  <i className="fas fa-camera mr-1"></i>Request Photos
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary text-[11px] py-1 px-2"
+                  onClick={() => setAdminReply("Provider: Please provide proof of arrival timestamp.")}
+                >
+                  <i className="fas fa-map-marker-alt mr-1"></i>Arrival Proof
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary text-[11px] py-1 px-2"
+                  onClick={() => setAdminReply("Both parties must respond within 12 hours before final ruling.")}
+                >
+                  <i className="fas fa-clock mr-1"></i>12h Notice
+                </button>
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  className="admin-input flex-1 text-xs"
+                  placeholder="Post mediator note or evidence request..."
+                  value={adminReply}
+                  onChange={(e) => setAdminReply(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="btn btn-secondary text-xs px-3"
+                  disabled={!adminReply.trim()}
+                  onClick={handleSendReply}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-lg bg-surface-elevated border border-border">
+              <h4 className="font-semibold text-xs uppercase tracking-wider text-secondary mb-2">
+                <i className="fas fa-balance-scale mr-1"></i>Escrow Settlement Decision
+              </h4>
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 cursor-pointer text-xs">
+                  <input
+                    type="radio"
+                    name="settlement"
+                    value="FULL_REFUND_CUSTOMER"
+                    checked={settlementDecision === "FULL_REFUND_CUSTOMER"}
+                    onChange={() => setSettlementDecision("FULL_REFUND_CUSTOMER")}
+                  />
+                  <span>
+                    <strong>100% Refund to Customer</strong> (₹1,150 back to customer wallet)
+                  </span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-xs">
+                  <input
+                    type="radio"
+                    name="settlement"
+                    value="FULL_PAYOUT_PROVIDER"
+                    checked={settlementDecision === "FULL_PAYOUT_PROVIDER"}
+                    onChange={() => setSettlementDecision("FULL_PAYOUT_PROVIDER")}
+                  />
+                  <span>
+                    <strong>Release Escrow to Provider</strong> (₹1,092.50 net payout)
+                  </span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-xs">
+                  <input
+                    type="radio"
+                    name="settlement"
+                    value="SPLIT_SETTLEMENT"
+                    checked={settlementDecision === "SPLIT_SETTLEMENT"}
+                    onChange={() => setSettlementDecision("SPLIT_SETTLEMENT")}
+                  />
+                  <span>
+                    <strong>Split Pro-Rate</strong> (Customer refund + Provider labor payout)
+                  </span>
+                </label>
+
+                {settlementDecision === "SPLIT_SETTLEMENT" && (
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      type="number"
+                      className="admin-input flex-1 text-xs"
+                      placeholder="Customer Refund (₹)"
+                      value={splitCustomerAmount}
+                      onChange={(e) => setSplitCustomerAmount(e.target.value)}
+                    />
+                    <input
+                      type="number"
+                      className="admin-input flex-1 text-xs"
+                      placeholder="Provider Payout (₹)"
+                      value={splitProviderAmount}
+                      onChange={(e) => setSplitProviderAmount(e.target.value)}
                     />
                   </div>
+                )}
 
-                  <div className="admin-decision-actions">
-                    <button
-                      type="button"
-                      className="admin-resolve-btn"
-                      disabled={!resolutionNote.trim()}
-                      onClick={handleExecuteResolution}
-                    >
-                      <i className="fas fa-check-circle"></i>
-                      <span>Execute & Resolve Case</span>
-                    </button>
+                <label className="flex items-center gap-2 cursor-pointer text-xs">
+                  <input
+                    type="radio"
+                    name="settlement"
+                    value="NO_FINANCIAL_ACTION"
+                    checked={settlementDecision === "NO_FINANCIAL_ACTION"}
+                    onChange={() => setSettlementDecision("NO_FINANCIAL_ACTION")}
+                  />
+                  <span>
+                    <strong>Advisory Only</strong> (Guidance note without escrow transfer)
+                  </span>
+                </label>
+              </div>
 
-                    {selectedTicket.status === "RESOLVED" && (
-                      <button
-                        type="button"
-                        className="admin-close-btn"
-                        onClick={handleCloseTicket}
-                      >
-                        <i className="fas fa-archive"></i>
-                        <span>Archive & Close Ticket</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
+              <div className="mt-3">
+                <label className="text-xs font-semibold text-secondary block mb-1">
+                  Official Ruling Note *
+                </label>
+                <textarea
+                  rows={2}
+                  className="admin-input w-full text-xs"
+                  placeholder="Explain mediation ruling and findings..."
+                  value={resolutionNote}
+                  onChange={(e) => setResolutionNote(e.target.value)}
+                />
               </div>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );
 };
+
+export default AdminSupportTicketsPage;

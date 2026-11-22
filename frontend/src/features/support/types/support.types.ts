@@ -23,6 +23,16 @@ export interface TicketMessage {
   attachments?: string[];
 }
 
+export interface SettlementReceipt {
+  txnId: string;
+  timestamp: string;
+  type: string;
+  customerAmount: number;
+  providerAmount: number;
+  feeAmount: number;
+  ledgerNote: string;
+}
+
 export interface SupportTicket {
   id: string;
   ticketNumber: string;
@@ -45,6 +55,9 @@ export interface SupportTicket {
   resolutionNote?: string;
   settlementDecision?: "FULL_REFUND_CUSTOMER" | "FULL_PAYOUT_PROVIDER" | "SPLIT_SETTLEMENT" | "NO_FINANCIAL_ACTION";
   settlementDetails?: string;
+  settlementReceipt?: SettlementReceipt;
+  assignedTo?: string;
+  sanctionsApplied?: string[];
   messages: TicketMessage[];
 }
 
