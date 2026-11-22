@@ -24,7 +24,6 @@ export interface TicketResponseDto {
   subject: string;
   description: string;
   metadata?: Record<string, any> | null;
-  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   status: "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "CLOSED";
   resolutionNote?: string | null;
   settlementDecision?: string | null;

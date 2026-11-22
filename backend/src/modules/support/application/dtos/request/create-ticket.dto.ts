@@ -9,6 +9,5 @@ export interface CreateTicketInputDto {
   subject: string;
   description: string;
   metadata?: Record<string, any>;
-  priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   authorName: string;
 }

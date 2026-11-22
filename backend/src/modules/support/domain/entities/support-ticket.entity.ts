@@ -1,5 +1,4 @@
 export type TicketStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "CLOSED";
-export type TicketPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 export type TicketCreatorRole = "CUSTOMER" | "PROVIDER";
 
 export class SupportTicketMessage {
@@ -28,7 +27,6 @@ export class SupportTicket {
     public readonly subject: string,
     public readonly description: string,
     public readonly metadata: Record<string, any> | null,
-    public readonly priority: TicketPriority,
     public readonly status: TicketStatus,
     public readonly resolutionNote: string | null,
     public readonly settlementDecision: string | null,

@@ -31,7 +31,6 @@ export class SupportController extends BaseController {
         subject,
         description,
         metadata,
-        priority,
         authorName
       } = req.body;
 
@@ -54,7 +53,6 @@ export class SupportController extends BaseController {
         subject,
         description,
         metadata: resolvedMetadata,
-        priority,
         authorName: authorName || (role === "PROVIDER" ? "Provider" : "Customer")
       });
 
@@ -90,7 +88,6 @@ export class SupportController extends BaseController {
     try {
       const status = req.query.status as string | undefined;
       const category = req.query.category as string | undefined;
-      const priority = req.query.priority as string | undefined;
       const search = req.query.search as string | undefined;
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 50;
@@ -98,7 +95,6 @@ export class SupportController extends BaseController {
       const response = await this._getAdminTicketsUseCase.execute({
         status,
         category,
-        priority,
         search,
         page,
         limit

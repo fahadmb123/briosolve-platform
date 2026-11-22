@@ -1,5 +1,3 @@
-export type TicketPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-
 export type TicketStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "CLOSED";
 
 export type TicketCategory =
@@ -51,7 +49,6 @@ export interface SupportTicket {
   subject: string;
   description: string;
   metadata?: Record<string, any>;
-  priority: TicketPriority;
   status: TicketStatus;
   attachments: string[];
   createdAt: string;
@@ -70,6 +67,5 @@ export interface CreateTicketPayload {
   category: TicketCategory;
   subject: string;
   description: string;
-  priority?: TicketPriority;
   attachments?: string[];
 }

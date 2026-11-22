@@ -22,7 +22,6 @@ export interface UserTicketsResult {
 export interface GetAdminTicketsParams {
   status?: string;
   category?: string;
-  priority?: string;
   search?: string;
   page?: number;
   limit?: number;

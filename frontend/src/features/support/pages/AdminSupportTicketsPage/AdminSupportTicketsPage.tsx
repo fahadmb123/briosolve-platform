@@ -10,7 +10,6 @@ export const AdminSupportTicketsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState("");
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
 
   useEffect(() => {
@@ -23,7 +22,6 @@ export const AdminSupportTicketsPage: React.FC = () => {
   const { data: ticketsResponse, isLoading } = useGetAdminSupportTickets({
     status: statusFilter || undefined,
     category: categoryFilter || undefined,
-    priority: priorityFilter || undefined,
     search: debouncedSearch || undefined
   });
 
@@ -56,7 +54,6 @@ export const AdminSupportTicketsPage: React.FC = () => {
     setDebouncedSearch("");
     setStatusFilter("");
     setCategoryFilter("");
-    setPriorityFilter("");
   };
 
   const handleStartReview = () => {
@@ -169,19 +166,6 @@ export const AdminSupportTicketsPage: React.FC = () => {
     }, 400);
   };
 
-  const getPriorityBadgeClass = (priority?: string) => {
-    switch (priority) {
-      case "URGENT":
-        return "badge-danger-alert";
-      case "HIGH":
-        return "badge-pending";
-      case "LOW":
-        return "badge-neutral";
-      default:
-        return "badge-admin";
-    }
-  };
-
   const getStatusBadgeClass = (status?: string) => {
     switch (status) {
       case "RESOLVED":
@@ -246,18 +230,6 @@ export const AdminSupportTicketsPage: React.FC = () => {
             <option value="GENERAL_INQUIRY">General Inquiry</option>
           </select>
 
-          <select
-            className="admin-select"
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value)}
-          >
-            <option value="">All Priorities</option>
-            <option value="URGENT">Urgent</option>
-            <option value="HIGH">High</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="LOW">Low</option>
-          </select>
-
           <button className="btn btn-secondary text-xs py-2" onClick={handleResetFilters}>
             <i className="fas fa-undo mr-1"></i>Reset
           </button>
@@ -269,7 +241,7 @@ export const AdminSupportTicketsPage: React.FC = () => {
           <table className="admin-table">
             <thead>
               <tr>
-                <th style={{ width: "16%" }}>Ticket & Priority</th>
+                <th style={{ width: "16%" }}>Ticket Number</th>
                 <th style={{ width: "18%" }}>Complainant</th>
                 <th style={{ width: "26%" }}>Subject / Linked Booking</th>
                 <th style={{ width: "14%" }}>Category</th>
@@ -327,12 +299,7 @@ export const AdminSupportTicketsPage: React.FC = () => {
                 tickets.map((t) => (
                   <tr key={t.id}>
                     <td>
-                      <div className="flex items-center gap-2">
-                        <strong className="text-sm font-semibold">#{t.ticketNumber}</strong>
-                        <span className={`badge ${getPriorityBadgeClass(t.priority)} text-xs`}>
-                          {t.priority}
-                        </span>
-                      </div>
+                      <strong className="text-sm font-semibold block">#{t.ticketNumber}</strong>
                       <span className="text-xs text-secondary block mt-0.5">
                         {new Date(t.createdAt).toLocaleDateString("en-IN", {
                           day: "numeric",
@@ -440,9 +407,6 @@ export const AdminSupportTicketsPage: React.FC = () => {
                   <span className="badge badge-admin text-xs">{selectedTicket.creatorRole}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`badge ${getPriorityBadgeClass(selectedTicket.priority)} text-xs`}>
-                    {selectedTicket.priority}
-                  </span>
                   <span className={`badge ${getStatusBadgeClass(selectedTicket.status)} text-xs`}>
                     {(selectedTicket.status || "OPEN").replace("_", " ")}
                   </span>

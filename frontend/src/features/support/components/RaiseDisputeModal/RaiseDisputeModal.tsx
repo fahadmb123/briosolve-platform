@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { TicketCategory, TicketPriority } from "../../types/support.types";
+import type { TicketCategory } from "../../types/support.types";
 import "./RaiseDisputeModal.css";
 
 interface RaiseDisputeModalProps {
@@ -18,7 +18,6 @@ interface RaiseDisputeModalProps {
   onSubmitConcern: (data: {
     bookingId: string;
     category: TicketCategory;
-    priority: TicketPriority;
     subject: string;
     description: string;
   }) => void;
@@ -54,7 +53,6 @@ export const RaiseDisputeModal: React.FC<RaiseDisputeModalProps> = ({
   const [category, setCategory] = useState<TicketCategory>(
     isCustomer ? "PROVIDER_NO_SHOW" : "CUSTOMER_ABSENT"
   );
-  const [priority, setPriority] = useState<TicketPriority>("HIGH");
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,7 +67,6 @@ export const RaiseDisputeModal: React.FC<RaiseDisputeModalProps> = ({
     onSubmitConcern({
       bookingId: booking.id,
       category,
-      priority,
       subject: subject.trim(),
       description: description.trim(),
     });
@@ -147,22 +144,6 @@ export const RaiseDisputeModal: React.FC<RaiseDisputeModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-          </div>
-
-          <div className="rdm-field">
-            <label>Urgency Level</label>
-            <div className="rdm-priority-group">
-              {(["MEDIUM", "HIGH", "URGENT"] as TicketPriority[]).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  className={`rdm-priority-chip ${priority === p ? "active" : ""}`}
-                  onClick={() => setPriority(p)}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
           </div>
 
           <div className="rdm-footer">

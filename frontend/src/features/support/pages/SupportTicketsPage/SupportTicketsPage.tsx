@@ -160,7 +160,6 @@ export const SupportTicketsPage: React.FC = () => {
         subject: subjectLine,
         description: data.description.trim(),
         metadata: data.concernType === "BOOKING" ? { serviceTitle: linkedServiceTitle } : { topic: data.generalTopic },
-        priority: "HIGH",
         authorName: user?.name || (isProvider ? "Provider" : "Customer")
       });
 
@@ -659,15 +658,15 @@ export const SupportTicketsPage: React.FC = () => {
                 {debouncedSearch
                   ? "No matching tickets found"
                   : ticketFilter !== "ALL"
-                  ? `No ${ticketFilter.toLowerCase()} tickets`
-                  : "No tickets found"}
+                    ? `No ${ticketFilter.toLowerCase()} tickets`
+                    : "No tickets found"}
               </h3>
               <p>
                 {debouncedSearch
                   ? `No support tickets match "${debouncedSearch}". Clear your search query or switch filters.`
                   : ticketFilter !== "ALL"
-                  ? `You do not have any ${ticketFilter.toLowerCase()} support or dispute tickets.`
-                  : "You do not have any open support or dispute tickets. Need help with an appointment or transaction?"}
+                    ? `You do not have any ${ticketFilter.toLowerCase()} support or dispute tickets.`
+                    : "You do not have any open support or dispute tickets. Need help with an appointment or transaction?"}
               </p>
               {debouncedSearch ? (
                 <button

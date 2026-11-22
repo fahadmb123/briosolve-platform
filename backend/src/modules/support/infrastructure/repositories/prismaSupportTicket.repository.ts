@@ -41,43 +41,55 @@ export class PrismaSupportTicketRepository implements ISupportTicketRepository {
     const limit = params.limit || 50;
     const skip = (page - 1) * limit;
 
-    const allRecords = await db.orm.public.support_tickets
-      .where({ creator_id: params.userId as never })
-      .orderBy((t) => t.created_at.desc())
-      .all();
-
-    const counts = {
-      all: allRecords.length,
-      active: allRecords.filter((t: any) => t.status === "OPEN" || t.status === "UNDER_REVIEW").length,
-      resolved: allRecords.filter((t: any) => t.status === "RESOLVED" || t.status === "CLOSED").length
-    };
-
-    let filtered = allRecords;
+    let query = db.orm.public.support_tickets.where({ creator_id: params.userId as never });
 
     if (params.status && params.status !== "ALL") {
       if (params.status === "ACTIVE") {
-        filtered = filtered.filter((t: any) => t.status === "OPEN" || t.status === "UNDER_REVIEW");
+        query = query.where((t) => t.status.in(["OPEN", "UNDER_REVIEW"]));
       } else if (params.status === "RESOLVED") {
-        filtered = filtered.filter((t: any) => t.status === "RESOLVED" || t.status === "CLOSED");
+        query = query.where((t) => t.status.in(["RESOLVED", "CLOSED"]));
       } else {
-        filtered = filtered.filter((t: any) => t.status === params.status);
+        query = query.where({ status: params.status as never });
       }
     }
 
     if (params.search && params.search.trim()) {
-      const q = params.search.trim().toLowerCase();
-      filtered = filtered.filter((t: any) => {
-        return (
-          (t.ticket_number && t.ticket_number.toLowerCase().includes(q)) ||
-          (t.subject && t.subject.toLowerCase().includes(q)) ||
-          (t.target_number && t.target_number.toLowerCase().includes(q)) ||
-          (t.description && t.description.toLowerCase().includes(q))
-        );
-      });
+      const term = `%${params.search.trim()}%`;
+      if (params.search.trim().toUpperCase().startsWith("TK")) {
+        query = query.where((t) => t.ticket_number.ilike(term));
+      } else {
+        query = query.where((t) => t.subject.ilike(term));
+      }
     }
 
-    const total = filtered.length;
-    const paged = filtered.slice(skip, skip + limit);
+    const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+    const total = Number(totalResult?.total || 0);
+
+    const allCounts = await db.orm.public.support_tickets
+      .where({ creator_id: params.userId as never })
+      .aggregate((agg) => ({ count: agg.count() }));
+
+    const activeCounts = await db.orm.public.support_tickets
+      .where({ creator_id: params.userId as never })
+      .where((t) => t.status.in(["OPEN", "UNDER_REVIEW"]))
+      .aggregate((agg) => ({ count: agg.count() }));
+
+    const resolvedCounts = await db.orm.public.support_tickets
+      .where({ creator_id: params.userId as never })
+      .where((t) => t.status.in(["RESOLVED", "CLOSED"]))
+      .aggregate((agg) => ({ count: agg.count() }));
+
+    const counts = {
+      all: Number(allCounts?.count || 0),
+      active: Number(activeCounts?.count || 0),
+      resolved: Number(resolvedCounts?.count || 0)
+    };
+
+    const paged = await query
+      .orderBy((t) => t.created_at.desc())
+      .offset(skip)
+      .limit(limit)
+      .all();
 
     const tickets: SupportTicket[] = [];
     for (const r of paged) {
@@ -96,45 +108,42 @@ export class PrismaSupportTicketRepository implements ISupportTicketRepository {
     const limit = params.limit || 50;
     const skip = (page - 1) * limit;
 
-    const allRecords = await db.orm.public.support_tickets
-      .orderBy((t) => t.created_at.desc())
-      .all();
-
-    const openCount = allRecords.filter((t: any) => t.status === "OPEN").length;
-
-    let filtered = allRecords;
+    let query = db.orm.public.support_tickets;
 
     if (params.status && params.status !== "ALL") {
-      filtered = filtered.filter((t: any) => t.status === params.status);
+      query = query.where({ status: params.status as never });
     }
 
     if (params.category && params.category.trim()) {
-      filtered = filtered.filter((t: any) => t.category === params.category);
-    }
-
-    if (params.priority && params.priority.trim()) {
-      filtered = filtered.filter((t: any) => t.priority === params.priority);
+      query = query.where({ category: params.category.trim() as never });
     }
 
     if (params.search && params.search.trim()) {
-      const q = params.search.trim().toLowerCase();
-      filtered = filtered.filter((t: any) => {
-        return (
-          (t.ticket_number && t.ticket_number.toLowerCase().includes(q)) ||
-          (t.subject && t.subject.toLowerCase().includes(q)) ||
-          (t.target_number && t.target_number.toLowerCase().includes(q)) ||
-          (t.description && t.description.toLowerCase().includes(q))
-        );
-      });
+      const term = `%${params.search.trim()}%`;
+      if (params.search.trim().toUpperCase().startsWith("TK")) {
+        query = query.where((t) => t.ticket_number.ilike(term));
+      } else {
+        query = query.where((t) => t.subject.ilike(term));
+      }
     }
 
-    const total = filtered.length;
-    const paged = filtered.slice(skip, skip + limit);
+    const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+    const total = Number(totalResult?.total || 0);
 
-    const userIds = [...new Set(paged.map((r: any) => r.creator_id))];
+    const openCountResult = await db.orm.public.support_tickets
+      .where({ status: "OPEN" as never })
+      .aggregate((agg) => ({ count: agg.count() }));
+    const openCount = Number(openCountResult?.count || 0);
+
+    const paged = await query
+      .orderBy((t) => t.created_at.desc())
+      .offset(skip)
+      .limit(limit)
+      .all();
+
+    const userIds = [...new Set(paged.map((r: any) => r.creator_id).filter(Boolean))];
     const usersMap = new Map<string, string>();
     for (const uid of userIds) {
-      if (!uid) continue;
       try {
         const u = await db.orm.public.users.where({ id: uid as never }).first();
         if (u) {

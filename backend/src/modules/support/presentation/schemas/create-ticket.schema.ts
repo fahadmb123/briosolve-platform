@@ -20,7 +20,6 @@ export const createTicketSchema = z.object({
     .min(15, "Description must be at least 15 characters")
     .max(2000, "Description cannot exceed 2000 characters"),
   metadata: z.record(z.string(), z.any()).optional().nullable(),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).default("HIGH").optional(),
   authorName: z.string().trim().optional().nullable()
 }).superRefine((data, ctx) => {
   const isBooking = data.targetType === "BOOKING" || Boolean(data.bookingId || data.bookingNumber);

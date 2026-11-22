@@ -14,7 +14,6 @@ export interface CreateTicketPayload {
   subject: string;
   description: string;
   metadata?: Record<string, any>;
-  priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   authorName?: string;
 }
 
@@ -28,7 +27,6 @@ export interface GetSupportTicketsParams {
 export interface GetAdminSupportTicketsParams {
   status?: string;
   category?: string;
-  priority?: string;
   search?: string;
   page?: number;
   limit?: number;

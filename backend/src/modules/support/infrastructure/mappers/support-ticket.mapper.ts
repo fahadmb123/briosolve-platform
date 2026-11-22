@@ -1,4 +1,4 @@
-import { SupportTicket, SupportTicketMessage, TicketPriority, TicketStatus, TicketCreatorRole } from "../../domain/entities/support-ticket.entity";
+import { SupportTicket, SupportTicketMessage, TicketStatus, TicketCreatorRole } from "../../domain/entities/support-ticket.entity";
 import { CreateTicketInputDto } from "../../application/dtos/request/create-ticket.dto";
 import { TicketResponseDto, TicketMessageResponseDto } from "../../application/dtos/response/ticket-response.dto";
 
@@ -31,7 +31,6 @@ export class SupportTicketMapper {
       record.subject,
       record.description,
       parsedMetadata,
-      record.priority as TicketPriority,
       record.status as TicketStatus,
       record.resolution_note ?? null,
       record.settlement_decision ?? null,
@@ -70,7 +69,7 @@ export class SupportTicketMapper {
       subject: input.subject.trim() as never,
       description: input.description.trim() as never,
       metadata: (input.metadata ? JSON.stringify(input.metadata) : null) as never,
-      priority: (input.priority ?? "HIGH") as never,
+      priority: "HIGH" as never,
       status: "OPEN" as never
     };
   }
@@ -104,7 +103,6 @@ export class SupportTicketMapper {
       subject: entity.subject,
       description: entity.description,
       metadata: entity.metadata,
-      priority: entity.priority,
       status: entity.status,
       resolutionNote: entity.resolutionNote,
       settlementDecision: entity.settlementDecision,
