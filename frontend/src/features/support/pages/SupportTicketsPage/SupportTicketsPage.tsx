@@ -87,7 +87,7 @@ export const SupportTicketsPage: React.FC = () => {
     defaultValues: {
       concernType: "BOOKING",
       selectedBookingId: "",
-      generalTopic: "Wallet & Payouts",
+      generalTopic: "Refund Inquiry",
       issueReason: "",
       description: ""
     }
@@ -122,7 +122,6 @@ export const SupportTicketsPage: React.FC = () => {
   ];
 
   const generalTopics = [
-    "Wallet & Payouts",
     "Refund Inquiry",
     "ID & KYC Verification",
     "Account & Login",
@@ -148,14 +147,14 @@ export const SupportTicketsPage: React.FC = () => {
 
     try {
       const res = await createTicketMutation.mutateAsync({
-        targetType: data.concernType === "BOOKING" ? "BOOKING" : "WALLET",
+        targetType: data.concernType === "BOOKING" ? "BOOKING" : "GENERAL",
         targetId: data.concernType === "BOOKING" ? data.selectedBookingId : undefined,
         targetNumber: linkedBookingNumber,
         bookingId: data.concernType === "BOOKING" ? data.selectedBookingId : undefined,
         bookingNumber: linkedBookingNumber,
         serviceTitle: linkedServiceTitle,
         category: data.concernType === "BOOKING" ? "PAYMENT_REFUND" : "GENERAL_INQUIRY",
-        categoryLabel: data.concernType === "BOOKING" ? "Booking Dispute" : "Wallet & General Account",
+        categoryLabel: data.concernType === "BOOKING" ? "Booking Dispute" : "Account & App Support",
         subject: subjectLine,
         description: data.description.trim(),
         metadata: data.concernType === "BOOKING" ? { serviceTitle: linkedServiceTitle } : { topic: data.generalTopic },
@@ -172,7 +171,7 @@ export const SupportTicketsPage: React.FC = () => {
       reset({
         concernType: "BOOKING",
         selectedBookingId: "",
-        generalTopic: "Wallet & Payouts",
+        generalTopic: "Refund Inquiry",
         issueReason: "",
         description: ""
       });
@@ -282,11 +281,11 @@ export const SupportTicketsPage: React.FC = () => {
                     }}
                   >
                     <div className="clean-type-icon">
-                      <i className="fas fa-wallet"></i>
+                      <i className="fas fa-user-shield"></i>
                     </div>
                     <div className="clean-type-text">
-                      <strong>Wallet & Account</strong>
-                      <span>Refunds, payout schedule, login, or general help</span>
+                      <strong>Account & App Support</strong>
+                      <span>Refunds, login, verification, or general questions</span>
                     </div>
                     <div className="clean-radio-dot"></div>
                   </div>
@@ -464,7 +463,7 @@ export const SupportTicketsPage: React.FC = () => {
                 <div className="clean-summary-field">
                   <span className="clean-summary-field-label">Target Category</span>
                   <span className="clean-summary-field-val highlight">
-                    {concernType === "BOOKING" ? "Booking Dispute" : "Wallet & Account"}
+                    {concernType === "BOOKING" ? "Booking Dispute" : "Account & App Support"}
                   </span>
                 </div>
 
