@@ -29,6 +29,7 @@ export default function CustomerLayout() {
     location.pathname.startsWith("/request-service") ||
     location.pathname.startsWith("/my-requests") ||
     location.pathname.startsWith("/bookings") ||
+    location.pathname.startsWith("/wallet") ||
     location.pathname.startsWith("/messages") ||
     location.pathname.startsWith("/chat") ||
     location.pathname.startsWith("/support") ||

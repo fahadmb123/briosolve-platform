@@ -13,6 +13,7 @@ import {
   CustomerPaymentCancelled,
   CustomerBookings,
   CustomerBookingDetails,
+  CustomerWallet,
   CustomerSupport
 } from '../lazy/customer.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
@@ -36,6 +37,7 @@ export const customerRoutes = (
         <Route path="bookings/:bookingId" element={<CustomerBookingDetails />} />
         <Route path="my-bookings" element={<CustomerBookings />} />
         <Route path="my-bookings/:bookingId" element={<CustomerBookingDetails />} />
+        <Route path="wallet" element={<CustomerWallet />} />
         <Route path="payment/success" element={<CustomerPaymentSuccess />} />
         <Route path="payment/cancelled" element={<CustomerPaymentCancelled />} />
         <Route path="customer/payment/success" element={<CustomerPaymentSuccess />} />

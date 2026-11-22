@@ -79,23 +79,18 @@ export const SupportTicketsPage: React.FC = () => {
     watch,
     reset,
     setError,
-    clearErrors,
     formState: { errors }
   } = useForm<SupportTicketInputType>({
     resolver: zodResolver(supportTicketSchema),
     mode: "onChange",
     defaultValues: {
-      concernType: "BOOKING",
       selectedBookingId: "",
-      generalTopic: "Refund Inquiry",
       issueReason: "",
       description: ""
     }
   });
 
-  const concernType = watch("concernType");
   const selectedBookingId = watch("selectedBookingId");
-  const generalTopic = watch("generalTopic");
   const issueReason = watch("issueReason");
 
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
@@ -121,43 +116,27 @@ export const SupportTicketsPage: React.FC = () => {
     "Other booking problem"
   ];
 
-  const generalTopics = [
-    "Refund Inquiry",
-    "ID & KYC Verification",
-    "Account & Login",
-    "Technical App Glitch",
-    "Feedback / Other"
-  ];
-
   const onSubmitTicket = async (data: SupportTicketInputType) => {
     if (createTicketMutation.isPending) return;
 
-    let subjectLine = "";
-    let linkedBookingNumber = undefined;
-    let linkedServiceTitle = undefined;
-
-    if (data.concernType === "BOOKING") {
-      const found = activeBookings.find((b) => b.id === data.selectedBookingId);
-      linkedBookingNumber = found?.bookingNumber;
-      linkedServiceTitle = found?.serviceTitle;
-      subjectLine = `${data.issueReason || "Booking Issue"} (${linkedBookingNumber || "Booking"})`;
-    } else {
-      subjectLine = `${data.generalTopic}: Issue Report`;
-    }
+    const found = activeBookings.find((b) => b.id === data.selectedBookingId);
+    const linkedBookingNumber = found?.bookingNumber;
+    const linkedServiceTitle = found?.serviceTitle;
+    const subjectLine = `${data.issueReason || "Booking Issue"} (${linkedBookingNumber || "Booking"})`;
 
     try {
       const res = await createTicketMutation.mutateAsync({
-        targetType: data.concernType === "BOOKING" ? "BOOKING" : "GENERAL",
-        targetId: data.concernType === "BOOKING" ? data.selectedBookingId : undefined,
+        targetType: "BOOKING",
+        targetId: data.selectedBookingId,
         targetNumber: linkedBookingNumber,
-        bookingId: data.concernType === "BOOKING" ? data.selectedBookingId : undefined,
+        bookingId: data.selectedBookingId,
         bookingNumber: linkedBookingNumber,
         serviceTitle: linkedServiceTitle,
-        category: data.concernType === "BOOKING" ? "PAYMENT_REFUND" : "GENERAL_INQUIRY",
-        categoryLabel: data.concernType === "BOOKING" ? "Booking Dispute" : "Account & App Support",
+        category: "PAYMENT_REFUND",
+        categoryLabel: "Booking Dispute",
         subject: subjectLine,
         description: data.description.trim(),
-        metadata: data.concernType === "BOOKING" ? { serviceTitle: linkedServiceTitle } : { topic: data.generalTopic },
+        metadata: { serviceTitle: linkedServiceTitle },
         authorName: user?.name || (isProvider ? "Provider" : "Customer")
       });
 
@@ -169,9 +148,7 @@ export const SupportTicketsPage: React.FC = () => {
       toast.success("Support ticket submitted successfully!");
       setSubmitSuccess(true);
       reset({
-        concernType: "BOOKING",
         selectedBookingId: "",
-        generalTopic: "Refund Inquiry",
         issueReason: "",
         description: ""
       });
@@ -256,13 +233,7 @@ export const SupportTicketsPage: React.FC = () => {
                 </div>
 
                 <div className="clean-type-selector">
-                  <div
-                    className={`clean-type-card ${concernType === "BOOKING" ? "active" : ""}`}
-                    onClick={() => {
-                      setValue("concernType", "BOOKING", { shouldValidate: true });
-                      clearErrors();
-                    }}
-                  >
+                  <div className="clean-type-card active">
                     <div className="clean-type-icon">
                       <i className="fas fa-calendar-check"></i>
                     </div>
@@ -272,103 +243,57 @@ export const SupportTicketsPage: React.FC = () => {
                     </div>
                     <div className="clean-radio-dot"></div>
                   </div>
-
-                  <div
-                    className={`clean-type-card ${concernType === "GENERAL" ? "active" : ""}`}
-                    onClick={() => {
-                      setValue("concernType", "GENERAL", { shouldValidate: true });
-                      clearErrors();
-                    }}
-                  >
-                    <div className="clean-type-icon">
-                      <i className="fas fa-user-shield"></i>
-                    </div>
-                    <div className="clean-type-text">
-                      <strong>Account & App Support</strong>
-                      <span>Refunds, login, verification, or general questions</span>
-                    </div>
-                    <div className="clean-radio-dot"></div>
-                  </div>
                 </div>
               </div>
 
               <div className="clean-section-block">
                 <div className="clean-step-header">
                   <span className="clean-step-badge">Step 2</span>
-                  <h3 className="clean-step-title">
-                    {concernType === "BOOKING" ? "Select the Booking" : "Select the Topic"}
-                  </h3>
+                  <h3 className="clean-step-title">Select the Booking</h3>
                 </div>
 
-                {concernType === "BOOKING" ? (
-                  <>
-                    <div className={`clean-selection-box ${errors.selectedBookingId ? "has-error" : ""}`}>
-                      {activeBookings.length === 0 ? (
-                        <div className="clean-empty-selection">
-                          <i className="fas fa-calendar-times"></i>
-                          <span>No bookings found on your account.</span>
-                        </div>
-                      ) : (
-                        <div className="clean-items-list">
-                          {activeBookings.map((b) => {
-                            const isChosen = selectedBookingId === b.id;
-                            return (
-                              <div
-                                key={b.id}
-                                className={`clean-item-row ${isChosen ? "chosen" : ""}`}
-                                onClick={() => {
-                                  setValue("selectedBookingId", b.id, { shouldValidate: true });
-                                }}
-                              >
-                                <div className="clean-item-radio">
-                                  <i className={isChosen ? "fas fa-check-circle" : "far fa-circle"}></i>
-                                </div>
-                                <div className="clean-item-info">
-                                  <div className="clean-item-meta-top">
-                                    <span className="clean-item-num">#{b.bookingNumber}</span>
-                                    <span className={`clean-item-status-badge ${b.status.toLowerCase()}`}>{b.status}</span>
-                                  </div>
-                                  <strong className="clean-item-title">{b.serviceTitle}</strong>
-                                </div>
-                                <div className="clean-item-price-pill">
-                                  ₹{b.totalAmount.toLocaleString("en-IN")}
-                                </div>
+                <div className={`clean-selection-box ${errors.selectedBookingId ? "has-error" : ""}`}>
+                  {activeBookings.length === 0 ? (
+                    <div className="clean-empty-selection">
+                      <i className="fas fa-calendar-times"></i>
+                      <span>No bookings found on your account.</span>
+                    </div>
+                  ) : (
+                    <div className="clean-items-list">
+                      {activeBookings.map((b) => {
+                        const isChosen = selectedBookingId === b.id;
+                        return (
+                          <div
+                            key={b.id}
+                            className={`clean-item-row ${isChosen ? "chosen" : ""}`}
+                            onClick={() => {
+                              setValue("selectedBookingId", b.id, { shouldValidate: true });
+                            }}
+                          >
+                            <div className="clean-item-radio">
+                              <i className={isChosen ? "fas fa-check-circle" : "far fa-circle"}></i>
+                            </div>
+                            <div className="clean-item-info">
+                              <div className="clean-item-meta-top">
+                                <span className="clean-item-num">#{b.bookingNumber}</span>
+                                <span className={`clean-item-status-badge ${b.status.toLowerCase()}`}>{b.status}</span>
                               </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                              <strong className="clean-item-title">{b.serviceTitle}</strong>
+                            </div>
+                            <div className="clean-item-price-pill">
+                              ₹{b.totalAmount.toLocaleString("en-IN")}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                    {errors.selectedBookingId && (
-                      <div className="clean-field-error">
-                        <i className="fas fa-exclamation-circle"></i>
-                        <span>{errors.selectedBookingId.message}</span>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="clean-pills-row">
-                      {generalTopics.map((top) => (
-                        <button
-                          key={top}
-                          type="button"
-                          className={`clean-topic-pill ${generalTopic === top ? "active" : ""}`}
-                          onClick={() => {
-                            setValue("generalTopic", top, { shouldValidate: true });
-                          }}
-                        >
-                          {top}
-                        </button>
-                      ))}
-                    </div>
-                    {errors.generalTopic && (
-                      <div className="clean-field-error">
-                        <i className="fas fa-exclamation-circle"></i>
-                        <span>{errors.generalTopic.message}</span>
-                      </div>
-                    )}
-                  </>
+                  )}
+                </div>
+                {errors.selectedBookingId && (
+                  <div className="clean-field-error">
+                    <i className="fas fa-exclamation-circle"></i>
+                    <span>{errors.selectedBookingId.message}</span>
+                  </div>
                 )}
               </div>
 
@@ -378,31 +303,29 @@ export const SupportTicketsPage: React.FC = () => {
                   <h3 className="clean-step-title">Specify the Reason & Details</h3>
                 </div>
 
-                {concernType === "BOOKING" && (
-                  <div className="clean-reasons-group">
-                    <label className="clean-label">What is the primary issue?</label>
-                    <div className="clean-chips-wrap">
-                      {bookingReasons.map((r) => (
-                        <button
-                          key={r}
-                          type="button"
-                          className={`clean-reason-chip ${issueReason === r ? "active" : ""}`}
-                          onClick={() => {
-                            setValue("issueReason", r, { shouldValidate: true });
-                          }}
-                        >
-                          {r}
-                        </button>
-                      ))}
-                    </div>
-                    {errors.issueReason && (
-                      <div className="clean-field-error">
-                        <i className="fas fa-exclamation-circle"></i>
-                        <span>{errors.issueReason.message}</span>
-                      </div>
-                    )}
+                <div className="clean-reasons-group">
+                  <label className="clean-label">What is the primary issue?</label>
+                  <div className="clean-chips-wrap">
+                    {bookingReasons.map((r) => (
+                      <button
+                        key={r}
+                        type="button"
+                        className={`clean-reason-chip ${issueReason === r ? "active" : ""}`}
+                        onClick={() => {
+                          setValue("issueReason", r, { shouldValidate: true });
+                        }}
+                      >
+                        {r}
+                      </button>
+                    ))}
                   </div>
-                )}
+                  {errors.issueReason && (
+                    <div className="clean-field-error">
+                      <i className="fas fa-exclamation-circle"></i>
+                      <span>{errors.issueReason.message}</span>
+                    </div>
+                  )}
+                </div>
 
                 <div className="clean-form-group">
                   <label htmlFor="clean-description" className="clean-label">
@@ -463,36 +386,29 @@ export const SupportTicketsPage: React.FC = () => {
                 <div className="clean-summary-field">
                   <span className="clean-summary-field-label">Target Category</span>
                   <span className="clean-summary-field-val highlight">
-                    {concernType === "BOOKING" ? "Booking Dispute" : "Account & App Support"}
+                    Booking Dispute
                   </span>
                 </div>
 
-                {concernType === "BOOKING" ? (
-                  <div className="clean-summary-field">
-                    <span className="clean-summary-field-label">Linked Booking</span>
-                    {selectedBooking ? (
-                      <div className="clean-summary-linked-card">
-                        <div className="clean-slc-num">#{selectedBooking.bookingNumber}</div>
-                        <div className="clean-slc-title">{selectedBooking.serviceTitle}</div>
-                        <div className="clean-slc-footer">
-                          <span className="clean-slc-amount">₹{selectedBooking.totalAmount.toLocaleString("en-IN")}</span>
-                          <span className={`clean-item-status-badge ${selectedBooking.status.toLowerCase()}`}>{selectedBooking.status}</span>
-                        </div>
+                <div className="clean-summary-field">
+                  <span className="clean-summary-field-label">Linked Booking</span>
+                  {selectedBooking ? (
+                    <div className="clean-summary-linked-card">
+                      <div className="clean-slc-num">#{selectedBooking.bookingNumber}</div>
+                      <div className="clean-slc-title">{selectedBooking.serviceTitle}</div>
+                      <div className="clean-slc-footer">
+                        <span className="clean-slc-amount">₹{selectedBooking.totalAmount.toLocaleString("en-IN")}</span>
+                        <span className={`clean-item-status-badge ${selectedBooking.status.toLowerCase()}`}>{selectedBooking.status}</span>
                       </div>
-                    ) : (
-                      <div className="clean-summary-placeholder-text">
-                        <i className="far fa-hand-pointer"></i> Please select a booking in Step 2
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="clean-summary-field">
-                    <span className="clean-summary-field-label">Topic</span>
-                    <span className="clean-summary-field-val">{generalTopic}</span>
-                  </div>
-                )}
+                    </div>
+                  ) : (
+                    <div className="clean-summary-placeholder-text">
+                      <i className="far fa-hand-pointer"></i> Please select a booking in Step 2
+                    </div>
+                  )}
+                </div>
 
-                {concernType === "BOOKING" && issueReason && (
+                {issueReason && (
                   <div className="clean-summary-field">
                     <span className="clean-summary-field-label">Primary Issue</span>
                     <span className="clean-summary-reason-tag">{issueReason}</span>
