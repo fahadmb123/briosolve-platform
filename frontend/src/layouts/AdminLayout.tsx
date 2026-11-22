@@ -124,8 +124,8 @@ export default function AdminLayout() {
                             to="/admin/support" 
                             className={() => `sidebar-item ${location.pathname.startsWith('/admin/support') || location.pathname.startsWith('/admin/investigations') ? 'active' : ''}`}
                         >
-                            <i className="fas fa-gavel"></i>
-                            <span>Investigations</span>
+                            <i className="fas fa-headset"></i>
+                            <span>Support Tickets</span>
                             {openTicketsCount > 0 && <span className="badge badge-danger ml-auto">{openTicketsCount}</span>}
                         </NavLink>
                     </li>
