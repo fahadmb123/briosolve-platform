@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import "./MyRequests.css";
@@ -55,8 +55,11 @@ export default function MyRequests() {
   const [selectedRequestForReopen, setSelectedRequestForReopen] =
     useState<CustomerServiceRequestItem | null>(null);
   const [isReopenModalOpen, setIsReopenModalOpen] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const isLoadingMoreRef = useRef<boolean>(false);
+  const fetchStartTimeRef = useRef<number>(0);
 
   const cancelMutation = useCancelServiceRequest();
   const reopenMutation = useReopenServiceRequest();
@@ -69,9 +72,81 @@ export default function MyRequests() {
     sortBy
   });
 
+  const isFetchingRef = useRef<boolean>(isFetching);
+  isFetchingRef.current = isFetching;
+  const hasMore = page < totalPages;
+  const hasMoreRef = useRef<boolean>(hasMore);
+  hasMoreRef.current = hasMore;
+  const cooldownUntilRef = useRef<number>(0);
+  const lastScrollYRef = useRef<number>(0);
+
+  const triggerLoadMore = useCallback(() => {
+    if (
+      !hasMoreRef.current ||
+      isFetchingRef.current ||
+      isLoadingMoreRef.current ||
+      Date.now() < cooldownUntilRef.current
+    ) {
+      return;
+    }
+
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const rect = sentinel.getBoundingClientRect();
+    if (rect.top <= window.innerHeight + 150) {
+      isLoadingMoreRef.current = true;
+      setIsLoadingMore(true);
+      fetchStartTimeRef.current = Date.now();
+      setPage((prev) => prev + 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 5) {
+        triggerLoadMore();
+      }
+    };
+
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      if (touchStartY - e.touches[0].clientY > 10) {
+        triggerLoadMore();
+      }
+    };
+
+    const handleScroll = () => {
+      const currentY = window.scrollY || document.documentElement.scrollTop;
+      if (currentY > lastScrollYRef.current + 15) {
+        triggerLoadMore();
+      }
+      lastScrollYRef.current = currentY;
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [triggerLoadMore]);
+
   useEffect(() => {
     if (requestsRes?.data) {
       const data = requestsRes.data;
+      isLoadingMoreRef.current = false;
+      setIsLoadingMore(false);
+      lastScrollYRef.current = window.scrollY || document.documentElement.scrollTop;
+      cooldownUntilRef.current = Date.now() + 300;
       if (Array.isArray(data)) {
         setRequests((prev) => {
           if (page === 1) return data;
@@ -98,6 +173,8 @@ export default function MyRequests() {
 
   useEffect(() => {
     setPage(1);
+    setIsLoadingMore(false);
+    isLoadingMoreRef.current = false;
   }, [searchQuery, selectedStatus, sortBy]);
 
   useEffect(() => {
@@ -106,16 +183,16 @@ export default function MyRequests() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && page < totalPages && !isFetching) {
-          setPage((prev) => prev + 1);
+        if (entries[0].isIntersecting) {
+          triggerLoadMore();
         }
       },
-      { rootMargin: "400px" }
+      { rootMargin: "150px" }
     );
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [page, totalPages, isFetching]);
+  }, [triggerLoadMore]);
 
   const handleStatusChange = (status: StatusFilterType) => {
     setSelectedStatus(status);
@@ -323,13 +400,13 @@ export default function MyRequests() {
                 onReopenRequest={handleOpenReopen}
               />
             ))}
-            {isFetching && page > 1 &&
+            {isLoadingMore &&
               Array.from({ length: 2 }).map((_, idx) => (
                 <ServiceRequestCardSkeleton key={`skeleton-${idx}`} variant="customer" />
               ))}
           </div>
 
-          {page < totalPages && <div ref={sentinelRef} className="myreq-sentinel" />}
+          <div ref={sentinelRef} className="myreq-sentinel" />
 
           {page >= totalPages && requests.length > 0 && totalPages > 1 && (
             <div className="myreq-end-message">

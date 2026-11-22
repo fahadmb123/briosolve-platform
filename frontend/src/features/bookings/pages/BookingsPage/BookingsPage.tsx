@@ -49,7 +49,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
   const providerQuery = useGetProviderBookings(queryParams, { enabled: isProvider });
   const updateStatusMutation = useUpdateBookingStatus();
 
-  const { data: responseData, isLoading, error, refetch, isFetching } = isProvider
+  const { data: responseData, isLoading, error, refetch } = isProvider
     ? providerQuery
     : customerQuery;
 
@@ -282,7 +282,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
       </div>
 
       <div className="bk-content-area">
-        {isLoading || isFetching ? (
+        {(isLoading && bookings.length === 0) ? (
           <div className="bk-cards-stack">
             {Array.from({ length: 3 }).map((_, idx) => (
               <BookingCardSkeleton key={idx} />

@@ -18,14 +18,17 @@ export function useNotificationSocket(): void {
 
     const fetchLatestNotifications = useCallback(() => {
         if (!isAuthenticated) return;
-        getNotificationsMutation.mutate(undefined, {
-            onSuccess: (res) => {
-                if (res?.data) {
-                    const items = Array.isArray(res.data) ? res.data : res.data.notifications || [];
-                    setNotifications(items);
-                }
-            },
-        });
+        getNotificationsMutation.mutate(
+            { page: 1, limit: 5, unreadOnly: true },
+            {
+                onSuccess: (res) => {
+                    if (res?.data) {
+                        const items = Array.isArray(res.data) ? res.data : res.data.notifications || [];
+                        setNotifications(items);
+                    }
+                },
+            }
+        );
     }, [isAuthenticated, setNotifications]);
 
     useEffect(() => {

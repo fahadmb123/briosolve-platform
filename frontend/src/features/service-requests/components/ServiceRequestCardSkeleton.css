@@ -11,15 +11,15 @@
     rgba(226, 232, 240, 0.7) 100%
   );
   background-size: 200% 100%;
-  animation: srSkShimmer 1.5s infinite linear;
+  animation: srSkShimmer 1.6s infinite ease-in-out;
 }
 
 @keyframes srSkShimmer {
   0% {
-    background-position: -200% 0;
+    background-position: 200% 0;
   }
   100% {
-    background-position: 200% 0;
+    background-position: -200% 0;
   }
 }
 

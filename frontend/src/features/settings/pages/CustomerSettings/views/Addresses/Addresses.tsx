@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { AddAddressModal, AddressCardSkeleton, AddressCardSkeletonGrid, type AddressPayload, useAddAddress, useDeleteAddress, useEditAddress, useGetAddresses, useSetDefaultAddress } from '../../../../../addresses';
 import Skeleton from 'react-loading-skeleton';
 import { toast } from 'react-hot-toast';
@@ -23,7 +23,10 @@ export const Addresses = () => {
   const [limit] = useState(5)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const isLoadingMoreRef = useRef(false)
+  const fetchStartTimeRef = useRef(0)
 
   const { data: addressesRes, isLoading, isFetching } = useGetAddresses({
     page,
@@ -31,22 +34,97 @@ export const Addresses = () => {
     limit,
   })
 
+  const isFetchingRef = useRef(isFetching)
+  isFetchingRef.current = isFetching
+  const hasMore = page < totalPages
+  const hasMoreRef = useRef(hasMore)
+  hasMoreRef.current = hasMore
+  const cooldownUntilRef = useRef<number>(0)
+  const lastScrollYRef = useRef<number>(0)
+
+  const triggerLoadMore = useCallback(() => {
+    if (
+      !hasMoreRef.current ||
+      isFetchingRef.current ||
+      isLoadingMoreRef.current ||
+      Date.now() < cooldownUntilRef.current
+    ) {
+      return
+    }
+
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const rect = sentinel.getBoundingClientRect()
+    if (rect.top <= window.innerHeight + 150) {
+      isLoadingMoreRef.current = true
+      setIsLoadingMore(true)
+      fetchStartTimeRef.current = Date.now()
+      setPage((prev) => prev + 1)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 5) {
+        triggerLoadMore()
+      }
+    }
+
+    let touchStartY = 0
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY
+    }
+    const handleTouchMove = (e: TouchEvent) => {
+      if (touchStartY - e.touches[0].clientY > 10) {
+        triggerLoadMore()
+      }
+    }
+
+    const handleScroll = () => {
+      const currentY = window.scrollY || document.documentElement.scrollTop
+      if (currentY > lastScrollYRef.current + 15) {
+        triggerLoadMore()
+      }
+      lastScrollYRef.current = currentY
+    }
+
+    window.addEventListener("wheel", handleWheel, { passive: true })
+    window.addEventListener("touchstart", handleTouchStart, { passive: true })
+    window.addEventListener("touchmove", handleTouchMove, { passive: true })
+    window.addEventListener("scroll", handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel)
+      window.removeEventListener("touchstart", handleTouchStart)
+      window.removeEventListener("touchmove", handleTouchMove)
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [triggerLoadMore])
+
   useEffect(() => {
     if (addressesRes?.data) {
-      const incoming = (addressesRes.data.addresses as AddressPayload[]) || []
+      const data = addressesRes.data
+      isLoadingMoreRef.current = false
+      setIsLoadingMore(false)
+      lastScrollYRef.current = window.scrollY || document.documentElement.scrollTop
+      cooldownUntilRef.current = Date.now() + 300
+      const incoming = (data.addresses as AddressPayload[]) || []
       setAddresses((prev) => {
         if (page === 1) return incoming
         const existingIds = new Set(prev.map((a) => a.id))
         const uniqueNew = incoming.filter((a) => !existingIds.has(a.id))
         return [...prev, ...uniqueNew]
       })
-      setTotal(addressesRes.data.total)
-      setTotalPages(addressesRes.data.totalPages)
+      setTotal(data.total)
+      setTotalPages(data.totalPages)
     }
   }, [addressesRes, page])
 
   useEffect(() => {
     setPage(1)
+    setIsLoadingMore(false)
+    isLoadingMoreRef.current = false
   }, [search])
 
   useEffect(() => {
@@ -55,16 +133,16 @@ export const Addresses = () => {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && page < totalPages && !isFetching) {
-          setPage((prev) => prev + 1)
+        if (entries[0].isIntersecting) {
+          triggerLoadMore()
         }
       },
-      { rootMargin: '400px' }
+      { rootMargin: '150px' }
     )
 
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [page, totalPages, isFetching])
+  }, [triggerLoadMore])
 
   const handleDelete = async () => {
     if (!addressToDelete) return;
@@ -125,7 +203,6 @@ export const Addresses = () => {
   return (
     <>
       <div className="bg-surface-container-low border border-surface-variant rounded-xl p-6 md:p-8 flex flex-col gap-6 shadow-xl">
-        {/* Header & Top Action */}
         <div className="flex flex-row items-center justify-between w-full text-left border-b border-surface-variant pb-6">
           <div className="text-left">
             <h2 className="font-headline-lg text-headline-lg text-on-surface m-0 text-left">Addresses</h2>
@@ -142,9 +219,7 @@ export const Addresses = () => {
           </div>
         </div>
 
-        {/* Search & Actions Ribbon */}
         <div className="flex flex-row items-center justify-between w-full gap-4 pt-2">
-          {/* Quick Search Field (Left) */}
           <div className="relative w-full sm:max-w-md">
             <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-base">search</span>
             <input className="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-lowest border border-surface-variant text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
@@ -156,7 +231,6 @@ export const Addresses = () => {
             />
           </div>
 
-          {/* Add New Address Button (Right) */}
           <button
             onClick={() => {
               setAddressToEdit(null);
@@ -169,7 +243,6 @@ export const Addresses = () => {
           </button>
         </div>
 
-        {/* Address Cards List */}
         <div className="flex flex-col gap-4">
 
           {isLoading && page === 1 ? (
@@ -182,7 +255,6 @@ export const Addresses = () => {
                   <div key={address.id} className={`bg-surface-container rounded-xl border ${isDefault ? 'border-primary/40 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.45)]' : 'border-surface-variant shadow-md'} p-5 relative overflow-hidden transition-all hover:border-primary/60 flex flex-col justify-between gap-4`}>
                     {isDefault && <div className="absolute top-0 left-0 w-1.5 h-full bg-primary"></div>}
 
-                    {/* Top Row: Info & Top Actions */}
                     <div className="flex items-start justify-between w-full pl-2 gap-4">
                       <div className="flex items-start gap-4 w-full">
                         <div className={`w-10 h-10 rounded-lg ${isDefault ? 'bg-primary/10 border border-primary/30 text-primary' : 'bg-surface-container-high border border-surface-variant text-on-surface-variant'} flex items-center justify-center shrink-0`}>
@@ -223,7 +295,6 @@ export const Addresses = () => {
                           )}
                         </div>
                       </div>
-                      {/* Top Right Edit Button */}
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           onClick={() => {
@@ -247,7 +318,6 @@ export const Addresses = () => {
                       </div>
                     </div>
 
-                    {/* Bottom Row */}
                     <div className="flex items-end justify-between w-full pl-2 mt-2">
                       {isDefault ? (
                         <span className="text-[11px] text-primary font-medium">Primary shipping destination</span>
@@ -279,12 +349,12 @@ export const Addresses = () => {
                 )
               })}
 
-              {isFetching && page > 1 &&
+              {isLoadingMore &&
                 Array.from({ length: 2 }).map((_, idx) => (
                   <AddressCardSkeleton key={`skeleton-${idx}`} />
                 ))}
 
-              {page < totalPages && <div ref={sentinelRef} className="w-full h-5 pointer-events-none opacity-0" />}
+              <div ref={sentinelRef} className="w-full h-5 pointer-events-none opacity-0" />
 
               {page >= totalPages && addresses.length > 0 && totalPages > 1 && (
                 <div className="flex items-center justify-center py-6 text-center">
@@ -306,7 +376,6 @@ export const Addresses = () => {
                 </div>
               )}
 
-              {/* Dashed Interactive Add Slot */}
               <div
                 onClick={() => {
                   setAddressToEdit(null);

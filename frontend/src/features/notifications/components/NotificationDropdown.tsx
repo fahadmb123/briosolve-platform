@@ -17,7 +17,6 @@ import {
 import { mapNotificationToHeader } from "../utils/notification.mapper";
 import { NotificationDropdownItem } from "./NotificationDropdownItem";
 import { NotificationDropdownEmpty } from "./NotificationDropdownEmpty";
-import { NotificationDropdownSkeleton } from "./NotificationDropdownSkeleton";
 import {
   MAX_DROPDOWN_BADGE_COUNT,
   NOTIFICATION_ROUTES,
@@ -38,9 +37,11 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPage, setDropdownPage] = useState(1);
-  const [dropdownTotalPages, setDropdownTotalPages] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
   const isFetchingMoreRef = useRef(false);
+  const dropdownPageRef = useRef(1);
+  const dropdownTotalPagesRef = useRef(1);
 
   const notifications = useNotificationStore((state) => state.notifications);
   const setNotifications = useNotificationStore(
@@ -112,33 +113,46 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const fetchDropdownNotifications = useCallback((page: number, isReset: boolean = false) => {
     if (page > 1) {
       isFetchingMoreRef.current = true;
+      setIsLoadingMore(true);
     }
     getNotificationsMutation.mutate(
       { page, limit: 5, unreadOnly: true },
       {
         onSuccess: (res) => {
           isFetchingMoreRef.current = false;
+          setIsLoadingMore(false);
           if (res?.data) {
             if (Array.isArray(res.data)) {
               setNotifications(res.data);
+              dropdownTotalPagesRef.current = 1;
             } else {
               const incoming = res.data.notifications || [];
+              if (incoming.length === 0) {
+                dropdownTotalPagesRef.current = page;
+                return;
+              }
               setNotifications(
                 isReset || page === 1
                   ? incoming
                   : (() => {
-                      const current = useNotificationStore.getState().notifications;
-                      const existingIds = new Set(current.map((n) => n.id));
-                      const newUnique = incoming.filter((n) => !existingIds.has(n.id));
-                      return [...current, ...newUnique];
-                    })()
+                    const current = useNotificationStore.getState().notifications;
+                    const existingIds = new Set(current.map((n) => n.id));
+                    const newUnique = incoming.filter((n) => !existingIds.has(n.id));
+                    if (newUnique.length === 0) {
+                      dropdownTotalPagesRef.current = page;
+                      return current;
+                    }
+                    return [...current, ...newUnique];
+                  })()
               );
-              setDropdownTotalPages(res.data.totalPages || 1);
+              const pages = res.data.totalPages || 1;
+              dropdownTotalPagesRef.current = pages;
             }
           }
         },
         onError: () => {
           isFetchingMoreRef.current = false;
+          setIsLoadingMore(false);
         }
       }
     );
@@ -150,6 +164,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     setIsOpen((prev) => {
       const next = !prev;
       if (next) {
+        dropdownPageRef.current = 1;
         setDropdownPage(1);
         fetchDropdownNotifications(1, true);
       }
@@ -159,15 +174,19 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   const handleScroll = useCallback(() => {
     const el = bodyRef.current;
-    if (!el || isFetchingMoreRef.current || getNotificationsMutation.isPending) return;
+    if (!el || isFetchingMoreRef.current) return;
+    if (el.scrollHeight <= el.clientHeight) return;
 
-    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
-    if (nearBottom && dropdownPage < dropdownTotalPages) {
-      const nextPage = dropdownPage + 1;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
+    if (nearBottom && dropdownPageRef.current < dropdownTotalPagesRef.current) {
+      isFetchingMoreRef.current = true;
+      setIsLoadingMore(true);
+      const nextPage = dropdownPageRef.current + 1;
+      dropdownPageRef.current = nextPage;
       setDropdownPage(nextPage);
       fetchDropdownNotifications(nextPage, false);
     }
-  }, [dropdownPage, dropdownTotalPages, getNotificationsMutation.isPending, fetchDropdownNotifications]);
+  }, [fetchDropdownNotifications]);
 
   const handleToggleRead = useCallback(
     (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
@@ -321,7 +340,13 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
           <div className="notif-dropdown-body" ref={bodyRef} onScroll={handleScroll}>
             {getNotificationsMutation.isPending && notifications.length === 0 ? (
-              <NotificationDropdownSkeleton />
+              <div className="notif-dropdown-initial-loader">
+                <div className="notif-dropdown-dots-loader">
+                  <span className="dot" />
+                  <span className="dot" />
+                  <span className="dot" />
+                </div>
+              </div>
             ) : displayedNotifications.length === 0 ? (
               <NotificationDropdownEmpty />
             ) : (
@@ -334,8 +359,12 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                     onToggleRead={handleToggleRead}
                   />
                 ))}
-                {getNotificationsMutation.isPending && dropdownPage > 1 && (
-                  <NotificationDropdownSkeleton />
+                {isLoadingMore && dropdownPage > 1 && (
+                  <div className="notif-dropdown-dots-loader">
+                    <span className="dot" />
+                    <span className="dot" />
+                    <span className="dot" />
+                  </div>
                 )}
               </>
             )}

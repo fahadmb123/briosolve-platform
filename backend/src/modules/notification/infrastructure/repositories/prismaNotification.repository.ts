@@ -39,11 +39,10 @@ export class PrismaNotificationRepository implements INotificationRepository {
         }
         query.orderBy((n) => n.created_at.desc());
 
-        if (options?.limit) {
-            const page = options.page || 1;
-            const skip = (page - 1) * options.limit;
-            query.offset(skip).limit(options.limit);
-        }
+        const limit = Math.max(1, options?.limit || 50);
+        const page = Math.max(1, options?.page || 1);
+        const skip = (page - 1) * limit;
+        query.offset(skip).limit(limit);
 
         const record = await query.all();
 
