@@ -6,6 +6,7 @@ import { BookingRouteDependencies } from "../types/booking.route.dependencies";
 export function buildBookingRoute(controller: BookingRouteDependencies): Router {
     const router = Router();
 
+    router.get("/admin", authMiddleware, requireRole(["ADMIN"]), controller.booking.getAdminBookings);
     router.get("/customer", authMiddleware, requireRole(["CUSTOMER"]), controller.booking.getCustomerBookings);
     router.get("/provider", authMiddleware, requireRole(["PROVIDER"]), controller.booking.getProviderBookings);
     router.get("/:id", authMiddleware, controller.booking.getById);

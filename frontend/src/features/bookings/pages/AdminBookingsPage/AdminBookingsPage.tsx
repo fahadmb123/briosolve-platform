@@ -31,9 +31,7 @@ export const AdminBookingsPage: React.FC = () => {
   });
 
   const bookings = response?.data?.bookings || [];
-  const total = response?.data?.total || 0;
   const totalPages = response?.data?.totalPages || 1;
-  const stats = response?.data?.stats;
 
   const handleResetFilters = () => {
     setSearch("");
@@ -82,60 +80,6 @@ export const AdminBookingsPage: React.FC = () => {
           <p className="text-secondary text-sm mb-0">
             Monitor marketplace bookings, service milestones, payment escrow, and fulfillment statuses.
           </p>
-        </div>
-      </div>
-
-      <div className="admin-kpi-grid">
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon bg-primary-light text-primary">
-            <i className="fas fa-calendar-check"></i>
-          </div>
-          <div>
-            <div className="admin-kpi-val">{stats?.total ?? total}</div>
-            <div className="admin-kpi-lbl">Total Bookings</div>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon bg-warning-light text-warning">
-            <i className="fas fa-tools"></i>
-          </div>
-          <div>
-            <div className="admin-kpi-val">{stats?.inProgress ?? 0}</div>
-            <div className="admin-kpi-lbl">In Progress</div>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon bg-success-light text-success">
-            <i className="fas fa-award"></i>
-          </div>
-          <div>
-            <div className="admin-kpi-val">{stats?.completed ?? 0}</div>
-            <div className="admin-kpi-lbl">Completed</div>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon bg-danger-light text-danger">
-            <i className="fas fa-ban"></i>
-          </div>
-          <div>
-            <div className="admin-kpi-val">{stats?.cancelled ?? 0}</div>
-            <div className="admin-kpi-lbl">Cancelled</div>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon bg-info-light text-info">
-            <i className="fas fa-coins"></i>
-          </div>
-          <div>
-            <div className="admin-kpi-val">
-              ₹{Number(stats?.totalPlatformFees ?? 0).toLocaleString("en-IN")}
-            </div>
-            <div className="admin-kpi-lbl">Platform Revenue</div>
-          </div>
         </div>
       </div>
 

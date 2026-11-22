@@ -10,7 +10,8 @@ import {
     createGetProviderBookingsUseCase,
     createUpdateBookingStatusUseCase,
     createReportServiceMismatchUseCase,
-    createResolveServiceMismatchUseCase
+    createResolveServiceMismatchUseCase,
+    createGetAdminBookingsUseCase
 } from "./useCases";
 
 export function createBookingController(
@@ -23,6 +24,7 @@ export function createBookingController(
     const updateBookingStatusUseCase = createUpdateBookingStatusUseCase(createNotificationUseCase, creditWalletUseCase);
     const reportServiceMismatchUseCase = createReportServiceMismatchUseCase(createNotificationUseCase);
     const resolveServiceMismatchUseCase = createResolveServiceMismatchUseCase(creditWalletUseCase, createNotificationUseCase);
+    const getAdminBookingsUseCase = createGetAdminBookingsUseCase();
 
     return new BookingController(
         getBookingByIdUseCase,
@@ -30,6 +32,7 @@ export function createBookingController(
         getProviderBookingsUseCase,
         updateBookingStatusUseCase,
         reportServiceMismatchUseCase,
-        resolveServiceMismatchUseCase
+        resolveServiceMismatchUseCase,
+        getAdminBookingsUseCase
     );
 }

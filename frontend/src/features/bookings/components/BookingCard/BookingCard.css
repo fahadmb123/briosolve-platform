@@ -1,42 +1,45 @@
 .bkcard-row-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 20px 24px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  min-height: 250px;
+  box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.05), 0 1px 4px -1px rgba(15, 23, 42, 0.03);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .bkcard-row-card:hover {
   border-color: #cbd5e1;
-  box-shadow: 0 6px 16px -4px rgba(15, 23, 42, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 10px 24px -6px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
 }
 
 .bkcard-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .bkcard-header-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .bkcard-ref-box {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 8px;
 }
 
@@ -46,7 +49,7 @@
 }
 
 .bkcard-ref-number {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 700;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   color: #0f172a;
@@ -59,9 +62,16 @@
 }
 
 .bkcard-date-booked {
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
   color: #64748b;
   font-weight: 500;
+}
+
+.bkcard-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .bkcard-badge {
@@ -123,19 +133,52 @@
   border: 1px solid #fecaca;
 }
 
+.bkcard-escrow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.735rem;
+  font-weight: 600;
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.bkcard-escrow-badge.paid {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.bkcard-escrow-badge.refunded {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
 .bkcard-body {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+
+.bkcard-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .bkcard-title {
-  font-size: 1.125rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
   cursor: pointer;
-  line-height: 1.4;
+  line-height: 1.35;
   transition: color 0.15s ease;
 }
 
@@ -143,17 +186,29 @@
   color: #ea580c;
 }
 
+.bkcard-category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
 .bkcard-diagnosis-pill {
   display: inline-flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   color: #166534;
-  font-size: 0.78rem;
-  padding: 6px 10px;
-  border-radius: 8px;
-  margin-top: 6px;
+  font-size: 0.8125rem;
+  padding: 10px 14px;
+  border-radius: 10px;
   max-width: 100%;
 }
 
@@ -163,7 +218,7 @@
 }
 
 .bkcard-diagnosis-title {
-  font-weight: 500;
+  font-weight: 600;
   color: #15803d;
 }
 
@@ -173,21 +228,21 @@
 }
 
 .bkcard-diagnosis-desc {
-  font-size: 0.74rem;
+  font-size: 0.775rem;
   color: #475569;
+  margin-top: 2px;
 }
 
 .bkcard-cancel-reason-pill {
   display: inline-flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
   background: #fef2f2;
   border: 1px solid #fecaca;
   color: #991b1b;
-  font-size: 0.78rem;
-  padding: 6px 10px;
-  border-radius: 8px;
-  margin-top: 6px;
+  font-size: 0.8125rem;
+  padding: 10px 14px;
+  border-radius: 10px;
   max-width: 100%;
 }
 
@@ -208,106 +263,128 @@
 }
 
 .bkcard-cancel-reason-text {
-  font-size: 0.74rem;
+  font-size: 0.775rem;
   color: #64748b;
   font-style: italic;
+  margin-top: 2px;
 }
 
-.bkcard-meta-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-.bkcard-meta-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #f8fafc;
+.bkcard-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  padding: 14px 16px;
+  background-color: #f8fafc;
   border: 1px solid #e2e8f0;
-  padding: 5px 10px;
+  border-radius: 12px;
+}
+
+.bkcard-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.bkcard-info-icon-wrapper {
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
-  font-size: 0.8rem;
-  color: #475569;
-}
-
-.bkcard-meta-tag i {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   color: #64748b;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
-.bkcard-meta-tag.counterparty strong {
-  color: #0f172a;
-}
-
-.bkcard-meta-tag.escrow {
+.bkcard-info-icon-wrapper.primary {
+  color: #ea580c;
   background: #fff7ed;
   border-color: #fed7aa;
-  color: #c2410c;
+}
+
+.bkcard-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.bkcard-info-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.bkcard-info-value {
+  font-size: 0.84rem;
   font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.bkcard-meta-tag.escrow i {
-  color: #ea580c;
-}
-
-.bkcard-meta-tag.type-fixed {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
-  color: #15803d;
-  font-weight: 600;
-}
-
-.bkcard-meta-tag.type-fixed i {
-  color: #16a34a;
-}
-
-.bkcard-meta-tag.type-inspection {
-  background: #faf5ff;
-  border-color: #e9d5ff;
-  color: #7c3aed;
-  font-weight: 600;
-}
-
-.bkcard-meta-tag.type-inspection i {
-  color: #8b5cf6;
+.bkcard-info-value.location-text {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.35;
 }
 
 .bkcard-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 14px;
+  padding-top: 18px;
   border-top: 1px solid #f1f5f9;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 16px;
 }
 
 .bkcard-footer-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .bkcard-price-block {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .bkcard-price-label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #64748b;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+}
+
+.bkcard-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 
 .bkcard-price-value {
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   font-weight: 800;
   color: #0f172a;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+}
+
+.bkcard-price-subtext {
+  font-size: 0.775rem;
+  color: #64748b;
+  font-weight: 500;
 }
 
 .bkcard-footer-right {
@@ -321,12 +398,12 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 9px 16px;
   background: #ffffff;
   border: 1px solid #cbd5e1;
   color: #334155;
   border-radius: 9px;
-  font-size: 0.84rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -342,19 +419,19 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 9px 18px;
   background: #ffffff;
   border: 1px solid #cbd5e1;
   color: #0f172a;
   border-radius: 9px;
-  font-size: 0.84rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .bkcard-btn-details:hover {
-  background: #f1f5f9;
+  background: #f8fafc;
   border-color: #94a3b8;
 }
 
@@ -362,19 +439,27 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 9px 20px;
   border-radius: 9px;
-  font-size: 0.84rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent;
   transition: all 0.15s ease;
+}
+
+.bkcard-btn-action.primary {
+  background: #ea580c;
+  color: #ffffff;
+}
+
+.bkcard-btn-action.primary:hover {
+  background: #c2410c;
 }
 
 .bkcard-btn-action.route {
   background: #0284c7;
   color: #ffffff;
-  box-shadow: 0 1px 2px rgba(2, 132, 199, 0.2);
 }
 
 .bkcard-btn-action.route:hover {
@@ -384,27 +469,15 @@
 .bkcard-btn-action.inspection {
   background: #7c3aed;
   color: #ffffff;
-  box-shadow: 0 1px 2px rgba(124, 58, 237, 0.2);
 }
 
 .bkcard-btn-action.inspection:hover {
   background: #6d28d9;
 }
 
-.bkcard-btn-action.primary {
-  background: #ea580c;
-  color: #ffffff;
-  box-shadow: 0 1px 2px rgba(234, 88, 12, 0.2);
-}
-
-.bkcard-btn-action.primary:hover {
-  background: #c2410c;
-}
-
 .bkcard-btn-action.success {
   background: #16a34a;
   color: #ffffff;
-  box-shadow: 0 1px 2px rgba(22, 163, 74, 0.2);
 }
 
 .bkcard-btn-action.success:hover {
@@ -412,33 +485,12 @@
 }
 
 .bkcard-btn-action.danger {
-  background: #fef2f2;
+  background: #ffffff;
   color: #dc2626;
-  border: 1px solid #fecaca;
+  border-color: #fca5a5;
 }
 
 .bkcard-btn-action.danger:hover {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-.bkcard-btn-request {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #475569;
-  border-radius: 9px;
-  font-size: 0.84rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.bkcard-btn-request:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #0f172a;
+  background: #fef2f2;
+  border-color: #f87171;
 }
