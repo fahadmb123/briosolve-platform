@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { useGetAdminBookings } from "../../hooks/useAdminBookings";
+import { AdminPagination } from "../../../admin/components/AdminPagination";
 import { AdminBookingDetailModal } from "../../components/AdminBookingDetailModal/AdminBookingDetailModal";
 import type { AdminBookingItem } from "../../types/booking.types";
 import "./AdminBookingsPage.css";
 
 export const AdminBookingsPage: React.FC = () => {
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -18,24 +17,23 @@ export const AdminBookingsPage: React.FC = () => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search.trim());
       setPage(1);
-    }, 300);
+    }, 350);
     return () => clearTimeout(handler);
   }, [search]);
 
-  const { data: response, isLoading } = useGetAdminBookings({
+  const { data, isLoading } = useGetAdminBookings({
     page,
-    limit,
-    search: debouncedSearch || undefined,
+    limit: 10,
+    search: debouncedSearch.trim() || undefined,
     status: statusFilter || undefined,
     paymentStatus: paymentStatusFilter || undefined
   });
 
-  const bookings = response?.data?.bookings || [];
-  const totalPages = response?.data?.totalPages || 1;
+  const bookings = data?.data?.bookings || [];
+  const totalPages = data?.data?.totalPages || 1;
 
   const handleResetFilters = () => {
     setSearch("");
-    setDebouncedSearch("");
     setStatusFilter("");
     setPaymentStatusFilter("");
     setPage(1);
@@ -43,48 +41,51 @@ export const AdminBookingsPage: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "COMPLETED":
-      case "CLOSED":
-        return <span className="badge badge-verified">{status.replace("_", " ")}</span>;
-      case "IN_PROGRESS":
+      case "CONFIRMED":
+        return <span className="admin-bk-pill confirmed"><i className="fas fa-check-circle text-xs"></i>Confirmed</span>;
       case "EN_ROUTE":
       case "INSPECTION":
-        return <span className="badge badge-pending">{status.replace("_", " ")}</span>;
+      case "IN_PROGRESS":
+        return <span className="admin-bk-pill progress"><i className="fas fa-spinner text-xs"></i>{status.replace("_", " ")}</span>;
+      case "PAYMENT_PENDING":
+        return <span className="admin-bk-pill progress"><i className="fas fa-clock text-xs"></i>Payment Pending</span>;
+      case "COMPLETED":
+        return <span className="admin-bk-pill completed"><i className="fas fa-check-double text-xs"></i>Completed</span>;
+      case "CLOSED":
+        return <span className="admin-bk-pill closed"><i className="fas fa-archive text-xs"></i>Closed</span>;
       case "CANCELLED":
-        return <span className="badge badge-danger-alert">{status}</span>;
+        return <span className="admin-bk-pill cancelled"><i className="fas fa-ban text-xs"></i>Cancelled</span>;
       default:
-        return <span className="badge badge-admin">{status.replace("_", " ")}</span>;
+        return <span className="admin-bk-pill closed">{status.replace("_", " ")}</span>;
     }
   };
 
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
       case "PAID":
-        return <span className="badge badge-verified">PAID</span>;
+        return <span className="admin-bk-pill pay-paid">Paid</span>;
       case "ADVANCE_PAID":
-        return <span className="badge badge-pending">ADVANCE PAID</span>;
+        return <span className="admin-bk-pill pay-advance">Advance Paid</span>;
       case "REFUNDED":
-        return <span className="badge badge-danger-alert">REFUNDED</span>;
+        return <span className="admin-bk-pill pay-refunded">Refunded</span>;
       default:
-        return <span className="badge badge-admin">{status}</span>;
+        return <span className="admin-bk-pill pay-pending">Pending</span>;
     }
   };
 
   return (
-    <div className="app-content">
-      <div className="flex justify-between items-center flex-wrap gap-4 mb-4">
-        <div>
-          <h1 className="font-extrabold tracking-tight mb-1" style={{ fontSize: "2rem" }}>
-            Bookings Management
-          </h1>
-          <p className="text-secondary text-sm mb-0">
-            Monitor marketplace bookings, service milestones, payment escrow, and fulfillment statuses.
-          </p>
-        </div>
+    <div className="admin-bookings-container">
+      <div className="admin-bookings-header">
+        <h1 className="admin-bookings-title">
+          Bookings Management
+        </h1>
+        <p className="admin-bookings-subtitle">
+          Monitor marketplace bookings, service milestones, payment escrow, and fulfillment statuses.
+        </p>
       </div>
 
-      <div className="admin-filter-bar">
-        <div className="admin-search-input">
+      <div className="admin-bookings-filter-bar">
+        <div className="admin-search-input" style={{ flex: "1 1 280px" }}>
           <i className="fas fa-search"></i>
           <input
             type="text"
@@ -135,18 +136,18 @@ export const AdminBookingsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="admin-table-card admin-booking-table-card">
+      <div className="admin-bookings-table-card">
         <div className="table-responsive">
-          <table className="admin-table">
+          <table className="admin-bookings-table">
             <thead>
               <tr>
-                <th style={{ width: "16%" }}>Booking Ref</th>
-                <th style={{ width: "18%" }}>Customer</th>
-                <th style={{ width: "18%" }}>Provider</th>
-                <th style={{ width: "18%" }}>Service & Schedule</th>
-                <th style={{ width: "14%" }}>Amounts</th>
-                <th style={{ width: "10%" }}>Status</th>
-                <th className="text-right" style={{ width: "6%" }}>Action</th>
+                <th style={{ width: "16%", minWidth: "150px" }}>Booking Ref</th>
+                <th style={{ width: "18%", minWidth: "170px" }}>Customer</th>
+                <th style={{ width: "20%", minWidth: "180px" }}>Provider</th>
+                <th style={{ width: "20%", minWidth: "180px" }}>Service & Schedule</th>
+                <th style={{ width: "12%", minWidth: "110px" }}>Amounts</th>
+                <th style={{ width: "14%", minWidth: "130px" }}>Status</th>
+                <th className="text-right" style={{ width: "8%", minWidth: "90px" }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -177,7 +178,7 @@ export const AdminBookingsPage: React.FC = () => {
                       <div className="admin-skel-line" style={{ width: "70px", height: "20px", borderRadius: "12px" }}></div>
                     </td>
                     <td className="text-right">
-                      <div className="admin-skel-line ml-auto" style={{ width: "32px", height: "32px", borderRadius: "6px" }}></div>
+                      <div className="admin-skel-line ml-auto" style={{ width: "60px", height: "28px", borderRadius: "6px" }}></div>
                     </td>
                   </tr>
                 ))
@@ -204,76 +205,94 @@ export const AdminBookingsPage: React.FC = () => {
                 bookings.map((b) => (
                   <tr key={b.id}>
                     <td>
-                      <strong className="text-sm font-semibold block">#{b.bookingNumber}</strong>
-                      <span className="text-xs text-secondary block mt-0.5">
-                        {new Date(b.createdAt).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit"
-                        })}
-                      </span>
-                    </td>
-                    <td>
-                      <strong className="text-sm block">{b.customerName || "Customer"}</strong>
-                      {b.customerEmail && (
-                        <span className="text-xs text-secondary block truncate" style={{ maxWidth: "160px" }}>
-                          {b.customerEmail}
+                      <div className="admin-bk-ref-cell">
+                        <span className="admin-bk-ref-code">#{b.bookingNumber}</span>
+                        <span className="admin-bk-ref-date">
+                          <i className="far fa-clock"></i>
+                          {new Date(b.createdAt).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                          })}
                         </span>
-                      )}
-                      {b.customerPhone && (
-                        <span className="text-xs text-secondary block">{b.customerPhone}</span>
-                      )}
+                      </div>
                     </td>
                     <td>
-                      <strong className="text-sm block">
-                        {b.providerBusinessName || b.providerName || "Assigned Provider"}
-                      </strong>
-                      {b.providerEmail && (
-                        <span className="text-xs text-secondary block truncate" style={{ maxWidth: "160px" }}>
-                          {b.providerEmail}
-                        </span>
-                      )}
-                      {b.providerPhone && (
-                        <span className="text-xs text-secondary block">{b.providerPhone}</span>
-                      )}
-                    </td>
-                    <td>
-                      <div className="text-sm font-medium">{b.serviceRequestTitle || "Service Requirement"}</div>
-                      <span className="text-xs text-secondary block mt-0.5">
-                        <i className="fas fa-calendar-alt mr-1"></i>
-                        {b.scheduledDate
-                          ? new Date(b.scheduledDate).toLocaleDateString("en-IN", {
-                              day: "numeric",
-                              month: "short"
-                            })
-                          : "Flexible"}
-                        {b.scheduledTime ? ` · ${b.scheduledTime}` : ""}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="admin-booking-amount-box">
-                        <div className="admin-booking-price-tag">
-                          ₹{Number(b.totalAmount).toLocaleString("en-IN")}
+                      <div className="admin-bk-user-cell">
+                        <div className="admin-bk-avatar customer">
+                          <i className="fas fa-user"></i>
                         </div>
-                        <div className="admin-booking-fee-tag">
-                          Fee: ₹{Number(b.platformFee).toLocaleString("en-IN")}
+                        <div className="admin-bk-user-meta">
+                          <span className="admin-bk-user-name" title={b.customerName || "Customer"}>
+                            {b.customerName || "Customer"}
+                          </span>
+                          <span className="admin-bk-user-sub" title={b.customerEmail || b.customerPhone || ""}>
+                            {b.customerPhone || b.customerEmail || "N/A"}
+                          </span>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <div className="admin-booking-badge-stack">
+                      <div className="admin-bk-user-cell">
+                        <div className="admin-bk-avatar provider">
+                          <i className="fas fa-store"></i>
+                        </div>
+                        <div className="admin-bk-user-meta">
+                          <span
+                            className="admin-bk-user-name"
+                            title={b.providerBusinessName || b.providerName || "Assigned Provider"}
+                          >
+                            {b.providerBusinessName || b.providerName || "Assigned Provider"}
+                          </span>
+                          <span className="admin-bk-user-sub" title={b.providerPhone || b.providerEmail || ""}>
+                            {b.providerPhone || b.providerEmail || "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="admin-bk-service-cell">
+                        <span className="admin-bk-service-title" title={b.serviceRequestTitle || "Service Requirement"}>
+                          {b.serviceRequestTitle || "Service Requirement"}
+                        </span>
+                        <span className="admin-bk-schedule-tag">
+                          <i className="far fa-calendar-alt"></i>
+                          {b.scheduledDate
+                            ? new Date(b.scheduledDate).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "short"
+                              })
+                            : "Flexible"}
+                          {b.scheduledTime ? ` · ${b.scheduledTime}` : ""}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="admin-bk-amount-cell">
+                        <span className="admin-bk-amount-total">
+                          ₹{Number(b.totalAmount).toLocaleString("en-IN")}
+                        </span>
+                        <span className="admin-bk-amount-fee">
+                          Fee: ₹{Number(b.platformFee).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="admin-bk-status-stack">
                         {getStatusBadge(b.status)}
                         {getPaymentStatusBadge(b.paymentStatus)}
                       </div>
                     </td>
                     <td className="text-right">
                       <button
-                        className="btn-icon"
-                        title="Inspect Booking"
+                        type="button"
+                        className="admin-bk-inspect-btn"
+                        title="Inspect Booking Details"
                         onClick={() => setSelectedBooking(b)}
                       >
-                        <i className="fas fa-eye text-primary"></i>
+                        <i className="fas fa-eye"></i>
+                        <span>Inspect</span>
                       </button>
                     </td>
                   </tr>
