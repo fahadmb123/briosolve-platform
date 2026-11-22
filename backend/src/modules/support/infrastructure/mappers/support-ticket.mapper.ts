@@ -1,46 +1,91 @@
-import { SupportTicketEntity, SupportTicketMessageEntity } from "../../domain/entities/support-ticket.entity";
+import { SupportTicket, SupportTicketMessage, TicketPriority, TicketStatus, TicketCreatorRole } from "../../domain/entities/support-ticket.entity";
+import { CreateTicketInputDto } from "../../application/dtos/request/create-ticket.dto";
 import { TicketResponseDto, TicketMessageResponseDto } from "../../application/dtos/response/ticket-response.dto";
 
 export class SupportTicketMapper {
-  static toDomain(record: any, messages: any[] = []): SupportTicketEntity {
+  private static parseDate(val: any): Date {
+    if (!val) return new Date();
+    if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
+      const epoch = (val as { epochMilliseconds: bigint | number }).epochMilliseconds;
+      return new Date(Number(epoch));
+    }
+    return new Date(val);
+  }
+
+  static toDomain(record: any, messages: any[] = []): SupportTicket {
+    let parsedMetadata: Record<string, any> | null = null;
+    if (record.metadata) {
+      parsedMetadata = typeof record.metadata === "string" ? JSON.parse(record.metadata) : record.metadata;
+    }
+
+    return new SupportTicket(
+      record.id,
+      record.ticket_number,
+      record.creator_id,
+      record.creator_role as TicketCreatorRole,
+      record.target_type || "GENERAL",
+      record.target_id ?? null,
+      record.target_number ?? null,
+      record.category,
+      record.category_label,
+      record.subject,
+      record.description,
+      parsedMetadata,
+      record.priority as TicketPriority,
+      record.status as TicketStatus,
+      record.resolution_note ?? null,
+      record.settlement_decision ?? null,
+      record.settlement_details ?? null,
+      record.assigned_to ?? null,
+      this.parseDate(record.created_at),
+      this.parseDate(record.updated_at),
+      messages.map((m) => this.toMessageDomain(m))
+    );
+  }
+
+  static toMessageDomain(record: any): SupportTicketMessage {
+    return new SupportTicketMessage(
+      record.id,
+      record.ticket_id,
+      record.author_id ?? null,
+      record.author_name,
+      record.author_role,
+      record.message,
+      this.parseDate(record.created_at)
+    );
+  }
+
+  static toPersistence(id: string, ticketNumber: string, input: CreateTicketInputDto) {
     return {
-      id: record.id,
-      ticketNumber: record.ticket_number,
-      creatorId: record.creator_id,
-      creatorRole: record.creator_role,
-      targetType: record.target_type || "GENERAL",
-      targetId: record.target_id ?? null,
-      targetNumber: record.target_number ?? null,
-      category: record.category,
-      categoryLabel: record.category_label,
-      subject: record.subject,
-      description: record.description,
-      metadata: record.metadata ? (typeof record.metadata === "string" ? JSON.parse(record.metadata) : record.metadata) : null,
-      priority: record.priority,
-      status: record.status,
-      resolutionNote: record.resolution_note ?? null,
-      settlementDecision: record.settlement_decision ?? null,
-      settlementDetails: record.settlement_details ?? null,
-      assignedTo: record.assigned_to ?? null,
-      createdAt: new Date(record.created_at),
-      updatedAt: new Date(record.updated_at),
-      messages: messages.map((m) => this.toMessageDomain(m))
+      id: id as never,
+      ticket_number: ticketNumber as never,
+      creator_id: input.creatorId as never,
+      creator_role: input.creatorRole as never,
+      target_type: (input.targetType || "GENERAL") as never,
+      target_id: (input.targetId ?? null) as never,
+      target_number: (input.targetNumber ?? null) as never,
+      category: input.category as never,
+      category_label: input.categoryLabel as never,
+      subject: input.subject.trim() as never,
+      description: input.description.trim() as never,
+      metadata: (input.metadata ? JSON.stringify(input.metadata) : null) as never,
+      priority: (input.priority ?? "HIGH") as never,
+      status: "OPEN" as never
     };
   }
 
-  static toMessageDomain(record: any): SupportTicketMessageEntity {
+  static toMessagePersistence(id: string, ticketId: string, input: CreateTicketInputDto) {
     return {
-      id: record.id,
-      ticketId: record.ticket_id,
-      authorId: record.author_id ?? null,
-      authorName: record.author_name,
-      authorRole: record.author_role,
-      message: record.message,
-      createdAt: new Date(record.created_at)
+      id: id as never,
+      ticket_id: ticketId as never,
+      author_id: input.creatorId as never,
+      author_name: input.authorName as never,
+      author_role: input.creatorRole as never,
+      message: input.description.trim() as never
     };
   }
 
-  static toResponseDto(entity: SupportTicketEntity): TicketResponseDto {
+  static toDto(entity: SupportTicket): TicketResponseDto {
     const isBooking = entity.targetType === "BOOKING";
     return {
       id: entity.id,
@@ -65,15 +110,19 @@ export class SupportTicketMapper {
       assignedTo: entity.assignedTo,
       createdAt: entity.createdAt.toISOString(),
       updatedAt: entity.updatedAt.toISOString(),
-      messages: (entity.messages || []).map((m): TicketMessageResponseDto => ({
-        id: m.id,
-        ticketId: m.ticketId,
-        authorId: m.authorId,
-        authorName: m.authorName,
-        authorRole: m.authorRole,
-        message: m.message,
-        createdAt: m.createdAt.toISOString()
-      }))
+      messages: entity.messages.map((m) => this.toMessageDto(m))
+    };
+  }
+
+  static toMessageDto(message: SupportTicketMessage): TicketMessageResponseDto {
+    return {
+      id: message.id,
+      ticketId: message.ticketId,
+      authorId: message.authorId,
+      authorName: message.authorName,
+      authorRole: message.authorRole,
+      message: message.message,
+      createdAt: message.createdAt.toISOString()
     };
   }
 }

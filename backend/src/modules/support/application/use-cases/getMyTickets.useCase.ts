@@ -12,6 +12,6 @@ export class GetMyTicketsUseCase implements IUseCase<GetMyTicketsInputDto, Ticke
 
   async execute(input: GetMyTicketsInputDto): Promise<TicketResponseDto[]> {
     const tickets = await this._ticketRepository.findByCreatorId(input.userId);
-    return tickets.map((t) => SupportTicketMapper.toResponseDto(t));
+    return tickets.map((t) => SupportTicketMapper.toDto(t));
   }
 }

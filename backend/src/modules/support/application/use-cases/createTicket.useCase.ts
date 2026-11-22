@@ -16,20 +16,7 @@ export class CreateTicketUseCase implements IUseCase<CreateTicketInputDto, Ticke
       throw new ApplicationError("MISSING_SUBJECT", "Ticket subject is required", "VALIDATION");
     }
 
-    const created = await this._ticketRepository.createTicket({
-      creatorId: input.creatorId,
-      creatorRole: input.creatorRole,
-      targetType: input.targetType || "GENERAL",
-      targetId: input.targetId ?? null,
-      targetNumber: input.targetNumber ?? null,
-      category: input.category,
-      categoryLabel: input.categoryLabel,
-      subject: input.subject.trim(),
-      description: input.description.trim(),
-      metadata: input.metadata ?? null,
-      priority: input.priority ?? "HIGH"
-    }, input.authorName);
-
-    return SupportTicketMapper.toResponseDto(created);
+    const createdTicket = await this._ticketRepository.createTicket(input);
+    return SupportTicketMapper.toDto(createdTicket);
   }
 }
