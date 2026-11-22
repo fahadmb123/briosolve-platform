@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetCustomerBookings, useGetProviderBookings } from "../../../bookings/hooks/useBookingMutations";
 import { useSupportStore } from "../../stores/support.store";
 import { useCreateSupportTicket, useGetMySupportTickets } from "../../hooks/useSupportTickets";
+import { createSupportTicketFormSchema } from "../../schemas/supportTicket.schema";
 import type { SupportTicket } from "../../types/support.types";
 import "./SupportTicketsPage.css";
 
@@ -79,6 +81,12 @@ export const SupportTicketsPage: React.FC = () => {
   const [generalTopic, setGeneralTopic] = useState<string>("Wallet & Payouts");
   const [issueReason, setIssueReason] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [formErrors, setFormErrors] = useState<{
+    booking?: string;
+    reason?: string;
+    topic?: string;
+    description?: string;
+  }>({});
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
   const [replyText, setReplyText] = useState<string>("");
 
@@ -114,7 +122,31 @@ export const SupportTicketsPage: React.FC = () => {
 
   const handleSubmitTicket = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description.trim() || createTicketMutation.isPending) return;
+    if (createTicketMutation.isPending) return;
+
+    setFormErrors({});
+
+    const validation = createSupportTicketFormSchema.safeParse({
+      concernType,
+      selectedBookingId,
+      generalTopic,
+      issueReason,
+      description
+    });
+
+    if (!validation.success) {
+      const errMap = validation.error.flatten().fieldErrors;
+      const newErrors = {
+        booking: errMap.selectedBookingId?.[0],
+        reason: errMap.issueReason?.[0],
+        topic: errMap.generalTopic?.[0],
+        description: errMap.description?.[0]
+      };
+      setFormErrors(newErrors);
+      const msg = newErrors.booking || newErrors.reason || newErrors.topic || newErrors.description || "Please resolve form validation errors";
+      toast.error(msg);
+      return;
+    }
 
     let subjectLine = "";
     let linkedBookingNumber = undefined;
@@ -152,53 +184,34 @@ export const SupportTicketsPage: React.FC = () => {
         setViewTicket(createdTicket);
       }
 
+      toast.success("Support ticket submitted successfully!");
       setSubmitSuccess(true);
       setDescription("");
       setIssueReason("");
       setSelectedBookingId("");
+      setFormErrors({});
 
       setTimeout(() => {
         setSubmitSuccess(false);
         setActiveTab("MY_TICKETS");
       }, 1000);
-    } catch {
-      const fallbackTicket: SupportTicket = {
-        id: `tk-${Date.now()}`,
-        ticketNumber: `TK-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-        creatorId: user?.id || "user",
-        creatorName: user?.name || (isProvider ? "Provider" : "Customer"),
-        creatorRole: isProvider ? "PROVIDER" : "CUSTOMER",
-        bookingNumber: linkedBookingNumber,
-        serviceTitle: linkedServiceTitle,
-        category: concernType === "BOOKING" ? "PAYMENT_REFUND" : "GENERAL_INQUIRY",
-        categoryLabel: concernType === "BOOKING" ? "Booking Dispute" : "Wallet & General Account",
-        subject: subjectLine,
-        description: description.trim(),
-        priority: "HIGH",
-        status: "OPEN",
-        attachments: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        messages: [
-          {
-            id: `msg-${Date.now()}`,
-            authorName: user?.name || "You",
-            authorRole: isProvider ? "PROVIDER" : "CUSTOMER",
-            message: description.trim(),
-            createdAt: new Date().toISOString()
-          }
-        ]
-      };
-      addTicketToStore(fallbackTicket);
-      setViewTicket(fallbackTicket);
-      setSubmitSuccess(true);
-      setDescription("");
-      setIssueReason("");
-      setSelectedBookingId("");
-      setTimeout(() => {
-        setSubmitSuccess(false);
-        setActiveTab("MY_TICKETS");
-      }, 1000);
+    } catch (err: any) {
+      const serverErrors = err?.response?.data?.errors;
+      if (serverErrors) {
+        setFormErrors({
+          booking: serverErrors.targetId?.[0] || serverErrors.bookingId?.[0],
+          reason: serverErrors.category?.[0] || serverErrors.subject?.[0],
+          description: serverErrors.description?.[0]
+        });
+        const serverMsg =
+          serverErrors.description?.[0] ||
+          serverErrors.targetId?.[0] ||
+          serverErrors.subject?.[0] ||
+          "Validation failed on server";
+        toast.error(serverMsg);
+        return;
+      }
+      toast.error(err?.response?.data?.message || err?.message || "Failed to submit ticket");
     }
   };
 
@@ -269,7 +282,10 @@ export const SupportTicketsPage: React.FC = () => {
                 <div className="clean-type-selector">
                   <div
                     className={`clean-type-card ${concernType === "BOOKING" ? "active" : ""}`}
-                    onClick={() => setConcernType("BOOKING")}
+                    onClick={() => {
+                      setConcernType("BOOKING");
+                      setFormErrors({});
+                    }}
                   >
                     <div className="clean-type-icon">
                       <i className="fas fa-calendar-check"></i>
@@ -283,7 +299,10 @@ export const SupportTicketsPage: React.FC = () => {
 
                   <div
                     className={`clean-type-card ${concernType === "GENERAL" ? "active" : ""}`}
-                    onClick={() => setConcernType("GENERAL")}
+                    onClick={() => {
+                      setConcernType("GENERAL");
+                      setFormErrors({});
+                    }}
                   >
                     <div className="clean-type-icon">
                       <i className="fas fa-wallet"></i>
@@ -306,54 +325,76 @@ export const SupportTicketsPage: React.FC = () => {
                 </div>
 
                 {concernType === "BOOKING" ? (
-                  <div className="clean-selection-box">
-                    {activeBookings.length === 0 ? (
-                      <div className="clean-empty-selection">
-                        <i className="fas fa-calendar-times"></i>
-                        <span>No bookings found on your account.</span>
-                      </div>
-                    ) : (
-                      <div className="clean-items-list">
-                        {activeBookings.map((b) => {
-                          const isChosen = selectedBookingId === b.id;
-                          return (
-                            <div
-                              key={b.id}
-                              className={`clean-item-row ${isChosen ? "chosen" : ""}`}
-                              onClick={() => setSelectedBookingId(b.id)}
-                            >
-                              <div className="clean-item-radio">
-                                <i className={isChosen ? "fas fa-check-circle" : "far fa-circle"}></i>
-                              </div>
-                              <div className="clean-item-info">
-                                <div className="clean-item-meta-top">
-                                  <span className="clean-item-num">#{b.bookingNumber}</span>
-                                  <span className={`clean-item-status-badge ${b.status.toLowerCase()}`}>{b.status}</span>
+                  <>
+                    <div className={`clean-selection-box ${formErrors.booking ? "has-error" : ""}`}>
+                      {activeBookings.length === 0 ? (
+                        <div className="clean-empty-selection">
+                          <i className="fas fa-calendar-times"></i>
+                          <span>No bookings found on your account.</span>
+                        </div>
+                      ) : (
+                        <div className="clean-items-list">
+                          {activeBookings.map((b) => {
+                            const isChosen = selectedBookingId === b.id;
+                            return (
+                              <div
+                                key={b.id}
+                                className={`clean-item-row ${isChosen ? "chosen" : ""}`}
+                                onClick={() => {
+                                  setSelectedBookingId(b.id);
+                                  if (formErrors.booking) setFormErrors((prev) => ({ ...prev, booking: undefined }));
+                                }}
+                              >
+                                <div className="clean-item-radio">
+                                  <i className={isChosen ? "fas fa-check-circle" : "far fa-circle"}></i>
                                 </div>
-                                <strong className="clean-item-title">{b.serviceTitle}</strong>
+                                <div className="clean-item-info">
+                                  <div className="clean-item-meta-top">
+                                    <span className="clean-item-num">#{b.bookingNumber}</span>
+                                    <span className={`clean-item-status-badge ${b.status.toLowerCase()}`}>{b.status}</span>
+                                  </div>
+                                  <strong className="clean-item-title">{b.serviceTitle}</strong>
+                                </div>
+                                <div className="clean-item-price-pill">
+                                  ₹{b.totalAmount.toLocaleString("en-IN")}
+                                </div>
                               </div>
-                              <div className="clean-item-price-pill">
-                                ₹{b.totalAmount.toLocaleString("en-IN")}
-                              </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                    {formErrors.booking && (
+                      <div className="clean-field-error">
+                        <i className="fas fa-exclamation-circle"></i>
+                        <span>{formErrors.booking}</span>
                       </div>
                     )}
-                  </div>
+                  </>
                 ) : (
-                  <div className="clean-pills-row">
-                    {generalTopics.map((top) => (
-                      <button
-                        key={top}
-                        type="button"
-                        className={`clean-topic-pill ${generalTopic === top ? "active" : ""}`}
-                        onClick={() => setGeneralTopic(top)}
-                      >
-                        {top}
-                      </button>
-                    ))}
-                  </div>
+                  <>
+                    <div className="clean-pills-row">
+                      {generalTopics.map((top) => (
+                        <button
+                          key={top}
+                          type="button"
+                          className={`clean-topic-pill ${generalTopic === top ? "active" : ""}`}
+                          onClick={() => {
+                            setGeneralTopic(top);
+                            if (formErrors.topic) setFormErrors((prev) => ({ ...prev, topic: undefined }));
+                          }}
+                        >
+                          {top}
+                        </button>
+                      ))}
+                    </div>
+                    {formErrors.topic && (
+                      <div className="clean-field-error">
+                        <i className="fas fa-exclamation-circle"></i>
+                        <span>{formErrors.topic}</span>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -372,12 +413,21 @@ export const SupportTicketsPage: React.FC = () => {
                           key={r}
                           type="button"
                           className={`clean-reason-chip ${issueReason === r ? "active" : ""}`}
-                          onClick={() => setIssueReason(r)}
+                          onClick={() => {
+                            setIssueReason(r);
+                            if (formErrors.reason) setFormErrors((prev) => ({ ...prev, reason: undefined }));
+                          }}
                         >
                           {r}
                         </button>
                       ))}
                     </div>
+                    {formErrors.reason && (
+                      <div className="clean-field-error">
+                        <i className="fas fa-exclamation-circle"></i>
+                        <span>{formErrors.reason}</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -389,11 +439,22 @@ export const SupportTicketsPage: React.FC = () => {
                     id="clean-description"
                     required
                     rows={5}
-                    className="clean-textarea"
-                    placeholder="Tell us what occurred, timing, or any attempts made to contact the other person..."
+                    className={`clean-textarea ${formErrors.description ? "has-error" : ""}`}
+                    placeholder="Tell us what occurred, timing, or any attempts made to contact the other person (at least 15 characters)..."
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    onChange={(e) => {
+                      setDescription(e.target.value);
+                      if (formErrors.description && e.target.value.trim().length >= 15) {
+                        setFormErrors((prev) => ({ ...prev, description: undefined }));
+                      }
+                    }}
                   />
+                  {formErrors.description && (
+                    <div className="clean-field-error">
+                      <i className="fas fa-exclamation-circle"></i>
+                      <span>{formErrors.description}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -408,7 +469,7 @@ export const SupportTicketsPage: React.FC = () => {
                 <button
                   type="submit"
                   className="clean-btn-primary"
-                  disabled={createTicketMutation.isPending || !description.trim() || (concernType === "BOOKING" && !selectedBookingId)}
+                  disabled={createTicketMutation.isPending}
                 >
                   {createTicketMutation.isPending ? (
                     <>
