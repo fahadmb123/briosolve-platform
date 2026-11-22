@@ -2,25 +2,17 @@ import React, { useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetCustomerBookings, useGetProviderBookings } from "../../../bookings/hooks/useBookingMutations";
-import { useGetMyServiceRequests, useGetProviderServiceRequests } from "../../../service-requests/hooks/useServiceRequestMutations";
 import { useSupportStore } from "../../stores/support.store";
 import type { SupportTicket } from "../../types/support.types";
 import "./SupportTicketsPage.css";
 
-type ConcernType = "BOOKING" | "REQUEST" | "GENERAL";
+type ConcernType = "BOOKING" | "GENERAL";
 
 interface MappedBookingItem {
   id: string;
   bookingNumber: string;
   serviceTitle: string;
   totalAmount: number;
-  status: string;
-}
-
-interface MappedRequestItem {
-  id: string;
-  title: string;
-  category: string;
   status: string;
 }
 
@@ -32,9 +24,6 @@ export const SupportTicketsPage: React.FC = () => {
   const customerBookingsQuery = useGetCustomerBookings(undefined, { enabled: !isProvider });
   const providerBookingsQuery = useGetProviderBookings(undefined, { enabled: isProvider });
 
-  const customerRequestsQuery = useGetMyServiceRequests();
-  const providerRequestsQuery = useGetProviderServiceRequests();
-
   const activeBookings = useMemo<MappedBookingItem[]>(() => {
     const rawList: any[] = isProvider
       ? providerBookingsQuery.data?.data?.bookings || []
@@ -43,26 +32,13 @@ export const SupportTicketsPage: React.FC = () => {
     return rawList.map((b: any): MappedBookingItem => ({
       id: b.booking?.id || b.id,
       bookingNumber: b.booking?.booking_number || b.bookingNumber,
-      serviceTitle: b.serviceRequestTitle || b.booking?.service_request?.title || "Service",
+      serviceTitle: b.serviceRequestTitle || b.booking?.service_request?.title || "Service Job",
       totalAmount: Number(b.booking?.total_amount || b.totalAmount || 0),
       status: b.booking?.status || b.status
     }));
   }, [isProvider, customerBookingsQuery.data, providerBookingsQuery.data]);
 
-  const activeRequests = useMemo<MappedRequestItem[]>(() => {
-    const rawList: any[] = isProvider
-      ? providerRequestsQuery.data?.data?.requests || []
-      : customerRequestsQuery.data?.data?.requests || [];
-
-    return rawList.map((r: any): MappedRequestItem => ({
-      id: r.id,
-      title: r.title,
-      category: r.category?.name || "General Service",
-      status: r.status
-    }));
-  }, [isProvider, customerRequestsQuery.data, providerRequestsQuery.data]);
-
-  const allTickets = useSupportStore((state) => state.tickets);
+  const allTickets = useSupportStore((state) => state.tickets || []);
   const addTicketToStore = useSupportStore((state) => state.addTicket);
   const addTicketMessage = useSupportStore((state) => state.addTicketMessage);
 
@@ -82,8 +58,8 @@ export const SupportTicketsPage: React.FC = () => {
       const q = ticketSearch.toLowerCase().trim();
       const isSearchMatch =
         !q ||
-        t.ticketNumber.toLowerCase().includes(q) ||
-        t.subject.toLowerCase().includes(q) ||
+        t.ticketNumber?.toLowerCase().includes(q) ||
+        t.subject?.toLowerCase().includes(q) ||
         (t.bookingNumber && t.bookingNumber.toLowerCase().includes(q)) ||
         (t.serviceTitle && t.serviceTitle.toLowerCase().includes(q));
 
@@ -93,7 +69,6 @@ export const SupportTicketsPage: React.FC = () => {
 
   const [concernType, setConcernType] = useState<ConcernType>("BOOKING");
   const [selectedBookingId, setSelectedBookingId] = useState<string>("");
-  const [selectedRequestId, setSelectedRequestId] = useState<string>("");
   const [generalTopic, setGeneralTopic] = useState<string>("Wallet & Payouts");
   const [issueReason, setIssueReason] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -104,10 +79,6 @@ export const SupportTicketsPage: React.FC = () => {
   const selectedBooking = useMemo(
     () => activeBookings.find((b) => b.id === selectedBookingId),
     [activeBookings, selectedBookingId]
-  );
-  const selectedRequest = useMemo(
-    () => activeRequests.find((r) => r.id === selectedRequestId),
-    [activeRequests, selectedRequestId]
   );
 
   const bookingReasons = isProvider ? [
@@ -124,14 +95,6 @@ export const SupportTicketsPage: React.FC = () => {
     "Dispute over final payment or refund",
     "Safety or unprofessional behavior",
     "Other booking problem"
-  ];
-
-  const requestReasons = [
-    "Quotation amount discrepancy",
-    "Unable to receive or review quotes",
-    "Provider canceled agreed quotation",
-    "Need to cancel or edit service request",
-    "Other request question"
   ];
 
   const generalTopics = [
@@ -158,9 +121,6 @@ export const SupportTicketsPage: React.FC = () => {
         linkedBookingNumber = found?.bookingNumber;
         linkedServiceTitle = found?.serviceTitle;
         subjectLine = `${issueReason || "Booking Issue"} (${linkedBookingNumber || "Booking"})`;
-      } else if (concernType === "REQUEST") {
-        const found = activeRequests.find((r) => r.id === selectedRequestId);
-        subjectLine = `${issueReason || "Request Issue"} - ${found?.title || "Service Request"}`;
       } else {
         subjectLine = `${generalTopic}: Issue Report`;
       }
@@ -173,8 +133,8 @@ export const SupportTicketsPage: React.FC = () => {
         creatorRole: isProvider ? "PROVIDER" : "CUSTOMER",
         bookingNumber: linkedBookingNumber,
         serviceTitle: linkedServiceTitle,
-        category: "GENERAL_INQUIRY",
-        categoryLabel: concernType === "BOOKING" ? "Booking Dispute" : concernType === "REQUEST" ? "Request Inquiry" : "General Support",
+        category: concernType === "BOOKING" ? "PAYMENT_REFUND" : "GENERAL_INQUIRY",
+        categoryLabel: concernType === "BOOKING" ? "Booking Dispute" : "Wallet & General Account",
         subject: subjectLine,
         description: description.trim(),
         priority: "HIGH",
@@ -199,7 +159,6 @@ export const SupportTicketsPage: React.FC = () => {
       setDescription("");
       setIssueReason("");
       setSelectedBookingId("");
-      setSelectedRequestId("");
 
       setTimeout(() => {
         setSubmitSuccess(false);
@@ -217,7 +176,7 @@ export const SupportTicketsPage: React.FC = () => {
       user?.name || (isProvider ? "Provider" : "Customer"),
       isProvider ? "PROVIDER" : "CUSTOMER"
     );
-    const updated = useSupportStore.getState().tickets.find((t) => t.id === viewTicket.id);
+    const updated = (useSupportStore.getState().tickets || []).find((t) => t.id === viewTicket.id);
     if (updated) setViewTicket(updated);
     setReplyText("");
   };
@@ -289,20 +248,6 @@ export const SupportTicketsPage: React.FC = () => {
                   </div>
 
                   <div
-                    className={`clean-type-card ${concernType === "REQUEST" ? "active" : ""}`}
-                    onClick={() => setConcernType("REQUEST")}
-                  >
-                    <div className="clean-type-icon">
-                      <i className="fas fa-clipboard-list"></i>
-                    </div>
-                    <div className="clean-type-text">
-                      <strong>A Service Request</strong>
-                      <span>Quotations, matching, or request cancellation</span>
-                    </div>
-                    <div className="clean-radio-dot"></div>
-                  </div>
-
-                  <div
                     className={`clean-type-card ${concernType === "GENERAL" ? "active" : ""}`}
                     onClick={() => setConcernType("GENERAL")}
                   >
@@ -322,13 +267,11 @@ export const SupportTicketsPage: React.FC = () => {
                 <div className="clean-step-header">
                   <span className="clean-step-badge">Step 2</span>
                   <h3 className="clean-step-title">
-                    {concernType === "BOOKING" && "Select the Booking"}
-                    {concernType === "REQUEST" && "Select the Service Request"}
-                    {concernType === "GENERAL" && "Select the Topic"}
+                    {concernType === "BOOKING" ? "Select the Booking" : "Select the Topic"}
                   </h3>
                 </div>
 
-                {concernType === "BOOKING" && (
+                {concernType === "BOOKING" ? (
                   <div className="clean-selection-box">
                     {activeBookings.length === 0 ? (
                       <div className="clean-empty-selection">
@@ -364,44 +307,7 @@ export const SupportTicketsPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                )}
-
-                {concernType === "REQUEST" && (
-                  <div className="clean-selection-box">
-                    {activeRequests.length === 0 ? (
-                      <div className="clean-empty-selection">
-                        <i className="fas fa-folder-open"></i>
-                        <span>No service requests found on your account.</span>
-                      </div>
-                    ) : (
-                      <div className="clean-items-list">
-                        {activeRequests.map((r) => {
-                          const isChosen = selectedRequestId === r.id;
-                          return (
-                            <div
-                              key={r.id}
-                              className={`clean-item-row ${isChosen ? "chosen" : ""}`}
-                              onClick={() => setSelectedRequestId(r.id)}
-                            >
-                              <div className="clean-item-radio">
-                                <i className={isChosen ? "fas fa-check-circle" : "far fa-circle"}></i>
-                              </div>
-                              <div className="clean-item-info">
-                                <div className="clean-item-meta-top">
-                                  <span className="clean-item-category-tag">{r.category}</span>
-                                  <span className={`clean-item-status-badge ${r.status.toLowerCase()}`}>{r.status}</span>
-                                </div>
-                                <strong className="clean-item-title">{r.title}</strong>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {concernType === "GENERAL" && (
+                ) : (
                   <div className="clean-pills-row">
                     {generalTopics.map((top) => (
                       <button
@@ -441,24 +347,6 @@ export const SupportTicketsPage: React.FC = () => {
                   </div>
                 )}
 
-                {concernType === "REQUEST" && (
-                  <div className="clean-reasons-group">
-                    <label className="clean-label">What is the problem?</label>
-                    <div className="clean-chips-wrap">
-                      {requestReasons.map((r) => (
-                        <button
-                          key={r}
-                          type="button"
-                          className={`clean-reason-chip ${issueReason === r ? "active" : ""}`}
-                          onClick={() => setIssueReason(r)}
-                        >
-                          {r}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 <div className="clean-form-group">
                   <label htmlFor="clean-description" className="clean-label">
                     Describe what happened *
@@ -466,7 +354,7 @@ export const SupportTicketsPage: React.FC = () => {
                   <textarea
                     id="clean-description"
                     required
-                    rows={4}
+                    rows={5}
                     className="clean-textarea"
                     placeholder="Tell us what occurred, timing, or any attempts made to contact the other person..."
                     value={description}
@@ -486,7 +374,7 @@ export const SupportTicketsPage: React.FC = () => {
                 <button
                   type="submit"
                   className="clean-btn-primary"
-                  disabled={isSubmitting || !description.trim()}
+                  disabled={isSubmitting || !description.trim() || (concernType === "BOOKING" && !selectedBookingId)}
                 >
                   {isSubmitting ? (
                     <>
@@ -513,12 +401,12 @@ export const SupportTicketsPage: React.FC = () => {
               <div className="clean-sidebar-summary-body">
                 <div className="clean-summary-field">
                   <span className="clean-summary-field-label">Target Category</span>
-                  <span className="clean-summary-field-val">
-                    {concernType === "BOOKING" ? "Booking Dispute" : concernType === "REQUEST" ? "Service Request" : "Wallet & Account"}
+                  <span className="clean-summary-field-val highlight">
+                    {concernType === "BOOKING" ? "Booking Dispute" : "Wallet & Account"}
                   </span>
                 </div>
 
-                {concernType === "BOOKING" && (
+                {concernType === "BOOKING" ? (
                   <div className="clean-summary-field">
                     <span className="clean-summary-field-label">Linked Booking</span>
                     {selectedBooking ? (
@@ -536,37 +424,16 @@ export const SupportTicketsPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                )}
-
-                {concernType === "REQUEST" && (
-                  <div className="clean-summary-field">
-                    <span className="clean-summary-field-label">Linked Request</span>
-                    {selectedRequest ? (
-                      <div className="clean-summary-linked-card">
-                        <div className="clean-slc-num">{selectedRequest.category}</div>
-                        <div className="clean-slc-title">{selectedRequest.title}</div>
-                        <div className="clean-slc-footer">
-                          <span className={`clean-item-status-badge ${selectedRequest.status.toLowerCase()}`}>{selectedRequest.status}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="clean-summary-placeholder-text">
-                        <i className="far fa-hand-pointer"></i> Please select a request in Step 2
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {concernType === "GENERAL" && (
+                ) : (
                   <div className="clean-summary-field">
                     <span className="clean-summary-field-label">Topic</span>
-                    <span className="clean-summary-field-val highlight">{generalTopic}</span>
+                    <span className="clean-summary-field-val">{generalTopic}</span>
                   </div>
                 )}
 
-                {issueReason && (
+                {concernType === "BOOKING" && issueReason && (
                   <div className="clean-summary-field">
-                    <span className="clean-summary-field-label">Primary Reason</span>
+                    <span className="clean-summary-field-label">Primary Issue</span>
                     <span className="clean-summary-reason-tag">{issueReason}</span>
                   </div>
                 )}
@@ -599,11 +466,11 @@ export const SupportTicketsPage: React.FC = () => {
                 </li>
                 <li>
                   <div className="clean-gl-icon">
-                    <i className="fas fa-comments"></i>
+                    <i className="fas fa-balance-scale"></i>
                   </div>
                   <div className="clean-gl-text">
-                    <strong>Two-Way Thread</strong>
-                    <p>Track notes, reply with evidence, and review resolutions directly.</p>
+                    <strong>Fair Mediation</strong>
+                    <p>Unbiased evaluation of service terms, chats, and job agreements.</p>
                   </div>
                 </li>
               </ul>
@@ -617,11 +484,12 @@ export const SupportTicketsPage: React.FC = () => {
               <i className="fas fa-search"></i>
               <input
                 type="text"
-                placeholder="Search ticket #, booking #, or subject..."
+                placeholder="Search ticket #, subject, or booking #..."
                 value={ticketSearch}
                 onChange={(e) => setTicketSearch(e.target.value)}
               />
             </div>
+
             <div className="clean-filter-pills">
               <button
                 type="button"
@@ -650,10 +518,14 @@ export const SupportTicketsPage: React.FC = () => {
           {tickets.length === 0 ? (
             <div className="clean-empty-state">
               <div className="clean-empty-icon">
-                <i className="fas fa-ticket-alt"></i>
+                <i className="fas fa-inbox"></i>
               </div>
-              <h3>No Tickets Yet</h3>
-              <p>You have not filed any complaints or concerns. If you experience an issue, click Raise Concern.</p>
+              <h3>No tickets found</h3>
+              <p>
+                {ticketSearch
+                  ? "No support tickets match your search criteria."
+                  : "You do not have any open support or dispute tickets."}
+              </p>
               <button
                 type="button"
                 className="clean-btn-primary"
@@ -667,54 +539,57 @@ export const SupportTicketsPage: React.FC = () => {
             <div className="clean-table-responsive">
               <div className="clean-tickets-table-card">
                 <div className="clean-table-header">
-                  <span>Ticket #</span>
+                  <span>Ticket ID</span>
                   <span>Category</span>
-                  <span>Subject / Summary</span>
+                  <span>Subject</span>
+                  <span>Submitted</span>
                   <span>Status</span>
-                  <span>Date</span>
-                  <span>Action</span>
+                  <span style={{ textAlign: "right" }}>Action</span>
                 </div>
-
-              <div className="clean-table-body">
-                {tickets.map((t) => (
-                  <div key={t.id} className="clean-table-row">
-                    <div className="clean-col-id">
-                      <strong>#{t.ticketNumber}</strong>
-                      {t.bookingNumber && <span className="clean-sub-link">Booking #{t.bookingNumber}</span>}
+                <div className="clean-table-body">
+                  {tickets.map((ticket) => (
+                    <div key={ticket.id} className="clean-table-row">
+                      <div className="clean-col-id">
+                        <strong>#{ticket.ticketNumber}</strong>
+                        {ticket.bookingNumber && (
+                          <span className="clean-sub-link">
+                            <i className="fas fa-calendar-check"></i> #{ticket.bookingNumber}
+                          </span>
+                        )}
+                      </div>
+                      <div className="clean-col-cat">
+                        <span className="clean-cat-tag">{ticket.categoryLabel}</span>
+                      </div>
+                      <div className="clean-col-subject">
+                        <strong>{ticket.subject}</strong>
+                        <p>{ticket.description}</p>
+                      </div>
+                      <div className="clean-col-date">
+                        {new Date(ticket.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short"
+                        })}
+                      </div>
+                      <div className="clean-col-status">
+                        <span className={`clean-status-badge ${ticket.status.toLowerCase()}`}>
+                          {ticket.status.replace("_", " ")}
+                        </span>
+                      </div>
+                      <div className="clean-col-action" style={{ textAlign: "right" }}>
+                        <button
+                          type="button"
+                          className="clean-view-btn"
+                          onClick={() => setViewTicket(ticket)}
+                        >
+                          View Details
+                        </button>
+                      </div>
                     </div>
-                    <div className="clean-col-cat">
-                      <span className="clean-cat-tag">{t.categoryLabel}</span>
-                    </div>
-                    <div className="clean-col-subject">
-                      <strong>{t.subject}</strong>
-                      <p>{t.description}</p>
-                    </div>
-                    <div className="clean-col-status">
-                      <span className={`clean-status-badge ${t.status.toLowerCase()}`}>
-                        {t.status.replace("_", " ")}
-                      </span>
-                    </div>
-                    <div className="clean-col-date">
-                      {new Date(t.createdAt).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short"
-                      })}
-                    </div>
-                    <div className="clean-col-action">
-                      <button
-                        type="button"
-                        className="clean-view-btn"
-                        onClick={() => setViewTicket(t)}
-                      >
-                        View Ticket
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
         </div>
       )}
 
@@ -743,28 +618,22 @@ export const SupportTicketsPage: React.FC = () => {
             <div className="clean-modal-body">
               <div className="clean-ticket-stepper">
                 <div className="clean-stepper-step completed">
-                  <div className="clean-step-circle"><i className="fas fa-check"></i></div>
+                  <div className="clean-step-circle">
+                    <i className="fas fa-check"></i>
+                  </div>
                   <span>1. Submitted</span>
                 </div>
-                <div className={`clean-stepper-line ${viewTicket.status !== "OPEN" ? "completed" : ""}`} />
+                <div className={`clean-stepper-line ${viewTicket.status !== "OPEN" ? "completed" : ""}`}></div>
                 <div className={`clean-stepper-step ${viewTicket.status === "UNDER_REVIEW" ? "active" : viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? "completed" : ""}`}>
                   <div className="clean-step-circle">
-                    {viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? (
-                      <i className="fas fa-check"></i>
-                    ) : (
-                      <span>2</span>
-                    )}
+                    {viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? <i className="fas fa-check"></i> : <span>2</span>}
                   </div>
                   <span>2. Under Review</span>
                 </div>
-                <div className={`clean-stepper-line ${viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? "completed" : ""}`} />
+                <div className={`clean-stepper-line ${viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? "completed" : ""}`}></div>
                 <div className={`clean-stepper-step ${viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? "completed" : ""}`}>
                   <div className="clean-step-circle">
-                    {viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? (
-                      <i className="fas fa-check"></i>
-                    ) : (
-                      <span>3</span>
-                    )}
+                    {viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? <i className="fas fa-check"></i> : <span>3</span>}
                   </div>
                   <span>3. Resolved</span>
                 </div>
@@ -773,13 +642,13 @@ export const SupportTicketsPage: React.FC = () => {
               {viewTicket.bookingNumber && (
                 <div className="clean-booking-pill-bar">
                   <i className="fas fa-calendar-check"></i>
-                  <span>Linked to Booking #{viewTicket.bookingNumber}</span>
-                  {viewTicket.serviceTitle && <strong>· {viewTicket.serviceTitle}</strong>}
+                  <strong>Booking Reference:</strong> #{viewTicket.bookingNumber}
+                  {viewTicket.serviceTitle && <span> · {viewTicket.serviceTitle}</span>}
                 </div>
               )}
 
               <div className="clean-dossier-box">
-                <label className="clean-dossier-label">Your Statement</label>
+                <span className="clean-dossier-label">Your Statement</span>
                 <p className="clean-dossier-content">{viewTicket.description}</p>
               </div>
 
@@ -787,65 +656,71 @@ export const SupportTicketsPage: React.FC = () => {
                 <div className="clean-resolution-box">
                   <div className="clean-rb-title">
                     <i className="fas fa-check-circle"></i>
-                    <span>Official Resolution Decision</span>
+                    <span>Official Resolution Ruling</span>
                   </div>
                   <p className="clean-rb-text">{viewTicket.resolutionNote}</p>
-                  {viewTicket.settlementDecision && (
-                    <div className="clean-settlement-tag">
-                      <strong>Action: </strong>
-                      <span>{viewTicket.settlementDecision.replace(/_/g, " ")}</span>
-                      {viewTicket.settlementDetails && ` · ${viewTicket.settlementDetails}`}
-                    </div>
+                  {viewTicket.settlementDetails && (
+                    <span className="clean-settlement-tag">
+                      <i className="fas fa-wallet mr-1"></i> {viewTicket.settlementDetails}
+                    </span>
                   )}
                 </div>
               )}
 
               <div className="clean-messages-thread">
-                <label className="clean-dossier-label">Activity & Responses</label>
-                <div className="clean-msgs-list">
-                  {viewTicket.messages.map((m) => (
-                    <div
-                      key={m.id}
-                      className={`clean-msg-card ${m.authorRole === "ADMIN" ? "admin" : "user"}`}
-                    >
-                      <div className="clean-msg-top">
-                        <strong>{m.authorName}</strong>
-                        <span className="clean-msg-role">{m.authorRole}</span>
-                        <span className="clean-msg-time">
-                          {new Date(m.createdAt).toLocaleTimeString("en-IN", {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                          })}
-                        </span>
-                      </div>
-                      <p className="clean-msg-text">{m.message}</p>
-                    </div>
-                  ))}
+                <div className="clean-dossier-label">
+                  <i className="fas fa-comments"></i> Case Activity ({(viewTicket.messages || []).length})
                 </div>
-              </div>
 
-              {viewTicket.status !== "CLOSED" && (
-                <div className="clean-reply-wrap">
-                  <textarea
-                    rows={3}
-                    className="clean-textarea"
-                    placeholder="Type an update or reply for the support team..."
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                  />
-                  <div className="clean-reply-footer">
-                    <button
-                      type="button"
-                      className="clean-btn-primary"
-                      disabled={!replyText.trim()}
-                      onClick={handleSendReply}
-                    >
-                      <i className="fas fa-reply"></i>
-                      <span>Send Reply</span>
-                    </button>
-                  </div>
+                <div className="clean-msgs-list">
+                  {(viewTicket.messages || []).map((msg) => {
+                    const isAdmin = msg.authorRole === "ADMIN" || msg.authorRole === "SYSTEM";
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`clean-msg-card ${isAdmin ? "admin" : "user"}`}
+                      >
+                        <div className="clean-msg-top">
+                          <strong>{msg.authorName}</strong>
+                          <span className="clean-msg-role">
+                            {isAdmin ? "Support Desk" : msg.authorRole}
+                          </span>
+                          <span className="clean-msg-time">
+                            {new Date(msg.createdAt).toLocaleTimeString("en-IN", {
+                              hour: "2-digit",
+                              minute: "2-digit"
+                            })}
+                          </span>
+                        </div>
+                        <p className="clean-msg-text">{msg.message}</p>
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
+
+                {viewTicket.status !== "RESOLVED" && viewTicket.status !== "CLOSED" && (
+                  <div className="clean-reply-wrap">
+                    <textarea
+                      rows={2}
+                      className="clean-textarea"
+                      placeholder="Add an update or response to support..."
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                    />
+                    <div className="clean-reply-footer">
+                      <button
+                        type="button"
+                        className="clean-btn-primary"
+                        disabled={!replyText.trim()}
+                        onClick={handleSendReply}
+                      >
+                        <i className="fas fa-paper-plane"></i>
+                        <span>Send Message</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
