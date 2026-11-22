@@ -11,7 +11,7 @@ export const AdminSupportTicketsPage: React.FC = () => {
   const resolveTicket = useSupportStore((state) => state.resolveTicket);
   const addTicketMessage = useSupportStore((state) => state.addTicketMessage);
 
-  const [activeTab, setActiveTab] = useState<"ALL" | "OPEN" | "UNDER_REVIEW" | "RESOLVED">("ALL");
+  const [statusFilter, setStatusFilter] = useState("");
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
@@ -26,25 +26,10 @@ export const AdminSupportTicketsPage: React.FC = () => {
   const [splitProviderAmount, setSplitProviderAmount] = useState("550");
   const [isResolving, setIsResolving] = useState(false);
 
-  const counts = useMemo(() => {
-    const list = Array.isArray(tickets) ? tickets : [];
-    return {
-      all: list.length,
-      open: list.filter((t) => t.status === "OPEN").length,
-      review: list.filter((t) => t.status === "UNDER_REVIEW").length,
-      resolved: list.filter((t) => t.status === "RESOLVED" || t.status === "CLOSED").length,
-    };
-  }, [tickets]);
-
   const filteredTickets = useMemo(() => {
     const list = Array.isArray(tickets) ? tickets : [];
     return list.filter((t) => {
-      const matchTab =
-        activeTab === "ALL" ||
-        (activeTab === "OPEN" && t.status === "OPEN") ||
-        (activeTab === "UNDER_REVIEW" && t.status === "UNDER_REVIEW") ||
-        (activeTab === "RESOLVED" && (t.status === "RESOLVED" || t.status === "CLOSED"));
-
+      const matchStatus = !statusFilter || t.status === statusFilter;
       const matchCategory = !categoryFilter || t.category === categoryFilter;
       const matchPriority = !priorityFilter || t.priority === priorityFilter;
 
@@ -56,9 +41,9 @@ export const AdminSupportTicketsPage: React.FC = () => {
         t.creatorName?.toLowerCase().includes(q) ||
         (t.bookingNumber && t.bookingNumber.toLowerCase().includes(q));
 
-      return matchTab && matchCategory && matchPriority && matchSearch;
+      return matchStatus && matchCategory && matchPriority && matchSearch;
     });
-  }, [tickets, activeTab, categoryFilter, priorityFilter, search]);
+  }, [tickets, statusFilter, categoryFilter, priorityFilter, search]);
 
   const handleOpenTicket = (ticket: SupportTicket) => {
     setSelectedTicket(ticket);
@@ -75,9 +60,9 @@ export const AdminSupportTicketsPage: React.FC = () => {
 
   const handleResetFilters = () => {
     setSearch("");
+    setStatusFilter("");
     setCategoryFilter("");
     setPriorityFilter("");
-    setActiveTab("ALL");
   };
 
   const handleStartReview = () => {
@@ -186,47 +171,6 @@ export const AdminSupportTicketsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="admin-subnav-container">
-        <nav className="admin-subnav-tabs" aria-label="Dispute Status Filters">
-          <button
-            type="button"
-            className={`admin-subnav-tab ${activeTab === "ALL" ? "active" : ""}`}
-            onClick={() => setActiveTab("ALL")}
-          >
-            <i className="fas fa-ticket-alt text-xs"></i>
-            <span>All Tickets</span>
-            <span className="admin-subnav-badge">{counts.all}</span>
-          </button>
-          <button
-            type="button"
-            className={`admin-subnav-tab ${activeTab === "OPEN" ? "active" : ""}`}
-            onClick={() => setActiveTab("OPEN")}
-          >
-            <i className="fas fa-exclamation-triangle text-xs"></i>
-            <span>Needs Review</span>
-            <span className="admin-subnav-badge">{counts.open}</span>
-          </button>
-          <button
-            type="button"
-            className={`admin-subnav-tab ${activeTab === "UNDER_REVIEW" ? "active" : ""}`}
-            onClick={() => setActiveTab("UNDER_REVIEW")}
-          >
-            <i className="fas fa-search text-xs"></i>
-            <span>Under Investigation</span>
-            <span className="admin-subnav-badge">{counts.review}</span>
-          </button>
-          <button
-            type="button"
-            className={`admin-subnav-tab ${activeTab === "RESOLVED" ? "active" : ""}`}
-            onClick={() => setActiveTab("RESOLVED")}
-          >
-            <i className="fas fa-check-circle text-xs"></i>
-            <span>Resolved</span>
-            <span className="admin-subnav-badge">{counts.resolved}</span>
-          </button>
-        </nav>
-      </div>
-
       <div className="admin-filter-bar">
         <div className="admin-search-input">
           <i className="fas fa-search"></i>
@@ -239,6 +183,18 @@ export const AdminSupportTicketsPage: React.FC = () => {
         </div>
 
         <div className="admin-filters-group">
+          <select
+            className="admin-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">All Statuses</option>
+            <option value="OPEN">Open</option>
+            <option value="UNDER_REVIEW">Under Review</option>
+            <option value="RESOLVED">Resolved</option>
+            <option value="CLOSED">Closed</option>
+          </select>
+
           <select
             className="admin-select"
             value={categoryFilter}
