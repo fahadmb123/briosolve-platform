@@ -1,12 +1,12 @@
 import { randomUUID } from "crypto";
 import { db } from "../../../../shared/database/client";
-import { SupportTicket, SupportTicketMessage } from "../../domain/entities/support-ticket.entity";
+import { SupportTicket, SupportTicketMessage, TicketStatus } from "../../domain/entities/support-ticket.entity";
 import { ISupportTicketRepository, GetUserTicketsParams, UserTicketsResult, GetAdminTicketsParams, AdminTicketsResult } from "../../domain/repositories/ISupportTicket.repository";
-import { CreateTicketInputDto } from "../../application/dtos/request/create-ticket.dto";
+import { CreateTicketRequestDto } from "../../application/dtos/request/create-ticket.dto";
 import { SupportTicketMapper } from "../mappers/support-ticket.mapper";
 
 export class PrismaSupportTicketRepository implements ISupportTicketRepository {
-  async createTicket(input: CreateTicketInputDto): Promise<SupportTicket> {
+  async createTicket(input: CreateTicketRequestDto): Promise<SupportTicket> {
     const ticketId = randomUUID();
     const year = new Date().getFullYear();
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
@@ -203,5 +203,18 @@ export class PrismaSupportTicketRepository implements ISupportTicketRepository {
     } as never);
 
     return SupportTicketMapper.toMessageDomain(created);
+  }
+
+  async updateTicketStatus(
+    ticketId: string,
+    data: { status: TicketStatus; resolutionNote?: string | null; assignedTo?: string | null }
+  ): Promise<SupportTicket | null> {
+    const updateData = SupportTicketMapper.toUpdatePersistence(data);
+
+    await db.orm.public.support_tickets
+      .where({ id: ticketId as never })
+      .update(updateData as never);
+
+    return this.findById(ticketId);
   }
 }

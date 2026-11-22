@@ -3,7 +3,7 @@ import { ISupportTicketRepository, GetUserTicketsParams } from "../../domain/rep
 import { TicketResponseDto } from "../dtos/response/ticket-response.dto";
 import { SupportTicketMapper } from "../../infrastructure/mappers/support-ticket.mapper";
 
-export interface GetMyTicketsInputDto extends GetUserTicketsParams {}
+export interface GetMyTicketsRequestDto extends GetUserTicketsParams {}
 
 export interface UserTicketsResponseDto {
   tickets: TicketResponseDto[];
@@ -15,10 +15,10 @@ export interface UserTicketsResponseDto {
   };
 }
 
-export class GetMyTicketsUseCase implements IUseCase<GetMyTicketsInputDto, UserTicketsResponseDto> {
+export class GetMyTicketsUseCase implements IUseCase<GetMyTicketsRequestDto, UserTicketsResponseDto> {
   constructor(private readonly _ticketRepository: ISupportTicketRepository) {}
 
-  async execute(input: GetMyTicketsInputDto): Promise<UserTicketsResponseDto> {
+  async execute(input: GetMyTicketsRequestDto): Promise<UserTicketsResponseDto> {
     const result = await this._ticketRepository.findByCreatorId(input);
     return {
       tickets: result.tickets.map((t) => SupportTicketMapper.toDto(t)),

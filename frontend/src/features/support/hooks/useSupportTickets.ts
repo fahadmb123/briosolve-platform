@@ -1,6 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createSupportTicketApi, getMySupportTicketsApi, getAdminSupportTicketsApi } from "../services/support.service";
-import type { CreateTicketPayload, GetSupportTicketsParams, GetAdminSupportTicketsParams } from "../services/support.service";
+import {
+  createSupportTicketApi,
+  getMySupportTicketsApi,
+  getAdminSupportTicketsApi,
+  updateTicketStatusApi
+} from "../services/support.service";
+import type {
+  CreateTicketPayload,
+  GetSupportTicketsParams,
+  GetAdminSupportTicketsParams,
+  UpdateTicketStatusPayload
+} from "../services/support.service";
 
 export const useGetMySupportTickets = (params?: GetSupportTicketsParams, options?: { enabled?: boolean }) => {
   return useQuery({
@@ -23,6 +33,18 @@ export const useCreateSupportTicket = () => {
   return useMutation({
     mutationFn: (payload: CreateTicketPayload) => createSupportTicketApi(payload),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mySupportTickets"] });
+    }
+  });
+};
+
+export const useUpdateTicketStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ ticketId, payload }: { ticketId: string; payload: UpdateTicketStatusPayload }) =>
+      updateTicketStatusApi(ticketId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminSupportTickets"] });
       queryClient.invalidateQueries({ queryKey: ["mySupportTickets"] });
     }
   });

@@ -64,3 +64,16 @@ export const getAdminSupportTicketsApi = async (
   const res = await apiClient.get<response<AdminTicketsData>>("/api/support/tickets/admin", { params });
   return res.data;
 };
+
+export interface UpdateTicketStatusPayload {
+  status: "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "CLOSED";
+  resolutionNote?: string | null;
+}
+
+export const updateTicketStatusApi = async (
+  ticketId: string,
+  payload: UpdateTicketStatusPayload
+): Promise<response<SupportTicket>> => {
+  const res = await apiClient.patch<response<SupportTicket>>(`/api/support/tickets/${ticketId}/status`, payload);
+  return res.data;
+};

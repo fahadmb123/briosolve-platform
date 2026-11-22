@@ -1,16 +1,18 @@
 import { BaseController } from "../../../../shared/base/controller/baseController";
 import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
-import { CreateTicketInputDto } from "../../application/dtos/request/create-ticket.dto";
+import { CreateTicketRequestDto } from "../../application/dtos/request/create-ticket.dto";
+import { UpdateTicketStatusRequestDto } from "../../application/dtos/request/update-ticket-status.dto";
 import { TicketResponseDto } from "../../application/dtos/response/ticket-response.dto";
-import { GetMyTicketsInputDto, UserTicketsResponseDto } from "../../application/use-cases/getMyTickets.useCase";
-import { GetAdminTicketsInputDto, AdminTicketsResponseDto } from "../../application/use-cases/getAdminTickets.useCase";
+import { GetMyTicketsRequestDto, UserTicketsResponseDto } from "../../application/use-cases/getMyTickets.useCase";
+import { GetAdminTicketsRequestDto, AdminTicketsResponseDto } from "../../application/use-cases/getAdminTickets.useCase";
 
 export class SupportController extends BaseController {
   constructor(
-    private readonly _createTicketUseCase: IUseCase<CreateTicketInputDto, TicketResponseDto>,
-    private readonly _getMyTicketsUseCase: IUseCase<GetMyTicketsInputDto, UserTicketsResponseDto>,
-    private readonly _getAdminTicketsUseCase: IUseCase<GetAdminTicketsInputDto, AdminTicketsResponseDto>
+    private readonly _createTicketUseCase: IUseCase<CreateTicketRequestDto, TicketResponseDto>,
+    private readonly _getMyTicketsUseCase: IUseCase<GetMyTicketsRequestDto, UserTicketsResponseDto>,
+    private readonly _getAdminTicketsUseCase: IUseCase<GetAdminTicketsRequestDto, AdminTicketsResponseDto>,
+    private readonly _updateTicketStatusUseCase: IUseCase<UpdateTicketStatusRequestDto, TicketResponseDto>
   ) {
     super();
   }
@@ -101,6 +103,25 @@ export class SupportController extends BaseController {
       });
 
       return this.sendSuccess(res, "Admin tickets retrieved successfully", response, 200);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateTicketStatus = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id as string;
+      const adminId = req.user?.userId;
+      const { status, resolutionNote } = req.body;
+
+      const response = await this._updateTicketStatusUseCase.execute({
+        ticketId,
+        status,
+        resolutionNote,
+        adminId
+      });
+
+      return this.sendSuccess(res, "Ticket status updated successfully", response, 200);
     } catch (error) {
       next(error);
     }

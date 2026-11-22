@@ -3,7 +3,7 @@ import { ISupportTicketRepository, GetAdminTicketsParams } from "../../domain/re
 import { TicketResponseDto } from "../dtos/response/ticket-response.dto";
 import { SupportTicketMapper } from "../../infrastructure/mappers/support-ticket.mapper";
 
-export interface GetAdminTicketsInputDto extends GetAdminTicketsParams {}
+export interface GetAdminTicketsRequestDto extends GetAdminTicketsParams {}
 
 export interface AdminTicketsResponseDto {
   tickets: TicketResponseDto[];
@@ -11,10 +11,10 @@ export interface AdminTicketsResponseDto {
   openCount: number;
 }
 
-export class GetAdminTicketsUseCase implements IUseCase<GetAdminTicketsInputDto, AdminTicketsResponseDto> {
+export class GetAdminTicketsUseCase implements IUseCase<GetAdminTicketsRequestDto, AdminTicketsResponseDto> {
   constructor(private readonly _ticketRepository: ISupportTicketRepository) {}
 
-  async execute(input: GetAdminTicketsInputDto): Promise<AdminTicketsResponseDto> {
+  async execute(input: GetAdminTicketsRequestDto): Promise<AdminTicketsResponseDto> {
     const result = await this._ticketRepository.findAdminTickets(input);
     return {
       tickets: result.tickets.map((t) => SupportTicketMapper.toDto(t)),

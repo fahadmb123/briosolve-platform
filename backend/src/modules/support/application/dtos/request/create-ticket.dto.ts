@@ -1,4 +1,4 @@
-export interface CreateTicketInputDto {
+export interface CreateTicketRequestDto {
   creatorId: string;
   creatorRole: "CUSTOMER" | "PROVIDER";
   targetType?: string;

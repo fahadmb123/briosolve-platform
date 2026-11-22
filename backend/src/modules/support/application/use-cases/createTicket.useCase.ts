@@ -1,14 +1,14 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { ISupportTicketRepository } from "../../domain/repositories/ISupportTicket.repository";
-import { CreateTicketInputDto } from "../dtos/request/create-ticket.dto";
+import { CreateTicketRequestDto } from "../dtos/request/create-ticket.dto";
 import { TicketResponseDto } from "../dtos/response/ticket-response.dto";
 import { SupportTicketMapper } from "../../infrastructure/mappers/support-ticket.mapper";
 
-export class CreateTicketUseCase implements IUseCase<CreateTicketInputDto, TicketResponseDto> {
+export class CreateTicketUseCase implements IUseCase<CreateTicketRequestDto, TicketResponseDto> {
   constructor(private readonly _ticketRepository: ISupportTicketRepository) {}
 
-  async execute(input: CreateTicketInputDto): Promise<TicketResponseDto> {
+  async execute(input: CreateTicketRequestDto): Promise<TicketResponseDto> {
     if (!input.description || !input.description.trim()) {
       throw new ApplicationError("MISSING_DESCRIPTION", "Ticket description is required", "VALIDATION");
     }

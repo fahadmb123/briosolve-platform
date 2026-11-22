@@ -1,5 +1,6 @@
+import { Temporal } from "@js-temporal/polyfill";
 import { SupportTicket, SupportTicketMessage, TicketStatus, TicketCreatorRole } from "../../domain/entities/support-ticket.entity";
-import { CreateTicketInputDto } from "../../application/dtos/request/create-ticket.dto";
+import { CreateTicketRequestDto } from "../../application/dtos/request/create-ticket.dto";
 import { TicketResponseDto, TicketMessageResponseDto } from "../../application/dtos/response/ticket-response.dto";
 
 export class SupportTicketMapper {
@@ -55,7 +56,7 @@ export class SupportTicketMapper {
     );
   }
 
-  static toPersistence(id: string, ticketNumber: string, input: CreateTicketInputDto) {
+  static toPersistence(id: string, ticketNumber: string, input: CreateTicketRequestDto) {
     return {
       id: id as never,
       ticket_number: ticketNumber as never,
@@ -74,7 +75,7 @@ export class SupportTicketMapper {
     };
   }
 
-  static toMessagePersistence(id: string, ticketId: string, input: CreateTicketInputDto) {
+  static toMessagePersistence(id: string, ticketId: string, input: CreateTicketRequestDto) {
     return {
       id: id as never,
       ticket_id: ticketId as never,
@@ -83,6 +84,23 @@ export class SupportTicketMapper {
       author_role: input.creatorRole as never,
       message: input.description.trim() as never
     };
+  }
+
+  static toUpdatePersistence(data: { status: TicketStatus; resolutionNote?: string | null; assignedTo?: string | null }): Record<string, unknown> {
+    const updatePayload: Record<string, unknown> = {
+      status: data.status as never,
+      updated_at: Temporal.Now.instant() as never
+    };
+
+    if (data.resolutionNote !== undefined) {
+      updatePayload.resolution_note = (data.resolutionNote ?? null) as never;
+    }
+
+    if (data.assignedTo !== undefined) {
+      updatePayload.assigned_to = (data.assignedTo ?? null) as never;
+    }
+
+    return updatePayload;
   }
 
   static toDto(entity: SupportTicket): TicketResponseDto {
