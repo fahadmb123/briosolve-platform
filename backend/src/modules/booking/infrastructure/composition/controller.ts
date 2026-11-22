@@ -11,7 +11,8 @@ import {
     createUpdateBookingStatusUseCase,
     createReportServiceMismatchUseCase,
     createResolveServiceMismatchUseCase,
-    createGetAdminBookingsUseCase
+    createGetAdminBookingsUseCase,
+    createAdminUpdateBookingStatusUseCase
 } from "./useCases";
 
 export function createBookingController(
@@ -25,6 +26,7 @@ export function createBookingController(
     const reportServiceMismatchUseCase = createReportServiceMismatchUseCase(createNotificationUseCase);
     const resolveServiceMismatchUseCase = createResolveServiceMismatchUseCase(creditWalletUseCase, createNotificationUseCase);
     const getAdminBookingsUseCase = createGetAdminBookingsUseCase();
+    const adminUpdateBookingStatusUseCase = createAdminUpdateBookingStatusUseCase(createNotificationUseCase, creditWalletUseCase);
 
     return new BookingController(
         getBookingByIdUseCase,
@@ -33,6 +35,7 @@ export function createBookingController(
         updateBookingStatusUseCase,
         reportServiceMismatchUseCase,
         resolveServiceMismatchUseCase,
-        getAdminBookingsUseCase
+        getAdminBookingsUseCase,
+        adminUpdateBookingStatusUseCase
     );
 }

@@ -2,6 +2,7 @@ import { apiClient } from "../../../shared/api/Client";
 import type { response } from "../../../shared/types/Dtos";
 import type {
   BookingItem,
+  BookingStatus,
   CustomerBookingsResponse,
   ProviderBookingsResponse,
   AdminBookingsResponse,
@@ -63,5 +64,13 @@ export const getAdminBookings = async (
   const res = await apiClient.get<response<AdminBookingsResponse>>("/api/booking/admin", {
     params
   });
+  return res.data;
+};
+
+export const adminUpdateBookingStatus = async (
+  id: string,
+  payload: { status: BookingStatus; reason?: string }
+): Promise<response<BookingItem>> => {
+  const res = await apiClient.patch<response<BookingItem>>(`/api/booking/admin/${id}/status`, payload);
   return res.data;
 };

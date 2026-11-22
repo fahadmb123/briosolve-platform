@@ -298,6 +298,7 @@ export const AdminBookingsPage: React.FC = () => {
         booking={selectedBooking}
         isOpen={Boolean(selectedBooking)}
         onClose={() => setSelectedBooking(null)}
+        onBookingUpdated={(updated) => setSelectedBooking(updated)}
       />
     </div>
   );

@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { GetBookingByIdInputDto, GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
 import { GetAdminBookingsInputDto } from "../../domain/repositories/IBookingRepository";
-import { UpdateBookingStatusInputDto } from "../../application/dtos/request/update-booking-status.dto";
+import { UpdateBookingStatusInputDto, AdminUpdateBookingStatusInputDto } from "../../application/dtos/request/update-booking-status.dto";
 import { ReportServiceMismatchInputDto, ResolveServiceMismatchInputDto } from "../../application/dtos/request/mismatch-report.dto";
 import { BookingResponseDto } from "../../application/dtos/response/booking-response.dto";
 import { CustomerBookingsResponseDto } from "../../application/dtos/response/customer-bookings-response.dto";
@@ -18,10 +18,28 @@ export class BookingController extends BaseController {
         private readonly _updateBookingStatusUseCase: IUseCase<UpdateBookingStatusInputDto, BookingResponseDto>,
         private readonly _reportServiceMismatchUseCase: IUseCase<ReportServiceMismatchInputDto, BookingResponseDto>,
         private readonly _resolveServiceMismatchUseCase: IUseCase<ResolveServiceMismatchInputDto, BookingResponseDto>,
-        private readonly _getAdminBookingsUseCase: IUseCase<GetAdminBookingsInputDto, AdminBookingsResponseDto>
+        private readonly _getAdminBookingsUseCase: IUseCase<GetAdminBookingsInputDto, AdminBookingsResponseDto>,
+        private readonly _adminUpdateBookingStatusUseCase: IUseCase<AdminUpdateBookingStatusInputDto, BookingResponseDto>
     ) {
         super();
     }
+
+    adminUpdateStatus = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const bookingId = req.params.id as string;
+            const { status, reason } = req.body;
+
+            const response = await this._adminUpdateBookingStatusUseCase.execute({
+                bookingId,
+                status,
+                reason
+            });
+
+            return this.sendSuccess(res, "Booking status updated by admin successfully", response, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
 
     getAdminBookings = async (req: Request, res: Response, next: NextFunction) => {
         try {
