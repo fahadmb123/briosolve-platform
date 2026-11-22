@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetCustomerBookings, useGetProviderBookings } from "../../../bookings/hooks/useBookingMutations";
 import { useGetMyServiceRequests, useGetProviderServiceRequests } from "../../../service-requests/hooks/useServiceRequestMutations";
+import { useSupportStore } from "../../stores/support.store";
 import type { SupportTicket } from "../../types/support.types";
 import "./SupportTicketsPage.css";
 
@@ -22,39 +23,6 @@ interface MappedRequestItem {
   category: string;
   status: string;
 }
-
-const INITIAL_MOCK_TICKETS: SupportTicket[] = [
-  {
-    id: "tk-9041",
-    ticketNumber: "TK-2026-9041",
-    creatorId: "user-1",
-    creatorName: "Fahad",
-    creatorRole: "CUSTOMER",
-    bookingId: "b64daea7-1e40-413a-a36e-51be0568bffe",
-    bookingNumber: "BK-MWQGDQBP-9950",
-    serviceTitle: "AC Repair & Check Cooling",
-    counterpartyName: "Basheer M B (Apex Electrician)",
-    category: "PAYMENT_REFUND",
-    categoryLabel: "Payment & Escrow Discrepancy",
-    subject: "Remaining balance and platform fee clarification",
-    description: "I noticed the platform fee breakdown calculation on the balance settlement needed review. I wanted to verify the exact wallet credit.",
-    priority: "MEDIUM",
-    status: "RESOLVED",
-    attachments: [],
-    createdAt: "2026-11-21T18:30:00.000Z",
-    updatedAt: "2026-11-21T19:00:00.000Z",
-    resolutionNote: "Escrow breakdown reviewed. Provider payout is verified net of the 5% platform fee with full wallet credit.",
-    messages: [
-      {
-        id: "m-1",
-        authorName: "Support Agent",
-        authorRole: "ADMIN",
-        message: "Hello! We reviewed the case. The 5% fee is calculated on base service value, and net earnings are credited upon customer settlement.",
-        createdAt: "2026-11-21T18:45:00.000Z"
-      }
-    ]
-  }
-];
 
 export const SupportTicketsPage: React.FC = () => {
   const location = useLocation();
@@ -94,9 +62,34 @@ export const SupportTicketsPage: React.FC = () => {
     }));
   }, [isProvider, customerRequestsQuery.data, providerRequestsQuery.data]);
 
+  const allTickets = useSupportStore((state) => state.tickets);
+  const addTicketToStore = useSupportStore((state) => state.addTicket);
+  const addTicketMessage = useSupportStore((state) => state.addTicketMessage);
+
   const [activeTab, setActiveTab] = useState<"MY_TICKETS" | "NEW_TICKET">("MY_TICKETS");
-  const [tickets, setTickets] = useState<SupportTicket[]>(INITIAL_MOCK_TICKETS);
+  const [ticketFilter, setTicketFilter] = useState<"ALL" | "ACTIVE" | "RESOLVED">("ALL");
+  const [ticketSearch, setTicketSearch] = useState<string>("");
   const [viewTicket, setViewTicket] = useState<SupportTicket | null>(null);
+
+  const tickets = useMemo(() => {
+    return allTickets.filter((t) => {
+      const isRoleMatch = isProvider ? t.creatorRole === "PROVIDER" : t.creatorRole === "CUSTOMER";
+      const isStatusMatch =
+        ticketFilter === "ALL" ||
+        (ticketFilter === "ACTIVE" && (t.status === "OPEN" || t.status === "UNDER_REVIEW")) ||
+        (ticketFilter === "RESOLVED" && (t.status === "RESOLVED" || t.status === "CLOSED"));
+
+      const q = ticketSearch.toLowerCase().trim();
+      const isSearchMatch =
+        !q ||
+        t.ticketNumber.toLowerCase().includes(q) ||
+        t.subject.toLowerCase().includes(q) ||
+        (t.bookingNumber && t.bookingNumber.toLowerCase().includes(q)) ||
+        (t.serviceTitle && t.serviceTitle.toLowerCase().includes(q));
+
+      return isRoleMatch && isStatusMatch && isSearchMatch;
+    });
+  }, [allTickets, isProvider, ticketFilter, ticketSearch]);
 
   const [concernType, setConcernType] = useState<ConcernType>("BOOKING");
   const [selectedBookingId, setSelectedBookingId] = useState<string>("");
@@ -107,6 +100,15 @@ export const SupportTicketsPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
   const [replyText, setReplyText] = useState<string>("");
+
+  const selectedBooking = useMemo(
+    () => activeBookings.find((b) => b.id === selectedBookingId),
+    [activeBookings, selectedBookingId]
+  );
+  const selectedRequest = useMemo(
+    () => activeRequests.find((r) => r.id === selectedRequestId),
+    [activeRequests, selectedRequestId]
+  );
 
   const bookingReasons = isProvider ? [
     "Customer absent at address / Unreachable",
@@ -191,7 +193,7 @@ export const SupportTicketsPage: React.FC = () => {
         ]
       };
 
-      setTickets([newTicket, ...tickets]);
+      addTicketToStore(newTicket);
       setIsSubmitting(false);
       setSubmitSuccess(true);
       setDescription("");
@@ -209,23 +211,14 @@ export const SupportTicketsPage: React.FC = () => {
 
   const handleSendReply = () => {
     if (!replyText.trim() || !viewTicket) return;
-
-    const newMsg = {
-      id: `reply-${Date.now()}`,
-      authorName: user?.name || "You",
-      authorRole: (isProvider ? "PROVIDER" : "CUSTOMER") as any,
-      message: replyText.trim(),
-      createdAt: new Date().toISOString()
-    };
-
-    const updated = {
-      ...viewTicket,
-      updatedAt: new Date().toISOString(),
-      messages: [...viewTicket.messages, newMsg]
-    };
-
-    setTickets((prev) => prev.map((t) => (t.id === viewTicket.id ? updated : t)));
-    setViewTicket(updated);
+    addTicketMessage(
+      viewTicket.id,
+      replyText.trim(),
+      user?.name || (isProvider ? "Provider" : "Customer"),
+      isProvider ? "PROVIDER" : "CUSTOMER"
+    );
+    const updated = useSupportStore.getState().tickets.find((t) => t.id === viewTicket.id);
+    if (updated) setViewTicket(updated);
     setReplyText("");
   };
 
@@ -264,239 +257,396 @@ export const SupportTicketsPage: React.FC = () => {
       </div>
 
       {activeTab === "NEW_TICKET" ? (
-        <div className="clean-ticket-wizard">
-          {submitSuccess && (
-            <div className="clean-alert-banner success">
-              <i className="fas fa-check-circle"></i>
-              <span>Ticket created successfully! Redirecting to ticket history...</span>
-            </div>
-          )}
+        <div className="clean-wizard-layout">
+          <div className="clean-ticket-wizard">
+            {submitSuccess && (
+              <div className="clean-alert-banner success">
+                <i className="fas fa-check-circle"></i>
+                <span>Ticket created successfully! Redirecting to ticket history...</span>
+              </div>
+            )}
 
-          <form onSubmit={handleSubmitTicket} className="clean-wizard-form">
-            <div className="clean-section-block">
-              <span className="clean-step-number">Step 1</span>
-              <h3 className="clean-step-title">What is your issue regarding?</h3>
-
-              <div className="clean-type-selector">
-                <div
-                  className={`clean-type-card ${concernType === "BOOKING" ? "active" : ""}`}
-                  onClick={() => setConcernType("BOOKING")}
-                >
-                  <div className="clean-type-icon">
-                    <i className="fas fa-calendar-check"></i>
-                  </div>
-                  <div className="clean-type-text">
-                    <strong>A Specific Booking</strong>
-                    <span>Technician arrival, quality of work, or payment dispute</span>
-                  </div>
-                  <div className="clean-radio-dot"></div>
+            <form onSubmit={handleSubmitTicket} className="clean-wizard-form">
+              <div className="clean-section-block">
+                <div className="clean-step-header">
+                  <span className="clean-step-badge">Step 1</span>
+                  <h3 className="clean-step-title">What is your issue regarding?</h3>
                 </div>
 
-                <div
-                  className={`clean-type-card ${concernType === "REQUEST" ? "active" : ""}`}
-                  onClick={() => setConcernType("REQUEST")}
-                >
-                  <div className="clean-type-icon">
-                    <i className="fas fa-clipboard-list"></i>
+                <div className="clean-type-selector">
+                  <div
+                    className={`clean-type-card ${concernType === "BOOKING" ? "active" : ""}`}
+                    onClick={() => setConcernType("BOOKING")}
+                  >
+                    <div className="clean-type-icon">
+                      <i className="fas fa-calendar-check"></i>
+                    </div>
+                    <div className="clean-type-text">
+                      <strong>A Specific Booking</strong>
+                      <span>Technician arrival, quality of work, or payment dispute</span>
+                    </div>
+                    <div className="clean-radio-dot"></div>
                   </div>
-                  <div className="clean-type-text">
-                    <strong>A Service Request</strong>
-                    <span>Quotations, matching, or request cancellation</span>
-                  </div>
-                  <div className="clean-radio-dot"></div>
-                </div>
 
-                <div
-                  className={`clean-type-card ${concernType === "GENERAL" ? "active" : ""}`}
-                  onClick={() => setConcernType("GENERAL")}
-                >
-                  <div className="clean-type-icon">
-                    <i className="fas fa-wallet"></i>
+                  <div
+                    className={`clean-type-card ${concernType === "REQUEST" ? "active" : ""}`}
+                    onClick={() => setConcernType("REQUEST")}
+                  >
+                    <div className="clean-type-icon">
+                      <i className="fas fa-clipboard-list"></i>
+                    </div>
+                    <div className="clean-type-text">
+                      <strong>A Service Request</strong>
+                      <span>Quotations, matching, or request cancellation</span>
+                    </div>
+                    <div className="clean-radio-dot"></div>
                   </div>
-                  <div className="clean-type-text">
-                    <strong>Wallet & Account</strong>
-                    <span>Refunds, payout schedule, login, or general help</span>
+
+                  <div
+                    className={`clean-type-card ${concernType === "GENERAL" ? "active" : ""}`}
+                    onClick={() => setConcernType("GENERAL")}
+                  >
+                    <div className="clean-type-icon">
+                      <i className="fas fa-wallet"></i>
+                    </div>
+                    <div className="clean-type-text">
+                      <strong>Wallet & Account</strong>
+                      <span>Refunds, payout schedule, login, or general help</span>
+                    </div>
+                    <div className="clean-radio-dot"></div>
                   </div>
-                  <div className="clean-radio-dot"></div>
                 </div>
               </div>
-            </div>
 
-            <div className="clean-section-block">
-              <span className="clean-step-number">Step 2</span>
-              <h3 className="clean-step-title">
-                {concernType === "BOOKING" && "Select the Booking"}
-                {concernType === "REQUEST" && "Select the Service Request"}
-                {concernType === "GENERAL" && "Select the Topic"}
-              </h3>
-
-              {concernType === "BOOKING" && (
-                <div className="clean-selection-box">
-                  {activeBookings.length === 0 ? (
-                    <div className="clean-empty-selection">
-                      <i className="fas fa-calendar-times"></i>
-                      <span>No bookings found on your account.</span>
-                    </div>
-                  ) : (
-                    <div className="clean-items-list">
-                      {activeBookings.map((b) => {
-                        const isChosen = selectedBookingId === b.id;
-                        return (
-                          <div
-                            key={b.id}
-                            className={`clean-item-row ${isChosen ? "chosen" : ""}`}
-                            onClick={() => setSelectedBookingId(b.id)}
-                          >
-                            <div className="clean-item-radio">
-                              <i className={isChosen ? "fas fa-check-circle" : "far fa-circle"}></i>
-                            </div>
-                            <div className="clean-item-info">
-                              <span className="clean-item-num">#{b.bookingNumber}</span>
-                              <strong className="clean-item-title">{b.serviceTitle}</strong>
-                              <span className="clean-item-sub">Total: ₹{b.totalAmount.toLocaleString("en-IN")} · Status: {b.status}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+              <div className="clean-section-block">
+                <div className="clean-step-header">
+                  <span className="clean-step-badge">Step 2</span>
+                  <h3 className="clean-step-title">
+                    {concernType === "BOOKING" && "Select the Booking"}
+                    {concernType === "REQUEST" && "Select the Service Request"}
+                    {concernType === "GENERAL" && "Select the Topic"}
+                  </h3>
                 </div>
-              )}
 
-              {concernType === "REQUEST" && (
-                <div className="clean-selection-box">
-                  {activeRequests.length === 0 ? (
-                    <div className="clean-empty-selection">
-                      <i className="fas fa-folder-open"></i>
-                      <span>No service requests found on your account.</span>
-                    </div>
-                  ) : (
-                    <div className="clean-items-list">
-                      {activeRequests.map((r) => {
-                        const isChosen = selectedRequestId === r.id;
-                        return (
-                          <div
-                            key={r.id}
-                            className={`clean-item-row ${isChosen ? "chosen" : ""}`}
-                            onClick={() => setSelectedRequestId(r.id)}
-                          >
-                            <div className="clean-item-radio">
-                              <i className={isChosen ? "fas fa-check-circle" : "far fa-circle"}></i>
+                {concernType === "BOOKING" && (
+                  <div className="clean-selection-box">
+                    {activeBookings.length === 0 ? (
+                      <div className="clean-empty-selection">
+                        <i className="fas fa-calendar-times"></i>
+                        <span>No bookings found on your account.</span>
+                      </div>
+                    ) : (
+                      <div className="clean-items-list">
+                        {activeBookings.map((b) => {
+                          const isChosen = selectedBookingId === b.id;
+                          return (
+                            <div
+                              key={b.id}
+                              className={`clean-item-row ${isChosen ? "chosen" : ""}`}
+                              onClick={() => setSelectedBookingId(b.id)}
+                            >
+                              <div className="clean-item-radio">
+                                <i className={isChosen ? "fas fa-check-circle" : "far fa-circle"}></i>
+                              </div>
+                              <div className="clean-item-info">
+                                <div className="clean-item-meta-top">
+                                  <span className="clean-item-num">#{b.bookingNumber}</span>
+                                  <span className={`clean-item-status-badge ${b.status.toLowerCase()}`}>{b.status}</span>
+                                </div>
+                                <strong className="clean-item-title">{b.serviceTitle}</strong>
+                              </div>
+                              <div className="clean-item-price-pill">
+                                ₹{b.totalAmount.toLocaleString("en-IN")}
+                              </div>
                             </div>
-                            <div className="clean-item-info">
-                              <strong className="clean-item-title">{r.title}</strong>
-                              <span className="clean-item-sub">Category: {r.category} · Status: {r.status}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {concernType === "GENERAL" && (
-                <div className="clean-pills-row">
-                  {generalTopics.map((top) => (
-                    <button
-                      key={top}
-                      type="button"
-                      className={`clean-topic-pill ${generalTopic === top ? "active" : ""}`}
-                      onClick={() => setGeneralTopic(top)}
-                    >
-                      {top}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="clean-section-block">
-              <span className="clean-step-number">Step 3</span>
-              <h3 className="clean-step-title">Specify the Reason & Details</h3>
-
-              {concernType === "BOOKING" && (
-                <div className="clean-reasons-group">
-                  <label className="clean-label">What is the primary issue?</label>
-                  <div className="clean-chips-wrap">
-                    {bookingReasons.map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        className={`clean-reason-chip ${issueReason === r ? "active" : ""}`}
-                        onClick={() => setIssueReason(r)}
-                      >
-                        {r}
-                      </button>
-                    ))}
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
-
-              {concernType === "REQUEST" && (
-                <div className="clean-reasons-group">
-                  <label className="clean-label">What is the problem?</label>
-                  <div className="clean-chips-wrap">
-                    {requestReasons.map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        className={`clean-reason-chip ${issueReason === r ? "active" : ""}`}
-                        onClick={() => setIssueReason(r)}
-                      >
-                        {r}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="clean-form-group">
-                <label htmlFor="clean-description" className="clean-label">
-                  Describe what happened *
-                </label>
-                <textarea
-                  id="clean-description"
-                  required
-                  rows={4}
-                  className="clean-textarea"
-                  placeholder="Tell us what occurred, timing, or any attempts made to contact the other person..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="clean-wizard-footer">
-              <button
-                type="button"
-                className="clean-btn-secondary"
-                onClick={() => setActiveTab("MY_TICKETS")}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="clean-btn-primary"
-                disabled={isSubmitting || !description.trim()}
-              >
-                {isSubmitting ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin"></i>
-                    <span>Submitting...</span>
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-paper-plane"></i>
-                    <span>Submit Ticket</span>
-                  </>
                 )}
-              </button>
+
+                {concernType === "REQUEST" && (
+                  <div className="clean-selection-box">
+                    {activeRequests.length === 0 ? (
+                      <div className="clean-empty-selection">
+                        <i className="fas fa-folder-open"></i>
+                        <span>No service requests found on your account.</span>
+                      </div>
+                    ) : (
+                      <div className="clean-items-list">
+                        {activeRequests.map((r) => {
+                          const isChosen = selectedRequestId === r.id;
+                          return (
+                            <div
+                              key={r.id}
+                              className={`clean-item-row ${isChosen ? "chosen" : ""}`}
+                              onClick={() => setSelectedRequestId(r.id)}
+                            >
+                              <div className="clean-item-radio">
+                                <i className={isChosen ? "fas fa-check-circle" : "far fa-circle"}></i>
+                              </div>
+                              <div className="clean-item-info">
+                                <div className="clean-item-meta-top">
+                                  <span className="clean-item-category-tag">{r.category}</span>
+                                  <span className={`clean-item-status-badge ${r.status.toLowerCase()}`}>{r.status}</span>
+                                </div>
+                                <strong className="clean-item-title">{r.title}</strong>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {concernType === "GENERAL" && (
+                  <div className="clean-pills-row">
+                    {generalTopics.map((top) => (
+                      <button
+                        key={top}
+                        type="button"
+                        className={`clean-topic-pill ${generalTopic === top ? "active" : ""}`}
+                        onClick={() => setGeneralTopic(top)}
+                      >
+                        {top}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="clean-section-block">
+                <div className="clean-step-header">
+                  <span className="clean-step-badge">Step 3</span>
+                  <h3 className="clean-step-title">Specify the Reason & Details</h3>
+                </div>
+
+                {concernType === "BOOKING" && (
+                  <div className="clean-reasons-group">
+                    <label className="clean-label">What is the primary issue?</label>
+                    <div className="clean-chips-wrap">
+                      {bookingReasons.map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          className={`clean-reason-chip ${issueReason === r ? "active" : ""}`}
+                          onClick={() => setIssueReason(r)}
+                        >
+                          {r}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {concernType === "REQUEST" && (
+                  <div className="clean-reasons-group">
+                    <label className="clean-label">What is the problem?</label>
+                    <div className="clean-chips-wrap">
+                      {requestReasons.map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          className={`clean-reason-chip ${issueReason === r ? "active" : ""}`}
+                          onClick={() => setIssueReason(r)}
+                        >
+                          {r}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="clean-form-group">
+                  <label htmlFor="clean-description" className="clean-label">
+                    Describe what happened *
+                  </label>
+                  <textarea
+                    id="clean-description"
+                    required
+                    rows={4}
+                    className="clean-textarea"
+                    placeholder="Tell us what occurred, timing, or any attempts made to contact the other person..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="clean-wizard-footer">
+                <button
+                  type="button"
+                  className="clean-btn-secondary"
+                  onClick={() => setActiveTab("MY_TICKETS")}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="clean-btn-primary"
+                  disabled={isSubmitting || !description.trim()}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i>
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-paper-plane"></i>
+                      <span>Submit Ticket</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <aside className="clean-wizard-sidebar">
+            <div className="clean-sidebar-card">
+              <div className="clean-sidebar-card-header">
+                <i className="fas fa-clipboard-check"></i>
+                <h4>Issue Overview</h4>
+              </div>
+              <div className="clean-sidebar-summary-body">
+                <div className="clean-summary-field">
+                  <span className="clean-summary-field-label">Target Category</span>
+                  <span className="clean-summary-field-val">
+                    {concernType === "BOOKING" ? "Booking Dispute" : concernType === "REQUEST" ? "Service Request" : "Wallet & Account"}
+                  </span>
+                </div>
+
+                {concernType === "BOOKING" && (
+                  <div className="clean-summary-field">
+                    <span className="clean-summary-field-label">Linked Booking</span>
+                    {selectedBooking ? (
+                      <div className="clean-summary-linked-card">
+                        <div className="clean-slc-num">#{selectedBooking.bookingNumber}</div>
+                        <div className="clean-slc-title">{selectedBooking.serviceTitle}</div>
+                        <div className="clean-slc-footer">
+                          <span className="clean-slc-amount">₹{selectedBooking.totalAmount.toLocaleString("en-IN")}</span>
+                          <span className={`clean-item-status-badge ${selectedBooking.status.toLowerCase()}`}>{selectedBooking.status}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="clean-summary-placeholder-text">
+                        <i className="far fa-hand-pointer"></i> Please select a booking in Step 2
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {concernType === "REQUEST" && (
+                  <div className="clean-summary-field">
+                    <span className="clean-summary-field-label">Linked Request</span>
+                    {selectedRequest ? (
+                      <div className="clean-summary-linked-card">
+                        <div className="clean-slc-num">{selectedRequest.category}</div>
+                        <div className="clean-slc-title">{selectedRequest.title}</div>
+                        <div className="clean-slc-footer">
+                          <span className={`clean-item-status-badge ${selectedRequest.status.toLowerCase()}`}>{selectedRequest.status}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="clean-summary-placeholder-text">
+                        <i className="far fa-hand-pointer"></i> Please select a request in Step 2
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {concernType === "GENERAL" && (
+                  <div className="clean-summary-field">
+                    <span className="clean-summary-field-label">Topic</span>
+                    <span className="clean-summary-field-val highlight">{generalTopic}</span>
+                  </div>
+                )}
+
+                {issueReason && (
+                  <div className="clean-summary-field">
+                    <span className="clean-summary-field-label">Primary Reason</span>
+                    <span className="clean-summary-reason-tag">{issueReason}</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </form>
+
+            <div className="clean-sidebar-card guarantee-card">
+              <div className="clean-sidebar-card-header">
+                <i className="fas fa-shield-alt"></i>
+                <h4>Resolution & Trust</h4>
+              </div>
+              <ul className="clean-guarantee-list">
+                <li>
+                  <div className="clean-gl-icon">
+                    <i className="fas fa-lock"></i>
+                  </div>
+                  <div className="clean-gl-text">
+                    <strong>Escrow Protected</strong>
+                    <p>Booking funds stay locked in escrow until the dispute is resolved.</p>
+                  </div>
+                </li>
+                <li>
+                  <div className="clean-gl-icon">
+                    <i className="fas fa-bolt"></i>
+                  </div>
+                  <div className="clean-gl-text">
+                    <strong>2 to 4 Hr Response</strong>
+                    <p>Dedicated dispute agents investigate and review evidence swiftly.</p>
+                  </div>
+                </li>
+                <li>
+                  <div className="clean-gl-icon">
+                    <i className="fas fa-comments"></i>
+                  </div>
+                  <div className="clean-gl-text">
+                    <strong>Two-Way Thread</strong>
+                    <p>Track notes, reply with evidence, and review resolutions directly.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </aside>
         </div>
       ) : (
         <div className="clean-tickets-list-wrap">
+          <div className="clean-tickets-toolbar">
+            <div className="clean-search-box">
+              <i className="fas fa-search"></i>
+              <input
+                type="text"
+                placeholder="Search ticket #, booking #, or subject..."
+                value={ticketSearch}
+                onChange={(e) => setTicketSearch(e.target.value)}
+              />
+            </div>
+            <div className="clean-filter-pills">
+              <button
+                type="button"
+                className={`clean-filter-pill ${ticketFilter === "ALL" ? "active" : ""}`}
+                onClick={() => setTicketFilter("ALL")}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                className={`clean-filter-pill ${ticketFilter === "ACTIVE" ? "active" : ""}`}
+                onClick={() => setTicketFilter("ACTIVE")}
+              >
+                Active
+              </button>
+              <button
+                type="button"
+                className={`clean-filter-pill ${ticketFilter === "RESOLVED" ? "active" : ""}`}
+                onClick={() => setTicketFilter("RESOLVED")}
+              >
+                Resolved
+              </button>
+            </div>
+          </div>
+
           {tickets.length === 0 ? (
             <div className="clean-empty-state">
               <div className="clean-empty-icon">
@@ -591,6 +741,35 @@ export const SupportTicketsPage: React.FC = () => {
             </div>
 
             <div className="clean-modal-body">
+              <div className="clean-ticket-stepper">
+                <div className="clean-stepper-step completed">
+                  <div className="clean-step-circle"><i className="fas fa-check"></i></div>
+                  <span>1. Submitted</span>
+                </div>
+                <div className={`clean-stepper-line ${viewTicket.status !== "OPEN" ? "completed" : ""}`} />
+                <div className={`clean-stepper-step ${viewTicket.status === "UNDER_REVIEW" ? "active" : viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? "completed" : ""}`}>
+                  <div className="clean-step-circle">
+                    {viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? (
+                      <i className="fas fa-check"></i>
+                    ) : (
+                      <span>2</span>
+                    )}
+                  </div>
+                  <span>2. Under Review</span>
+                </div>
+                <div className={`clean-stepper-line ${viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? "completed" : ""}`} />
+                <div className={`clean-stepper-step ${viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? "completed" : ""}`}>
+                  <div className="clean-step-circle">
+                    {viewTicket.status === "RESOLVED" || viewTicket.status === "CLOSED" ? (
+                      <i className="fas fa-check"></i>
+                    ) : (
+                      <span>3</span>
+                    )}
+                  </div>
+                  <span>3. Resolved</span>
+                </div>
+              </div>
+
               {viewTicket.bookingNumber && (
                 <div className="clean-booking-pill-bar">
                   <i className="fas fa-calendar-check"></i>
@@ -608,9 +787,16 @@ export const SupportTicketsPage: React.FC = () => {
                 <div className="clean-resolution-box">
                   <div className="clean-rb-title">
                     <i className="fas fa-check-circle"></i>
-                    <span>Resolution Summary</span>
+                    <span>Official Resolution Decision</span>
                   </div>
                   <p className="clean-rb-text">{viewTicket.resolutionNote}</p>
+                  {viewTicket.settlementDecision && (
+                    <div className="clean-settlement-tag">
+                      <strong>Action: </strong>
+                      <span>{viewTicket.settlementDecision.replace(/_/g, " ")}</span>
+                      {viewTicket.settlementDetails && ` · ${viewTicket.settlementDetails}`}
+                    </div>
+                  )}
                 </div>
               )}
 

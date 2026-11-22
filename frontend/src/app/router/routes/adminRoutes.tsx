@@ -6,7 +6,8 @@ import {
   AdminSettings,
   AdminUsers,
   AdminRequests,
-  AdminCategories
+  AdminCategories,
+  AdminSupport
 } from '../lazy/admin.lazy';
 
 export const adminRoutes = (
@@ -25,5 +26,7 @@ export const adminRoutes = (
     <Route path="notifications" element={<AdminNotifications />} />
     <Route path="categories" element={<AdminCategories />} />
     <Route path="services" element={<Navigate to="/admin/categories?tab=services" replace />} />
+    <Route path="support" element={<AdminSupport />} />
+    <Route path="investigations" element={<Navigate to="/admin/support" replace />} />
   </>
 );

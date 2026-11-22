@@ -5,6 +5,7 @@ import { useTheme } from '../shared/hooks/useTheme';
 import { useAuthStore } from '../features/auth/stores/auth.store';
 import { useLogout } from '../features/auth/hooks/use-otp-varify';
 import NotificationDropdown from '../features/notifications/components/NotificationDropdown';
+import { useSupportStore } from '../features/support/stores/support.store';
 
 export default function AdminLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
@@ -14,6 +15,7 @@ export default function AdminLayout() {
     const logout = useLogout();
     const navigate = useNavigate();
     const location = useLocation();
+    const openTicketsCount = useSupportStore((state) => state.tickets.filter((t) => t.status === "OPEN").length);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const profileDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -118,11 +120,14 @@ export default function AdminLayout() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink 
+                            to="/admin/support" 
+                            className={() => `sidebar-item ${location.pathname.startsWith('/admin/support') || location.pathname.startsWith('/admin/investigations') ? 'active' : ''}`}
+                        >
                             <i className="fas fa-gavel"></i>
                             <span>Investigations</span>
-                            <span className="badge badge-danger ml-auto">4</span>
-                        </Link>
+                            {openTicketsCount > 0 && <span className="badge badge-danger ml-auto">{openTicketsCount}</span>}
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">

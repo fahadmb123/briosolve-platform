@@ -43,6 +43,8 @@ export interface SupportTicket {
   createdAt: string;
   updatedAt: string;
   resolutionNote?: string;
+  settlementDecision?: "FULL_REFUND_CUSTOMER" | "FULL_PAYOUT_PROVIDER" | "SPLIT_SETTLEMENT" | "NO_FINANCIAL_ACTION";
+  settlementDetails?: string;
   messages: TicketMessage[];
 }
 
