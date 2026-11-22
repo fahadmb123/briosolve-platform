@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { db } from "../../../../shared/database/client";
 import { SupportTicket, SupportTicketMessage } from "../../domain/entities/support-ticket.entity";
-import { ISupportTicketRepository, GetUserTicketsParams, UserTicketsResult } from "../../domain/repositories/ISupportTicket.repository";
+import { ISupportTicketRepository, GetUserTicketsParams, UserTicketsResult, GetAdminTicketsParams, AdminTicketsResult } from "../../domain/repositories/ISupportTicket.repository";
 import { CreateTicketInputDto } from "../../application/dtos/request/create-ticket.dto";
 import { SupportTicketMapper } from "../mappers/support-ticket.mapper";
 
@@ -89,6 +89,73 @@ export class PrismaSupportTicketRepository implements ISupportTicketRepository {
     }
 
     return { tickets, total, counts };
+  }
+
+  async findAdminTickets(params: GetAdminTicketsParams): Promise<AdminTicketsResult> {
+    const page = params.page || 1;
+    const limit = params.limit || 50;
+    const skip = (page - 1) * limit;
+
+    const allRecords = await db.orm.public.support_tickets
+      .orderBy((t) => t.created_at.desc())
+      .all();
+
+    const openCount = allRecords.filter((t: any) => t.status === "OPEN").length;
+
+    let filtered = allRecords;
+
+    if (params.status && params.status !== "ALL") {
+      filtered = filtered.filter((t: any) => t.status === params.status);
+    }
+
+    if (params.category && params.category.trim()) {
+      filtered = filtered.filter((t: any) => t.category === params.category);
+    }
+
+    if (params.priority && params.priority.trim()) {
+      filtered = filtered.filter((t: any) => t.priority === params.priority);
+    }
+
+    if (params.search && params.search.trim()) {
+      const q = params.search.trim().toLowerCase();
+      filtered = filtered.filter((t: any) => {
+        return (
+          (t.ticket_number && t.ticket_number.toLowerCase().includes(q)) ||
+          (t.subject && t.subject.toLowerCase().includes(q)) ||
+          (t.target_number && t.target_number.toLowerCase().includes(q)) ||
+          (t.description && t.description.toLowerCase().includes(q))
+        );
+      });
+    }
+
+    const total = filtered.length;
+    const paged = filtered.slice(skip, skip + limit);
+
+    const userIds = [...new Set(paged.map((r: any) => r.creator_id))];
+    const usersMap = new Map<string, string>();
+    for (const uid of userIds) {
+      if (!uid) continue;
+      try {
+        const u = await db.orm.public.users.where({ id: uid as never }).first();
+        if (u) {
+          usersMap.set(uid, (u as any).name || (u as any).email || "User");
+        }
+      } catch {
+        usersMap.set(uid, "User");
+      }
+    }
+
+    const tickets: SupportTicket[] = [];
+    for (const r of paged) {
+      const messages = await db.orm.public.support_ticket_messages
+        .where({ ticket_id: r.id as never })
+        .orderBy((m) => m.created_at.asc())
+        .all();
+      const creatorName = usersMap.get(r.creator_id) || null;
+      tickets.push(SupportTicketMapper.toDomain(r, messages, creatorName));
+    }
+
+    return { tickets, total, openCount };
   }
 
   async getAll(status?: string): Promise<SupportTicket[]> {

@@ -7,7 +7,6 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { useGetCustomerBookings, useGetProviderBookings } from "../../../bookings/hooks/useBookingMutations";
-import { useSupportStore } from "../../stores/support.store";
 import { useCreateSupportTicket, useGetMySupportTickets } from "../../hooks/useSupportTickets";
 import { supportTicketSchema, type SupportTicketInputType } from "../../schemas/supportTicket.schema";
 import type { SupportTicket } from "../../types/support.types";
@@ -42,9 +41,6 @@ export const SupportTicketsPage: React.FC = () => {
       status: b.booking?.status || b.status
     }));
   }, [isProvider, customerBookingsQuery.data, providerBookingsQuery.data]);
-
-  const addTicketToStore = useSupportStore((state) => state.addTicket);
-  const addTicketMessage = useSupportStore((state) => state.addTicketMessage);
 
   const createTicketMutation = useCreateSupportTicket();
 
@@ -170,7 +166,6 @@ export const SupportTicketsPage: React.FC = () => {
 
       const createdTicket = res.data;
       if (createdTicket) {
-        addTicketToStore(createdTicket);
         setViewTicket(createdTicket);
       }
 
@@ -214,14 +209,16 @@ export const SupportTicketsPage: React.FC = () => {
 
   const handleSendReply = () => {
     if (!replyText.trim() || !viewTicket) return;
-    addTicketMessage(
-      viewTicket.id,
-      replyText.trim(),
-      user?.name || (isProvider ? "Provider" : "Customer"),
-      isProvider ? "PROVIDER" : "CUSTOMER"
+    const newMsg = {
+      id: `msg-${Date.now()}`,
+      authorName: user?.name || (isProvider ? "Provider" : "Customer"),
+      authorRole: (isProvider ? "PROVIDER" : "CUSTOMER") as "PROVIDER" | "CUSTOMER",
+      message: replyText.trim(),
+      createdAt: new Date().toISOString()
+    };
+    setViewTicket((prev) =>
+      prev ? { ...prev, messages: [...(prev.messages || []), newMsg] } : null
     );
-    const updated = (useSupportStore.getState().tickets || []).find((t) => t.id === viewTicket.id);
-    if (updated) setViewTicket(updated);
     setReplyText("");
   };
 

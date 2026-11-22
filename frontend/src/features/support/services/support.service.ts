@@ -25,6 +25,15 @@ export interface GetSupportTicketsParams {
   limit?: number;
 }
 
+export interface GetAdminSupportTicketsParams {
+  status?: string;
+  category?: string;
+  priority?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
 export interface UserTicketsData {
   tickets: SupportTicket[];
   total: number;
@@ -35,6 +44,12 @@ export interface UserTicketsData {
   };
 }
 
+export interface AdminTicketsData {
+  tickets: SupportTicket[];
+  total: number;
+  openCount: number;
+}
+
 export const createSupportTicketApi = async (payload: CreateTicketPayload): Promise<response<SupportTicket>> => {
   const res = await apiClient.post<response<SupportTicket>>("/api/support/tickets", payload);
   return res.data;
@@ -42,5 +57,12 @@ export const createSupportTicketApi = async (payload: CreateTicketPayload): Prom
 
 export const getMySupportTicketsApi = async (params?: GetSupportTicketsParams): Promise<response<UserTicketsData>> => {
   const res = await apiClient.get<response<UserTicketsData>>("/api/support/tickets/my", { params });
+  return res.data;
+};
+
+export const getAdminSupportTicketsApi = async (
+  params?: GetAdminSupportTicketsParams
+): Promise<response<AdminTicketsData>> => {
+  const res = await apiClient.get<response<AdminTicketsData>>("/api/support/tickets/admin", { params });
   return res.data;
 };

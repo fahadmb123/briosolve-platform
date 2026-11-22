@@ -5,7 +5,7 @@ import { useTheme } from '../shared/hooks/useTheme';
 import { useAuthStore } from '../features/auth/stores/auth.store';
 import { useLogout } from '../features/auth/hooks/use-otp-varify';
 import NotificationDropdown from '../features/notifications/components/NotificationDropdown';
-import { useSupportStore } from '../features/support/stores/support.store';
+import { useGetAdminSupportTickets } from '../features/support/hooks/useSupportTickets';
 
 export default function AdminLayout() {
     const { isSidebarOpen, setIsSidebarOpen, handleSidebarToggle } = useSidebar();
@@ -15,7 +15,8 @@ export default function AdminLayout() {
     const logout = useLogout();
     const navigate = useNavigate();
     const location = useLocation();
-    const openTicketsCount = useSupportStore((state) => Array.isArray(state.tickets) ? state.tickets.filter((t) => t.status === "OPEN").length : 0);
+    const adminTicketsQuery = useGetAdminSupportTickets({ status: "OPEN", limit: 1 });
+    const openTicketsCount = adminTicketsQuery.data?.data?.openCount ?? 0;
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const profileDropdownRef = useRef<HTMLDivElement>(null);
 

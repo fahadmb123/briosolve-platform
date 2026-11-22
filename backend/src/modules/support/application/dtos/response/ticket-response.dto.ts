@@ -12,6 +12,7 @@ export interface TicketResponseDto {
   id: string;
   ticketNumber: string;
   creatorId: string;
+  creatorName?: string | null;
   creatorRole: "CUSTOMER" | "PROVIDER";
   targetType: string;
   targetId?: string | null;

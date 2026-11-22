@@ -1,21 +1,33 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { Modal } from "../../../../shared/components/ui/Modal";
-import { useSupportStore } from "../../stores/support.store";
+import { useGetAdminSupportTickets } from "../../hooks/useSupportTickets";
 import type { SupportTicket } from "../../types/support.types";
 import "./AdminSupportTicketsPage.css";
 
 export const AdminSupportTicketsPage: React.FC = () => {
-  const tickets = useSupportStore((state) => state.tickets || []);
-  const updateTicketStatus = useSupportStore((state) => state.updateTicketStatus);
-  const resolveTicket = useSupportStore((state) => state.resolveTicket);
-  const addTicketMessage = useSupportStore((state) => state.addTicketMessage);
-
   const [statusFilter, setStatusFilter] = useState("");
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const { data: ticketsResponse, isLoading } = useGetAdminSupportTickets({
+    status: statusFilter || undefined,
+    category: categoryFilter || undefined,
+    priority: priorityFilter || undefined,
+    search: debouncedSearch || undefined
+  });
+
+  const tickets = ticketsResponse?.data?.tickets || [];
 
   const [adminReply, setAdminReply] = useState("");
   const [resolutionNote, setResolutionNote] = useState("");
@@ -25,25 +37,6 @@ export const AdminSupportTicketsPage: React.FC = () => {
   const [splitCustomerAmount, setSplitCustomerAmount] = useState("600");
   const [splitProviderAmount, setSplitProviderAmount] = useState("550");
   const [isResolving, setIsResolving] = useState(false);
-
-  const filteredTickets = useMemo(() => {
-    const list = Array.isArray(tickets) ? tickets : [];
-    return list.filter((t) => {
-      const matchStatus = !statusFilter || t.status === statusFilter;
-      const matchCategory = !categoryFilter || t.category === categoryFilter;
-      const matchPriority = !priorityFilter || t.priority === priorityFilter;
-
-      const q = search.toLowerCase().trim();
-      const matchSearch =
-        !q ||
-        t.ticketNumber?.toLowerCase().includes(q) ||
-        t.subject?.toLowerCase().includes(q) ||
-        t.creatorName?.toLowerCase().includes(q) ||
-        (t.bookingNumber && t.bookingNumber.toLowerCase().includes(q));
-
-      return matchStatus && matchCategory && matchPriority && matchSearch;
-    });
-  }, [tickets, statusFilter, categoryFilter, priorityFilter, search]);
 
   const handleOpenTicket = (ticket: SupportTicket) => {
     setSelectedTicket(ticket);
@@ -60,6 +53,7 @@ export const AdminSupportTicketsPage: React.FC = () => {
 
   const handleResetFilters = () => {
     setSearch("");
+    setDebouncedSearch("");
     setStatusFilter("");
     setCategoryFilter("");
     setPriorityFilter("");
@@ -67,25 +61,45 @@ export const AdminSupportTicketsPage: React.FC = () => {
 
   const handleStartReview = () => {
     if (!selectedTicket) return;
-    updateTicketStatus(selectedTicket.id, "UNDER_REVIEW");
-    addTicketMessage(
-      selectedTicket.id,
-      "Administrator has placed this dispute under active review. Escrow disbursement is locked.",
-      "Support Resolution Desk",
-      "SYSTEM"
-    );
+    const sysMsg = {
+      id: `msg-${Date.now()}`,
+      authorName: "Support Resolution Desk",
+      authorRole: "SYSTEM" as const,
+      message: "Administrator has placed this dispute under active review. Escrow disbursement is locked.",
+      createdAt: new Date().toISOString()
+    };
     setSelectedTicket((prev) =>
-      prev ? { ...prev, status: "UNDER_REVIEW", updatedAt: new Date().toISOString() } : null
+      prev
+        ? {
+            ...prev,
+            status: "UNDER_REVIEW",
+            updatedAt: new Date().toISOString(),
+            messages: [...(prev.messages || []), sysMsg]
+          }
+        : null
     );
     toast.success("Case marked as Under Investigation.");
   };
 
   const handleSendReply = () => {
     if (!adminReply.trim() || !selectedTicket) return;
-    addTicketMessage(selectedTicket.id, adminReply.trim(), "Support Administrator", "ADMIN");
+    const newMsg = {
+      id: `msg-${Date.now()}`,
+      authorName: "Support Administrator",
+      authorRole: "ADMIN" as const,
+      message: adminReply.trim(),
+      createdAt: new Date().toISOString()
+    };
+    setSelectedTicket((prev) =>
+      prev
+        ? {
+            ...prev,
+            updatedAt: new Date().toISOString(),
+            messages: [...(prev.messages || []), newMsg]
+          }
+        : null
+    );
     setAdminReply("");
-    const updated = (useSupportStore.getState().tickets || []).find((t) => t.id === selectedTicket.id);
-    if (updated) setSelectedTicket(updated);
     toast.success("Message posted to case thread.");
   };
 
@@ -126,7 +140,29 @@ export const AdminSupportTicketsPage: React.FC = () => {
         ledgerNote: resolutionNote.trim(),
       };
 
-      resolveTicket(selectedTicket.id, resolutionNote.trim(), settlementDecision, details, receipt);
+      const resMsg = {
+        id: `msg-${Date.now()}`,
+        authorName: "Support Resolution Team",
+        authorRole: "SYSTEM" as const,
+        message: `Official Resolution: ${resolutionNote.trim()}${settlementDecision ? ` [Settlement: ${settlementDecision.replace(/_/g, " ")}]` : ""}`,
+        createdAt: new Date().toISOString()
+      };
+
+      setSelectedTicket((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: "RESOLVED",
+              resolutionNote: resolutionNote.trim(),
+              settlementDecision,
+              settlementDetails: details,
+              settlementReceipt: receipt,
+              updatedAt: new Date().toISOString(),
+              messages: [...(prev.messages || []), resMsg]
+            }
+          : null
+      );
+
       setIsResolving(false);
       handleCloseModal();
       toast.success("Case resolved and settlement executed successfully!");
@@ -242,15 +278,53 @@ export const AdminSupportTicketsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredTickets.length === 0 ? (
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <tr key={`skel-${idx}`}>
+                    <td>
+                      <div className="admin-skel-line" style={{ width: "70%", height: "16px", marginBottom: "6px" }}></div>
+                      <div className="admin-skel-line" style={{ width: "40%", height: "12px" }}></div>
+                    </td>
+                    <td>
+                      <div className="admin-skel-line" style={{ width: "60%", height: "16px", marginBottom: "6px" }}></div>
+                      <div className="admin-skel-line" style={{ width: "35%", height: "12px" }}></div>
+                    </td>
+                    <td>
+                      <div className="admin-skel-line" style={{ width: "80%", height: "16px", marginBottom: "6px" }}></div>
+                      <div className="admin-skel-line" style={{ width: "50%", height: "12px" }}></div>
+                    </td>
+                    <td>
+                      <div className="admin-skel-line" style={{ width: "60%", height: "16px" }}></div>
+                    </td>
+                    <td>
+                      <div className="admin-skel-line" style={{ width: "50%", height: "20px", borderRadius: "12px" }}></div>
+                    </td>
+                    <td className="text-right">
+                      <div className="admin-skel-line ml-auto" style={{ width: "90px", height: "28px", borderRadius: "6px" }}></div>
+                    </td>
+                  </tr>
+                ))
+              ) : tickets.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-secondary">
-                    <i className="fas fa-inbox text-2xl mb-2 block"></i>
-                    No support tickets found matching current filters.
+                  <td colSpan={6} className="text-center py-12">
+                    <div className="flex flex-col items-center justify-center">
+                      <img
+                        src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                        alt="No Support Tickets"
+                        style={{ width: "130px", height: "auto", marginBottom: "1rem", opacity: 0.9 }}
+                        onError={(e) => {
+                          e.currentTarget.src = "/images/no-data.png";
+                        }}
+                      />
+                      <h3 className="font-semibold text-base mb-1 text-text">No Support Tickets Found</h3>
+                      <p className="text-secondary text-xs mb-0">
+                        There are no support or dispute tickets matching your search or filters.
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                filteredTickets.map((t) => (
+                tickets.map((t) => (
                   <tr key={t.id}>
                     <td>
                       <div className="flex items-center gap-2">
@@ -269,7 +343,7 @@ export const AdminSupportTicketsPage: React.FC = () => {
                       </span>
                     </td>
                     <td>
-                      <strong className="text-sm block">{t.creatorName}</strong>
+                      <strong className="text-sm block">{t.creatorName || (t.creatorRole === "PROVIDER" ? "Service Provider" : "Customer")}</strong>
                       <span className="badge badge-admin text-xs mt-0.5">
                         {t.creatorRole}
                       </span>

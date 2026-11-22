@@ -13,3 +13,19 @@
 .admin-input:focus {
   border-color: var(--admin-primary, #ff7900);
 }
+
+.admin-skel-line {
+  background: linear-gradient(90deg, var(--surface-elevated, #202024) 25%, var(--border, #2c2c34) 50%, var(--surface-elevated, #202024) 75%);
+  background-size: 200% 100%;
+  animation: adminSkelShimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes adminSkelShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
