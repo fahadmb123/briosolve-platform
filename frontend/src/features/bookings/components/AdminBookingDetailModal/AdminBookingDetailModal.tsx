@@ -108,9 +108,10 @@ export const AdminBookingDetailModal: React.FC<AdminBookingDetailModalProps> = (
           reason: reasonText.trim() || undefined
         }
       });
+      const updatedData = (updated as any)?.data || updated;
       const updatedItem: AdminBookingItem = {
         ...currentBooking,
-        ...updated,
+        ...updatedData,
         status: newStatus,
         paymentStatus: newStatus === "CANCELLED" ? "REFUNDED" : newStatus === "COMPLETED" ? "PAID" : currentBooking.paymentStatus
       };

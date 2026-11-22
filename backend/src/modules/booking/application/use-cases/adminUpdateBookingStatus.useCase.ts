@@ -2,6 +2,8 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IBookingRepository } from "../../domain/repositories/IBookingRepository";
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
+import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
+import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
 import { AdminUpdateBookingStatusInputDto } from "../dtos/request/update-booking-status.dto";
 import { BookingResponseDto, BookingStatusHistoryItem } from "../dtos/response/booking-response.dto";
 import { BookingMapper } from "../../infrastructure/mappers/booking.mapper";
@@ -14,6 +16,8 @@ export class AdminUpdateBookingStatusUseCase implements IUseCase<AdminUpdateBook
     constructor(
         private readonly _bookingRepository: IBookingRepository,
         private readonly _providerRepository: IProviderRepository,
+        private readonly _serviceRequestRepository?: IServiceRequestRepository,
+        private readonly _quotationRepository?: IQuotationRepository,
         private readonly _createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
         private readonly _creditWalletUseCase?: IUseCase<CreditWalletInputDto, WalletResponseDto>
     ) {}
@@ -84,6 +88,15 @@ export class AdminUpdateBookingStatusUseCase implements IUseCase<AdminUpdateBook
 
         if (input.status === "CANCELLED") {
             updatedPaymentStatus = "REFUNDED";
+            if (this._serviceRequestRepository) {
+                await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "EXPIRED").catch(() => null);
+            }
+            if (this._quotationRepository) {
+                await this._quotationRepository.update(details.booking.quotation_id, {
+                    status: "WITHDRAWN",
+                    rejectionReason: `Booking cancelled by Administrator: ${noteText}`
+                }).catch(() => null);
+            }
             if (this._creditWalletUseCase && details.booking.payment_status !== "REFUNDED") {
                 const refundAmount = details.booking.advance_amount && details.booking.advance_amount > 0
                     ? Number(details.booking.advance_amount)
@@ -101,6 +114,11 @@ export class AdminUpdateBookingStatusUseCase implements IUseCase<AdminUpdateBook
             }
         } else if (input.status === "COMPLETED") {
             updatedPaymentStatus = "PAID";
+            if (this._serviceRequestRepository) {
+                await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "COMPLETED").catch(() => null);
+            }
+            await this._providerRepository.incrementCompletedJobs(details.booking.provider_id).catch(() => null);
+
             if (this._creditWalletUseCase && details.booking.payment_status !== "PAID") {
                 const profile = await this._providerRepository.findById(details.booking.provider_id);
                 if (profile && profile.user_id) {

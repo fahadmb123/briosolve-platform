@@ -46,6 +46,8 @@ export function createAdminUpdateBookingStatusUseCase(
     return new AdminUpdateBookingStatusUseCase(
         bookingRepository,
         providerRepository,
+        serviceRequestRepository,
+        quotationRepository,
         createNotificationUseCase,
         creditWalletUseCase
     );
