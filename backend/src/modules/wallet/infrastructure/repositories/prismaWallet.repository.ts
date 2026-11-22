@@ -38,16 +38,19 @@ export class PrismaWalletRepository implements IWalletRepository {
     }
 
     async getTransactions(walletId: string, limit: number = 20, offset: number = 0): Promise<{ transactions: WalletTransaction[]; total: number }> {
-        const records = await db.orm.public.wallet_transactions
-            .where({ wallet_id: walletId as never })
+        const query = db.orm.public.wallet_transactions
+            .where({ wallet_id: walletId as never });
+
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+        const records = await query
             .orderBy((t) => t.created_at.desc())
+            .offset(offset)
+            .limit(limit)
             .all();
 
-        const total = records.length;
-        const pagedRecords = records.slice(offset, offset + limit);
-        const transactions = pagedRecords.map((r: any) => WalletMapper.toTransactionDomain(r));
+        const transactions = records.map((r: any) => WalletMapper.toTransactionDomain(r));
 
-        return { transactions, total };
+        return { transactions, total: totalResult.total };
     }
 
     async recordTransaction(params: RecordTransactionParams): Promise<WalletTransaction> {
