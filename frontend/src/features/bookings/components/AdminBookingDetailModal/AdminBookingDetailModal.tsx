@@ -68,6 +68,28 @@ export const AdminBookingDetailModal: React.FC<AdminBookingDetailModalProps> = (
     currentBooking.status === "CANCELLED" ||
     currentBooking.status === "CLOSED";
 
+  const canReleaseEscrow =
+    currentBooking.status === "IN_PROGRESS" ||
+    currentBooking.status === "PAYMENT_PENDING";
+  const canForceCancel = !isTerminalState;
+
+  const availableStatuses: BookingStatus[] = useMemo(() => {
+    switch (currentBooking.status) {
+      case "CONFIRMED":
+        return ["CONFIRMED", "EN_ROUTE", "IN_PROGRESS", "CANCELLED"];
+      case "EN_ROUTE":
+        return ["EN_ROUTE", "INSPECTION", "IN_PROGRESS", "CANCELLED"];
+      case "INSPECTION":
+        return ["INSPECTION", "IN_PROGRESS", "CANCELLED"];
+      case "IN_PROGRESS":
+        return ["IN_PROGRESS", "PAYMENT_PENDING", "COMPLETED", "CANCELLED"];
+      case "PAYMENT_PENDING":
+        return ["PAYMENT_PENDING", "COMPLETED", "CANCELLED"];
+      default:
+        return [currentBooking.status];
+    }
+  }, [currentBooking.status]);
+
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
@@ -360,29 +382,33 @@ export const AdminBookingDetailModal: React.FC<AdminBookingDetailModalProps> = (
 
           {!isTerminalState && (
             <div className="admin-bk-quick-actions">
-              <button
-                type="button"
-                className="admin-bk-btn-cancel"
-                onClick={() => {
-                  setActiveConfirmAction(activeConfirmAction === "CANCEL" ? null : "CANCEL");
-                  setActionReason("Forced cancellation and wallet refund initiated by administrator.");
-                }}
-              >
-                <i className="fas fa-ban"></i>
-                <span>Force Cancel & Refund</span>
-              </button>
+              {canForceCancel && (
+                <button
+                  type="button"
+                  className="admin-bk-btn-cancel"
+                  onClick={() => {
+                    setActiveConfirmAction(activeConfirmAction === "CANCEL" ? null : "CANCEL");
+                    setActionReason("Forced cancellation and wallet refund initiated by administrator.");
+                  }}
+                >
+                  <i className="fas fa-ban"></i>
+                  <span>Force Cancel & Refund</span>
+                </button>
+              )}
 
-              <button
-                type="button"
-                className="admin-bk-btn-release"
-                onClick={() => {
-                  setActiveConfirmAction(activeConfirmAction === "RELEASE" ? null : "RELEASE");
-                  setActionReason("Escrow funds released to provider by administrator.");
-                }}
-              >
-                <i className="fas fa-hand-holding-usd"></i>
-                <span>Release Escrow to Provider</span>
-              </button>
+              {canReleaseEscrow && (
+                <button
+                  type="button"
+                  className="admin-bk-btn-release"
+                  onClick={() => {
+                    setActiveConfirmAction(activeConfirmAction === "RELEASE" ? null : "RELEASE");
+                    setActionReason("Escrow funds released to provider by administrator.");
+                  }}
+                >
+                  <i className="fas fa-hand-holding-usd"></i>
+                  <span>Release Escrow to Provider</span>
+                </button>
+              )}
             </div>
           )}
 
@@ -504,13 +530,11 @@ export const AdminBookingDetailModal: React.FC<AdminBookingDetailModalProps> = (
                     value={overrideStatus}
                     onChange={(e) => setOverrideStatus(e.target.value as BookingStatus)}
                   >
-                    <option value="CONFIRMED">CONFIRMED</option>
-                    <option value="EN_ROUTE">EN ROUTE</option>
-                    <option value="INSPECTION">INSPECTION</option>
-                    <option value="IN_PROGRESS">IN PROGRESS</option>
-                    <option value="PAYMENT_PENDING">PAYMENT PENDING</option>
-                    <option value="COMPLETED">COMPLETED</option>
-                    <option value="CANCELLED">CANCELLED</option>
+                    {availableStatuses.map((st) => (
+                      <option key={st} value={st}>
+                        {st.replace("_", " ")}
+                      </option>
+                    ))}
                   </select>
 
                   <input

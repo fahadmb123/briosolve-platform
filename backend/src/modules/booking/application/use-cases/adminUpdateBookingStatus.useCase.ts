@@ -45,6 +45,14 @@ export class AdminUpdateBookingStatusUseCase implements IUseCase<AdminUpdateBook
             }
         }
 
+        if (input.status === "COMPLETED" && currentStatus !== "IN_PROGRESS" && currentStatus !== "PAYMENT_PENDING") {
+            throw new ApplicationError(
+                "INVALID_STATUS_TRANSITION",
+                `Cannot release escrow or complete booking from ${currentStatus}. Work must be in progress or payment pending.`,
+                "VALIDATION"
+            );
+        }
+
         let history: BookingStatusHistoryItem[] = [];
         if (details.booking.notes) {
             try {
