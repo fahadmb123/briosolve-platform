@@ -38,11 +38,15 @@ export class MessageRepository implements IMessageRepository {
         cursor?: string,
         limit?: number
     ): Promise<Message[]> {
-        const records = await db.orm.public.messages
+        let query = db.orm.public.messages
             .where({ conversation_id: conversationId as never })
-            .orderBy((m) => m.created_at.asc())
-            .all();
+            .orderBy((m) => m.created_at.asc());
 
+        if (limit) {
+            query = query.limit(limit);
+        }
+
+        const records = await query.all();
         return records.map(record => MessageMapper.toDomain(record));
     }
 }

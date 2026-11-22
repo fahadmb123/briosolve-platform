@@ -13,7 +13,8 @@ import {
   CustomerPaymentCancelled,
   CustomerBookings,
   CustomerBookingDetails,
-  CustomerWallet
+  CustomerWallet,
+  CustomerSupport
 } from '../lazy/customer.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
 import RoleRoute from '../guards/RoleRoute';
@@ -43,6 +44,8 @@ export const customerRoutes = (
         <Route path="customer/payment/cancelled" element={<CustomerPaymentCancelled />} />
         <Route path="messages" element={<CustomerChat />} />
         <Route path="chat" element={<CustomerChat />} />
+        <Route path="support" element={<CustomerSupport />} />
+        <Route path="tickets" element={<CustomerSupport />} />
       </Route>
     </Route>
   </>

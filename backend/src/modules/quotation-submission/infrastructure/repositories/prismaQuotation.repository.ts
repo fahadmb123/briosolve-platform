@@ -96,31 +96,35 @@ export class PrismaQuotationRepository implements IQuotationRepository {
         await this.syncExpiredQuotations();
         const { page, limit, status, sortBy } = params;
 
-        const whereClause: Record<string, any> = { provider_id: providerId as never };
+        let query = db.orm.public.quotations.where({ provider_id: providerId as never });
+
         if (status && status !== "ALL") {
-            whereClause.status = status as never;
+            query = query.where({ status: status as never });
         }
 
-        const allRecords = await db.orm.public.quotations
-            .where(whereClause)
+        if (sortBy === "OLDEST") {
+            query = query.orderBy((q) => q.created_at.asc());
+        } else {
+            query = query.orderBy((q) => q.created_at.desc());
+        }
+
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+        const offset = (page - 1) * limit;
+        const paginated = await query.offset(offset).limit(limit).all();
+
+        const statusRows = await db.orm.public.quotations
+            .where({ provider_id: providerId as never })
+            .select("status")
             .all();
 
         const statusList = ["PENDING", "ACCEPTED", "REJECTED", "EXPIRED", "WITHDRAWN"];
-        const counts: Record<string, number> = { ALL: allRecords.length };
+        const counts: Record<string, number> = { ALL: statusRows.length };
         for (const s of statusList) {
-            counts[s] = allRecords.filter((r: any) => r.status === s).length;
+            counts[s] = statusRows.filter((r: any) => r.status === s).length;
         }
 
-        const sorted = [...allRecords].sort((a: any, b: any) => {
-            const aTime = a.created_at ? Number(a.created_at.epochMilliseconds ?? new Date(a.created_at).getTime()) : 0;
-            const bTime = b.created_at ? Number(b.created_at.epochMilliseconds ?? new Date(b.created_at).getTime()) : 0;
-            return sortBy === "OLDEST" ? aTime - bTime : bTime - aTime;
-        });
-
-        const total = sorted.length;
+        const total = totalResult.total;
         const totalPages = Math.ceil(total / limit) || 1;
-        const offset = (page - 1) * limit;
-        const paginated = sorted.slice(offset, offset + limit);
 
         return {
             quotations: paginated.map((r: any) => QuotationMapper.toDomain(r)),

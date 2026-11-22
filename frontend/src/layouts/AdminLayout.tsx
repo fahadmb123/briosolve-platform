@@ -118,11 +118,23 @@ export default function AdminLayout() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink 
+                            to="/admin/support" 
+                            className={({ isActive }) => `sidebar-item ${isActive || location.pathname.startsWith('/admin/support') ? 'active' : ''}`}
+                        >
+                            <i className="fas fa-headset"></i>
+                            <span>Support Tickets</span>
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to="/admin/investigations" 
+                            className={({ isActive }) => `sidebar-item ${isActive || location.pathname.startsWith('/admin/investigations') ? 'active' : ''}`}
+                        >
                             <i className="fas fa-gavel"></i>
                             <span>Investigations</span>
-                            <span className="badge badge-danger ml-auto">4</span>
-                        </Link>
+                            <span className="badge badge-danger ml-auto">1</span>
+                        </NavLink>
                     </li>
                     <li>
                         <Link to="#" className="sidebar-item">

@@ -30,6 +30,7 @@ import { createQuotationRoutes } from "./modules/quotation-submission/infrastruc
 import { createPaymentRoutes } from "./modules/payment/infrastructure/composition";
 import { createBookingRoutes } from "./modules/booking/infrastructure/composition";
 import { createWalletRoutes, createCreditWalletUseCase } from "./modules/wallet/infrastructure/composition";
+import { createSupportRoutes } from "./modules/support/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -56,6 +57,7 @@ const startServer = async (): Promise<void> => {
         const paymentRoutes = createPaymentRoutes(notificationUseCase, creditWalletUseCase);
         const bookingRoutes = createBookingRoutes(notificationUseCase, creditWalletUseCase);
         const walletRoutes = createWalletRoutes();
+        const supportRoutes = createSupportRoutes(notificationUseCase);
 
         const rootRouter = createRootRouter({
             authRoutes,
@@ -74,7 +76,8 @@ const startServer = async (): Promise<void> => {
             quotationRoutes,
             paymentRoutes,
             bookingRoutes,
-            walletRoutes
+            walletRoutes,
+            supportRoutes
         });
 
         app.use("/api", rootRouter);

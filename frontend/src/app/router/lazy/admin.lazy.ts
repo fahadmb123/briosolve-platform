@@ -12,3 +12,4 @@ export const AdminNotifications = React.lazy(() => import('../../../features/not
 export const AdminCategories = React.lazy(() => import('../../../features/service-catalog/pages/Categories/Categories'));
 export const AdminServices = React.lazy(() => import('../../../features/service-catalog/pages/Services/Services'));
 export const AdminReactivations = React.lazy(() => import('../../../features/account-reactivation/pages/Reactivations/Reactivations'));
+export const AdminSupport = React.lazy(() => import('../../../features/support/pages/AdminSupportTicketsPage/AdminSupportTicketsPage'));

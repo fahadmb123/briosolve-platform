@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetMyQuotations } from "../../hooks/useQuotationMutations";
 import type { ProviderQuotationItem } from "../../types/quotation.types";
@@ -25,7 +25,12 @@ export default function MyQuotations() {
   const [limit] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const isLoadingMoreRef = useRef<boolean>(false);
+  const fetchStartTimeRef = useRef<number>(0);
+  const cooldownUntilRef = useRef<number>(0);
+  const lastScrollYRef = useRef<number>(0);
 
   const [selectedQuotation, setSelectedQuotation] = useState<ProviderQuotationItem | null>(null);
 
@@ -36,22 +41,94 @@ export default function MyQuotations() {
     sortBy
   });
 
+  const isFetchingRef = useRef<boolean>(isFetching);
+  isFetchingRef.current = isFetching;
+  const hasMoreRef = useRef<boolean>(hasMore);
+  hasMoreRef.current = hasMore;
+
+  const triggerLoadMore = useCallback(() => {
+    if (
+      !hasMoreRef.current ||
+      isFetchingRef.current ||
+      isLoadingMoreRef.current ||
+      Date.now() < cooldownUntilRef.current
+    ) {
+      return;
+    }
+
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const rect = sentinel.getBoundingClientRect();
+    if (rect.top <= window.innerHeight + 150) {
+      isLoadingMoreRef.current = true;
+      setIsLoadingMore(true);
+      fetchStartTimeRef.current = Date.now();
+      setPage((prev) => prev + 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 5) {
+        triggerLoadMore();
+      }
+    };
+
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      if (touchStartY - e.touches[0].clientY > 10) {
+        triggerLoadMore();
+      }
+    };
+
+    const handleScroll = () => {
+      const currentY = window.scrollY || document.documentElement.scrollTop;
+      if (currentY > lastScrollYRef.current + 15) {
+        triggerLoadMore();
+      }
+      lastScrollYRef.current = currentY;
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [triggerLoadMore]);
+
   useEffect(() => {
     if (quotationsRes?.data) {
-      const newItems = quotationsRes.data.quotations || [];
+      const data = quotationsRes.data;
+      isLoadingMoreRef.current = false;
+      setIsLoadingMore(false);
+      lastScrollYRef.current = window.scrollY || document.documentElement.scrollTop;
+      cooldownUntilRef.current = Date.now() + 300;
+      const newItems = data.quotations || [];
       setQuotations((prev) => {
         if (page === 1) return newItems;
         const existingIds = new Set(prev.map((q) => q.id));
         return [...prev, ...newItems.filter((q) => !existingIds.has(q.id))];
       });
-      setCounts(quotationsRes.data.counts || {});
-      setTotalPages(quotationsRes.data.totalPages || 0);
-      setHasMore(page < (quotationsRes.data.totalPages || 0));
+      setCounts(data.counts || {});
+      setTotalPages(data.totalPages || 0);
+      setHasMore(page < (data.totalPages || 0));
     }
   }, [quotationsRes, page]);
 
   useEffect(() => {
     setPage(1);
+    setIsLoadingMore(false);
+    isLoadingMoreRef.current = false;
   }, [activeStatus, sortBy]);
 
   useEffect(() => {
@@ -60,16 +137,16 @@ export default function MyQuotations() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isFetching) {
-          setPage((prev) => prev + 1);
+        if (entries[0].isIntersecting) {
+          triggerLoadMore();
         }
       },
-      { rootMargin: "400px" }
+      { rootMargin: "150px" }
     );
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasMore, isFetching]);
+  }, [triggerLoadMore]);
 
   const handleViewRequest = (serviceRequestId: string) => {
     navigate(`/provider/service-requests/${serviceRequestId}`);
@@ -208,7 +285,7 @@ export default function MyQuotations() {
                 onEdit={handleEditQuotation}
               />
             ))}
-            {isFetching && page > 1 &&
+            {isLoadingMore &&
               Array.from({ length: 2 }).map((_, idx) => (
                 <div key={`skeleton-${idx}`} className="myquote-skeleton-row-card">
                   <div className="myquote-skeleton-block myquote-sk-avatar" />
@@ -225,7 +302,7 @@ export default function MyQuotations() {
               ))}
           </div>
 
-          {hasMore && <div ref={sentinelRef} className="myquote-sentinel" />}
+          <div ref={sentinelRef} className="myquote-sentinel" />
 
           {!hasMore && quotations.length > 0 && totalPages > 1 && (
             <div className="myquote-end-message">

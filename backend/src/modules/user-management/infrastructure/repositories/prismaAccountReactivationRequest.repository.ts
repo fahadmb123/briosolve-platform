@@ -39,13 +39,30 @@ export class AccountReactivationRequestRepository implements IAccountReactivatio
         const { page, limit, search, filter, role, sort } = input;
         const skip = (page - 1) * limit;
 
-        let query = db.orm.public.account_reactivation_requests
-            .include("user", (u) => u.include("customer_profile").include("provider_profile"))
-            .include("block")
-            .include("reviewer");
+        let targetUserIds: string[] | null = null;
+        if ((search && search.trim()) || (role && role !== "ALL")) {
+            let userQuery = db.orm.public.users;
+            if (role && role !== "ALL") {
+                userQuery = userQuery.where({ role: role as any });
+            }
+            if (search && search.trim()) {
+                userQuery = userQuery.where((u) => u.email.ilike(`%${search.trim()}%`));
+            }
+            const matchingUsers = await userQuery.select("id").all();
+            targetUserIds = matchingUsers.map((u) => u.id);
+            if (targetUserIds.length === 0) {
+                return { requests: [], total: 0 };
+            }
+        }
+
+        let query = db.orm.public.account_reactivation_requests;
 
         if (filter && filter !== "ALL") {
             query = query.where({ status: filter as any });
+        }
+
+        if (targetUserIds !== null) {
+            query = query.where((req) => req.user_id.in(targetUserIds!));
         }
 
         if (sort === "asc") {
@@ -54,25 +71,18 @@ export class AccountReactivationRequestRepository implements IAccountReactivatio
             query = query.orderBy((req) => req.updated_at.desc());
         }
 
-        let records = await query.all();
-
-        if (search) {
-            const queryLower = search.trim().toLowerCase();
-            records = records.filter((rec) => {
-                return (rec as any).user?.email?.toLowerCase().includes(queryLower);
-            });
-        }
-
-        if (role && role !== "ALL") {
-            records = records.filter((rec) => (rec as any).user?.role === role);
-        }
-
-        const total = records.length;
-        const paginated = records.slice(skip, skip + limit);
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+        const records = await query
+            .include("user", (u) => u.include("customer_profile").include("provider_profile"))
+            .include("block")
+            .include("reviewer")
+            .offset(skip)
+            .limit(limit)
+            .all();
 
         return {
-            requests: paginated.map(AccountReactivationRequestMapper.toDomain),
-            total
+            requests: records.map(AccountReactivationRequestMapper.toDomain),
+            total: totalResult.total
         };
     }
 
