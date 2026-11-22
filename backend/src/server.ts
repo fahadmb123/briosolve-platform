@@ -57,7 +57,7 @@ const startServer = async (): Promise<void> => {
         const paymentRoutes = createPaymentRoutes(notificationUseCase, creditWalletUseCase);
         const bookingRoutes = createBookingRoutes(notificationUseCase, creditWalletUseCase);
         const walletRoutes = createWalletRoutes();
-        const supportRoutes = createSupportRoutes();
+        const supportRoutes = createSupportRoutes(notificationUseCase);
 
         const rootRouter = createRootRouter({
             authRoutes,
