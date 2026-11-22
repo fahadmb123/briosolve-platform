@@ -14,11 +14,11 @@ export const AdminNoData: React.FC<AdminNoDataProps> = ({
   return (
     <div className={`admin-table-empty-container ${className}`.trim()}>
       <img
-        src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+        src="/images/admin-no-data.png"
         alt="No data found"
         className="admin-empty-image"
         onError={(e) => {
-          e.currentTarget.src = "/images/no-data.png";
+          e.currentTarget.src = "https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png";
         }}
       />
       <div className="admin-empty-title">{title}</div>

@@ -278,14 +278,14 @@ export const AdminSupportTicketsPage: React.FC = () => {
                 ))
               ) : tickets.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12">
-                    <div className="flex flex-col items-center justify-center">
+                  <td colSpan={6} className="admin-empty-ticket-cell">
+                    <div className="admin-empty-ticket-box">
                       <img
-                        src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                        src="/images/admin-no-data.png"
                         alt="No Support Tickets"
-                        style={{ width: "130px", height: "auto", marginBottom: "1rem", opacity: 0.9 }}
+                        className="admin-empty-ticket-img"
                         onError={(e) => {
-                          e.currentTarget.src = "/images/no-data.png";
+                          e.currentTarget.src = "https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png";
                         }}
                       />
                       <h3 className="font-semibold text-base mb-1 text-text">No Support Tickets Found</h3>
