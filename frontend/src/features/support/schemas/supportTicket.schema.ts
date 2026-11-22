@@ -41,3 +41,30 @@ export const createSupportTicketFormSchema = z.object({
 export type CreateSupportTicketFormData = z.infer<typeof createSupportTicketFormSchema>;
 export const supportTicketSchema = createSupportTicketFormSchema;
 export type SupportTicketInputType = CreateSupportTicketFormData;
+
+export const updateTicketStatusSchema = z.object({
+  status: z.enum(["OPEN", "UNDER_REVIEW", "RESOLVED", "CLOSED"]),
+  resolutionNote: z
+    .string()
+    .trim()
+    .max(1000, "Resolution note cannot exceed 1000 characters")
+    .optional()
+}).superRefine((data, ctx) => {
+  if (data.status === "RESOLVED" || data.status === "CLOSED") {
+    if (!data.resolutionNote || data.resolutionNote.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Resolution note is required when resolving or closing a ticket",
+        path: ["resolutionNote"]
+      });
+    } else if (data.resolutionNote.trim().length < 10) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Resolution note must be at least 10 characters",
+        path: ["resolutionNote"]
+      });
+    }
+  }
+});
+
+export type UpdateTicketStatusFormData = z.infer<typeof updateTicketStatusSchema>;

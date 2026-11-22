@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { Modal } from "../../../../shared/components/ui/Modal";
 import { useGetAdminSupportTickets, useUpdateTicketStatus } from "../../hooks/useSupportTickets";
-import type { SupportTicket, TicketStatus } from "../../types/support.types";
+import type { SupportTicket } from "../../types/support.types";
+import { updateTicketStatusSchema, type UpdateTicketStatusFormData } from "../../schemas/supportTicket.schema";
 import "./AdminSupportTicketsPage.css";
 
 export const AdminSupportTicketsPage: React.FC = () => {
@@ -10,10 +13,32 @@ export const AdminSupportTicketsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
-  const [newStatus, setNewStatus] = useState<TicketStatus>("OPEN");
-  const [resolutionNote, setResolutionNote] = useState("");
 
   const updateTicketMutation = useUpdateTicketStatus();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors }
+  } = useForm<UpdateTicketStatusFormData>({
+    resolver: zodResolver(updateTicketStatusSchema),
+    mode: "onChange",
+    defaultValues: {
+      status: "OPEN",
+      resolutionNote: ""
+    }
+  });
+
+  const watchedStatus = watch("status");
+  const watchedResolutionNote = watch("resolutionNote");
+
+  const hasChanges = Boolean(
+    selectedTicket &&
+      (watchedStatus !== selectedTicket.status ||
+        (watchedResolutionNote ?? "").trim() !== (selectedTicket.resolutionNote ?? "").trim())
+  );
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -31,44 +56,42 @@ export const AdminSupportTicketsPage: React.FC = () => {
 
   const handleOpenTicket = (ticket: SupportTicket) => {
     setSelectedTicket(ticket);
-    setNewStatus(ticket.status);
-    setResolutionNote(ticket.resolutionNote || "");
+    reset({
+      status: ticket.status || "OPEN",
+      resolutionNote: ticket.resolutionNote || ""
+    });
   };
 
   const handleCloseModal = () => {
     setSelectedTicket(null);
-    setResolutionNote("");
+    reset({
+      status: "OPEN",
+      resolutionNote: ""
+    });
   };
 
-  const handleUpdateStatus = async () => {
-    if (!selectedTicket) return;
-    if ((newStatus === "RESOLVED" || newStatus === "CLOSED") && !resolutionNote.trim()) {
-      toast.error("Please enter a resolution note before resolving or closing the ticket.");
-      return;
-    }
+  const onSubmitStatusUpdate = async (formData: UpdateTicketStatusFormData) => {
+    if (!selectedTicket || updateTicketMutation.isPending) return;
 
     try {
       const res = await updateTicketMutation.mutateAsync({
         ticketId: selectedTicket.id,
         payload: {
-          status: newStatus,
-          resolutionNote: resolutionNote.trim() || null
+          status: formData.status,
+          resolutionNote: formData.resolutionNote?.trim() || null
         }
       });
-      if (res.data) {
-        setSelectedTicket(res.data);
-      } else {
-        setSelectedTicket((prev) =>
-          prev
-            ? {
-                ...prev,
-                status: newStatus,
-                resolutionNote: resolutionNote.trim() || undefined
-              }
-            : null
-        );
-      }
-      toast.success(`Ticket status updated to ${newStatus.replace("_", " ")}`);
+      const updatedTicket = res.data ?? {
+        ...selectedTicket,
+        status: formData.status,
+        resolutionNote: formData.resolutionNote?.trim() || undefined
+      };
+      setSelectedTicket(updatedTicket);
+      reset({
+        status: updatedTicket.status || "OPEN",
+        resolutionNote: updatedTicket.resolutionNote || ""
+      });
+      toast.success(`Ticket status updated to ${formData.status.replace("_", " ")}`);
     } catch {
       toast.error("Failed to update ticket status");
     }
@@ -399,19 +422,18 @@ export const AdminSupportTicketsPage: React.FC = () => {
               </div>
             )}
 
-            <div className="ticket-detail-section">
+            <form onSubmit={handleSubmit(onSubmitStatusUpdate)} className="ticket-detail-section">
               <div className="ticket-section-title">
                 <i className="fas fa-sliders-h"></i>
                 Update Ticket Status
               </div>
               <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <div className="flex-1">
                     <label className="ticket-info-label mb-1 block">Ticket Status</label>
                     <select
-                      className="admin-input"
-                      value={newStatus}
-                      onChange={(e) => setNewStatus(e.target.value as TicketStatus)}
+                      {...register("status")}
+                      className={`admin-input ${errors.status ? "has-error" : ""}`}
                       disabled={updateTicketMutation.isPending}
                     >
                       <option value="OPEN">Open</option>
@@ -419,13 +441,18 @@ export const AdminSupportTicketsPage: React.FC = () => {
                       <option value="RESOLVED">Resolved</option>
                       <option value="CLOSED">Closed</option>
                     </select>
+                    {errors.status && (
+                      <div className="clean-field-error mt-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        <span>{errors.status.message}</span>
+                      </div>
+                    )}
                   </div>
                   <div className="pt-5">
                     <button
-                      type="button"
+                      type="submit"
                       className="btn btn-primary text-xs px-4 py-2"
-                      onClick={handleUpdateStatus}
-                      disabled={updateTicketMutation.isPending}
+                      disabled={updateTicketMutation.isPending || !hasChanges}
                     >
                       {updateTicketMutation.isPending ? (
                         <>
@@ -440,23 +467,28 @@ export const AdminSupportTicketsPage: React.FC = () => {
                   </div>
                 </div>
 
-                {(newStatus === "RESOLVED" || newStatus === "CLOSED" || selectedTicket.resolutionNote) && (
+                {(watchedStatus === "RESOLVED" || watchedStatus === "CLOSED" || selectedTicket.resolutionNote) && (
                   <div>
                     <label className="ticket-info-label mb-1 block">
-                      Resolution Note {(newStatus === "RESOLVED" || newStatus === "CLOSED") && <span className="text-danger">*</span>}
+                      Resolution Note {(watchedStatus === "RESOLVED" || watchedStatus === "CLOSED") && <span className="text-danger">*</span>}
                     </label>
                     <textarea
-                      className="admin-input"
+                      {...register("resolutionNote")}
                       rows={3}
-                      placeholder="Provide details about how this ticket or dispute was resolved..."
-                      value={resolutionNote}
-                      onChange={(e) => setResolutionNote(e.target.value)}
+                      className={`admin-input ${errors.resolutionNote ? "has-error" : ""}`}
+                      placeholder="Provide details about how this ticket or dispute was resolved (at least 10 characters)..."
                       disabled={updateTicketMutation.isPending}
                     />
+                    {errors.resolutionNote && (
+                      <div className="clean-field-error mt-1">
+                        <i className="fas fa-exclamation-circle"></i>
+                        <span>{errors.resolutionNote.message}</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            </div>
+            </form>
           </div>
         </Modal>
       )}

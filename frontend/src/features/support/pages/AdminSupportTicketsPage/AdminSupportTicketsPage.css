@@ -140,3 +140,16 @@
   overflow: hidden;
   object-fit: cover;
 }
+
+.admin-input.has-error {
+  border-color: #ef4444 !important;
+}
+
+.clean-field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #ef4444;
+  font-size: 0.775rem;
+  font-weight: 500;
+}

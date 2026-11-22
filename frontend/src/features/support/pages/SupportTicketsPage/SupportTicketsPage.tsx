@@ -99,7 +99,6 @@ export const SupportTicketsPage: React.FC = () => {
   const issueReason = watch("issueReason");
 
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
-  const [replyText, setReplyText] = useState<string>("");
 
   const selectedBooking = useMemo(
     () => activeBookings.find((b) => b.id === selectedBookingId),
@@ -204,21 +203,6 @@ export const SupportTicketsPage: React.FC = () => {
       }
       toast.error(err?.response?.data?.message || err?.message || "Failed to submit ticket");
     }
-  };
-
-  const handleSendReply = () => {
-    if (!replyText.trim() || !viewTicket) return;
-    const newMsg = {
-      id: `msg-${Date.now()}`,
-      authorName: user?.name || (isProvider ? "Provider" : "Customer"),
-      authorRole: (isProvider ? "PROVIDER" : "CUSTOMER") as "PROVIDER" | "CUSTOMER",
-      message: replyText.trim(),
-      createdAt: new Date().toISOString()
-    };
-    setViewTicket((prev) =>
-      prev ? { ...prev, messages: [...(prev.messages || []), newMsg] } : null
-    );
-    setReplyText("");
   };
 
   return (
@@ -822,60 +806,30 @@ export const SupportTicketsPage: React.FC = () => {
                 </div>
               )}
 
-              <div className="clean-messages-thread">
-                <div className="clean-dossier-label">
-                  <i className="fas fa-comments"></i> Case Activity ({(viewTicket.messages || []).length})
-                </div>
-
-                <div className="clean-msgs-list">
-                  {(viewTicket.messages || []).map((msg) => {
-                    const isAdmin = msg.authorRole === "ADMIN" || msg.authorRole === "SYSTEM";
-                    return (
-                      <div
-                        key={msg.id}
-                        className={`clean-msg-card ${isAdmin ? "admin" : "user"}`}
+              {viewTicket.attachments && viewTicket.attachments.length > 0 && (
+                <div className="clean-dossier-box">
+                  <span className="clean-dossier-label">
+                    <i className="fas fa-paperclip mr-1"></i> Attached Evidence ({viewTicket.attachments.length})
+                  </span>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {viewTicket.attachments.map((url, i) => (
+                      <a
+                        key={i}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block hover:opacity-80 transition-opacity"
                       >
-                        <div className="clean-msg-top">
-                          <strong>{msg.authorName}</strong>
-                          <span className="clean-msg-role">
-                            {isAdmin ? "Support Desk" : msg.authorRole}
-                          </span>
-                          <span className="clean-msg-time">
-                            {new Date(msg.createdAt).toLocaleTimeString("en-IN", {
-                              hour: "2-digit",
-                              minute: "2-digit"
-                            })}
-                          </span>
-                        </div>
-                        <p className="clean-msg-text">{msg.message}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {viewTicket.status !== "RESOLVED" && viewTicket.status !== "CLOSED" && (
-                  <div className="clean-reply-wrap">
-                    <textarea
-                      rows={2}
-                      className="clean-textarea"
-                      placeholder="Add an update or response to support..."
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
-                    />
-                    <div className="clean-reply-footer">
-                      <button
-                        type="button"
-                        className="clean-btn-primary"
-                        disabled={!replyText.trim()}
-                        onClick={handleSendReply}
-                      >
-                        <i className="fas fa-paper-plane"></i>
-                        <span>Send Message</span>
-                      </button>
-                    </div>
+                        <img
+                          src={url}
+                          alt={`Attachment ${i + 1}`}
+                          className="w-16 h-16 rounded object-cover border border-border"
+                        />
+                      </a>
+                    ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
