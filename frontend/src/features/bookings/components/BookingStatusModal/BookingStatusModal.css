@@ -14,12 +14,17 @@
 .bkstatus-modal-dialog {
   background: #ffffff;
   border-radius: 16px;
-  max-width: 480px;
+  max-width: 500px;
   width: 100%;
   box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
   animation: bkmodalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 92vh;
   padding: 24px;
+}
+
+.bkstatus-modal-dialog.bkstatus-modal-wide {
+  max-width: 660px;
 }
 
 .bkstatus-modal-header {
@@ -794,18 +799,27 @@
 .bkstatus-warranty-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
+}
+
+@media (min-width: 520px) {
+  .bkstatus-warranty-chips {
+    flex-wrap: nowrap;
+  }
 }
 
 .bkstatus-warranty-chip {
-  padding: 5px 12px;
+  flex: 1;
+  text-align: center;
+  padding: 8px 10px;
   border-radius: 20px;
   border: 1px solid #cbd5e1;
   background: #ffffff;
-  font-size: 0.775rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #475569;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.15s ease;
 }
 

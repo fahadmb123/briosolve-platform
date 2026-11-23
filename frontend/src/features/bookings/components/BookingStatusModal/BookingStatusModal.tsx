@@ -473,7 +473,7 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   return (
     <div className={`bkstatus-modal-overlay ${isUntouchable ? "untouchable" : ""}`} onClick={handleOverlayClick}>
       <div
-        className="bkstatus-modal-dialog"
+        className={`bkstatus-modal-dialog ${isCompleting ? "bkstatus-modal-wide" : ""}`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
