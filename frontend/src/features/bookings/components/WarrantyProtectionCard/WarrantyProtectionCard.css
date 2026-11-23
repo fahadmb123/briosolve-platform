@@ -334,6 +334,7 @@
 
 .warranty-provider-actions {
   display: flex;
+  align-items: center;
   gap: 0.75rem;
   margin-top: 1.25rem;
   padding-top: 1.25rem;
@@ -345,14 +346,17 @@
   background: #2563eb;
   color: #ffffff;
   border: none;
-  padding: 0.65rem 1.25rem;
+  height: 38px;
+  padding: 0 1.25rem;
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  box-sizing: border-box;
   transition: background 0.15s;
 }
 
@@ -364,14 +368,17 @@
   background: #ffffff;
   color: #dc2626;
   border: 1.5px solid #fca5a5;
-  padding: 0.65rem 1.25rem;
+  height: 38px;
+  padding: 0 1.25rem;
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  box-sizing: border-box;
   transition: all 0.15s;
 }
 

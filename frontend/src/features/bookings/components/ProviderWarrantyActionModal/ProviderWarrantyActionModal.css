@@ -8,6 +8,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  overflow-y: auto;
   animation: practionFadeIn 0.2s ease-out;
 }
 
@@ -20,13 +21,15 @@
   background: #ffffff;
   border-radius: 16px;
   width: 100%;
-  max-width: 560px;
+  max-width: 600px;
   max-height: 90vh;
+  margin: auto;
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   animation: practionSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
 @keyframes practionSlideUp {
@@ -44,13 +47,19 @@
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e2e8f0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   position: relative;
+  background: #ffffff;
+  flex-shrink: 0;
 }
 
 .praction-header-dispute {
-  background: #fff1f2;
+  border-top: 4px solid #ef4444;
+}
+
+.praction-header:not(.praction-header-dispute) {
+  border-top: 4px solid #2563eb;
 }
 
 .praction-icon-wrap {
@@ -59,6 +68,7 @@
   border-radius: 12px;
   background: #eff6ff;
   color: #2563eb;
+  border: 1px solid #bfdbfe;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,8 +77,9 @@
 }
 
 .praction-header-dispute .praction-icon-wrap {
-  background: #fee2e2;
+  background: #fef2f2;
   color: #dc2626;
+  border: 1px solid #fecaca;
 }
 
 .praction-header-text {
@@ -80,11 +91,12 @@
   font-size: 1.15rem;
   font-weight: 700;
   color: #0f172a;
+  line-height: 1.35;
 }
 
 .praction-header-text p {
-  margin: 0.2rem 0 0;
-  font-size: 0.85rem;
+  margin: 0.25rem 0 0;
+  font-size: 0.825rem;
   color: #64748b;
 }
 
@@ -100,6 +112,8 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.15s;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .praction-close-btn:hover {
@@ -107,12 +121,40 @@
   color: #0f172a;
 }
 
+.praction-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .praction-body {
   padding: 1.25rem 1.5rem;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 1.15rem;
+}
+
+.praction-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.praction-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.praction-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.praction-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .praction-error-box {
@@ -130,15 +172,15 @@
 .praction-claim-summary {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.6rem;
 }
 
 .praction-summary-title {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   font-weight: 700;
   color: #64748b;
@@ -147,38 +189,109 @@
 
 .praction-claim-desc {
   margin: 0;
-  font-size: 0.9rem;
-  color: #1e293b;
-  font-style: italic;
-  line-height: 1.45;
+  font-size: 0.885rem;
+  color: #334155;
+  line-height: 1.5;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #3b82f6;
+  padding: 0.65rem 0.85rem;
+  border-radius: 6px;
 }
 
 .praction-claim-pref {
   font-size: 0.8rem;
-  color: #2563eb;
+  color: #1d4ed8;
   font-weight: 600;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 4px 10px;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+.praction-claim-photos {
   margin-top: 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-.praction-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+.praction-photos-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.05em;
 }
 
-@media (max-width: 480px) {
-  .praction-grid-2 {
-    grid-template-columns: 1fr;
-  }
+.praction-photos-grid {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.praction-photo-thumb {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid #cbd5e1;
+  cursor: pointer;
+}
+
+.praction-photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.praction-photo-thumb:hover img {
+  transform: scale(1.06);
+}
+
+.praction-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  font-size: 0.85rem;
+}
+
+.praction-photo-thumb:hover .praction-photo-overlay {
+  opacity: 1;
 }
 
 .praction-field {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+.praction-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.praction-counter {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.praction-counter.has-error {
+  color: #ef4444;
 }
 
 .praction-field label {
@@ -192,10 +305,9 @@
 }
 
 .praction-textarea,
-.praction-input,
-.praction-select {
+.praction-input {
   width: 100%;
-  padding: 0.65rem 0.85rem;
+  padding: 0.7rem 0.85rem;
   border: 1.5px solid #cbd5e1;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -203,39 +315,61 @@
   background: #ffffff;
   transition: border-color 0.15s, box-shadow 0.15s;
   box-sizing: border-box;
+  font-family: inherit;
 }
 
 .praction-textarea:focus,
-.praction-input:focus,
-.praction-select:focus {
+.praction-input:focus {
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
+.praction-header-dispute ~ form .praction-textarea:focus,
+.praction-header-dispute ~ form .praction-input:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.praction-field-error {
+  color: #ef4444;
+  font-size: 0.775rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.2rem;
+}
+
+.praction-textarea.has-error,
+.praction-input.has-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
 .praction-fee-notice {
   background: #eff6ff;
   border: 1px solid #bfdbfe;
-  border-radius: 8px;
-  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
   display: flex;
-  gap: 0.6rem;
+  gap: 0.75rem;
   align-items: flex-start;
   font-size: 0.825rem;
   color: #1e40af;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .praction-fee-notice i {
   color: #2563eb;
-  font-size: 0.95rem;
+  font-size: 1rem;
   margin-top: 0.1rem;
 }
 
-.praction-escalation-notice {
+.praction-dispute-warning {
   background: #fff7ed;
   border: 1px solid #fed7aa;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0.85rem 1rem;
   display: flex;
   gap: 0.75rem;
@@ -245,30 +379,60 @@
   line-height: 1.45;
 }
 
-.praction-escalation-notice i {
+.praction-dispute-warning i {
   color: #ea580c;
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin-top: 0.1rem;
+}
+
+.praction-resolve-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.praction-resolve-box i {
+  color: #16a34a;
+  font-size: 1.35rem;
+}
+
+.praction-resolve-box p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #166534;
 }
 
 .praction-footer {
   padding: 1rem 1.5rem;
   border-top: 1px solid #e2e8f0;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 0.75rem;
   background: #f8fafc;
+  flex-shrink: 0;
 }
 
 .praction-btn-cancel {
-  padding: 0.65rem 1.25rem;
+  min-width: 110px;
+  height: 40px;
+  padding: 0 1.25rem;
   background: #ffffff;
   border: 1.5px solid #cbd5e1;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #475569;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-sizing: border-box;
   transition: all 0.15s;
 }
 
@@ -278,17 +442,21 @@
 }
 
 .praction-btn-submit {
-  padding: 0.65rem 1.35rem;
+  min-width: 140px;
+  height: 40px;
+  padding: 0 1.25rem;
   background: #2563eb;
   border: none;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #ffffff;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  box-sizing: border-box;
   transition: all 0.15s;
 }
 
@@ -296,11 +464,11 @@
   background: #1d4ed8;
 }
 
-.praction-btn-danger {
+.praction-btn-submit.danger {
   background: #dc2626;
 }
 
-.praction-btn-danger:hover:not(:disabled) {
+.praction-btn-submit.danger:hover:not(:disabled) {
   background: #b91c1c;
 }
 
@@ -308,4 +476,56 @@
 .praction-btn-cancel:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.praction-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.praction-lightbox-box {
+  position: relative;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.praction-lightbox-box img {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.praction-lightbox-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #0f172a;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background 0.15s;
+}
+
+.praction-lightbox-close:hover {
+  background: #f1f5f9;
 }

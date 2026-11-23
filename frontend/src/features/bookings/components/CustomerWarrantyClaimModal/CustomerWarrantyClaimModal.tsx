@@ -230,8 +230,8 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
   };
 
   return (
-    <div className="bkclaim-overlay" onClick={onClose}>
-      <div className="bkclaim-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+    <div className="bkclaim-overlay">
+      <div className="bkclaim-dialog" role="dialog" aria-modal="true">
         <div className="bkclaim-header">
           <div className="bkclaim-header-icon">
             <i className="fas fa-shield-alt" />
@@ -257,7 +257,7 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} noValidate>
+        <form className="bkclaim-form" onSubmit={handleSubmit} noValidate>
           <div className="bkclaim-body">
             <div className="bkclaim-field">
               <div className="bkclaim-field-header">
