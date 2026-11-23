@@ -237,6 +237,7 @@ export class BookingMapper {
         let parsedHistory: BookingStatusHistoryItem[] | undefined = undefined;
         let displayNotes = entity.notes;
         let mismatchReport: MismatchReport | null = null;
+        let warranty: any = null;
 
         if (entity.notes) {
             try {
@@ -248,6 +249,9 @@ export class BookingMapper {
                 } else if (typeof parsed === "object" && parsed !== null) {
                     if (parsed.mismatchReport) {
                         mismatchReport = parsed.mismatchReport;
+                    }
+                    if (parsed.warranty) {
+                        warranty = parsed.warranty;
                     }
                     if (Array.isArray(parsed.history) && parsed.history.length > 0) {
                         parsedHistory = parsed.history;
@@ -321,6 +325,7 @@ export class BookingMapper {
             providerCancellationsCount: details?.providerCancellationsCount ?? extra?.providerCancellationsCount ?? 0,
             maxAllowedCancellations: details?.maxAllowedCancellations ?? extra?.maxAllowedCancellations ?? 2,
             mismatchReport: mismatchReport || details?.mismatchReport || null,
+            warranty: warranty || (details as any)?.warranty || null,
             cancellationPolicy: details?.cancellationPolicy ?? extra?.cancellationPolicy ?? calculateCancellationPolicy({
                 role: "CUSTOMER",
                 status: entity.status,

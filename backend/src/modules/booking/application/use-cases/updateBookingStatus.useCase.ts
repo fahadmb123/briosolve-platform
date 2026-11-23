@@ -73,20 +73,24 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
         }
 
         let history: BookingStatusHistoryItem[] = [];
+        let existingMismatchReport: any = null;
+        let existingWarranty: any = null;
+
         if (details.booking.notes) {
             try {
                 const parsed = JSON.parse(details.booking.notes);
                 if (Array.isArray(parsed)) {
                     history = parsed;
                 } else if (typeof parsed === "object" && parsed !== null) {
-                    history = [parsed];
-                } else if (typeof details.booking.notes === "string" && details.booking.notes.trim()) {
-                    history = [{
-                        status: details.booking.status,
-                        note: details.booking.notes,
-                        timestamp: details.booking.updated_at.toISOString(),
-                        authorName: providerProfile?.business_name || null
-                    }];
+                    if (Array.isArray(parsed.history)) {
+                        history = parsed.history;
+                    }
+                    if (parsed.mismatchReport) {
+                        existingMismatchReport = parsed.mismatchReport;
+                    }
+                    if (parsed.warranty) {
+                        existingWarranty = parsed.warranty;
+                    }
                 }
             } catch {
                 if (details.booking.notes.trim()) {
@@ -109,7 +113,31 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             });
         }
 
-        const serializedNotes = history.length > 0 ? JSON.stringify(history) : details.booking.notes;
+        let warranty = existingWarranty;
+        if (input.status === "COMPLETED" && typeof input.warrantyDays === "number" && input.warrantyDays > 0) {
+            const expiresDate = new Date();
+            expiresDate.setDate(expiresDate.getDate() + input.warrantyDays);
+            warranty = {
+                days: input.warrantyDays,
+                terms: input.warrantyTerms?.trim() || null,
+                expiresAt: expiresDate.toISOString(),
+                claim: null
+            };
+        }
+
+        let serializedNotes = details.booking.notes;
+        if (history.length > 0 || existingMismatchReport || warranty) {
+            const notesObj: Record<string, any> = {
+                history
+            };
+            if (existingMismatchReport) {
+                notesObj.mismatchReport = existingMismatchReport;
+            }
+            if (warranty) {
+                notesObj.warranty = warranty;
+            }
+            serializedNotes = JSON.stringify(notesObj);
+        }
 
         const nextPaymentStatus = input.paymentStatus || (
             input.status === "COMPLETED"

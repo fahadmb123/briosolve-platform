@@ -60,4 +60,27 @@ export interface BookingResponseDto {
     maxAllowedCancellations?: number;
     cancellationPolicy?: CancellationPolicyDetails;
     mismatchReport?: MismatchReport | null;
+    warranty?: BookingWarrantyDto | null;
+}
+
+export interface WarrantyClaimDto {
+    status: "PENDING" | "ACCEPTED" | "REJECTED" | "RESOLVED";
+    issueDescription: string;
+    proofImages?: string[];
+    preferredDate?: string;
+    preferredTime?: string;
+    reportedAt: string;
+    providerResponse?: string | null;
+    revisitScheduledDate?: string | null;
+    revisitScheduledTime?: string | null;
+    rejectionReason?: string | null;
+    disputedAt?: string | null;
+    resolvedAt?: string | null;
+}
+
+export interface BookingWarrantyDto {
+    days: number;
+    terms?: string | null;
+    expiresAt?: string | null;
+    claim?: WarrantyClaimDto | null;
 }

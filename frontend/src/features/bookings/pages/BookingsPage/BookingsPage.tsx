@@ -130,14 +130,20 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
   const handleConfirmStatusChange = (
     booking: BookingItem,
     newStatus: BookingStatus,
-    notes?: string
+    notes?: string,
+    totalAmount?: number,
+    warrantyDays?: number,
+    warrantyTerms?: string
   ) => {
     updateStatusMutation.mutate(
       {
         id: booking.id,
         payload: {
           status: newStatus,
-          notes
+          notes,
+          totalAmount,
+          warrantyDays,
+          warrantyTerms
         }
       },
       {

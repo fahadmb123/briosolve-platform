@@ -7,6 +7,8 @@ export interface UpdateBookingStatusInputDto {
     notes?: string | null;
     paymentStatus?: BookingPaymentStatus;
     totalAmount?: number;
+    warrantyDays?: number;
+    warrantyTerms?: string;
 }
 
 export interface UpdateBookingRepoDto {

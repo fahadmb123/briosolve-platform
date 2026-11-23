@@ -69,6 +69,29 @@ export interface BookingItem {
   maxAllowedCancellations?: number;
   cancellationPolicy?: CancellationPolicyDetails;
   mismatchReport?: MismatchReport | null;
+  warranty?: BookingWarranty | null;
+}
+
+export interface WarrantyClaimDetails {
+  status: "PENDING" | "ACCEPTED" | "REJECTED" | "RESOLVED";
+  issueDescription: string;
+  proofImages?: string[];
+  preferredDate?: string;
+  preferredTime?: string;
+  reportedAt: string;
+  providerResponse?: string | null;
+  revisitScheduledDate?: string | null;
+  revisitScheduledTime?: string | null;
+  rejectionReason?: string | null;
+  disputedAt?: string | null;
+  resolvedAt?: string | null;
+}
+
+export interface BookingWarranty {
+  days: number;
+  terms?: string | null;
+  expiresAt?: string | null;
+  claim?: WarrantyClaimDetails | null;
 }
 
 export interface BookingCounts {
@@ -107,6 +130,8 @@ export interface UpdateBookingStatusPayload {
   notes?: string | null;
   paymentStatus?: BookingPaymentStatus;
   totalAmount?: number;
+  warrantyDays?: number;
+  warrantyTerms?: string;
 }
 
 export type BookingFilterTab = "ALL" | "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "PAYMENT_PENDING" | "COMPLETED" | "CLOSED" | "CANCELLED";

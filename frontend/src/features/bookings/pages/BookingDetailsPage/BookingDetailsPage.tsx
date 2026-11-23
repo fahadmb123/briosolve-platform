@@ -135,7 +135,9 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     item: BookingItem,
     newStatus: BookingStatus,
     notes?: string,
-    totalAmount?: number
+    totalAmount?: number,
+    warrantyDays?: number,
+    warrantyTerms?: string
   ) => {
     updateStatusMutation.mutate(
       {
@@ -143,7 +145,9 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         payload: {
           status: newStatus,
           notes,
-          totalAmount
+          totalAmount,
+          warrantyDays,
+          warrantyTerms
         }
       },
       {

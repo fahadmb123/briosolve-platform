@@ -11,6 +11,8 @@ import {
     createUpdateBookingStatusUseCase,
     createReportServiceMismatchUseCase,
     createResolveServiceMismatchUseCase,
+    createSubmitWarrantyClaimUseCase,
+    createResolveWarrantyClaimUseCase,
     createGetAdminBookingsUseCase,
     createAdminUpdateBookingStatusUseCase
 } from "./useCases";
@@ -25,6 +27,8 @@ export function createBookingController(
     const updateBookingStatusUseCase = createUpdateBookingStatusUseCase(createNotificationUseCase, creditWalletUseCase);
     const reportServiceMismatchUseCase = createReportServiceMismatchUseCase(createNotificationUseCase);
     const resolveServiceMismatchUseCase = createResolveServiceMismatchUseCase(creditWalletUseCase, createNotificationUseCase);
+    const submitWarrantyClaimUseCase = createSubmitWarrantyClaimUseCase(createNotificationUseCase);
+    const resolveWarrantyClaimUseCase = createResolveWarrantyClaimUseCase(createNotificationUseCase);
     const getAdminBookingsUseCase = createGetAdminBookingsUseCase();
     const adminUpdateBookingStatusUseCase = createAdminUpdateBookingStatusUseCase(createNotificationUseCase, creditWalletUseCase);
 
@@ -36,6 +40,8 @@ export function createBookingController(
         reportServiceMismatchUseCase,
         resolveServiceMismatchUseCase,
         getAdminBookingsUseCase,
-        adminUpdateBookingStatusUseCase
+        adminUpdateBookingStatusUseCase,
+        submitWarrantyClaimUseCase,
+        resolveWarrantyClaimUseCase
     );
 }

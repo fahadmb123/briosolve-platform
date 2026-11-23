@@ -14,6 +14,8 @@ export function buildBookingRoute(controller: BookingRouteDependencies): Router 
     router.patch("/:id/status", authMiddleware, requireRole(["PROVIDER", "CUSTOMER"]), controller.booking.updateStatus);
     router.post("/:id/mismatch-report", authMiddleware, requireRole(["PROVIDER"]), controller.booking.reportMismatch);
     router.post("/:id/mismatch-resolve", authMiddleware, requireRole(["CUSTOMER"]), controller.booking.resolveMismatch);
+    router.post("/:id/warranty-claim", authMiddleware, requireRole(["CUSTOMER"]), controller.booking.submitWarrantyClaim);
+    router.post("/:id/warranty-resolve", authMiddleware, requireRole(["PROVIDER"]), controller.booking.resolveWarrantyClaim);
 
     return router;
 }

@@ -9,7 +9,14 @@ interface BookingStatusModalProps {
   isLoading: boolean;
   role?: "CUSTOMER" | "PROVIDER";
   onClose: () => void;
-  onConfirm: (booking: BookingItem, newStatus: BookingStatus, notes?: string, totalAmount?: number) => void;
+  onConfirm: (
+    booking: BookingItem,
+    newStatus: BookingStatus,
+    notes?: string,
+    totalAmount?: number,
+    warrantyDays?: number,
+    warrantyTerms?: string
+  ) => void;
 }
 
 export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
@@ -22,10 +29,23 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
   onConfirm
 }) => {
   const [notes, setNotes] = useState("");
+  const [warrantyDays, setWarrantyDays] = useState<number>(0);
+  const [warrantyTerms, setWarrantyTerms] = useState<string>("");
   const initialAdvancePaid = booking ? (booking.advanceAmount || booking.totalAmount) : 0;
   const initialRemaining = booking ? Math.max(0, (booking.totalAmount || 0) - initialAdvancePaid) : 0;
   const [remainingAmount, setRemainingAmount] = useState<number>(() => initialRemaining);
   const [cancellationStep, setCancellationStep] = useState<"WARNING" | "FORM">("WARNING");
+
+  const calculatedExpiryDate = React.useMemo(() => {
+    if (warrantyDays <= 0) return null;
+    const date = new Date();
+    date.setDate(date.getDate() + warrantyDays);
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+  }, [warrantyDays]);
 
   React.useEffect(() => {
     if (booking?.totalAmount !== undefined) {
@@ -38,6 +58,8 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
     if (isOpen) {
       setCancellationStep("WARNING");
       setNotes("");
+      setWarrantyDays(0);
+      setWarrantyTerms("");
     }
   }, [isOpen, targetStatus]);
 
@@ -190,6 +212,8 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
     onClose();
   };
 
+  const isCompleting = (targetStatus === "COMPLETED" || willCompleteDirectly) && role === "PROVIDER";
+
   const handleConfirm = () => {
     if (isInvalidRemaining) return;
     const effectiveStatus = willCompleteDirectly ? "COMPLETED" : targetStatus;
@@ -198,7 +222,9 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
       booking,
       effectiveStatus,
       notes.trim() || undefined,
-      effectiveAmount
+      effectiveAmount,
+      isCompleting ? warrantyDays : undefined,
+      isCompleting && warrantyDays > 0 ? warrantyTerms.trim() || undefined : undefined
     );
   };
 
@@ -630,6 +656,61 @@ export const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+
+          {isCompleting && (
+            <div className="bkstatus-warranty-section">
+              <div className="bkstatus-warranty-header">
+                <i className="fas fa-shield-alt text-primary"></i>
+                <div>
+                  <h4 className="bkstatus-warranty-title">Provide Service Warranty Guarantee</h4>
+                  <p className="bkstatus-warranty-subtitle">
+                    Offer post-service protection to enhance customer trust and review rating
+                  </p>
+                </div>
+              </div>
+
+              <div className="bkstatus-warranty-chips">
+                {[
+                  { label: "No Warranty", days: 0 },
+                  { label: "7 Days", days: 7 },
+                  { label: "15 Days", days: 15 },
+                  { label: "30 Days", days: 30 },
+                  { label: "60 Days", days: 60 }
+                ].map((opt) => (
+                  <button
+                    key={opt.days}
+                    type="button"
+                    className={`bkstatus-warranty-chip ${warrantyDays === opt.days ? "active" : ""}`}
+                    onClick={() => setWarrantyDays(opt.days)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
+              {warrantyDays > 0 && (
+                <div className="bkstatus-warranty-details">
+                  <div className="bkstatus-warranty-expiry">
+                    <i className="far fa-calendar-check text-success"></i>
+                    <span>Warranty active until: <strong>{calculatedExpiryDate}</strong> ({warrantyDays} days)</span>
+                  </div>
+
+                  <label className="bkstatus-label mt-2" htmlFor="warranty-terms">
+                    Coverage Scope &amp; Terms (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    id="warranty-terms"
+                    className="bkstatus-input"
+                    placeholder="e.g. Covers pipe leakage, replaced washers and joint seals"
+                    value={warrantyTerms}
+                    onChange={(e) => setWarrantyTerms(e.target.value)}
+                    maxLength={150}
+                  />
+                </div>
+              )}
             </div>
           )}
 

@@ -373,6 +373,73 @@ export const AdminBookingDetailModal: React.FC<AdminBookingDetailModalProps> = (
           )}
         </div>
 
+        {currentBooking.warranty && currentBooking.warranty.days > 0 && (
+          <div className="admin-bk-card">
+            <div className="admin-bk-card-title">
+              <i className="fas fa-shield-alt text-primary"></i>
+              <span>Service Warranty & Dispute Details</span>
+            </div>
+            <div className="admin-bk-financial-grid">
+              <div className="admin-bk-fin-box">
+                <div className="admin-bk-fin-lbl">Coverage Duration</div>
+                <div className="admin-bk-fin-val text-primary">{currentBooking.warranty.days} Days</div>
+              </div>
+              <div className="admin-bk-fin-box">
+                <div className="admin-bk-fin-lbl">Expires On</div>
+                <div className="admin-bk-fin-val">
+                  {currentBooking.warranty.expiresAt
+                    ? new Date(currentBooking.warranty.expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+                    : "N/A"}
+                </div>
+              </div>
+              <div className="admin-bk-fin-box">
+                <div className="admin-bk-fin-lbl">Terms & Scope</div>
+                <div className="admin-bk-fin-val" style={{ fontSize: "0.85rem" }}>
+                  {currentBooking.warranty.terms || "Standard service guarantee"}
+                </div>
+              </div>
+              <div className="admin-bk-fin-box">
+                <div className="admin-bk-fin-lbl">Claim Status</div>
+                <div className="admin-bk-fin-val" style={{
+                  color: currentBooking.warranty.claim?.status === "REJECTED" ? "#ef4444" : currentBooking.warranty.claim?.status === "PENDING" ? "#f59e0b" : "#10b981"
+                }}>
+                  {currentBooking.warranty.claim ? currentBooking.warranty.claim.status : "NO CLAIM FILED"}
+                </div>
+              </div>
+            </div>
+
+            {currentBooking.warranty.claim && (
+              <div style={{ marginTop: "1rem", padding: "1rem", background: "var(--bg-secondary, #1e293b)", borderRadius: "8px" }}>
+                <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text, #ffffff)", marginBottom: "0.5rem" }}>
+                  Claim Investigation Dossier:
+                </div>
+                <p style={{ margin: "0 0 0.5rem", fontSize: "0.85rem", color: "var(--text-muted, #94a3b8)" }}>
+                  <strong>Reported Issue:</strong> "{currentBooking.warranty.claim.issueDescription}"
+                </p>
+                {currentBooking.warranty.claim.rejectionReason && (
+                  <p style={{ margin: "0 0 0.5rem", fontSize: "0.85rem", color: "#fca5a5" }}>
+                    <strong>Provider Dispute Reason:</strong> "{currentBooking.warranty.claim.rejectionReason}"
+                  </p>
+                )}
+                {currentBooking.warranty.claim.revisitScheduledDate && (
+                  <p style={{ margin: "0 0 0.5rem", fontSize: "0.85rem", color: "#6ee7b7" }}>
+                    <strong>Scheduled Free Re-visit:</strong> {currentBooking.warranty.claim.revisitScheduledDate} {currentBooking.warranty.claim.revisitScheduledTime ? `(${currentBooking.warranty.claim.revisitScheduledTime})` : ""}
+                  </p>
+                )}
+                {currentBooking.warranty.claim.proofImages && currentBooking.warranty.claim.proofImages.length > 0 && (
+                  <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                    {currentBooking.warranty.claim.proofImages.map((img, i) => (
+                      <a key={i} href={img} target="_blank" rel="noopener noreferrer">
+                        <img src={img} alt={`Proof ${i + 1}`} style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px" }} />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="admin-bk-card admin-bk-actions-card">
           <div className="admin-bk-card-title">
             <i className="fas fa-shield-alt text-primary"></i>

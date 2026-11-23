@@ -74,3 +74,30 @@ export const adminUpdateBookingStatus = async (
   const res = await apiClient.patch<response<BookingItem>>(`/api/booking/admin/${id}/status`, payload);
   return res.data;
 };
+
+export const submitWarrantyClaim = async (
+  id: string,
+  payload: {
+    issueDescription: string;
+    proofImages?: string[];
+    preferredDate?: string;
+    preferredTime?: string;
+  }
+): Promise<response<BookingItem>> => {
+  const res = await apiClient.post<response<BookingItem>>(`/api/booking/${id}/warranty-claim`, payload);
+  return res.data;
+};
+
+export const resolveWarrantyClaim = async (
+  id: string,
+  payload: {
+    action: "ACCEPT" | "REJECT" | "RESOLVE";
+    revisitScheduledDate?: string;
+    revisitScheduledTime?: string;
+    providerResponse?: string;
+    rejectionReason?: string;
+  }
+): Promise<response<BookingItem>> => {
+  const res = await apiClient.post<response<BookingItem>>(`/api/booking/${id}/warranty-resolve`, payload);
+  return res.data;
+};

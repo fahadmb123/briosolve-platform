@@ -5,7 +5,9 @@ import {
   getBookingById,
   updateBookingStatus,
   reportBookingMismatch,
-  resolveBookingMismatch
+  resolveBookingMismatch,
+  submitWarrantyClaim,
+  resolveWarrantyClaim
 } from "../services/booking.service";
 import type { GetBookingsQueryParams, UpdateBookingStatusPayload } from "../types/booking.types";
 
@@ -80,6 +82,53 @@ export const useResolveBookingMismatch = () => {
       queryClient.invalidateQueries({ queryKey: ["booking", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["wallet"] });
       queryClient.invalidateQueries({ queryKey: ["customerServiceRequests"] });
+    }
+  });
+};
+
+export const useSubmitWarrantyClaim = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload
+    }: {
+      id: string;
+      payload: {
+        issueDescription: string;
+        proofImages?: string[];
+        preferredDate?: string;
+        preferredTime?: string;
+      };
+    }) => submitWarrantyClaim(id, payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["customerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["providerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["booking", variables.id] });
+    }
+  });
+};
+
+export const useResolveWarrantyClaim = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload
+    }: {
+      id: string;
+      payload: {
+        action: "ACCEPT" | "REJECT" | "RESOLVE";
+        revisitScheduledDate?: string;
+        revisitScheduledTime?: string;
+        providerResponse?: string;
+        rejectionReason?: string;
+      };
+    }) => resolveWarrantyClaim(id, payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["customerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["providerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["booking", variables.id] });
     }
   });
 };

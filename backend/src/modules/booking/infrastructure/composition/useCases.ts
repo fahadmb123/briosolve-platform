@@ -16,6 +16,8 @@ import { AdminUpdateBookingStatusUseCase } from "../../application/use-cases/adm
 import { UpdateBookingStatusUseCase } from "../../application/use-cases/updateBookingStatus.useCase";
 import { ReportServiceMismatchUseCase } from "../../application/use-cases/reportServiceMismatch.useCase";
 import { ResolveServiceMismatchUseCase } from "../../application/use-cases/resolveServiceMismatch.useCase";
+import { SubmitWarrantyClaimUseCase } from "../../application/use-cases/submitWarrantyClaim.useCase";
+import { ResolveWarrantyClaimUseCase } from "../../application/use-cases/resolveWarrantyClaim.useCase";
 
 export function createCreateBookingUseCase(
     createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
@@ -86,6 +88,26 @@ export function createResolveServiceMismatchUseCase(
         providerRepository,
         serviceRequestRepository,
         creditWalletUseCase,
+        createNotificationUseCase
+    );
+}
+
+export function createSubmitWarrantyClaimUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): SubmitWarrantyClaimUseCase {
+    return new SubmitWarrantyClaimUseCase(
+        bookingRepository,
+        providerRepository,
+        createNotificationUseCase
+    );
+}
+
+export function createResolveWarrantyClaimUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>
+): ResolveWarrantyClaimUseCase {
+    return new ResolveWarrantyClaimUseCase(
+        bookingRepository,
+        providerRepository,
         createNotificationUseCase
     );
 }
