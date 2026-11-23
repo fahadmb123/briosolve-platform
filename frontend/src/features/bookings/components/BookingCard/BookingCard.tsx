@@ -230,7 +230,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
       <div className="bkcard-body">
         <div className="bkcard-title-row">
           <h3 className="bkcard-title" onClick={() => onViewDetails(booking)}>
-            {booking.serviceRequestTitle || "Service Requirement"}
+            {booking.serviceRequestTitle || `Booking #${booking.bookingNumber}`}
           </h3>
           {booking.categoryName && (
             <span className="bkcard-category-chip">
@@ -295,17 +295,19 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             </div>
           </div>
 
-          <div className="bkcard-info-item">
-            <div className="bkcard-info-icon-wrapper">
-              <i className="fas fa-map-marker-alt"></i>
+          {booking.addressText && (
+            <div className="bkcard-info-item">
+              <div className="bkcard-info-icon-wrapper">
+                <i className="fas fa-map-marker-alt"></i>
+              </div>
+              <div className="bkcard-info-content">
+                <span className="bkcard-info-label">Service Location</span>
+                <span className="bkcard-info-value location-text" title={booking.addressText}>
+                  {booking.addressText}
+                </span>
+              </div>
             </div>
-            <div className="bkcard-info-content">
-              <span className="bkcard-info-label">Service Location</span>
-              <span className="bkcard-info-value location-text" title={booking.addressText || "On-site Service"}>
-                {booking.addressText || "On-site Service"}
-              </span>
-            </div>
-          </div>
+          )}
 
           <div className="bkcard-info-item">
             <div className="bkcard-info-icon-wrapper">

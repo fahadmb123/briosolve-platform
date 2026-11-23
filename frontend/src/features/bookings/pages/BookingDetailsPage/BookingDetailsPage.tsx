@@ -803,7 +803,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           </div>
 
           <h1 className="bkdet-title">
-            {booking.serviceRequestTitle || "Service Job Booking"}
+            {booking.serviceRequestTitle || `Booking #${booking.bookingNumber}`}
           </h1>
 
           <span className="bkdet-created-date">
@@ -1327,26 +1327,23 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </div>
 
             <div className="bkdet-meta-grid">
-              <div className="bkdet-meta-box">
-                <div className="bkdet-meta-box-label">Service Request</div>
-                <div className="bkdet-meta-box-value">
-                  {booking.serviceRequestTitle || "Service Job"}
+              {booking.serviceRequestTitle && (
+                <div className="bkdet-meta-box">
+                  <div className="bkdet-meta-box-label">Service Request</div>
+                  <div className="bkdet-meta-box-value">
+                    {booking.serviceRequestTitle}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="bkdet-meta-box">
-                <div className="bkdet-meta-box-label">Category</div>
-                <div className="bkdet-meta-box-value">
-                  {booking.categoryName || "Home & Local Service"}
+              {booking.categoryName && (
+                <div className="bkdet-meta-box">
+                  <div className="bkdet-meta-box-label">Category</div>
+                  <div className="bkdet-meta-box-value">
+                    {booking.categoryName}
+                  </div>
                 </div>
-              </div>
-
-              <div className="bkdet-meta-box">
-                <div className="bkdet-meta-box-label">Service Warranty</div>
-                <div className="bkdet-meta-box-value" style={{ color: "#16a34a", fontWeight: 600 }}>
-                  15-Day Protection Active
-                </div>
-              </div>
+              )}
 
               <div className="bkdet-meta-box">
                 <div className="bkdet-meta-box-label">Pricing / Job Model</div>
@@ -1362,40 +1359,42 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </button>
           </div>
 
-          <div className="bkdet-section-card">
-            <div className="bkdet-section-header">
-              <div className="bkdet-section-title-wrap">
-                <div className="bkdet-section-icon">
-                  <i className="fas fa-map-marker-alt" />
-                </div>
-                <h3 className="bkdet-section-title">Service Location</h3>
-              </div>
-            </div>
-
-            <div className="bkdet-address-row">
-              <div className="bkdet-address-pin">
-                <i className="fas fa-location-arrow" />
-              </div>
-              <div className="bkdet-address-content">
-                <div className="bkdet-address-title">Service Address</div>
-                <div className="bkdet-address-text">
-                  {booking.addressText || "Customer address registered on file"}
+          {booking.addressText && (
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-section-icon">
+                    <i className="fas fa-map-marker-alt" />
+                  </div>
+                  <h3 className="bkdet-section-title">Service Location</h3>
                 </div>
               </div>
-            </div>
 
-            {mapsUrl && (
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bkdet-directions-btn"
-              >
-                <i className="fas fa-directions" />
-                <span>Open in Google Maps / Get Directions</span>
-              </a>
-            )}
-          </div>
+              <div className="bkdet-address-row">
+                <div className="bkdet-address-pin">
+                  <i className="fas fa-location-arrow" />
+                </div>
+                <div className="bkdet-address-content">
+                  <div className="bkdet-address-title">Service Address</div>
+                  <div className="bkdet-address-text">
+                    {booking.addressText}
+                  </div>
+                </div>
+              </div>
+
+              {mapsUrl && (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bkdet-directions-btn"
+                >
+                  <i className="fas fa-directions" />
+                  <span>Open in Google Maps / Get Directions</span>
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="bkdet-col-side">
