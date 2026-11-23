@@ -19,6 +19,14 @@ function getCategoryIcon(name: string): string {
   return "fa-tools";
 }
 
+function getUrgencyBadgeClass(urgency: string): string {
+  const u = urgency.toUpperCase();
+  if (u.includes("EMERGENCY") || u.includes("URGENT") || u.includes("IMMEDIATE")) return "urgency-urgent";
+  if (u.includes("HIGH") || u.includes("TODAY")) return "urgency-high";
+  if (u.includes("MEDIUM") || u.includes("SCHEDULED")) return "urgency-medium";
+  return "urgency-low";
+}
+
 export default function CustomerDashboard() {
   const { data, isLoading, isError, refetch } = useCustomerDashboard();
   const authUser = useAuthStore((state) => state.user);
@@ -43,6 +51,8 @@ export default function CustomerDashboard() {
     );
   }
 
+  const hour = new Date().getHours();
+  const timeGreeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const userName = data.user?.name || authUser?.name || "Customer";
   const stats = data.stats;
   const activeRequests = data.activeRequests || [];
@@ -61,250 +71,135 @@ export default function CustomerDashboard() {
   });
 
   return (
-    <div className="app-content">
-      <div className="customer-hero-banner mb-6">
-        <div className="flex justify-between items-center flex-wrap gap-4">
+    <div className="app-content customer-dashboard-container">
+      <div className="dashboard-hero-card">
+        <div className="hero-content-row">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="badge badge-primary text-xs">Customer Portal</span>
-              <span className="text-xs text-secondary">
-                <i className="fas fa-shield-alt text-success mr-1"></i> 100% Direct Marketplace
+            <div className="hero-user-badge-row">
+              <span className="hero-status-pill">
+                <span className="hero-status-dot"></span>
+                Marketplace Live
               </span>
+              <span className="badge badge-primary text-xs">Verified Customer</span>
             </div>
-            <h1 className="h2 mb-1">Welcome back, {userName} 👋</h1>
-            <p className="text-secondary text-sm mb-0">
+            <h1 className="welcome-greeting-title">
+              {timeGreeting}, {userName} 👋
+            </h1>
+            <p className="welcome-subtitle">
               {stats.quotationsReceivedCount > 0 ? (
                 <>
                   You have{" "}
                   <strong className="text-primary font-bold">
-                    {stats.quotationsReceivedCount} competitive quote{stats.quotationsReceivedCount !== 1 ? "s" : ""}
+                    {stats.quotationsReceivedCount} quotation{stats.quotationsReceivedCount !== 1 ? "s" : ""}
                   </strong>{" "}
-                  ready for your review across {stats.activeRequestsCount} active service request{stats.activeRequestsCount !== 1 ? "s" : ""}.
+                  ready across {stats.activeRequestsCount} active request{stats.activeRequestsCount !== 1 ? "s" : ""}. Review and hire with 0% platform fee.
                 </>
               ) : stats.activeRequestsCount > 0 ? (
                 <>
-                  You have{" "}
-                  <strong className="text-primary font-bold">
-                    {stats.activeRequestsCount} active request{stats.activeRequestsCount !== 1 ? "s" : ""}
-                  </strong>{" "}
-                  live on the marketplace awaiting competitive quotes.
+                  <strong className="text-primary font-bold">{stats.activeRequestsCount} service request{stats.activeRequestsCount !== 1 ? "s" : ""}</strong> currently broadcasted to top-rated nearby pros.
                 </>
               ) : (
-                "Post a service request to start receiving competitive, zero-commission bids from verified local providers."
+                "Post a service request to receive direct, transparent bids from verified independent professionals."
               )}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Link to="/nearby-providers" className="btn btn-outline text-xs">
-              <i className="fas fa-search-location mr-1"></i> Browse Providers
+
+          <div className="hero-actions-group">
+            <Link to="/nearby-providers" className="hero-btn-secondary">
+              <i className="fas fa-search-location"></i> Find Local Pros
             </Link>
-            <Link to="/request-service" className="btn btn-primary">
-              <i className="fas fa-plus-circle mr-1"></i> Post a Request
+            <Link to="/request-service" className="hero-btn-primary">
+              <i className="fas fa-plus-circle"></i> Post a Request
             </Link>
           </div>
         </div>
       </div>
 
       {quickCategories.length > 0 && (
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs uppercase font-extrabold text-muted tracking-wider">
-                Services &amp; Immediate Requests
-              </span>
-              <span className="badge badge-secondary text-xs">Zero Markup</span>
-            </div>
-            <Link to="/request-service" className="text-xs text-primary font-bold hover:underline flex items-center gap-1">
-              All Categories <i className="fas fa-arrow-right text-xs"></i>
+        <div className="category-compact-ribbon">
+          <span className="category-ribbon-label">
+            <i className="fas fa-bolt text-primary"></i> Popular:
+          </span>
+          {quickCategories.map((cat) => (
+            <Link
+              key={cat.id}
+              to={`/request-service?category=${encodeURIComponent(cat.id)}`}
+              className="category-compact-chip"
+            >
+              <i className={`fas ${getCategoryIcon(cat.name)} category-chip-icon`}></i>
+              <span>{cat.name}</span>
             </Link>
-          </div>
-
-          <div className="modern-category-grid">
-            {quickCategories.map((cat) => (
-              <Link
-                key={cat.id}
-                to={`/request-service?category=${encodeURIComponent(cat.id)}`}
-                className="modern-category-card"
-              >
-                <div className="cat-card-icon">
-                  <i className={`fas ${getCategoryIcon(cat.name)}`}></i>
-                </div>
-                <div className="cat-card-name">{cat.name}</div>
-                <div className="cat-card-action">
-                  Post Request <i className="fas fa-arrow-right ml-1"></i>
-                </div>
-              </Link>
-            ))}
-          </div>
+          ))}
+          <Link to="/request-service" className="category-compact-chip" style={{ borderColor: "var(--primary)" }}>
+            <span className="text-primary font-bold">+ Explore All</span>
+          </Link>
         </div>
       )}
 
-      <div className="dashboard-stats-grid mb-8">
-        <div className="stat-widget">
-          <div className="stat-icon-wrapper bg-primary-light text-primary">
+      <div className="compact-stats-grid">
+        <Link to="/my-requests" className="compact-stat-card">
+          <div className="compact-stat-icon stat-icon-primary">
             <i className="fas fa-file-alt"></i>
           </div>
-          <div className="stat-body">
-            <div className="stat-value">{stats.activeRequestsCount}</div>
-            <div className="stat-title">Active Requests</div>
-            <div className="stat-meta text-primary">
-              <i className="fas fa-layer-group mr-1"></i> In marketplace
-            </div>
+          <div>
+            <div className="compact-stat-val">{stats.activeRequestsCount}</div>
+            <div className="compact-stat-lbl">Active Requests</div>
+            <div className="compact-stat-meta text-primary">Live requirements</div>
           </div>
-        </div>
+        </Link>
 
-        <div className="stat-widget">
-          <div className="stat-icon-wrapper bg-warning-light text-warning">
+        <Link to="/my-requests" className="compact-stat-card">
+          <div className="compact-stat-icon stat-icon-warning">
             <i className="fas fa-file-invoice-dollar"></i>
           </div>
-          <div className="stat-body">
-            <div className="stat-value">{stats.quotationsReceivedCount}</div>
-            <div className="stat-title">Quotations Received</div>
-            <div className="stat-meta text-warning">
-              <i className="fas fa-balance-scale mr-1"></i> Competitive bids
-            </div>
+          <div>
+            <div className="compact-stat-val">{stats.quotationsReceivedCount}</div>
+            <div className="compact-stat-lbl">Quotes Received</div>
+            <div className="compact-stat-meta text-warning">Direct provider bids</div>
           </div>
-        </div>
+        </Link>
 
-        <div className="stat-widget">
-          <div className="stat-icon-wrapper bg-info-light text-info">
+        <Link to="/bookings" className="compact-stat-card">
+          <div className="compact-stat-icon stat-icon-info">
             <i className="fas fa-calendar-check"></i>
           </div>
-          <div className="stat-body">
-            <div className="stat-value">{stats.upcomingBookingsCount}</div>
-            <div className="stat-title">Upcoming Bookings</div>
-            <div className="stat-meta text-secondary">
-              <i className="fas fa-clock mr-1"></i> Scheduled services
-            </div>
-          </div>
-        </div>
-
-        <div className="stat-widget">
-          <div className="stat-icon-wrapper bg-success-light text-success">
-            <i className="fas fa-check-circle"></i>
-          </div>
-          <div className="stat-body">
-            <div className="stat-value">{stats.completedServicesCount}</div>
-            <div className="stat-title">Completed Services</div>
-            <div className="stat-meta text-muted">
-              ₹{stats.totalCompletedSpend.toLocaleString("en-IN")} Total value
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="modern-analytics-card mb-8">
-        <div className="analytics-header">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="h5 mb-0 font-bold">Spending Insights &amp; Marketplace Savings</h2>
-              <span className="badge badge-primary text-xs">Analytics Hub</span>
-            </div>
-            <p className="text-xs text-secondary mb-0">
-              Real-time expenditure tracking and reverse bidding value savings
-            </p>
+            <div className="compact-stat-val">{stats.upcomingBookingsCount}</div>
+            <div className="compact-stat-lbl">Upcoming Bookings</div>
+            <div className="compact-stat-meta text-secondary">Scheduled visits</div>
           </div>
-          {stats.estimatedSavings !== undefined && stats.estimatedSavings > 0 ? (
-            <div className="savings-pill-banner">
-              <div className="savings-pill-icon">
-                <i className="fas fa-piggy-bank"></i>
-              </div>
-              <div>
-                <div className="text-xs uppercase font-bold text-success">Direct Savings</div>
-                <div className="text-sm font-extrabold text-success">
-                  ₹{stats.estimatedSavings.toLocaleString("en-IN")} saved
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="savings-pill-banner">
-              <div className="savings-pill-icon">
-                <i className="fas fa-handshake"></i>
-              </div>
-              <div>
-                <div className="text-xs uppercase font-bold text-primary">Direct Bids</div>
-                <div className="text-sm font-extrabold text-text">Zero Platform Markup</div>
-              </div>
-            </div>
-          )}
-        </div>
+        </Link>
 
-        <div className="analytics-body-grid">
-          <div className="chart-panel">
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-xs font-bold text-secondary uppercase tracking-wider">
-                <i className="fas fa-chart-bar text-primary mr-1"></i> 6-Month Spending Trend
-              </span>
-              <span className="text-xs text-muted font-medium">
-                Total: <strong className="text-text">₹{stats.totalCompletedSpend.toLocaleString("en-IN")}</strong>
-              </span>
-            </div>
-            <div className="monthly-bars-chart">
-              {monthlySpending.length > 0 ? (
-                monthlySpending.map((item, idx) => {
-                  const heightPercent = item.spend > 0
-                    ? Math.max(14, Math.round((item.spend / maxMonthSpend) * 100))
-                    : 6;
-                  return (
-                    <div key={idx} className="chart-col">
-                      <div
-                        className="chart-bar-fill"
-                        style={{ height: `${heightPercent}%` }}
-                        title={`${item.month}: ₹${item.spend.toLocaleString("en-IN")}`}
-                      ></div>
-                      <span className="chart-col-label">{item.month}</span>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="text-xs text-muted text-center w-full py-6">
-                  No monthly spending recorded yet.
-                </div>
-              )}
-            </div>
+        <div className="compact-stat-card">
+          <div className="compact-stat-icon stat-icon-success">
+            <i className="fas fa-shield-check"></i>
           </div>
-
-          <div className="category-panel flex flex-col justify-between">
-            <div className="text-xs font-bold text-secondary uppercase tracking-wider mb-3">
-              <i className="fas fa-pie-chart text-primary mr-1"></i> Spend by Category
+          <div>
+            <div className="compact-stat-val">₹{stats.totalCompletedSpend.toLocaleString("en-IN")}</div>
+            <div className="compact-stat-lbl">Completed Spend</div>
+            <div className="compact-stat-meta text-success">
+              {stats.estimatedSavings && stats.estimatedSavings > 0
+                ? `Saved ~₹${stats.estimatedSavings.toLocaleString("en-IN")}`
+                : `${stats.completedServicesCount} services fulfilled`}
             </div>
-            {categoryBreakdown.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {categoryBreakdown.slice(0, 4).map((cat, idx) => (
-                  <div key={idx} className="category-spend-item">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="font-semibold text-text flex items-center gap-1">
-                        <i className={`fas ${getCategoryIcon(cat.categoryName)} text-primary text-xs`}></i>
-                        {cat.categoryName}
-                      </span>
-                      <span className="text-secondary font-medium">
-                        ₹{cat.amount.toLocaleString("en-IN")} ({cat.percentage}%)
-                      </span>
-                    </div>
-                    <div className="progress-track">
-                      <div className="progress-fill" style={{ width: `${cat.percentage}%` }}></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-xs text-muted text-center py-6">
-                <i className="fas fa-chart-pie text-2xl mb-2 text-muted"></i>
-                <p className="mb-0">Completed service categories will be mapped here.</p>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
       <div className="dashboard-main-grid">
-        <div className="grid-left flex flex-col gap-6">
-          <div className="card p-5">
-            <div className="flex justify-between items-center mb-4 flex-wrap gap-3">
+        <div className="flex flex-col gap-5">
+          <div className="dashboard-panel-card">
+            <div className="panel-header-row">
               <div>
-                <h2 className="h5 mb-0 font-bold">Active Service Requests</h2>
-                <p className="text-xs text-secondary mb-0">Live marketplace requirements receiving competitive quotes</p>
+                <h2 className="panel-header-title">
+                  <i className="fas fa-bullhorn text-primary text-sm"></i>
+                  Active Service Requests
+                </h2>
+                <p className="panel-header-subtitle">
+                  Live requirements currently receiving bids from independent providers
+                </p>
               </div>
+
               <div className="flex items-center gap-3">
                 <div className="filter-tab-bar">
                   <button
@@ -327,7 +222,7 @@ export default function CustomerDashboard() {
                   </button>
                 </div>
                 <Link to="/my-requests" className="btn btn-text text-xs">
-                  View All <i className="fas fa-arrow-right ml-1"></i>
+                  All Requests <i className="fas fa-arrow-right ml-1"></i>
                 </Link>
               </div>
             </div>
@@ -342,12 +237,13 @@ export default function CustomerDashboard() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <Link to={`/my-requests/${req.id}`} className="font-bold text-text hover-primary text-sm">
+                          <Link to={`/my-requests/${req.id}`} className="request-title-link">
                             {req.title}
                           </Link>
                           <span className="badge badge-secondary text-xs">{req.categoryName}</span>
-                          <span className="badge badge-outline text-xs">
-                            <i className="fas fa-bolt text-warning mr-1"></i> {req.urgency.replace(/_/g, " ")}
+                          <span className={`urgency-badge ${getUrgencyBadgeClass(req.urgency)}`}>
+                            <i className="fas fa-bolt text-xs mr-1"></i>
+                            {req.urgency.replace(/_/g, " ")}
                           </span>
                         </div>
                         <div className="text-xs text-secondary flex items-center gap-3 flex-wrap">
@@ -361,7 +257,7 @@ export default function CustomerDashboard() {
                       </div>
                     </div>
 
-                    <div className="modern-request-actions">
+                    <div className="flex items-center gap-3">
                       <div className="text-right">
                         {req.quotationsCount > 0 ? (
                           <>
@@ -370,17 +266,17 @@ export default function CustomerDashboard() {
                             </div>
                             {req.minQuoteAmount !== undefined && (
                               <div className="text-xs text-secondary">
-                                From <strong>₹{req.minQuoteAmount.toLocaleString("en-IN")}</strong>
+                                Starting <strong>₹{req.minQuoteAmount.toLocaleString("en-IN")}</strong>
                               </div>
                             )}
                           </>
                         ) : (
-                          <div className="text-xs text-muted flex items-center gap-1">
-                            <span className="radar-ping-dot"></span> Awaiting Quotes
+                          <div className="text-xs text-muted flex items-center gap-1.5">
+                            <span className="radar-ping-dot"></span> Awaiting Bids
                           </div>
                         )}
                       </div>
-                      <Link to={`/my-requests/${req.id}`} className="btn btn-primary btn-sm">
+                      <Link to={`/my-requests/${req.id}`} className="hero-btn-primary py-1 px-3 text-xs">
                         {req.quotationsCount > 0 ? `Review Quotes (${req.quotationsCount}) →` : "View Details →"}
                       </Link>
                     </div>
@@ -388,26 +284,53 @@ export default function CustomerDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center bg-surface-elevated rounded border">
-                <i className="fas fa-inbox text-3xl mb-2 text-muted"></i>
-                <p className="text-sm font-semibold text-text mb-1">
+              <div className="empty-launchpad-card">
+                <i className="fas fa-clipboard-list text-3xl mb-2 text-primary"></i>
+                <h3 className="text-sm font-bold text-text mb-1">
                   {requestFilter === "ALL"
-                    ? "You do not have any active service requests right now."
-                    : "No service requests match this filter."}
+                    ? "Ready to get things done?"
+                    : "No requests found for this filter."}
+                </h3>
+                <p className="text-xs text-muted max-w-md mx-auto mb-3">
+                  Post your requirement in under 60 seconds and receive multiple transparent quotes directly from vetted professionals.
                 </p>
-                <p className="text-xs text-muted mb-4">Post a request to receive competitive quotes directly from independent providers.</p>
-                <Link to="/request-service" className="btn btn-primary text-xs">
-                  <i className="fas fa-plus mr-1"></i> Post a Service Request
+
+                <div className="empty-launchpad-grid">
+                  <Link to="/request-service?title=Electrical+Wiring+or+Switch+Repair" className="launchpad-template-btn">
+                    <i className="fas fa-bolt launchpad-template-icon"></i>
+                    <span className="launchpad-template-title">Electrical Repairs</span>
+                  </Link>
+                  <Link to="/request-service?title=Plumbing+Leak+or+Tap+Fitting" className="launchpad-template-btn">
+                    <i className="fas fa-faucet launchpad-template-icon"></i>
+                    <span className="launchpad-template-title">Plumbing &amp; Leak</span>
+                  </Link>
+                  <Link to="/request-service?title=Deep+Home+Cleaning" className="launchpad-template-btn">
+                    <i className="fas fa-broom launchpad-template-icon"></i>
+                    <span className="launchpad-template-title">Deep Cleaning</span>
+                  </Link>
+                  <Link to="/request-service?title=AC+Servicing+and+Filter+Cleaning" className="launchpad-template-btn">
+                    <i className="fas fa-snowflake launchpad-template-icon"></i>
+                    <span className="launchpad-template-title">AC Servicing</span>
+                  </Link>
+                </div>
+
+                <Link to="/request-service" className="hero-btn-primary">
+                  <i className="fas fa-plus"></i> Post a Custom Request
                 </Link>
               </div>
             )}
           </div>
 
-          <div className="card p-5">
-            <div className="flex justify-between items-center mb-4">
+          <div className="dashboard-panel-card">
+            <div className="panel-header-row">
               <div>
-                <h2 className="h5 mb-0 font-bold">Upcoming Bookings</h2>
-                <p className="text-xs text-secondary mb-0">Confirmed and in-progress service appointments</p>
+                <h2 className="panel-header-title">
+                  <i className="fas fa-calendar-alt text-primary text-sm"></i>
+                  Upcoming Bookings
+                </h2>
+                <p className="panel-header-subtitle">
+                  Confirmed and scheduled appointments with assigned service specialists
+                </p>
               </div>
               <Link to="/bookings" className="btn btn-text text-xs">
                 All Bookings <i className="fas fa-arrow-right ml-1"></i>
@@ -423,7 +346,7 @@ export default function CustomerDashboard() {
 
                   return (
                     <div key={b.id} className="modern-booking-item">
-                      <div className="flex items-center gap-4 flex-1 min-width-[240px]">
+                      <div className="flex items-center gap-4 flex-1">
                         <div className="booking-calendar-box">
                           <div className="booking-cal-month">{monthStr}</div>
                           <div className="booking-cal-day">{dayStr}</div>
@@ -435,7 +358,7 @@ export default function CustomerDashboard() {
                             <h3 className="h6 mb-0 font-bold text-text">{b.serviceTitle}</h3>
                             <span className="badge badge-info text-xs">{b.status}</span>
                           </div>
-                          <div className="text-xs text-secondary mb-2">
+                          <div className="text-xs text-secondary mb-1">
                             Booking ID: <strong>#{b.bookingNumber}</strong>
                           </div>
 
@@ -483,33 +406,108 @@ export default function CustomerDashboard() {
                 })}
               </div>
             ) : (
-              <div className="p-8 text-center bg-surface-elevated rounded border">
-                <i className="fas fa-calendar-times text-3xl mb-2 text-muted"></i>
-                <p className="text-sm font-semibold text-text mb-1">No upcoming bookings scheduled</p>
-                <p className="text-xs text-muted mb-0">When you accept a quotation, your scheduled service will appear here.</p>
+              <div className="empty-launchpad-card">
+                <i className="fas fa-calendar-check text-3xl mb-2 text-primary"></i>
+                <h3 className="text-sm font-bold text-text mb-1">No upcoming bookings scheduled</h3>
+                <p className="text-xs text-muted max-w-sm mx-auto mb-3">
+                  Once you accept a quotation from a service specialist, your confirmed booking timeline and live updates will appear here.
+                </p>
+                <Link to="/nearby-providers" className="hero-btn-secondary">
+                  <i className="fas fa-user-check"></i> Browse Verified Pros
+                </Link>
               </div>
             )}
           </div>
         </div>
 
-        <div className="grid-right flex flex-col gap-6">
-          <div className="card p-5">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="h6 mb-0 font-bold">
-                <i className="fas fa-bell text-primary mr-2"></i>Recent Activity
-              </h2>
-              <span className="text-xs text-muted">Live Feed</span>
+        <div className="flex flex-col gap-5">
+          <div className="dashboard-panel-card">
+            <div className="panel-header-row">
+              <h3 className="panel-header-title">
+                <i className="fas fa-chart-pie text-primary text-sm"></i>
+                Spending &amp; Insights
+              </h3>
+              {stats.estimatedSavings !== undefined && stats.estimatedSavings > 0 ? (
+                <span className="badge badge-success text-xs font-bold py-0 px-2">
+                  Saved ₹{stats.estimatedSavings.toLocaleString("en-IN")}
+                </span>
+              ) : (
+                <span className="badge badge-outline text-xs">0% Markups</span>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <div className="flex justify-between items-center text-xs mb-2">
+                <span className="font-semibold text-secondary uppercase tracking-wider">6-Month Trend</span>
+                <span className="text-muted">Total: ₹{stats.totalCompletedSpend.toLocaleString("en-IN")}</span>
+              </div>
+              <div className="monthly-bars-chart">
+                {monthlySpending.length > 0 ? (
+                  monthlySpending.map((item, idx) => {
+                    const heightPercent = item.spend > 0
+                      ? Math.max(16, Math.round((item.spend / maxMonthSpend) * 100))
+                      : 8;
+                    return (
+                      <div key={idx} className="chart-col">
+                        <div
+                          className="chart-bar-fill"
+                          style={{ height: `${heightPercent}%` }}
+                          title={`${item.month}: ₹${item.spend.toLocaleString("en-IN")}`}
+                        ></div>
+                        <span className="chart-col-label">{item.month}</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-xs text-muted text-center w-full py-4">No spend recorded.</div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs font-semibold text-secondary uppercase tracking-wider mb-2">
+                Top Categories
+              </div>
+              {categoryBreakdown.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {categoryBreakdown.slice(0, 3).map((cat, idx) => (
+                    <div key={idx} className="text-xs">
+                      <div className="flex justify-between mb-1">
+                        <span className="font-semibold text-text">{cat.categoryName}</span>
+                        <span className="text-muted">₹{cat.amount.toLocaleString("en-IN")} ({cat.percentage}%)</span>
+                      </div>
+                      <div className="progress-track">
+                        <div className="progress-fill" style={{ width: `${cat.percentage}%` }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-xs text-muted text-center py-2">
+                  Spend breakdown will populate as services are completed.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="dashboard-panel-card">
+            <div className="panel-header-row">
+              <h3 className="panel-header-title">
+                <i className="fas fa-bell text-primary text-sm"></i>
+                Activity &amp; Updates
+              </h3>
+              <span className="text-xs text-muted">Live</span>
             </div>
 
             {recentActivity.length > 0 ? (
               <ul className="activity-feed">
                 {recentActivity.map((act) => (
                   <li key={act.id} className="activity-feed-item">
-                    <div className="feed-icon bg-primary-light text-primary">
+                    <div className="feed-icon">
                       <i className="fas fa-bell"></i>
                     </div>
-                    <div className="feed-content">
-                      <div className="feed-title font-bold text-xs">
+                    <div className="flex-1">
+                      <div className="font-bold text-xs text-text">
                         {act.title}
                       </div>
                       <div className="text-xs text-secondary mt-1">
@@ -526,25 +524,28 @@ export default function CustomerDashboard() {
                 ))}
               </ul>
             ) : (
-              <div className="p-6 text-center text-secondary text-xs">
-                <i className="fas fa-stream text-2xl mb-2 text-muted"></i>
-                <p className="mb-0">No recent activity recorded yet.</p>
+              <div className="p-4 text-center text-secondary text-xs">
+                <i className="fas fa-lightbulb text-primary text-xl mb-2"></i>
+                <p className="font-semibold text-text mb-1">Pro Marketplace Tip</p>
+                <p className="text-muted mb-0 leading-relaxed">
+                  Adding clear descriptions and photos when posting a request helps local professionals give you precise, competitive estimates faster.
+                </p>
               </div>
             )}
           </div>
 
-          <div className="card p-5 border-primary">
+          <div className="guarantee-card">
             <div className="flex items-start gap-3">
-              <div className="text-primary text-2xl mt-1">
+              <div className="text-primary text-2xl mt-0.5">
                 <i className="fas fa-shield-alt"></i>
               </div>
               <div>
-                <h3 className="h6 mb-1 text-primary font-bold">100% Direct Marketplace</h3>
-                <p className="text-xs text-secondary mb-3 leading-relaxed">
-                  Independent professionals own their services with zero middleman commissions, delivering higher quality and competitive transparent rates.
+                <h4 className="font-bold text-sm text-primary mb-1">100% Direct Marketplace Guarantee</h4>
+                <p className="text-xs text-secondary mb-2 leading-relaxed">
+                  Zero commission fees charged to customers or hidden in service costs. You pay independent providers directly.
                 </p>
-                <Link to="/request-service" className="btn btn-outline text-xs py-1">
-                  Post Another Service
+                <Link to="/request-service" className="hero-btn-primary py-1 px-3 text-xs">
+                  Post Your First Request
                 </Link>
               </div>
             </div>
