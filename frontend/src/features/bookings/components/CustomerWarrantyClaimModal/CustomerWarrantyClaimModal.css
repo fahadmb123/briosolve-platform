@@ -191,6 +191,25 @@
   margin-top: 0.15rem;
 }
 
+.bkclaim-field-error {
+  color: #ef4444;
+  font-size: 0.775rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.2rem;
+  animation: bkclaimFadeIn 0.15s ease-out;
+}
+
+.bkclaim-textarea.has-error,
+.bkclaim-input.has-error,
+.bkclaim-select.has-error,
+.bkclaim-dropzone.has-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
 .bkclaim-textarea {
   width: 100%;
   padding: 0.75rem;

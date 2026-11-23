@@ -24,6 +24,13 @@ const TIME_SLOTS = [
   "Weekends Only"
 ];
 
+interface FormErrors {
+  issueDescription?: string;
+  preferredDate?: string;
+  preferredTime?: string;
+  proofImages?: string;
+}
+
 export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProps> = ({
   isOpen,
   booking,
@@ -36,7 +43,8 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
   const [preferredTime, setPreferredTime] = useState(TIME_SLOTS[0]);
   const [proofImages, setProofImages] = useState<string[]>([]);
   const [previewModalImage, setPreviewModalImage] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const warranty = booking?.warranty;
   const daysRemaining = warranty?.expiresAt
@@ -55,11 +63,67 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
       setPreferredTime(TIME_SLOTS[0]);
       setProofImages([]);
       setPreviewModalImage(null);
-      setErrorMsg("");
+      setErrors({});
+      setTouched({});
     }
   }, [isOpen]);
 
   if (!isOpen || !booking) return null;
+
+  const validateField = (field: keyof FormErrors, value?: any): string | undefined => {
+    switch (field) {
+      case "issueDescription": {
+        const val = (value !== undefined ? value : issueDescription).trim();
+        if (!val) {
+          return "Please describe the issue encountered with the service";
+        }
+        if (val.length < 15) {
+          return "Please provide at least 15 characters explaining the issue in detail";
+        }
+        if (val.length > 1000) {
+          return "Description cannot exceed 1000 characters";
+        }
+        return undefined;
+      }
+      case "preferredDate": {
+        const val = value !== undefined ? value : preferredDate;
+        if (val) {
+          if (val < todayStr) {
+            return "Available date cannot be in the past";
+          }
+          if (maxDateStr && val > maxDateStr) {
+            return "Date cannot exceed your active warranty expiration date";
+          }
+        }
+        return undefined;
+      }
+      case "preferredTime": {
+        const val = value !== undefined ? value : preferredTime;
+        if (val && !TIME_SLOTS.includes(val)) {
+          return "Please select a valid time slot from the list";
+        }
+        return undefined;
+      }
+      case "proofImages": {
+        const val = value !== undefined ? value : proofImages;
+        if (val && val.length > 3) {
+          return "Maximum 3 photos allowed";
+        }
+        return undefined;
+      }
+      default:
+        return undefined;
+    }
+  };
+
+  const handleBlur = (field: keyof FormErrors) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const err = validateField(field);
+    setErrors((prev) => ({
+      ...prev,
+      [field]: err
+    }));
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -69,6 +133,7 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
     const currentCount = proofImages.length;
     if (currentCount >= 3) {
       toast.error("Maximum 3 photos allowed");
+      setErrors((prev) => ({ ...prev, proofImages: "Maximum 3 photos allowed" }));
       e.target.value = "";
       return;
     }
@@ -112,20 +177,50 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
     );
 
     const newImages = await Promise.all(readPromises);
-    setProofImages((prev) => [...prev, ...newImages].slice(0, 3));
+    setProofImages((prev) => {
+      const next = [...prev, ...newImages].slice(0, 3);
+      setErrors((errs) => ({ ...errs, proofImages: undefined }));
+      return next;
+    });
     e.target.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
-    setProofImages((prev) => prev.filter((_, i) => i !== index));
+    setProofImages((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      setErrors((errs) => ({ ...errs, proofImages: undefined }));
+      return next;
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!issueDescription.trim()) {
-      setErrorMsg("Please describe the issue encountered with the service");
+
+    const descErr = validateField("issueDescription", issueDescription);
+    const dateErr = validateField("preferredDate", preferredDate);
+    const timeErr = validateField("preferredTime", preferredTime);
+    const imgErr = validateField("proofImages", proofImages);
+
+    const newErrors: FormErrors = {
+      issueDescription: descErr,
+      preferredDate: dateErr,
+      preferredTime: timeErr,
+      proofImages: imgErr
+    };
+
+    setErrors(newErrors);
+    setTouched({
+      issueDescription: true,
+      preferredDate: true,
+      preferredTime: true,
+      proofImages: true
+    });
+
+    if (descErr || dateErr || timeErr || imgErr) {
+      toast.error("Please resolve highlighted form errors");
       return;
     }
+
     onSubmit({
       issueDescription: issueDescription.trim(),
       proofImages: proofImages.length > 0 ? proofImages : undefined,
@@ -162,31 +257,36 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="bkclaim-body">
-            {errorMsg && (
-              <div className="bkclaim-error-box">
-                <i className="fas fa-exclamation-circle" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
-
             <div className="bkclaim-field">
-              <label>
-                Describe What Went Wrong <span className="req">*</span>
-              </label>
+              <div className="bkclaim-field-header">
+                <label>
+                  Describe What Went Wrong <span className="req">*</span>
+                </label>
+                <span className="bkclaim-count-pill">{issueDescription.length}/1000</span>
+              </div>
               <textarea
-                className="bkclaim-textarea"
+                className={`bkclaim-textarea ${touched.issueDescription && errors.issueDescription ? "has-error" : ""}`}
                 rows={4}
                 value={issueDescription}
                 onChange={(e) => {
-                  setIssueDescription(e.target.value);
-                  if (errorMsg) setErrorMsg("");
+                  const val = e.target.value;
+                  setIssueDescription(val);
+                  if (touched.issueDescription) {
+                    setErrors((prev) => ({ ...prev, issueDescription: validateField("issueDescription", val) }));
+                  }
                 }}
-                placeholder="Explain the recurring issue, defect, or parts not functioning properly..."
+                onBlur={() => handleBlur("issueDescription")}
+                placeholder="Explain the recurring issue, defect, or parts not functioning properly in detail..."
                 required
                 disabled={isLoading}
               />
+              {touched.issueDescription && errors.issueDescription && (
+                <span className="bkclaim-field-error">
+                  <i className="fas fa-exclamation-circle" /> {errors.issueDescription}
+                </span>
+              )}
             </div>
 
             <div className="bkclaim-grid-2">
@@ -194,24 +294,44 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
                 <label>Available Any Day Until</label>
                 <input
                   type="date"
-                  className="bkclaim-input"
+                  className={`bkclaim-input ${touched.preferredDate && errors.preferredDate ? "has-error" : ""}`}
                   min={todayStr}
                   max={maxDateStr}
                   value={preferredDate}
-                  onChange={(e) => setPreferredDate(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPreferredDate(val);
+                    if (touched.preferredDate) {
+                      setErrors((prev) => ({ ...prev, preferredDate: validateField("preferredDate", val) }));
+                    }
+                  }}
+                  onBlur={() => handleBlur("preferredDate")}
                   disabled={isLoading}
                 />
-                <span className="bkclaim-field-hint">
-                  Technician can re-visit any day on or before this date
-                </span>
+                {touched.preferredDate && errors.preferredDate ? (
+                  <span className="bkclaim-field-error">
+                    <i className="fas fa-exclamation-circle" /> {errors.preferredDate}
+                  </span>
+                ) : (
+                  <span className="bkclaim-field-hint">
+                    Technician can re-visit any day on or before this date
+                  </span>
+                )}
               </div>
 
               <div className="bkclaim-field">
                 <label>General Time Availability</label>
                 <select
-                  className="bkclaim-select"
+                  className={`bkclaim-select ${touched.preferredTime && errors.preferredTime ? "has-error" : ""}`}
                   value={preferredTime}
-                  onChange={(e) => setPreferredTime(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPreferredTime(val);
+                    if (touched.preferredTime) {
+                      setErrors((prev) => ({ ...prev, preferredTime: validateField("preferredTime", val) }));
+                    }
+                  }}
+                  onBlur={() => handleBlur("preferredTime")}
                   disabled={isLoading}
                 >
                   {TIME_SLOTS.map((slot) => (
@@ -220,9 +340,15 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
                     </option>
                   ))}
                 </select>
-                <span className="bkclaim-field-hint">
-                  Your daily convenient time window for re-visits
-                </span>
+                {touched.preferredTime && errors.preferredTime ? (
+                  <span className="bkclaim-field-error">
+                    <i className="fas fa-exclamation-circle" /> {errors.preferredTime}
+                  </span>
+                ) : (
+                  <span className="bkclaim-field-hint">
+                    Your daily convenient time window for re-visits
+                  </span>
+                )}
               </div>
             </div>
 
@@ -244,7 +370,7 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
 
               <label
                 htmlFor={proofImages.length >= 3 || isLoading ? undefined : "bkclaim-file-upload"}
-                className={`bkclaim-dropzone ${proofImages.length >= 3 ? "disabled" : ""}`}
+                className={`bkclaim-dropzone ${proofImages.length >= 3 ? "disabled" : ""} ${errors.proofImages ? "has-error" : ""}`}
               >
                 <div className="bkclaim-dropzone-icon">
                   <i className={`fas ${proofImages.length >= 3 ? "fa-check-circle text-success" : "fa-cloud-upload-alt"}`} />
@@ -256,6 +382,12 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
                   Supports JPG, PNG, WEBP (up to 10MB each)
                 </div>
               </label>
+
+              {errors.proofImages && (
+                <span className="bkclaim-field-error">
+                  <i className="fas fa-exclamation-circle" /> {errors.proofImages}
+                </span>
+              )}
 
               {proofImages.length > 0 && (
                 <div className="bkclaim-preview-grid">
@@ -308,7 +440,7 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
             <button
               type="submit"
               className="bkclaim-btn-submit"
-              disabled={isLoading || !issueDescription.trim()}
+              disabled={isLoading}
             >
               {isLoading ? (
                 <>
