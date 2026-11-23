@@ -266,7 +266,7 @@ export const ProviderTopNav: React.FC = () => {
               <div className="prov-dropdown-panel" role="menu">
                 <div className="prov-panel-grid">
                   <div className="prov-panel-col">
-                    <div className="prov-col-title">OVERVIEW & LEADS</div>
+                    <div className="prov-col-title">WORKSPACE</div>
                     <NavLink
                       to="/provider/dashboard"
                       end
@@ -291,22 +291,6 @@ export const ProviderTopNav: React.FC = () => {
                       </div>
                       <span className="prov-mono-badge">8 New</span>
                     </Link>
-                  </div>
-
-                  <div className="prov-panel-col">
-                    <div className="prov-col-title">OPERATIONS</div>
-                    <NavLink
-                      to="/provider/bookings"
-                      className={({ isActive }) =>
-                        `prov-panel-item ${isActive ? "item-active" : ""}`
-                      }
-                      onClick={closeAll}
-                    >
-                      <div className="prov-item-main">
-                        <i className="fas fa-calendar-check"></i>
-                        <span>Bookings</span>
-                      </div>
-                    </NavLink>
                     <Link
                       to="/provider/messages"
                       className="prov-panel-item"
@@ -323,6 +307,34 @@ export const ProviderTopNav: React.FC = () => {
                       )}
                     </Link>
                   </div>
+
+                  <div className="prov-panel-col">
+                    <div className="prov-col-title">ALERTS & PROFILE</div>
+                    <NavLink
+                      to="/provider/notifications"
+                      className={({ isActive }) =>
+                        `prov-panel-item ${isActive ? "item-active" : ""}`
+                      }
+                      onClick={closeAll}
+                    >
+                      <div className="prov-item-main">
+                        <i className="fas fa-bell"></i>
+                        <span>Notifications</span>
+                      </div>
+                    </NavLink>
+                    <NavLink
+                      to="/provider/profile"
+                      className={({ isActive }) =>
+                        `prov-panel-item ${isActive ? "item-active" : ""}`
+                      }
+                      onClick={closeAll}
+                    >
+                      <div className="prov-item-main">
+                        <i className="fas fa-id-badge"></i>
+                        <span>Profile</span>
+                      </div>
+                    </NavLink>
+                  </div>
                 </div>
               </div>
             )}
@@ -330,35 +342,47 @@ export const ProviderTopNav: React.FC = () => {
 
           <div
             className="prov-category-wrapper"
-            onMouseEnter={() => handleMouseEnter("finances")}
+            onMouseEnter={() => handleMouseEnter("more")}
             onMouseLeave={handleMouseLeave}
           >
             <button
               type="button"
-              className={`prov-category-btn ${isFinancesSection ? "active" : ""}`}
+              className={`prov-category-btn ${isMoreSection ? "active" : ""}`}
               onClick={() => {
-                if (isFinancesSection) {
-                  togglePanel("finances");
+                if (isMoreSection) {
+                  togglePanel("more");
                 } else {
                   closeAll();
-                  navigate("/provider/quotations");
+                  navigate("/provider/bookings");
                 }
               }}
-              aria-expanded={activePanel === "finances"}
+              aria-expanded={activePanel === "more"}
             >
-              <span>Finances</span>
+              <span>More</span>
               <i
                 className={`fas fa-chevron-down prov-caret ${
-                  activePanel === "finances" ? "rotate" : ""
+                  activePanel === "more" ? "rotate" : ""
                 }`}
               ></i>
             </button>
 
-            {activePanel === "finances" && (
+            {activePanel === "more" && (
               <div className="prov-dropdown-panel" role="menu">
                 <div className="prov-panel-grid">
                   <div className="prov-panel-col">
-                    <div className="prov-col-title">QUOTATIONS & BILLING</div>
+                    <div className="prov-col-title">OPERATIONS & EARNINGS</div>
+                    <NavLink
+                      to="/provider/bookings"
+                      className={({ isActive }) =>
+                        `prov-panel-item ${isActive ? "item-active" : ""}`
+                      }
+                      onClick={closeAll}
+                    >
+                      <div className="prov-item-main">
+                        <i className="fas fa-calendar-check"></i>
+                        <span>Bookings</span>
+                      </div>
+                    </NavLink>
                     <NavLink
                       to="/provider/quotations"
                       className={({ isActive }) =>
@@ -371,115 +395,44 @@ export const ProviderTopNav: React.FC = () => {
                         <span>My Quotations</span>
                       </div>
                     </NavLink>
-                    <Link
-                      to="#"
-                      className="prov-panel-item"
-                      onClick={closeAll}
-                    >
-                      <div className="prov-item-main">
-                        <i className="fas fa-receipt"></i>
-                        <span>Invoices & Receipts</span>
-                      </div>
-                    </Link>
-                  </div>
-
-                  <div className="prov-panel-col">
-                    <div className="prov-col-title">EARNINGS & RATES</div>
                     <NavLink
-                      to="/provider/dashboard"
-                      className="prov-panel-item"
+                      to="/provider/wallet"
+                      className={({ isActive }) =>
+                        `prov-panel-item ${isActive ? "item-active" : ""}`
+                      }
                       onClick={closeAll}
                     >
                       <div className="prov-item-main">
                         <i className="fas fa-wallet"></i>
-                        <span>Payout Overview</span>
-                      </div>
-                    </NavLink>
-                    <NavLink
-                      to="/provider/settings"
-                      className="prov-panel-item"
-                      onClick={closeAll}
-                    >
-                      <div className="prov-item-main">
-                        <i className="fas fa-tags"></i>
-                        <span>Service Rates & Radius</span>
-                      </div>
-                    </NavLink>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div
-            className="prov-category-wrapper"
-            onMouseEnter={() => handleMouseEnter("performance")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button
-              type="button"
-              className="prov-category-btn"
-              onClick={() => togglePanel("performance")}
-              aria-expanded={activePanel === "performance"}
-            >
-              <span>Performance</span>
-              <i
-                className={`fas fa-chevron-down prov-caret ${
-                  activePanel === "performance" ? "rotate" : ""
-                }`}
-              ></i>
-            </button>
-
-            {activePanel === "performance" && (
-              <div className="prov-dropdown-panel" role="menu">
-                <div className="prov-panel-grid">
-                  <div className="prov-panel-col">
-                    <div className="prov-col-title">REPUTATION & FEEDBACK</div>
-                    <Link
-                      to="#"
-                      className="prov-panel-item"
-                      onClick={closeAll}
-                    >
-                      <div className="prov-item-main">
-                        <i className="fas fa-star"></i>
-                        <span>Customer Reviews</span>
-                      </div>
-                    </Link>
-                    <NavLink
-                      to="/provider/dashboard"
-                      className="prov-panel-item"
-                      onClick={closeAll}
-                    >
-                      <div className="prov-item-main">
-                        <i className="fas fa-chart-line"></i>
-                        <span>Rating Analytics</span>
+                        <span>Wallet & Earnings</span>
                       </div>
                     </NavLink>
                   </div>
 
                   <div className="prov-panel-col">
-                    <div className="prov-col-title">CREDENTIALS</div>
+                    <div className="prov-col-title">SUPPORT & COMPLIANCE</div>
+                    <NavLink
+                      to="/provider/support"
+                      className={({ isActive }) =>
+                        `prov-panel-item ${isActive ? "item-active" : ""}`
+                      }
+                      onClick={closeAll}
+                    >
+                      <div className="prov-item-main">
+                        <i className="fas fa-life-ring"></i>
+                        <span>Support Tickets</span>
+                      </div>
+                    </NavLink>
                     <NavLink
                       to="/provider/kyc"
-                      className="prov-panel-item"
+                      className={({ isActive }) =>
+                        `prov-panel-item ${isActive ? "item-active" : ""}`
+                      }
                       onClick={closeAll}
                     >
                       <div className="prov-item-main">
                         <i className="fas fa-shield-alt"></i>
-                        <span>KYC Verification</span>
-                      </div>
-                      <span className="prov-mono-badge">
-                        <i className="fas fa-check"></i>
-                      </span>
-                    </NavLink>
-                    <NavLink
-                      to="/provider/kyc"
-                      className="prov-panel-item"
-                      onClick={closeAll}
-                    >
-                      <div className="prov-item-main">
-                        <i className="fas fa-certificate"></i>
-                        <span>Verified Pro Status</span>
+                        <span>KYC Documents</span>
                       </div>
                     </NavLink>
                   </div>
