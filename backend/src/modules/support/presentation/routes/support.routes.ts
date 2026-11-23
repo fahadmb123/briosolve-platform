@@ -12,13 +12,7 @@ export function buildSupportRoute(controller: SupportRouteDependencies): Router 
   router.get("/tickets/my", authMiddleware, controller.support.getMyTickets);
   router.get("/tickets/admin", authMiddleware, requireRole(["ADMIN"]), controller.support.getAdminTickets);
   router.post("/tickets", authMiddleware, validate(createTicketSchema), controller.support.createTicket);
-  router.patch(
-    "/tickets/:id/status",
-    authMiddleware,
-    requireRole(["ADMIN"]),
-    validate(updateTicketStatusSchema),
-    controller.support.updateTicketStatus
-  );
+  router.patch("/tickets/:id/status",authMiddleware,requireRole(["ADMIN"]),validate(updateTicketStatusSchema),controller.support.updateTicketStatus)
 
   return router;
 }
