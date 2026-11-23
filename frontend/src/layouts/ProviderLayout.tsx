@@ -18,28 +18,29 @@ export default function ProviderLayout() {
   }
 
   const isSettingsSection =
-    location.pathname.startsWith("/provider/settings") ||
-    location.pathname.startsWith("/provider/profile") ||
-    location.pathname.startsWith("/provider/kyc") ||
-    location.pathname.startsWith("/provider/notifications") ||
-    location.pathname.startsWith("/provider/verification");
+    location.pathname === "/provider/settings" ||
+    location.pathname.startsWith("/provider/settings");
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
     location.pathname.startsWith("/provider/dashboard") ||
     location.pathname.startsWith("/provider/service-requests") ||
     location.pathname.startsWith("/provider/requests") ||
-    location.pathname.startsWith("/provider/bookings") ||
     location.pathname.startsWith("/provider/messages") ||
+    location.pathname.startsWith("/provider/chat") ||
+    location.pathname.startsWith("/provider/notifications") ||
+    location.pathname.startsWith("/provider/profile");
+
+  const isMoreSection =
+    location.pathname.startsWith("/provider/bookings") ||
+    location.pathname.startsWith("/provider/quotations") ||
+    location.pathname.startsWith("/provider/wallet") ||
     location.pathname.startsWith("/provider/support") ||
     location.pathname.startsWith("/provider/tickets") ||
-    location.pathname.startsWith("/provider/chat");
+    location.pathname.startsWith("/provider/kyc") ||
+    location.pathname.startsWith("/provider/verification");
 
-  const isFinancesSection =
-    location.pathname.startsWith("/provider/quotations") ||
-    location.pathname.startsWith("/provider/wallet");
-
-  const hasSubnav = isSettingsSection || isWorkspaceSection || isFinancesSection;
+  const hasSubnav = isSettingsSection || isWorkspaceSection || isMoreSection;
 
   return (
     <div className={`provider-top-layout ${showVerificationWarning ? "has-verification-warning" : ""}`}>

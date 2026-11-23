@@ -22,19 +22,19 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-search-dollar",
   },
   {
-    label: "Bookings",
-    to: "/provider/bookings",
-    icon: "fas fa-calendar-check",
-  },
-  {
     label: "Messages",
     to: "/provider/messages",
     icon: "fas fa-comments",
   },
   {
-    label: "Support Tickets",
-    to: "/provider/support",
-    icon: "fas fa-life-ring",
+    label: "Notifications",
+    to: "/provider/notifications",
+    icon: "fas fa-bell",
+  },
+  {
+    label: "Profile",
+    to: "/provider/profile",
+    icon: "fas fa-user-tie",
   },
 ];
 
@@ -56,7 +56,12 @@ const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
   },
 ];
 
-const FINANCES_SUBNAV_ITEMS: SubnavItem[] = [
+const MORE_SUBNAV_ITEMS: SubnavItem[] = [
+  {
+    label: "Bookings",
+    to: "/provider/bookings",
+    icon: "fas fa-calendar-check",
+  },
   {
     label: "My Quotations",
     to: "/provider/quotations",
@@ -68,14 +73,14 @@ const FINANCES_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-wallet",
   },
   {
-    label: "Invoices & Receipts",
-    to: "/provider/quotations#invoices",
-    icon: "fas fa-receipt",
+    label: "Support Tickets",
+    to: "/provider/support",
+    icon: "fas fa-life-ring",
   },
   {
-    label: "Service Rates",
-    to: "/provider/settings#rates",
-    icon: "fas fa-tags",
+    label: "KYC Documents",
+    to: "/provider/kyc",
+    icon: "fas fa-id-card",
   },
 ];
 
@@ -88,15 +93,17 @@ export const ProviderSubnavSidebar: React.FC = () => {
   const showVerificationWarning = Boolean(isAuthenticated && !isVerified);
 
   const isSettingsSection =
-    location.pathname.startsWith("/provider/settings") ||
-    location.pathname.startsWith("/provider/profile") ||
-    location.pathname.startsWith("/provider/kyc") ||
-    location.pathname.startsWith("/provider/notifications") ||
-    location.pathname.startsWith("/provider/verification");
+    location.pathname === "/provider/settings" ||
+    location.pathname.startsWith("/provider/settings");
 
-  const isFinancesSection =
+  const isMoreSection =
+    location.pathname.startsWith("/provider/bookings") ||
     location.pathname.startsWith("/provider/quotations") ||
-    location.pathname.startsWith("/provider/wallet");
+    location.pathname.startsWith("/provider/wallet") ||
+    location.pathname.startsWith("/provider/support") ||
+    location.pathname.startsWith("/provider/tickets") ||
+    location.pathname.startsWith("/provider/kyc") ||
+    location.pathname.startsWith("/provider/verification");
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
@@ -104,33 +111,32 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/provider/service-requests") ||
     location.pathname.startsWith("/provider/requests") ||
     location.pathname.startsWith("/provider/messages") ||
-    location.pathname.startsWith("/provider/bookings") ||
-    location.pathname.startsWith("/provider/support") ||
-    location.pathname.startsWith("/provider/tickets") ||
-    location.pathname.startsWith("/provider/chat");
+    location.pathname.startsWith("/provider/chat") ||
+    location.pathname.startsWith("/provider/notifications") ||
+    location.pathname.startsWith("/provider/profile");
 
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS
     : isWorkspaceSection
     ? WORKSPACE_SUBNAV_ITEMS
-    : isFinancesSection
-    ? FINANCES_SUBNAV_ITEMS
+    : isMoreSection
+    ? MORE_SUBNAV_ITEMS
     : null;
 
   const activeSubnavTitle = isSettingsSection
     ? "Settings"
     : isWorkspaceSection
     ? "Workspace"
-    : isFinancesSection
-    ? "Finances"
+    : isMoreSection
+    ? "More"
     : "";
 
   const activeSubnavIcon = isSettingsSection
     ? "fas fa-sliders-h"
     : isWorkspaceSection
     ? "fas fa-th-large"
-    : isFinancesSection
-    ? "fas fa-wallet"
+    : isMoreSection
+    ? "fas fa-ellipsis-h"
     : "";
 
   const isAccountSettingsActive =
