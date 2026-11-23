@@ -5,6 +5,7 @@ import { GetBookingByIdInputDto, GetCustomerBookingsInputDto, GetProviderBooking
 import { GetAdminBookingsInputDto } from "../../domain/repositories/IBookingRepository";
 import { UpdateBookingStatusInputDto, AdminUpdateBookingStatusInputDto } from "../../application/dtos/request/update-booking-status.dto";
 import { ReportServiceMismatchInputDto, ResolveServiceMismatchInputDto } from "../../application/dtos/request/mismatch-report.dto";
+import { SubmitWarrantyClaimInputDto, ResolveWarrantyClaimInputDto } from "../../application/dtos/request/warranty-claim.dto";
 import { BookingResponseDto } from "../../application/dtos/response/booking-response.dto";
 import { CustomerBookingsResponseDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
@@ -19,7 +20,9 @@ export class BookingController extends BaseController {
         private readonly _reportServiceMismatchUseCase: IUseCase<ReportServiceMismatchInputDto, BookingResponseDto>,
         private readonly _resolveServiceMismatchUseCase: IUseCase<ResolveServiceMismatchInputDto, BookingResponseDto>,
         private readonly _getAdminBookingsUseCase: IUseCase<GetAdminBookingsInputDto, AdminBookingsResponseDto>,
-        private readonly _adminUpdateBookingStatusUseCase: IUseCase<AdminUpdateBookingStatusInputDto, BookingResponseDto>
+        private readonly _adminUpdateBookingStatusUseCase: IUseCase<AdminUpdateBookingStatusInputDto, BookingResponseDto>,
+        private readonly _submitWarrantyClaimUseCase?: IUseCase<SubmitWarrantyClaimInputDto, BookingResponseDto>,
+        private readonly _resolveWarrantyClaimUseCase?: IUseCase<ResolveWarrantyClaimInputDto, BookingResponseDto>
     ) {
         super();
     }
@@ -179,6 +182,63 @@ export class BookingController extends BaseController {
             });
 
             return this.sendSuccess(res, action === "ACCEPT" ? "Diagnosis accepted and booking closed" : "Diagnosis report declined", response, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    submitWarrantyClaim = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const customerId = req.user?.userId;
+            const bookingId = req.params.id as string;
+            const { issueDescription, proofImages, preferredDate, preferredTime } = req.body;
+
+            if (!this._submitWarrantyClaimUseCase) {
+                return res.status(500).json({ success: false, message: "Warranty claim service not initialized" });
+            }
+
+            const response = await this._submitWarrantyClaimUseCase.execute({
+                bookingId,
+                customerId: customerId!,
+                issueDescription,
+                proofImages,
+                preferredDate,
+                preferredTime
+            });
+
+            return this.sendSuccess(res, "Warranty claim submitted successfully", response, 201);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    resolveWarrantyClaim = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const providerUserId = req.user?.userId;
+            const bookingId = req.params.id as string;
+            const { action, revisitScheduledDate, revisitScheduledTime, providerResponse, rejectionReason } = req.body;
+
+            if (!this._resolveWarrantyClaimUseCase) {
+                return res.status(500).json({ success: false, message: "Warranty claim service not initialized" });
+            }
+
+            const response = await this._resolveWarrantyClaimUseCase.execute({
+                bookingId,
+                providerUserId: providerUserId!,
+                action,
+                revisitScheduledDate,
+                revisitScheduledTime,
+                providerResponse,
+                rejectionReason
+            });
+
+            const message = action === "ACCEPT"
+                ? "Free warranty re-visit scheduled successfully"
+                : action === "REJECT"
+                    ? "Warranty claim disputed and escalated to Admin Support"
+                    : "Warranty service marked as resolved";
+
+            return this.sendSuccess(res, message, response, 200);
         } catch (error) {
             next(error);
         }

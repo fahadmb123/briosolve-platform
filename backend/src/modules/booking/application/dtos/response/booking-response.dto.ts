@@ -67,8 +67,8 @@ export interface WarrantyClaimDto {
     status: "PENDING" | "ACCEPTED" | "REJECTED" | "RESOLVED";
     issueDescription: string;
     proofImages?: string[];
-    preferredDate?: string;
-    preferredTime?: string;
+    preferredDate?: string | null;
+    preferredTime?: string | null;
     reportedAt: string;
     providerResponse?: string | null;
     revisitScheduledDate?: string | null;
