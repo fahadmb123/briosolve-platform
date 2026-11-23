@@ -77,11 +77,6 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/provider/support",
     icon: "fas fa-life-ring",
   },
-  {
-    label: "KYC Documents",
-    to: "/provider/kyc",
-    icon: "fas fa-id-card",
-  },
 ];
 
 export const ProviderSubnavSidebar: React.FC = () => {
@@ -93,17 +88,16 @@ export const ProviderSubnavSidebar: React.FC = () => {
   const showVerificationWarning = Boolean(isAuthenticated && !isVerified);
 
   const isSettingsSection =
-    location.pathname === "/provider/settings" ||
-    location.pathname.startsWith("/provider/settings");
+    location.pathname.startsWith("/provider/settings") ||
+    location.pathname.startsWith("/provider/kyc") ||
+    location.pathname.startsWith("/provider/verification");
 
   const isMoreSection =
     location.pathname.startsWith("/provider/bookings") ||
     location.pathname.startsWith("/provider/quotations") ||
     location.pathname.startsWith("/provider/wallet") ||
     location.pathname.startsWith("/provider/support") ||
-    location.pathname.startsWith("/provider/tickets") ||
-    location.pathname.startsWith("/provider/kyc") ||
-    location.pathname.startsWith("/provider/verification");
+    location.pathname.startsWith("/provider/tickets");
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||

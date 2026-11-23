@@ -18,8 +18,9 @@ export default function ProviderLayout() {
   }
 
   const isSettingsSection =
-    location.pathname === "/provider/settings" ||
-    location.pathname.startsWith("/provider/settings");
+    location.pathname.startsWith("/provider/settings") ||
+    location.pathname.startsWith("/provider/kyc") ||
+    location.pathname.startsWith("/provider/verification");
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
@@ -36,9 +37,7 @@ export default function ProviderLayout() {
     location.pathname.startsWith("/provider/quotations") ||
     location.pathname.startsWith("/provider/wallet") ||
     location.pathname.startsWith("/provider/support") ||
-    location.pathname.startsWith("/provider/tickets") ||
-    location.pathname.startsWith("/provider/kyc") ||
-    location.pathname.startsWith("/provider/verification");
+    location.pathname.startsWith("/provider/tickets");
 
   const hasSubnav = isSettingsSection || isWorkspaceSection || isMoreSection;
 
