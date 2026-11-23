@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'591aad6c6aeceeb18f7eaf740494daf3fa66e688ad385063f2bca3bb2e142b70'>;
+  StorageHashBase<'111d37638aa081577760e867082db90f5a702d6a2cda1dfc8eb54bf97dcf914c'>;
 export type ExecutionHash =
   ExecutionHashBase<'c9f957c3fe6980f77d61b2f6eba3a6d772da140a60d8b8c809b73b53332e35db'>;
 export type ProfileHash =
@@ -295,6 +295,8 @@ export type FieldOutputTypes = {
       readonly payment_id: Varchar<255> | null;
       readonly order_id: Varchar<255> | null;
       readonly notes: CodecTypes['pg/text@1']['output'] | null;
+      readonly warranty_days: CodecTypes['pg/int4@1']['output'] | null;
+      readonly warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -620,6 +622,8 @@ export type FieldInputTypes = {
       readonly payment_id: CodecTypes['sql/varchar@1']['input'] | null;
       readonly order_id: CodecTypes['sql/varchar@1']['input'] | null;
       readonly notes: CodecTypes['pg/text@1']['input'] | null;
+      readonly warranty_days: CodecTypes['pg/int4@1']['input'] | null;
+      readonly warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -947,6 +951,8 @@ export type StorageColumnTypes = {
         | 'CLOSED';
       readonly total_amount: Numeric<12, 2>;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly warranty_days: CodecTypes['pg/int4@1']['output'] | null;
+      readonly warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
     };
     readonly categories: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -1272,6 +1278,8 @@ export type StorageColumnInputTypes = {
         | 'CLOSED';
       readonly total_amount: CodecTypes['pg/numeric@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly warranty_days: CodecTypes['pg/int4@1']['input'] | null;
+      readonly warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
     };
     readonly categories: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -1929,6 +1937,8 @@ export namespace Models {
     payment_id: Varchar<255> | null;
     order_id: Varchar<255> | null;
     notes: CodecTypes['pg/text@1']['output'] | null;
+    warranty_days: CodecTypes['pg/int4@1']['output'] | null;
+    warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     customer: public_users;
@@ -2382,6 +2392,16 @@ type ContractBase = Omit<
                 readonly notes: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly warranty_days: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly warranty_expires_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
                   readonly nullable: true;
                 };
                 readonly created_at: {
@@ -5170,6 +5190,17 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly warranty_days: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly warranty_expires_at: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
               readonly created_at: {
                 readonly nullable: false;
                 readonly type: {
@@ -5266,6 +5297,8 @@ type ContractBase = Omit<
                 readonly payment_id: { readonly column: 'payment_id' };
                 readonly order_id: { readonly column: 'order_id' };
                 readonly notes: { readonly column: 'notes' };
+                readonly warranty_days: { readonly column: 'warranty_days' };
+                readonly warranty_expires_at: { readonly column: 'warranty_expires_at' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
               };

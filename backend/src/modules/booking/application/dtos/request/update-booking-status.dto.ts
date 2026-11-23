@@ -16,6 +16,8 @@ export interface UpdateBookingRepoDto {
     notes?: string | null;
     paymentStatus?: BookingPaymentStatus;
     totalAmount?: number;
+    warrantyDays?: number | null;
+    warrantyExpiresAt?: Date | string | null;
 }
 
 export interface AdminUpdateBookingStatusInputDto {

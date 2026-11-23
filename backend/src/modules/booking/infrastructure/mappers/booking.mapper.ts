@@ -189,6 +189,8 @@ export class BookingMapper {
         const createdDate = parseDate(record.created_at);
         const updatedDate = parseDate(record.updated_at);
         const scheduledDate = parseNullableDate(record.scheduled_date);
+        const warrantyExpiresAt = parseNullableDate(record.warranty_expires_at);
+        const warrantyDays = record.warranty_days !== undefined && record.warranty_days !== null ? Number(record.warranty_days) : null;
 
         return new Booking(
             record.id,
@@ -210,7 +212,9 @@ export class BookingMapper {
             (record.payment_status as BookingPaymentStatus) || (record.status === "COMPLETED" ? "PAID" : record.status === "CANCELLED" ? "REFUNDED" : "ADVANCE_PAID"),
             record.advance_amount !== undefined && record.advance_amount !== null && Number(record.advance_amount) > 0
                 ? Number(record.advance_amount)
-                : Number(record.total_amount)
+                : Number(record.total_amount),
+            warrantyDays,
+            warrantyExpiresAt
         );
     }
 
@@ -433,6 +437,17 @@ export class BookingMapper {
         }
         if (data.notes !== undefined) {
             payload.notes = data.notes;
+        }
+        if (data.warrantyDays !== undefined) {
+            payload.warranty_days = data.warrantyDays;
+        }
+        if (data.warrantyExpiresAt !== undefined) {
+            if (!data.warrantyExpiresAt) {
+                payload.warranty_expires_at = null;
+            } else {
+                const dateObj = data.warrantyExpiresAt instanceof Date ? data.warrantyExpiresAt : new Date(data.warrantyExpiresAt);
+                payload.warranty_expires_at = Temporal.Instant.fromEpochMilliseconds(dateObj.getTime());
+            }
         }
         return payload;
     }

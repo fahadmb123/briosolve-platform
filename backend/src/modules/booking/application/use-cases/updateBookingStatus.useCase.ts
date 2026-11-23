@@ -159,7 +159,9 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             status: input.status,
             notes: serializedNotes,
             paymentStatus: nextPaymentStatus,
-            totalAmount: resolvedTotalAmount
+            totalAmount: resolvedTotalAmount,
+            warrantyDays: warranty?.days ?? undefined,
+            warrantyExpiresAt: warranty?.expiresAt ?? undefined
         });
 
         if (!updated) {

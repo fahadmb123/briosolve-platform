@@ -572,6 +572,9 @@ model bookings {
 
   notes              String?
 
+  warranty_days       Int?
+  warranty_expires_at DateTime?
+
   created_at         DateTime             @default(now())
   updated_at         temporal.updatedAt()
 

@@ -20,6 +20,8 @@ export class Booking {
         public readonly created_at: Date,
         public readonly updated_at: Date,
         public readonly payment_status: BookingPaymentStatus = "ADVANCE_PAID",
-        public readonly advance_amount: number = 0
+        public readonly advance_amount: number = 0,
+        public readonly warranty_days: number | null = null,
+        public readonly warranty_expires_at: Date | null = null
     ) {}
 }
