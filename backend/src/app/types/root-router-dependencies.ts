@@ -19,4 +19,5 @@ export interface RootRouterDependencies {
     bookingRoutes: ExpressRouter;
     walletRoutes: ExpressRouter;
     supportRoutes: ExpressRouter;
+    dashboardRoutes: ExpressRouter;
 }

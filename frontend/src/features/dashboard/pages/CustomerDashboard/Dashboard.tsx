@@ -1,338 +1,343 @@
-import './Dashboard.css';
+import { Link } from "react-router-dom";
+import { useCustomerDashboard } from "../../hooks/useDashboard";
+import { useAuthStore } from "../../../auth/stores/auth.store";
+import "./Dashboard.css";
 
-import { Link } from 'react-router-dom';
-export default function Dashboard() {
+export default function CustomerDashboard() {
+  const { data, isLoading } = useCustomerDashboard();
+  const authUser = useAuthStore((state) => state.user);
+
+  const userName = data?.user?.name || authUser?.name || "Customer";
+  const stats = data?.stats || {
+    activeRequestsCount: 0,
+    quotationsReceivedCount: 0,
+    upcomingBookingsCount: 0,
+    completedServicesCount: 0,
+    totalCompletedSpend: 0,
+  };
+  const activeRequests = data?.activeRequests || [];
+  const upcomingBookings = data?.upcomingBookings || [];
+  const recentActivity = data?.recentActivity || [];
+
   return (
-    <>
-      
     <div className="app-content">
-                
-                <div className="welcome-header flex justify-between items-center flex-wrap gap-4 mb-8">
-                    <div>
-                        <h1 className="h2 mb-1">Welcome back, Aarav 👋</h1>
-                        <p className="text-secondary text-sm">
-                            You have <span className="text-primary font-semibold">7 new quotations</span> waiting for your review across 2 active requests.
-                        </p>
-                    </div>
-                    <Link to="/request-service" className="btn btn-primary btn-lg cta-pulse-btn">
-                        <i className="fas fa-plus-circle"></i>
-                        <span>Post a Service Request</span>
-                    </Link>
-                </div>
+      <div className="welcome-header flex justify-between items-center flex-wrap gap-4 mb-8">
+        <div>
+          <h1 className="h2 mb-1">Welcome back, {userName} 👋</h1>
+          <p className="text-secondary text-sm">
+            {stats.quotationsReceivedCount > 0 ? (
+              <>
+                You have{" "}
+                <span className="text-primary font-semibold">
+                  {stats.quotationsReceivedCount} quotation{stats.quotationsReceivedCount !== 1 ? "s" : ""}
+                </span>{" "}
+                waiting for your review across {stats.activeRequestsCount} active request{stats.activeRequestsCount !== 1 ? "s" : ""}.
+              </>
+            ) : stats.activeRequestsCount > 0 ? (
+              <>
+                You have{" "}
+                <span className="text-primary font-semibold">
+                  {stats.activeRequestsCount} active request{stats.activeRequestsCount !== 1 ? "s" : ""}
+                </span>{" "}
+                live on the marketplace awaiting provider quotes.
+              </>
+            ) : (
+              "Post a service request to start receiving competitive quotes from verified local providers."
+            )}
+          </p>
+        </div>
+        <Link to="/request-service" className="btn btn-primary btn-lg cta-pulse-btn">
+          <i className="fas fa-plus-circle"></i>
+          <span>Post a Service Request</span>
+        </Link>
+      </div>
 
-                
-                <div className="dashboard-stats-grid mb-8">
-                    <div className="card stat-widget">
-                        <div className="stat-icon-wrapper bg-primary-light text-primary">
-                            <i className="fas fa-file-alt"></i>
-                        </div>
-                        <div className="stat-body">
-                            <div className="stat-value">3</div>
-                            <div className="stat-title">Active Requests</div>
-                            <div className="stat-meta text-success"><i className="fas fa-arrow-up"></i> 1 posted today</div>
-                        </div>
-                    </div>
-
-                    <div className="card stat-widget">
-                        <div className="stat-icon-wrapper bg-warning-light text-warning">
-                            <i className="fas fa-file-invoice-dollar"></i>
-                        </div>
-                        <div className="stat-body">
-                            <div className="stat-value">7</div>
-                            <div className="stat-title">Quotations Received</div>
-                            <div className="stat-meta text-primary"><i className="fas fa-balance-scale"></i> Ready to compare</div>
-                        </div>
-                    </div>
-
-                    <div className="card stat-widget">
-                        <div className="stat-icon-wrapper bg-info-light text-info">
-                            <i className="fas fa-calendar-check"></i>
-                        </div>
-                        <div className="stat-body">
-                            <div className="stat-value">1</div>
-                            <div className="stat-title">Upcoming Booking</div>
-                            <div className="stat-meta text-secondary"><i className="fas fa-clock"></i> Tomorrow, 10:30 AM</div>
-                        </div>
-                    </div>
-
-                    <div className="card stat-widget">
-                        <div className="stat-icon-wrapper bg-success-light text-success">
-                            <i className="fas fa-check-circle"></i>
-                        </div>
-                        <div className="stat-body">
-                            <div className="stat-value">14</div>
-                            <div className="stat-title">Completed Services</div>
-                            <div className="stat-meta text-muted">₹42,800 Total value</div>
-                        </div>
-                    </div>
-                </div>
-
-                
-                <div className="dashboard-main-grid">
-                    
-                    <div className="grid-left flex flex-col gap-6">
-                        
-                        <div className="card">
-                            <div className="card-header flex justify-between items-center">
-                                <div>
-                                    <h2 className="h5 mb-0">Active Service Requests</h2>
-                                    <p className="text-xs text-secondary mb-0">Track quotes received from competing providers</p>
-                                </div>
-                                <Link to="#" className="btn btn-text text-xs">
-                                    View All <i className="fas fa-chevron-right ml-1"></i>
-                                </Link>
-                            </div>
-
-                            <div className="table-responsive">
-                                <table className="table mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Requirement</th>
-                                            <th>Category</th>
-                                            <th>Budget Range</th>
-                                            <th>Quotations</th>
-                                            <th>Status</th>
-                                            <th className="text-right">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <Link to="#" className="font-semibold text-text hover-primary">
-                                                    Bathroom Plumbing & Pipe Leak Repair
-                                                </Link>
-                                                <div className="text-xs text-secondary mt-1">
-                                                    <i className="fas fa-map-marker-alt"></i> Andheri West, Mumbai • Needed by Oct 15
-                                                </div>
-                                            </td>
-                                            <td><span className="badge badge-secondary">Plumbing</span></td>
-                                            <td className="font-medium">₹1,500 - ₹2,500</td>
-                                            <td>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="badge badge-warning font-semibold">4 Bids</span>
-                                                    <span className="text-xs text-secondary">from ₹1,400</span>
-                                                </div>
-                                            </td>
-                                            <td><span className="badge badge-warning">Receiving Bids</span></td>
-                                            <td className="text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Link to="#" className="btn btn-secondary text-xs py-1">
-                                                        View Quotes (4)
-                                                    </Link>
-                                                    <Link to="#" className="btn btn-primary text-xs py-1">
-                                                        Compare
-                                                    </Link>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <Link to="#" className="font-semibold text-text hover-primary">
-                                                    Split AC Master Cleaning & Gas Refill
-                                                </Link>
-                                                <div className="text-xs text-secondary mt-1">
-                                                    <i className="fas fa-map-marker-alt"></i> Bandra, Mumbai • Needed by Oct 18
-                                                </div>
-                                            </td>
-                                            <td><span className="badge badge-secondary">AC Repair</span></td>
-                                            <td className="font-medium">₹1,800 - ₹2,200</td>
-                                            <td>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="badge badge-warning font-semibold">3 Bids</span>
-                                                    <span className="text-xs text-secondary">from ₹1,750</span>
-                                                </div>
-                                            </td>
-                                            <td><span className="badge badge-warning">Receiving Bids</span></td>
-                                            <td className="text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Link to="#" className="btn btn-secondary text-xs py-1">
-                                                        View Quotes (3)
-                                                    </Link>
-                                                    <Link to="#" className="btn btn-primary text-xs py-1">
-                                                        Compare
-                                                    </Link>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <Link to="#" className="font-semibold text-text hover-primary">
-                                                    Full 2BHK Deep House Sanitization
-                                                </Link>
-                                                <div className="text-xs text-secondary mt-1">
-                                                    <i className="fas fa-map-marker-alt"></i> Juhu, Mumbai • Needed by Oct 24
-                                                </div>
-                                            </td>
-                                            <td><span className="badge badge-secondary">Cleaning</span></td>
-                                            <td className="font-medium">₹4,000 - ₹5,500</td>
-                                            <td>
-                                                <span className="text-xs text-muted">Awaiting initial bids</span>
-                                            </td>
-                                            <td><span className="badge badge-primary">Published</span></td>
-                                            <td className="text-right">
-                                                <Link to="#" className="btn btn-secondary text-xs py-1">
-                                                    View Details
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        
-                        <div className="card">
-                            <div className="card-header flex justify-between items-center">
-                                <div>
-                                    <h2 className="h5 mb-0">Upcoming Bookings</h2>
-                                    <p className="text-xs text-secondary mb-0">Services confirmed and scheduled with providers</p>
-                                </div>
-                                <Link to="#" className="btn btn-text text-xs">
-                                    All Bookings <i className="fas fa-chevron-right ml-1"></i>
-                                </Link>
-                            </div>
-
-                            <div className="card-body">
-                                <div className="booking-card-item p-4 bg-surface-elevated rounded border flex justify-between items-center flex-wrap gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="date-badge-box text-center">
-                                            <div className="date-month text-xs text-uppercase font-semibold text-primary">OCT</div>
-                                            <div className="date-day font-bold text-lg">14</div>
-                                        </div>
-
-                                        <div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <h3 className="h6 mb-0">Kitchen Water Purifier Installation</h3>
-                                                <span className="badge badge-info">Confirmed</span>
-                                            </div>
-                                            <div className="text-xs text-secondary mb-2">
-                                                Scheduled Time: <strong>10:30 AM - 11:30 AM</strong> • Booking ID: #BK-9204
-                                            </div>
-
-                                            
-                                            <div className="flex items-center gap-2">
-                                                <img src="https://ui-avatars.com/api/?name=Rajesh+Patil&background=334155&color=fff" alt="Rajesh Patil" className="avatar avatar-sm" />
-                                                <span className="text-xs font-semibold">Rajesh Patil</span>
-                                                <span className="badge badge-success text-xs py-0 px-2"><i className="fas fa-check-circle mr-1"></i> Verified</span>
-                                                <span className="text-xs text-warning"><i className="fas fa-star"></i> 4.9 (184 jobs)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <div className="text-right">
-                                            <div className="text-xs text-secondary">Total Agreed</div>
-                                            <div className="font-bold text-base text-text">₹1,200</div>
-                                        </div>
-                                        <Link to="#" className="btn btn-secondary btn-sm" aria-label="Chat with Provider">
-                                            <i className="fas fa-comment-dots"></i> Chat
-                                        </Link>
-                                        <Link to="#" className="btn btn-outline btn-sm">
-                                            Manage
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-                    <div className="grid-right flex flex-col gap-6">
-                        
-                        <div className="card">
-                            <div className="card-header">
-                                <h2 className="h5 mb-0">Recent Activity</h2>
-                            </div>
-                            <div className="card-body p-0">
-                                <ul className="activity-feed">
-                                    <li className="activity-feed-item">
-                                        <div className="feed-icon bg-warning-light text-warning">
-                                            <i className="fas fa-file-invoice-dollar"></i>
-                                        </div>
-                                        <div className="feed-content">
-                                            <div className="feed-title">
-                                                <strong>Apex Plumbing Solutions</strong> submitted a quote of <strong>₹1,600</strong>
-                                            </div>
-                                            <div className="feed-meta text-xs text-secondary">
-                                                For: Bathroom Plumbing Repair • 20 mins ago
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li className="activity-feed-item">
-                                        <div className="feed-icon bg-info-light text-info">
-                                            <i className="fas fa-comments"></i>
-                                        </div>
-                                        <div className="feed-content">
-                                            <div className="feed-title">
-                                                New message from <strong>Rajesh Patil</strong>
-                                            </div>
-                                            <div className="feed-preview text-xs text-muted">
-                                                "I have picked up the RO filter spares. See you tomorrow at 10:30."
-                                            </div>
-                                            <div className="feed-meta text-xs text-secondary mt-1">
-                                                1 hour ago
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li className="activity-feed-item">
-                                        <div className="feed-icon bg-success-light text-success">
-                                            <i className="fas fa-check-double"></i>
-                                        </div>
-                                        <div className="feed-content">
-                                            <div className="feed-title">
-                                                Booking <strong>#BK-9204</strong> Confirmed
-                                            </div>
-                                            <div className="feed-meta text-xs text-secondary">
-                                                Provider accepted your schedule • 3 hours ago
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li className="activity-feed-item">
-                                        <div className="feed-icon bg-primary-light text-primary">
-                                            <i className="fas fa-paper-plane"></i>
-                                        </div>
-                                        <div className="feed-content">
-                                            <div className="feed-title">
-                                                New Request Published
-                                            </div>
-                                            <div className="feed-meta text-xs text-secondary">
-                                                Split AC Master Cleaning • 5 hours ago
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        
-                        <div className="card p-5 border-primary">
-                            <div className="flex items-start gap-3">
-                                <div className="tip-icon text-primary"><i className="fas fa-lightbulb"></i></div>
-                                <div>
-                                    <h3 className="h6 mb-1 text-primary">Marketplace Tip</h3>
-                                    <p className="text-xs text-secondary mb-3">
-                                        Comparing quotations? Don't just look at the price. Check provider completion ratings, warranty offered on parts, and past customer reviews.
-                                    </p>
-                                    <Link to="#" className="btn btn-outline text-xs py-1">
-                                        Open Provider Comparison Tool
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <div className="dashboard-stats-grid mb-8">
+        <div className="card stat-widget">
+          <div className="stat-icon-wrapper bg-primary-light text-primary">
+            <i className="fas fa-file-alt"></i>
+          </div>
+          <div className="stat-body">
+            <div className="stat-value">{isLoading ? "-" : stats.activeRequestsCount}</div>
+            <div className="stat-title">Active Requests</div>
+            <div className="stat-meta text-primary">
+              <i className="fas fa-layer-group"></i> Marketplace leads
             </div>
-        
-    
+          </div>
+        </div>
 
-    
-    
+        <div className="card stat-widget">
+          <div className="stat-icon-wrapper bg-warning-light text-warning">
+            <i className="fas fa-file-invoice-dollar"></i>
+          </div>
+          <div className="stat-body">
+            <div className="stat-value">{isLoading ? "-" : stats.quotationsReceivedCount}</div>
+            <div className="stat-title">Quotations Received</div>
+            <div className="stat-meta text-warning">
+              <i className="fas fa-balance-scale"></i> Competitive bids
+            </div>
+          </div>
+        </div>
 
-    </>
+        <div className="card stat-widget">
+          <div className="stat-icon-wrapper bg-info-light text-info">
+            <i className="fas fa-calendar-check"></i>
+          </div>
+          <div className="stat-body">
+            <div className="stat-value">{isLoading ? "-" : stats.upcomingBookingsCount}</div>
+            <div className="stat-title">Upcoming Bookings</div>
+            <div className="stat-meta text-secondary">
+              <i className="fas fa-clock"></i> Scheduled jobs
+            </div>
+          </div>
+        </div>
+
+        <div className="card stat-widget">
+          <div className="stat-icon-wrapper bg-success-light text-success">
+            <i className="fas fa-check-circle"></i>
+          </div>
+          <div className="stat-body">
+            <div className="stat-value">{isLoading ? "-" : stats.completedServicesCount}</div>
+            <div className="stat-title">Completed Services</div>
+            <div className="stat-meta text-muted">
+              ₹{stats.totalCompletedSpend.toLocaleString("en-IN")} Total value
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-main-grid">
+        <div className="grid-left flex flex-col gap-6">
+          <div className="card">
+            <div className="card-header flex justify-between items-center">
+              <div>
+                <h2 className="h5 mb-0">Active Service Requests</h2>
+                <p className="text-xs text-secondary mb-0">Track quotes received from competing providers</p>
+              </div>
+              <Link to="/my-requests" className="btn btn-text text-xs">
+                View All <i className="fas fa-chevron-right ml-1"></i>
+              </Link>
+            </div>
+
+            <div className="table-responsive">
+              {activeRequests.length > 0 ? (
+                <table className="table mb-0">
+                  <thead>
+                    <tr>
+                      <th>Requirement</th>
+                      <th>Category</th>
+                      <th>Urgency</th>
+                      <th>Quotations</th>
+                      <th>Status</th>
+                      <th className="text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activeRequests.map((req) => (
+                      <tr key={req.id}>
+                        <td>
+                          <Link to="/my-requests" className="font-semibold text-text hover-primary">
+                            {req.title}
+                          </Link>
+                          <div className="text-xs text-secondary mt-1">
+                            <i className="fas fa-map-marker-alt mr-1"></i>
+                            {req.location}
+                          </div>
+                        </td>
+                        <td>
+                          <span className="badge badge-secondary">{req.categoryName}</span>
+                        </td>
+                        <td className="font-medium text-xs">
+                          {req.urgency.replace(/_/g, " ")}
+                        </td>
+                        <td>
+                          {req.quotationsCount > 0 ? (
+                            <div className="flex items-center gap-2">
+                              <span className="badge badge-warning font-semibold">
+                                {req.quotationsCount} Bid{req.quotationsCount !== 1 ? "s" : ""}
+                              </span>
+                              {req.minQuoteAmount !== undefined && (
+                                <span className="text-xs text-secondary">
+                                  from ₹{req.minQuoteAmount.toLocaleString("en-IN")}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-muted">Awaiting bids</span>
+                          )}
+                        </td>
+                        <td>
+                          <span className="badge badge-primary">{req.status}</span>
+                        </td>
+                        <td className="text-right">
+                          <Link to="/my-requests" className="btn btn-secondary text-xs py-1">
+                            View Quotes ({req.quotationsCount})
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="p-6 text-center">
+                  <div className="text-secondary text-sm mb-3">
+                    You do not have any active service requests right now.
+                  </div>
+                  <Link to="/request-service" className="btn btn-outline text-xs">
+                    <i className="fas fa-plus mr-1"></i> Create a Request
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-header flex justify-between items-center">
+              <div>
+                <h2 className="h5 mb-0">Upcoming Bookings</h2>
+                <p className="text-xs text-secondary mb-0">Services confirmed and scheduled with providers</p>
+              </div>
+              <Link to="/bookings" className="btn btn-text text-xs">
+                All Bookings <i className="fas fa-chevron-right ml-1"></i>
+              </Link>
+            </div>
+
+            <div className="card-body">
+              {upcomingBookings.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {upcomingBookings.map((b) => {
+                    const dateObj = b.scheduledDate ? new Date(b.scheduledDate) : null;
+                    const monthStr = dateObj ? dateObj.toLocaleString("en-US", { month: "short" }).toUpperCase() : "SCHED";
+                    const dayStr = dateObj ? dateObj.getDate() : "--";
+
+                    return (
+                      <div
+                        key={b.id}
+                        className="booking-card-item p-4 bg-surface-elevated rounded border flex justify-between items-center flex-wrap gap-4"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="date-badge-box text-center">
+                            <div className="date-month text-xs text-uppercase font-semibold text-primary">
+                              {monthStr}
+                            </div>
+                            <div className="date-day font-bold text-lg">{dayStr}</div>
+                          </div>
+
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="h6 mb-0">{b.serviceTitle}</h3>
+                              <span className="badge badge-info">{b.status}</span>
+                            </div>
+                            <div className="text-xs text-secondary mb-2">
+                              {b.scheduledTime && (
+                                <>
+                                  Scheduled Time: <strong>{b.scheduledTime}</strong> •{" "}
+                                </>
+                              )}
+                              Booking ID: #{b.bookingNumber}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <img
+                                src={
+                                  b.providerAvatar ||
+                                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                    b.providerName
+                                  )}&background=334155&color=fff`
+                                }
+                                alt={b.providerName}
+                                className="avatar avatar-sm"
+                              />
+                              <span className="text-xs font-semibold">{b.providerName}</span>
+                              <span className="badge badge-secondary text-xs py-0 px-2">{b.categoryName}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <div className="text-xs text-secondary">Total Agreed</div>
+                            <div className="font-bold text-base text-text">
+                              ₹{b.totalAmount.toLocaleString("en-IN")}
+                            </div>
+                          </div>
+                          <Link
+                            to="/messages"
+                            className="btn btn-secondary btn-sm"
+                            aria-label="Chat with Provider"
+                          >
+                            <i className="fas fa-comment-dots"></i> Chat
+                          </Link>
+                          <Link to={`/bookings/${b.id}`} className="btn btn-outline btn-sm">
+                            Manage
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="p-6 text-center text-secondary text-sm">
+                  No upcoming bookings. Confirmed services will appear here.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid-right flex flex-col gap-6">
+          <div className="card">
+            <div className="card-header">
+              <h2 className="h5 mb-0">Recent Activity</h2>
+            </div>
+            <div className="card-body p-0">
+              {recentActivity.length > 0 ? (
+                <ul className="activity-feed">
+                  {recentActivity.map((act) => (
+                    <li key={act.id} className="activity-feed-item">
+                      <div className="feed-icon bg-primary-light text-primary">
+                        <i className="fas fa-bell"></i>
+                      </div>
+                      <div className="feed-content">
+                        <div className="feed-title">
+                          <strong>{act.title}</strong>
+                        </div>
+                        <div className="feed-preview text-xs text-secondary mt-1">
+                          {act.message}
+                        </div>
+                        <div className="feed-meta text-xs text-muted mt-1">
+                          {new Date(act.createdAt).toLocaleString()}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="p-5 text-center text-secondary text-xs">
+                  No recent activity recorded yet.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="card p-5 border-primary">
+            <div className="flex items-start gap-3">
+              <div className="tip-icon text-primary">
+                <i className="fas fa-lightbulb"></i>
+              </div>
+              <div>
+                <h3 className="h6 mb-1 text-primary">Marketplace Tip</h3>
+                <p className="text-xs text-secondary mb-3">
+                  Comparing quotations? Don't just look at the price. Check provider completion ratings, warranties offered on workmanship, and scope of included services.
+                </p>
+                <Link to="/my-requests" className="btn btn-outline text-xs py-1">
+                  View Active Quotes
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
