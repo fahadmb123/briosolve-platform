@@ -5,10 +5,18 @@ import {
   useGetBookingById,
   useUpdateBookingStatus,
   useReportBookingMismatch,
-  useResolveBookingMismatch
+  useResolveBookingMismatch,
+  useSubmitWarrantyClaim,
+  useResolveWarrantyClaim
 } from "../../hooks/useBookingMutations";
 import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
-import { BookingStatusModal, ServiceMismatchModal } from "../../components";
+import {
+  BookingStatusModal,
+  ServiceMismatchModal,
+  WarrantyProtectionCard,
+  CustomerWarrantyClaimModal,
+  ProviderWarrantyActionModal
+} from "../../components";
 import { RaiseDisputeModal } from "../../../support";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
@@ -37,6 +45,8 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const updateStatusMutation = useUpdateBookingStatus();
   const reportMismatchMutation = useReportBookingMismatch();
   const resolveMismatchMutation = useResolveBookingMismatch();
+  const submitWarrantyClaimMutation = useSubmitWarrantyClaim();
+  const resolveWarrantyClaimMutation = useResolveWarrantyClaim();
 
   const booking: BookingItem | null = responseData?.data || initialBooking;
 
@@ -44,6 +54,8 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
   const [isMismatchModalOpen, setIsMismatchModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [isCustomerClaimModalOpen, setIsCustomerClaimModalOpen] = useState(false);
+  const [providerActionModalMode, setProviderActionModalMode] = useState<"ACCEPT" | "REJECT" | "RESOLVE" | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const activeRazorpayRef = useRef<any>(null);
 
@@ -1174,6 +1186,15 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
         </div>
       )}
 
+      {booking.status === "COMPLETED" && booking.warranty && booking.warranty.days > 0 && (
+        <WarrantyProtectionCard
+          booking={booking}
+          role={isProvider ? "PROVIDER" : "CUSTOMER"}
+          onRequestClaim={() => setIsCustomerClaimModalOpen(true)}
+          onProviderAction={(mode) => setProviderActionModalMode(mode)}
+        />
+      )}
+
       <div className="bkdet-layout-grid">
         <div className="bkdet-col-main">
           <div className="bkdet-section-card">
@@ -1347,8 +1368,23 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
               <div className="bkdet-meta-box">
                 <div className="bkdet-meta-box-label">Service Warranty</div>
-                <div className="bkdet-meta-box-value" style={{ color: "#16a34a", fontWeight: 600 }}>
-                  15-Day Protection Active
+                <div className="bkdet-meta-box-value">
+                  {booking.warranty && booking.warranty.days > 0 ? (
+                    (() => {
+                      const isExpired = booking.warranty.expiresAt
+                        ? new Date(booking.warranty.expiresAt).getTime() < Date.now()
+                        : false;
+                      return (
+                        <span style={{ color: isExpired ? "#64748b" : "#16a34a", fontWeight: 600 }}>
+                          {booking.warranty.days}-Day {isExpired ? "Expired" : "Coverage Active"}
+                        </span>
+                      );
+                    })()
+                  ) : (
+                    <span style={{ color: "#64748b", fontWeight: 500 }}>
+                      {booking.status === "COMPLETED" ? "No Warranty" : "Not Provided"}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -1675,6 +1711,55 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           onSubmitConcern={() => {
             toast.success("Concern submitted successfully. Our resolution team will review it.");
             navigate(isProvider ? "/provider/support" : "/support");
+          }}
+        />
+      )}
+
+      {isCustomerClaimModalOpen && booking && (
+        <CustomerWarrantyClaimModal
+          isOpen={isCustomerClaimModalOpen}
+          booking={booking}
+          isLoading={submitWarrantyClaimMutation.isPending}
+          onClose={() => setIsCustomerClaimModalOpen(false)}
+          onSubmit={(payload) => {
+            submitWarrantyClaimMutation.mutate(
+              { id: booking.id, payload },
+              {
+                onSuccess: () => {
+                  toast.success("Warranty claim submitted successfully");
+                  setIsCustomerClaimModalOpen(false);
+                  refetch();
+                },
+                onError: (err: any) => {
+                  toast.error(err?.response?.data?.message || "Failed to submit warranty claim");
+                }
+              }
+            );
+          }}
+        />
+      )}
+
+      {providerActionModalMode && booking && (
+        <ProviderWarrantyActionModal
+          isOpen={!!providerActionModalMode}
+          booking={booking}
+          mode={providerActionModalMode}
+          isLoading={resolveWarrantyClaimMutation.isPending}
+          onClose={() => setProviderActionModalMode(null)}
+          onSubmit={(payload) => {
+            resolveWarrantyClaimMutation.mutate(
+              { id: booking.id, payload },
+              {
+                onSuccess: () => {
+                  toast.success("Warranty action updated successfully");
+                  setProviderActionModalMode(null);
+                  refetch();
+                },
+                onError: (err: any) => {
+                  toast.error(err?.response?.data?.message || "Failed to update warranty claim");
+                }
+              }
+            );
           }}
         />
       )}
