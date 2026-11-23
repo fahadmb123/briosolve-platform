@@ -126,9 +126,10 @@ export const WarrantyProtectionCard: React.FC<WarrantyProtectionCardProps> = ({
             {claim.status === "PENDING" && (
               <div className="warranty-claim-grid">
                 <div className="warranty-claim-field">
-                  <span className="warranty-claim-lbl">Customer Preferred Slot:</span>
+                  <span className="warranty-claim-lbl">Customer Availability Window:</span>
                   <span className="warranty-claim-val">
-                    {claim.preferredDate ? `${claim.preferredDate} ${claim.preferredTime ? `(${claim.preferredTime})` : ""}` : "Any available slot"}
+                    {claim.preferredDate ? `Any day until ${formatDate(claim.preferredDate)}` : "Flexible availability"}
+                    {claim.preferredTime ? ` • ${claim.preferredTime}` : ""}
                   </span>
                 </div>
                 <div className="warranty-claim-field">

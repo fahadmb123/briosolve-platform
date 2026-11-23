@@ -20,13 +20,14 @@
   background: #ffffff;
   border-radius: 16px;
   width: 100%;
-  max-width: 560px;
+  max-width: 580px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   animation: bkclaimSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
 @keyframes bkclaimSlideUp {
@@ -99,14 +100,13 @@
 }
 
 .bkclaim-warranty-banner {
-  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-  border-bottom: 1px solid #d1fae5;
-  padding: 0.875rem 1.5rem;
+  background: #f0fdf4;
+  border-bottom: 1px solid #bbf7d0;
+  padding: 0.85rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  flex-wrap: wrap;
 }
 
 .bkclaim-banner-stat {
@@ -115,23 +115,23 @@
 }
 
 .bkclaim-banner-label {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   font-weight: 700;
+  color: #15803d;
   letter-spacing: 0.05em;
-  color: #047857;
 }
 
 .bkclaim-banner-value {
   font-size: 0.95rem;
-  font-weight: 800;
-  color: #065f46;
+  font-weight: 700;
+  color: #166534;
 }
 
 .bkclaim-banner-info {
   font-size: 0.825rem;
-  color: #047857;
-  max-width: 300px;
+  color: #166534;
+  text-align: right;
 }
 
 .bkclaim-body {
@@ -139,15 +139,15 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
+  gap: 1rem;
 }
 
 .bkclaim-error-box {
   background: #fef2f2;
   border: 1px solid #fecaca;
   color: #dc2626;
-  padding: 0.75rem 1rem;
   border-radius: 8px;
+  padding: 0.65rem 0.9rem;
   font-size: 0.85rem;
   display: flex;
   align-items: center;
@@ -160,8 +160,23 @@
   gap: 0.4rem;
 }
 
+.bkclaim-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bkclaim-count-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
 .bkclaim-field label {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #334155;
 }
@@ -170,26 +185,28 @@
   color: #ef4444;
 }
 
-.bkclaim-textarea,
-.bkclaim-input,
-.bkclaim-select {
-  width: 100%;
-  padding: 0.65rem 0.85rem;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  color: #0f172a;
-  background: #ffffff;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  box-sizing: border-box;
+.bkclaim-field-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.15rem;
 }
 
-.bkclaim-textarea:focus,
-.bkclaim-input:focus,
-.bkclaim-select:focus {
+.bkclaim-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.9rem;
+  color: #0f172a;
   outline: none;
+  resize: vertical;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.bkclaim-textarea:focus {
   border-color: #059669;
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
 }
 
 .bkclaim-grid-2 {
@@ -198,73 +215,135 @@
   gap: 1rem;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
   .bkclaim-grid-2 {
     grid-template-columns: 1fr;
   }
 }
 
-.bkclaim-photo-input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.bkclaim-btn-add-img {
-  background: #f1f5f9;
-  border: 1.5px solid #cbd5e1;
-  color: #334155;
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 0 1rem;
+.bkclaim-input,
+.bkclaim-select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
   border-radius: 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.875rem;
+  color: #0f172a;
+  outline: none;
+  background: #ffffff;
   transition: all 0.15s;
 }
 
-.bkclaim-btn-add-img:hover:not(:disabled) {
-  background: #e2e8f0;
-  border-color: #94a3b8;
+.bkclaim-input:focus,
+.bkclaim-select:focus {
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
 }
 
-.bkclaim-btn-add-img:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.bkclaim-thumbnails {
+.bkclaim-dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
   display: flex;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.bkclaim-thumbnail-item {
+.bkclaim-dropzone:hover:not(.disabled) {
+  border-color: #059669;
+  background: #f0fdf4;
+}
+
+.bkclaim-dropzone.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  border-color: #e2e8f0;
+}
+
+.bkclaim-dropzone-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #059669;
+  margin-bottom: 0.5rem;
+}
+
+.bkclaim-dropzone-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.2rem;
+}
+
+.bkclaim-dropzone-sub {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.bkclaim-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.bkclaim-preview-item {
   position: relative;
-  width: 72px;
-  height: 72px;
-  border-radius: 8px;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
   overflow: hidden;
   border: 1.5px solid #e2e8f0;
+  cursor: pointer;
 }
 
-.bkclaim-thumbnail-item img {
+.bkclaim-preview-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.2s ease;
 }
 
-.bkclaim-thumb-remove {
+.bkclaim-preview-item:hover img {
+  transform: scale(1.05);
+}
+
+.bkclaim-preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  font-size: 1rem;
+}
+
+.bkclaim-preview-item:hover .bkclaim-preview-overlay {
+  opacity: 1;
+}
+
+.bkclaim-preview-remove {
   position: absolute;
   top: 4px;
   right: 4px;
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(15, 23, 42, 0.8);
   color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 50%;
   width: 22px;
   height: 22px;
   display: flex;
@@ -272,10 +351,11 @@
   justify-content: center;
   font-size: 0.75rem;
   cursor: pointer;
+  z-index: 2;
   transition: background 0.15s;
 }
 
-.bkclaim-thumb-remove:hover {
+.bkclaim-preview-remove:hover {
   background: #dc2626;
 }
 
@@ -347,4 +427,57 @@
 .bkclaim-btn-cancel:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.bkclaim-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: bkclaimFadeIn 0.15s ease-out;
+}
+
+.bkclaim-lightbox-box {
+  position: relative;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bkclaim-lightbox-box img {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.bkclaim-lightbox-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #0f172a;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background 0.15s;
+}
+
+.bkclaim-lightbox-close:hover {
+  background: #f1f5f9;
 }

@@ -120,7 +120,7 @@ export const ProviderWarrantyActionModal: React.FC<ProviderWarrantyActionModalPr
               <p className="praction-claim-desc">"{claim.issueDescription}"</p>
               {claim.preferredDate && (
                 <div className="praction-claim-pref">
-                  <i className="far fa-clock" /> Customer Preferred: {claim.preferredDate} {claim.preferredTime ? `(${claim.preferredTime})` : ""}
+                  <i className="far fa-clock" /> Available Until: {claim.preferredDate} {claim.preferredTime ? `• ${claim.preferredTime}` : ""}
                 </div>
               )}
             </div>

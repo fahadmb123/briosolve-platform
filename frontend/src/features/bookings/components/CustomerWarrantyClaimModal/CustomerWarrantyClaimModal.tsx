@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import type { BookingItem } from "../../types/booking.types";
 import "./CustomerWarrantyClaimModal.css";
 
@@ -16,9 +17,11 @@ interface CustomerWarrantyClaimModalProps {
 }
 
 const TIME_SLOTS = [
+  "Anytime / Flexible (Fastest Re-visit)",
   "Morning (09:00 AM - 12:00 PM)",
   "Afternoon (12:00 PM - 04:00 PM)",
-  "Evening (04:00 PM - 07:00 PM)"
+  "Evening (04:00 PM - 07:00 PM)",
+  "Weekends Only"
 ];
 
 export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProps> = ({
@@ -30,9 +33,9 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
 }) => {
   const [issueDescription, setIssueDescription] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
-  const [preferredTime, setPreferredTime] = useState("");
-  const [imageUrlInput, setImageUrlInput] = useState("");
+  const [preferredTime, setPreferredTime] = useState(TIME_SLOTS[0]);
   const [proofImages, setProofImages] = useState<string[]>([]);
+  const [previewModalImage, setPreviewModalImage] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
   const warranty = booking?.warranty;
@@ -41,30 +44,76 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
     : (warranty?.days || 0);
 
   const todayStr = new Date().toISOString().split("T")[0];
+  const maxDateStr = warranty?.expiresAt
+    ? new Date(warranty.expiresAt).toISOString().split("T")[0]
+    : undefined;
 
   useEffect(() => {
     if (isOpen) {
       setIssueDescription("");
       setPreferredDate("");
-      setPreferredTime("");
-      setImageUrlInput("");
+      setPreferredTime(TIME_SLOTS[0]);
       setProofImages([]);
+      setPreviewModalImage(null);
       setErrorMsg("");
     }
   }, [isOpen]);
 
   if (!isOpen || !booking) return null;
 
-  const handleAddImage = () => {
-    const trimmed = imageUrlInput.trim();
-    if (!trimmed) return;
-    if (proofImages.length >= 3) {
-      setErrorMsg("Maximum 3 reference images allowed");
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    const currentCount = proofImages.length;
+    if (currentCount >= 3) {
+      toast.error("Maximum 3 photos allowed");
+      e.target.value = "";
       return;
     }
-    setProofImages((prev) => [...prev, trimmed]);
-    setImageUrlInput("");
-    setErrorMsg("");
+
+    const rawFiles = Array.from(files);
+    const validFiles: File[] = [];
+    for (const file of rawFiles) {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`"${file.name}" is not a supported image file`);
+        continue;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`"${file.name}" exceeds the 10MB limit`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    const availableSlots = 3 - currentCount;
+    if (validFiles.length > availableSlots) {
+      toast.error(`Only up to 3 photos allowed. Adding the first ${availableSlots}.`);
+    }
+
+    const filesToRead = validFiles.slice(0, availableSlots);
+    if (filesToRead.length === 0) {
+      e.target.value = "";
+      return;
+    }
+
+    const readPromises = filesToRead.map(
+      (file) =>
+        new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            if (event.target?.result) {
+              resolve(event.target.result as string);
+            }
+          };
+          reader.readAsDataURL(file);
+        })
+    );
+
+    const newImages = await Promise.all(readPromises);
+    setProofImages((prev) => [...prev, ...newImages].slice(0, 3));
+    e.target.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
@@ -142,68 +191,96 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
 
             <div className="bkclaim-grid-2">
               <div className="bkclaim-field">
-                <label>Preferred Re-visit Date</label>
+                <label>Available Any Day Until</label>
                 <input
                   type="date"
                   className="bkclaim-input"
                   min={todayStr}
+                  max={maxDateStr}
                   value={preferredDate}
                   onChange={(e) => setPreferredDate(e.target.value)}
                   disabled={isLoading}
                 />
+                <span className="bkclaim-field-hint">
+                  Technician can re-visit any day on or before this date
+                </span>
               </div>
 
               <div className="bkclaim-field">
-                <label>Preferred Time Slot</label>
+                <label>General Time Availability</label>
                 <select
                   className="bkclaim-select"
                   value={preferredTime}
                   onChange={(e) => setPreferredTime(e.target.value)}
                   disabled={isLoading}
                 >
-                  <option value="">Select a preferred slot</option>
                   {TIME_SLOTS.map((slot) => (
                     <option key={slot} value={slot}>
                       {slot}
                     </option>
                   ))}
                 </select>
+                <span className="bkclaim-field-hint">
+                  Your daily convenient time window for re-visits
+                </span>
               </div>
             </div>
 
             <div className="bkclaim-field">
-              <label>Attach Photos / Evidence URLs (Optional, max 3)</label>
-              <div className="bkclaim-photo-input-group">
-                <input
-                  type="url"
-                  className="bkclaim-input"
-                  placeholder="Paste image URL (e.g. image link)"
-                  value={imageUrlInput}
-                  onChange={(e) => setImageUrlInput(e.target.value)}
-                  disabled={isLoading || proofImages.length >= 3}
-                />
-                <button
-                  type="button"
-                  className="bkclaim-btn-add-img"
-                  onClick={handleAddImage}
-                  disabled={isLoading || !imageUrlInput.trim() || proofImages.length >= 3}
-                >
-                  <i className="fas fa-plus" /> Add
-                </button>
+              <div className="bkclaim-field-header">
+                <label>Photos of the Issue (Max 3)</label>
+                <span className="bkclaim-count-pill">{proofImages.length}/3</span>
               </div>
 
+              <input
+                type="file"
+                id="bkclaim-file-upload"
+                multiple
+                accept="image/png, image/jpeg, image/webp"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+                disabled={isLoading || proofImages.length >= 3}
+              />
+
+              <label
+                htmlFor={proofImages.length >= 3 || isLoading ? undefined : "bkclaim-file-upload"}
+                className={`bkclaim-dropzone ${proofImages.length >= 3 ? "disabled" : ""}`}
+              >
+                <div className="bkclaim-dropzone-icon">
+                  <i className={`fas ${proofImages.length >= 3 ? "fa-check-circle text-success" : "fa-cloud-upload-alt"}`} />
+                </div>
+                <div className="bkclaim-dropzone-text">
+                  {proofImages.length >= 3 ? "Maximum 3 photos uploaded" : "Click or drag photos of the issue here"}
+                </div>
+                <div className="bkclaim-dropzone-sub">
+                  Supports JPG, PNG, WEBP (up to 10MB each)
+                </div>
+              </label>
+
               {proofImages.length > 0 && (
-                <div className="bkclaim-thumbnails">
-                  {proofImages.map((url, idx) => (
-                    <div key={idx} className="bkclaim-thumbnail-item">
-                      <img src={url} alt={`Evidence ${idx + 1}`} />
+                <div className="bkclaim-preview-grid">
+                  {proofImages.map((src, idx) => (
+                    <div
+                      key={idx}
+                      className="bkclaim-preview-item"
+                      onClick={() => setPreviewModalImage(src)}
+                      title="Click to view image"
+                    >
+                      <img src={src} alt={`Upload ${idx + 1}`} />
+                      <div className="bkclaim-preview-overlay">
+                        <i className="fas fa-search-plus" />
+                      </div>
                       <button
                         type="button"
-                        className="bkclaim-thumb-remove"
-                        onClick={() => handleRemoveImage(idx)}
+                        className="bkclaim-preview-remove"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveImage(idx);
+                        }}
                         disabled={isLoading}
+                        title="Remove photo"
                       >
-                        <i className="fas fa-trash-alt" />
+                        <i className="fas fa-times" />
                       </button>
                     </div>
                   ))}
@@ -245,6 +322,21 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
             </button>
           </div>
         </form>
+
+        {previewModalImage && (
+          <div className="bkclaim-lightbox-overlay" onClick={() => setPreviewModalImage(null)}>
+            <div className="bkclaim-lightbox-box" onClick={(e) => e.stopPropagation()}>
+              <img src={previewModalImage} alt="Photo Preview" />
+              <button
+                type="button"
+                className="bkclaim-lightbox-close"
+                onClick={() => setPreviewModalImage(null)}
+              >
+                <i className="fas fa-times" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
