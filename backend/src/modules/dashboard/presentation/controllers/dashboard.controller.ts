@@ -35,16 +35,16 @@ export class DashboardController {
 
       const requestIds = allRequests.map((r) => r.id);
       const allQuotations = requestIds.length
-        ? await db.orm.public.quotations.where({ service_request_id: { $in: requestIds } as any }).all()
+        ? await db.orm.public.quotations.where((q) => q.service_request_id.in(requestIds as never)).all()
         : [];
 
       const providerIds = Array.from(new Set(allBookings.map((b) => b.provider_id)));
       const providers = providerIds.length
-        ? await db.orm.public.provider_profiles.where({ id: { $in: providerIds } as any }).all()
+        ? await db.orm.public.provider_profiles.where((p) => p.id.in(providerIds as never)).all()
         : [];
       const providerUserIds = providers.map((p) => p.user_id);
       const providerUsers = providerUserIds.length
-        ? await db.orm.public.users.where({ id: { $in: providerUserIds } as any }).all()
+        ? await db.orm.public.users.where((u) => u.id.in(providerUserIds as never)).all()
         : [];
       const providerUserMap = new Map(providerUsers.map((u) => [u.id, u]));
       const providerMap = new Map(
@@ -263,20 +263,20 @@ export class DashboardController {
         .all();
 
       const availableRequests = await db.orm.public.service_requests
-        .where({ status: { $in: ["PENDING", "ACTIVE"] } as any })
+        .where((r) => r.status.in(["PENDING", "ACTIVE"]))
         .orderBy((r) => r.created_at.desc())
         .limit(10)
         .all();
 
       const customerIds = Array.from(new Set(availableRequests.map((r) => r.customer_id)));
       const customers = customerIds.length
-        ? await db.orm.public.users.where({ id: { $in: customerIds } as any }).all()
+        ? await db.orm.public.users.where((u) => u.id.in(customerIds as never)).all()
         : [];
       const customerMap = new Map(customers.map((c) => [c.id, c.name]));
 
       const addressIds = Array.from(new Set(availableRequests.map((r) => r.address_id)));
       const addresses = addressIds.length
-        ? await db.orm.public.addresses.where({ id: { $in: addressIds } as any }).all()
+        ? await db.orm.public.addresses.where((a) => a.id.in(addressIds as never)).all()
         : [];
       const addressMap = new Map(
         addresses.map((a) => [
@@ -287,7 +287,7 @@ export class DashboardController {
 
       const requestIds = availableRequests.map((r) => r.id);
       const reqQuotes = requestIds.length
-        ? await db.orm.public.quotations.where({ service_request_id: { $in: requestIds } as any }).all()
+        ? await db.orm.public.quotations.where((q) => q.service_request_id.in(requestIds as never)).all()
         : [];
 
       const opportunities = availableRequests.map((r) => {
