@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import toast from "react-hot-toast";
 import type { BookingItem, WarrantyClaimDetails } from "../../types/booking.types";
 import "./ProviderWarrantyActionModal.css";
 
@@ -128,7 +127,6 @@ export const ProviderWarrantyActionModal: React.FC<ProviderWarrantyActionModalPr
       (mode === "REJECT" && reasonErr) ||
       respErr
     ) {
-      toast.error("Please resolve highlighted form errors");
       return;
     }
 
@@ -149,6 +147,12 @@ export const ProviderWarrantyActionModal: React.FC<ProviderWarrantyActionModalPr
         action: "RESOLVE",
         providerResponse: providerResponse.trim() || undefined
       });
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
+      e.preventDefault();
     }
   };
 
@@ -174,7 +178,7 @@ export const ProviderWarrantyActionModal: React.FC<ProviderWarrantyActionModalPr
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} noValidate className="praction-form">
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} noValidate className="praction-form">
           <div className="praction-body">
             <div className="praction-claim-summary">
               <div className="praction-summary-header">

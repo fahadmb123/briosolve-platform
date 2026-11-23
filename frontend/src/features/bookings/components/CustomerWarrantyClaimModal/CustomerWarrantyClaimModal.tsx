@@ -217,7 +217,6 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
     });
 
     if (descErr || dateErr || timeErr || imgErr) {
-      toast.error("Please resolve highlighted form errors");
       return;
     }
 
@@ -227,6 +226,12 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
       preferredDate: preferredDate || undefined,
       preferredTime: preferredTime || undefined
     });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -257,7 +262,7 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
           </div>
         </div>
 
-        <form className="bkclaim-form" onSubmit={handleSubmit} noValidate>
+        <form className="bkclaim-form" onSubmit={handleSubmit} onKeyDown={handleKeyDown} noValidate>
           <div className="bkclaim-body">
             <div className="bkclaim-field">
               <div className="bkclaim-field-header">
