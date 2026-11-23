@@ -78,6 +78,64 @@ export class DashboardController {
         0
       );
 
+      const requestMap = new Map(allRequests.map((r) => [r.id, r]));
+
+      let estimatedSavings = 0;
+      for (const booking of completedBookings) {
+        const quotes = allQuotations.filter((q) => q.service_request_id === booking.service_request_id);
+        if (quotes.length > 1) {
+          const maxQuote = Math.max(...quotes.map((q) => Number(q.amount || 0)));
+          const bookingAmount = Number(booking.total_amount || 0);
+          if (maxQuote > bookingAmount) {
+            estimatedSavings += (maxQuote - bookingAmount);
+          }
+        }
+      }
+
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const now = new Date();
+      const monthlySpendingMap = new Map<string, number>();
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${monthNames[d.getMonth()]}`;
+        monthlySpendingMap.set(key, 0);
+      }
+
+      for (const b of completedBookings) {
+        const bDate = new Date(b.created_at);
+        const key = `${monthNames[bDate.getMonth()]}`;
+        if (monthlySpendingMap.has(key)) {
+          monthlySpendingMap.set(key, (monthlySpendingMap.get(key) || 0) + Number(b.total_amount || 0));
+        }
+      }
+
+      const monthlySpending = Array.from(monthlySpendingMap.entries()).map(([month, spend]) => ({
+        month,
+        spend,
+      }));
+
+      const categorySpendMap = new Map<string, { amount: number; count: number }>();
+      for (const b of completedBookings) {
+        const sr = requestMap.get(b.service_request_id);
+        const catName = sr ? (categoryMap.get(sr.category_id) || "Other") : "Other";
+        const cur = categorySpendMap.get(catName) || { amount: 0, count: 0 };
+        cur.amount += Number(b.total_amount || 0);
+        cur.count += 1;
+        categorySpendMap.set(catName, cur);
+      }
+
+      const categoryBreakdown = Array.from(categorySpendMap.entries()).map(([categoryName, data]) => ({
+        categoryName,
+        amount: data.amount,
+        percentage: totalCompletedSpend > 0 ? Math.round((data.amount / totalCompletedSpend) * 100) : 0,
+        count: data.count,
+      }));
+
+      const quickCategories = allCategories.slice(0, 6).map((c) => ({
+        id: c.id,
+        name: c.name,
+      }));
+
       const formattedActiveRequests = activeRequests.slice(0, 5).map((r) => {
         const reqQuotes = allQuotations.filter((q) => q.service_request_id === r.id);
         const quoteAmounts = reqQuotes.map((q) => Number(q.amount || 0)).filter((a) => a > 0);
@@ -97,8 +155,6 @@ export class DashboardController {
           minQuoteAmount,
         };
       });
-
-      const requestMap = new Map(allRequests.map((r) => [r.id, r]));
 
       const formattedUpcomingBookings = activeBookings.slice(0, 3).map((b) => {
         const sr = requestMap.get(b.service_request_id);
@@ -140,7 +196,11 @@ export class DashboardController {
             upcomingBookingsCount: activeBookings.length,
             completedServicesCount: completedBookings.length,
             totalCompletedSpend,
+            estimatedSavings,
           },
+          monthlySpending,
+          categoryBreakdown,
+          quickCategories,
           activeRequests: formattedActiveRequests,
           upcomingBookings: formattedUpcomingBookings,
           recentActivity: formattedRecentActivity,

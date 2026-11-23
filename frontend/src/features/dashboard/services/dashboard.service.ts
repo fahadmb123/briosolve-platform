@@ -11,7 +11,22 @@ export interface CustomerDashboardData {
     upcomingBookingsCount: number;
     completedServicesCount: number;
     totalCompletedSpend: number;
+    estimatedSavings?: number;
   };
+  monthlySpending?: Array<{
+    month: string;
+    spend: number;
+  }>;
+  categoryBreakdown?: Array<{
+    categoryName: string;
+    amount: number;
+    percentage: number;
+    count: number;
+  }>;
+  quickCategories?: Array<{
+    id: string;
+    name: string;
+  }>;
   activeRequests: Array<{
     id: string;
     title: string;
