@@ -109,9 +109,7 @@ export const CustomerWarrantyClaimModal: React.FC<CustomerWarrantyClaimModalProp
           <div className="bkclaim-banner-info">
             {warranty?.terms ? (
               <span><strong>Scope:</strong> {warranty.terms}</span>
-            ) : (
-              <span>Includes free inspection & re-work on previously completed items.</span>
-            )}
+            ) : null}
           </div>
         </div>
 

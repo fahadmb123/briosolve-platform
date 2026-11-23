@@ -91,15 +91,15 @@ export const WarrantyProtectionCard: React.FC<WarrantyProtectionCardProps> = ({
               <span className="warranty-info-val">{formatDate(warranty.expiresAt)}</span>
             </div>
             <div className="warranty-info-item">
-              <span className="warranty-info-label">Coverage Terms</span>
-              <span className="warranty-info-val">
-                {warranty.terms || "Free inspection and re-work on previously serviced parts."}
-              </span>
+              <span className="warranty-info-label">Warranty Period</span>
+              <span className="warranty-info-val">{warranty.days} Days ({daysRemaining} days remaining)</span>
             </div>
-            <div className="warranty-info-item">
-              <span className="warranty-info-label">Protection Fee</span>
-              <span className="warranty-info-val free-highlight">₹0 Free Guarantee</span>
-            </div>
+            {warranty.terms && (
+              <div className="warranty-info-item">
+                <span className="warranty-info-label">Coverage Terms</span>
+                <span className="warranty-info-val">{warranty.terms}</span>
+              </div>
+            )}
           </div>
         )}
 
