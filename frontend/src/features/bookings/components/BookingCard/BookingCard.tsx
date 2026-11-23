@@ -165,6 +165,39 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     }
   };
 
+  const renderEscrowBadge = () => {
+    switch (booking.paymentStatus) {
+      case "PAID":
+        return (
+          <span className="bkcard-escrow-badge paid">
+            <i className="fas fa-check-circle"></i>
+            <span>Fully Paid</span>
+          </span>
+        );
+      case "REFUNDED":
+        return (
+          <span className="bkcard-escrow-badge refunded">
+            <i className="fas fa-undo"></i>
+            <span>Refunded</span>
+          </span>
+        );
+      case "ADVANCE_PAID":
+        return (
+          <span className="bkcard-escrow-badge">
+            <i className="fas fa-shield-alt"></i>
+            <span>Advance Paid</span>
+          </span>
+        );
+      default:
+        return (
+          <span className="bkcard-escrow-badge">
+            <i className="fas fa-shield-alt"></i>
+            <span>Escrow Secured</span>
+          </span>
+        );
+    }
+  };
+
   const counterpartyName =
     role === "CUSTOMER"
       ? booking.providerBusinessName || booking.providerName || "Assigned Provider"
@@ -188,13 +221,24 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           <span className="bkcard-date-booked">Booked on {bookedAtDate}</span>
         </div>
 
-        <div className="bkcard-header-right">{renderStatusBadge()}</div>
+        <div className="bkcard-header-right">
+          {renderEscrowBadge()}
+          {renderStatusBadge()}
+        </div>
       </div>
 
       <div className="bkcard-body">
-        <h3 className="bkcard-title" onClick={() => onViewDetails(booking)}>
-          {booking.serviceRequestTitle || "Service Requirement"}
-        </h3>
+        <div className="bkcard-title-row">
+          <h3 className="bkcard-title" onClick={() => onViewDetails(booking)}>
+            {booking.serviceRequestTitle || "Service Requirement"}
+          </h3>
+          {booking.categoryName && (
+            <span className="bkcard-category-chip">
+              <i className="fas fa-th-large"></i>
+              <span>{booking.categoryName}</span>
+            </span>
+          )}
+        </div>
 
         {isDiagnosisClosed ? (
           <div className="bkcard-diagnosis-pill">
@@ -226,40 +270,53 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           )
         )}
 
-        <div className="bkcard-meta-row">
-          <div className="bkcard-meta-tag counterparty">
-            <i className={role === "CUSTOMER" ? "fas fa-user-tie" : "fas fa-user"}></i>
-            <span>{role === "CUSTOMER" ? "Provider:" : "Client:"} <strong>{counterpartyName}</strong></span>
-          </div>
-
-          <div className="bkcard-meta-tag timing">
-            <i className="far fa-calendar-alt"></i>
-            <span>{formattedDate}{booking.scheduledTime ? ` (${booking.scheduledTime})` : ""}</span>
-          </div>
-
-          {booking.addressText && (
-            <div className="bkcard-meta-tag location">
-              <i className="fas fa-map-marker-alt"></i>
-              <span>{booking.addressText}</span>
+        <div className="bkcard-info-grid">
+          <div className="bkcard-info-item">
+            <div className="bkcard-info-icon-wrapper primary">
+              <i className={role === "CUSTOMER" ? "fas fa-user-tie" : "fas fa-user"}></i>
             </div>
-          )}
-
-          <div className={`bkcard-meta-tag ${requiresInspection ? "type-inspection" : "type-fixed"}`}>
-            <i className={requiresInspection ? "fas fa-clipboard-check" : "fas fa-lock"}></i>
-            <span>{requiresInspection ? "Inspection Required" : "Fixed Price"}</span>
+            <div className="bkcard-info-content">
+              <span className="bkcard-info-label">{role === "CUSTOMER" ? "Service Provider" : "Client"}</span>
+              <span className="bkcard-info-value" title={counterpartyName}>
+                {counterpartyName}
+              </span>
+            </div>
           </div>
 
-          <div className="bkcard-meta-tag escrow">
-            <i className="fas fa-shield-alt"></i>
-            <span>
-              {booking.paymentStatus === "PAID"
-                ? "Fully Paid"
-                : booking.paymentStatus === "ADVANCE_PAID"
-                ? "Advance Paid"
-                : booking.paymentStatus === "REFUNDED"
-                ? "Refunded"
-                : "Escrow Secured"}
-            </span>
+          <div className="bkcard-info-item">
+            <div className="bkcard-info-icon-wrapper">
+              <i className="far fa-calendar-alt"></i>
+            </div>
+            <div className="bkcard-info-content">
+              <span className="bkcard-info-label">Schedule</span>
+              <span className="bkcard-info-value">
+                {formattedDate} {booking.scheduledTime ? `(${booking.scheduledTime})` : ""}
+              </span>
+            </div>
+          </div>
+
+          <div className="bkcard-info-item">
+            <div className="bkcard-info-icon-wrapper">
+              <i className="fas fa-map-marker-alt"></i>
+            </div>
+            <div className="bkcard-info-content">
+              <span className="bkcard-info-label">Service Location</span>
+              <span className="bkcard-info-value location-text" title={booking.addressText || "On-site Service"}>
+                {booking.addressText || "On-site Service"}
+              </span>
+            </div>
+          </div>
+
+          <div className="bkcard-info-item">
+            <div className="bkcard-info-icon-wrapper">
+              <i className={requiresInspection ? "fas fa-clipboard-check" : "fas fa-tag"}></i>
+            </div>
+            <div className="bkcard-info-content">
+              <span className="bkcard-info-label">Pricing Model</span>
+              <span className="bkcard-info-value">
+                {requiresInspection ? "Inspection Required" : "Fixed Price"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -268,7 +325,14 @@ export const BookingCard: React.FC<BookingCardProps> = ({
         <div className="bkcard-footer-left">
           <div className="bkcard-price-block">
             <span className="bkcard-price-label">Total Amount</span>
-            <span className="bkcard-price-value">₹{booking.totalAmount.toLocaleString("en-IN")}</span>
+            <div className="bkcard-price-row">
+              <span className="bkcard-price-value">₹{booking.totalAmount.toLocaleString("en-IN")}</span>
+              {booking.advanceAmount && booking.advanceAmount < booking.totalAmount ? (
+                <span className="bkcard-price-subtext">
+                  (Advance: ₹{Number(booking.advanceAmount).toLocaleString("en-IN")})
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
 

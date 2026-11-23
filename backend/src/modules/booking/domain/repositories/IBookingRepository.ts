@@ -24,9 +24,11 @@ export interface BookingDetails {
     addressText?: string | null;
     providerBusinessName: string | null;
     providerName: string | null;
+    providerEmail?: string | null;
     providerPhone?: string | null;
     providerUserId?: string | null;
     customerName: string | null;
+    customerEmail?: string | null;
     customerPhone?: string | null;
     quotationType?: string | null;
     requiresInspection?: boolean;
@@ -44,6 +46,22 @@ export interface BookingListResult {
     counts: BookingCountsDto;
 }
 
+export interface GetAdminBookingsInputDto {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    paymentStatus?: string;
+}
+
+export interface AdminBookingListResult {
+    bookings: BookingDetails[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
 export interface IBookingRepository extends BaseRepository<Booking | null> {
     create(data: CreateBookingRepoDto): Promise<Booking | null>;
     update(id: string, data: UpdateBookingRepoDto): Promise<Booking | null>;
@@ -53,6 +71,7 @@ export interface IBookingRepository extends BaseRepository<Booking | null> {
     findByServiceRequestId(serviceRequestId: string): Promise<Booking | null>;
     findByCustomerId(input: GetCustomerBookingsInputDto | string): Promise<BookingListResult | BookingDetails[]>;
     findByProviderProfileId(input: (GetProviderBookingsInputDto & { providerProfileId: string }) | string): Promise<BookingListResult | BookingDetails[]>;
+    findForAdmin(input: GetAdminBookingsInputDto): Promise<AdminBookingListResult>;
     countProviderCancellations(providerProfileId: string): Promise<number>;
     countCustomerCancellations(customerId: string): Promise<number>;
 }

@@ -1,4 +1,4 @@
-import { useState, useId, useEffect, useMemo } from "react";
+import { useState, useId, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
@@ -102,6 +102,8 @@ export default function RequestService() {
     setDismissedErrors(false);
   }, [currentLevel]);
 
+  const isInitializedRef = useRef(false);
+
   useEffect(() => {
     if (categoriesRes?.data?.categories) {
       const rawCats = (categoriesRes.data.categories || []) as Category[];
@@ -112,23 +114,37 @@ export default function RequestService() {
         ),
       }));
       setCategories(cats);
-      if (cats.length > 0) {
+
+      if (!isInitializedRef.current && cats.length > 0) {
+        isInitializedRef.current = true;
         const firstCat = cats[0];
         setSelectedCategory(firstCat);
         setValue("categoryId", firstCat.id, { shouldValidate: true });
         if (firstCat.services && firstCat.services.length > 0) {
-          setSelectedSubservice(firstCat.services[0]);
-          setValue("subserviceId", firstCat.services[0].id, { shouldValidate: true });
+          const firstSub = firstCat.services[0];
+          setSelectedSubservice(firstSub);
+          setValue("subserviceId", firstSub.id, { shouldValidate: true });
           if (!watch("title")) {
-            setValue("title", firstCat.services[0].name, { shouldValidate: true });
+            setValue("title", firstSub.name, { shouldValidate: true });
           }
         } else {
           setSelectedSubservice(null);
           setValue("subserviceId", "", { shouldValidate: true });
         }
+      } else if (isInitializedRef.current && selectedCategory) {
+        const refreshedCat = cats.find((c) => c.id === selectedCategory.id);
+        if (refreshedCat) {
+          setSelectedCategory(refreshedCat);
+          if (selectedSubservice) {
+            const refreshedSub = refreshedCat.services?.find((s) => s.id === selectedSubservice.id);
+            if (refreshedSub) {
+              setSelectedSubservice(refreshedSub);
+            }
+          }
+        }
       }
     }
-  }, [categoriesRes, setValue, watch]);
+  }, [categoriesRes, setValue]);
 
   useEffect(() => {
     if (addressesRes?.data?.addresses) {
@@ -151,17 +167,26 @@ export default function RequestService() {
     };
     setSelectedCategory(categoryWithActiveServices);
     setValue("categoryId", category.id, { shouldValidate: true });
+
+    const currentTitle = watch("title");
+    const isTitleDefault = !currentTitle || currentTitle === selectedSubservice?.name;
+
     if (activeServices.length > 0) {
       const firstSub = activeServices[0];
       setSelectedSubservice(firstSub);
       setValue("subserviceId", firstSub.id, { shouldValidate: true });
-      if (!title) {
+      if (isTitleDefault) {
         setValue("title", firstSub.name, { shouldValidate: true });
       }
     } else {
       setSelectedSubservice(null);
       setValue("subserviceId", "", { shouldValidate: true });
+      if (isTitleDefault) {
+        setValue("title", "", { shouldValidate: true });
+      }
     }
+    setAnswers({});
+    setQuestionErrors({});
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -497,11 +522,16 @@ export default function RequestService() {
                 errorSubserviceId={errors.subserviceId?.message}
                 onSelectCategory={handleCategorySelect}
                 onSelectSubservice={(sub) => {
+                  const currentTitle = watch("title");
+                  const isTitleDefault = !currentTitle || currentTitle === selectedSubservice?.name;
+
                   setSelectedSubservice(sub);
                   setValue("subserviceId", sub.id, { shouldValidate: true });
-                  if (!title) {
+                  if (isTitleDefault) {
                     setValue("title", sub.name, { shouldValidate: true });
                   }
+                  setAnswers({});
+                  setQuestionErrors({});
                 }}
                 onNext={handleNextLevel}
               />
@@ -578,6 +608,9 @@ export default function RequestService() {
           setShowSuccessModal(false);
           setCurrentLevel(1);
           setUploadedImages([]);
+          setAnswers({});
+          setQuestionErrors({});
+          isInitializedRef.current = false;
         }}
       />
     </div>

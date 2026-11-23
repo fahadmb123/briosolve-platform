@@ -11,6 +11,8 @@ import { CreateBookingUseCase } from "../../application/use-cases/createBooking.
 import { GetBookingByIdUseCase } from "../../application/use-cases/getBookingById.useCase";
 import { GetCustomerBookingsUseCase } from "../../application/use-cases/getCustomerBookings.useCase";
 import { GetProviderBookingsUseCase } from "../../application/use-cases/getProviderBookings.useCase";
+import { GetAdminBookingsUseCase } from "../../application/use-cases/getAdminBookings.useCase";
+import { AdminUpdateBookingStatusUseCase } from "../../application/use-cases/adminUpdateBookingStatus.useCase";
 import { UpdateBookingStatusUseCase } from "../../application/use-cases/updateBookingStatus.useCase";
 import { ReportServiceMismatchUseCase } from "../../application/use-cases/reportServiceMismatch.useCase";
 import { ResolveServiceMismatchUseCase } from "../../application/use-cases/resolveServiceMismatch.useCase";
@@ -31,6 +33,24 @@ export function createGetCustomerBookingsUseCase(): GetCustomerBookingsUseCase {
 
 export function createGetProviderBookingsUseCase(): GetProviderBookingsUseCase {
     return new GetProviderBookingsUseCase(bookingRepository, providerRepository);
+}
+
+export function createGetAdminBookingsUseCase(): GetAdminBookingsUseCase {
+    return new GetAdminBookingsUseCase(bookingRepository);
+}
+
+export function createAdminUpdateBookingStatusUseCase(
+    createNotificationUseCase?: IUseCase<CreateNotificationRequestDto, NotificationResponseDto>,
+    creditWalletUseCase?: IUseCase<CreditWalletInputDto, WalletResponseDto>
+): AdminUpdateBookingStatusUseCase {
+    return new AdminUpdateBookingStatusUseCase(
+        bookingRepository,
+        providerRepository,
+        serviceRequestRepository,
+        quotationRepository,
+        createNotificationUseCase,
+        creditWalletUseCase
+    );
 }
 
 export function createUpdateBookingStatusUseCase(

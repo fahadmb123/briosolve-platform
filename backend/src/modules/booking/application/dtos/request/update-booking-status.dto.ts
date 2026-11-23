@@ -15,3 +15,9 @@ export interface UpdateBookingRepoDto {
     paymentStatus?: BookingPaymentStatus;
     totalAmount?: number;
 }
+
+export interface AdminUpdateBookingStatusInputDto {
+    bookingId: string;
+    status: BookingStatus;
+    reason?: string;
+}

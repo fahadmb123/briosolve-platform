@@ -45,9 +45,11 @@ export interface BookingResponseDto {
     addressText?: string | null;
     providerBusinessName?: string | null;
     providerName?: string | null;
+    providerEmail?: string | null;
     providerPhone?: string | null;
     providerUserId?: string | null;
     customerName?: string | null;
+    customerEmail?: string | null;
     customerPhone?: string | null;
     quotationType?: string | null;
     requiresInspection?: boolean;

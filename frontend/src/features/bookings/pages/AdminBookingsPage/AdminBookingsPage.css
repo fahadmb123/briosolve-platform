@@ -1,0 +1,23 @@
+.badge-confirmed {
+  background-color: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.28);
+}
+
+.badge-advance {
+  background-color: rgba(255, 121, 0, 0.12);
+  color: #ea580c;
+  border: 1px solid rgba(255, 121, 0, 0.28);
+}
+
+.admin-skel-line {
+  background: linear-gradient(90deg, rgba(226, 232, 240, 0.6) 25%, rgba(203, 213, 225, 0.8) 50%, rgba(226, 232, 240, 0.6) 75%);
+  background-size: 200% 100%;
+  animation: admin-skel-pulse 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes admin-skel-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

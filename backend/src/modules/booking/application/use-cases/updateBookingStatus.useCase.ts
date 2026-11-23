@@ -44,6 +44,11 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             throw new ApplicationError("FORBIDDEN", "You are not authorized to update this booking", "AUTHENTICATION");
         }
 
+        const currentBookingStatus = details.booking.status;
+        if (currentBookingStatus === "COMPLETED" || currentBookingStatus === "CANCELLED" || currentBookingStatus === "CLOSED") {
+            throw new ApplicationError("TERMINAL_STATE", `This booking is ${currentBookingStatus.toLowerCase()} and cannot be modified.`, "VALIDATION");
+        }
+
         if (isCustomerAction && input.status !== "CANCELLED") {
             throw new ApplicationError("FORBIDDEN", "Customers can only cancel bookings.", "AUTHENTICATION");
         }
@@ -197,7 +202,7 @@ export class UpdateBookingStatusUseCase implements IUseCase<UpdateBookingStatusI
             await this._serviceRequestRepository.updateStatus(details.booking.service_request_id, "COMPLETED").catch(() => null);
             await this._providerRepository.incrementCompletedJobs(details.booking.provider_id).catch(() => null);
 
-            if (this._creditWalletUseCase) {
+            if (this._creditWalletUseCase && details.booking.payment_status !== "PAID") {
                 const profile = await this._providerRepository.findById(details.booking.provider_id);
                 if (profile && profile.user_id) {
                     const finalTotal = resolvedTotalAmount || details.booking.total_amount;

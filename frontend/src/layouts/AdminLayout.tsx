@@ -106,16 +106,13 @@ export default function AdminLayout() {
                     </li>
 
                     <li>
-                        <Link to="#" className="sidebar-item">
-                            <i className="fas fa-calculator"></i>
-                            <span>Quotations</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink 
+                            to="/admin/bookings" 
+                            className={({ isActive }) => `sidebar-item ${isActive || location.pathname.startsWith('/admin/bookings') ? 'active' : ''}`}
+                        >
                             <i className="fas fa-calendar-check"></i>
                             <span>Bookings</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <NavLink 

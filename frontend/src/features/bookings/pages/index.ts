@@ -4,6 +4,7 @@ import { BookingDetailsPage } from "./BookingDetailsPage/BookingDetailsPage";
 
 export { BookingsPage } from "./BookingsPage/BookingsPage";
 export { BookingDetailsPage } from "./BookingDetailsPage/BookingDetailsPage";
+export { AdminBookingsPage } from "./AdminBookingsPage/AdminBookingsPage";
 
 export const CustomerBookings: React.FC = () =>
   React.createElement(BookingsPage, { role: "customer" });

@@ -1,6 +1,12 @@
 import { db } from "../../../../shared/database/client";
 import { Booking } from "../../domain/entities/booking.entity";
-import { IBookingRepository, BookingDetails, BookingListResult } from "../../domain/repositories/IBookingRepository";
+import {
+    IBookingRepository,
+    BookingDetails,
+    BookingListResult,
+    GetAdminBookingsInputDto,
+    AdminBookingListResult
+} from "../../domain/repositories/IBookingRepository";
 import { CreateBookingRepoDto } from "../../application/dtos/request/create-booking.dto";
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
 import { GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
@@ -338,9 +344,11 @@ export class PrismaBookingRepository implements IBookingRepository {
                 let addressText: string | null = null;
                 let providerBusinessName: string | null = null;
                 let providerName: string | null = null;
+                let providerEmail: string | null = null;
                 let providerPhone: string | null = null;
                 let providerUserId: string | null = null;
                 let customerName: string | null = null;
+                let customerEmail: string | null = null;
                 let customerPhone: string | null = null;
 
                 const sr = await db.orm.public.service_requests
@@ -370,6 +378,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                     if (pUser) {
                         providerName = pUser.name;
                         providerPhone = pUser.phone;
+                        providerEmail = pUser.email;
                     }
                 }
 
@@ -379,6 +388,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                 if (cUser) {
                     customerName = cUser.name;
                     customerPhone = cUser.phone;
+                    customerEmail = cUser.email;
                 }
 
                 let quotationType: string | null = null;
@@ -403,9 +413,11 @@ export class PrismaBookingRepository implements IBookingRepository {
                     addressText,
                     providerBusinessName,
                     providerName,
+                    providerEmail,
                     providerPhone,
                     providerUserId,
                     customerName,
+                    customerEmail,
                     customerPhone,
                     quotationType,
                     requiresInspection,
@@ -413,5 +425,109 @@ export class PrismaBookingRepository implements IBookingRepository {
                 };
             })
         );
+    }
+
+    async findForAdmin(input: GetAdminBookingsInputDto): Promise<AdminBookingListResult> {
+        const page = input.page ? Number(input.page) : 1;
+        const limit = input.limit ? Number(input.limit) : 10;
+        const search = input.search?.trim();
+        const status = input.status;
+        const paymentStatus = input.paymentStatus;
+        const skip = (page - 1) * limit;
+
+        let query = db.orm.public.bookings;
+
+        if (status && status !== "ALL") {
+            query = query.where({ status: status as never });
+        }
+
+        if (paymentStatus && paymentStatus !== "ALL") {
+            query = query.where({ payment_status: paymentStatus as never });
+        }
+
+        if (search) {
+            const term = `%${search}%`;
+            if (search.toUpperCase().startsWith("BK")) {
+                query = query.where((b) => b.booking_number.ilike(term));
+            } else {
+                const matchingBookingIds = new Set<string>();
+
+                const byNumber = await db.orm.public.bookings
+                    .where((b) => b.booking_number.ilike(term))
+                    .select("id")
+                    .all();
+                for (const b of byNumber) matchingBookingIds.add(b.id);
+
+                const usersByName = await db.orm.public.users
+                    .where((u) => u.name.ilike(term))
+                    .select("id")
+                    .all();
+                const usersByEmail = await db.orm.public.users
+                    .where((u) => u.email.ilike(term))
+                    .select("id")
+                    .all();
+                const userIds = Array.from(new Set([...usersByName.map((u) => u.id), ...usersByEmail.map((u) => u.id)]));
+                if (userIds.length > 0) {
+                    const byCustomer = await db.orm.public.bookings
+                        .where((b) => b.customer_id.in(userIds))
+                        .select("id")
+                        .all();
+                    for (const b of byCustomer) matchingBookingIds.add(b.id);
+                }
+
+                const matchingProviders = await db.orm.public.provider_profiles
+                    .where((p) => p.business_name.ilike(term))
+                    .select("id")
+                    .all();
+                const providerIds = matchingProviders.map((p) => p.id);
+                if (providerIds.length > 0) {
+                    const byProvider = await db.orm.public.bookings
+                        .where((b) => b.provider_id.in(providerIds))
+                        .select("id")
+                        .all();
+                    for (const b of byProvider) matchingBookingIds.add(b.id);
+                }
+
+                const matchingSrs = await db.orm.public.service_requests
+                    .where((sr) => sr.title.ilike(term))
+                    .select("id")
+                    .all();
+                const srIds = matchingSrs.map((s) => s.id);
+                if (srIds.length > 0) {
+                    const bySr = await db.orm.public.bookings
+                        .where((b) => b.service_request_id.in(srIds))
+                        .select("id")
+                        .all();
+                    for (const b of bySr) matchingBookingIds.add(b.id);
+                }
+
+                if (matchingBookingIds.size > 0) {
+                    query = query.where((b) => b.id.in(Array.from(matchingBookingIds)));
+                } else {
+                    query = query.where((b) => b.id.in(["00000000-0000-0000-0000-000000000000"]));
+                }
+            }
+        }
+
+        const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
+        const records = await query
+            .orderBy((b) => b.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all();
+
+        const bookings = records.map((r: any) => BookingMapper.toDomain(r));
+        const detailed = await this.populateDetails(bookings);
+
+        const total = totalResult.total;
+        const totalPages = Math.ceil(total / limit) || 1;
+
+        return {
+            bookings: detailed,
+            total,
+            page,
+            limit,
+            totalPages
+        };
     }
 }

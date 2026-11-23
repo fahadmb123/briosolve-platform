@@ -110,3 +110,34 @@ export interface UpdateBookingStatusPayload {
 }
 
 export type BookingFilterTab = "ALL" | "CONFIRMED" | "EN_ROUTE" | "INSPECTION" | "IN_PROGRESS" | "PAYMENT_PENDING" | "COMPLETED" | "CLOSED" | "CANCELLED";
+
+export interface AdminBookingItem extends BookingItem {
+  customerEmail?: string | null;
+  providerEmail?: string | null;
+}
+
+export interface AdminBookingsStats {
+  total: number;
+  confirmed: number;
+  inProgress: number;
+  completed: number;
+  cancelled: number;
+  totalPlatformFees: number;
+}
+
+export interface AdminBookingsResponse {
+  bookings: AdminBookingItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  stats?: AdminBookingsStats;
+}
+
+export interface GetAdminBookingsQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  paymentStatus?: string;
+}

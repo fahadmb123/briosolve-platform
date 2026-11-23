@@ -2,11 +2,13 @@ import { BaseController } from "../../../../shared/base/controller/baseControlle
 import type { NextFunction, Request, Response } from "express";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { GetBookingByIdInputDto, GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
-import { UpdateBookingStatusInputDto } from "../../application/dtos/request/update-booking-status.dto";
+import { GetAdminBookingsInputDto } from "../../domain/repositories/IBookingRepository";
+import { UpdateBookingStatusInputDto, AdminUpdateBookingStatusInputDto } from "../../application/dtos/request/update-booking-status.dto";
 import { ReportServiceMismatchInputDto, ResolveServiceMismatchInputDto } from "../../application/dtos/request/mismatch-report.dto";
 import { BookingResponseDto } from "../../application/dtos/response/booking-response.dto";
 import { CustomerBookingsResponseDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { ProviderBookingsResponseDto } from "../../application/dtos/response/provider-bookings-response.dto";
+import { AdminBookingsResponseDto } from "../../application/dtos/response/admin-bookings-response.dto";
 
 export class BookingController extends BaseController {
     constructor(
@@ -15,10 +17,51 @@ export class BookingController extends BaseController {
         private readonly _getProviderBookingsUseCase: IUseCase<GetProviderBookingsInputDto, ProviderBookingsResponseDto>,
         private readonly _updateBookingStatusUseCase: IUseCase<UpdateBookingStatusInputDto, BookingResponseDto>,
         private readonly _reportServiceMismatchUseCase: IUseCase<ReportServiceMismatchInputDto, BookingResponseDto>,
-        private readonly _resolveServiceMismatchUseCase: IUseCase<ResolveServiceMismatchInputDto, BookingResponseDto>
+        private readonly _resolveServiceMismatchUseCase: IUseCase<ResolveServiceMismatchInputDto, BookingResponseDto>,
+        private readonly _getAdminBookingsUseCase: IUseCase<GetAdminBookingsInputDto, AdminBookingsResponseDto>,
+        private readonly _adminUpdateBookingStatusUseCase: IUseCase<AdminUpdateBookingStatusInputDto, BookingResponseDto>
     ) {
         super();
     }
+
+    adminUpdateStatus = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const bookingId = req.params.id as string;
+            const { status, reason } = req.body;
+
+            const response = await this._adminUpdateBookingStatusUseCase.execute({
+                bookingId,
+                status,
+                reason
+            });
+
+            return this.sendSuccess(res, "Booking status updated by admin successfully", response, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    getAdminBookings = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const search = req.query.search as string | undefined;
+            const status = req.query.status as string | undefined;
+            const paymentStatus = req.query.paymentStatus as string | undefined;
+
+            const response = await this._getAdminBookingsUseCase.execute({
+                page,
+                limit,
+                search,
+                status,
+                paymentStatus
+            });
+
+            return this.sendSuccess(res, "Admin bookings retrieved successfully", response, 200);
+        } catch (error) {
+            next(error);
+        }
+    };
 
     getById = async (req: Request, res: Response, next: NextFunction) => {
         try {
