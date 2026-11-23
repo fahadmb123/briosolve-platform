@@ -165,6 +165,66 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     }
   };
 
+  const renderWarrantyBadge = () => {
+    if (booking.status !== "COMPLETED" || !booking.warranty || !booking.warranty.days || booking.warranty.days <= 0) {
+      return null;
+    }
+    const claim = booking.warranty.claim;
+    const isExpired = booking.warranty.expiresAt
+      ? new Date(booking.warranty.expiresAt).getTime() < Date.now()
+      : false;
+    const daysRemaining = booking.warranty.expiresAt
+      ? Math.max(0, Math.ceil((new Date(booking.warranty.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+      : booking.warranty.days;
+
+    if (claim?.status === "PENDING") {
+      return (
+        <span className="bkcard-warranty-badge claim-pending" title="Warranty claim under review">
+          <i className="fas fa-exclamation-circle"></i>
+          <span>Claim Pending</span>
+        </span>
+      );
+    }
+    if (claim?.status === "ACCEPTED") {
+      return (
+        <span className="bkcard-warranty-badge claim-scheduled" title="Free warranty re-visit scheduled">
+          <i className="fas fa-calendar-check"></i>
+          <span>Re-visit Scheduled</span>
+        </span>
+      );
+    }
+    if (claim?.status === "REJECTED") {
+      return (
+        <span className="bkcard-warranty-badge claim-disputed" title="Warranty claim disputed and under investigation">
+          <i className="fas fa-balance-scale"></i>
+          <span>Disputed</span>
+        </span>
+      );
+    }
+    if (claim?.status === "RESOLVED") {
+      return (
+        <span className="bkcard-warranty-badge claim-resolved" title="Warranty re-visit resolved">
+          <i className="fas fa-check-double"></i>
+          <span>Warranty Resolved</span>
+        </span>
+      );
+    }
+    if (!isExpired) {
+      return (
+        <span className="bkcard-warranty-badge active" title="Active warranty coverage">
+          <i className="fas fa-shield-alt"></i>
+          <span>{daysRemaining}d Warranty</span>
+        </span>
+      );
+    }
+    return (
+      <span className="bkcard-warranty-badge expired" title="Warranty coverage has ended">
+        <i className="fas fa-shield-virus"></i>
+        <span>Warranty Expired</span>
+      </span>
+    );
+  };
+
   const renderEscrowBadge = () => {
     switch (booking.paymentStatus) {
       case "PAID":
@@ -222,6 +282,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
         </div>
 
         <div className="bkcard-header-right">
+          {renderWarrantyBadge()}
           {renderEscrowBadge()}
           {renderStatusBadge()}
         </div>
@@ -239,6 +300,32 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             </span>
           )}
         </div>
+
+        {booking.status === "COMPLETED" && booking.warranty?.claim && (
+          <div className={`bkcard-warranty-claim-pill ${booking.warranty.claim.status.toLowerCase()}`}>
+            <i className={
+              booking.warranty.claim.status === "PENDING"
+                ? "fas fa-shield-alt"
+                : booking.warranty.claim.status === "ACCEPTED"
+                ? "fas fa-calendar-check"
+                : booking.warranty.claim.status === "REJECTED"
+                ? "fas fa-balance-scale"
+                : "fas fa-check-double"
+            }></i>
+            <div className="bkcard-cancel-info">
+              <span className="bkcard-warranty-claim-title">
+                {booking.warranty.claim.status === "PENDING" && "Warranty Claim Under Review"}
+                {booking.warranty.claim.status === "ACCEPTED" && "Free Warranty Re-Visit Scheduled"}
+                {booking.warranty.claim.status === "REJECTED" && "Warranty Claim Under Investigation"}
+                {booking.warranty.claim.status === "RESOLVED" && "Warranty Re-Visit Completed"}
+              </span>
+              <span className="bkcard-diagnosis-desc">
+                Claim: "{booking.warranty.claim.issueDescription}"
+                {booking.warranty.claim.preferredDate && ` • Re-visit Date: ${booking.warranty.claim.preferredDate}`}
+              </span>
+            </div>
+          </div>
+        )}
 
         {isDiagnosisClosed ? (
           <div className="bkcard-diagnosis-pill">

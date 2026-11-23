@@ -133,6 +133,91 @@
   border: 1px solid #fecaca;
 }
 
+.bkcard-warranty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.725rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.bkcard-warranty-badge.active {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.bkcard-warranty-badge.claim-pending {
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
+}
+
+.bkcard-warranty-badge.claim-scheduled {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.bkcard-warranty-badge.claim-disputed {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.bkcard-warranty-badge.claim-resolved {
+  background: #f0fdf4;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.bkcard-warranty-badge.expired {
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+}
+
+.bkcard-warranty-claim-pill {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  max-width: 100%;
+  font-size: 0.8125rem;
+}
+
+.bkcard-warranty-claim-pill.pending {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #c2410c;
+}
+
+.bkcard-warranty-claim-pill.accepted {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.bkcard-warranty-claim-pill.rejected {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.bkcard-warranty-claim-pill.resolved {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+.bkcard-warranty-claim-title {
+  font-weight: 600;
+}
+
 .bkcard-escrow-badge {
   display: inline-flex;
   align-items: center;
