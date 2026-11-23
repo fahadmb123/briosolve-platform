@@ -19,7 +19,9 @@ export default function ProviderLayout() {
 
   const isSettingsSection =
     location.pathname.startsWith("/provider/settings") ||
+    location.pathname.startsWith("/provider/profile") ||
     location.pathname.startsWith("/provider/kyc") ||
+    location.pathname.startsWith("/provider/notifications") ||
     location.pathname.startsWith("/provider/verification");
 
   const isWorkspaceSection =
@@ -28,9 +30,7 @@ export default function ProviderLayout() {
     location.pathname.startsWith("/provider/service-requests") ||
     location.pathname.startsWith("/provider/requests") ||
     location.pathname.startsWith("/provider/messages") ||
-    location.pathname.startsWith("/provider/chat") ||
-    location.pathname.startsWith("/provider/notifications") ||
-    location.pathname.startsWith("/provider/profile");
+    location.pathname.startsWith("/provider/chat");
 
   const isMoreSection =
     location.pathname.startsWith("/provider/bookings") ||

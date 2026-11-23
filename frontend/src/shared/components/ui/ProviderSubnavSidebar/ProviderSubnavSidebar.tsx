@@ -26,16 +26,6 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/provider/messages",
     icon: "fas fa-comments",
   },
-  {
-    label: "Notifications",
-    to: "/provider/notifications",
-    icon: "fas fa-bell",
-  },
-  {
-    label: "Profile",
-    to: "/provider/profile",
-    icon: "fas fa-user-tie",
-  },
 ];
 
 const SETTINGS_SUBNAV_ITEMS: SubnavItem[] = [
@@ -89,7 +79,9 @@ export const ProviderSubnavSidebar: React.FC = () => {
 
   const isSettingsSection =
     location.pathname.startsWith("/provider/settings") ||
+    location.pathname.startsWith("/provider/profile") ||
     location.pathname.startsWith("/provider/kyc") ||
+    location.pathname.startsWith("/provider/notifications") ||
     location.pathname.startsWith("/provider/verification");
 
   const isMoreSection =
@@ -105,9 +97,7 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/provider/service-requests") ||
     location.pathname.startsWith("/provider/requests") ||
     location.pathname.startsWith("/provider/messages") ||
-    location.pathname.startsWith("/provider/chat") ||
-    location.pathname.startsWith("/provider/notifications") ||
-    location.pathname.startsWith("/provider/profile");
+    location.pathname.startsWith("/provider/chat");
 
   const activeSubnavItems = isSettingsSection
     ? SETTINGS_SUBNAV_ITEMS
