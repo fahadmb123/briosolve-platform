@@ -4,6 +4,7 @@ import type {
   ProviderDashboardData,
   AdminDashboardData,
   AdminAuditLogsResponse,
+  AdminAnalyticsResponse,
 } from "../services/dashboard.service";
 import { dashboardService } from "../services/dashboard.service";
 
@@ -41,5 +42,13 @@ export function useAdminAuditLogs(params?: {
     queryKey: ["dashboard", "admin", "audit-logs", params],
     queryFn: () => dashboardService.getAdminAuditLogs(params),
     staleTime: 15000,
+  });
+}
+
+export function useAdminAnalytics(timeframe?: string) {
+  return useQuery<AdminAnalyticsResponse>({
+    queryKey: ["dashboard", "admin", "analytics", timeframe],
+    queryFn: () => dashboardService.getAdminAnalytics(timeframe),
+    staleTime: 30000,
   });
 }

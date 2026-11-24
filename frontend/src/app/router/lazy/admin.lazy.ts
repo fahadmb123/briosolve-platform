@@ -15,3 +15,4 @@ export const AdminReactivations = React.lazy(() => import('../../../features/acc
 export const AdminSupport = React.lazy(() => import('../../../features/support/pages/AdminSupportTicketsPage/AdminSupportTicketsPage'));
 export const AdminBookings = React.lazy(() => import('../../../features/bookings/pages/AdminBookingsPage/AdminBookingsPage'));
 export const AdminAuditLogs = React.lazy(() => import('../../../features/admin/pages/AdminAuditLogs/AdminAuditLogs'));
+export const AdminAnalytics = React.lazy(() => import('../../../features/admin/pages/AdminAnalytics/AdminAnalytics'));

@@ -141,10 +141,13 @@ export default function AdminLayout() {
                     </li>
 
                     <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink 
+                            to="/admin/analytics" 
+                            className={({ isActive }) => `sidebar-item ${isActive || location.pathname.startsWith('/admin/analytics') ? 'active' : ''}`}
+                        >
                             <i className="fas fa-chart-pie"></i>
                             <span>Analytics</span>
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <NavLink 

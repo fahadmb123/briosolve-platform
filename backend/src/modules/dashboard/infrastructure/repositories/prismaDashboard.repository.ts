@@ -1,5 +1,5 @@
 import { db } from "../../../../shared/database/client";
-import { IDashboardRepository, RawAuditLogSources } from "../../domain/repositories/IDashboard.repository";
+import { IDashboardRepository, RawAuditLogSources, RawAnalyticsSources } from "../../domain/repositories/IDashboard.repository";
 import { CustomerDashboardResponseDto } from "../../application/dtos/response/customer-dashboard-response.dto";
 import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
 import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
@@ -87,6 +87,79 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       profiles,
       notifications,
       customers,
+    };
+  }
+
+  async getRawAnalyticsSources(): Promise<RawAnalyticsSources> {
+    return this.fetchAdminAnalyticsRawData();
+  }
+
+  private async fetchAdminAnalyticsRawData(): Promise<RawAnalyticsSources> {
+    let users: any[] = [];
+    try {
+      users = await db.orm.public.users.all();
+    } catch {
+      users = [];
+    }
+
+    let providerProfiles: any[] = [];
+    try {
+      providerProfiles = await db.orm.public.provider_profiles.all();
+    } catch {
+      providerProfiles = [];
+    }
+
+    let requests: any[] = [];
+    try {
+      requests = await db.orm.public.service_requests.all();
+    } catch {
+      requests = [];
+    }
+
+    let quotations: any[] = [];
+    try {
+      quotations = await db.orm.public.quotations.all();
+    } catch {
+      quotations = [];
+    }
+
+    let bookings: any[] = [];
+    try {
+      bookings = await db.orm.public.bookings.all();
+    } catch {
+      bookings = [];
+    }
+
+    let categories: any[] = [];
+    try {
+      categories = await db.orm.public.categories.all();
+    } catch {
+      categories = [];
+    }
+
+    let addresses: any[] = [];
+    try {
+      addresses = await db.orm.public.addresses.all();
+    } catch {
+      addresses = [];
+    }
+
+    let tickets: any[] = [];
+    try {
+      tickets = await db.orm.public.support_tickets.all();
+    } catch {
+      tickets = [];
+    }
+
+    return {
+      users,
+      providerProfiles,
+      requests,
+      quotations,
+      bookings,
+      categories,
+      addresses,
+      tickets,
     };
   }
 

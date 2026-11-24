@@ -8,13 +8,16 @@ import { ProviderDashboardResponseDto } from "../../application/dtos/response/pr
 import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
 import { GetAdminAuditLogsRequestDto } from "../../application/dtos/request/get-admin-audit-logs.dto";
 import { AdminAuditLogsResponseDto } from "../../application/dtos/response/admin-audit-logs-response.dto";
+import { GetAdminAnalyticsRequestDto } from "../../application/dtos/request/get-admin-analytics.dto";
+import { AdminAnalyticsResponseDto } from "../../application/dtos/response/admin-analytics-response.dto";
 
 export class DashboardController extends BaseController {
     constructor(
         private readonly _getCustomerDashboardUseCase: IUseCase<GetCustomerDashboardRequestDto, CustomerDashboardResponseDto>,
         private readonly _getProviderDashboardUseCase: IUseCase<GetProviderDashboardRequestDto, ProviderDashboardResponseDto>,
         private readonly _getAdminDashboardUseCase: IUseCase<void, AdminDashboardResponseDto>,
-        private readonly _getAdminAuditLogsUseCase: IUseCase<GetAdminAuditLogsRequestDto, AdminAuditLogsResponseDto>
+        private readonly _getAdminAuditLogsUseCase: IUseCase<GetAdminAuditLogsRequestDto, AdminAuditLogsResponseDto>,
+        private readonly _getAdminAnalyticsUseCase: IUseCase<GetAdminAnalyticsRequestDto, AdminAnalyticsResponseDto>
     ) {
         super();
     }
@@ -61,6 +64,17 @@ export class DashboardController extends BaseController {
             const response = await this._getAdminAuditLogsUseCase.execute({ page, limit, type, search });
 
             return this.sendSuccess(res, "Admin audit logs retrieved successfully", response);
+        } catch (err) {
+            next(err);
+        }
+    };
+
+    getAdminAnalytics = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const timeframe = req.query.timeframe as string | undefined;
+            const response = await this._getAdminAnalyticsUseCase.execute({ timeframe });
+
+            return this.sendSuccess(res, "Admin analytics retrieved successfully", response);
         } catch (err) {
             next(err);
         }

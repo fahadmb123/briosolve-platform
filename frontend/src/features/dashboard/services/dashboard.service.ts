@@ -175,6 +175,61 @@ export interface AdminAuditLogsResponse {
   totalPages: number;
 }
 
+export interface AdminAnalyticsKpis {
+  gmv: number;
+  platformRevenue: number;
+  totalBookings: number;
+  completedBookings: number;
+  averageOrderValue: number;
+  quotationToBookingRate: number;
+  customerGrowthRate: number;
+  activeProviders: number;
+}
+
+export interface AdminVolumeTrendPoint {
+  label: string;
+  volume: number;
+  revenue: number;
+  bookings: number;
+}
+
+export interface AdminFunnelStage {
+  stage: string;
+  count: number;
+  percentage: number;
+  dropoffRate: number;
+}
+
+export interface AdminCategoryShare {
+  categoryId: string;
+  categoryName: string;
+  volume: number;
+  bookingsCount: number;
+  percentage: number;
+}
+
+export interface AdminRegionalShare {
+  region: string;
+  bookingsCount: number;
+  volume: number;
+}
+
+export interface AdminFulfillmentMetric {
+  metric: string;
+  value: string;
+  score: number;
+}
+
+export interface AdminAnalyticsResponse {
+  timeframe: string;
+  kpis: AdminAnalyticsKpis;
+  volumeTrends: AdminVolumeTrendPoint[];
+  funnel: AdminFunnelStage[];
+  categoryShares: AdminCategoryShare[];
+  regionalShares: AdminRegionalShare[];
+  fulfillmentMetrics: AdminFulfillmentMetric[];
+}
+
 export const dashboardService = {
   async getCustomerDashboard(): Promise<CustomerDashboardData> {
     const res = await apiClient.get<{ success: boolean; data: CustomerDashboardData }>("/api/dashboard/customer");
@@ -203,6 +258,13 @@ export const dashboardService = {
     const queryString = query.toString() ? `?${query.toString()}` : "";
     const res = await apiClient.get<{ success: boolean; data: AdminAuditLogsResponse }>(
       `/api/dashboard/admin/audit-logs${queryString}`
+    );
+    return res.data.data;
+  },
+  async getAdminAnalytics(timeframe?: string): Promise<AdminAnalyticsResponse> {
+    const query = timeframe ? `?timeframe=${encodeURIComponent(timeframe)}` : "";
+    const res = await apiClient.get<{ success: boolean; data: AdminAnalyticsResponse }>(
+      `/api/dashboard/admin/analytics${query}`
     );
     return res.data.data;
   },
