@@ -97,49 +97,59 @@ export default function Dashboard() {
   const paginatedOrders = filteredOrders.slice((safePage - 1) * itemsPerPage, safePage * itemsPerPage);
 
   const trends = monthlyTrends.length > 0 ? monthlyTrends : [
-    { month: 'Jan', bookingsCount: 12, quotationsCount: 22, volume: 15000 },
-    { month: 'Feb', bookingsCount: 16, quotationsCount: 28, volume: 21000 },
-    { month: 'Mar', bookingsCount: 14, quotationsCount: 26, volume: 18000 },
-    { month: 'Apr', bookingsCount: 24, quotationsCount: 38, volume: 31000 },
-    { month: 'May', bookingsCount: 30, quotationsCount: 48, volume: 42000 },
-    { month: 'Jun', bookingsCount: 26, quotationsCount: 42, volume: 35000 },
+    { month: 'Jun', bookingsCount: 14, quotationsCount: 22, volume: 15000 },
+    { month: 'Jul', bookingsCount: 18, quotationsCount: 28, volume: 21000 },
+    { month: 'Aug', bookingsCount: 12, quotationsCount: 20, volume: 18000 },
+    { month: 'Sep', bookingsCount: 22, quotationsCount: 34, volume: 31000 },
+    { month: 'Oct', bookingsCount: 30, quotationsCount: 46, volume: 42000 },
+    { month: 'Nov', bookingsCount: 25, quotationsCount: 38, volume: 35000 },
   ];
 
-  const maxPointVal = Math.max(
-    ...trends.map((t) => Math.max(t.bookingsCount, t.quotationsCount, 1)),
-    10
+  const rawMax = Math.max(
+    ...trends.map((t) => Math.max(t.bookingsCount, t.quotationsCount)),
+    1
   );
 
-  const xCoords = [25, 125, 225, 325, 425, 515];
+  const yMax = rawMax > 25 ? Math.ceil(rawMax / 5) * 5 : 35;
+  const yTicks = [
+    { label: `${yMax}`, y: 25 },
+    { label: `${Math.round(yMax * 0.75)}`, y: 60 },
+    { label: `${Math.round(yMax * 0.5)}`, y: 95 },
+    { label: `${Math.round(yMax * 0.25)}`, y: 130 },
+    { label: '0', y: 165 },
+  ];
+
+  const xCoords = [75, 175, 275, 375, 475, 565];
+
   const bookingPoints = trends.map((t, idx) => {
-    const x = xCoords[idx] ?? 25;
-    const y = 150 - Math.round((t.bookingsCount / maxPointVal) * 110);
-    return { x, y, val: t.bookingsCount, month: t.month };
+    const x = xCoords[idx] ?? 75;
+    const y = 165 - Math.round((t.bookingsCount / yMax) * 140);
+    return { x, y: Math.max(20, Math.min(165, y)), val: t.bookingsCount, month: t.month };
   });
 
   const quotePoints = trends.map((t, idx) => {
-    const x = xCoords[idx] ?? 25;
-    const y = 150 - Math.round((t.quotationsCount / (maxPointVal * 1.25 || 1)) * 110);
-    return { x, y, val: t.quotationsCount, month: t.month };
+    const x = xCoords[idx] ?? 75;
+    const y = 165 - Math.round((t.quotationsCount / yMax) * 140);
+    return { x, y: Math.max(20, Math.min(165, y)), val: t.quotationsCount, month: t.month };
   });
 
-  const bookingPathD = bookingPoints.reduce((acc, p, i) => {
-    if (i === 0) return `M ${p.x} ${p.y}`;
-    const prev = bookingPoints[i - 1];
-    const cpx = (prev.x + p.x) / 2;
-    return `${acc} C ${cpx} ${prev.y}, ${cpx} ${p.y}, ${p.x} ${p.y}`;
-  }, '');
+  const buildSmoothPath = (pts: { x: number; y: number }[]) => {
+    if (pts.length === 0) return '';
+    let d = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 1; i < pts.length; i++) {
+      const prev = pts[i - 1];
+      const cur = pts[i];
+      const cpx = (prev.x + cur.x) / 2;
+      d += ` C ${cpx} ${prev.y}, ${cpx} ${cur.y}, ${cur.x} ${cur.y}`;
+    }
+    return d;
+  };
 
-  const bookingAreaD = `${bookingPathD} L ${bookingPoints[bookingPoints.length - 1].x} 160 L ${bookingPoints[0].x} 160 Z`;
+  const bookingPathD = buildSmoothPath(bookingPoints);
+  const bookingAreaD = `${bookingPathD} L ${bookingPoints[bookingPoints.length - 1].x} 165 L ${bookingPoints[0].x} 165 Z`;
 
-  const quotePathD = quotePoints.reduce((acc, p, i) => {
-    if (i === 0) return `M ${p.x} ${p.y}`;
-    const prev = quotePoints[i - 1];
-    const cpx = (prev.x + p.x) / 2;
-    return `${acc} C ${cpx} ${prev.y}, ${cpx} ${p.y}, ${p.x} ${p.y}`;
-  }, '');
-
-  const quoteAreaD = `${quotePathD} L ${quotePoints[quotePoints.length - 1].x} 160 L ${quotePoints[0].x} 160 Z`;
+  const quotePathD = buildSmoothPath(quotePoints);
+  const quoteAreaD = `${quotePathD} L ${quotePoints[quotePoints.length - 1].x} 165 L ${quotePoints[0].x} 165 Z`;
 
   const displayVolume = kpis.currentMonthVolume
     ? kpis.currentMonthVolume
@@ -239,7 +249,7 @@ export default function Dashboard() {
             </div>
 
             <div className="mad-svg-chart-container">
-              <svg className="mad-svg-chart" viewBox="0 0 540 175" preserveAspectRatio="none">
+              <svg className="mad-svg-chart" viewBox="0 0 600 205">
                 <defs>
                   <linearGradient id="wavePinkGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#e91e63" stopOpacity="0.45" />
@@ -249,16 +259,31 @@ export default function Dashboard() {
                     <stop offset="0%" stopColor="#ff9800" stopOpacity="0.35" />
                     <stop offset="100%" stopColor="#ff9800" stopOpacity="0.0" />
                   </linearGradient>
-                  <linearGradient id="wavePurpleGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#673ab7" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#673ab7" stopOpacity="0.0" />
-                  </linearGradient>
                 </defs>
 
-                <line x1="0" y1="35" x2="540" y2="35" stroke="var(--border)" strokeDasharray="3 3" opacity="0.6" />
-                <line x1="0" y1="80" x2="540" y2="80" stroke="var(--border)" strokeDasharray="3 3" opacity="0.6" />
-                <line x1="0" y1="125" x2="540" y2="125" stroke="var(--border)" strokeDasharray="3 3" opacity="0.6" />
-                <line x1="0" y1="160" x2="540" y2="160" stroke="var(--border)" />
+                {yTicks.map((tick, i) => (
+                  <g key={`ytick-${i}`}>
+                    <text
+                      x="38"
+                      y={tick.y + 4}
+                      textAnchor="end"
+                      fill="var(--text-secondary)"
+                      fontSize="11"
+                      fontWeight="700"
+                    >
+                      {tick.label}
+                    </text>
+                    <line
+                      x1="48"
+                      y1={tick.y}
+                      x2="590"
+                      y2={tick.y}
+                      stroke="var(--border)"
+                      strokeDasharray={i === yTicks.length - 1 ? 'none' : '3 3'}
+                      opacity={i === yTicks.length - 1 ? 1 : 0.6}
+                    />
+                  </g>
+                ))}
 
                 <path d={quoteAreaD} fill="url(#waveOrangeGrad)" />
                 <path d={quotePathD} fill="none" stroke="#ff9800" strokeWidth="2.5" />
@@ -266,19 +291,20 @@ export default function Dashboard() {
                 <path d={bookingAreaD} fill="url(#wavePinkGrad)" />
                 <path d={bookingPathD} fill="none" stroke="#e91e63" strokeWidth="3" />
 
-                {bookingPoints.map((p, idx) => (
-                  <circle key={`bp-${idx}`} cx={p.x} cy={p.y} r="4.5" fill="#e91e63" stroke="#ffffff" strokeWidth="2" />
+                {quotePoints.map((p, idx) => (
+                  <circle key={`qp-${idx}`} cx={p.x} cy={p.y} r="4.5" fill="#ff9800" stroke="#ffffff" strokeWidth="2" />
                 ))}
 
-                {quotePoints.map((p, idx) => (
-                  <circle key={`qp-${idx}`} cx={p.x} cy={p.y} r="4" fill="#ff9800" stroke="#ffffff" strokeWidth="2" />
+                {bookingPoints.map((p, idx) => (
+                  <circle key={`bp-${idx}`} cx={p.x} cy={p.y} r="5" fill="#e91e63" stroke="#ffffff" strokeWidth="2" />
                 ))}
 
                 {trends.map((t, idx) => (
                   <text
                     key={`txt-${idx}`}
-                    x={xCoords[idx] - 10}
-                    y="172"
+                    x={xCoords[idx]}
+                    y="190"
+                    textAnchor="middle"
                     fill="var(--text-secondary)"
                     fontSize="11"
                     fontWeight="700"
