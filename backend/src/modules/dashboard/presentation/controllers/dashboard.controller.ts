@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../../../../shared/base/controller/baseController";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { GetCustomerDashboardInputDto } from "../../application/dtos/request/get-customer-dashboard.dto";
@@ -6,80 +6,45 @@ import { CustomerDashboardResponseDto } from "../../application/dtos/response/cu
 import { GetProviderDashboardInputDto } from "../../application/dtos/request/get-provider-dashboard.dto";
 import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
 import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
-import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export class DashboardController extends BaseController {
-  constructor(
-    private readonly _getCustomerDashboardUseCase: IUseCase<
-      GetCustomerDashboardInputDto,
-      CustomerDashboardResponseDto
-    >,
-    private readonly _getProviderDashboardUseCase: IUseCase<
-      GetProviderDashboardInputDto,
-      ProviderDashboardResponseDto
-    >,
-    private readonly _getAdminDashboardUseCase: IUseCase<
-      void,
-      AdminDashboardResponseDto
-    >
-  ) {
-    super();
-  }
-
-  getCustomerDashboard = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const userId = req.user?.userId;
-      if (!userId) {
-        throw new ApplicationError(
-          "AUTHENTICATION_REQUIRED",
-          "Authentication required",
-          "AUTHENTICATION"
-        );
-      }
-
-      const result = await this._getCustomerDashboardUseCase.execute({ userId });
-      this.sendSuccess(res, "Customer dashboard retrieved successfully", result, 200);
-    } catch (error) {
-      next(error);
+    constructor(
+        private readonly _getCustomerDashboardUseCase: IUseCase<GetCustomerDashboardInputDto, CustomerDashboardResponseDto>,
+        private readonly _getProviderDashboardUseCase: IUseCase<GetProviderDashboardInputDto, ProviderDashboardResponseDto>,
+        private readonly _getAdminDashboardUseCase: IUseCase<void, AdminDashboardResponseDto>
+    ) {
+        super();
     }
-  };
 
-  getProviderDashboard = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const userId = req.user?.userId;
-      if (!userId) {
-        throw new ApplicationError(
-          "AUTHENTICATION_REQUIRED",
-          "Authentication required",
-          "AUTHENTICATION"
-        );
-      }
+    getCustomerDashboard = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId as string;
+            const response = await this._getCustomerDashboardUseCase.execute({ userId });
 
-      const result = await this._getProviderDashboardUseCase.execute({ userId });
-      this.sendSuccess(res, "Provider dashboard retrieved successfully", result, 200);
-    } catch (error) {
-      next(error);
-    }
-  };
+            return this.sendSuccess(res, "Customer dashboard retrieved successfully", response);
+        } catch (err) {
+            next(err);
+        }
+    };
 
-  getAdminDashboard = async (
-    _req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const result = await this._getAdminDashboardUseCase.execute();
-      this.sendSuccess(res, "Admin dashboard retrieved successfully", result, 200);
-    } catch (error) {
-      next(error);
-    }
-  };
+    getProviderDashboard = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId as string;
+            const response = await this._getProviderDashboardUseCase.execute({ userId });
+
+            return this.sendSuccess(res, "Provider dashboard retrieved successfully", response);
+        } catch (err) {
+            next(err);
+        }
+    };
+
+    getAdminDashboard = async (_req: Request, res: Response, next: NextFunction) => {
+        try {
+            const response = await this._getAdminDashboardUseCase.execute();
+
+            return this.sendSuccess(res, "Admin dashboard retrieved successfully", response);
+        } catch (err) {
+            next(err);
+        }
+    };
 }
