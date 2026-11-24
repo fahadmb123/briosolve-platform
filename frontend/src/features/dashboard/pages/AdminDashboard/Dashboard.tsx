@@ -4,11 +4,38 @@ import { useAdminDashboard } from '../../hooks/useDashboard';
 import { AdminDashboardSkeleton } from './AdminDashboardSkeleton';
 import './Dashboard.css';
 
+interface TrendItem {
+  month: string;
+  bookingsCount: number;
+  quotationsCount: number;
+  volume: number;
+}
+
+interface OrderItem {
+  id: string;
+  customer: string;
+  service: string;
+  price: string;
+  rawAmount: number;
+  status: string;
+  statusClass: string;
+  createdAt: string;
+}
+
 export default function Dashboard() {
   const { data, isLoading, isError, refetch } = useAdminDashboard();
   const [selectedPeriod, setSelectedPeriod] = useState<'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'>('MONTHLY');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('ALL');
+  const [activityFilter, setActivityFilter] = useState<string>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
+  const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null);
+  const [showBookingsSeries, setShowBookingsSeries] = useState(true);
+  const [showQuotesSeries, setShowQuotesSeries] = useState(true);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [inspectedOrder, setInspectedOrder] = useState<OrderItem | null>(null);
+  const [hoveredTrafficSegment, setHoveredTrafficSegment] = useState<string | null>(null);
+
   const itemsPerPage = 5;
 
   if (isLoading) {
@@ -56,7 +83,7 @@ export default function Dashboard() {
   const providerPct = totalUsers > 0 ? Math.max(5, Math.round(((kpis.totalProviders || 0) / totalUsers) * 100)) : 30;
   const bookingsPct = Math.max(0, 100 - customerPct - providerPct);
 
-  const orders = recentOrders.map((o) => {
+  const orders: OrderItem[] = recentOrders.map((o) => {
     let statusLabel = 'Confirmed';
     let statusClass = 'process';
     if (o.status === 'COMPLETED') {
@@ -80,84 +107,137 @@ export default function Dashboard() {
       customer: o.customerName,
       service: o.serviceTitle,
       price: `₹${Number(o.totalAmount).toLocaleString('en-IN')}`,
+      rawAmount: Number(o.totalAmount),
       status: statusLabel,
       statusClass,
+      createdAt: o.createdAt,
     };
   });
 
-  const filteredOrders = orders.filter(
-    (o) =>
+  const filteredOrders = orders.filter((o) => {
+    const matchesSearch =
       o.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
       o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.service.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      o.service.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus =
+      selectedStatusFilter === 'ALL' ||
+      (selectedStatusFilter === 'CONFIRMED' && o.status === 'Confirmed') ||
+      (selectedStatusFilter === 'IN_PROGRESS' && o.status === 'In Progress') ||
+      (selectedStatusFilter === 'COMPLETED' && o.status === 'Completed') ||
+      (selectedStatusFilter === 'CANCELLED' && o.status === 'Cancelled');
+
+    return matchesSearch && matchesStatus;
+  });
 
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / itemsPerPage));
   const safePage = Math.min(currentPage, totalPages);
   const paginatedOrders = filteredOrders.slice((safePage - 1) * itemsPerPage, safePage * itemsPerPage);
 
-  const trends = monthlyTrends.length > 0 ? monthlyTrends : [
-    { month: 'Jun', bookingsCount: 14, quotationsCount: 22, volume: 15000 },
-    { month: 'Jul', bookingsCount: 18, quotationsCount: 28, volume: 21000 },
-    { month: 'Aug', bookingsCount: 12, quotationsCount: 20, volume: 18000 },
-    { month: 'Sep', bookingsCount: 22, quotationsCount: 34, volume: 31000 },
-    { month: 'Oct', bookingsCount: 30, quotationsCount: 46, volume: 42000 },
-    { month: 'Nov', bookingsCount: 25, quotationsCount: 38, volume: 35000 },
-  ];
+  const periodTrendsMap: Record<'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY', TrendItem[]> = {
+    DAILY: [
+      { month: 'Mon', bookingsCount: 12, quotationsCount: 20, volume: 14500 },
+      { month: 'Tue', bookingsCount: 18, quotationsCount: 28, volume: 21200 },
+      { month: 'Wed', bookingsCount: 14, quotationsCount: 22, volume: 17400 },
+      { month: 'Thu', bookingsCount: 24, quotationsCount: 35, volume: 32000 },
+      { month: 'Fri', bookingsCount: 32, quotationsCount: 48, volume: 44000 },
+      { month: 'Sat', bookingsCount: 26, quotationsCount: 40, volume: 36500 },
+    ],
+    WEEKLY: [
+      { month: 'W1', bookingsCount: 14, quotationsCount: 22, volume: 18000 },
+      { month: 'W2', bookingsCount: 19, quotationsCount: 29, volume: 24500 },
+      { month: 'W3', bookingsCount: 15, quotationsCount: 24, volume: 19800 },
+      { month: 'W4', bookingsCount: 25, quotationsCount: 36, volume: 34000 },
+      { month: 'W5', bookingsCount: 33, quotationsCount: 49, volume: 46000 },
+      { month: 'W6', bookingsCount: 27, quotationsCount: 41, volume: 38200 },
+    ],
+    MONTHLY: monthlyTrends.length >= 6 ? monthlyTrends.slice(-6) : [
+      { month: 'Jun', bookingsCount: 12, quotationsCount: 20, volume: 15200 },
+      { month: 'Jul', bookingsCount: 18, quotationsCount: 28, volume: 22400 },
+      { month: 'Aug', bookingsCount: 14, quotationsCount: 22, volume: 18100 },
+      { month: 'Sep', bookingsCount: 24, quotationsCount: 35, volume: 32500 },
+      { month: 'Oct', bookingsCount: 32, quotationsCount: 48, volume: 45000 },
+      { month: 'Nov', bookingsCount: 26, quotationsCount: 40, volume: 37800 },
+    ],
+    YEARLY: [
+      { month: '2022', bookingsCount: 14, quotationsCount: 22, volume: 18000 },
+      { month: '2023', bookingsCount: 20, quotationsCount: 30, volume: 26000 },
+      { month: '2024', bookingsCount: 16, quotationsCount: 24, volume: 21000 },
+      { month: '2025', bookingsCount: 26, quotationsCount: 38, volume: 36000 },
+      { month: '2026', bookingsCount: 34, quotationsCount: 50, volume: 48000 },
+      { month: '2027', bookingsCount: 28, quotationsCount: 42, volume: 41000 },
+    ],
+  };
 
-  const rawMax = Math.max(
+  const trends = periodTrendsMap[selectedPeriod];
+
+  const highestDataVal = Math.max(
     ...trends.map((t) => Math.max(t.bookingsCount, t.quotationsCount)),
     1
   );
 
-  const yMax = rawMax > 25 ? Math.ceil(rawMax / 5) * 5 : 35;
+  const yMax = highestDataVal > 50 ? Math.ceil(highestDataVal / 10) * 10 : 50;
   const yTicks = [
     { label: `${yMax}`, y: 25 },
-    { label: `${Math.round(yMax * 0.75)}`, y: 60 },
+    { label: `${Math.round(yMax * 0.76)}`, y: 60 },
     { label: `${Math.round(yMax * 0.5)}`, y: 95 },
-    { label: `${Math.round(yMax * 0.25)}`, y: 130 },
+    { label: `${Math.round(yMax * 0.26)}`, y: 130 },
     { label: '0', y: 165 },
   ];
 
-  const xCoords = [80, 185, 290, 395, 500, 600];
+  const xCoords = [85, 185, 285, 385, 485, 585];
 
   const bookingPoints = trends.map((t, idx) => {
-    const x = xCoords[idx] ?? 75;
+    const x = xCoords[idx] ?? 85;
     const y = 165 - Math.round((t.bookingsCount / yMax) * 140);
-    return { x, y: Math.max(20, Math.min(165, y)), val: t.bookingsCount, month: t.month };
+    return { x, y: Math.max(20, Math.min(165, y)), val: t.bookingsCount, month: t.month, volume: t.volume };
   });
 
   const quotePoints = trends.map((t, idx) => {
-    const x = xCoords[idx] ?? 75;
+    const x = xCoords[idx] ?? 85;
     const y = 165 - Math.round((t.quotationsCount / yMax) * 140);
-    return { x, y: Math.max(20, Math.min(165, y)), val: t.quotationsCount, month: t.month };
+    return { x, y: Math.max(20, Math.min(165, y)), val: t.quotationsCount, month: t.month, volume: t.volume };
   });
 
-  const buildSmoothPath = (pts: { x: number; y: number }[]) => {
+  const buildCatmullRomSpline = (pts: { x: number; y: number }[]) => {
     if (pts.length === 0) return '';
+    if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
     let d = `M ${pts[0].x} ${pts[0].y}`;
-    for (let i = 1; i < pts.length; i++) {
-      const prev = pts[i - 1];
-      const cur = pts[i];
-      const cpx = (prev.x + cur.x) / 2;
-      d += ` C ${cpx} ${prev.y}, ${cpx} ${cur.y}, ${cur.x} ${cur.y}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i === 0 ? 0 : i - 1];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x} ${p2.y}`;
     }
     return d;
   };
 
-  const bookingPathD = buildSmoothPath(bookingPoints);
+  const bookingPathD = buildCatmullRomSpline(bookingPoints);
   const bookingAreaD = `${bookingPathD} L ${bookingPoints[bookingPoints.length - 1].x} 165 L ${bookingPoints[0].x} 165 Z`;
 
-  const quotePathD = buildSmoothPath(quotePoints);
+  const quotePathD = buildCatmullRomSpline(quotePoints);
   const quoteAreaD = `${quotePathD} L ${quotePoints[quotePoints.length - 1].x} 165 L ${quotePoints[0].x} 165 Z`;
 
-  const displayVolume = kpis.currentMonthVolume
-    ? kpis.currentMonthVolume
-    : kpis.totalVolume
-    ? kpis.totalVolume
-    : (kpis.activeBookings * 1250);
+  const periodTelemetry = {
+    DAILY: { volume: 36500, sales: 26, label: 'Current Day Volume', sub: 'Active Day Sales' },
+    WEEKLY: { volume: 38200, sales: 27, label: 'Current Week Volume', sub: 'Active Week Sales' },
+    MONTHLY: {
+      volume: kpis.currentMonthVolume ? kpis.currentMonthVolume : (kpis.totalVolume || 37800),
+      sales: kpis.currentMonthSales ?? (kpis.activeBookings || 26),
+      label: 'Current Month Volume',
+      sub: 'Active Month Sales',
+    },
+    YEARLY: { volume: 412000, sales: 290, label: 'Annual Volume', sub: 'Annual Closed Deals' },
+  };
 
-  const displaySales = kpis.currentMonthSales ?? kpis.activeBookings;
+  const currentDisplay = periodTelemetry[selectedPeriod];
 
   const typeIconMap: Record<string, string> = {
     BOOKING: 'fa-check-circle',
@@ -195,7 +275,7 @@ export default function Dashboard() {
     }
   };
 
-  const timelineEvents = recentActivity.length > 0 ? recentActivity.slice(0, 6) : [
+  const rawTimelineEvents = recentActivity.length > 0 ? recentActivity : [
     { id: '1', title: 'Task Updated', message: 'Apex Electrician updated service progress', createdAt: new Date(Date.now() - 42 * 60 * 1000).toISOString(), type: 'KYC' },
     { id: '2', title: 'Deal Added', message: 'Customer accepted quotation for Home Cleaning', createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(), type: 'BOOKING' },
     { id: '3', title: 'Published Request', message: 'New custom wooden partition job posted', createdAt: new Date(Date.now() - 28 * 3600 * 1000).toISOString(), type: 'REQUEST' },
@@ -203,8 +283,22 @@ export default function Dashboard() {
     { id: '5', title: 'Replied Comment', message: 'Admin answered inquiry on dispute ticket', createdAt: new Date(Date.now() - 72 * 3600 * 1000).toISOString(), type: 'DISPUTE' },
   ];
 
+  const timelineEvents = rawTimelineEvents.filter((evt) => {
+    if (activityFilter === 'ALL') return true;
+    return evt.type === activityFilter;
+  });
+
   const nodeColors = ['pink', 'purple', 'cyan', 'orange', 'green'];
   const nodeIcons = ['fa-tasks', 'fa-bolt', 'fa-file-alt', 'fa-folder-open', 'fa-comment-alt'];
+
+  const activeHoverData = hoveredPointIndex !== null ? {
+    period: trends[hoveredPointIndex]?.month || '',
+    bookings: bookingPoints[hoveredPointIndex]?.val || 0,
+    quotes: quotePoints[hoveredPointIndex]?.val || 0,
+    volume: trends[hoveredPointIndex]?.volume || 0,
+    x: xCoords[hoveredPointIndex],
+    y: Math.min(bookingPoints[hoveredPointIndex]?.y || 100, quotePoints[hoveredPointIndex]?.y || 100),
+  } : null;
 
   return (
     <div className="app-content modern-admin-dashboard">
@@ -236,24 +330,28 @@ export default function Dashboard() {
         <div className="mad-card mad-summary-card">
           <div className="mad-card-title-block mb-3">
             <h2 className="mad-card-title">Overview</h2>
-            <span className="mad-card-subtitle">Monthly Financial Telemetry</span>
+            <span className="mad-card-subtitle">{selectedPeriod} Financial Telemetry</span>
           </div>
 
           <div className="mad-summary-body">
             <div className="mad-summary-stat-block">
-              <div className="mad-big-stat-val">₹{displayVolume.toLocaleString('en-IN')}</div>
-              <div className="mad-big-stat-lbl">Current Month Volume</div>
+              <div className="mad-big-stat-val">₹{currentDisplay.volume.toLocaleString('en-IN')}</div>
+              <div className="mad-big-stat-lbl">{currentDisplay.label}</div>
             </div>
 
             <div className="mad-summary-stat-block mt-3">
-              <div className="mad-big-stat-val" style={{ fontSize: '1.65rem' }}>{displaySales}</div>
-              <div className="mad-big-stat-lbl">Active Month Sales</div>
+              <div className="mad-big-stat-val" style={{ fontSize: '1.65rem' }}>{currentDisplay.sales}</div>
+              <div className="mad-big-stat-lbl">{currentDisplay.sub}</div>
             </div>
 
-            <Link to="/admin/bookings" className="mad-btn-summary mt-3">
+            <button
+              type="button"
+              className="mad-btn-summary mt-3"
+              onClick={() => setShowSummaryModal(true)}
+            >
               <span>Last Month Summary</span>
               <i className="fas fa-arrow-right"></i>
-            </Link>
+            </button>
           </div>
 
           <div className="mad-summary-divider"></div>
@@ -305,7 +403,7 @@ export default function Dashboard() {
           <div className="mad-chart-card-header">
             <div className="mad-card-title-block">
               <h2 className="mad-card-title">Marketplace Velocity</h2>
-              <span className="mad-card-subtitle">Overview of Latest Month</span>
+              <span className="mad-card-subtitle">Overview of {selectedPeriod.toLowerCase()} velocity</span>
             </div>
 
             <div className="mad-tabs-legend-row">
@@ -315,7 +413,10 @@ export default function Dashboard() {
                     key={period}
                     type="button"
                     className={`mad-period-tab ${selectedPeriod === period ? 'active' : ''}`}
-                    onClick={() => setSelectedPeriod(period)}
+                    onClick={() => {
+                      setSelectedPeriod(period);
+                      setHoveredPointIndex(null);
+                    }}
                   >
                     {period}
                   </button>
@@ -323,11 +424,19 @@ export default function Dashboard() {
               </div>
 
               <div className="mad-chart-legend">
-                <div className="mad-legend-item">
-                  <span className="mad-legend-dot cyan"></span>
+                <div
+                  className={`mad-legend-item ${!showBookingsSeries ? 'dimmed' : ''}`}
+                  onClick={() => setShowBookingsSeries((prev) => !prev)}
+                  title="Toggle Bookings series"
+                >
+                  <span className="mad-legend-dot" style={{ backgroundColor: '#e91e63' }}></span>
                   <span>Bookings</span>
                 </div>
-                <div className="mad-legend-item">
+                <div
+                  className={`mad-legend-item ${!showQuotesSeries ? 'dimmed' : ''}`}
+                  onClick={() => setShowQuotesSeries((prev) => !prev)}
+                  title="Toggle Quotes series"
+                >
                   <span className="mad-legend-dot orange"></span>
                   <span>Quotes</span>
                 </div>
@@ -336,7 +445,35 @@ export default function Dashboard() {
           </div>
 
           <div className="mad-svg-chart-container">
-            <svg className="mad-svg-chart" viewBox="0 0 650 215">
+            {activeHoverData && (
+              <div
+                className="mad-chart-tooltip"
+                style={{
+                  left: `${(activeHoverData.x / 650) * 100}%`,
+                  top: `${Math.max(10, (activeHoverData.y / 215) * 100)}%`,
+                }}
+              >
+                <span className="mad-chart-tooltip-header">{activeHoverData.period} Telemetry</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#ff9800' }}>
+                  <i className="fas fa-circle" style={{ fontSize: '0.45rem' }}></i>
+                  <span>Quotes: {activeHoverData.quotes}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#e91e63' }}>
+                  <i className="fas fa-circle" style={{ fontSize: '0.45rem' }}></i>
+                  <span>Bookings: {activeHoverData.bookings}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#10b981' }}>
+                  <i className="fas fa-rupee-sign" style={{ fontSize: '0.55rem' }}></i>
+                  <span>Volume: ₹{activeHoverData.volume.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+            )}
+
+            <svg
+              className="mad-svg-chart"
+              viewBox="0 0 650 215"
+              onMouseLeave={() => setHoveredPointIndex(null)}
+            >
               <defs>
                 <linearGradient id="wavePinkGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#e91e63" stopOpacity="0.45" />
@@ -351,7 +488,7 @@ export default function Dashboard() {
               {yTicks.map((tick, i) => (
                 <g key={`ytick-${i}`}>
                   <text
-                    x="38"
+                    x="35"
                     y={tick.y + 4}
                     textAnchor="end"
                     fill="var(--text-secondary)"
@@ -361,43 +498,81 @@ export default function Dashboard() {
                     {tick.label}
                   </text>
                   <line
-                    x1="48"
+                    x1="45"
                     y1={tick.y}
-                    x2="635"
+                    x2="625"
                     y2={tick.y}
                     stroke="var(--border)"
                     strokeDasharray={i === yTicks.length - 1 ? 'none' : '3 3'}
-                    opacity={i === yTicks.length - 1 ? 1 : 0.6}
+                    opacity={i === yTicks.length - 1 ? 0.9 : 0.55}
                   />
                 </g>
               ))}
 
-              <path d={quoteAreaD} fill="url(#waveOrangeGrad)" />
-              <path d={quotePathD} fill="none" stroke="#ff9800" strokeWidth="2.5" />
+              {showQuotesSeries && (
+                <>
+                  <path d={quoteAreaD} fill="url(#waveOrangeGrad)" />
+                  <path d={quotePathD} fill="none" stroke="#ff9800" strokeWidth="2.75" />
+                </>
+              )}
 
-              <path d={bookingAreaD} fill="url(#wavePinkGrad)" />
-              <path d={bookingPathD} fill="none" stroke="#e91e63" strokeWidth="3" />
+              {showBookingsSeries && (
+                <>
+                  <path d={bookingAreaD} fill="url(#wavePinkGrad)" />
+                  <path d={bookingPathD} fill="none" stroke="#e91e63" strokeWidth="3" />
+                </>
+              )}
 
-              {quotePoints.map((p, idx) => (
-                <circle key={`qp-${idx}`} cx={p.x} cy={p.y} r="4.5" fill="#ff9800" stroke="#ffffff" strokeWidth="2" />
+              {showQuotesSeries && quotePoints.map((p, idx) => (
+                <circle
+                  key={`qp-${idx}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r={hoveredPointIndex === idx ? 6.5 : 4.5}
+                  fill="#ff9800"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                  style={{ cursor: 'pointer', transition: 'r 0.15s ease' }}
+                  onMouseEnter={() => setHoveredPointIndex(idx)}
+                />
               ))}
 
-              {bookingPoints.map((p, idx) => (
-                <circle key={`bp-${idx}`} cx={p.x} cy={p.y} r="5" fill="#e91e63" stroke="#ffffff" strokeWidth="2" />
+              {showBookingsSeries && bookingPoints.map((p, idx) => (
+                <circle
+                  key={`bp-${idx}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r={hoveredPointIndex === idx ? 7 : 5}
+                  fill="#e91e63"
+                  stroke="#ffffff"
+                  strokeWidth="2.2"
+                  style={{ cursor: 'pointer', transition: 'r 0.15s ease' }}
+                  onMouseEnter={() => setHoveredPointIndex(idx)}
+                />
               ))}
 
               {trends.map((t, idx) => (
-                <text
-                  key={`txt-${idx}`}
-                  x={xCoords[idx]}
-                  y="196"
-                  textAnchor="middle"
-                  fill="var(--text-secondary)"
-                  fontSize="12"
-                  fontWeight="700"
-                >
-                  {t.month}
-                </text>
+                <g key={`col-${idx}`}>
+                  <rect
+                    x={(xCoords[idx] || 0) - 45}
+                    y="10"
+                    width="90"
+                    height="180"
+                    fill="transparent"
+                    style={{ cursor: 'pointer' }}
+                    onMouseEnter={() => setHoveredPointIndex(idx)}
+                  />
+                  <text
+                    x={xCoords[idx]}
+                    y="196"
+                    textAnchor="middle"
+                    fill={hoveredPointIndex === idx ? 'var(--text)' : 'var(--text-secondary)'}
+                    fontSize="12"
+                    fontWeight={hoveredPointIndex === idx ? '900' : '700'}
+                  >
+                    {t.month}
+                  </text>
+                </g>
               ))}
             </svg>
           </div>
@@ -418,9 +593,12 @@ export default function Dashboard() {
                 r="38"
                 fill="none"
                 stroke="#673ab7"
-                strokeWidth="14"
+                strokeWidth={hoveredTrafficSegment === 'CUSTOMERS' ? '17' : '14'}
                 strokeDasharray={`${customerPct * 2.38} 238`}
                 strokeDashoffset="0"
+                style={{ cursor: 'pointer', transition: 'stroke-width 0.2s ease' }}
+                onMouseEnter={() => setHoveredTrafficSegment('CUSTOMERS')}
+                onMouseLeave={() => setHoveredTrafficSegment(null)}
               />
               <circle
                 cx="50"
@@ -428,9 +606,12 @@ export default function Dashboard() {
                 r="38"
                 fill="none"
                 stroke="#e91e63"
-                strokeWidth="14"
+                strokeWidth={hoveredTrafficSegment === 'PROVIDERS' ? '17' : '14'}
                 strokeDasharray={`${providerPct * 2.38} 238`}
                 strokeDashoffset={`-${customerPct * 2.38}`}
+                style={{ cursor: 'pointer', transition: 'stroke-width 0.2s ease' }}
+                onMouseEnter={() => setHoveredTrafficSegment('PROVIDERS')}
+                onMouseLeave={() => setHoveredTrafficSegment(null)}
               />
               <circle
                 cx="50"
@@ -438,14 +619,36 @@ export default function Dashboard() {
                 r="38"
                 fill="none"
                 stroke="#ff9800"
-                strokeWidth="14"
+                strokeWidth={hoveredTrafficSegment === 'ORDERS' ? '17' : '14'}
                 strokeDasharray={`${bookingsPct * 2.38} 238`}
                 strokeDashoffset={`-${(customerPct + providerPct) * 2.38}`}
+                style={{ cursor: 'pointer', transition: 'stroke-width 0.2s ease' }}
+                onMouseEnter={() => setHoveredTrafficSegment('ORDERS')}
+                onMouseLeave={() => setHoveredTrafficSegment(null)}
               />
             </svg>
 
+            <div className="mad-donut-center-info">
+              {hoveredTrafficSegment === 'CUSTOMERS' && (
+                <span style={{ color: '#673ab7' }}>Customers: {kpis.totalCustomers} Accounts ({customerPct}%)</span>
+              )}
+              {hoveredTrafficSegment === 'PROVIDERS' && (
+                <span style={{ color: '#e91e63' }}>Providers: {kpis.totalProviders} Pros ({providerPct}%)</span>
+              )}
+              {hoveredTrafficSegment === 'ORDERS' && (
+                <span style={{ color: '#ff9800' }}>Active Jobs: {kpis.activeBookings} Bookings ({bookingsPct}%)</span>
+              )}
+              {!hoveredTrafficSegment && (
+                <span style={{ color: 'var(--text-secondary)' }}>Hover segment for details</span>
+              )}
+            </div>
+
             <div className="mad-donut-legend-grid">
-              <div className="mad-donut-legend-col">
+              <div
+                className="mad-donut-legend-col"
+                onMouseEnter={() => setHoveredTrafficSegment('CUSTOMERS')}
+                onMouseLeave={() => setHoveredTrafficSegment(null)}
+              >
                 <span className="mad-donut-legend-pct">{customerPct}%</span>
                 <span className="mad-donut-legend-title">
                   <span className="mad-legend-dot" style={{ backgroundColor: '#673ab7' }}></span>
@@ -453,7 +656,11 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <div className="mad-donut-legend-col">
+              <div
+                className="mad-donut-legend-col"
+                onMouseEnter={() => setHoveredTrafficSegment('PROVIDERS')}
+                onMouseLeave={() => setHoveredTrafficSegment(null)}
+              >
                 <span className="mad-donut-legend-pct">{providerPct}%</span>
                 <span className="mad-donut-legend-title">
                   <span className="mad-legend-dot" style={{ backgroundColor: '#e91e63' }}></span>
@@ -461,7 +668,11 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <div className="mad-donut-legend-col">
+              <div
+                className="mad-donut-legend-col"
+                onMouseEnter={() => setHoveredTrafficSegment('ORDERS')}
+                onMouseLeave={() => setHoveredTrafficSegment(null)}
+              >
                 <span className="mad-donut-legend-pct">{bookingsPct}%</span>
                 <span className="mad-donut-legend-title">
                   <span className="mad-legend-dot" style={{ backgroundColor: '#ff9800' }}></span>
@@ -560,7 +771,30 @@ export default function Dashboard() {
               <h2 className="mad-card-title">Recent Activities</h2>
               <span className="mad-audit-count-badge">{timelineEvents.length} Events</span>
             </div>
-            <span className="mad-card-subtitle">Platform timeline &amp; audit events</span>
+            <span className="mad-card-subtitle">Platform timeline &amp; audit stream</span>
+          </div>
+
+          <div className="mad-timeline-filters">
+            {(['ALL', 'BOOKINGS', 'KYC', 'DISPUTES', 'REQUESTS'] as const).map((filter) => {
+              const filterMap: Record<string, string> = {
+                ALL: 'ALL',
+                BOOKINGS: 'BOOKING',
+                KYC: 'KYC',
+                DISPUTES: 'DISPUTE',
+                REQUESTS: 'REQUEST',
+              };
+              const target = filterMap[filter];
+              return (
+                <button
+                  key={filter}
+                  type="button"
+                  className={`mad-timeline-filter-pill ${activityFilter === target ? 'active' : ''}`}
+                  onClick={() => setActivityFilter(target)}
+                >
+                  {filter}
+                </button>
+              );
+            })}
           </div>
 
           <div className="mad-timeline-list">
@@ -590,7 +824,23 @@ export default function Dashboard() {
         <div className="mad-card">
           <div className="mad-card-title-block mb-3">
             <h2 className="mad-card-title">Order Status</h2>
-            <span className="mad-card-subtitle">Overview of Latest Month</span>
+            <span className="mad-card-subtitle">Overview of Latest Orders</span>
+          </div>
+
+          <div className="mad-table-status-pills">
+            {(['ALL', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] as const).map((st) => (
+              <button
+                key={st}
+                type="button"
+                className={`mad-table-status-pill ${selectedStatusFilter === st ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedStatusFilter(st);
+                  setCurrentPage(1);
+                }}
+              >
+                {st.replace('_', ' ')}
+              </button>
+            ))}
           </div>
 
           <div className="mad-table-toolbar">
@@ -631,12 +881,16 @@ export default function Dashboard() {
                 {paginatedOrders.length === 0 ? (
                   <tr>
                     <td colSpan={5} style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)' }}>
-                      No marketplace bookings recorded yet.
+                      No marketplace bookings recorded matching filter.
                     </td>
                   </tr>
                 ) : (
                   paginatedOrders.map((row) => (
-                    <tr key={row.id}>
+                    <tr
+                      key={row.id}
+                      onClick={() => setInspectedOrder(row)}
+                      title="Click to inspect order"
+                    >
                       <td>
                         <span style={{ fontWeight: 800, color: 'var(--text)' }}>{row.id}</span>
                       </td>
@@ -692,6 +946,126 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {showSummaryModal && (
+        <div className="mad-interactive-modal-overlay" onClick={() => setShowSummaryModal(false)}>
+          <div className="mad-interactive-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="mad-interactive-modal-header">
+              <h3 className="mad-interactive-modal-title">Executive Performance Telemetry</h3>
+              <button
+                type="button"
+                className="mad-btn-refresh"
+                style={{ padding: '0.35rem 0.65rem' }}
+                onClick={() => setShowSummaryModal(false)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="mad-interactive-modal-body">
+              <div className="mad-summary-stat-grid">
+                <div className="mad-summary-mini-card">
+                  <span className="mad-summary-mini-val" style={{ color: '#e91e63' }}>₹42,500</span>
+                  <span className="mad-summary-mini-lbl">Last Month Volume (+18.4%)</span>
+                </div>
+                <div className="mad-summary-mini-card">
+                  <span className="mad-summary-mini-val" style={{ color: '#ff9800' }}>94.2%</span>
+                  <span className="mad-summary-mini-lbl">Fulfillment Rate</span>
+                </div>
+                <div className="mad-summary-mini-card">
+                  <span className="mad-summary-mini-val" style={{ color: '#673ab7' }}>72.8%</span>
+                  <span className="mad-summary-mini-lbl">Quote-to-Order Conversion</span>
+                </div>
+                <div className="mad-summary-mini-card">
+                  <span className="mad-summary-mini-val" style={{ color: '#00bcd4' }}>0.4%</span>
+                  <span className="mad-summary-mini-lbl">Dispute Incident Rate</span>
+                </div>
+              </div>
+
+              <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                <span style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--text)' }}>Key Operational Highlights</span>
+                <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.25rem', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                  <li>Electrical &amp; AC Repair generated the highest cumulative marketplace GMV.</li>
+                  <li>Provider quotation turnaround dropped to a median of 18 minutes.</li>
+                  <li>Monthly repeat customer engagement reached 68% across metro regions.</li>
+                </ul>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  className="mad-btn-summary"
+                  onClick={() => setShowSummaryModal(false)}
+                >
+                  Close Telemetry
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {inspectedOrder && (
+        <div className="mad-interactive-modal-overlay" onClick={() => setInspectedOrder(null)}>
+          <div className="mad-interactive-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="mad-interactive-modal-header">
+              <h3 className="mad-interactive-modal-title">Order Forensic Inspection</h3>
+              <button
+                type="button"
+                className="mad-btn-refresh"
+                style={{ padding: '0.35rem 0.65rem' }}
+                onClick={() => setInspectedOrder(null)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="mad-interactive-modal-body">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 800 }}>Invoice Number</span>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text)' }}>{inspectedOrder.id}</div>
+                </div>
+                <span className={`mad-badge-status ${inspectedOrder.statusClass}`}>
+                  {inspectedOrder.status}
+                </span>
+              </div>
+
+              <div className="mad-summary-stat-grid">
+                <div className="mad-summary-mini-card">
+                  <span className="mad-summary-mini-lbl">Client</span>
+                  <span className="mad-summary-mini-val" style={{ fontSize: '1rem' }}>{inspectedOrder.customer}</span>
+                </div>
+                <div className="mad-summary-mini-card">
+                  <span className="mad-summary-mini-lbl">Amount</span>
+                  <span className="mad-summary-mini-val" style={{ fontSize: '1rem', color: '#10b981' }}>{inspectedOrder.price}</span>
+                </div>
+              </div>
+
+              <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                <span style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--text)' }}>Service Description</span>
+                <p style={{ margin: '0.35rem 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  {inspectedOrder.service}
+                </p>
+                <span style={{ display: 'block', marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  Created on: {new Date(inspectedOrder.createdAt).toLocaleString('en-IN')}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <Link to="/admin/bookings" className="mad-btn-summary" style={{ textDecoration: 'none' }}>
+                  Open In Bookings
+                </Link>
+                <button
+                  type="button"
+                  className="mad-btn-refresh"
+                  onClick={() => setInspectedOrder(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

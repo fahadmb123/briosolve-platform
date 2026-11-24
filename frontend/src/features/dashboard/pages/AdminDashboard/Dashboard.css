@@ -999,3 +999,210 @@
     font-weight: 800;
     box-shadow: 0 2px 8px rgba(233, 30, 99, 0.4);
 }
+
+.mad-legend-item {
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.mad-legend-item:hover {
+    transform: translateY(-1px);
+}
+
+.mad-legend-item.dimmed {
+    opacity: 0.35;
+}
+
+.mad-chart-tooltip {
+    position: absolute;
+    background: #111827;
+    color: #ffffff;
+    padding: 0.6rem 0.85rem;
+    border-radius: 10px;
+    font-size: 0.775rem;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    pointer-events: none;
+    z-index: 20;
+    transform: translate(-50%, -105%);
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.mad-chart-tooltip-header {
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
+}
+
+.mad-table-status-pills {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+}
+
+.mad-table-status-pill {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.mad-table-status-pill:hover {
+    color: var(--text);
+    border-color: var(--text-secondary);
+}
+
+.mad-table-status-pill.active {
+    background: #e91e63;
+    color: #ffffff;
+    border-color: #e91e63;
+    box-shadow: 0 2px 6px rgba(233, 30, 99, 0.35);
+}
+
+.mad-order-table tbody tr {
+    cursor: pointer;
+}
+
+.mad-timeline-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.mad-timeline-filter-pill {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.725rem;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.mad-timeline-filter-pill.active {
+    background: linear-gradient(135deg, #673ab7, #9c27b0);
+    color: #ffffff;
+    border-color: transparent;
+}
+
+.mad-donut-center-info {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-align: center;
+    color: var(--text);
+    margin-top: 0.5rem;
+    min-height: 22px;
+}
+
+.mad-donut-legend-col {
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 8px;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.mad-donut-legend-col:hover {
+    background: var(--surface);
+    transform: translateY(-2px);
+}
+
+.mad-interactive-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1.5rem;
+}
+
+.mad-interactive-modal-card {
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.mad-interactive-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.mad-interactive-modal-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--text);
+    margin: 0;
+}
+
+.mad-interactive-modal-body {
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.mad-summary-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.mad-summary-mini-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.mad-summary-mini-val {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.mad-summary-mini-lbl {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
