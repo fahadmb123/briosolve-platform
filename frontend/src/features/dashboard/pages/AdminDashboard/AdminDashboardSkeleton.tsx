@@ -93,20 +93,23 @@ export function AdminDashboardSkeleton() {
       </div>
 
       <div className="mad-bottom-grid">
-        <div className="mad-card">
+        <div className="mad-card mad-audit-card">
           <div className="mad-card-title-block mb-3">
-            <div className="sk-shimmer mb-2" style={{ width: '130px', height: '18px', borderRadius: '4px' }}></div>
+            <div className="mad-audit-header-flex">
+              <div className="sk-shimmer mb-2" style={{ width: '130px', height: '18px', borderRadius: '4px' }}></div>
+              <div className="sk-shimmer" style={{ width: '65px', height: '18px', borderRadius: '9999px' }}></div>
+            </div>
             <div className="sk-shimmer" style={{ width: '180px', height: '12px', borderRadius: '4px' }}></div>
           </div>
           <div className="mad-timeline-list">
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="mad-timeline-item">
+                <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '8px' }}>
+                  <div className="sk-shimmer" style={{ width: '55px', height: '10px', borderRadius: '4px' }}></div>
+                </div>
                 <div className="sk-shimmer" style={{ width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0 }}></div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div className="sk-shimmer" style={{ width: '110px', height: '14px', borderRadius: '4px' }}></div>
-                    <div className="sk-shimmer" style={{ width: '60px', height: '10px', borderRadius: '4px' }}></div>
-                  </div>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', paddingTop: '6px' }}>
+                  <div className="sk-shimmer" style={{ width: '110px', height: '14px', borderRadius: '4px' }}></div>
                   <div className="sk-shimmer" style={{ width: '180px', height: '12px', borderRadius: '4px' }}></div>
                 </div>
               </div>

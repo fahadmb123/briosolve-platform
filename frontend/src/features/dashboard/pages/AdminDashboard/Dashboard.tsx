@@ -159,11 +159,47 @@ export default function Dashboard() {
 
   const displaySales = kpis.currentMonthSales ?? kpis.activeBookings;
 
-  const timelineEvents = recentActivity.length > 0 ? recentActivity.slice(0, 5) : [
+  const typeIconMap: Record<string, string> = {
+    BOOKING: 'fa-check-circle',
+    QUOTATION: 'fa-bolt',
+    REQUEST: 'fa-file-alt',
+    KYC: 'fa-shield-alt',
+    DISPUTE: 'fa-comment-alt',
+    SYSTEM: 'fa-tasks',
+  };
+
+  const typeColorMap: Record<string, string> = {
+    BOOKING: 'pink',
+    QUOTATION: 'purple',
+    REQUEST: 'cyan',
+    KYC: 'orange',
+    DISPUTE: 'green',
+    SYSTEM: 'purple',
+  };
+
+  const formatTimeAgo = (isoDate: string): string => {
+    try {
+      const diffMs = Date.now() - new Date(isoDate).getTime();
+      const diffSec = Math.max(0, Math.floor(diffMs / 1000));
+      if (diffSec < 60) return 'Just now';
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return `${diffMin} Mins Ago`;
+      const diffHours = Math.floor(diffMin / 60);
+      if (diffHours < 24) return `${diffHours} Hour${diffHours > 1 ? 's' : ''} Ago`;
+      const diffDays = Math.floor(diffHours / 24);
+      if (diffDays < 30) return `${diffDays} Day${diffDays > 1 ? 's' : ''} Ago`;
+      const diffMonths = Math.floor(diffDays / 30);
+      return `${diffMonths} Month${diffMonths > 1 ? 's' : ''} Ago`;
+    } catch {
+      return 'Recently';
+    }
+  };
+
+  const timelineEvents = recentActivity.length > 0 ? recentActivity.slice(0, 6) : [
     { id: '1', title: 'Task Updated', message: 'Apex Electrician updated service progress', createdAt: new Date(Date.now() - 42 * 60 * 1000).toISOString(), type: 'KYC' },
     { id: '2', title: 'Deal Added', message: 'Customer accepted quotation for Home Cleaning', createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(), type: 'BOOKING' },
-    { id: '3', title: 'Published Request', message: 'New custom wooden partition job posted', createdAt: new Date(Date.now() - 28 * 3600 * 1000).toISOString(), type: 'DISPUTE' },
-    { id: '4', title: 'Dock Updated', message: 'Provider profile submitted for verification', createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(), type: 'SYSTEM' },
+    { id: '3', title: 'Published Request', message: 'New custom wooden partition job posted', createdAt: new Date(Date.now() - 28 * 3600 * 1000).toISOString(), type: 'REQUEST' },
+    { id: '4', title: 'Dock Updated', message: 'Provider profile submitted for verification', createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(), type: 'KYC' },
     { id: '5', title: 'Replied Comment', message: 'Admin answered inquiry on dispute ticket', createdAt: new Date(Date.now() - 72 * 3600 * 1000).toISOString(), type: 'DISPUTE' },
   ];
 
@@ -518,32 +554,31 @@ export default function Dashboard() {
       </div>
 
       <div className="mad-bottom-grid">
-        <div className="mad-card">
+        <div className="mad-card mad-audit-card">
           <div className="mad-card-title-block mb-3">
-            <h2 className="mad-card-title">Recent Activities</h2>
+            <div className="mad-audit-header-flex">
+              <h2 className="mad-card-title">Recent Activities</h2>
+              <span className="mad-audit-count-badge">{timelineEvents.length} Events</span>
+            </div>
             <span className="mad-card-subtitle">Platform timeline &amp; audit events</span>
           </div>
 
           <div className="mad-timeline-list">
             {timelineEvents.map((evt, idx) => {
-              const colorClass = nodeColors[idx % nodeColors.length];
-              const iconClass = nodeIcons[idx % nodeIcons.length];
+              const colorClass = (evt.type && typeColorMap[evt.type]) || nodeColors[idx % nodeColors.length];
+              const iconClass = (evt.type && typeIconMap[evt.type]) || nodeIcons[idx % nodeIcons.length];
+              const timeAgo = formatTimeAgo(evt.createdAt);
 
               return (
                 <div key={evt.id || idx} className="mad-timeline-item">
+                  <div className="mad-timeline-time-col">
+                    {timeAgo}
+                  </div>
                   <div className={`mad-timeline-node ${colorClass}`}>
                     <i className={`fas ${iconClass}`}></i>
                   </div>
                   <div className="mad-timeline-content">
-                    <div className="mad-timeline-top">
-                      <span className="mad-timeline-heading">{evt.title}</span>
-                      <span className="mad-timeline-time">
-                        {new Date(evt.createdAt).toLocaleTimeString(undefined, {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
-                    </div>
+                    <span className="mad-timeline-heading">{evt.title}</span>
                     <p className="mad-timeline-desc">{evt.message}</p>
                   </div>
                 </div>

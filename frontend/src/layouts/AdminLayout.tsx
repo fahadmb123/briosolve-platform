@@ -147,10 +147,13 @@ export default function AdminLayout() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink 
+                            to="/admin/dashboard" 
+                            className="sidebar-item"
+                        >
                             <i className="fas fa-history"></i>
                             <span>Audit Logs</span>
-                        </Link>
+                        </NavLink>
                     </li>
                 </ul>
             </div>
