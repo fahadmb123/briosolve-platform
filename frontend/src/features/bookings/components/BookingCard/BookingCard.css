@@ -299,6 +299,15 @@
   font-size: 0.85rem;
 }
 
+.bkcard-counterparty-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+
 .bkcard-info-icon-wrapper.primary {
   color: #ea580c;
   background: #fff7ed;

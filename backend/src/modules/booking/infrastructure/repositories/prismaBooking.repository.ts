@@ -404,6 +404,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                     } catch {}
                 }
 
+                let customerAvatar: string | null = null;
                 const cUser = await db.orm.public.users
                     .where({ id: booking.customer_id as never })
                     .first();
@@ -411,6 +412,13 @@ export class PrismaBookingRepository implements IBookingRepository {
                     customerName = cUser.name;
                     customerPhone = cUser.phone;
                     customerEmail = cUser.email;
+
+                    const cProfile = await db.orm.public.customer_profiles
+                        .where({ user_id: cUser.id as never })
+                        .first();
+                    if (cProfile) {
+                        customerAvatar = cProfile.profile_image || null;
+                    }
                 }
 
                 let quotationType: string | null = null;
@@ -453,6 +461,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                     providerRating,
                     providerReviewCount,
                     customerName,
+                    customerAvatar,
                     customerEmail,
                     customerPhone,
                     quotationType,

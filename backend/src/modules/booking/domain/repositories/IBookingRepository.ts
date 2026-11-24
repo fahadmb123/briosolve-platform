@@ -34,6 +34,7 @@ export interface BookingDetails {
     providerRating?: number | null;
     providerReviewCount?: number | null;
     customerName: string | null;
+    customerAvatar?: string | null;
     customerEmail?: string | null;
     customerPhone?: string | null;
     quotationType?: string | null;

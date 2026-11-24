@@ -228,6 +228,7 @@ export class BookingMapper {
             providerRating?: number | null;
             providerReviewCount?: number | null;
             customerName?: string | null;
+            customerAvatar?: string | null;
             quotationType?: string | null;
             requiresInspection?: boolean;
             statusHistory?: BookingStatusHistoryItem[];
@@ -323,6 +324,7 @@ export class BookingMapper {
             providerRating: details?.providerRating ?? extra?.providerRating ?? null,
             providerReviewCount: details?.providerReviewCount ?? extra?.providerReviewCount ?? null,
             customerName: details?.customerName ?? extra?.customerName ?? null,
+            customerAvatar: details?.customerAvatar ?? extra?.customerAvatar ?? null,
             customerEmail: details?.customerEmail ?? null,
             customerPhone: details?.customerPhone ?? null,
             quotationType: details?.quotationType ?? extra?.quotationType ?? null,

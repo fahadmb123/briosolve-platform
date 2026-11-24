@@ -723,7 +723,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const counterpartyName = isProvider
     ? booking.customerName || "Customer"
     : booking.providerName || booking.providerBusinessName || "Service Provider";
-  const counterpartyInitial = counterpartyName.charAt(0).toUpperCase();
 
   const mapsUrl = booking.addressText
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.addressText)}`
@@ -1740,20 +1739,35 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                     }}
                   />
                 ) : (
-                  counterpartyInitial
+                  <img
+                    src={
+                      booking.customerAvatar ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.customerName || "Customer")}&background=0f172a&color=fff&size=160&bold=true`
+                    }
+                    alt={booking.customerName || "Customer"}
+                    className="bkdet-counterparty-avatar-img"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.customerName || "Customer")}&background=0f172a&color=fff&size=160&bold=true`;
+                    }}
+                  />
                 )}
               </div>
               <div className="bkdet-counterparty-info">
                 <span className="bkdet-counterparty-role">
-                  {isProvider ? "Customer" : "Assigned Specialist"}
+                  {isProvider ? "Client Details" : "Assigned Specialist"}
                 </span>
                 <span
                   className="bkdet-counterparty-name"
                   onClick={!isProvider ? () => setIsProviderModalOpen(true) : undefined}
                   style={{ cursor: !isProvider ? "pointer" : "default" }}
                 >
-                  {!isProvider && providerPersonName ? providerPersonName : counterpartyName}
+                  {isProvider ? (booking.customerName || "Customer") : (providerPersonName || counterpartyName)}
                 </span>
+                {isProvider && booking.customerEmail && (
+                  <span className="bkdet-counterparty-email" style={{ fontSize: "0.82rem", color: "#64748b", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <i className="fas fa-envelope" /> {booking.customerEmail}
+                  </span>
+                )}
                 {!isProvider && providerBusinessName && (
                   <span className="bkdet-counterparty-business">
                     <i className="fas fa-building" /> {providerBusinessName}

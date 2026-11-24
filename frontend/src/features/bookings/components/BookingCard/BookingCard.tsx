@@ -276,9 +276,35 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 
         <div className="bkcard-info-grid">
           <div className="bkcard-info-item">
-            <div className="bkcard-info-icon-wrapper primary">
-              <i className={role === "CUSTOMER" ? "fas fa-user-tie" : "fas fa-user"}></i>
-            </div>
+            {role === "PROVIDER" ? (
+              <img
+                src={
+                  booking.customerAvatar ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.customerName || "Customer")}&background=0f172a&color=fff&size=80&bold=true`
+                }
+                alt={booking.customerName || "Customer"}
+                className="bkcard-counterparty-avatar"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.customerName || "Customer")}&background=0f172a&color=fff&size=80&bold=true`;
+                }}
+              />
+            ) : booking.providerAvatar || booking.providerName ? (
+              <img
+                src={
+                  booking.providerAvatar ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.providerName || "Provider")}&background=FF7900&color=fff&size=80&bold=true`
+                }
+                alt={booking.providerName || "Provider"}
+                className="bkcard-counterparty-avatar"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.providerName || "Provider")}&background=FF7900&color=fff&size=80&bold=true`;
+                }}
+              />
+            ) : (
+              <div className="bkcard-info-icon-wrapper primary">
+                <i className="fas fa-user-tie"></i>
+              </div>
+            )}
             <div className="bkcard-info-content">
               <span className="bkcard-info-label">{role === "CUSTOMER" ? "Service Provider" : "Client"}</span>
               <span className="bkcard-info-value" title={counterpartyName}>
