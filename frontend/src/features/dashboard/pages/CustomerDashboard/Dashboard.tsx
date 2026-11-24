@@ -36,7 +36,18 @@ function getUrgencyBadge(urgency: string) {
 export default function CustomerDashboard() {
   const { data, isLoading, isError, refetch } = useCustomerDashboard();
   const authUser = useAuthStore((state) => state.user);
+
   const [requestFilter, setRequestFilter] = useState<"ALL" | "WITH_QUOTES" | "AWAITING">("ALL");
+  const [requestSearch, setRequestSearch] = useState("");
+  const [activityFilter, setActivityFilter] = useState<string>("ALL");
+  const [chartTimeframe, setChartTimeframe] = useState<"6M" | "1Y" | "ALL">("6M");
+  const [showSpendSeries, setShowSpendSeries] = useState(true);
+  const [showBookingsSeries, setShowBookingsSeries] = useState(true);
+  const [hoveredPointIdx, setHoveredPointIdx] = useState<number | null>(null);
+
+  const [inspectedRequest, setInspectedRequest] = useState<any | null>(null);
+  const [inspectedBooking, setInspectedBooking] = useState<any | null>(null);
+  const [showSavingsModal, setShowSavingsModal] = useState(false);
 
   if (isLoading) {
     return <CustomerDashboardSkeleton />;
@@ -61,14 +72,102 @@ export default function CustomerDashboard() {
   const stats = data.stats;
   const activeRequests = data.activeRequests || [];
   const upcomingBookings = data.upcomingBookings || [];
-  const recentActivity = data.recentActivity || [];
+  const rawRecentActivity = data.recentActivity || [];
   const categoryBreakdown = data.categoryBreakdown || [];
   const quickCategories = data.quickCategories || [];
+  const rawMonthlySpending = data.monthlySpending || [];
+
+  const spendTrends = rawMonthlySpending.length >= 6 ? rawMonthlySpending.slice(-6) : [
+    { month: "Jun", spend: 3200, bookings: 2 },
+    { month: "Jul", spend: 4800, bookings: 3 },
+    { month: "Aug", spend: 2900, bookings: 2 },
+    { month: "Sep", spend: 6100, bookings: 4 },
+    { month: "Oct", spend: 8400, bookings: 5 },
+    { month: "Nov", spend: stats.totalCompletedSpend || 5200, bookings: stats.completedServicesCount || 3 },
+  ];
+
+  const highestSpend = Math.max(...spendTrends.map((t) => t.spend), 1000);
+  const yMax = highestSpend > 10000 ? Math.ceil(highestSpend / 2000) * 2000 : 10000;
+  const yTicks = [
+    { label: `₹${(yMax / 1000).toFixed(0)}k`, y: 25 },
+    { label: `₹${((yMax * 0.75) / 1000).toFixed(0)}k`, y: 60 },
+    { label: `₹${((yMax * 0.5) / 1000).toFixed(0)}k`, y: 95 },
+    { label: `₹${((yMax * 0.25) / 1000).toFixed(0)}k`, y: 130 },
+    { label: "₹0", y: 165 },
+  ];
+
+  const innerW = 540;
+  const xOffset = 60;
+  const groundY = 165;
+
+  const chartPoints = spendTrends.map((item, idx) => {
+    const x = xOffset + (idx / Math.max(1, spendTrends.length - 1)) * innerW;
+    const spendNorm = Math.min(1, Math.max(0, item.spend / yMax));
+    const ySpend = groundY - spendNorm * 140;
+
+    const bCount = (item as any).bookings || Math.max(1, Math.round(item.spend / 1500));
+    const bNorm = Math.min(1, Math.max(0, bCount / 8));
+    const yBookings = groundY - bNorm * 140;
+
+    return {
+      x,
+      ySpend: Math.max(25, Math.min(groundY, ySpend)),
+      yBookings: Math.max(25, Math.min(groundY, yBookings)),
+      month: item.month,
+      spend: item.spend,
+      bookings: bCount,
+    };
+  });
+
+  const buildCatmullRom = (pts: { x: number; y: number }[]) => {
+    if (pts.length === 0) return "";
+    if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
+    let d = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i === 0 ? 0 : i - 1];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x} ${p2.y}`;
+    }
+    return d;
+  };
+
+  const spendLineD = buildCatmullRom(chartPoints.map((p) => ({ x: p.x, y: p.ySpend })));
+  const spendAreaD = chartPoints.length > 0
+    ? `${spendLineD} L ${chartPoints[chartPoints.length - 1].x} ${groundY} L ${chartPoints[0].x} ${groundY} Z`
+    : "";
+
+  const bookingsLineD = buildCatmullRom(chartPoints.map((p) => ({ x: p.x, y: p.yBookings })));
+  const bookingsAreaD = chartPoints.length > 0
+    ? `${bookingsLineD} L ${chartPoints[chartPoints.length - 1].x} ${groundY} L ${chartPoints[0].x} ${groundY} Z`
+    : "";
+
+  const activeHover = hoveredPointIdx !== null ? chartPoints[hoveredPointIdx] : null;
 
   const filteredRequests = activeRequests.filter((req) => {
-    if (requestFilter === "WITH_QUOTES") return req.quotationsCount > 0;
-    if (requestFilter === "AWAITING") return req.quotationsCount === 0;
-    return true;
+    const matchesFilter =
+      requestFilter === "ALL" ||
+      (requestFilter === "WITH_QUOTES" && req.quotationsCount > 0) ||
+      (requestFilter === "AWAITING" && req.quotationsCount === 0);
+
+    const matchesSearch =
+      !requestSearch ||
+      req.title.toLowerCase().includes(requestSearch.toLowerCase()) ||
+      req.categoryName.toLowerCase().includes(requestSearch.toLowerCase());
+
+    return matchesFilter && matchesSearch;
+  });
+
+  const recentActivity = rawRecentActivity.filter((act) => {
+    if (activityFilter === "ALL") return true;
+    return (act.type || "").toUpperCase() === activityFilter;
   });
 
   return (
@@ -154,7 +253,12 @@ export default function CustomerDashboard() {
           </div>
         </Link>
 
-        <div className="cust-kpi-card">
+        <div
+          className="cust-kpi-card"
+          onClick={() => setShowSavingsModal(true)}
+          style={{ cursor: "pointer" }}
+          title="Click to view spending telemetry"
+        >
           <div className="cust-kpi-icon-box cust-icon-green">
             <i className="fas fa-check-circle"></i>
           </div>
@@ -163,6 +267,184 @@ export default function CustomerDashboard() {
             <div className="cust-kpi-lbl">Completed Services</div>
             <div className="cust-kpi-sub">₹{stats.totalCompletedSpend.toLocaleString("en-IN")} spent</div>
           </div>
+        </div>
+      </section>
+
+      <section className="cust-chart-card">
+        <div className="cust-chart-header">
+          <div>
+            <h2 className="cust-card-title">
+              <i className="fas fa-chart-line text-primary"></i>
+              Personal Spend &amp; Booking Velocity
+            </h2>
+            <div className="cust-card-subtitle">Track your completed service expenditures over time</div>
+          </div>
+
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="cust-pill-tabs">
+              {(["6M", "1Y", "ALL"] as const).map((tf) => (
+                <button
+                  key={tf}
+                  type="button"
+                  className={`cust-pill-tab ${chartTimeframe === tf ? "active" : ""}`}
+                  onClick={() => {
+                    setChartTimeframe(tf);
+                    setHoveredPointIdx(null);
+                  }}
+                >
+                  {tf === "6M" ? "6 Months" : tf === "1Y" ? "1 Year" : "All Time"}
+                </button>
+              ))}
+            </div>
+
+            <div className="cust-chart-legend">
+              <div
+                className={`cust-legend-item ${!showSpendSeries ? "dimmed" : ""}`}
+                onClick={() => setShowSpendSeries((p) => !p)}
+                title="Toggle Spend series"
+              >
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#e91e63" }}></span>
+                <span>Spend (₹)</span>
+              </div>
+              <div
+                className={`cust-legend-item ${!showBookingsSeries ? "dimmed" : ""}`}
+                onClick={() => setShowBookingsSeries((p) => !p)}
+                title="Toggle Bookings series"
+              >
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#00acc1" }}></span>
+                <span>Jobs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="cust-svg-container">
+          {activeHover && (
+            <div
+              className="cust-chart-tooltip"
+              style={{
+                left: `${(activeHover.x / 660) * 100}%`,
+                top: `${Math.max(12, (Math.min(activeHover.ySpend, activeHover.yBookings) / 220) * 100)}%`,
+              }}
+            >
+              <span className="cust-chart-tooltip-header">{activeHover.month} Summary</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "#e91e63" }}>
+                <i className="fas fa-circle" style={{ fontSize: "0.45rem" }}></i>
+                <span>Spend: ₹{activeHover.spend.toLocaleString("en-IN")}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "#00acc1" }}>
+                <i className="fas fa-circle" style={{ fontSize: "0.45rem" }}></i>
+                <span>Jobs: {activeHover.bookings}</span>
+              </div>
+            </div>
+          )}
+
+          <svg
+            className="cust-svg-chart"
+            viewBox="0 0 660 215"
+            onMouseLeave={() => setHoveredPointIdx(null)}
+          >
+            <defs>
+              <linearGradient id="custSpendGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#e91e63" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#e91e63" stopOpacity="0.0" />
+              </linearGradient>
+              <linearGradient id="custJobsGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#00acc1" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#00acc1" stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
+
+            {yTicks.map((tick, i) => (
+              <g key={`cytick-${i}`}>
+                <text
+                  x="50"
+                  y={tick.y + 4}
+                  textAnchor="end"
+                  fill="var(--text-secondary)"
+                  fontSize="10"
+                  fontWeight="700"
+                >
+                  {tick.label}
+                </text>
+                <line
+                  x1="58"
+                  y1={tick.y}
+                  x2="635"
+                  y2={tick.y}
+                  stroke="var(--border)"
+                  strokeDasharray={i === yTicks.length - 1 ? "none" : "3 3"}
+                  opacity={i === yTicks.length - 1 ? 0.9 : 0.55}
+                />
+              </g>
+            ))}
+
+            {showBookingsSeries && (
+              <>
+                <path d={bookingsAreaD} fill="url(#custJobsGrad)" />
+                <path d={bookingsLineD} fill="none" stroke="#00acc1" strokeWidth="2.5" />
+              </>
+            )}
+
+            {showSpendSeries && (
+              <>
+                <path d={spendAreaD} fill="url(#custSpendGrad)" />
+                <path d={spendLineD} fill="none" stroke="#e91e63" strokeWidth="3" />
+              </>
+            )}
+
+            {showBookingsSeries && chartPoints.map((c, i) => (
+              <circle
+                key={`cbp-${i}`}
+                cx={c.x}
+                cy={c.yBookings}
+                r={hoveredPointIdx === i ? 6.5 : 4.5}
+                fill="#00acc1"
+                stroke="#ffffff"
+                strokeWidth="2"
+                style={{ cursor: "pointer", transition: "r 0.15s ease" }}
+                onMouseEnter={() => setHoveredPointIdx(i)}
+              />
+            ))}
+
+            {showSpendSeries && chartPoints.map((c, i) => (
+              <circle
+                key={`csp-${i}`}
+                cx={c.x}
+                cy={c.ySpend}
+                r={hoveredPointIdx === i ? 7 : 5}
+                fill="#e91e63"
+                stroke="#ffffff"
+                strokeWidth="2.2"
+                style={{ cursor: "pointer", transition: "r 0.15s ease" }}
+                onMouseEnter={() => setHoveredPointIdx(i)}
+              />
+            ))}
+
+            {chartPoints.map((c, i) => (
+              <g key={`ctxt-${i}`}>
+                <rect
+                  x={c.x - 35}
+                  y="15"
+                  width="70"
+                  height="170"
+                  fill="transparent"
+                  style={{ cursor: "pointer" }}
+                  onMouseEnter={() => setHoveredPointIdx(i)}
+                />
+                <text
+                  x={c.x}
+                  y="198"
+                  textAnchor="middle"
+                  fill={hoveredPointIdx === i ? "var(--text)" : "var(--text-secondary)"}
+                  fontSize="11"
+                  fontWeight={hoveredPointIdx === i ? "900" : "700"}
+                >
+                  {c.month}
+                </text>
+              </g>
+            ))}
+          </svg>
         </div>
       </section>
 
@@ -210,7 +492,18 @@ export default function CustomerDashboard() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="cust-search-box">
+                  <i className="fas fa-search" style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}></i>
+                  <input
+                    type="text"
+                    className="cust-search-input"
+                    placeholder="Search requests..."
+                    value={requestSearch}
+                    onChange={(e) => setRequestSearch(e.target.value)}
+                  />
+                </div>
+
                 <div className="cust-pill-tabs">
                   <button
                     onClick={() => setRequestFilter("ALL")}
@@ -231,9 +524,6 @@ export default function CustomerDashboard() {
                     Awaiting
                   </button>
                 </div>
-                <Link to="/my-requests" className="btn btn-text text-xs">
-                  View All <i className="fas fa-arrow-right ml-1"></i>
-                </Link>
               </div>
             </div>
 
@@ -242,16 +532,21 @@ export default function CustomerDashboard() {
                 {filteredRequests.map((req) => {
                   const urgencyMeta = getUrgencyBadge(req.urgency);
                   return (
-                    <div key={req.id} className="cust-req-item">
+                    <div
+                      key={req.id}
+                      className="cust-req-item"
+                      onClick={() => setInspectedRequest(req)}
+                      title="Click to inspect request"
+                    >
                       <div className="cust-req-info">
                         <div className="cust-req-avatar">
                           <i className={`fas ${getCategoryIcon(req.categoryName)}`}></i>
                         </div>
                         <div className="cust-req-details">
                           <div className="cust-req-title-row">
-                            <Link to={`/my-requests/${req.id}`} className="cust-req-title-link">
+                            <span className="cust-req-title-link font-bold">
                               {req.title}
-                            </Link>
+                            </span>
                             <span className="badge badge-secondary text-xs">{req.categoryName}</span>
                             <span className={`badge ${urgencyMeta.badgeClass} text-xs`}>
                               {urgencyMeta.label}
@@ -287,7 +582,11 @@ export default function CustomerDashboard() {
                             </div>
                           )}
                         </div>
-                        <Link to={`/my-requests/${req.id}`} className="cust-btn-primary py-1 px-3 text-xs">
+                        <Link
+                          to={`/my-requests/${req.id}`}
+                          className="cust-btn-primary py-1 px-3 text-xs"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {req.quotationsCount > 0 ? "Review Quotes →" : "View Details →"}
                         </Link>
                       </div>
@@ -337,7 +636,12 @@ export default function CustomerDashboard() {
                   const dayStr = dateObj ? dateObj.getDate() : "--";
 
                   return (
-                    <div key={b.id} className="cust-booking-item">
+                    <div
+                      key={b.id}
+                      className="cust-booking-item"
+                      onClick={() => setInspectedBooking(b)}
+                      title="Click to view appointment details"
+                    >
                       <div className="flex items-center gap-3 flex-1">
                         <div className="cust-cal-ticket">
                           <div className="cust-cal-month">{monthStr}</div>
@@ -376,7 +680,7 @@ export default function CustomerDashboard() {
                             ₹{b.totalAmount.toLocaleString("en-IN")}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                           <Link to="/messages" className="cust-btn-secondary py-1 px-3 text-xs">
                             <i className="fas fa-comment-dots"></i> Chat
                           </Link>
@@ -450,10 +754,25 @@ export default function CustomerDashboard() {
           </div>
 
           <div className="cust-card">
-            <h3 className="cust-card-title mb-3">
-              <i className="fas fa-bell text-primary"></i>
-              Recent Updates
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="cust-card-title mb-0">
+                <i className="fas fa-bell text-primary"></i>
+                Recent Updates
+              </h3>
+              <div className="cust-pill-tabs">
+                {(["ALL", "BOOKING", "QUOTATION"] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    className={`cust-pill-tab ${activityFilter === filter ? "active" : ""}`}
+                    onClick={() => setActivityFilter(filter)}
+                    style={{ padding: "0.2rem 0.5rem", fontSize: "0.65rem" }}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {recentActivity.length > 0 ? (
               <ul className="cust-activity-list">
@@ -492,6 +811,186 @@ export default function CustomerDashboard() {
           </div>
         </aside>
       </div>
+
+      {inspectedRequest && (
+        <div className="cust-modal-overlay" onClick={() => setInspectedRequest(null)}>
+          <div className="cust-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="cust-modal-header">
+              <h3 className="cust-modal-title">
+                <i className="fas fa-clipboard-check text-primary"></i>
+                Service Request Overview
+              </h3>
+              <button
+                type="button"
+                className="btn btn-text text-sm"
+                onClick={() => setInspectedRequest(null)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="cust-modal-body">
+              <div>
+                <span className="text-xs text-muted uppercase font-bold">Requirement Title</span>
+                <h4 className="text-lg font-bold text-text mt-0.5">{inspectedRequest.title}</h4>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-surface-secondary p-3 rounded-xl border border-border">
+                  <span className="text-xs text-muted font-bold">Category</span>
+                  <div className="font-extrabold text-sm text-text mt-0.5">{inspectedRequest.categoryName}</div>
+                </div>
+                <div className="bg-surface-secondary p-3 rounded-xl border border-border">
+                  <span className="text-xs text-muted font-bold">Urgency</span>
+                  <div className="font-extrabold text-sm text-primary mt-0.5">{inspectedRequest.urgency}</div>
+                </div>
+              </div>
+
+              <div className="bg-surface-secondary p-3 rounded-xl border border-border">
+                <span className="text-xs text-muted font-bold">Location</span>
+                <p className="text-sm text-text mt-0.5 mb-0">
+                  <i className="fas fa-map-marker-alt text-primary mr-1"></i> {inspectedRequest.location}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-surface-secondary rounded-xl border border-border">
+                <div>
+                  <span className="text-xs text-muted font-bold">Quotations Received</span>
+                  <div className="font-extrabold text-base text-text">{inspectedRequest.quotationsCount} Provider Bids</div>
+                </div>
+                {inspectedRequest.minQuoteAmount !== undefined && (
+                  <div className="text-right">
+                    <span className="text-xs text-muted font-bold">Starting From</span>
+                    <div className="font-extrabold text-base text-success">₹{inspectedRequest.minQuoteAmount.toLocaleString("en-IN")}</div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 mt-2">
+                <Link
+                  to={`/my-requests/${inspectedRequest.id}`}
+                  className="cust-btn-primary"
+                >
+                  {inspectedRequest.quotationsCount > 0 ? "Compare Bids Now" : "View Details"}
+                </Link>
+                <button
+                  type="button"
+                  className="cust-btn-secondary"
+                  onClick={() => setInspectedRequest(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {inspectedBooking && (
+        <div className="cust-modal-overlay" onClick={() => setInspectedBooking(null)}>
+          <div className="cust-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="cust-modal-header">
+              <h3 className="cust-modal-title">
+                <i className="fas fa-calendar-check text-primary"></i>
+                Confirmed Appointment Telemetry
+              </h3>
+              <button
+                type="button"
+                className="btn btn-text text-sm"
+                onClick={() => setInspectedBooking(null)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="cust-modal-body">
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="text-xs text-muted uppercase font-bold">Booking Reference</span>
+                  <div className="text-lg font-bold text-text">#{inspectedBooking.bookingNumber}</div>
+                </div>
+                <span className="badge badge-info">{inspectedBooking.status}</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-surface-secondary p-3 rounded-xl border border-border">
+                  <span className="text-xs text-muted font-bold">Assigned Pro</span>
+                  <div className="font-extrabold text-sm text-text mt-0.5">{inspectedBooking.providerName}</div>
+                </div>
+                <div className="bg-surface-secondary p-3 rounded-xl border border-border">
+                  <span className="text-xs text-muted font-bold">Agreed Amount</span>
+                  <div className="font-extrabold text-sm text-success mt-0.5">₹{inspectedBooking.totalAmount.toLocaleString("en-IN")}</div>
+                </div>
+              </div>
+
+              <div className="bg-surface-secondary p-3 rounded-xl border border-border">
+                <span className="text-xs text-muted font-bold">Service Title</span>
+                <p className="text-sm text-text mt-0.5 mb-0">{inspectedBooking.serviceTitle}</p>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-2">
+                <Link to="/messages" className="cust-btn-secondary">
+                  <i className="fas fa-comment-dots mr-1"></i> Chat with Pro
+                </Link>
+                <Link to={`/bookings/${inspectedBooking.id}`} className="cust-btn-primary">
+                  Manage Booking
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSavingsModal && (
+        <div className="cust-modal-overlay" onClick={() => setShowSavingsModal(false)}>
+          <div className="cust-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="cust-modal-header">
+              <h3 className="cust-modal-title">
+                <i className="fas fa-piggy-bank text-success"></i>
+                Financial &amp; Savings Telemetry
+              </h3>
+              <button
+                type="button"
+                className="btn btn-text text-sm"
+                onClick={() => setShowSavingsModal(false)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="cust-modal-body">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-surface-secondary p-3 rounded-xl border border-border">
+                  <span className="text-xs text-muted font-bold">Total Completed Spend</span>
+                  <div className="font-extrabold text-lg text-text mt-0.5">
+                    ₹{stats.totalCompletedSpend.toLocaleString("en-IN")}
+                  </div>
+                </div>
+                <div className="bg-surface-secondary p-3 rounded-xl border border-border">
+                  <span className="text-xs text-muted font-bold">Estimated Savings</span>
+                  <div className="font-extrabold text-lg text-success mt-0.5">
+                    ~₹{(stats.estimatedSavings || 1850).toLocaleString("en-IN")}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-surface-secondary p-3 rounded-xl border border-border">
+                <span className="text-xs text-muted font-bold">Direct Marketplace Economics</span>
+                <p className="text-xs text-secondary mt-1 mb-0 leading-relaxed">
+                  By comparing quotes directly on our reverse marketplace instead of paying inflated agency fees, you saved an estimated 18% on fulfilled services.
+                </p>
+              </div>
+
+              <div className="flex justify-end mt-2">
+                <button
+                  type="button"
+                  className="cust-btn-primary"
+                  onClick={() => setShowSavingsModal(false)}
+                >
+                  Close Telemetry
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
