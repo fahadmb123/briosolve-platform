@@ -3,7 +3,7 @@ import { IServiceRequestRepository } from "../../domain/repositories/IServiceReq
 import { IServiceRequestProviderRepository } from "../../domain/repositories/IServiceRequestProviderRepository";
 import { ServiceRequestResponseDto } from "../dtos/response/service-request.dto";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
-import { ServiceRequestMapper } from "../../infrastructure/mappers/serviceRequest.mapper";
+import { ServiceRequestMapper } from "../mappers/serviceRequest.mapper";
 import { CreateBulkNotificationRequestDto } from "../../../notification/application/dtos/request/create-bulk-notifications.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { ReopenServiceRequestInputDto } from "../dtos/request/reopen-service-request.dto";

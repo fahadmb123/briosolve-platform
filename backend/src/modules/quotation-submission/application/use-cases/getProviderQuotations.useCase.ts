@@ -5,7 +5,7 @@ import { IProviderRepository } from "../../../user-management/domain/repositorie
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { GetProviderQuotationsInputDto } from "../dtos/request/get-provider-quotations.dto";
 import { ProviderQuotationsResponseDto } from "../dtos/response/provider-quotations-response.dto";
-import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
+import { QuotationMapper } from "../mappers/quotation.mapper";
 
 export class GetProviderQuotationsUseCase implements IUseCase<GetProviderQuotationsInputDto, ProviderQuotationsResponseDto> {
     constructor(

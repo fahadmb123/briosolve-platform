@@ -6,7 +6,7 @@ import { ImageUploadService } from "../../../../shared/interfaces/services/IImag
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { CreateServiceRequestInputDto } from "../dtos/request/create-service-request.dto";
 import { ServiceRequestResponseDto } from "../dtos/response/service-request.dto";
-import { ServiceRequestMapper } from "../../infrastructure/mappers/serviceRequest.mapper";
+import { ServiceRequestMapper } from "../mappers/serviceRequest.mapper";
 import { CreateBulkNotificationRequestDto } from "../../../notification/application/dtos/request/create-bulk-notifications.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { IUserRepository } from "../../../user-management/domain/repositories/IUserRepository";

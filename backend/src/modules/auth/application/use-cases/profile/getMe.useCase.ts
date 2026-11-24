@@ -5,7 +5,7 @@ import { User } from "../../../domain/entities/user.entity"
 import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase"
 import { IUserRepository } from "../../../domain/repositories/user.repository"
 import { UserResponseDto } from "../../dtos/response/user.dto"
-import { UserMapper } from "../../../infrastructure/mappers/user.mapper"
+import { UserMapper } from "../../mappers/user.mapper"
 
 
 

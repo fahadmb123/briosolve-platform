@@ -11,7 +11,7 @@ import {
   AdminReviewsResult,
   ReviewBookingEligibility
 } from "../../domain/repositories/IReview.repository";
-import { ReviewMapper } from "../mappers/review.mapper";
+import { ReviewMapper } from "../../application/mappers/review.mapper";
 import { ReviewRatingService } from "../../application/services/review-rating.service";
 
 export class PrismaReviewRepository implements IReviewRepository {

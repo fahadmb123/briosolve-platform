@@ -5,7 +5,7 @@ import { IMessageRepository } from "../../domain/repositories/IMessageRepository
 import { MessageStatus } from "../../domain/entities/message.entity";
 import { GetMessagesRequestDto } from "../dtos/request/message/get-messages.dto";
 import { MessageResponseDto } from "../dtos/response/message/message-response.dto";
-import { MessageMapper } from "../../infrastructure/mappers/message.mapper";
+import { MessageMapper } from "../mappers/message.mapper";
 
 export class GetMessagesUseCase implements IUseCase<GetMessagesRequestDto, MessageResponseDto[]> {
     constructor(

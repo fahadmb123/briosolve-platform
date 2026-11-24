@@ -6,7 +6,7 @@ import { GetNearbyProvidersDto } from "../../dtos/request/customer/get-nearby-pr
 import { GetNearbyProvidersOutputDto } from "../../dtos/response/customer/get-nearby-providers-output.dto";
 import { User } from "../../../domain/entities/user.entity";
 import { Address } from "../../../domain/entities/address.entity";
-import { UserMapper } from "../../../infrastructure/mappers/user.mapper";
+import { UserMapper } from "../../mappers/user.mapper";
 import { UserResponseDto } from "../../dtos/response/user/user-dto";
 import { CalculateDistance } from "../../../../../shared/utils/calculate-distance";
 import { IProviderServiceRepository } from "../../../../service-catalog/domain/repositories/IProviderServiceRepository";

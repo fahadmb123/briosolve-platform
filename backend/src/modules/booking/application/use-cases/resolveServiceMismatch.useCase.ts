@@ -5,7 +5,7 @@ import { IProviderRepository } from "../../../user-management/domain/repositorie
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";
 import { ResolveServiceMismatchInputDto } from "../dtos/request/mismatch-report.dto";
 import { BookingResponseDto, BookingStatusHistoryItem, MismatchReport } from "../dtos/response/booking-response.dto";
-import { BookingMapper } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper } from "../mappers/booking.mapper";
 import { CreditWalletInputDto } from "../../../wallet/application/dtos/request/credit-wallet.dto";
 import { WalletResponseDto } from "../../../wallet/application/dtos/response/wallet-response.dto";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";

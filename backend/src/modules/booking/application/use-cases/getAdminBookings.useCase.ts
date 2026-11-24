@@ -1,7 +1,7 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IBookingRepository, GetAdminBookingsInputDto } from "../../domain/repositories/IBookingRepository";
 import { AdminBookingsResponseDto } from "../dtos/response/admin-bookings-response.dto";
-import { BookingMapper } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper } from "../mappers/booking.mapper";
 
 export class GetAdminBookingsUseCase implements IUseCase<GetAdminBookingsInputDto, AdminBookingsResponseDto> {
     constructor(private readonly _bookingRepository: IBookingRepository) {}

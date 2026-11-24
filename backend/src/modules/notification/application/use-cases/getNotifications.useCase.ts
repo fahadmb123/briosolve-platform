@@ -1,7 +1,7 @@
 import { INotificationRepository } from "../../domain/repositories/INotification.repository";
 import { NotificationResponseDto } from "../dtos/response/notification-response.dto";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
-import { NotificationMapper } from "../../infrastructure/mappers/notification.mapper";
+import { NotificationMapper } from "../mappers/notification.mapper";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import {
     GetNotificationRequestDto,

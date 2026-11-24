@@ -5,7 +5,7 @@ import {
     CreateParticipantData,
     IConversationParticipantRepository
 } from "../../domain/repositories/IConversationParticipantRepository";
-import { ConversationParticipantMapper } from "../mappers/conversationParticipant.mapper";
+import { ConversationParticipantMapper } from "../../application/mappers/conversationParticipant.mapper";
 
 export class ConversationParticipantRepository implements IConversationParticipantRepository {
     async findById(id: string): Promise<ConversationParticipant | null> {

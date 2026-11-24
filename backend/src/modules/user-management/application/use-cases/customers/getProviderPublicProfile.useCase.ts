@@ -6,7 +6,7 @@ import { IProviderServiceRepository } from "../../../../service-catalog/domain/r
 import { IProviderAvailabilityRepository } from "../../../domain/repositories/IProviderAvailabilityRepository";
 import { CalculateDistance } from "../../../../../shared/utils/calculate-distance";
 import { Address } from "../../../domain/entities/address.entity";
-import { UserMapper } from "../../../infrastructure/mappers/user.mapper";
+import { UserMapper } from "../../mappers/user.mapper";
 import { GetProviderPublicProfileDto } from "../../dtos/request/customer/get-provider-public-profile.dto";
 import { GetProviderPublicProfileOutputDto } from "../../dtos/response/customer/get-provider-public-profile-output.dto";
 

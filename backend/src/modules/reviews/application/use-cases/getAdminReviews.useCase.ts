@@ -2,7 +2,7 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IReviewRepository } from "../../domain/repositories/IReview.repository";
 import { GetAdminReviewsRequestDto } from "../dtos/request/get-admin-reviews.request.dto";
 import { AdminReviewsResponseDto } from "../dtos/response/admin-reviews-response.dto";
-import { ReviewMapper } from "../../infrastructure/mappers/review.mapper";
+import { ReviewMapper } from "../mappers/review.mapper";
 
 export class GetAdminReviewsUseCase implements IUseCase<GetAdminReviewsRequestDto, AdminReviewsResponseDto> {
   constructor(private readonly _reviewRepo: IReviewRepository) {}

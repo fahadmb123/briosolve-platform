@@ -11,7 +11,7 @@ import { CreateBookingRepoDto } from "../../application/dtos/request/create-book
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
 import { GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
 import { BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
-import { BookingMapper } from "../mappers/booking.mapper";
+import { BookingMapper } from "../../application/mappers/booking.mapper";
 
 export class PrismaBookingRepository implements IBookingRepository {
     async findById(id: string): Promise<Booking | null> {

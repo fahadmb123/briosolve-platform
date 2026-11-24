@@ -2,7 +2,7 @@ import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import { db } from "../../../../shared/database/client";
 import { User } from "../../domain/entities/user.entity";
 import { IUserRepository, GetUsersWithRoleInput } from "../../domain/repositories/IUserRepository";
-import { UserMapper } from "../mappers/user.mapper";
+import { UserMapper } from "../../application/mappers/user.mapper";
 import { UpdateUserRepositoryInput } from "../../application/dtos/request/user/update-user-repository.dto";
 
 

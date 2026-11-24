@@ -1,7 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { db } from "../../../../shared/database/client";
 import { Notification } from "../../domain/entities/notification.entity";
-import { NotificationMapper } from "../mappers/notification.mapper";
+import { NotificationMapper } from "../../application/mappers/notification.mapper";
 import {
     CreateNotificationData,
     FindNotificationsOptions,

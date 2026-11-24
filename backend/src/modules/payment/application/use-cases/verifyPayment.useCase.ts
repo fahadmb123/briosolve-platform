@@ -7,8 +7,8 @@ import { IProviderRepository } from "../../../user-management/domain/repositorie
 import { IRazorpayService } from "../../domain/services/IRazorpayService";
 import { VerifyPaymentInputDto } from "../dtos/request/verify-payment.dto";
 import { VerifyPaymentResponseDto } from "../dtos/response/verify-payment-response.dto";
-import { PaymentMapper } from "../../infrastructure/mappers/payment.mapper";
-import { BookingMapper } from "../../../booking/infrastructure/mappers/booking.mapper";
+import { PaymentMapper } from "../mappers/payment.mapper";
+import { BookingMapper } from "../../../booking/application/mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 

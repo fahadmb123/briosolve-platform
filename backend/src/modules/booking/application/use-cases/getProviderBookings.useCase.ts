@@ -3,7 +3,7 @@ import { IBookingRepository } from "../../domain/repositories/IBookingRepository
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { GetProviderBookingsInputDto } from "../dtos/request/get-booking.dto";
 import { ProviderBookingsResponseDto } from "../dtos/response/provider-bookings-response.dto";
-import { BookingMapper } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper } from "../mappers/booking.mapper";
 
 export class GetProviderBookingsUseCase implements IUseCase<GetProviderBookingsInputDto, ProviderBookingsResponseDto> {
     constructor(

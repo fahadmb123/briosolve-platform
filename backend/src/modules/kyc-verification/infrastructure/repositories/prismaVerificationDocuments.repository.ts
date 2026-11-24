@@ -5,10 +5,10 @@ import {
     IVerificationDocumentRepository,
     UpdateDocumentStatusInput
 } from "../../domain/repositories/IVerificationDocumentRepository";
-import { VerificationDocumentMapper } from "../mappers/verificationDocument.mapper";
-import { VerificationFileMapper } from "../mappers/verificationFile.mapper";
+import { VerificationDocumentMapper } from "../../application/mappers/verificationDocument.mapper";
+import { VerificationFileMapper } from "../../application/mappers/verificationFile.mapper";
 import { VerificationProfile } from "../../domain/entities/verificationProfile.entity";
-import { VerificationProfileMapper } from "../mappers/verificationProfile.mapper";
+import { VerificationProfileMapper } from "../../application/mappers/verificationProfile.mapper";
 import { UpdateVerificationDocumentRepositoryDto } from "../../application/dtos/verification-document/request/update-veridication-document-repository.dto";
 import { CreateVerificationDocumentInputDto } from "../../application/dtos/verification-document/request/create-verification-document.dto";
 import { GetAdminKycRequestsInput } from "../../application/dtos/admin/request/get-admin-kyc.dto";

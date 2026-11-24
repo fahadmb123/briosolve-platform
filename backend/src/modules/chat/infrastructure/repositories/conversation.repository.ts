@@ -1,7 +1,7 @@
 import { db } from "../../../../shared/database/client";
 import { Conversation } from "../../domain/entities/conversation.entity";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import { ConversationMapper } from "../mappers/conversation.mapper";
+import { ConversationMapper } from "../../application/mappers/conversation.mapper";
 import { ConversationResponseDto } from "../../application/dtos/response/conversation/conversation-response.dto";
 import { PresenceTracker } from "../../../../shared/realtime/services/presence.tracker";
 import { StorageUtil } from "../../../../shared/utils/storage.util";

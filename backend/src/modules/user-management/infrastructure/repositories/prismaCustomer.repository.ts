@@ -3,7 +3,7 @@ import { Varchar } from "@prisma/orm-postgres/target/codec-types"
 import { db } from "../../../../shared/database/client"
 import { ICustomerRepository } from "../../domain/repositories/ICustomerRespository"
 import { CustomerProfile } from "../../domain/entities/customerProfile.entity"
-import { CustomerProfileMapper } from "../mappers/customerProfile.mapper"
+import { CustomerProfileMapper } from "../../application/mappers/customerProfile.mapper"
 import { UpdateCustomerProfileInputDto } from "../../application/dtos/request/customer/update-customer-profile.dto";
 
 export class CustomerRepository implements ICustomerRepository {

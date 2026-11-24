@@ -3,7 +3,7 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IReviewRepository } from "../../domain/repositories/IReview.repository";
 import { ReplyReviewRequestDto } from "../dtos/request/reply-review.request.dto";
 import { ReviewResponseDto } from "../dtos/response/review-response.dto";
-import { ReviewMapper } from "../../infrastructure/mappers/review.mapper";
+import { ReviewMapper } from "../mappers/review.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 

@@ -9,7 +9,7 @@ import {
     GetCustomerRequestsOutputDto
 } from "../../application/dtos/response/service-request.dto";
 import { GetCustomerServiceRequestsInputDto } from "../../application/use-cases/getCustomerServiceRequests.useCase";
-import { ServiceRequestMapper } from "../mappers/serviceRequest.mapper";
+import { ServiceRequestMapper } from "../../application/mappers/serviceRequest.mapper";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export class ServiceRequestRepository implements IServiceRequestRepository {

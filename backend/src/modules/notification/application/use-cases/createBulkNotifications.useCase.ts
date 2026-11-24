@@ -1,7 +1,7 @@
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { INotificationRepository } from "../../domain/repositories/INotification.repository";
-import { NotificationMapper } from "../../infrastructure/mappers/notification.mapper";
+import { NotificationMapper } from "../mappers/notification.mapper";
 import { CreateBulkNotificationRequestDto } from "../dtos/request/create-bulk-notifications.dto";
 import { CreateNotificationRequestDto } from "../dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../dtos/response/notification-response.dto";

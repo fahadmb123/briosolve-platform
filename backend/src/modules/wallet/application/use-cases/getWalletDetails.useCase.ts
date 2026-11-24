@@ -1,6 +1,6 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IWalletRepository } from "../../domain/repositories/IWallet.repository";
-import { WalletMapper } from "../../infrastructure/mappers/wallet.mapper";
+import { WalletMapper } from "../mappers/wallet.mapper";
 import { GetWalletDetailsInputDto } from "../dtos/response/get-wallet-details.dto";
 import { WalletResponseDto } from "../dtos/response/wallet-response.dto";
 

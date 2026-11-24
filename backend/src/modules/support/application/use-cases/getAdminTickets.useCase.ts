@@ -1,7 +1,7 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ISupportTicketRepository, GetAdminTicketsParams } from "../../domain/repositories/ISupportTicket.repository";
 import { TicketResponseDto } from "../dtos/response/ticket-response.dto";
-import { SupportTicketMapper } from "../../infrastructure/mappers/support-ticket.mapper";
+import { SupportTicketMapper } from "../mappers/support-ticket.mapper";
 
 export interface GetAdminTicketsRequestDto extends GetAdminTicketsParams {}
 

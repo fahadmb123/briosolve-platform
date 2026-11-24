@@ -3,7 +3,7 @@ import { IPendingRegistrationStore } from "../../../../../shared/interfaces/IPen
 import { IUseCase } from "../../../../../shared/interfaces/use-cases/IUseCase";
 import { IProviderRepository } from "../../../domain/repositories/IProviderRepository";
 import { IProviderAvailabilityRepository } from "../../../domain/repositories/IProviderAvailabilityRepository";
-import { UserMapper } from "../../../infrastructure/mappers/user.mapper";
+import { UserMapper } from "../../mappers/user.mapper";
 import { UserResponseDto } from "../../dtos/response/user/user-dto";
 import { CompleteProviderRegistrationInput } from "../../dtos/request/provider/complete-provider-registration.dto";
 

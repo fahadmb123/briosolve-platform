@@ -4,8 +4,8 @@ import { db } from "../../../../shared/database/client";
 import { IProviderRepository, CreateProviderInput, CreateProviderProfileInput } from "../../domain/repositories/IProviderRepository";
 import { User } from "../../domain/entities/user.entity";
 import { ProviderProfile } from "../../domain/entities/providerProfile.entity";
-import { UserMapper } from "../mappers/user.mapper";
-import { ProviderProfileMapper, ProviderProfileRaw } from "../mappers/providerProfile.mapper";
+import { UserMapper } from "../../application/mappers/user.mapper";
+import { ProviderProfileMapper, ProviderProfileRaw } from "../../application/mappers/providerProfile.mapper";
 import { UpdateProviderProfileInputDto } from "../../application/dtos/request/provider/update-provider-profile.dto";
 
 export class ProviderRepository implements IProviderRepository {

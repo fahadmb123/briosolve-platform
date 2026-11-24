@@ -3,7 +3,7 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { ISupportTicketRepository } from "../../domain/repositories/ISupportTicket.repository";
 import { CreateTicketRequestDto } from "../dtos/request/create-ticket.dto";
 import { TicketResponseDto } from "../dtos/response/ticket-response.dto";
-import { SupportTicketMapper } from "../../infrastructure/mappers/support-ticket.mapper";
+import { SupportTicketMapper } from "../mappers/support-ticket.mapper";
 
 export class CreateTicketUseCase implements IUseCase<CreateTicketRequestDto, TicketResponseDto> {
   constructor(private readonly _ticketRepository: ISupportTicketRepository) {}

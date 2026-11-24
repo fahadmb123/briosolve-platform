@@ -6,7 +6,7 @@ import {
     CreateReactivationRequestInput,
     GetReactivationRequestsInput
 } from "../../domain/repositories/IAccountReactivationRequestRepository";
-import { AccountReactivationRequestMapper } from "../mappers/accountReactivationRequest.mapper";
+import { AccountReactivationRequestMapper } from "../../application/mappers/accountReactivationRequest.mapper";
 
 export class AccountReactivationRequestRepository implements IAccountReactivationRequestRepository {
     async create(data: CreateReactivationRequestInput): Promise<AccountReactivationRequest> {

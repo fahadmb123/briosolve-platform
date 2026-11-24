@@ -3,7 +3,7 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IReviewRepository } from "../../domain/repositories/IReview.repository";
 import { GetCustomerReviewsRequestDto } from "../dtos/request/get-customer-reviews.request.dto";
 import { CustomerReviewsResponseDto } from "../dtos/response/customer-reviews-response.dto";
-import { ReviewMapper } from "../../infrastructure/mappers/review.mapper";
+import { ReviewMapper } from "../mappers/review.mapper";
 
 export class GetCustomerReviewsUseCase implements IUseCase<GetCustomerReviewsRequestDto, CustomerReviewsResponseDto> {
   constructor(private readonly _reviewRepo: IReviewRepository) {}

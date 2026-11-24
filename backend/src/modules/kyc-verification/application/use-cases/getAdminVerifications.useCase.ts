@@ -2,7 +2,7 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import {
     IVerificationDocumentRepository
 } from "../../domain/repositories/IVerificationDocumentRepository";
-import { VerificationProfileMapper } from "../../infrastructure/mappers/verificationProfile.mapper";
+import { VerificationProfileMapper } from "../mappers/verificationProfile.mapper";
 import { GetAdminKycRequestsInput } from "../dtos/admin/request/get-admin-kyc.dto";
 import { AdminKycStats, GetAdminKycResponse } from "../dtos/admin/response/get-admin-kyc.dto";
 

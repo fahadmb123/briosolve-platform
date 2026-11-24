@@ -3,7 +3,7 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IReviewRepository } from "../../domain/repositories/IReview.repository";
 import { GetProviderReviewsRequestDto } from "../dtos/request/get-provider-reviews.request.dto";
 import { ProviderReviewsSummaryResponseDto } from "../dtos/response/provider-reviews-summary-response.dto";
-import { ReviewMapper } from "../../infrastructure/mappers/review.mapper";
+import { ReviewMapper } from "../mappers/review.mapper";
 import { ReviewRatingService } from "../services/review-rating.service";
 
 export class GetProviderReviewsUseCase implements IUseCase<GetProviderReviewsRequestDto, ProviderReviewsSummaryResponseDto> {

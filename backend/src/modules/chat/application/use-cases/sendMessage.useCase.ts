@@ -3,7 +3,7 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { IConversationParticipantRepository } from "../../domain/repositories/IConversationParticipantRepository";
 import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
-import { MessageMapper } from "../../infrastructure/mappers/message.mapper";
+import { MessageMapper } from "../mappers/message.mapper";
 import { IMessageDelivery } from "../interfaces/IMessageDelivery";
 import { SendMessageRequestDto } from "../dtos/request/message/send-message.dto";
 import { MessageResponseDto } from "../dtos/response/message/message-response.dto";

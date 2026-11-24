@@ -3,7 +3,7 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IWalletRepository } from "../../domain/repositories/IWallet.repository";
 import { WalletTransactionCategory } from "../../domain/entities/wallet-transaction.entity";
 import { WalletResponseDto } from "../dtos/response/wallet-response.dto";
-import { WalletMapper } from "../../infrastructure/mappers/wallet.mapper";
+import { WalletMapper } from "../mappers/wallet.mapper";
 import { DebitWalletInputDto } from "../dtos/request/debit-wallet.dto";
 
 

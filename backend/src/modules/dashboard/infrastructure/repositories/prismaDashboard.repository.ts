@@ -8,7 +8,7 @@ import {
   CustomerDashboardRawData,
   ProviderDashboardRawData,
   AdminDashboardRawData,
-} from "../mappers/dashboard.mapper";
+} from "../../application/mappers/dashboard.mapper";
 
 export class PrismaDashboardRepository implements IDashboardRepository {
   async getCustomerDashboardData(userId: string): Promise<CustomerDashboardResponseDto> {
