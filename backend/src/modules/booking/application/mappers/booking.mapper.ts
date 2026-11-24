@@ -321,6 +321,7 @@ export class BookingMapper {
             providerCancellationsCount: details?.providerCancellationsCount ?? extra?.providerCancellationsCount ?? 0,
             maxAllowedCancellations: details?.maxAllowedCancellations ?? extra?.maxAllowedCancellations ?? 2,
             mismatchReport: mismatchReport || details?.mismatchReport || null,
+            isReviewed: details?.isReviewed ?? (extra as any)?.isReviewed ?? false,
             cancellationPolicy: details?.cancellationPolicy ?? extra?.cancellationPolicy ?? calculateCancellationPolicy({
                 role: "CUSTOMER",
                 status: entity.status,

@@ -875,7 +875,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </button>
           )}
 
-          {!isProvider && isCompleted && !existingReview && (
+          {!isProvider && isCompleted && !existingReview && !booking.isReviewed && (
             <button
               type="button"
               className="bkdet-action-btn primary"
@@ -1219,7 +1219,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </div>
           )}
 
-          {isCompleted && !isProvider && !existingReview && (
+          {isCompleted && !isProvider && !existingReview && !booking.isReviewed && (
             <div className="bkdet-section-card bkdet-review-prompt-card">
               <div className="bkdet-review-prompt-content">
                 <div className="bkdet-review-prompt-icon">

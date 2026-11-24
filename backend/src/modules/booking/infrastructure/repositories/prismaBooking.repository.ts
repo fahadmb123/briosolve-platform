@@ -406,6 +406,14 @@ export class PrismaBookingRepository implements IBookingRepository {
                     quoteAmount = Number(quote.amount);
                 }
 
+                let isReviewed = false;
+                try {
+                    const rev = await db.orm.public.reviews
+                        .where({ booking_id: booking.id as never })
+                        .first();
+                    isReviewed = Boolean(rev);
+                } catch {}
+
                 return {
                     booking,
                     serviceRequestTitle,
@@ -421,7 +429,8 @@ export class PrismaBookingRepository implements IBookingRepository {
                     customerPhone,
                     quotationType,
                     requiresInspection,
-                    quoteAmount
+                    quoteAmount,
+                    isReviewed
                 };
             })
         );

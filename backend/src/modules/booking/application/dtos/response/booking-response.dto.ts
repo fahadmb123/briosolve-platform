@@ -60,4 +60,5 @@ export interface BookingResponseDto {
     maxAllowedCancellations?: number;
     cancellationPolicy?: CancellationPolicyDetails;
     mismatchReport?: MismatchReport | null;
+    isReviewed?: boolean;
 }

@@ -55,7 +55,9 @@ export interface AdminReviewsResult {
 export interface ReviewBookingEligibility {
   id: string;
   customerId: string;
+  customerName?: string | null;
   providerId: string;
+  providerUserId?: string | null;
   status: string;
   bookingNumber: string;
   serviceTitle: string | null;

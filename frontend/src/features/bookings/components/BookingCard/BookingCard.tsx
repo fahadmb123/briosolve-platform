@@ -429,18 +429,25 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             </button>
           )}
 
-          {role === "CUSTOMER" && booking.status === "COMPLETED" && onReview && (
-            <button
-              type="button"
-              className="bkcard-btn-action review"
-              onClick={(e) => {
-                e.stopPropagation();
-                onReview(booking);
-              }}
-            >
-              <i className="fas fa-star"></i>
-              <span>Write Review</span>
-            </button>
+          {role === "CUSTOMER" && booking.status === "COMPLETED" && (
+            booking.isReviewed ? (
+              <span className="bkcard-reviewed-badge">
+                <i className="fas fa-check-circle"></i>
+                <span>Reviewed</span>
+              </span>
+            ) : onReview ? (
+              <button
+                type="button"
+                className="bkcard-btn-action review"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReview(booking);
+                }}
+              >
+                <i className="fas fa-star"></i>
+                <span>Write Review</span>
+              </button>
+            ) : null
           )}
         </div>
       </div>

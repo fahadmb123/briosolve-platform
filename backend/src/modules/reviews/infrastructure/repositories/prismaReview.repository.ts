@@ -34,10 +34,32 @@ export class PrismaReviewRepository implements IReviewRepository {
         }
       }
 
+      let providerUserId: string | null = null;
+      if (record.provider_id) {
+        const profile = await db.orm.public.provider_profiles
+          .where({ id: record.provider_id as never })
+          .first();
+        if (profile) {
+          providerUserId = profile.user_id;
+        }
+      }
+
+      let customerName: string | null = null;
+      if (record.customer_id) {
+        const cUser = await db.orm.public.users
+          .where({ id: record.customer_id as never })
+          .first();
+        if (cUser) {
+          customerName = (cUser as any).name || (cUser as any).email || null;
+        }
+      }
+
       return {
         id: record.id,
         customerId: record.customer_id,
+        customerName,
         providerId: record.provider_id,
+        providerUserId,
         status: record.status,
         bookingNumber: record.booking_number,
         serviceTitle

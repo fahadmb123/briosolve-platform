@@ -69,6 +69,7 @@ export interface BookingItem {
   maxAllowedCancellations?: number;
   cancellationPolicy?: CancellationPolicyDetails;
   mismatchReport?: MismatchReport | null;
+  isReviewed?: boolean;
 }
 
 export interface BookingCounts {

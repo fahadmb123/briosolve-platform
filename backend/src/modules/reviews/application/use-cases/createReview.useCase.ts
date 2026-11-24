@@ -55,14 +55,15 @@ export class CreateReviewUseCase implements IUseCase<CreateReviewRequestDto, Rev
       aspectRatings: input.aspectRatings || null
     });
 
-    if (this._notificationUseCase && booking.providerId) {
+    if (this._notificationUseCase && booking.providerUserId) {
       try {
+        const customerDisplayName = booking.customerName || "A customer";
         await this._notificationUseCase.execute({
-          recipientId: booking.providerId,
+          recipientId: booking.providerUserId,
           type: "REVIEW_RECEIVED",
           title_code: "REVIEW_RECEIVED",
           title: "New Review Received",
-          message: `A customer left a ${createdReview.rating}-star review for booking #${booking.bookingNumber}.`
+          message: `${customerDisplayName} left a ${createdReview.rating}-star review for booking #${booking.bookingNumber}.`
         });
       } catch {}
     }
