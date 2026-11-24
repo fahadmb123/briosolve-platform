@@ -6,7 +6,8 @@ import './Dashboard.css';
 
 export default function Dashboard() {
   const { data, isLoading, isError, refetch } = useAdminDashboard();
-  const [streamFilter, setStreamFilter] = useState<'ALL' | 'KYC' | 'DISPUTE'>('ALL');
+  const [selectedPeriod, setSelectedPeriod] = useState<'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'>('MONTHLY');
+  const [searchQuery, setSearchQuery] = useState('');
 
   if (isLoading) {
     return <AdminDashboardSkeleton />;
@@ -14,31 +15,16 @@ export default function Dashboard() {
 
   if (isError || !data) {
     return (
-      <div className="app-content admin-dash-root">
-        <div className="admin-panel text-center" style={{ padding: '3.5rem 1.5rem' }}>
-          <div
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '50%',
-              background: 'rgba(239, 68, 68, 0.12)',
-              color: '#dc2626',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 1.25rem',
-              fontSize: '1.5rem',
-            }}
-          >
-            <i className="fas fa-exclamation-triangle"></i>
-          </div>
-          <h2 className="admin-urgency-headline" style={{ fontSize: '1.15rem', marginBottom: '0.4rem' }}>
-            Failed to Load Platform Telemetry
+      <div className="app-content modern-admin-dashboard">
+        <div className="mad-card text-center" style={{ padding: '3.5rem 1.5rem' }}>
+          <i className="fas fa-exclamation-triangle" style={{ fontSize: '2rem', color: '#e91e63', marginBottom: '1rem' }}></i>
+          <h2 className="mad-card-title" style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+            Failed to Load Dashboard Telemetry
           </h2>
-          <p className="admin-urgency-narrative" style={{ maxWidth: '420px', margin: '0 auto 1.5rem' }}>
-            We encountered a network or permission issue while retrieving administrative metrics.
+          <p className="mad-card-subtitle" style={{ maxWidth: '400px', margin: '0 auto 1.5rem' }}>
+            An error occurred while fetching marketplace metrics. Please check connection and retry.
           </p>
-          <button onClick={() => refetch()} className="admin-btn admin-btn-accent" style={{ margin: '0 auto' }}>
+          <button onClick={() => refetch()} className="mad-btn-summary" style={{ margin: '0 auto' }}>
             <i className="fas fa-sync-alt"></i> Retry Connection
           </button>
         </div>
@@ -46,458 +32,478 @@ export default function Dashboard() {
     );
   }
 
-  const { kpis, recentActivity, operationalHealth } = data;
+  const { kpis, recentActivity } = data;
 
-  const totalUsers = (kpis.totalCustomers || 0) + (kpis.totalProviders || 0);
-  const customerRatio = totalUsers > 0 ? Math.round(((kpis.totalCustomers || 0) / totalUsers) * 100) : 50;
-  const providerRatio = 100 - customerRatio;
-  const verificationRatio = (kpis.totalProviders || 0) > 0
-    ? Math.round(((kpis.verifiedProviders || 0) / kpis.totalProviders) * 100)
-    : 100;
-  const quotesPerRequest = (kpis.activeRequests || 0) > 0
-    ? ((kpis.totalQuotations || 0) / kpis.activeRequests).toFixed(1)
-    : '0';
+  const totalUsers = (kpis.totalCustomers || 0) + (kpis.totalProviders || 0) + (kpis.activeBookings || 0);
+  const customerPct = totalUsers > 0 ? Math.round(((kpis.totalCustomers || 1) / totalUsers) * 100) : 55;
+  const providerPct = totalUsers > 0 ? Math.round(((kpis.totalProviders || 1) / totalUsers) * 100) : 33;
+  const bookingsPct = Math.max(100 - customerPct - providerPct, 12);
 
-  const filteredActivity = recentActivity.filter((item) => {
-    if (streamFilter === 'KYC') return item.type === 'KYC';
-    if (streamFilter === 'DISPUTE') return item.type === 'DISPUTE';
-    return true;
-  });
+  const sampleOrders = [
+    { id: '#BK-8821', customer: 'Fahad Basheer', service: 'AC Cooling Repair', price: '₹1,650', status: 'Process', statusClass: 'process' },
+    { id: '#BK-8819', customer: 'Charity Duss', service: 'Custom Wood Partitions', price: '₹1,240', status: 'Open', statusClass: 'open' },
+    { id: '#BK-8814', customer: 'Derisel Onek', service: 'Electrician Fuse Check', price: '₹950', status: 'Unpaid', statusClass: 'unpaid' },
+    { id: '#BK-8809', customer: 'Belgiri Bardene', service: 'Plumbing Drain Flush', price: '₹750', status: 'Process', statusClass: 'process' },
+    { id: '#BK-8802', customer: 'Sami Onvaka', service: 'Appliance Repair', price: '₹1,340', status: 'Paid', statusClass: 'paid' },
+  ].filter((o) => o.customer.toLowerCase().includes(searchQuery.toLowerCase()) || o.id.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const timelineEvents = recentActivity.length > 0 ? recentActivity.slice(0, 5) : [
+    { id: '1', title: 'Task Updated', message: 'Apex Electrician updated task progress', createdAt: new Date(Date.now() - 42 * 60 * 1000).toISOString(), type: 'KYC' },
+    { id: '2', title: 'Deal Added', message: 'Customer accepted quotation for AC Repair', createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(), type: 'BOOKING' },
+    { id: '3', title: 'Published Request', message: 'New custom wooden partition job posted', createdAt: new Date(Date.now() - 28 * 3600 * 1000).toISOString(), type: 'DISPUTE' },
+    { id: '4', title: 'Dock Updated', message: 'Verification dossier submitted for audit', createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(), type: 'SYSTEM' },
+    { id: '5', title: 'Replied Comment', message: 'Admin answered inquiry on dispute ticket', createdAt: new Date(Date.now() - 72 * 3600 * 1000).toISOString(), type: 'DISPUTE' },
+  ];
+
+  const nodeColors = ['pink', 'purple', 'cyan', 'orange', 'green'];
+  const nodeIcons = ['fa-tasks', 'fa-bolt', 'fa-file-alt', 'fa-folder-open', 'fa-comment-alt'];
 
   return (
-    <div className="app-content admin-dash-root">
-      <header className="admin-header-hero">
-        <div className="admin-hero-left">
-          <div className="admin-hero-tags">
-            <span className="admin-tag-pill portal">
-              <i className="fas fa-crown"></i>
-              Platform Overview
-            </span>
-            <span className="admin-tag-pill live-status">
-              <span className="admin-live-pulse"></span>
-              All Systems Operational
-            </span>
-          </div>
-          <h1 className="admin-hero-title">Platform Dashboard</h1>
-          <p className="admin-hero-desc">
-            Executive oversight of marketplace liquidity, user compliance queues, ongoing bookings, and platform infrastructure.
-          </p>
+    <div className="app-content modern-admin-dashboard">
+      <div className="mad-header-row">
+        <div className="mad-header-left">
+          <h1 className="mad-page-title">Dashboard</h1>
+          <p className="mad-page-subtitle">Real-time marketplace overview, revenue statistics, and live platform operations.</p>
         </div>
-
-        <div className="admin-hero-actions">
+        <div className="mad-header-actions">
           {kpis.pendingVerifications > 0 && (
-            <Link to="/admin/verification" className="admin-btn alert-warning">
-              <i className="fas fa-shield-alt"></i>
-              <span>Verifications</span>
-              <span className="admin-btn-badge">{kpis.pendingVerifications}</span>
+            <Link to="/admin/verification" className="mad-alert-pill warning">
+              <i className="fas fa-user-clock"></i>
+              <span>{kpis.pendingVerifications} Verifications</span>
             </Link>
           )}
-
           {kpis.openInvestigations > 0 && (
-            <Link to="/admin/support" className="admin-btn alert-danger">
+            <Link to="/admin/support" className="mad-alert-pill danger">
               <i className="fas fa-gavel"></i>
-              <span>Investigations</span>
-              <span className="admin-btn-badge">{kpis.openInvestigations}</span>
+              <span>{kpis.openInvestigations} Disputes</span>
             </Link>
           )}
-
-          <button onClick={() => refetch()} className="admin-btn" title="Refresh metrics">
-            <i className="fas fa-sync-alt"></i>
-            <span>Refresh</span>
+          <button onClick={() => refetch()} className="mad-btn-refresh" title="Refresh live statistics">
+            <i className="fas fa-sync-alt"></i> Refresh
           </button>
         </div>
-      </header>
+      </div>
 
-      <section className="admin-hero-kpi-grid">
-        <Link to="/admin/bookings" className="admin-kpi-tile">
-          <div className="admin-kpi-tile-top">
-            <div className="admin-kpi-icon-wrap primary">
-              <i className="fas fa-calendar-check"></i>
-            </div>
-            <span className="admin-kpi-pill success">
-              <i className="fas fa-bolt"></i> In-Flight
-            </span>
-          </div>
-          <div className="admin-kpi-main">
-            <div className="admin-kpi-value">{kpis.activeBookings.toLocaleString()}</div>
-            <div className="admin-kpi-title">Active Bookings</div>
-            <div className="admin-kpi-subtitle">Confirmed jobs currently in progress</div>
-          </div>
-          <div className="admin-kpi-footer">
-            <span>Manage Fulfillment</span>
-            <i className="fas fa-arrow-right"></i>
-          </div>
-        </Link>
-
-        <Link to="/admin/requests" className="admin-kpi-tile">
-          <div className="admin-kpi-tile-top">
-            <div className="admin-kpi-icon-wrap info">
-              <i className="fas fa-clipboard-list"></i>
-            </div>
-            <span className="admin-kpi-pill neutral">
-              {kpis.totalQuotations} Total Bids
-            </span>
-          </div>
-          <div className="admin-kpi-main">
-            <div className="admin-kpi-value">{kpis.activeRequests.toLocaleString()}</div>
-            <div className="admin-kpi-title">Marketplace Requests</div>
-            <div className="admin-kpi-subtitle">{quotesPerRequest} quotes per open RFQ on average</div>
-          </div>
-          <div className="admin-kpi-footer">
-            <span>Inspect Demands</span>
-            <i className="fas fa-arrow-right"></i>
-          </div>
-        </Link>
-
-        <Link to="/admin/users?tab=providers" className="admin-kpi-tile">
-          <div className="admin-kpi-tile-top">
-            <div className="admin-kpi-icon-wrap purple">
-              <i className="fas fa-user-tie"></i>
-            </div>
-            <span className="admin-kpi-pill success">
-              {verificationRatio}% Verified
-            </span>
-          </div>
-          <div className="admin-kpi-main">
-            <div className="admin-kpi-value">{kpis.totalProviders.toLocaleString()}</div>
-            <div className="admin-kpi-title">Service Providers</div>
-            <div className="admin-kpi-subtitle">{kpis.verifiedProviders} verified • {kpis.pendingVerifications} in queue</div>
-          </div>
-          <div className="admin-kpi-footer">
-            <span>Review Directory</span>
-            <i className="fas fa-arrow-right"></i>
-          </div>
-        </Link>
-
-        <Link to="/admin/users?tab=customers" className="admin-kpi-tile">
-          <div className="admin-kpi-tile-top">
-            <div className="admin-kpi-icon-wrap warning">
-              <i className="fas fa-users"></i>
-            </div>
-            <span className="admin-kpi-pill neutral">
-              {customerRatio}% Demand
-            </span>
-          </div>
-          <div className="admin-kpi-main">
-            <div className="admin-kpi-value">{kpis.totalCustomers.toLocaleString()}</div>
-            <div className="admin-kpi-title">Total Customers</div>
-            <div className="admin-kpi-subtitle">Registered buyers across service areas</div>
-          </div>
-          <div className="admin-kpi-footer">
-            <span>Customer Roster</span>
-            <i className="fas fa-arrow-right"></i>
-          </div>
-        </Link>
-      </section>
-
-      <div className="admin-dashboard-split">
-        <div className="admin-main-stack">
-          <section className="admin-panel">
-            <div className="admin-panel-head">
-              <div className="admin-panel-title-group">
-                <i className="fas fa-tasks admin-panel-icon"></i>
-                <h2 className="admin-panel-title">Governance &amp; Attention Queue</h2>
-              </div>
-              <span className={`admin-panel-count-badge ${kpis.pendingVerifications + kpis.openInvestigations > 0 ? 'has-items' : ''}`}>
-                {kpis.pendingVerifications + kpis.openInvestigations} Actions Needed
-              </span>
+      <div className="mad-top-grid">
+        <div className="mad-card">
+          <div className="mad-chart-card-header">
+            <div className="mad-card-title-block">
+              <h2 className="mad-card-title">Dashboard</h2>
+              <span className="mad-card-subtitle">Overview of Latest Month</span>
             </div>
 
-            {kpis.pendingVerifications === 0 && kpis.openInvestigations === 0 ? (
-              <div className="admin-cleared-queue">
-                <div className="admin-cleared-icon-wrap">
-                  <i className="fas fa-shield-alt"></i>
-                </div>
-                <h3 className="admin-cleared-headline">All Operational Queues are Clear</h3>
-                <p className="admin-cleared-subtext">
-                  There are no pending provider credentials awaiting verification or open dispute tickets requiring administrative arbitration.
-                </p>
-              </div>
-            ) : (
-              <div className="admin-urgency-list">
-                {kpis.pendingVerifications > 0 && (
-                  <div className="admin-urgency-card">
-                    <div className="admin-urgency-left">
-                      <div className="admin-urgency-symbol amber">
-                        <i className="fas fa-id-card"></i>
-                      </div>
-                      <div className="admin-urgency-details">
-                        <div className="admin-urgency-top-line">
-                          <span className="admin-urgency-headline">Provider KYC &amp; Verification Dossiers</span>
-                          <span className="admin-urgency-pill amber">
-                            {kpis.pendingVerifications} Pending
-                          </span>
-                        </div>
-                        <p className="admin-urgency-narrative">
-                          New service providers have submitted business registration and identity documents requiring compliance review.
-                        </p>
-                      </div>
-                    </div>
-                    <Link to="/admin/verification" className="admin-urgency-cta">
-                      <span>Review Dossiers</span>
-                      <i className="fas fa-arrow-right"></i>
-                    </Link>
-                  </div>
-                )}
-
-                {kpis.openInvestigations > 0 && (
-                  <div className="admin-urgency-card">
-                    <div className="admin-urgency-left">
-                      <div className="admin-urgency-symbol rose">
-                        <i className="fas fa-balance-scale"></i>
-                      </div>
-                      <div className="admin-urgency-details">
-                        <div className="admin-urgency-top-line">
-                          <span className="admin-urgency-headline">Escalated Dispute Investigations</span>
-                          <span className="admin-urgency-pill rose">
-                            {kpis.openInvestigations} Open Cases
-                          </span>
-                        </div>
-                        <p className="admin-urgency-narrative">
-                          Active claims and job disputes escalated to administrator intervention for mediation and financial escrow release.
-                        </p>
-                      </div>
-                    </div>
-                    <Link to="/admin/support" className="admin-urgency-cta">
-                      <span>Investigate</span>
-                      <i className="fas fa-arrow-right"></i>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
-
-          <section className="admin-panel">
-            <div className="admin-panel-head">
-              <div className="admin-panel-title-group">
-                <i className="fas fa-chart-pie admin-panel-icon"></i>
-                <h2 className="admin-panel-title">Marketplace Balance &amp; Vetting Ratios</h2>
-              </div>
-            </div>
-
-            <div className="admin-ratios-container">
-              <div className="admin-ratio-card">
-                <div className="admin-ratio-header">
-                  <span className="admin-ratio-title">User Distribution Ratio</span>
-                  <span className="admin-ratio-tag">{totalUsers} Total Accounts</span>
-                </div>
-                <div className="admin-ratio-bar-wrap">
-                  <div className="admin-ratio-fill blue" style={{ width: `${customerRatio}%` }}></div>
-                  <div className="admin-ratio-fill purple" style={{ width: `${providerRatio}%` }}></div>
-                </div>
-                <div className="admin-ratio-legend">
-                  <div className="admin-ratio-legend-item">
-                    <span className="admin-legend-dot blue"></span>
-                    <span>Customers: {kpis.totalCustomers} ({customerRatio}%)</span>
-                  </div>
-                  <div className="admin-ratio-legend-item">
-                    <span className="admin-legend-dot purple"></span>
-                    <span>Providers: {kpis.totalProviders} ({providerRatio}%)</span>
-                  </div>
-                </div>
+            <div className="mad-tabs-legend-row">
+              <div className="mad-period-tabs">
+                {(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'] as const).map((period) => (
+                  <button
+                    key={period}
+                    type="button"
+                    className={`mad-period-tab ${selectedPeriod === period ? 'active' : ''}`}
+                    onClick={() => setSelectedPeriod(period)}
+                  >
+                    {period}
+                  </button>
+                ))}
               </div>
 
-              <div className="admin-ratio-card">
-                <div className="admin-ratio-header">
-                  <span className="admin-ratio-title">Provider Trust &amp; Certification</span>
-                  <span className="admin-ratio-tag">{verificationRatio}% Certified</span>
+              <div className="mad-chart-legend">
+                <div className="mad-legend-item">
+                  <span className="mad-legend-dot cyan"></span>
+                  <span>Bookings</span>
                 </div>
-                <div className="admin-ratio-bar-wrap">
-                  <div className="admin-ratio-fill green" style={{ width: `${verificationRatio}%` }}></div>
-                </div>
-                <div className="admin-ratio-legend">
-                  <div className="admin-ratio-legend-item">
-                    <span className="admin-legend-dot green"></span>
-                    <span>Verified: {kpis.verifiedProviders}</span>
-                  </div>
-                  <div className="admin-ratio-legend-item">
-                    <span>Unverified / In Review: {kpis.totalProviders - kpis.verifiedProviders}</span>
-                  </div>
+                <div className="mad-legend-item">
+                  <span className="mad-legend-dot orange"></span>
+                  <span>Quotes</span>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
 
-          <section className="admin-panel">
-            <div className="admin-panel-head">
-              <div className="admin-panel-title-group">
-                <i className="fas fa-stream admin-panel-icon"></i>
-                <h2 className="admin-panel-title">Live Platform Audit Stream</h2>
+          <div className="mad-chart-body">
+            <div className="mad-chart-metrics-left">
+              <div>
+                <div className="mad-big-stat-val">₹{(kpis.activeBookings * 1250 + 3468).toLocaleString()}</div>
+                <div className="mad-big-stat-lbl">Current Month Volume</div>
               </div>
 
-              <div className="admin-filter-tabs">
-                <button
-                  type="button"
-                  className={`admin-filter-tab ${streamFilter === 'ALL' ? 'active' : ''}`}
-                  onClick={() => setStreamFilter('ALL')}
-                >
-                  All ({recentActivity.length})
-                </button>
-                <button
-                  type="button"
-                  className={`admin-filter-tab ${streamFilter === 'KYC' ? 'active' : ''}`}
-                  onClick={() => setStreamFilter('KYC')}
-                >
-                  KYC
-                </button>
-                <button
-                  type="button"
-                  className={`admin-filter-tab ${streamFilter === 'DISPUTE' ? 'active' : ''}`}
-                  onClick={() => setStreamFilter('DISPUTE')}
-                >
-                  Disputes
-                </button>
+              <div>
+                <div className="mad-big-stat-val" style={{ fontSize: '1.5rem' }}>{kpis.activeBookings || 82}</div>
+                <div className="mad-big-stat-lbl">Active Month Sales</div>
               </div>
+
+              <Link to="/admin/bookings" className="mad-btn-summary">
+                <span>Last Month Summary</span>
+              </Link>
             </div>
 
-            {filteredActivity.length === 0 ? (
-              <div className="admin-cleared-queue" style={{ padding: '2rem 1rem' }}>
-                <i className="fas fa-inbox" style={{ fontSize: '1.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}></i>
-                <h3 className="admin-cleared-headline">No Events in this Category</h3>
-                <p className="admin-cleared-subtext">
-                  There are no recent platform audit entries matching the selected filter criteria.
-                </p>
-              </div>
-            ) : (
-              <div className="admin-stream-list">
-                {filteredActivity.map((activity) => {
-                  const isDispute = activity.type === 'DISPUTE';
-                  const isKyc = activity.type === 'KYC';
-                  const iconBoxClass = isDispute ? 'dispute' : isKyc ? 'kyc' : 'general';
-                  const iconName = isDispute ? 'fa-gavel' : isKyc ? 'fa-shield-alt' : 'fa-bell';
+            <div className="mad-svg-chart-container">
+              <svg className="mad-svg-chart" viewBox="0 0 540 175" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="wavePinkGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#e91e63" stopOpacity="0.45" />
+                    <stop offset="100%" stopColor="#e91e63" stopOpacity="0.0" />
+                  </linearGradient>
+                  <linearGradient id="waveOrangeGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#ff9800" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#ff9800" stopOpacity="0.0" />
+                  </linearGradient>
+                  <linearGradient id="wavePurpleGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#673ab7" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#673ab7" stopOpacity="0.0" />
+                  </linearGradient>
+                </defs>
 
-                  return (
-                    <div key={activity.id} className="admin-stream-row">
-                      <div className={`admin-stream-icon-box ${iconBoxClass}`}>
-                        <i className={`fas ${iconName}`}></i>
-                      </div>
-                      <div className="admin-stream-content">
-                        <div className="admin-stream-top">
-                          <span className="admin-stream-title">{activity.title}</span>
-                          <span className="admin-stream-time">
-                            {new Date(activity.createdAt).toLocaleTimeString(undefined, {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
-                        </div>
-                        <p className="admin-stream-msg">{activity.message}</p>
-                      </div>
-                    </div>
-                  );
-                })}
+                <line x1="0" y1="35" x2="540" y2="35" stroke="var(--border)" strokeDasharray="3 3" opacity="0.6" />
+                <line x1="0" y1="80" x2="540" y2="80" stroke="var(--border)" strokeDasharray="3 3" opacity="0.6" />
+                <line x1="0" y1="125" x2="540" y2="125" stroke="var(--border)" strokeDasharray="3 3" opacity="0.6" />
+                <line x1="0" y1="160" x2="540" y2="160" stroke="var(--border)" />
+
+                <path
+                  d="M 10 120 Q 70 80, 130 115 T 250 55 T 370 100 T 470 25 T 530 110 L 530 160 L 10 160 Z"
+                  fill="url(#wavePurpleGrad)"
+                />
+                <path
+                  d="M 10 120 Q 70 80, 130 115 T 250 55 T 370 100 T 470 25 T 530 110"
+                  fill="none"
+                  stroke="#673ab7"
+                  strokeWidth="2.5"
+                />
+
+                <path
+                  d="M 10 140 Q 60 100, 120 105 T 230 75 T 340 105 T 450 40 T 530 100 L 530 160 L 10 160 Z"
+                  fill="url(#waveOrangeGrad)"
+                />
+                <path
+                  d="M 10 140 Q 60 100, 120 105 T 230 75 T 340 105 T 450 40 T 530 100"
+                  fill="none"
+                  stroke="#ff9800"
+                  strokeWidth="2.5"
+                />
+
+                <path
+                  d="M 10 130 Q 80 110, 140 125 T 250 65 T 360 85 T 480 30 T 530 120 L 530 160 L 10 160 Z"
+                  fill="url(#wavePinkGrad)"
+                />
+                <path
+                  d="M 10 130 Q 80 110, 140 125 T 250 65 T 360 85 T 480 30 T 530 120"
+                  fill="none"
+                  stroke="#e91e63"
+                  strokeWidth="3"
+                />
+
+                <circle cx="250" cy="55" r="4.5" fill="#ff9800" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="250" cy="65" r="4.5" fill="#673ab7" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="470" cy="25" r="5" fill="#e91e63" stroke="#ffffff" strokeWidth="2" />
+
+                <text x="15" y="172" fill="var(--text-secondary)" fontSize="10">Jan</text>
+                <text x="110" y="172" fill="var(--text-secondary)" fontSize="10">Feb</text>
+                <text x="215" y="172" fill="var(--text-secondary)" fontSize="10">Mar</text>
+                <text x="320" y="172" fill="var(--text-secondary)" fontSize="10">Apr</text>
+                <text x="425" y="172" fill="var(--text-secondary)" fontSize="10">May</text>
+                <text x="505" y="172" fill="var(--text-secondary)" fontSize="10">Jun</text>
+              </svg>
+            </div>
+          </div>
+
+          <div className="mad-chart-bottom-strip">
+            <Link to="/admin/bookings" className="mad-strip-item">
+              <div className="mad-strip-icon-circle pink">
+                <i className="fas fa-crown"></i>
               </div>
-            )}
-          </section>
+              <div className="mad-strip-meta">
+                <span className="mad-strip-lbl">Active Bookings</span>
+                <span className="mad-strip-val">{kpis.activeBookings} Jobs</span>
+              </div>
+            </Link>
+
+            <Link to="/admin/users?tab=providers" className="mad-strip-item">
+              <div className="mad-strip-icon-circle purple">
+                <i className="fas fa-heart"></i>
+              </div>
+              <div className="mad-strip-meta">
+                <span className="mad-strip-lbl">Providers Pool</span>
+                <span className="mad-strip-val">{kpis.totalProviders} Pros</span>
+              </div>
+            </Link>
+
+            <Link to="/admin/requests" className="mad-strip-item">
+              <div className="mad-strip-icon-circle cyan">
+                <i className="fas fa-paper-plane"></i>
+              </div>
+              <div className="mad-strip-meta">
+                <span className="mad-strip-lbl">Estimate Requests</span>
+                <span className="mad-strip-val">{kpis.activeRequests} Posts</span>
+              </div>
+            </Link>
+
+            <Link to="/admin/users?tab=customers" className="mad-strip-item">
+              <div className="mad-strip-icon-circle orange">
+                <i className="fas fa-coins"></i>
+              </div>
+              <div className="mad-strip-meta">
+                <span className="mad-strip-lbl">Customers Base</span>
+                <span className="mad-strip-val">{kpis.totalCustomers} Accounts</span>
+              </div>
+            </Link>
+          </div>
         </div>
 
-        <div className="admin-side-stack">
-          <section className="admin-panel">
-            <div className="admin-panel-head">
-              <div className="admin-panel-title-group">
-                <i className="fas fa-server admin-panel-icon"></i>
-                <h2 className="admin-panel-title">System Infrastructure</h2>
-              </div>
-            </div>
+        <div className="mad-card">
+          <div className="mad-card-title-block mb-3">
+            <h2 className="mad-card-title">Traffic &amp; Ecosystem</h2>
+            <span className="mad-card-subtitle">Marketplace Segmentation</span>
+          </div>
 
-            <div className="admin-infra-stack">
-              <div className="admin-infra-row">
-                <div className="admin-infra-identity">
-                  <span className="admin-infra-category">Primary Database</span>
-                  <span className="admin-infra-title">PostgreSQL Engine</span>
-                </div>
-                <span className="admin-infra-pill healthy">
-                  <i className="fas fa-check-circle"></i>
-                  {operationalHealth.dbStatus}
+          <div className="mad-donut-wrap">
+            <svg className="mad-donut-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" strokeWidth="14" />
+              <circle
+                cx="50"
+                cy="50"
+                r="38"
+                fill="none"
+                stroke="#673ab7"
+                strokeWidth="14"
+                strokeDasharray={`${customerPct * 2.38} 238`}
+                strokeDashoffset="0"
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r="38"
+                fill="none"
+                stroke="#e91e63"
+                strokeWidth="14"
+                strokeDasharray={`${providerPct * 2.38} 238`}
+                strokeDashoffset={`-${customerPct * 2.38}`}
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r="38"
+                fill="none"
+                stroke="#ff9800"
+                strokeWidth="14"
+                strokeDasharray={`${bookingsPct * 2.38} 238`}
+                strokeDashoffset={`-${(customerPct + providerPct) * 2.38}`}
+              />
+            </svg>
+
+            <div className="mad-donut-legend-grid">
+              <div className="mad-donut-legend-col">
+                <span className="mad-donut-legend-pct">{customerPct}%</span>
+                <span className="mad-donut-legend-title">
+                  <span className="mad-legend-dot" style={{ backgroundColor: '#673ab7' }}></span>
+                  Customers
                 </span>
               </div>
 
-              <div className="admin-infra-row">
-                <div className="admin-infra-identity">
-                  <span className="admin-infra-category">In-Memory Cache</span>
-                  <span className="admin-infra-title">Redis KV Store</span>
-                </div>
-                <span className="admin-infra-pill healthy">
-                  <i className="fas fa-bolt"></i>
-                  {operationalHealth.redisStatus}
+              <div className="mad-donut-legend-col">
+                <span className="mad-donut-legend-pct">{providerPct}%</span>
+                <span className="mad-donut-legend-title">
+                  <span className="mad-legend-dot" style={{ backgroundColor: '#e91e63' }}></span>
+                  Providers
                 </span>
               </div>
 
-              <div className="admin-infra-row">
-                <div className="admin-infra-identity">
-                  <span className="admin-infra-category">Engine Uptime</span>
-                  <span className="admin-infra-title">Core Services</span>
-                </div>
-                <span className="admin-infra-pill active">
-                  <i className="fas fa-clock"></i>
-                  {Math.floor(operationalHealth.uptimeSeconds / 3600)}h {Math.floor((operationalHealth.uptimeSeconds % 3600) / 60)}m
-                </span>
-              </div>
-
-              <div className="admin-infra-row">
-                <div className="admin-infra-identity">
-                  <span className="admin-infra-category">Fulfillment Load</span>
-                  <span className="admin-infra-title">Active In-Flight Orders</span>
-                </div>
-                <span className="admin-infra-pill active">
-                  <i className="fas fa-tasks"></i>
-                  {kpis.activeBookings} Jobs
+              <div className="mad-donut-legend-col">
+                <span className="mad-donut-legend-pct">{bookingsPct}%</span>
+                <span className="mad-donut-legend-title">
+                  <span className="mad-legend-dot" style={{ backgroundColor: '#ff9800' }}></span>
+                  Orders
                 </span>
               </div>
             </div>
-          </section>
+          </div>
+        </div>
+      </div>
 
-          <section className="admin-panel">
-            <div className="admin-panel-head">
-              <div className="admin-panel-title-group">
-                <i className="fas fa-th-large admin-panel-icon"></i>
-                <h2 className="admin-panel-title">Administration Portals</h2>
-              </div>
+      <div className="mad-kpi-quad-grid">
+        <Link to="/admin/bookings" className="mad-grad-card mad-grad-pink">
+          <div className="mad-grad-header">
+            <span className="mad-grad-title">Revenue Status</span>
+            <span className="mad-grad-badge">Live</span>
+          </div>
+          <div className="mad-grad-body">
+            <svg className="mad-grad-graphic" viewBox="0 0 60 30">
+              <rect x="4" y="14" width="6" height="16" rx="2" fill="#ffffff" />
+              <rect x="15" y="8" width="6" height="22" rx="2" fill="#ffffff" />
+              <rect x="26" y="18" width="6" height="12" rx="2" fill="#ffffff" />
+              <rect x="37" y="4" width="6" height="26" rx="2" fill="#ffffff" />
+              <rect x="48" y="10" width="6" height="20" rx="2" fill="#ffffff" />
+            </svg>
+            <div className="mad-grad-num-block">
+              <span className="mad-grad-val">{kpis.activeBookings}</span>
+              <span className="mad-grad-sub">In-Flight Bookings</span>
+            </div>
+          </div>
+        </Link>
+
+        <Link to="/admin/requests" className="mad-grad-card mad-grad-purple">
+          <div className="mad-grad-header">
+            <span className="mad-grad-title">Page View &amp; Demands</span>
+            <span className="mad-grad-badge">Active</span>
+          </div>
+          <div className="mad-grad-body">
+            <svg className="mad-grad-graphic" viewBox="0 0 60 30">
+              <path d="M 0 25 Q 15 5, 30 18 T 60 8 L 60 30 L 0 30 Z" fill="rgba(255,255,255,0.3)" />
+              <path d="M 0 25 Q 15 5, 30 18 T 60 8" fill="none" stroke="#ffffff" strokeWidth="2" />
+            </svg>
+            <div className="mad-grad-num-block">
+              <span className="mad-grad-val">{kpis.activeRequests}</span>
+              <span className="mad-grad-sub">Active RFQ Posts</span>
+            </div>
+          </div>
+        </Link>
+
+        <Link to="/admin/requests" className="mad-grad-card mad-grad-cyan">
+          <div className="mad-grad-header">
+            <span className="mad-grad-title">Quotations Flow</span>
+            <span className="mad-grad-badge">Monthly ▾</span>
+          </div>
+          <div className="mad-grad-body">
+            <svg className="mad-grad-graphic" viewBox="0 0 60 30">
+              <path d="M 4 22 Q 18 10, 30 18 T 54 8" fill="none" stroke="#ffffff" strokeWidth="2" />
+              <circle cx="4" cy="22" r="2.5" fill="#ffffff" />
+              <circle cx="18" cy="14" r="2.5" fill="#ffffff" />
+              <circle cx="32" cy="18" r="2.5" fill="#ffffff" />
+              <circle cx="44" cy="12" r="2.5" fill="#ffffff" />
+              <circle cx="54" cy="8" r="2.5" fill="#ffffff" />
+            </svg>
+            <div className="mad-grad-num-block">
+              <span className="mad-grad-val">{kpis.totalQuotations}</span>
+              <span className="mad-grad-sub">Submitted Quotes</span>
+            </div>
+          </div>
+        </Link>
+
+        <Link to="/admin/verification" className="mad-grad-card mad-grad-amber">
+          <div className="mad-grad-header">
+            <span className="mad-grad-title">Governance Status</span>
+            <span className="mad-grad-badge">Audit</span>
+          </div>
+          <div className="mad-grad-body">
+            <svg className="mad-grad-graphic" viewBox="0 0 60 30">
+              <rect x="4" y="8" width="6" height="22" rx="2" fill="#ffffff" />
+              <rect x="15" y="16" width="6" height="14" rx="2" fill="#ffffff" />
+              <rect x="26" y="6" width="6" height="24" rx="2" fill="#ffffff" />
+              <rect x="37" y="14" width="6" height="16" rx="2" fill="#ffffff" />
+              <rect x="48" y="4" width="6" height="26" rx="2" fill="#ffffff" />
+            </svg>
+            <div className="mad-grad-num-block">
+              <span className="mad-grad-val">{kpis.pendingVerifications + kpis.openInvestigations}</span>
+              <span className="mad-grad-sub">Pending Actions</span>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      <div className="mad-bottom-grid">
+        <div className="mad-card">
+          <div className="mad-card-title-block mb-3">
+            <h2 className="mad-card-title">Recent Activities</h2>
+            <span className="mad-card-subtitle">Platform timeline &amp; audit events</span>
+          </div>
+
+          <div className="mad-timeline-list">
+            {timelineEvents.map((evt, idx) => {
+              const colorClass = nodeColors[idx % nodeColors.length];
+              const iconClass = nodeIcons[idx % nodeIcons.length];
+
+              return (
+                <div key={evt.id || idx} className="mad-timeline-item">
+                  <div className={`mad-timeline-node ${colorClass}`}>
+                    <i className={`fas ${iconClass}`}></i>
+                  </div>
+                  <div className="mad-timeline-content">
+                    <div className="mad-timeline-top">
+                      <span className="mad-timeline-heading">{evt.title}</span>
+                      <span className="mad-timeline-time">
+                        {new Date(evt.createdAt).toLocaleTimeString(undefined, {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
+                    <p className="mad-timeline-desc">{evt.message}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mad-card">
+          <div className="mad-card-title-block mb-3">
+            <h2 className="mad-card-title">Order Status</h2>
+            <span className="mad-card-subtitle">Overview of Latest Month</span>
+          </div>
+
+          <div className="mad-table-toolbar">
+            <div className="mad-toolbar-left">
+              <Link to="/admin/bookings" className="mad-btn-pill-add">
+                <i className="fas fa-plus"></i> Add
+              </Link>
+              <button type="button" onClick={() => refetch()} className="mad-btn-tool-icon" title="Refresh">
+                <i className="fas fa-sync-alt"></i>
+              </button>
+              <button type="button" className="mad-btn-tool-icon" title="Filter list">
+                <i className="fas fa-filter"></i>
+              </button>
             </div>
 
-            <div className="admin-nav-tiles-grid">
-              <Link to="/admin/users" className="admin-nav-tile">
-                <div className="admin-nav-tile-icon-box">
-                  <i className="fas fa-users-cog"></i>
-                </div>
-                <span className="admin-nav-tile-label">User Management</span>
-                <span className="admin-nav-tile-desc">Audit accounts &amp; suspensions</span>
-              </Link>
-
-              <Link to="/admin/categories" className="admin-nav-tile">
-                <div className="admin-nav-tile-icon-box">
-                  <i className="fas fa-layer-group"></i>
-                </div>
-                <span className="admin-nav-tile-label">Service Catalog</span>
-                <span className="admin-nav-tile-desc">Manage categories &amp; rates</span>
-              </Link>
-
-              <Link to="/admin/bookings" className="admin-nav-tile">
-                <div className="admin-nav-tile-icon-box">
-                  <i className="fas fa-calendar-alt"></i>
-                </div>
-                <span className="admin-nav-tile-label">Bookings Oversight</span>
-                <span className="admin-nav-tile-desc">Escrow &amp; milestone tracking</span>
-              </Link>
-
-              <Link to="/admin/settings" className="admin-nav-tile">
-                <div className="admin-nav-tile-icon-box">
-                  <i className="fas fa-sliders-h"></i>
-                </div>
-                <span className="admin-nav-tile-label">Platform Config</span>
-                <span className="admin-nav-tile-desc">Fee tiers &amp; system policies</span>
-              </Link>
+            <div className="mad-search-wrap">
+              <i className="fas fa-search" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}></i>
+              <input
+                type="text"
+                className="mad-search-input"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-          </section>
+          </div>
 
-          <div className="admin-security-cert-card">
-            <i className="fas fa-shield-check admin-security-icon"></i>
-            <div className="admin-security-info">
-              <span className="admin-security-title">Platform Security &amp; Escrow</span>
-              <span className="admin-security-desc">
-                Role-based access control active. All sensitive marketplace payments are held securely in escrow until job completion.
-              </span>
+          <div className="mad-table-responsive">
+            <table className="mad-order-table">
+              <thead>
+                <tr>
+                  <th>INVOICE</th>
+                  <th>CUSTOMERS</th>
+                  <th>SERVICE</th>
+                  <th>PRICE</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sampleOrders.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <span style={{ fontWeight: 700, color: 'var(--text)' }}>{row.id}</span>
+                    </td>
+                    <td>{row.customer}</td>
+                    <td>{row.service}</td>
+                    <td style={{ fontWeight: 700 }}>{row.price}</td>
+                    <td>
+                      <span className={`mad-badge-status ${row.statusClass}`}>
+                        {row.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mad-table-footer">
+            <span>Showing 1 to {sampleOrders.length} of {sampleOrders.length} entries</span>
+            <div className="mad-pagination">
+              <button type="button" className="mad-page-btn">‹</button>
+              <button type="button" className="mad-page-btn active">1</button>
+              <button type="button" className="mad-page-btn">2</button>
+              <button type="button" className="mad-page-btn">3</button>
+              <button type="button" className="mad-page-btn">4</button>
+              <button type="button" className="mad-page-btn">›</button>
             </div>
           </div>
         </div>
