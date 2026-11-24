@@ -24,7 +24,7 @@ export default function Home() {
     if (!user) return "/login";
     if (user.role === "ADMIN") return "/admin/dashboard";
     if (user.role === "PROVIDER") return "/provider/dashboard";
-    return "/dashboard";
+    return "/bookings";
   }, [user]);
 
   useEffect(() => {

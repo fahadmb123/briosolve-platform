@@ -135,9 +135,9 @@ export const PaymentSuccessPage: React.FC = () => {
             </Link>
           )}
 
-          <Link to="/dashboard" className="paysuccess-btn-secondary">
-            <i className="fas fa-home"></i>
-            <span>Dashboard</span>
+          <Link to="/bookings" className="paysuccess-btn-secondary">
+            <i className="fas fa-calendar-check"></i>
+            <span>View Bookings</span>
           </Link>
         </div>
       </div>

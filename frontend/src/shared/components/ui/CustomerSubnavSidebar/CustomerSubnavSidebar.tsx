@@ -12,9 +12,14 @@ interface SubnavItem {
 
 const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
   {
-    label: "Dashboard",
-    to: "/dashboard",
-    icon: "fas fa-chart-pie",
+    label: "My Bookings",
+    to: "/bookings",
+    icon: "fas fa-calendar-check",
+  },
+  {
+    label: "My Requests",
+    to: "/my-requests",
+    icon: "fas fa-clipboard-list",
   },
   {
     label: "Find Providers",
@@ -40,29 +45,14 @@ const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
 
 const MORE_SUBNAV_ITEMS: SubnavItem[] = [
   {
-    label: "My Requests",
-    to: "/my-requests",
-    icon: "fas fa-clipboard-list",
-  },
-  {
     label: "Request Service",
     to: "/request-service",
     icon: "fas fa-plus-circle",
   },
   {
-    label: "Bookings",
-    to: "/bookings",
-    icon: "fas fa-calendar-check",
-  },
-  {
     label: "Wallet",
     to: "/wallet",
     icon: "fas fa-wallet",
-  },
-  {
-    label: "Reviews",
-    to: "/dashboard#reviews",
-    icon: "fas fa-star",
   },
   {
     label: "Support Tickets",

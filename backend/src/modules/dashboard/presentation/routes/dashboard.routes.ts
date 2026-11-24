@@ -7,13 +7,6 @@ export function buildDashboardRoute(dependencies: DashboardRouteDependencies): R
   const router = Router();
 
   router.get(
-    "/customer",
-    authMiddleware,
-    requireRole(["CUSTOMER"]),
-    dependencies.dashboard.getCustomerDashboard
-  );
-
-  router.get(
     "/provider",
     authMiddleware,
     requireRole(["PROVIDER"]),

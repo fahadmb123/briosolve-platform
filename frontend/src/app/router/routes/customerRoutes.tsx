@@ -1,6 +1,5 @@
-import { Route } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import {
-  CustomerDashboard,
   CustomerNotifications,
   CustomerProfile,
   CustomerSettings,
@@ -25,7 +24,7 @@ export const customerRoutes = (
     <Route element={<ProtectedRoute />}>
       <Route element={<RoleRoute allowedRoles={["CUSTOMER"]} />}>
         <Route path="settings" element={<CustomerSettings />} />
-        <Route path="dashboard" element={<CustomerDashboard />} />
+        <Route path="dashboard" element={<Navigate to="/bookings" replace />} />
         <Route path="profile" element={<CustomerProfile />} />
         <Route path="notifications" element={<CustomerNotifications />} />
         <Route path="nearby-providers" element={<CustomerNearbyProviders />} />

@@ -1,20 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import type {
-  CustomerDashboardData,
   ProviderDashboardData,
   AdminDashboardData,
   AdminAuditLogsResponse,
   AdminAnalyticsResponse,
 } from "../services/dashboard.service";
 import { dashboardService } from "../services/dashboard.service";
-
-export function useCustomerDashboard() {
-  return useQuery<CustomerDashboardData>({
-    queryKey: ["dashboard", "customer"],
-    queryFn: () => dashboardService.getCustomerDashboard(),
-    staleTime: 30000,
-  });
-}
 
 export function useProviderDashboard() {
   return useQuery<ProviderDashboardData>({

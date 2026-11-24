@@ -109,7 +109,7 @@ export const TopNav: React.FC = () => {
     if (!user) return "/login";
     if (user.role === "ADMIN") return "/admin/dashboard";
     if (user.role === "PROVIDER") return "/provider/dashboard";
-    return "/dashboard";
+    return "/bookings";
   }, [user]);
 
   const profileRoute = useMemo(() => {
@@ -211,12 +211,12 @@ export const TopNav: React.FC = () => {
             {isCustomer ? (
               <>
                 <NavLink
-                  to="/dashboard"
+                  to="/bookings"
                   className={({ isActive }) =>
                     `topnav-link ${isActive ? "active" : ""}`
                   }
                 >
-                  Dashboard
+                  My Bookings
                 </NavLink>
 
                 <div
@@ -372,7 +372,7 @@ export const TopNav: React.FC = () => {
                         <i className="fas fa-calendar-check"></i>
                       </Link>
                       <Link
-                        to="/dashboard"
+                        to="/bookings"
                         className="topnav-dropdown-item"
                         role="menuitem"
                         onClick={closeAllMenus}
@@ -384,7 +384,7 @@ export const TopNav: React.FC = () => {
                       <div className="topnav-dropdown-divider"></div>
                       <div className="topnav-dropdown-section-title">Features</div>
                       <Link
-                        to="/dashboard"
+                        to="/nearby-providers"
                         className="topnav-dropdown-item"
                         role="menuitem"
                         onClick={closeAllMenus}
@@ -393,7 +393,7 @@ export const TopNav: React.FC = () => {
                         <span className="topnav-mono-badge">AI</span>
                       </Link>
                       <Link
-                        to="/dashboard"
+                        to="/request-service"
                         className="topnav-dropdown-item"
                         role="menuitem"
                         onClick={closeAllMenus}
@@ -705,13 +705,13 @@ export const TopNav: React.FC = () => {
               {isCustomer ? (
                 <>
                   <NavLink
-                    to="/dashboard"
+                    to="/bookings"
                     className={({ isActive }) =>
                       `topnav-mobile-item ${isActive ? "active" : ""}`
                     }
                     onClick={closeAllMenus}
                   >
-                    Dashboard
+                    My Bookings
                   </NavLink>
 
                   <NavLink
@@ -787,7 +787,7 @@ export const TopNav: React.FC = () => {
                     Bookings
                   </Link>
                   <Link
-                    to="/dashboard"
+                    to="/bookings"
                     className="topnav-mobile-item"
                     onClick={closeAllMenus}
                   >
@@ -798,14 +798,14 @@ export const TopNav: React.FC = () => {
                 <div className="topnav-mobile-section">
                   <div className="topnav-mobile-label">Features</div>
                   <Link
-                    to="/dashboard"
+                    to="/nearby-providers"
                     className="topnav-mobile-item"
                     onClick={closeAllMenus}
                   >
                     AI Assistant
                   </Link>
                   <Link
-                    to="/dashboard"
+                    to="/request-service"
                     className="topnav-mobile-item"
                     onClick={closeAllMenus}
                   >
