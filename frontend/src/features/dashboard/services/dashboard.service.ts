@@ -81,6 +81,18 @@ export interface ProviderDashboardData {
     averageRating: number;
     totalEarnings: number;
   };
+  activeBookings?: Array<{
+    id: string;
+    bookingNumber: string;
+    status: string;
+    scheduledDate?: string;
+    scheduledTime?: string;
+    serviceTitle: string;
+    categoryName: string;
+    customerName: string;
+    location: string;
+    totalAmount: number;
+  }>;
   opportunities: Array<{
     id: string;
     title: string;

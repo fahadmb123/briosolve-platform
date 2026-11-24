@@ -317,6 +317,45 @@ export class DashboardController {
       );
       const completedBookings = allBookings.filter((b) => b.status === "COMPLETED");
 
+      const bookingRequestIds = Array.from(new Set(acceptedBookings.map((b) => b.service_request_id).filter(Boolean)));
+      const bookingRequests = bookingRequestIds.length
+        ? await db.orm.public.service_requests.where((r) => r.id.in(bookingRequestIds as never)).all()
+        : [];
+      const bookingRequestMap = new Map(bookingRequests.map((r) => [r.id, r]));
+
+      const bookingCustomerIds = Array.from(new Set(acceptedBookings.map((b) => b.customer_id).filter(Boolean)));
+      const bookingCustomers = bookingCustomerIds.length
+        ? await db.orm.public.users.where((u) => u.id.in(bookingCustomerIds as never)).all()
+        : [];
+      const bookingCustomerMap = new Map(bookingCustomers.map((u) => [u.id, u.name]));
+
+      const bookingAddressIds = Array.from(new Set(bookingRequests.map((r) => r.address_id).filter(Boolean)));
+      const bookingAddresses = bookingAddressIds.length
+        ? await db.orm.public.addresses.where((a) => a.id.in(bookingAddressIds as never)).all()
+        : [];
+      const bookingAddressMap = new Map(
+        bookingAddresses.map((a) => [
+          a.id,
+          [a.city || a.district || a.area, a.state].filter(Boolean).join(", "),
+        ])
+      );
+
+      const formattedActiveBookings = acceptedBookings.slice(0, 5).map((b) => {
+        const sr = bookingRequestMap.get(b.service_request_id);
+        return {
+          id: b.id,
+          bookingNumber: b.booking_number,
+          status: b.status,
+          scheduledDate: b.scheduled_date,
+          scheduledTime: b.scheduled_time,
+          serviceTitle: sr?.title || "Assigned Service",
+          categoryName: sr ? (categoryMap.get(sr.category_id) || "Service") : "Service",
+          customerName: bookingCustomerMap.get(b.customer_id) || "Client",
+          location: sr ? (bookingAddressMap.get(sr.address_id) || "Client Location") : "Client Location",
+          totalAmount: Number(b.total_amount || 0),
+        };
+      });
+
       const totalEarnings = completedBookings.reduce((sum, b) => {
         const net = Number(b.total_amount || 0) - Number(b.platform_fee || 0);
         return sum + Math.max(0, net);
@@ -345,6 +384,7 @@ export class DashboardController {
             averageRating: 4.9,
             totalEarnings,
           },
+          activeBookings: formattedActiveBookings,
           opportunities,
           recentActivity: notifications.map((n) => ({
             id: n.id,

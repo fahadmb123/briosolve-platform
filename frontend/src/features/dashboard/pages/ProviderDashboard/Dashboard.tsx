@@ -1,29 +1,39 @@
-import './Dashboard.css';
-import { Link } from 'react-router-dom';
-import { useProviderDashboard } from '../../hooks/useDashboard';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useProviderDashboard } from "../../hooks/useDashboard";
+import { ProviderDashboardSkeleton } from "./ProviderDashboardSkeleton";
+import "./Dashboard.css";
+
+function getUrgencyBadge(urgency: string) {
+  const u = urgency.toUpperCase();
+  if (u.includes("EMERGENCY") || u.includes("URGENT") || u.includes("IMMEDIATE")) {
+    return { label: "Urgent", badgeClass: "badge-danger" };
+  }
+  if (u.includes("HIGH") || u.includes("TODAY")) {
+    return { label: "High Priority", badgeClass: "badge-warning" };
+  }
+  if (u.includes("MEDIUM") || u.includes("SCHEDULED")) {
+    return { label: "Scheduled", badgeClass: "badge-info" };
+  }
+  return { label: "Flexible", badgeClass: "badge-secondary" };
+}
 
 export default function Dashboard() {
   const { data, isLoading, isError, refetch } = useProviderDashboard();
+  const [leadFilter, setLeadFilter] = useState<"ALL" | "URGENT" | "LOW_COMPETITION">("ALL");
 
   if (isLoading) {
-    return (
-      <div className="app-content">
-        <div className="card p-8 text-center">
-          <i className="fas fa-spinner fa-spin text-2xl text-primary mb-3"></i>
-          <p className="text-sm text-secondary mb-0">Loading provider dashboard...</p>
-        </div>
-      </div>
-    );
+    return <ProviderDashboardSkeleton />;
   }
 
   if (isError || !data) {
     return (
-      <div className="app-content">
-        <div className="card p-8 text-center">
+      <div className="app-content pro-dashboard-root">
+        <div className="pro-card text-center p-8">
           <i className="fas fa-exclamation-triangle text-2xl text-danger mb-3"></i>
-          <p className="text-sm font-semibold text-text mb-1">Failed to load dashboard metrics</p>
-          <p className="text-xs text-secondary mb-4">Please check your network connection and try again.</p>
-          <button onClick={() => refetch()} className="btn btn-primary text-xs">
+          <h2 className="pro-empty-title">Failed to load provider metrics</h2>
+          <p className="pro-empty-desc">An error occurred while fetching your dashboard details.</p>
+          <button onClick={() => refetch()} className="pro-btn-primary">
             <i className="fas fa-sync-alt mr-1"></i> Retry
           </button>
         </div>
@@ -31,282 +41,399 @@ export default function Dashboard() {
     );
   }
 
-  const { provider, stats, opportunities, recentActivity } = data;
-  const displayName = provider.businessName || provider.name || 'Provider';
-  const locationString = provider.serviceArea || 'Registered Coverage Area';
+  const { provider, stats, opportunities, recentActivity, activeBookings = [] } = data;
+  const displayName = provider.businessName || provider.name || "Provider";
+  const locationString = provider.serviceArea || "Registered Dispatch Area";
+
+  const filteredOpportunities = opportunities.filter((opp) => {
+    if (leadFilter === "URGENT") {
+      const u = opp.urgency.toUpperCase();
+      return u.includes("EMERGENCY") || u.includes("URGENT") || u.includes("IMMEDIATE") || u.includes("HIGH");
+    }
+    if (leadFilter === "LOW_COMPETITION") {
+      return opp.quotationsCount < 3;
+    }
+    return true;
+  });
 
   return (
-    <>
-      <div className="app-content">
-        <div className="pro-welcome-banner">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className={`badge ${provider.isVerified ? 'badge-primary' : 'badge-warning'} text-xs`}>
-                <i className={`fas ${provider.isVerified ? 'fa-shield-check' : 'fa-clock'} mr-1`}></i>
-                {provider.isVerified ? 'Verified Pro' : 'Verification In-Progress'}
+    <div className="app-content pro-dashboard-root">
+      <header className="pro-dashboard-header">
+        <div className="pro-header-left">
+          <div className="pro-header-badge-row">
+            {provider.isVerified ? (
+              <span className="pro-badge-verified">
+                <i className="fas fa-shield-check"></i> Verified Professional
               </span>
-              <span className="text-xs text-secondary">
-                <i className="fas fa-map-marker-alt mr-1"></i> {locationString} (Within {provider.serviceRadiusKm} km)
+            ) : (
+              <span className="pro-badge-pending">
+                <i className="fas fa-clock"></i> Verification In-Progress
               </span>
-            </div>
-            <h1 className="h2 mb-1">Good day, {displayName}</h1>
-            <p className="text-secondary text-sm mb-0">
-              Find new service requests and grow your business with direct client connections.
+            )}
+            <span className="pro-badge-coverage">
+              <i className="fas fa-map-marker-alt text-primary"></i>
+              {locationString} • {provider.serviceRadiusKm} km Radius
+            </span>
+          </div>
+
+          <h1 className="pro-header-title">Welcome back, {displayName}</h1>
+          <p className="pro-header-subtitle">
+            Review your active job assignments, discover high-priority client leads, and track your business earnings.
+          </p>
+        </div>
+
+        <div className="pro-header-actions">
+          <Link to="/provider/service-requests" className="pro-btn-primary">
+            <i className="fas fa-search-dollar"></i> Browse Requests
+          </Link>
+          <Link to="/provider/kyc" className="pro-btn-secondary">
+            <i className="fas fa-shield-alt"></i> {provider.isVerified ? "Verification Active" : "Complete KYC"}
+          </Link>
+        </div>
+      </header>
+
+      {!provider.isVerified ? (
+        <div className="pro-alert-banner pro-alert-warning">
+          <div className="pro-alert-left">
+            <i className="fas fa-exclamation-circle text-warning pro-alert-icon"></i>
+            <p className="pro-alert-text">
+              <strong>Verification Required:</strong> Complete your KYC documents to get your profile certified and unlock quoting on all service requests.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Link to="/provider/service-requests" className="btn btn-primary">
-              <i className="fas fa-search-dollar mr-1"></i> Browse Requests
-            </Link>
-            <Link to="/provider/kyc" className="btn btn-outline text-xs">
-              <i className="fas fa-shield-alt mr-1"></i> {provider.isVerified ? 'Verification Active' : 'Complete KYC'}
-            </Link>
+          <Link to="/provider/kyc" className="pro-alert-link">
+            Submit Documents <i className="fas fa-arrow-right"></i>
+          </Link>
+        </div>
+      ) : stats.newRequestsCount > 0 ? (
+        <div className="pro-alert-banner pro-alert-info">
+          <div className="pro-alert-left">
+            <i className="fas fa-bolt text-primary pro-alert-icon"></i>
+            <p className="pro-alert-text">
+              <strong>{stats.newRequestsCount} new service request{stats.newRequestsCount !== 1 ? "s" : ""}</strong> waiting for quotes in your dispatch zone. Submit quotes early to increase your winning rate.
+            </p>
+          </div>
+          <Link to="/provider/service-requests" className="pro-alert-link">
+            View Requests <i className="fas fa-arrow-right"></i>
+          </Link>
+        </div>
+      ) : null}
+
+      <section className="pro-kpi-grid">
+        <Link to="/provider/service-requests" className="pro-kpi-card">
+          <div className="pro-kpi-icon-box bg-primary-light text-primary">
+            <i className="fas fa-search-dollar"></i>
+          </div>
+          <div>
+            <div className="pro-kpi-val">{stats.newRequestsCount}</div>
+            <div className="pro-kpi-lbl">Open Leads</div>
+            <div className="pro-kpi-sub">In your zone</div>
+          </div>
+        </Link>
+
+        <Link to="/provider/service-requests" className="pro-kpi-card">
+          <div className="pro-kpi-icon-box bg-warning-light text-warning">
+            <i className="fas fa-file-invoice-dollar"></i>
+          </div>
+          <div>
+            <div className="pro-kpi-val">{stats.activeQuotationsCount}</div>
+            <div className="pro-kpi-lbl">Active Quotes</div>
+            <div className="pro-kpi-sub">Awaiting review</div>
+          </div>
+        </Link>
+
+        <Link to="/bookings" className="pro-kpi-card">
+          <div className="pro-kpi-icon-box bg-info-light text-info">
+            <i className="fas fa-calendar-check"></i>
+          </div>
+          <div>
+            <div className="pro-kpi-val">{stats.acceptedBookingsCount}</div>
+            <div className="pro-kpi-lbl">Active Bookings</div>
+            <div className="pro-kpi-sub">Scheduled jobs</div>
+          </div>
+        </Link>
+
+        <div className="pro-kpi-card">
+          <div className="pro-kpi-icon-box bg-success-light text-success">
+            <i className="fas fa-chart-line"></i>
+          </div>
+          <div>
+            <div className="pro-kpi-val">₹{stats.totalEarnings.toLocaleString("en-IN")}</div>
+            <div className="pro-kpi-lbl">Net Earnings</div>
+            <div className="pro-kpi-sub">{stats.completedServicesCount} jobs fulfilled</div>
           </div>
         </div>
 
-        <div className="card p-4 mb-6 flex justify-between items-center flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <div
-              className="icon-circle bg-primary-light text-primary"
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.1rem'
-              }}
-            >
-              <i className="fas fa-compass"></i>
+        <div className="pro-kpi-card">
+          <div className="pro-kpi-icon-box bg-warning-light text-warning">
+            <i className="fas fa-star"></i>
+          </div>
+          <div>
+            <div className="pro-kpi-val">
+              {stats.averageRating > 0 ? `${stats.averageRating.toFixed(1)} ★` : "5.0 ★"}
             </div>
-            <div>
-              <div className="text-xs text-secondary uppercase font-semibold">Service Coverage Area</div>
-              <div className="text-sm font-bold text-text">📍 {locationString}</div>
-              <div className="text-xs text-secondary">
-                Within <strong>{provider.serviceRadiusKm} km</strong> radius • Active dispatch zone
+            <div className="pro-kpi-lbl">Reputation</div>
+            <div className="pro-kpi-sub">{provider.reviewCount} review{provider.reviewCount === 1 ? "" : "s"}</div>
+          </div>
+        </div>
+      </section>
+
+      <div className="pro-main-layout">
+        <div className="pro-content-column">
+          <section className="pro-card">
+            <div className="pro-card-head">
+              <div>
+                <h2 className="pro-card-title">
+                  <i className="fas fa-calendar-alt text-primary"></i>
+                  Active &amp; Upcoming Jobs
+                </h2>
+                <div className="pro-card-subtitle">
+                  Confirmed client appointments assigned to you
+                </div>
+              </div>
+              <Link to="/bookings" className="btn btn-text text-xs">
+                All Bookings <i className="fas fa-arrow-right ml-1"></i>
+              </Link>
+            </div>
+
+            {activeBookings.length > 0 ? (
+              <div className="pro-item-list">
+                {activeBookings.map((b) => {
+                  const dateObj = b.scheduledDate ? new Date(b.scheduledDate) : null;
+                  const monthStr = dateObj ? dateObj.toLocaleString("en-US", { month: "short" }).toUpperCase() : "SCHED";
+                  const dayStr = dateObj ? dateObj.getDate() : "--";
+
+                  return (
+                    <div key={b.id} className="pro-booking-item">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="pro-cal-ticket">
+                          <div className="pro-cal-month">{monthStr}</div>
+                          <div className="pro-cal-day">{dayStr}</div>
+                          <div className="pro-cal-time">{b.scheduledTime || "TBD"}</div>
+                        </div>
+
+                        <div>
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <h3 className="h6 mb-0 font-bold text-text">{b.serviceTitle}</h3>
+                            <span className="badge badge-info text-xs">{b.status}</span>
+                          </div>
+                          <div className="text-xs text-secondary mb-1">
+                            Booking #{b.bookingNumber} • Client: <strong>{b.customerName}</strong>
+                          </div>
+                          <div className="text-xs text-muted">
+                            <i className="fas fa-map-marker-alt text-primary mr-1"></i> {b.location}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <div className="text-xs text-muted">Amount</div>
+                          <div className="font-extrabold text-sm text-text">
+                            ₹{b.totalAmount.toLocaleString("en-IN")}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link to="/messages" className="pro-btn-secondary py-1 px-3 text-xs">
+                            <i className="fas fa-comment-dots"></i> Chat
+                          </Link>
+                          <Link to={`/bookings/${b.id}`} className="pro-btn-secondary py-1 px-3 text-xs">
+                            Manage
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="pro-empty-block">
+                <i className="fas fa-calendar-check pro-empty-icon"></i>
+                <h3 className="pro-empty-title">No active appointments scheduled</h3>
+                <p className="pro-empty-desc">
+                  When a customer accepts your quotation, your scheduled job assignment and customer contact info will appear here.
+                </p>
+                <Link to="/provider/service-requests" className="pro-btn-primary">
+                  <i className="fas fa-search-dollar"></i> Find Leads to Quote
+                </Link>
+              </div>
+            )}
+          </section>
+
+          <section className="pro-card">
+            <div className="pro-card-head">
+              <div>
+                <h2 className="pro-card-title">
+                  <i className="fas fa-bolt text-primary"></i>
+                  Matching Lead Opportunities
+                </h2>
+                <div className="pro-card-subtitle">
+                  Open service requirements posted in your coverage radius
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="pro-pill-tabs">
+                  <button
+                    onClick={() => setLeadFilter("ALL")}
+                    className={`pro-pill-tab ${leadFilter === "ALL" ? "active" : ""}`}
+                  >
+                    All ({opportunities.length})
+                  </button>
+                  <button
+                    onClick={() => setLeadFilter("URGENT")}
+                    className={`pro-pill-tab ${leadFilter === "URGENT" ? "active" : ""}`}
+                  >
+                    Urgent
+                  </button>
+                  <button
+                    onClick={() => setLeadFilter("LOW_COMPETITION")}
+                    className={`pro-pill-tab ${leadFilter === "LOW_COMPETITION" ? "active" : ""}`}
+                  >
+                    Low Bids
+                  </button>
+                </div>
+                <Link to="/provider/service-requests" className="btn btn-text text-xs">
+                  View All <i className="fas fa-arrow-right ml-1"></i>
+                </Link>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link to="/provider/settings" className="btn btn-secondary btn-xs">
+
+            {filteredOpportunities.length > 0 ? (
+              <div className="pro-item-list">
+                {filteredOpportunities.map((opp) => {
+                  const urgencyMeta = getUrgencyBadge(opp.urgency);
+                  return (
+                    <div key={opp.id} className="pro-lead-item">
+                      <div className="pro-lead-main">
+                        <div className="pro-lead-badge-row">
+                          <span className="badge badge-secondary text-xs">{opp.categoryName}</span>
+                          <span className={`badge ${urgencyMeta.badgeClass} text-xs`}>
+                            {urgencyMeta.label}
+                          </span>
+                          <span className="text-xs text-muted">
+                            Posted {new Date(opp.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+
+                        <h3 className="pro-lead-title">
+                          <Link to="/provider/service-requests" className="pro-lead-title-link">
+                            {opp.title}
+                          </Link>
+                        </h3>
+
+                        <p className="pro-lead-desc">
+                          {opp.description || "No specific details provided. Check request for full scope."}
+                        </p>
+
+                        <div className="pro-lead-meta-row">
+                          <span>
+                            <i className="fas fa-user text-primary mr-1"></i> {opp.customerName}
+                          </span>
+                          <span>
+                            <i className="fas fa-map-marker-alt text-primary mr-1"></i> {opp.location}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pro-lead-action-col">
+                        <div className="pro-bids-pill">
+                          <i className="fas fa-file-invoice-dollar"></i> {opp.quotationsCount} Bid{opp.quotationsCount === 1 ? "" : "s"}
+                        </div>
+                        <Link to="/provider/service-requests" className="pro-btn-primary py-1 px-3 text-xs">
+                          Send Quote →
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="pro-empty-block">
+                <i className="fas fa-inbox pro-empty-icon"></i>
+                <h3 className="pro-empty-title">
+                  {leadFilter === "ALL"
+                    ? "No open opportunities in your area right now"
+                    : "No opportunities match this filter"}
+                </h3>
+                <p className="pro-empty-desc">
+                  New service requests in your area will appear here automatically. You can also expand your service radius to receive more leads.
+                </p>
+                <Link to="/provider/settings" className="pro-btn-secondary">
+                  <i className="fas fa-sliders-h"></i> Adjust Service Area
+                </Link>
+              </div>
+            )}
+          </section>
+        </div>
+
+        <aside className="pro-sidebar-column">
+          <div className="pro-card">
+            <h3 className="pro-card-title mb-3">
+              <i className="fas fa-compass text-primary"></i>
+              Coverage &amp; Dispatch Area
+            </h3>
+
+            <div className="pro-coverage-box">
+              <div className="pro-coverage-icon">
+                <i className="fas fa-crosshairs"></i>
+              </div>
+              <div>
+                <div className="text-xs text-secondary uppercase font-semibold">Active Zone</div>
+                <div className="text-sm font-bold text-text">{locationString}</div>
+                <div className="text-xs text-secondary mt-0.5">
+                  Within <strong>{provider.serviceRadiusKm} km</strong> radius
+                </div>
+              </div>
+            </div>
+
+            <Link to="/provider/settings" className="pro-btn-secondary w-full text-center text-xs py-2">
               <i className="fas fa-sliders-h mr-1"></i> Manage Service Area
             </Link>
           </div>
-        </div>
 
-        <div className="pro-stats-grid">
-          <div className="card stat-widget">
-            <div className="stat-icon-wrapper bg-primary-light text-primary">
-              <i className="fas fa-search-dollar"></i>
-            </div>
-            <div className="stat-value">{stats.newRequestsCount}</div>
-            <div className="stat-title">New Requests</div>
-            <div className="stat-meta text-primary">
-              <i className="fas fa-bolt mr-1"></i> Matching your profile
-            </div>
-          </div>
+          <div className="pro-card">
+            <h3 className="pro-card-title mb-3">
+              <i className="fas fa-bell text-primary"></i>
+              Recent Activity
+            </h3>
 
-          <div className="card stat-widget">
-            <div className="stat-icon-wrapper bg-warning-light text-warning">
-              <i className="fas fa-file-invoice-dollar"></i>
-            </div>
-            <div className="stat-value">{stats.activeQuotationsCount}</div>
-            <div className="stat-title">Active Quotations</div>
-            <div className="stat-meta text-warning">
-              <i className="fas fa-clock mr-1"></i> Awaiting client review
-            </div>
-          </div>
-
-          <div className="card stat-widget">
-            <div className="stat-icon-wrapper bg-info-light text-info">
-              <i className="fas fa-calendar-check"></i>
-            </div>
-            <div className="stat-value">{stats.acceptedBookingsCount}</div>
-            <div className="stat-title">Active Bookings</div>
-            <div className="stat-meta text-info">
-              <i className="fas fa-calendar-day mr-1"></i> Confirmed &amp; In-progress
-            </div>
-          </div>
-
-          <div className="card stat-widget">
-            <div className="stat-icon-wrapper bg-success-light text-success">
-              <i className="fas fa-check-double"></i>
-            </div>
-            <div className="stat-value">{stats.completedServicesCount}</div>
-            <div className="stat-title">Completed Services</div>
-            <div className="stat-meta text-success">
-              <i className="fas fa-check-circle mr-1"></i> Successfully delivered
-            </div>
-          </div>
-
-          <div className="card stat-widget">
-            <div className="stat-icon-wrapper bg-warning-light text-warning">
-              <i className="fas fa-star"></i>
-            </div>
-            <div className="stat-value">
-              {stats.averageRating > 0 ? `${stats.averageRating.toFixed(1)} ★` : '—'}
-            </div>
-            <div className="stat-title">Average Rating</div>
-            <div className="stat-meta text-secondary">
-              <i className="fas fa-thumbs-up mr-1"></i> {provider.reviewCount} review{provider.reviewCount === 1 ? '' : 's'}
-            </div>
-          </div>
-
-          <div className="card stat-widget">
-            <div className="stat-icon-wrapper bg-primary-light text-primary">
-              <i className="fas fa-chart-line"></i>
-            </div>
-            <div className="stat-value">₹{stats.totalEarnings.toLocaleString('en-IN')}</div>
-            <div className="stat-title">Completed Volume</div>
-            <div className="stat-meta text-muted">Total delivered service value</div>
-          </div>
-        </div>
-
-        <div className="dashboard-grid-container">
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="h5 mb-0">Opportunities Matching Your Profile</h2>
-                <p className="text-xs text-secondary mb-0">
-                  Open requests posted recently in your coverage area
-                </p>
-              </div>
-              <Link to="/provider/service-requests" className="btn btn-outline text-xs">
-                View All Requests <i className="fas fa-arrow-right ml-1"></i>
-              </Link>
-            </div>
-
-            {opportunities.length === 0 ? (
-              <div className="card p-8 text-center text-secondary">
-                <i className="fas fa-inbox text-3xl mb-2 text-muted"></i>
-                <p className="text-sm font-semibold mb-1">No open opportunities right now</p>
-                <p className="text-xs text-muted mb-0">
-                  New service requests in your area will appear here automatically. Check back soon or expand your service radius in settings.
-                </p>
-              </div>
+            {recentActivity.length > 0 ? (
+              <ul className="pro-activity-list">
+                {recentActivity.map((act) => (
+                  <li key={act.id} className="pro-activity-item">
+                    <div className="pro-activity-icon">
+                      <i className="fas fa-bell"></i>
+                    </div>
+                    <div className="flex-1">
+                      <div className="pro-activity-title">{act.title}</div>
+                      <div className="pro-activity-msg">{act.message}</div>
+                      <div className="pro-activity-time">
+                        {new Date(act.createdAt).toLocaleString(undefined, {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        })}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             ) : (
-              opportunities.map((opp) => (
-                <div key={opp.id} className="opportunity-card match-lead">
-                  <div className="flex justify-between items-start flex-wrap gap-3 mb-2">
-                    <div>
-                      <div className="opportunity-badge-row">
-                        <span className="badge badge-primary text-xs">
-                          {opp.urgency.replace('_', ' ')}
-                        </span>
-                        <span className="badge badge-warning text-xs">
-                          <i className="fas fa-clock mr-1"></i> {opp.quotationsCount} Bid{opp.quotationsCount === 1 ? '' : 's'}
-                        </span>
-                        <span className="text-xs text-muted">
-                          ID: #{opp.id.slice(0, 8).toUpperCase()} • {new Date(opp.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <h3 className="h6 mb-1">
-                        <Link to="/provider/service-requests" className="text-text hover-primary">
-                          {opp.title}
-                        </Link>
-                      </h3>
-                      <div className="text-xs text-secondary flex items-center gap-4 flex-wrap">
-                        <span>
-                          <i className="fas fa-tag text-primary mr-1"></i> {opp.categoryName}
-                        </span>
-                        <span>
-                          <i className="fas fa-map-marker-alt text-primary mr-1"></i> {opp.location || locationString}
-                        </span>
-                        <span>
-                          <i className="fas fa-clock text-warning mr-1"></i> Urgency: {opp.urgency}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="lead-price-box">
-                      <div className="text-xs text-secondary uppercase font-semibold">Service Status</div>
-                      <div className="lead-budget">Ready for Quotes</div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-secondary mb-3 leading-relaxed">
-                    {opp.description || 'No additional description provided.'}
-                  </p>
-                  <div className="flex justify-between items-center flex-wrap gap-2 pt-2 border-top">
-                    <span className="text-xs text-muted">
-                      <i className="fas fa-user-circle text-primary mr-1"></i> {opp.customerName}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <Link to="/provider/service-requests" className="btn btn-primary text-xs">
-                        <i className="fas fa-paper-plane mr-1"></i> View &amp; Quote
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))
+              <p className="text-xs text-muted mb-0">
+                No recent activity yet. When you receive quotes, bookings, or reviews, they will show up here.
+              </p>
             )}
           </div>
 
-          <div className="flex flex-col gap-4">
-            <div className="card p-5">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="h6 mb-0">Recent Activity</h3>
-                <span className="text-xs text-muted">Live updates</span>
-              </div>
-
-              {recentActivity.length === 0 ? (
-                <div className="p-4 text-center text-xs text-muted">
-                  No recent activity yet. When you receive quotes, bookings, or reviews, they will show up here.
-                </div>
-              ) : (
-                <div className="activity-feed-list">
-                  {recentActivity.map((activity) => (
-                    <div key={activity.id} className="activity-feed-item">
-                      <div className="activity-icon-badge bg-primary-light text-primary">
-                        <i className="fas fa-bell"></i>
-                      </div>
-                      <div className="activity-content">
-                        <div className="activity-title">
-                          <strong>{activity.title}</strong>: {activity.message}
-                        </div>
-                        <div className="activity-time">
-                          {new Date(activity.createdAt).toLocaleString(undefined, {
-                            dateStyle: 'short',
-                            timeStyle: 'short'
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div
-              className="card p-5"
-              style={{
-                background: 'linear-gradient(135deg, var(--surface) 0%, rgba(99, 102, 241, 0.05) 100%)'
-              }}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`avatar avatar-sm ${provider.isVerified ? 'bg-success-light text-success' : 'bg-warning-light text-warning'}`}>
-                  <i className={`fas ${provider.isVerified ? 'fa-shield-check' : 'fa-shield-alt'} text-lg`}></i>
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm text-text mb-0">
-                    {provider.isVerified ? 'Verified Provider' : 'Verification Status'}
-                  </h4>
-                  <div className="text-xs text-secondary">
-                    {provider.isVerified ? 'Full Credential Trust Active' : 'KYC Review Pending / Required'}
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-secondary mb-3">
-                {provider.isVerified
-                  ? 'Your verified profile is prominently highlighted to clients across your coverage radius.'
-                  : 'Submit and verify your documents to build trust with customers and win more requests.'}
-              </p>
-              <Link to="/provider/kyc" className="btn btn-outline text-xs w-full text-center">
-                {provider.isVerified ? 'View Verification Details' : 'Complete Verification'}
-              </Link>
-            </div>
+          <div className="pro-guarantee-box">
+            <h4 className="pro-guarantee-title">
+              <i className="fas fa-shield-alt mr-1"></i> 100% Direct Marketplace
+            </h4>
+            <p className="pro-guarantee-desc">
+              Independent professionals keep 100% of their agreed quotation price with zero middleman deductions. Quote competitively and build direct customer relationships.
+            </p>
           </div>
-        </div>
+        </aside>
       </div>
-    </>
+    </div>
   );
 }
