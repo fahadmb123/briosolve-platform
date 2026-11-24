@@ -47,17 +47,6 @@ body.dark .topnav-header {
   flex-shrink: 0;
 }
 
-.topnav-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  pointer-events: auto;
-}
-
 .topnav-brand {
   display: inline-flex;
   align-items: center;
@@ -780,7 +769,6 @@ body.dark .topnav-header {
 }
 
 @media (max-width: 992px) {
-  .topnav-center,
   .topnav-links {
     display: none;
   }
@@ -971,7 +959,6 @@ body.dark .topnav-header {
     display: none !important;
   }
 
-  .topnav-center,
   .topnav-links {
     display: none !important;
   }

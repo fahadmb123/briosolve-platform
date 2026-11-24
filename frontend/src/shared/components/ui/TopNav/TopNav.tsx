@@ -214,9 +214,7 @@ export const TopNav: React.FC = () => {
               <img src="/briosolve-logo.svg" alt="Briosolve" className="topnav-brand-logo" />
               <img src="/briosolve-text-logo.svg" alt="Briosolve" className="topnav-brand-text-logo" />
             </Link>
-          </div>
 
-          <div className="topnav-center">
             <nav className="topnav-links" aria-label="Primary Navigation" ref={linksNavRef}>
               <div
                 className={`topnav-active-pill ${pillHasMounted ? "is-animated" : ""}`}
