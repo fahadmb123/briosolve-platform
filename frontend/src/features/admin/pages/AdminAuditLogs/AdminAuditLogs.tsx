@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useAdminAuditLogs } from '../../../dashboard/hooks/useDashboard';
 import type { AdminAuditLogItem } from '../../../dashboard/services/dashboard.service';
 import './AdminAuditLogs.css';
@@ -13,11 +14,15 @@ const FILTER_TABS = [
   { id: 'SYSTEM', label: 'System' },
 ] as const;
 
+const SEVERITY_FILTERS = ['ALL', 'INFO', 'WARNING', 'CRITICAL'] as const;
+
 export default function AdminAuditLogs() {
   const [selectedType, setSelectedType] = useState<string>('ALL');
+  const [selectedSeverity, setSelectedSeverity] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [inspectedEvent, setInspectedEvent] = useState<AdminAuditLogItem | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const { data, isLoading, isError, refetch } = useAdminAuditLogs({
     page,
@@ -26,9 +31,14 @@ export default function AdminAuditLogs() {
     search: searchQuery,
   });
 
-  const logs = data?.logs || [];
+  const rawLogs = data?.logs || [];
   const total = data?.total || 0;
   const totalPages = data?.totalPages || 1;
+
+  const logs = useMemo(() => {
+    if (selectedSeverity === 'ALL') return rawLogs;
+    return rawLogs.filter((l) => (l.severity || 'INFO').toUpperCase() === selectedSeverity);
+  }, [rawLogs, selectedSeverity]);
 
   const formatTimeAgo = (isoDate: string): string => {
     try {
@@ -84,6 +94,37 @@ export default function AdminAuditLogs() {
     return range;
   }, [page, totalPages]);
 
+  const handleCopy = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const handleExportCsv = () => {
+    if (logs.length === 0) {
+      alert('No audit logs available to export.');
+      return;
+    }
+    const headers = ['ID', 'Type', 'Title', 'Message', 'Actor', 'Severity', 'Timestamp'];
+    const rows = logs.map((l) => [
+      `"${l.id}"`,
+      `"${l.type}"`,
+      `"${l.title.replace(/"/g, '""')}"`,
+      `"${l.message.replace(/"/g, '""')}"`,
+      `"${l.actor || 'Platform'}"`,
+      `"${l.severity || 'INFO'}"`,
+      `"${l.createdAt}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `audit_trail_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="admin-audit-logs-page">
       <div className="aal-header-row">
@@ -95,14 +136,28 @@ export default function AdminAuditLogs() {
         </div>
 
         <div className="aal-header-actions">
+          <div className="aal-live-indicator">
+            <span className="aal-pulse-dot"></span>
+            <span>Live Stream Active</span>
+          </div>
+
           <div className="aal-stat-badge">
-            <i className="fas fa-circle"></i>
+            <i className="fas fa-database"></i>
             {isLoading ? (
               <div className="aal-sk-shimmer" style={{ width: '85px', height: '14px', borderRadius: '4px' }}></div>
             ) : (
               <span>{total} Total Events</span>
             )}
           </div>
+
+          <button
+            type="button"
+            className="aal-btn-export"
+            onClick={handleExportCsv}
+            title="Export CSV audit records"
+          >
+            <i className="fas fa-file-csv"></i> Export CSV
+          </button>
 
           <button onClick={() => refetch()} className="aal-btn-refresh" title="Refresh Live Audit Stream">
             <i className="fas fa-sync-alt"></i> Refresh Stream
@@ -153,6 +208,22 @@ export default function AdminAuditLogs() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="aal-severity-pills">
+          <span style={{ fontSize: '0.725rem', fontWeight: 800, color: 'var(--text-secondary)', marginRight: '0.4rem' }}>
+            Severity:
+          </span>
+          {SEVERITY_FILTERS.map((sev) => (
+            <button
+              key={sev}
+              type="button"
+              className={`aal-severity-pill ${selectedSeverity === sev ? 'active' : ''}`}
+              onClick={() => setSelectedSeverity(sev)}
+            >
+              {sev === 'ALL' ? 'All Severities' : sev}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -231,7 +302,11 @@ export default function AdminAuditLogs() {
                   });
 
                   return (
-                    <tr key={log.id}>
+                    <tr
+                      key={log.id}
+                      onClick={() => setInspectedEvent(log)}
+                      title="Click row to inspect record"
+                    >
                       <td>
                         <div className="aal-time-cell">
                           <span className="aal-time-primary">{formattedDate}</span>
@@ -270,7 +345,10 @@ export default function AdminAuditLogs() {
                         <button
                           type="button"
                           className="aal-btn-inspect"
-                          onClick={() => setInspectedEvent(log)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setInspectedEvent(log);
+                          }}
                         >
                           <i className="fas fa-search-plus"></i> Inspect
                         </button>
@@ -343,17 +421,27 @@ export default function AdminAuditLogs() {
 
             <div className="aal-modal-body">
               <div className="aal-modal-row">
-                <span className="aal-modal-lbl">Audit Event ID</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="aal-modal-lbl">Audit Event ID</span>
+                  <button
+                    type="button"
+                    className="aal-copy-btn"
+                    onClick={() => handleCopy(inspectedEvent.id, 'id')}
+                  >
+                    <i className={copiedField === 'id' ? 'fas fa-check' : 'fas fa-copy'}></i>
+                    <span>{copiedField === 'id' ? 'Copied!' : 'Copy ID'}</span>
+                  </button>
+                </div>
                 <span className="aal-modal-val" style={{ fontFamily: 'monospace' }}>{inspectedEvent.id}</span>
               </div>
 
               <div className="aal-modal-row">
                 <span className="aal-modal-lbl">Event Action &amp; Type</span>
-                <div className="flex items-center gap-2 mt-1">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
                   <span className={`aal-badge-type ${getBadgeClass(inspectedEvent.type)}`}>
                     {inspectedEvent.type}
                   </span>
-                  <span className="font-bold">{inspectedEvent.title}</span>
+                  <span style={{ fontWeight: 800, color: 'var(--text)' }}>{inspectedEvent.title}</span>
                 </div>
               </div>
 
@@ -374,12 +462,47 @@ export default function AdminAuditLogs() {
 
               {inspectedEvent.metadata && (
                 <div className="aal-modal-row">
-                  <span className="aal-modal-lbl">Forensic Metadata Payload</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <span className="aal-modal-lbl">Forensic Metadata Payload</span>
+                    <button
+                      type="button"
+                      className="aal-copy-btn"
+                      onClick={() => handleCopy(JSON.stringify(inspectedEvent.metadata, null, 2), 'payload')}
+                    >
+                      <i className={copiedField === 'payload' ? 'fas fa-check' : 'fas fa-copy'}></i>
+                      <span>{copiedField === 'payload' ? 'Copied JSON!' : 'Copy JSON'}</span>
+                    </button>
+                  </div>
                   <pre className="aal-json-pre">
                     {JSON.stringify(inspectedEvent.metadata, null, 2)}
                   </pre>
                 </div>
               )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                {inspectedEvent.type === 'BOOKING' && (
+                  <Link to="/admin/bookings" className="aal-btn-inspect" style={{ textDecoration: 'none' }}>
+                    <i className="fas fa-calendar-check mr-1"></i> Open Bookings
+                  </Link>
+                )}
+                {inspectedEvent.type === 'KYC' && (
+                  <Link to="/admin/verification" className="aal-btn-inspect" style={{ textDecoration: 'none' }}>
+                    <i className="fas fa-shield-alt mr-1"></i> Verification Desk
+                  </Link>
+                )}
+                {inspectedEvent.type === 'DISPUTE' && (
+                  <Link to="/admin/support" className="aal-btn-inspect" style={{ textDecoration: 'none' }}>
+                    <i className="fas fa-gavel mr-1"></i> Disputes Console
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  className="aal-btn-refresh"
+                  onClick={() => setInspectedEvent(null)}
+                >
+                  Close Record
+                </button>
+              </div>
             </div>
           </div>
         </div>

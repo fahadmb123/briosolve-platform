@@ -598,3 +598,118 @@
     margin-left: auto;
 }
 
+.aal-audit-table tbody tr {
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.aal-audit-table tbody tr:hover {
+    background: rgba(233, 30, 99, 0.04);
+}
+
+.aal-live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.775rem;
+    font-weight: 800;
+    color: #10b981;
+}
+
+.aal-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: aalPulse 1.8s infinite;
+}
+
+@keyframes aalPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.aal-severity-pills {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+}
+
+.aal-severity-pill {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.725rem;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.aal-severity-pill:hover {
+    color: var(--text);
+    border-color: var(--text-secondary);
+}
+
+.aal-severity-pill.active {
+    background: #673ab7;
+    color: #ffffff;
+    border-color: #673ab7;
+    box-shadow: 0 2px 6px rgba(103, 58, 183, 0.35);
+}
+
+.aal-btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    padding: 0.55rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.aal-btn-export:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.aal-copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.15s ease;
+}
+
+.aal-copy-btn:hover {
+    color: var(--text);
+    border-color: var(--text);
+}
+

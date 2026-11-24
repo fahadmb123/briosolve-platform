@@ -482,3 +482,188 @@
         background-position: -200% 0;
     }
 }
+
+.ana-chart-tooltip {
+    position: absolute;
+    background: #111827;
+    color: #ffffff;
+    padding: 0.65rem 0.9rem;
+    border-radius: 12px;
+    font-size: 0.775rem;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    pointer-events: none;
+    z-index: 30;
+    transform: translate(-50%, -105%);
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.ana-chart-tooltip-header {
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
+}
+
+.ana-legend-item {
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ana-legend-item:hover {
+    transform: translateY(-1px);
+}
+
+.ana-legend-item.dimmed {
+    opacity: 0.35;
+}
+
+.ana-kpi-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ana-kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.ana-kpi-card.focused {
+    border-color: #e91e63;
+    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.25), 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.ana-funnel-item {
+    cursor: pointer;
+    padding: 0.45rem;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+}
+
+.ana-funnel-item:hover {
+    background: var(--surface);
+}
+
+.ana-share-row {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 10px;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.ana-share-row:hover {
+    background: var(--surface);
+    transform: translateX(3px);
+}
+
+.ana-btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #e91e63, #ff4081);
+    color: #ffffff;
+    border: none;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    padding: 0.55rem 1.15rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(233, 30, 99, 0.35);
+}
+
+.ana-btn-export:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(233, 30, 99, 0.45);
+}
+
+.ana-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1.5rem;
+}
+
+.ana-modal-card {
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.ana-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.ana-modal-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.ana-modal-body {
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.ana-modal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.ana-modal-stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ana-modal-stat-val {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.ana-modal-stat-lbl {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
