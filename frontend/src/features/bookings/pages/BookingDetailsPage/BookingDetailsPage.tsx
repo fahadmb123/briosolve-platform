@@ -10,6 +10,7 @@ import {
 import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
 import { BookingStatusModal, ServiceMismatchModal } from "../../components";
 import { RaiseDisputeModal } from "../../../support";
+import { ReviewModal, BookingReviewCard, useBookingReviewQuery } from "../../../reviews";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
 import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
@@ -44,8 +45,12 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
   const [isMismatchModalOpen, setIsMismatchModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const activeRazorpayRef = useRef<any>(null);
+
+  const { data: reviewData, refetch: refetchReview } = useBookingReviewQuery(booking?.id);
+  const existingReview = reviewData?.data || null;
 
   useEffect(() => {
     return () => {
@@ -856,6 +861,18 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </button>
           )}
 
+          {!isProvider && isCompleted && !existingReview && (
+            <button
+              type="button"
+              className="bkdet-action-btn primary"
+              style={{ background: "#FF7900", borderColor: "#ea580c" }}
+              onClick={() => setIsReviewModalOpen(true)}
+            >
+              <i className="fas fa-star" />
+              <span>Write Review</span>
+            </button>
+          )}
+
           {isProvider && isEnRoute && (
             requiresInspection ? (
               <button
@@ -1172,6 +1189,46 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
       <div className="bkdet-layout-grid">
         <div className="bkdet-col-main">
+          {isCompleted && existingReview && (
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-section-icon" style={{ color: "#f59e0b" }}>
+                    <i className="fas fa-star" />
+                  </div>
+                  <h3 className="bkdet-section-title">
+                    {isProvider ? "Customer Feedback & Review" : "Your Review for Specialist"}
+                  </h3>
+                </div>
+              </div>
+              <BookingReviewCard review={existingReview} />
+            </div>
+          )}
+
+          {isCompleted && !isProvider && !existingReview && (
+            <div className="bkdet-section-card bkdet-review-prompt-card">
+              <div className="bkdet-review-prompt-content">
+                <div className="bkdet-review-prompt-icon">
+                  <i className="fas fa-star" />
+                </div>
+                <div className="bkdet-review-prompt-text">
+                  <h3 className="bkdet-review-prompt-title">Rate & Review Your Specialist</h3>
+                  <p className="bkdet-review-prompt-desc">
+                    Your service is completed! Take a moment to rate {counterpartyName} and help other customers in the marketplace.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="bkdet-review-prompt-btn"
+                  onClick={() => setIsReviewModalOpen(true)}
+                >
+                  <i className="fas fa-star" />
+                  <span>Write a Review</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="bkdet-section-card">
             <div className="bkdet-section-header">
               <div className="bkdet-section-title-wrap">
@@ -1670,6 +1727,21 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           onSubmitConcern={() => {
             toast.success("Concern submitted successfully. Our resolution team will review it.");
             navigate(isProvider ? "/provider/support" : "/support");
+          }}
+        />
+      )}
+
+      {booking && (
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          bookingId={booking.id}
+          bookingNumber={booking.bookingNumber}
+          providerName={counterpartyName}
+          serviceTitle={booking.serviceRequestTitle || booking.categoryName}
+          onSuccess={() => {
+            refetchReview();
+            refetch();
           }}
         />
       )}

@@ -1,0 +1,157 @@
+.bk-review-card {
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .bk-review-card {
+  background: #18181b;
+  border-color: #27272a;
+}
+
+.bk-review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.bk-review-stars-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bk-review-stars {
+  display: flex;
+  gap: 0.2rem;
+  font-size: 1.15rem;
+  color: #d1d5db;
+}
+
+.bk-review-stars .fa-star.active {
+  color: #f59e0b;
+}
+
+.bk-review-rating-num {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+.bk-review-verified-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  background: #ecfdf5;
+  color: #059669;
+}
+
+[data-theme="dark"] .bk-review-verified-pill {
+  background: rgba(5, 150, 105, 0.15);
+  color: #34d399;
+}
+
+.bk-review-date {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+[data-theme="dark"] .bk-review-date {
+  color: #9ca3af;
+}
+
+.bk-review-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.bk-review-comment {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #374151;
+}
+
+[data-theme="dark"] .bk-review-comment {
+  color: #d1d5db;
+}
+
+.bk-review-aspects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.bk-review-aspect-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+[data-theme="dark"] .bk-review-aspect-pill {
+  background: #27272a;
+  color: #9ca3af;
+}
+
+.bk-review-reply-box {
+  margin-top: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  background: #f9fafb;
+  border-left: 3px solid #f59e0b;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+[data-theme="dark"] .bk-review-reply-box {
+  background: #202024;
+}
+
+.bk-review-reply-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bk-review-reply-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ea580c;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.bk-review-reply-time {
+  font-size: 0.72rem;
+  color: #9ca3af;
+}
+
+.bk-review-reply-text {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #4b5563;
+}
+
+[data-theme="dark"] .bk-review-reply-text {
+  color: #d1d5db;
+}

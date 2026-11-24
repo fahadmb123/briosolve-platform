@@ -15,3 +15,4 @@ export const CustomerBookings = React.lazy(() => import('../../../features/booki
 export const CustomerBookingDetails = React.lazy(() => import('../../../features/bookings/pages/BookingDetailsPage/BookingDetailsPage').then(m => ({ default: m.BookingDetailsPage })));
 export const CustomerWallet = React.lazy(() => import('../../../features/wallet/pages/WalletPage/WalletPage'));
 export const CustomerSupport = React.lazy(() => import('../../../features/support/pages/SupportTicketsPage/SupportTicketsPage').then(m => ({ default: m.SupportTicketsPage })));
+export const CustomerReviews = React.lazy(() => import('../../../features/reviews/pages/CustomerReviewsPage/CustomerReviewsPage').then(m => ({ default: m.CustomerReviewsPage })));

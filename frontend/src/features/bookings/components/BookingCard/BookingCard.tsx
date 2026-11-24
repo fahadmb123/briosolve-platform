@@ -8,6 +8,7 @@ interface BookingCardProps {
   onViewDetails: (booking: BookingItem) => void;
   onChat: (booking: BookingItem) => void;
   onUpdateStatus?: (booking: BookingItem, newStatus: BookingStatus) => void;
+  onReview?: (booking: BookingItem) => void;
 }
 
 export const BookingCard: React.FC<BookingCardProps> = ({
@@ -15,7 +16,8 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   role,
   onViewDetails,
   onChat,
-  onUpdateStatus
+  onUpdateStatus,
+  onReview
 }) => {
   const formattedDate = booking.scheduledDate
     ? new Date(booking.scheduledDate).toLocaleDateString("en-IN", {
@@ -422,6 +424,20 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             >
               <i className="fas fa-check"></i>
               <span>Mark Completed</span>
+            </button>
+          )}
+
+          {role === "CUSTOMER" && booking.status === "COMPLETED" && onReview && (
+            <button
+              type="button"
+              className="bkcard-btn-action review"
+              onClick={(e) => {
+                e.stopPropagation();
+                onReview(booking);
+              }}
+            >
+              <i className="fas fa-star"></i>
+              <span>Write Review</span>
             </button>
           )}
         </div>

@@ -19,7 +19,8 @@ export class ReviewController extends BaseController {
     private readonly _getCustomerReviewsUseCase: IUseCase<GetCustomerReviewsRequestDto, CustomerReviewsResponseDto>,
     private readonly _replyToReviewUseCase: IUseCase<ReplyReviewRequestDto, ReviewResponseDto>,
     private readonly _getAdminReviewsUseCase: IUseCase<GetAdminReviewsRequestDto, AdminReviewsResponseDto>,
-    private readonly _moderateReviewUseCase: IUseCase<ModerateReviewRequestDto, ReviewResponseDto>
+    private readonly _moderateReviewUseCase: IUseCase<ModerateReviewRequestDto, ReviewResponseDto>,
+    private readonly _getBookingReviewUseCase: IUseCase<{ bookingId: string }, ReviewResponseDto | null>
   ) {
     super();
   }
@@ -151,6 +152,16 @@ export class ReviewController extends BaseController {
       });
 
       return this.sendSuccess(res, "Review reported successfully", response, 200);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getBookingReview = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const bookingId = String(req.params.bookingId);
+      const response = await this._getBookingReviewUseCase.execute({ bookingId });
+      return this.sendSuccess(res, "Booking review retrieved successfully", response, 200);
     } catch (error) {
       next(error);
     }

@@ -5,6 +5,7 @@ import { GetCustomerReviewsUseCase } from "../../application/use-cases/getCustom
 import { ReplyToReviewUseCase } from "../../application/use-cases/replyToReview.useCase";
 import { GetAdminReviewsUseCase } from "../../application/use-cases/getAdminReviews.useCase";
 import { ModerateReviewUseCase } from "../../application/use-cases/moderateReview.useCase";
+import { GetBookingReviewUseCase } from "../../application/use-cases/getBookingReview.useCase";
 
 export function createReviewController(
   createReviewUC: CreateReviewUseCase,
@@ -12,7 +13,8 @@ export function createReviewController(
   getCustomerReviewsUC: GetCustomerReviewsUseCase,
   replyToReviewUC: ReplyToReviewUseCase,
   getAdminReviewsUC: GetAdminReviewsUseCase,
-  moderateReviewUC: ModerateReviewUseCase
+  moderateReviewUC: ModerateReviewUseCase,
+  getBookingReviewUC: GetBookingReviewUseCase
 ): ReviewController {
   return new ReviewController(
     createReviewUC,
@@ -20,6 +22,7 @@ export function createReviewController(
     getCustomerReviewsUC,
     replyToReviewUC,
     getAdminReviewsUC,
-    moderateReviewUC
+    moderateReviewUC,
+    getBookingReviewUC
   );
 }

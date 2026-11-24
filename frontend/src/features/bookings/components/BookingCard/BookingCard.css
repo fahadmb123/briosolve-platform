@@ -484,6 +484,16 @@
   background: #15803d;
 }
 
+.bkcard-btn-action.review {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #d97706;
+}
+
+.bkcard-btn-action.review:hover {
+  background: #d97706;
+}
+
 .bkcard-btn-action.danger {
   background: #ffffff;
   color: #dc2626;

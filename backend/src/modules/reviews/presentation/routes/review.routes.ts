@@ -9,6 +9,7 @@ export function buildReviewRoute(controller: ReviewRouteDependencies): Router {
   const router = Router();
 
   router.post("/", authMiddleware, requireRole(["CUSTOMER"]), validate(createReviewSchema), controller.review.createReview);
+  router.get("/booking/:bookingId", authMiddleware, controller.review.getBookingReview);
   router.get("/provider/:providerId", controller.review.getProviderReviews);
   router.get("/my", authMiddleware, controller.review.getMyReviews);
   router.post("/:id/reply", authMiddleware, requireRole(["PROVIDER"]), validate(replyReviewSchema), controller.review.replyToReview);

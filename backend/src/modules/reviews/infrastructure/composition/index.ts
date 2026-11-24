@@ -6,7 +6,8 @@ import {
   createGetCustomerReviewsUseCase,
   createReplyToReviewUseCase,
   createGetAdminReviewsUseCase,
-  createModerateReviewUseCase
+  createModerateReviewUseCase,
+  createGetBookingReviewUseCase
 } from "./useCases";
 import { createReviewController } from "./controller";
 import { buildReviewRoute } from "../../presentation/routes/review.routes";
@@ -24,6 +25,7 @@ export function createReviewRoutes(
   const replyToReviewUC = createReplyToReviewUseCase(repository, notificationUseCase);
   const getAdminReviewsUC = createGetAdminReviewsUseCase(repository);
   const moderateReviewUC = createModerateReviewUseCase(repository);
+  const getBookingReviewUC = createGetBookingReviewUseCase(repository);
 
   const controller = createReviewController(
     createReviewUC,
@@ -31,7 +33,8 @@ export function createReviewRoutes(
     getCustomerReviewsUC,
     replyToReviewUC,
     getAdminReviewsUC,
-    moderateReviewUC
+    moderateReviewUC,
+    getBookingReviewUC
   );
 
   return buildReviewRoute({ review: controller });

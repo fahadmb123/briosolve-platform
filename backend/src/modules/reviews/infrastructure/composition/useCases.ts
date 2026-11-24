@@ -5,6 +5,7 @@ import { GetCustomerReviewsUseCase } from "../../application/use-cases/getCustom
 import { ReplyToReviewUseCase } from "../../application/use-cases/replyToReview.useCase";
 import { GetAdminReviewsUseCase } from "../../application/use-cases/getAdminReviews.useCase";
 import { ModerateReviewUseCase } from "../../application/use-cases/moderateReview.useCase";
+import { GetBookingReviewUseCase } from "../../application/use-cases/getBookingReview.useCase";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
@@ -37,4 +38,8 @@ export function createGetAdminReviewsUseCase(repo: IReviewRepository): GetAdminR
 
 export function createModerateReviewUseCase(repo: IReviewRepository): ModerateReviewUseCase {
   return new ModerateReviewUseCase(repo);
+}
+
+export function createGetBookingReviewUseCase(repo: IReviewRepository): GetBookingReviewUseCase {
+  return new GetBookingReviewUseCase(repo);
 }

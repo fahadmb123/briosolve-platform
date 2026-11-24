@@ -12,6 +12,7 @@ import {
   BookingCardSkeleton,
   BookingStatusModal
 } from "../../components";
+import { ReviewModal } from "../../../reviews";
 import "./BookingsPage.css";
 
 interface BookingsPageProps {
@@ -55,6 +56,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
 
   const [statusModalBooking, setStatusModalBooking] = useState<BookingItem | null>(null);
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
+  const [reviewBooking, setReviewBooking] = useState<BookingItem | null>(null);
 
   const bookings: BookingItem[] = responseData?.data?.bookings || [];
 
@@ -366,6 +368,7 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
                 onViewDetails={handleOpenDetails}
                 onChat={handleChat}
                 onUpdateStatus={handleRequestStatusChange}
+                onReview={(b) => setReviewBooking(b)}
               />
             ))}
           </div>
@@ -381,6 +384,20 @@ export const BookingsPage: React.FC<BookingsPageProps> = ({ role: roleProp }) =>
           onClose={handleCloseStatusModal}
           onConfirm={handleConfirmStatusChange}
           isLoading={updateStatusMutation.isPending}
+        />
+      )}
+
+      {reviewBooking && (
+        <ReviewModal
+          isOpen={Boolean(reviewBooking)}
+          onClose={() => setReviewBooking(null)}
+          bookingId={reviewBooking.id}
+          bookingNumber={reviewBooking.bookingNumber}
+          providerName={reviewBooking.providerBusinessName || reviewBooking.providerName}
+          serviceTitle={reviewBooking.serviceRequestTitle || reviewBooking.categoryName}
+          onSuccess={() => {
+            refetch();
+          }}
         />
       )}
     </div>

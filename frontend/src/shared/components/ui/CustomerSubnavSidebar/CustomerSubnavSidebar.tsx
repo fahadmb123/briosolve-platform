@@ -59,6 +59,11 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/support",
     icon: "fas fa-life-ring",
   },
+  {
+    label: "Reviews",
+    to: "/reviews",
+    icon: "fas fa-star",
+  },
 ];
 
 export const CustomerSubnavSidebar: React.FC = () => {
