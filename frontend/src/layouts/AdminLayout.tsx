@@ -148,8 +148,8 @@ export default function AdminLayout() {
                     </li>
                     <li>
                         <NavLink 
-                            to="/admin/dashboard" 
-                            className="sidebar-item"
+                            to="/admin/audit-logs" 
+                            className={({ isActive }) => `sidebar-item ${isActive || location.pathname.startsWith('/admin/audit') ? 'active' : ''}`}
                         >
                             <i className="fas fa-history"></i>
                             <span>Audit Logs</span>

@@ -156,6 +156,25 @@ export interface AdminDashboardData {
   };
 }
 
+export interface AdminAuditLogItem {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  createdAt: string;
+  actor?: string;
+  severity?: 'INFO' | 'WARNING' | 'CRITICAL' | 'SUCCESS';
+  metadata?: Record<string, any>;
+}
+
+export interface AdminAuditLogsResponse {
+  logs: AdminAuditLogItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export const dashboardService = {
   async getCustomerDashboard(): Promise<CustomerDashboardData> {
     const res = await apiClient.get<{ success: boolean; data: CustomerDashboardData }>("/api/dashboard/customer");
@@ -167,6 +186,24 @@ export const dashboardService = {
   },
   async getAdminDashboard(): Promise<AdminDashboardData> {
     const res = await apiClient.get<{ success: boolean; data: AdminDashboardData }>("/api/dashboard/admin");
+    return res.data.data;
+  },
+  async getAdminAuditLogs(params?: {
+    page?: number;
+    limit?: number;
+    type?: string;
+    search?: string;
+  }): Promise<AdminAuditLogsResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.append("page", String(params.page));
+    if (params?.limit) query.append("limit", String(params.limit));
+    if (params?.type && params.type !== "ALL") query.append("type", params.type);
+    if (params?.search) query.append("search", params.search);
+
+    const queryString = query.toString() ? `?${query.toString()}` : "";
+    const res = await apiClient.get<{ success: boolean; data: AdminAuditLogsResponse }>(
+      `/api/dashboard/admin/audit-logs${queryString}`
+    );
     return res.data.data;
   },
 };

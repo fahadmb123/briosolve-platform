@@ -27,5 +27,12 @@ export function buildDashboardRoute(dependencies: DashboardRouteDependencies): R
     dependencies.dashboard.getAdminDashboard
   );
 
+  router.get(
+    "/admin/audit-logs",
+    authMiddleware,
+    requireRole(["ADMIN"]),
+    dependencies.dashboard.getAdminAuditLogs
+  );
+
   return router;
 }

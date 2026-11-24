@@ -6,12 +6,15 @@ import { CustomerDashboardResponseDto } from "../../application/dtos/response/cu
 import { GetProviderDashboardInputDto } from "../../application/dtos/request/get-provider-dashboard.dto";
 import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
 import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
+import { GetAdminAuditLogsInputDto } from "../../application/use-cases/getAdminAuditLogs.useCase";
+import { AdminAuditLogsResponseDto } from "../../domain/repositories/IDashboard.repository";
 
 export class DashboardController extends BaseController {
     constructor(
         private readonly _getCustomerDashboardUseCase: IUseCase<GetCustomerDashboardInputDto, CustomerDashboardResponseDto>,
         private readonly _getProviderDashboardUseCase: IUseCase<GetProviderDashboardInputDto, ProviderDashboardResponseDto>,
-        private readonly _getAdminDashboardUseCase: IUseCase<void, AdminDashboardResponseDto>
+        private readonly _getAdminDashboardUseCase: IUseCase<void, AdminDashboardResponseDto>,
+        private readonly _getAdminAuditLogsUseCase: IUseCase<GetAdminAuditLogsInputDto, AdminAuditLogsResponseDto>
     ) {
         super();
     }
@@ -43,6 +46,21 @@ export class DashboardController extends BaseController {
             const response = await this._getAdminDashboardUseCase.execute();
 
             return this.sendSuccess(res, "Admin dashboard retrieved successfully", response);
+        } catch (err) {
+            next(err);
+        }
+    };
+
+    getAdminAuditLogs = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const type = req.query.type as string | undefined;
+            const search = req.query.search as string | undefined;
+
+            const response = await this._getAdminAuditLogsUseCase.execute({ page, limit, type, search });
+
+            return this.sendSuccess(res, "Admin audit logs retrieved successfully", response);
         } catch (err) {
             next(err);
         }

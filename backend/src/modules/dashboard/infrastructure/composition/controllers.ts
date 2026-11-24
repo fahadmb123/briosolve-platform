@@ -3,10 +3,12 @@ import {
   getCustomerDashboardUseCase,
   getProviderDashboardUseCase,
   getAdminDashboardUseCase,
+  getAdminAuditLogsUseCase,
 } from "./useCases";
 
 export const dashboardController = new DashboardController(
   getCustomerDashboardUseCase,
   getProviderDashboardUseCase,
-  getAdminDashboardUseCase
+  getAdminDashboardUseCase,
+  getAdminAuditLogsUseCase
 );
