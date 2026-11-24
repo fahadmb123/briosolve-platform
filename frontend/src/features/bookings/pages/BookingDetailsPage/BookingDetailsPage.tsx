@@ -12,8 +12,6 @@ import { BookingStatusModal, ServiceMismatchModal } from "../../components";
 import { RaiseDisputeModal } from "../../../support";
 import { ReviewModal, BookingReviewCard, useBookingReviewQuery } from "../../../reviews";
 import { useGetProviderPublicProfile } from "../../../nearby-providers/hooks/mutations/useGetProviderPublicProfile";
-import { ProviderDetailsModal } from "../../../nearby-providers/components/ProviderDetailsModal";
-import type { ProviderPublicProfileData } from "../../../nearby-providers/services/nearbyProviders.service";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
 import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
@@ -49,7 +47,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const [isMismatchModalOpen, setIsMismatchModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const activeRazorpayRef = useRef<any>(null);
 
@@ -62,33 +59,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
     !isProvider && targetProviderId ? targetProviderId : undefined
   );
   const publicProvider = providerProfileRes?.data || null;
-
-  const modalProviderData = useMemo(() => {
-    if (publicProvider) return publicProvider;
-    if (!booking) return null;
-    return {
-      id: targetProviderId || booking.providerId,
-      name: booking.providerName || "Service Provider",
-      email: booking.providerEmail || "",
-      phone: booking.providerPhone || null,
-      status: "ACTIVE",
-      current_address_id: booking.addressText || null,
-      provider_profile: {
-        id: booking.providerId,
-        user_id: booking.providerUserId || "",
-        business_name: booking.providerBusinessName || booking.providerName || "Service Provider",
-        experience: booking.providerExperience || "Experienced",
-        bio: booking.providerBio || "",
-        profile_image: booking.providerAvatar || null,
-        completed_jobs: booking.providerCompletedJobs ?? 0,
-        kyc_status: "APPROVED",
-        skills: null,
-        service_radius_km: null
-      },
-      services: [],
-      availability: []
-    } as ProviderPublicProfileData;
-  }, [publicProvider, booking, targetProviderId]);
 
   useEffect(() => {
     return () => {
@@ -715,7 +685,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
       return;
     }
     navigate(`/nearby-providers/${targetProviderId}`, {
-      state: { returnUrl: location.pathname }
+      state: { returnUrl: location.pathname, from: "booking" }
     });
   };
 
@@ -1715,9 +1685,9 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             <div className="bkdet-person-avatar-wrap">
               <div
                 className="bkdet-person-avatar"
-                onClick={!isProvider ? () => setIsProviderModalOpen(true) : undefined}
-                style={{ cursor: !isProvider ? "pointer" : "default" }}
-                title={!isProvider ? "Click to view full provider profile" : undefined}
+                onClick={!isProvider && targetProviderId ? handleViewProviderProfile : undefined}
+                style={{ cursor: !isProvider && targetProviderId ? "pointer" : "default" }}
+                title={!isProvider && targetProviderId ? "Click to view full provider profile" : undefined}
               >
                 {!isProvider ? (
                   <img
@@ -1803,11 +1773,11 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <i className="fas fa-comment-dots" />
                 <span>Chat</span>
               </button>
-              {!isProvider && (
+              {!isProvider && targetProviderId && (
                 <button
                   type="button"
                   className="bkdet-contact-btn bkdet-profile-btn"
-                  onClick={() => setIsProviderModalOpen(true)}
+                  onClick={handleViewProviderProfile}
                 >
                   <i className="fas fa-id-card" />
                   <span>View Profile</span>
@@ -1873,18 +1843,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             refetchReview();
             refetch();
           }}
-        />
-      )}
-
-      {!isProvider && isProviderModalOpen && modalProviderData && (
-        <ProviderDetailsModal
-          provider={modalProviderData}
-          onClose={() => setIsProviderModalOpen(false)}
-          onChat={() => {
-            setIsProviderModalOpen(false);
-            handleChat();
-          }}
-          onViewFullProfile={targetProviderId ? handleViewProviderProfile : undefined}
         />
       )}
     </div>
