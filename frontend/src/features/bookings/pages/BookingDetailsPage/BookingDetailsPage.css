@@ -1980,6 +1980,104 @@
   border: 1px solid rgba(22, 163, 74, 0.2);
 }
 
+.bkdet-person-kv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 14px 0 16px;
+}
+
+[data-theme="dark"] .bkdet-person-kv-list {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.bkdet-person-kv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.84rem;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+[data-theme="dark"] .bkdet-person-kv-row {
+  border-bottom-color: #334155;
+}
+
+.bkdet-person-kv-row:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.bkdet-person-kv-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .bkdet-person-kv-label {
+  color: #94a3b8;
+}
+
+.bkdet-person-kv-label i {
+  font-size: 0.8rem;
+  color: #ea580c;
+  width: 14px;
+  text-align: center;
+}
+
+.bkdet-person-kv-value {
+  font-weight: 600;
+  color: #0f172a;
+  text-align: right;
+  word-break: break-word;
+}
+
+[data-theme="dark"] .bkdet-person-kv-value {
+  color: #f1f5f9;
+}
+
+.bkdet-person-kv-value a {
+  color: #ea580c;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.bkdet-person-kv-value a:hover {
+  text-decoration: underline;
+}
+
+.bkdet-person-kv-bio {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.bkdet-person-kv-bio .bkdet-person-kv-value {
+  text-align: left;
+  font-weight: 400;
+  font-style: italic;
+  color: #475569;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .bkdet-person-kv-bio .bkdet-person-kv-value {
+  color: #cbd5e1;
+}
+
 .bkdet-provider-stats-row {
   display: flex;
   flex-wrap: wrap;

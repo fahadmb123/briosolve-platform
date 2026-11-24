@@ -1754,7 +1754,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </div>
               <div className="bkdet-counterparty-info">
                 <span className="bkdet-counterparty-role">
-                  {isProvider ? "Client Details" : "Assigned Specialist"}
+                  {isProvider ? "Client" : "Service Specialist"}
                 </span>
                 <span
                   className="bkdet-counterparty-name"
@@ -1763,55 +1763,148 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 >
                   {isProvider ? (booking.customerName || "Customer") : (providerPersonName || counterpartyName)}
                 </span>
-                {isProvider && booking.customerEmail && (
-                  <span className="bkdet-counterparty-email" style={{ fontSize: "0.82rem", color: "#64748b", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                    <i className="fas fa-envelope" /> {booking.customerEmail}
-                  </span>
-                )}
                 {!isProvider && providerBusinessName && (
                   <span className="bkdet-counterparty-business">
                     <i className="fas fa-building" /> {providerBusinessName}
                   </span>
                 )}
-                {!isProvider && (
-                  <div className="bkdet-provider-stats-row">
-                    {(booking.providerRating != null || (booking.providerReviewCount && booking.providerReviewCount > 0)) && (
-                      <span className="bkdet-provider-stat-item rating">
-                        <i className="fas fa-star" />
-                        <strong>{booking.providerRating ? booking.providerRating.toFixed(1) : "New"}</strong>
-                        {booking.providerReviewCount ? ` (${booking.providerReviewCount})` : ""}
-                      </span>
-                    )}
-                    {(booking.providerExperience || publicProvider?.provider_profile?.experience) && (
-                      <span className="bkdet-provider-stat-item">
-                        <i className="fas fa-briefcase" />
-                        {booking.providerExperience || publicProvider?.provider_profile?.experience} yrs exp
-                      </span>
-                    )}
-                    {(booking.providerCompletedJobs != null || publicProvider?.provider_profile?.completed_jobs != null) && (
-                      <span className="bkdet-provider-stat-item">
-                        <i className="fas fa-check-circle" />
-                        {booking.providerCompletedJobs ?? publicProvider?.provider_profile?.completed_jobs ?? 0} jobs
-                      </span>
-                    )}
-                  </div>
-                )}
-                {!isProvider && (booking.providerBio || publicProvider?.provider_profile?.bio) && (
-                  <p className="bkdet-provider-bio-snippet">
-                    "{booking.providerBio || publicProvider?.provider_profile?.bio}"
-                  </p>
-                )}
-                {!isProvider && booking.providerPhone && (
-                  <a href={`tel:${booking.providerPhone}`} className="bkdet-counterparty-phone">
-                    <i className="fas fa-phone-alt" /> {booking.providerPhone}
-                  </a>
-                )}
-                {isProvider && booking.customerPhone && (
-                  <a href={`tel:${booking.customerPhone}`} className="bkdet-counterparty-phone">
-                    <i className="fas fa-phone-alt" /> {booking.customerPhone}
-                  </a>
-                )}
               </div>
+            </div>
+
+            <div className="bkdet-person-kv-list">
+              {!isProvider ? (
+                <>
+                  <div className="bkdet-person-kv-row">
+                    <span className="bkdet-person-kv-label">
+                      <i className="fas fa-user" /> Specialist
+                    </span>
+                    <span className="bkdet-person-kv-value">
+                      {providerPersonName || counterpartyName}
+                    </span>
+                  </div>
+
+                  {providerBusinessName && (
+                    <div className="bkdet-person-kv-row">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-briefcase" /> Business
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        {providerBusinessName}
+                      </span>
+                    </div>
+                  )}
+
+                  {booking.providerPhone && (
+                    <div className="bkdet-person-kv-row">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-phone-alt" /> Phone
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        <a href={`tel:${booking.providerPhone}`}>{booking.providerPhone}</a>
+                      </span>
+                    </div>
+                  )}
+
+                  {booking.providerEmail && (
+                    <div className="bkdet-person-kv-row">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-envelope" /> Email
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        <a href={`mailto:${booking.providerEmail}`}>{booking.providerEmail}</a>
+                      </span>
+                    </div>
+                  )}
+
+                  {(booking.providerExperience || publicProvider?.provider_profile?.experience) && (
+                    <div className="bkdet-person-kv-row">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-history" /> Experience
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        {booking.providerExperience || publicProvider?.provider_profile?.experience} years
+                      </span>
+                    </div>
+                  )}
+
+                  {(booking.providerCompletedJobs != null || publicProvider?.provider_profile?.completed_jobs != null) && (
+                    <div className="bkdet-person-kv-row">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-check-circle" /> Jobs Done
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        {booking.providerCompletedJobs ?? publicProvider?.provider_profile?.completed_jobs ?? 0} completed
+                      </span>
+                    </div>
+                  )}
+
+                  {(booking.providerRating != null || (booking.providerReviewCount && booking.providerReviewCount > 0)) && (
+                    <div className="bkdet-person-kv-row">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-star" /> Rating
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        ⭐ {booking.providerRating ? booking.providerRating.toFixed(1) : "New"} {booking.providerReviewCount ? `(${booking.providerReviewCount} reviews)` : ""}
+                      </span>
+                    </div>
+                  )}
+
+                  {(booking.providerBio || publicProvider?.provider_profile?.bio) && (
+                    <div className="bkdet-person-kv-row bkdet-person-kv-bio">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-quote-left" /> About
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        "{booking.providerBio || publicProvider?.provider_profile?.bio}"
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="bkdet-person-kv-row">
+                    <span className="bkdet-person-kv-label">
+                      <i className="fas fa-user" /> Client Name
+                    </span>
+                    <span className="bkdet-person-kv-value">
+                      {booking.customerName || "Customer"}
+                    </span>
+                  </div>
+
+                  {booking.customerPhone && (
+                    <div className="bkdet-person-kv-row">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-phone-alt" /> Phone
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        <a href={`tel:${booking.customerPhone}`}>{booking.customerPhone}</a>
+                      </span>
+                    </div>
+                  )}
+
+                  {booking.customerEmail && (
+                    <div className="bkdet-person-kv-row">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-envelope" /> Email
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        <a href={`mailto:${booking.customerEmail}`}>{booking.customerEmail}</a>
+                      </span>
+                    </div>
+                  )}
+
+                  {booking.addressText && (
+                    <div className="bkdet-person-kv-row">
+                      <span className="bkdet-person-kv-label">
+                        <i className="fas fa-map-marker-alt" /> Location
+                      </span>
+                      <span className="bkdet-person-kv-value">
+                        {booking.addressText}
+                      </span>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
             <div className="bkdet-contact-actions">
