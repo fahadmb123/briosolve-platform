@@ -1,20 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../../../../shared/base/controller/baseController";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
-import { GetCustomerDashboardInputDto } from "../../application/dtos/request/get-customer-dashboard.dto";
+import { GetCustomerDashboardRequestDto } from "../../application/dtos/request/get-customer-dashboard.dto";
 import { CustomerDashboardResponseDto } from "../../application/dtos/response/customer-dashboard-response.dto";
-import { GetProviderDashboardInputDto } from "../../application/dtos/request/get-provider-dashboard.dto";
+import { GetProviderDashboardRequestDto } from "../../application/dtos/request/get-provider-dashboard.dto";
 import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
 import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
-import { GetAdminAuditLogsInputDto } from "../../application/use-cases/getAdminAuditLogs.useCase";
-import { AdminAuditLogsResponseDto } from "../../domain/repositories/IDashboard.repository";
+import { GetAdminAuditLogsRequestDto } from "../../application/dtos/request/get-admin-audit-logs.dto";
+import { AdminAuditLogsResponseDto } from "../../application/dtos/response/admin-audit-logs-response.dto";
 
 export class DashboardController extends BaseController {
     constructor(
-        private readonly _getCustomerDashboardUseCase: IUseCase<GetCustomerDashboardInputDto, CustomerDashboardResponseDto>,
-        private readonly _getProviderDashboardUseCase: IUseCase<GetProviderDashboardInputDto, ProviderDashboardResponseDto>,
+        private readonly _getCustomerDashboardUseCase: IUseCase<GetCustomerDashboardRequestDto, CustomerDashboardResponseDto>,
+        private readonly _getProviderDashboardUseCase: IUseCase<GetProviderDashboardRequestDto, ProviderDashboardResponseDto>,
         private readonly _getAdminDashboardUseCase: IUseCase<void, AdminDashboardResponseDto>,
-        private readonly _getAdminAuditLogsUseCase: IUseCase<GetAdminAuditLogsInputDto, AdminAuditLogsResponseDto>
+        private readonly _getAdminAuditLogsUseCase: IUseCase<GetAdminAuditLogsRequestDto, AdminAuditLogsResponseDto>
     ) {
         super();
     }
