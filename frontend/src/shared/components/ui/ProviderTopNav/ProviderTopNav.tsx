@@ -85,7 +85,8 @@ export const ProviderTopNav: React.FC = () => {
     location.pathname.startsWith("/provider/quotations") ||
     location.pathname.startsWith("/provider/wallet") ||
     location.pathname.startsWith("/provider/support") ||
-    location.pathname.startsWith("/provider/tickets");
+    location.pathname.startsWith("/provider/tickets") ||
+    location.pathname.startsWith("/provider/reviews");
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
@@ -395,6 +396,18 @@ export const ProviderTopNav: React.FC = () => {
                           <span>Support Tickets</span>
                         </div>
                       </NavLink>
+                      <NavLink
+                        to="/provider/reviews"
+                        className={({ isActive }) =>
+                          `prov-panel-item ${isActive ? "item-active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <div className="prov-item-main">
+                          <i className="fas fa-star"></i>
+                          <span>Reviews</span>
+                        </div>
+                      </NavLink>
                     </div>
                   </div>
                 </div>
@@ -408,9 +421,8 @@ export const ProviderTopNav: React.FC = () => {
             >
               <button
                 type="button"
-                className={`prov-category-btn ${
-                  isSettingsSection ? "active" : ""
-                }`}
+                className={`prov-category-btn ${isSettingsSection ? "active" : ""
+                  }`}
                 onClick={() => {
                   if (isSettingsSection) {
                     togglePanel("settings");
@@ -428,9 +440,8 @@ export const ProviderTopNav: React.FC = () => {
                   </span>
                 )}
                 <i
-                  className={`fas fa-chevron-down prov-caret ${
-                    activePanel === "settings" ? "rotate" : ""
-                  }`}
+                  className={`fas fa-chevron-down prov-caret ${activePanel === "settings" ? "rotate" : ""
+                    }`}
                 ></i>
               </button>
 
@@ -517,312 +528,312 @@ export const ProviderTopNav: React.FC = () => {
                 </div>
               )}
             </div>
-    </nav >
+          </nav >
 
-      <div className="prov-topnav-right">
-        <Link
-          to="/provider/messages"
-          className="prov-icon-btn prov-msg-nav-btn"
-          title="Messages"
-          aria-label="Messages"
-        >
-          <i className="fas fa-comments"></i>
-          {unreadMessagesCount > 0 && (
-            <span className="prov-icon-badge">
-              {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
-            </span>
-          )}
-        </Link>
-
-        <NotificationDropdown
-          role="PROVIDER"
-          viewAllLink="/provider/notifications"
-        />
-
-        <div className="prov-user-wrapper">
-          <button
-            type="button"
-            className={`prov-user-btn ${activePanel === "user" ? "active" : ""
-              }`}
-            onClick={() => togglePanel("user")}
-            aria-expanded={activePanel === "user"}
-          >
-            <span className="prov-user-avatar">
-              <img
-                src={
-                  profile?.profile_image ||
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    user?.name || "Provider",
-                  )}&background=000&color=fff&rounded=false`
-                }
-                alt={user?.name || "Provider"}
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    user?.name || "Provider",
-                  )}&background=000&color=fff&rounded=false`;
-                }}
-              />
-            </span>
-            <span className="prov-user-name hide-mobile">
-              {user?.name || profile?.business_name || "Provider"}
-            </span>
-            <i
-              className={`fas fa-chevron-down prov-caret ${activePanel === "user" ? "rotate" : ""
-                }`}
-            ></i>
-          </button>
-
-          {activePanel === "user" && (
-            <div
-              className="prov-dropdown-panel prov-dropdown-panel-right"
-              role="menu"
+          <div className="prov-topnav-right">
+            <Link
+              to="/provider/messages"
+              className="prov-icon-btn prov-msg-nav-btn"
+              title="Messages"
+              aria-label="Messages"
             >
-              <div className="prov-user-panel-header">
-                <div className="prov-header-name">
-                  {user?.name || profile?.business_name || "Provider"}
-                </div>
-                <div className="prov-header-email">{user?.email}</div>
-                <div className="prov-header-meta">
-                  {isVerified ? (
-                    <>
-                      <span className="prov-mono-badge">Verified Provider</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="prov-mono-badge">Not Verified</span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="prov-dropdown-divider"></div>
-              <NavLink
-                to="/"
-                end
-                className="prov-mobile-item"
-                onClick={closeAll}
-              >
-                <span>Home</span>
-              </NavLink>
-              <NavLink
-                to="/provider/dashboard"
-                end
-                className="prov-mobile-item"
-                onClick={closeAll}
-              >
-                <span>Dashboard</span>
-              </NavLink>
-              <NavLink
-                to="/provider/service-requests"
-                className="prov-mobile-item"
-                onClick={closeAll}
-              >
-                <span>Service Requests</span>
-              </NavLink>
-              <Link to="/provider/messages" className="prov-mobile-item" onClick={closeAll}>
-                <span>Messages</span>
-                {unreadMessagesCount > 0 && (
-                  <span className="prov-mono-badge">
-                    {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
-                  </span>
-                )}
-              </Link>
-              <NavLink
-                to="/provider/profile"
-                className="prov-mobile-item"
-                onClick={closeAll}
-              >
-                <span>Business Profile</span>
-              </NavLink>
-              <NavLink
-                to="/provider/kyc"
-                className="prov-panel-item"
-                onClick={closeAll}
-              >
-                <div className="prov-item-main">
-                  <i className="fas fa-shield-alt"></i>
-                  <span>KYC Verification</span>
-                </div>
-              </NavLink>
-              <NavLink
-                to="/provider/notifications"
-                className="prov-mobile-item"
-                onClick={closeAll}
-              >
-                <span>Notification Alerts</span>
-              </NavLink>
-              <NavLink
-                to="/provider/settings"
-                className="prov-panel-item"
-                onClick={closeAll}
-              >
-                <div className="prov-item-main">
-                  <i className="fas fa-cog"></i>
-                  <span>Settings</span>
-                </div>
-                {!isVerified && (
-                  <span className="prov-nav-warning-badge" title="Verification required">
-                    <i className="fas fa-exclamation"></i>
-                  </span>
-                )}
-              </NavLink>
-              <Link
-                to="/provider/verification"
-                className="prov-panel-item"
-                onClick={closeAll}
-              >
-                <div className="prov-item-main">
-                  <i className="fas fa-exchange-alt"></i>
-                  <span>Switch to User</span>
-                </div>
-              </Link>
-              <button
-                type="button"
-                className="prov-panel-item"
-                onClick={toggleTheme}
-              >
-                <div className="prov-item-main">
-                  <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
-                  <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
-                </div>
-              </button>
-              <div className="prov-dropdown-divider"></div>
-              <button
-                type="button"
-                className="prov-panel-item prov-logout-item"
-                onClick={handleLogout}
-              >
-                <div className="prov-item-main">
-                  <i className="fas fa-sign-out-alt"></i>
-                  <span>Log Out</span>
-                </div>
-              </button>
-            </div>
-          )}
-        </div>
+              <i className="fas fa-comments"></i>
+              {unreadMessagesCount > 0 && (
+                <span className="prov-icon-badge">
+                  {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                </span>
+              )}
+            </Link>
 
-        <button
-          type="button"
-          className="prov-mobile-btn"
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          aria-label="Toggle mobile menu"
-        >
-          <i className={mobileMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
-        </button>
-      </div>
+            <NotificationDropdown
+              role="PROVIDER"
+              viewAllLink="/provider/notifications"
+            />
+
+            <div className="prov-user-wrapper">
+              <button
+                type="button"
+                className={`prov-user-btn ${activePanel === "user" ? "active" : ""
+                  }`}
+                onClick={() => togglePanel("user")}
+                aria-expanded={activePanel === "user"}
+              >
+                <span className="prov-user-avatar">
+                  <img
+                    src={
+                      profile?.profile_image ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        user?.name || "Provider",
+                      )}&background=000&color=fff&rounded=false`
+                    }
+                    alt={user?.name || "Provider"}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        user?.name || "Provider",
+                      )}&background=000&color=fff&rounded=false`;
+                    }}
+                  />
+                </span>
+                <span className="prov-user-name hide-mobile">
+                  {user?.name || profile?.business_name || "Provider"}
+                </span>
+                <i
+                  className={`fas fa-chevron-down prov-caret ${activePanel === "user" ? "rotate" : ""
+                    }`}
+                ></i>
+              </button>
+
+              {activePanel === "user" && (
+                <div
+                  className="prov-dropdown-panel prov-dropdown-panel-right"
+                  role="menu"
+                >
+                  <div className="prov-user-panel-header">
+                    <div className="prov-header-name">
+                      {user?.name || profile?.business_name || "Provider"}
+                    </div>
+                    <div className="prov-header-email">{user?.email}</div>
+                    <div className="prov-header-meta">
+                      {isVerified ? (
+                        <>
+                          <span className="prov-mono-badge">Verified Provider</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="prov-mono-badge">Not Verified</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="prov-dropdown-divider"></div>
+                  <NavLink
+                    to="/"
+                    end
+                    className="prov-mobile-item"
+                    onClick={closeAll}
+                  >
+                    <span>Home</span>
+                  </NavLink>
+                  <NavLink
+                    to="/provider/dashboard"
+                    end
+                    className="prov-mobile-item"
+                    onClick={closeAll}
+                  >
+                    <span>Dashboard</span>
+                  </NavLink>
+                  <NavLink
+                    to="/provider/service-requests"
+                    className="prov-mobile-item"
+                    onClick={closeAll}
+                  >
+                    <span>Service Requests</span>
+                  </NavLink>
+                  <Link to="/provider/messages" className="prov-mobile-item" onClick={closeAll}>
+                    <span>Messages</span>
+                    {unreadMessagesCount > 0 && (
+                      <span className="prov-mono-badge">
+                        {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                      </span>
+                    )}
+                  </Link>
+                  <NavLink
+                    to="/provider/profile"
+                    className="prov-mobile-item"
+                    onClick={closeAll}
+                  >
+                    <span>Business Profile</span>
+                  </NavLink>
+                  <NavLink
+                    to="/provider/kyc"
+                    className="prov-panel-item"
+                    onClick={closeAll}
+                  >
+                    <div className="prov-item-main">
+                      <i className="fas fa-shield-alt"></i>
+                      <span>KYC Verification</span>
+                    </div>
+                  </NavLink>
+                  <NavLink
+                    to="/provider/notifications"
+                    className="prov-mobile-item"
+                    onClick={closeAll}
+                  >
+                    <span>Notification Alerts</span>
+                  </NavLink>
+                  <NavLink
+                    to="/provider/settings"
+                    className="prov-panel-item"
+                    onClick={closeAll}
+                  >
+                    <div className="prov-item-main">
+                      <i className="fas fa-cog"></i>
+                      <span>Settings</span>
+                    </div>
+                    {!isVerified && (
+                      <span className="prov-nav-warning-badge" title="Verification required">
+                        <i className="fas fa-exclamation"></i>
+                      </span>
+                    )}
+                  </NavLink>
+                  <Link
+                    to="/provider/verification"
+                    className="prov-panel-item"
+                    onClick={closeAll}
+                  >
+                    <div className="prov-item-main">
+                      <i className="fas fa-exchange-alt"></i>
+                      <span>Switch to User</span>
+                    </div>
+                  </Link>
+                  <button
+                    type="button"
+                    className="prov-panel-item"
+                    onClick={toggleTheme}
+                  >
+                    <div className="prov-item-main">
+                      <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                      <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                    </div>
+                  </button>
+                  <div className="prov-dropdown-divider"></div>
+                  <button
+                    type="button"
+                    className="prov-panel-item prov-logout-item"
+                    onClick={handleLogout}
+                  >
+                    <div className="prov-item-main">
+                      <i className="fas fa-sign-out-alt"></i>
+                      <span>Log Out</span>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="prov-mobile-btn"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              aria-label="Toggle mobile menu"
+            >
+              <i className={mobileMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
+            </button>
+          </div>
         </div >
       </header >
 
-  { showVerificationWarning && (
-    <div className="app-verification-warning-banner" role="alert">
-      <div className="app-verification-warning-content">
-        <i className="fas fa-exclamation-triangle app-verification-warning-icon"></i>
-        <span className="app-verification-warning-text">
-          Profile verification incomplete. Complete your verifications to unlock full marketplace access.
-        </span>
-        <Link to={verificationRoute} className="app-verification-warning-link">
-          Complete Verification
-        </Link>
-      </div>
-    </div>
-  )}
-
-
-
-{
-  mobileMenuOpen && (
-    <>
-      <div className="prov-mobile-backdrop" onClick={closeAll}></div>
-      <div className="prov-mobile-menu">
-        <div className="prov-mobile-user-card">
-          <span className="prov-mobile-user-avatar">
-            <img
-              src={
-                profile?.profile_image ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  user?.name || "Provider",
-                )}&background=000&color=fff&rounded=false`
-              }
-              alt={user?.name || "Provider"}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  user?.name || "Provider",
-                )}&background=000&color=fff&rounded=false`;
-              }}
-            />
-          </span>
-          <div className="prov-mobile-user-info">
-            <div className="prov-mobile-user-name">
-              {user?.name || profile?.business_name || "Provider"}
-            </div>
-            <div className="prov-mobile-user-email">{user?.email}</div>
-            <div className="prov-mobile-user-badge">
-              {isVerified ? (
-                <span className="prov-mono-badge">Verified Provider</span>
-              ) : (
-                <span className="prov-mono-badge">Not Verified</span>
-              )}
-            </div>
+      {showVerificationWarning && (
+        <div className="app-verification-warning-banner" role="alert">
+          <div className="app-verification-warning-content">
+            <i className="fas fa-exclamation-triangle app-verification-warning-icon"></i>
+            <span className="app-verification-warning-text">
+              Profile verification incomplete. Complete your verifications to unlock full marketplace access.
+            </span>
+            <Link to={verificationRoute} className="app-verification-warning-link">
+              Complete Verification
+            </Link>
           </div>
-          <button
-            type="button"
-            className="prov-mobile-close-btn"
-            onClick={closeAll}
-            aria-label="Close menu"
-          >
-            <i className="fas fa-times"></i>
-          </button>
         </div>
+      )}
 
-        <div className="prov-mobile-section">
-          <div className="prov-col-title">WORKSPACE</div>
-          <NavLink
-            to="/"
-            end
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Home</span>
-          </NavLink>
-          <NavLink
-            to="/provider/dashboard"
-            end
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Dashboard</span>
-          </NavLink>
-          <NavLink
-            to="/provider/service-requests"
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Service Requests</span>
-          </NavLink>
-          <Link to="/provider/messages" className="prov-mobile-item" onClick={closeAll}>
-            <span>Messages</span>
-            {unreadMessagesCount > 0 && (
-              <span className="prov-mono-badge">
-                {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
-              </span>
-            )}
-          </Link>
-          <NavLink
-            to="/provider/notifications"
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Notifications</span>
-          </NavLink>
-          <NavLink
-            to="/provider/profile"
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Profile</span>
-          </NavLink>
-        </div>
+
+
+      {
+        mobileMenuOpen && (
+          <>
+            <div className="prov-mobile-backdrop" onClick={closeAll}></div>
+            <div className="prov-mobile-menu">
+              <div className="prov-mobile-user-card">
+                <span className="prov-mobile-user-avatar">
+                  <img
+                    src={
+                      profile?.profile_image ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        user?.name || "Provider",
+                      )}&background=000&color=fff&rounded=false`
+                    }
+                    alt={user?.name || "Provider"}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        user?.name || "Provider",
+                      )}&background=000&color=fff&rounded=false`;
+                    }}
+                  />
+                </span>
+                <div className="prov-mobile-user-info">
+                  <div className="prov-mobile-user-name">
+                    {user?.name || profile?.business_name || "Provider"}
+                  </div>
+                  <div className="prov-mobile-user-email">{user?.email}</div>
+                  <div className="prov-mobile-user-badge">
+                    {isVerified ? (
+                      <span className="prov-mono-badge">Verified Provider</span>
+                    ) : (
+                      <span className="prov-mono-badge">Not Verified</span>
+                    )}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="prov-mobile-close-btn"
+                  onClick={closeAll}
+                  aria-label="Close menu"
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+
+              <div className="prov-mobile-section">
+                <div className="prov-col-title">WORKSPACE</div>
+                <NavLink
+                  to="/"
+                  end
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Home</span>
+                </NavLink>
+                <NavLink
+                  to="/provider/dashboard"
+                  end
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Dashboard</span>
+                </NavLink>
+                <NavLink
+                  to="/provider/service-requests"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Service Requests</span>
+                </NavLink>
+                <Link to="/provider/messages" className="prov-mobile-item" onClick={closeAll}>
+                  <span>Messages</span>
+                  {unreadMessagesCount > 0 && (
+                    <span className="prov-mono-badge">
+                      {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                    </span>
+                  )}
+                </Link>
+                <NavLink
+                  to="/provider/notifications"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Notifications</span>
+                </NavLink>
+                <NavLink
+                  to="/provider/profile"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Profile</span>
+                </NavLink>
+              </div>
 
         <div className="prov-mobile-section">
           <div className="prov-col-title">MORE</div>
@@ -854,110 +865,117 @@ export const ProviderTopNav: React.FC = () => {
           >
             <span>Support Tickets</span>
           </NavLink>
-        </div>
-
-        <div className="prov-mobile-section">
-          <div className="prov-col-title">ACCOUNT & SETTINGS</div>
           <NavLink
-            to="/provider/kyc"
+            to="/provider/reviews"
             className="prov-mobile-item"
             onClick={closeAll}
           >
-            <span>KYC Documents</span>
+            <span>Reviews</span>
           </NavLink>
-          <NavLink
-            to="/provider/settings"
-            className="prov-mobile-item flex items-center justify-between"
-            onClick={closeAll}
-          >
-            <span>Account Settings</span>
-            {!isVerified && (
-              <span className="prov-nav-warning-badge" title="Verification required">
-                <i className="fas fa-exclamation"></i>
-              </span>
+        </div>
+
+              <div className="prov-mobile-section">
+                <div className="prov-col-title">ACCOUNT & SETTINGS</div>
+                <NavLink
+                  to="/provider/kyc"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>KYC Documents</span>
+                </NavLink>
+                <NavLink
+                  to="/provider/settings"
+                  className="prov-mobile-item flex items-center justify-between"
+                  onClick={closeAll}
+                >
+                  <span>Account Settings</span>
+                  {!isVerified && (
+                    <span className="prov-nav-warning-badge" title="Verification required">
+                      <i className="fas fa-exclamation"></i>
+                    </span>
+                  )}
+                </NavLink>
+                <Link
+                  to="/provider/verification"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Switch to User</span>
+                </Link>
+                <button
+                  type="button"
+                  className="prov-mobile-item flex items-center justify-between"
+                  onClick={toggleTheme}
+                >
+                  <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                  <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
+                </button>
+                <button
+                  type="button"
+                  className="prov-mobile-item prov-logout-item"
+                  onClick={handleLogout}
+                >
+                  <span>Log Out</span>
+                </button>
+              </div>
+            </div>
+          </>
+        )
+      }
+
+      <nav className="prov-bottom-bar" aria-label="Mobile Bottom Navigation">
+        <NavLink
+          to="/provider/dashboard"
+          end
+          className={({ isActive }) => `prov-bottom-item ${isActive ? "active" : ""}`}
+          onClick={closeAll}
+        >
+          <i className="fas fa-chart-line"></i>
+          <span>Dashboard</span>
+        </NavLink>
+
+        <NavLink
+          to="/provider/service-requests"
+          className={({ isActive }) => `prov-bottom-item ${isActive ? "active" : ""}`}
+          onClick={closeAll}
+        >
+          <i className="fas fa-clipboard-list"></i>
+          <span>Requests</span>
+        </NavLink>
+
+        <NavLink
+          to="/provider/messages"
+          className={({ isActive }) => `prov-bottom-item prov-bottom-item-center ${isActive ? "active" : ""}`}
+          onClick={closeAll}
+        >
+          <div className="prov-bottom-center-icon">
+            <i className="fas fa-comments"></i>
+            {unreadMessagesCount > 0 && (
+              <span className="prov-bottom-badge">{unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}</span>
             )}
-          </NavLink>
-          <Link
-            to="/provider/verification"
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Switch to User</span>
-          </Link>
-          <button
-            type="button"
-            className="prov-mobile-item flex items-center justify-between"
-            onClick={toggleTheme}
-          >
-            <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
-            <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
-          </button>
-          <button
-            type="button"
-            className="prov-mobile-item prov-logout-item"
-            onClick={handleLogout}
-          >
-            <span>Log Out</span>
-          </button>
-        </div>
-      </div>
-    </>
-  )
-}
+          </div>
+          <span>Messages</span>
+        </NavLink>
 
-<nav className="prov-bottom-bar" aria-label="Mobile Bottom Navigation">
-  <NavLink
-    to="/provider/dashboard"
-    end
-    className={({ isActive }) => `prov-bottom-item ${isActive ? "active" : ""}`}
-    onClick={closeAll}
-  >
-    <i className="fas fa-chart-line"></i>
-    <span>Dashboard</span>
-  </NavLink>
+        <NavLink
+          to="/provider/profile"
+          className={({ isActive }) => `prov-bottom-item ${isActive ? "active" : ""}`}
+          onClick={closeAll}
+        >
+          <i className="fas fa-user-tie"></i>
+          <span>Profile</span>
+        </NavLink>
 
-  <NavLink
-    to="/provider/service-requests"
-    className={({ isActive }) => `prov-bottom-item ${isActive ? "active" : ""}`}
-    onClick={closeAll}
-  >
-    <i className="fas fa-clipboard-list"></i>
-    <span>Requests</span>
-  </NavLink>
-
-  <NavLink
-    to="/provider/messages"
-    className={({ isActive }) => `prov-bottom-item prov-bottom-item-center ${isActive ? "active" : ""}`}
-    onClick={closeAll}
-  >
-    <div className="prov-bottom-center-icon">
-      <i className="fas fa-comments"></i>
-      {unreadMessagesCount > 0 && (
-        <span className="prov-bottom-badge">{unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}</span>
-      )}
-    </div>
-    <span>Messages</span>
-  </NavLink>
-
-  <NavLink
-    to="/provider/profile"
-    className={({ isActive }) => `prov-bottom-item ${isActive ? "active" : ""}`}
-    onClick={closeAll}
-  >
-    <i className="fas fa-user-tie"></i>
-    <span>Profile</span>
-  </NavLink>
-
-  <button
-    type="button"
-    className={`prov-bottom-item ${mobileMenuOpen ? "active" : ""}`}
-    onClick={() => setMobileMenuOpen((prev) => !prev)}
-    aria-label="Toggle navigation drawer"
-  >
-    <i className={mobileMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
-    <span>Menu</span>
-  </button>
-</nav>
+        <button
+          type="button"
+          className={`prov-bottom-item ${mobileMenuOpen ? "active" : ""}`}
+          onClick={() => setMobileMenuOpen((prev) => !prev)}
+          aria-label="Toggle navigation drawer"
+        >
+          <i className={mobileMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
+          <span>Menu</span>
+        </button>
+      </nav>
     </>
   );
 };
