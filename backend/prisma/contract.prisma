@@ -60,6 +60,7 @@ model users {
   messages                       messages[]
   wallet                         wallets?
   support_tickets                support_tickets[]
+  reviews                        reviews[]                       @relation("CustomerReviews")
 }
 
 enum weekday {
@@ -119,6 +120,7 @@ model provider_profiles {
   service_requests       service_request_providers[]
   quotations             quotations[]
   bookings               bookings[]
+  reviews                reviews[]                         @relation("ProviderReviews")
 }
 
 model provider_verification_documents {
@@ -572,6 +574,9 @@ model bookings {
 
   notes              String?
 
+  warranty_days      Int?                   @default(0)
+  warranty_expires_at DateTime?
+
   created_at         DateTime             @default(now())
   updated_at         temporal.updatedAt()
 
@@ -580,6 +585,7 @@ model bookings {
   customer           users                @relation("CustomerBookings", fields:[customer_id], references:[id])
   provider           provider_profiles    @relation(fields:[provider_id], references:[id], onDelete: Cascade)
   wallet_transactions wallet_transactions[]
+  review             reviews?
 
   @@index([service_request_id])
   @@index([quotation_id])
@@ -698,5 +704,34 @@ model support_ticket_messages {
   ticket      support_tickets     @relation(fields:[ticket_id], references:[id], onDelete: Cascade)
 
   @@index([ticket_id])
+  @@index([created_at])
+}
+
+model reviews {
+  id                  Uuid              @id @default(uuid())
+  booking_id          Uuid              @unique
+  customer_id         Uuid
+  provider_id         Uuid
+
+  rating              Int               @default(5)
+  title               VarChar(150)?
+  comment             VarChar(2000)
+  aspect_ratings      Json?
+
+  provider_reply      VarChar(1500)?
+  provider_replied_at DateTime?
+
+  is_reported         Boolean           @default(false)
+  is_hidden           Boolean           @default(false)
+
+  created_at          DateTime          @default(now())
+  updated_at          temporal.updatedAt()
+
+  booking             bookings          @relation(fields:[booking_id], references:[id], onDelete: Cascade)
+  customer            users             @relation("CustomerReviews", fields:[customer_id], references:[id], onDelete: Cascade)
+  provider            provider_profiles @relation("ProviderReviews", fields:[provider_id], references:[id], onDelete: Cascade)
+
+  @@index([provider_id])
+  @@index([customer_id])
   @@index([created_at])
 }
