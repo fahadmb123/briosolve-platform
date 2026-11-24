@@ -11,6 +11,9 @@ import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../..
 import { BookingStatusModal, ServiceMismatchModal } from "../../components";
 import { RaiseDisputeModal } from "../../../support";
 import { ReviewModal, BookingReviewCard, useBookingReviewQuery } from "../../../reviews";
+import { useGetProviderPublicProfile } from "../../../nearby-providers/hooks/mutations/useGetProviderPublicProfile";
+import { ProviderDetailsModal } from "../../../nearby-providers/components/ProviderDetailsModal";
+import type { ProviderPublicProfileData } from "../../../nearby-providers/services/nearbyProviders.service";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
 import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
@@ -46,11 +49,46 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const [isMismatchModalOpen, setIsMismatchModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const activeRazorpayRef = useRef<any>(null);
 
   const { data: reviewData, refetch: refetchReview } = useBookingReviewQuery(booking?.id);
   const existingReview = reviewData?.data || null;
+
+  const targetProviderId = booking?.providerUserId || booking?.providerId;
+
+  const { data: providerProfileRes } = useGetProviderPublicProfile(
+    !isProvider && targetProviderId ? targetProviderId : undefined
+  );
+  const publicProvider = providerProfileRes?.data || null;
+
+  const modalProviderData = useMemo(() => {
+    if (publicProvider) return publicProvider;
+    if (!booking) return null;
+    return {
+      id: targetProviderId || booking.providerId,
+      name: booking.providerName || "Service Provider",
+      email: booking.providerEmail || "",
+      phone: booking.providerPhone || null,
+      status: "ACTIVE",
+      current_address_id: booking.addressText || null,
+      provider_profile: {
+        id: booking.providerId,
+        user_id: booking.providerUserId || "",
+        business_name: booking.providerBusinessName || booking.providerName || "Service Provider",
+        experience: booking.providerExperience || "Experienced",
+        bio: booking.providerBio || "",
+        profile_image: booking.providerAvatar || null,
+        completed_jobs: booking.providerCompletedJobs ?? 0,
+        kyc_status: "APPROVED",
+        skills: null,
+        service_radius_km: null
+      },
+      services: [],
+      availability: []
+    } as ProviderPublicProfileData;
+  }, [publicProvider, booking, targetProviderId]);
 
   useEffect(() => {
     return () => {
@@ -672,8 +710,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
   const providerPersonName = booking.providerName || null;
   const providerBusinessName = booking.providerBusinessName || null;
-  const targetProviderId = booking.providerUserId || booking.providerId;
-
   const handleViewProviderProfile = () => {
     if (!targetProviderId) {
       toast.error("Provider profile is not available");
@@ -1666,7 +1702,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </div>
           </div>
 
-          <div className="bkdet-section-card">
+          <div className="bkdet-section-card bkdet-provider-card">
             <div className="bkdet-section-header">
               <div className="bkdet-section-title-wrap">
                 <div className="bkdet-section-icon">
@@ -1676,15 +1712,32 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   {isProvider ? "Client Details" : "Provider Details"}
                 </h3>
               </div>
+              {!isProvider && (
+                <span className="bkdet-provider-verified-badge">
+                  <i className="fas fa-check-circle" /> Verified Specialist
+                </span>
+              )}
             </div>
 
             <div className="bkdet-counterparty-row">
-              <div className="bkdet-counterparty-avatar">
-                {!isProvider && providerPersonName ? (
+              <div
+                className="bkdet-counterparty-avatar"
+                onClick={!isProvider ? () => setIsProviderModalOpen(true) : undefined}
+                style={{ cursor: !isProvider ? "pointer" : "default" }}
+                title={!isProvider ? "Click to view full provider profile" : undefined}
+              >
+                {!isProvider ? (
                   <img
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(providerPersonName)}&background=FF7900&color=fff&size=120&bold=true`}
-                    alt={providerPersonName}
+                    src={
+                      booking.providerAvatar ||
+                      publicProvider?.provider_profile?.profile_image ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(providerPersonName || counterpartyName)}&background=FF7900&color=fff&size=160&bold=true`
+                    }
+                    alt={providerPersonName || counterpartyName}
                     className="bkdet-counterparty-avatar-img"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(providerPersonName || counterpartyName)}&background=FF7900&color=fff&size=160&bold=true`;
+                    }}
                   />
                 ) : (
                   counterpartyInitial
@@ -1692,9 +1745,13 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </div>
               <div className="bkdet-counterparty-info">
                 <span className="bkdet-counterparty-role">
-                  {isProvider ? "Customer" : "Verified Provider"}
+                  {isProvider ? "Customer" : "Assigned Specialist"}
                 </span>
-                <span className="bkdet-counterparty-name">
+                <span
+                  className="bkdet-counterparty-name"
+                  onClick={!isProvider ? () => setIsProviderModalOpen(true) : undefined}
+                  style={{ cursor: !isProvider ? "pointer" : "default" }}
+                >
                   {!isProvider && providerPersonName ? providerPersonName : counterpartyName}
                 </span>
                 {!isProvider && providerBusinessName && (
@@ -1702,9 +1759,42 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                     <i className="fas fa-building" /> {providerBusinessName}
                   </span>
                 )}
+                {!isProvider && (
+                  <div className="bkdet-provider-stats-row">
+                    {(booking.providerRating != null || (booking.providerReviewCount && booking.providerReviewCount > 0)) && (
+                      <span className="bkdet-provider-stat-item rating">
+                        <i className="fas fa-star" />
+                        <strong>{booking.providerRating ? booking.providerRating.toFixed(1) : "New"}</strong>
+                        {booking.providerReviewCount ? ` (${booking.providerReviewCount})` : ""}
+                      </span>
+                    )}
+                    {(booking.providerExperience || publicProvider?.provider_profile?.experience) && (
+                      <span className="bkdet-provider-stat-item">
+                        <i className="fas fa-briefcase" />
+                        {booking.providerExperience || publicProvider?.provider_profile?.experience} yrs exp
+                      </span>
+                    )}
+                    {(booking.providerCompletedJobs != null || publicProvider?.provider_profile?.completed_jobs != null) && (
+                      <span className="bkdet-provider-stat-item">
+                        <i className="fas fa-check-circle" />
+                        {booking.providerCompletedJobs ?? publicProvider?.provider_profile?.completed_jobs ?? 0} jobs
+                      </span>
+                    )}
+                  </div>
+                )}
+                {!isProvider && (booking.providerBio || publicProvider?.provider_profile?.bio) && (
+                  <p className="bkdet-provider-bio-snippet">
+                    "{booking.providerBio || publicProvider?.provider_profile?.bio}"
+                  </p>
+                )}
                 {!isProvider && booking.providerPhone && (
                   <a href={`tel:${booking.providerPhone}`} className="bkdet-counterparty-phone">
                     <i className="fas fa-phone-alt" /> {booking.providerPhone}
+                  </a>
+                )}
+                {isProvider && booking.customerPhone && (
+                  <a href={`tel:${booking.customerPhone}`} className="bkdet-counterparty-phone">
+                    <i className="fas fa-phone-alt" /> {booking.customerPhone}
                   </a>
                 )}
               </div>
@@ -1715,13 +1805,13 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <i className="fas fa-comment-dots" />
                 <span>Chat</span>
               </button>
-              {!isProvider && targetProviderId && (
+              {!isProvider && (
                 <button
                   type="button"
                   className="bkdet-contact-btn bkdet-profile-btn"
-                  onClick={handleViewProviderProfile}
+                  onClick={() => setIsProviderModalOpen(true)}
                 >
-                  <i className="fas fa-user-circle" />
+                  <i className="fas fa-id-card" />
                   <span>View Profile</span>
                 </button>
               )}
@@ -1785,6 +1875,18 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             refetchReview();
             refetch();
           }}
+        />
+      )}
+
+      {!isProvider && isProviderModalOpen && modalProviderData && (
+        <ProviderDetailsModal
+          provider={modalProviderData}
+          onClose={() => setIsProviderModalOpen(false)}
+          onChat={() => {
+            setIsProviderModalOpen(false);
+            handleChat();
+          }}
+          onViewFullProfile={targetProviderId ? handleViewProviderProfile : undefined}
         />
       )}
     </div>

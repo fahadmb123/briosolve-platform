@@ -1,17 +1,21 @@
 import React from 'react';
 import type { User } from '../../../shared/types/Dtos';
 import type { Address } from '../../addresses';
+import type { ProviderPublicProfileData } from '../services/nearbyProviders.service';
 
 interface ProviderDetailsModalProps {
-    provider: User | null;
+    provider: (User | ProviderPublicProfileData) | null;
     onClose: () => void;
+    onChat?: () => void;
+    onViewFullProfile?: () => void;
 }
 
-export const ProviderDetailsModal: React.FC<ProviderDetailsModalProps> = React.memo(({ provider, onClose }) => {
+export const ProviderDetailsModal: React.FC<ProviderDetailsModalProps> = React.memo(({ provider, onClose, onChat, onViewFullProfile }) => {
     if (!provider) return null;
 
     const profile = provider.provider_profile;
     const address = typeof provider.current_address_id === 'object' ? (provider.current_address_id as Address | null) : null;
+    const locationDisplay = address ? `${address.area}, ${address.city}, ${address.state}` : typeof provider.current_address_id === 'string' ? provider.current_address_id : 'Location on request';
     const isKycApproved = profile?.kyc_status === 'APPROVED';
 
     return (
@@ -89,7 +93,7 @@ export const ProviderDetailsModal: React.FC<ProviderDetailsModalProps> = React.m
                             Location
                         </span>
                         <span className="text-sm font-medium text-text">
-                            {address ? `${address.area}, ${address.city}, ${address.state}` : 'Location on request'}
+                            {locationDisplay}
                         </span>
                     </div>
 
@@ -142,6 +146,27 @@ export const ProviderDetailsModal: React.FC<ProviderDetailsModalProps> = React.m
                 )}
 
                 <div className="flex justify-end gap-2 pt-3 border-top">
+                    {onChat && (
+                        <button
+                            type="button"
+                            onClick={onChat}
+                            className="btn btn-outline-primary btn-sm"
+                        >
+                            <i className="fas fa-comment-dots mr-1" />
+                            Chat
+                        </button>
+                    )}
+                    {onViewFullProfile && (
+                        <button
+                            type="button"
+                            onClick={onViewFullProfile}
+                            className="btn btn-primary btn-sm"
+                            style={{ background: '#FF7900', borderColor: '#ea580c' }}
+                        >
+                            <i className="fas fa-external-link-alt mr-1" />
+                            Full Profile
+                        </button>
+                    )}
                     <button
                         type="button"
                         onClick={onClose}

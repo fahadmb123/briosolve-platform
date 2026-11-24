@@ -1967,6 +1967,66 @@
   color: #ffffff;
 }
 
+.bkdet-provider-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.1);
+  padding: 3px 8px;
+  border-radius: 9999px;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.bkdet-provider-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.bkdet-provider-stat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+[data-theme="dark"] .bkdet-provider-stat-item {
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+.bkdet-provider-stat-item.rating {
+  color: #d97706;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.bkdet-provider-bio-snippet {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-style: italic;
+  margin: 6px 0 2px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .bkdet-provider-bio-snippet {
+  color: #94a3b8;
+}
+
 .bkdet-loading-box,
 .bkdet-error-box {
   display: flex;

@@ -221,6 +221,12 @@ export class BookingMapper {
             providerBusinessName?: string | null;
             providerName?: string | null;
             providerUserId?: string | null;
+            providerAvatar?: string | null;
+            providerExperience?: string | null;
+            providerCompletedJobs?: number | null;
+            providerBio?: string | null;
+            providerRating?: number | null;
+            providerReviewCount?: number | null;
             customerName?: string | null;
             quotationType?: string | null;
             requiresInspection?: boolean;
@@ -310,6 +316,12 @@ export class BookingMapper {
             providerEmail: details?.providerEmail ?? null,
             providerPhone: details?.providerPhone ?? null,
             providerUserId: details?.providerUserId ?? extra?.providerUserId ?? null,
+            providerAvatar: details?.providerAvatar ?? extra?.providerAvatar ?? null,
+            providerExperience: details?.providerExperience ?? extra?.providerExperience ?? null,
+            providerCompletedJobs: details?.providerCompletedJobs ?? extra?.providerCompletedJobs ?? null,
+            providerBio: details?.providerBio ?? extra?.providerBio ?? null,
+            providerRating: details?.providerRating ?? extra?.providerRating ?? null,
+            providerReviewCount: details?.providerReviewCount ?? extra?.providerReviewCount ?? null,
             customerName: details?.customerName ?? extra?.customerName ?? null,
             customerEmail: details?.customerEmail ?? null,
             customerPhone: details?.customerPhone ?? null,

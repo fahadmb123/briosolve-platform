@@ -347,6 +347,12 @@ export class PrismaBookingRepository implements IBookingRepository {
                 let providerEmail: string | null = null;
                 let providerPhone: string | null = null;
                 let providerUserId: string | null = null;
+                let providerAvatar: string | null = null;
+                let providerExperience: string | null = null;
+                let providerCompletedJobs: number | null = null;
+                let providerBio: string | null = null;
+                let providerRating: number | null = null;
+                let providerReviewCount: number | null = null;
                 let customerName: string | null = null;
                 let customerEmail: string | null = null;
                 let customerPhone: string | null = null;
@@ -372,6 +378,11 @@ export class PrismaBookingRepository implements IBookingRepository {
                 if (providerProfile) {
                     providerBusinessName = providerProfile.business_name;
                     providerUserId = providerProfile.user_id;
+                    providerAvatar = providerProfile.profile_image || null;
+                    providerExperience = providerProfile.experience || null;
+                    providerCompletedJobs = providerProfile.completed_jobs ?? null;
+                    providerBio = providerProfile.bio || null;
+
                     const pUser = await db.orm.public.users
                         .where({ id: providerProfile.user_id as never })
                         .first();
@@ -380,6 +391,17 @@ export class PrismaBookingRepository implements IBookingRepository {
                         providerPhone = pUser.phone;
                         providerEmail = pUser.email;
                     }
+
+                    try {
+                        const pReviews = await db.orm.public.reviews
+                            .where({ provider_id: booking.provider_id as never, is_hidden: false as never })
+                            .all();
+                        if (pReviews.length > 0) {
+                            const sum = pReviews.reduce((acc: number, r: any) => acc + Number(r.rating || 0), 0);
+                            providerRating = Number((sum / pReviews.length).toFixed(1));
+                            providerReviewCount = pReviews.length;
+                        }
+                    } catch {}
                 }
 
                 const cUser = await db.orm.public.users
@@ -424,6 +446,12 @@ export class PrismaBookingRepository implements IBookingRepository {
                     providerEmail,
                     providerPhone,
                     providerUserId,
+                    providerAvatar,
+                    providerExperience,
+                    providerCompletedJobs,
+                    providerBio,
+                    providerRating,
+                    providerReviewCount,
                     customerName,
                     customerEmail,
                     customerPhone,
