@@ -515,3 +515,86 @@
     margin: 0;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.aal-skeleton-row {
+    pointer-events: none;
+    user-select: none;
+}
+
+.aal-sk-shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(226, 232, 240, 0.7) 0%,
+        rgba(241, 245, 249, 0.95) 50%,
+        rgba(226, 232, 240, 0.7) 100%
+    );
+    background-size: 200% 100%;
+    animation: aalShimmer 1.5s infinite ease-in-out;
+    border-radius: 4px;
+}
+
+[data-theme="dark"] .aal-sk-shimmer {
+    background: linear-gradient(
+        90deg,
+        #1e293b 0%,
+        #334155 50%,
+        #1e293b 100%
+    );
+    background-size: 200% 100%;
+    animation: aalShimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes aalShimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.aal-sk-time-primary {
+    width: 110px;
+    height: 14px;
+    margin-bottom: 4px;
+}
+
+.aal-sk-time-sub {
+    width: 75px;
+    height: 11px;
+}
+
+.aal-sk-badge {
+    width: 78px;
+    height: 22px;
+    border-radius: 9999px;
+}
+
+.aal-sk-title {
+    height: 15px;
+    margin-bottom: 6px;
+}
+
+.aal-sk-desc {
+    height: 12px;
+}
+
+.aal-sk-actor {
+    width: 105px;
+    height: 24px;
+    border-radius: 8px;
+}
+
+.aal-sk-severity {
+    width: 55px;
+    height: 18px;
+    border-radius: 6px;
+}
+
+.aal-sk-btn {
+    width: 75px;
+    height: 28px;
+    border-radius: 8px;
+    margin-left: auto;
+}
+

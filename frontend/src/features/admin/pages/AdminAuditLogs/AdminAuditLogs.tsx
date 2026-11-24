@@ -97,7 +97,11 @@ export default function AdminAuditLogs() {
         <div className="aal-header-actions">
           <div className="aal-stat-badge">
             <i className="fas fa-circle"></i>
-            <span>{total} Total Events</span>
+            {isLoading ? (
+              <div className="aal-sk-shimmer" style={{ width: '85px', height: '14px', borderRadius: '4px' }}></div>
+            ) : (
+              <span>{total} Total Events</span>
+            )}
           </div>
 
           <button onClick={() => refetch()} className="aal-btn-refresh" title="Refresh Live Audit Stream">
@@ -167,11 +171,40 @@ export default function AdminAuditLogs() {
             </thead>
             <tbody>
               {isLoading ? (
-                <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '3.5rem 1rem', color: 'var(--text-secondary)' }}>
-                    <i className="fas fa-circle-notch fa-spin mr-2"></i> Loading immutable audit stream...
-                  </td>
-                </tr>
+                Array.from({ length: 8 }).map((_, idx) => (
+                  <tr key={`aal-sk-${idx}`} className="aal-skeleton-row">
+                    <td>
+                      <div className="aal-time-cell">
+                        <div className="aal-sk-shimmer aal-sk-time-primary"></div>
+                        <div className="aal-sk-shimmer aal-sk-time-sub"></div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="aal-sk-shimmer aal-sk-badge"></div>
+                    </td>
+                    <td>
+                      <div className="aal-event-cell">
+                        <div
+                          className="aal-sk-shimmer aal-sk-title"
+                          style={{ width: idx % 3 === 0 ? '55%' : idx % 3 === 1 ? '78%' : '65%' }}
+                        ></div>
+                        <div
+                          className="aal-sk-shimmer aal-sk-desc"
+                          style={{ width: idx % 2 === 0 ? '92%' : '82%' }}
+                        ></div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="aal-sk-shimmer aal-sk-actor"></div>
+                    </td>
+                    <td>
+                      <div className="aal-sk-shimmer aal-sk-severity"></div>
+                    </td>
+                    <td>
+                      <div className="aal-sk-shimmer aal-sk-btn"></div>
+                    </td>
+                  </tr>
+                ))
               ) : isError ? (
                 <tr>
                   <td colSpan={6} style={{ textAlign: 'center', padding: '3rem 1rem', color: '#e91e63' }}>
@@ -251,9 +284,13 @@ export default function AdminAuditLogs() {
         </div>
 
         <div className="aal-table-footer">
-          <span>
-            Showing {total > 0 ? (page - 1) * 10 + 1 : 0} to {Math.min(page * 10, total)} of {total} events
-          </span>
+          {isLoading ? (
+            <div className="aal-sk-shimmer" style={{ width: '160px', height: '14px', borderRadius: '4px' }}></div>
+          ) : (
+            <span>
+              Showing {total > 0 ? (page - 1) * 10 + 1 : 0} to {Math.min(page * 10, total)} of {total} events
+            </span>
+          )}
 
           {totalPages > 1 && (
             <div className="aal-pagination">
