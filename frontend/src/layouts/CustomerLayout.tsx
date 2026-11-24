@@ -20,8 +20,6 @@ export default function CustomerLayout() {
   }
 
   const hasSubnav =
-    location.pathname === "/dashboard" ||
-    location.pathname.startsWith("/dashboard") ||
     location.pathname.startsWith("/nearby-providers") ||
     location.pathname.startsWith("/profile") ||
     location.pathname.startsWith("/settings") ||
@@ -29,12 +27,15 @@ export default function CustomerLayout() {
     location.pathname.startsWith("/request-service") ||
     location.pathname.startsWith("/my-requests") ||
     location.pathname.startsWith("/bookings") ||
+    location.pathname.startsWith("/my-bookings") ||
     location.pathname.startsWith("/wallet") ||
     location.pathname.startsWith("/messages") ||
     location.pathname.startsWith("/chat") ||
     location.pathname.startsWith("/support") ||
     location.pathname.startsWith("/tickets") ||
-    location.pathname.startsWith("/reviews");
+    location.pathname.startsWith("/reviews") ||
+    location.pathname.startsWith("/customer/payment") ||
+    location.pathname.startsWith("/payment");
 
   return (
     <div className={`top-nav-layout ${showVerificationWarning ? "has-verification-warning" : ""}`}>

@@ -10,6 +10,33 @@ import { useUnreadChatCount } from "../../../../features/chat";
 
 let lastKnownTopNavPill: { left: number; width: number } | null = null;
 
+const isCustomerMoreRoute = (pathname: string): boolean => {
+  return (
+    pathname.startsWith("/my-requests") ||
+    pathname.startsWith("/request-service") ||
+    pathname.startsWith("/bookings") ||
+    pathname.startsWith("/my-bookings") ||
+    pathname.startsWith("/wallet") ||
+    pathname.startsWith("/support") ||
+    pathname.startsWith("/tickets") ||
+    pathname.startsWith("/reviews") ||
+    pathname.startsWith("/customer/payment") ||
+    pathname.startsWith("/payment")
+  );
+};
+
+const isCustomerWorkspaceRoute = (pathname: string): boolean => {
+  return (
+    !isCustomerMoreRoute(pathname) &&
+    (pathname.startsWith("/nearby-providers") ||
+      pathname.startsWith("/messages") ||
+      pathname.startsWith("/chat") ||
+      pathname.startsWith("/profile") ||
+      pathname.startsWith("/notifications") ||
+      pathname.startsWith("/settings"))
+  );
+};
+
 export const TopNav: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const unreadMessagesCount = useUnreadChatCount();
@@ -182,241 +209,248 @@ export const TopNav: React.FC = () => {
     <>
       <header className={`topnav-header`} ref={navRef}>
         <div className="topnav-container">
-        <div className="topnav-left">
-          <Link to="/" className="topnav-brand" onClick={closeAllMenus}>
-            <img src="/briosolve-logo.svg" alt="Briosolve" className="topnav-brand-logo" />
-            <img src="/briosolve-text-logo.svg" alt="Briosolve" className="topnav-brand-text-logo" />
-          </Link>
+          <div className="topnav-left">
+            <Link to="/" className="topnav-brand" onClick={closeAllMenus}>
+              <img src="/briosolve-logo.svg" alt="Briosolve" className="topnav-brand-logo" />
+              <img src="/briosolve-text-logo.svg" alt="Briosolve" className="topnav-brand-text-logo" />
+            </Link>
+          </div>
 
-          <nav className="topnav-links" aria-label="Primary Navigation" ref={linksNavRef}>
-            <div
-              className={`topnav-active-pill ${pillHasMounted ? "is-animated" : ""}`}
-              style={{
-                transform: `translateX(${activePillStyle.left}px)`,
-                width: `${activePillStyle.width}px`,
-                opacity: activePillStyle.opacity,
-              }}
-              aria-hidden="true"
-            />
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                `topnav-link ${isActive ? "active" : ""}`
-              }
-            >
-              Home
-            </NavLink>
-
-            {isCustomer ? (
-              <>
-                <div
-                  className="topnav-dropdown-wrapper"
-                  onMouseEnter={() => setOpenDropdown("workspace")}
-                  onMouseLeave={() => setOpenDropdown(null)}
-                >
-                  <NavLink
-                    to="/nearby-providers"
-                    className={() =>
-                      `topnav-link topnav-dropdown-trigger ${
-                        location.pathname.startsWith("/nearby-providers") ||
-                        location.pathname.startsWith("/messages") ||
-                        location.pathname.startsWith("/chat") ||
-                        location.pathname.startsWith("/profile") ||
-                        location.pathname.startsWith("/notifications") ||
-                        location.pathname.startsWith("/settings")
-                          ? "active"
-                          : ""
-                      }`
-                    }
-                    onClick={() => {
-                      setOpenDropdown(null);
-                    }}
-                    aria-expanded={openDropdown === "workspace"}
-                    aria-haspopup="menu"
-                  >
-                    <span>Workspace</span>
-                    <i
-                      className={`fas fa-chevron-down topnav-caret ${
-                        openDropdown === "workspace" ? "rotate" : ""
-                      }`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleDropdown("workspace");
-                      }}
-                    ></i>
-                  </NavLink>
-
-                  {openDropdown === "workspace" && (
-                    <div className="topnav-dropdown-menu" role="menu">
-                      <div className="topnav-dropdown-section-title">Workspace</div>
-                      <Link
-                        to="/nearby-providers"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>Find Providers</span>
-                        <i className="fas fa-search-location"></i>
-                      </Link>
-                      <Link
-                        to="/messages"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>Messages</span>
-                        {unreadMessagesCount > 0 && (
-                          <span className="prov-mono-badge">
-                            {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
-                          </span>
-                        )}
-                      </Link>
-                      <Link
-                        to="/profile"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>Profile</span>
-                        <i className="fas fa-user"></i>
-                      </Link>
-                      <Link
-                        to="/notifications"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>Notifications</span>
-                        <i className="fas fa-bell"></i>
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                <div
-                  className="topnav-dropdown-wrapper"
-                  onMouseEnter={() => setOpenDropdown("more")}
-                  onMouseLeave={() => setOpenDropdown(null)}
-                >
-                  <NavLink
-                    to="/my-requests"
-                    className={({ isActive }) =>
-                      `topnav-link topnav-dropdown-trigger ${
-                        isActive ||
-                        location.pathname.startsWith("/my-requests") ||
-                        location.pathname.startsWith("/request-service") ||
-                        location.pathname.startsWith("/bookings") ||
-                        location.pathname.startsWith("/reviews")
-                          ? "active"
-                          : ""
-                      }`
-                    }
-                    onClick={() => {
-                      setOpenDropdown(null);
-                    }}
-                    aria-expanded={openDropdown === "more"}
-                    aria-haspopup="menu"
-                  >
-                    <span>More</span>
-                    <i
-                      className={`fas fa-chevron-down topnav-caret ${
-                        openDropdown === "more" ? "rotate" : ""
-                      }`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleDropdown("more");
-                      }}
-                    ></i>
-                  </NavLink>
-
-                  {openDropdown === "more" && (
-                    <div className="topnav-dropdown-menu" role="menu">
-                      <div className="topnav-dropdown-section-title">Activity</div>
-                      <Link
-                        to="/request-service"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>Request Service</span>
-                        <i className="fas fa-plus-circle"></i>
-                      </Link>
-                      <Link
-                        to="/my-requests"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>My Requests</span>
-                        <i className="fas fa-file-alt"></i>
-                      </Link>
-                      <Link
-                        to="/bookings"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>Bookings</span>
-                        <i className="fas fa-calendar-check"></i>
-                      </Link>
-                      <Link
-                        to="/bookings"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>Reviews</span>
-                        <i className="fas fa-star"></i>
-                      </Link>
-
-                      <div className="topnav-dropdown-divider"></div>
-                      <div className="topnav-dropdown-section-title">Features</div>
-                      <Link
-                        to="/nearby-providers"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>AI Assistant</span>
-                        <span className="topnav-mono-badge">AI</span>
-                      </Link>
-                      <Link
-                        to="/request-service"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>Products</span>
-                        <span className="topnav-mono-badge">NEW</span>
-                      </Link>
-                      <Link
-                        to="/#how-it-works"
-                        className="topnav-dropdown-item"
-                        role="menuitem"
-                        onClick={closeAllMenus}
-                      >
-                        <span>How It Works</span>
-                        <i className="fas fa-info-circle"></i>
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : isAuthenticated ? (
+          <div className="topnav-center">
+            <nav className="topnav-links" aria-label="Primary Navigation" ref={linksNavRef}>
+              <div
+                className={`topnav-active-pill ${pillHasMounted ? "is-animated" : ""}`}
+                style={{
+                  transform: `translateX(${activePillStyle.left}px)`,
+                  width: `${activePillStyle.width}px`,
+                  opacity: activePillStyle.opacity,
+                }}
+                aria-hidden="true"
+              />
               <NavLink
-                to={dashboardRoute}
+                to="/"
+                end
                 className={({ isActive }) =>
                   `topnav-link ${isActive ? "active" : ""}`
                 }
               >
-                Dashboard
+                Home
               </NavLink>
-            ) : null}
-          </nav>
-        </div>
+
+              {isCustomer ? (
+                <>
+                  <div
+                    className="topnav-dropdown-wrapper"
+                    onMouseEnter={() => setOpenDropdown("workspace")}
+                    onMouseLeave={() => setOpenDropdown(null)}
+                  >
+                    <NavLink
+                      to="/nearby-providers"
+                      className={() =>
+                        `topnav-link topnav-dropdown-trigger ${
+                          isCustomerWorkspaceRoute(location.pathname) ? "active" : ""
+                        }`
+                      }
+                      onClick={() => {
+                        setOpenDropdown(null);
+                      }}
+                      aria-expanded={openDropdown === "workspace"}
+                      aria-haspopup="menu"
+                    >
+                      <span>Workspace</span>
+                      <i
+                        className={`fas fa-chevron-down topnav-caret ${
+                          openDropdown === "workspace" ? "rotate" : ""
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleDropdown("workspace");
+                        }}
+                      ></i>
+                    </NavLink>
+
+                    {openDropdown === "workspace" && (
+                      <div className="topnav-dropdown-menu" role="menu">
+                        <div className="topnav-dropdown-section-title">Workspace</div>
+                        <Link
+                          to="/nearby-providers"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>Find Providers</span>
+                          <i className="fas fa-search-location"></i>
+                        </Link>
+                        <Link
+                          to="/messages"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>Messages</span>
+                          {unreadMessagesCount > 0 && (
+                            <span className="prov-mono-badge">
+                              {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                            </span>
+                          )}
+                        </Link>
+                        <Link
+                          to="/profile"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>Profile</span>
+                          <i className="fas fa-user"></i>
+                        </Link>
+                        <Link
+                          to="/notifications"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>Notifications</span>
+                          <i className="fas fa-bell"></i>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+
+                  <div
+                    className="topnav-dropdown-wrapper"
+                    onMouseEnter={() => setOpenDropdown("more")}
+                    onMouseLeave={() => setOpenDropdown(null)}
+                  >
+                    <NavLink
+                      to="/my-requests"
+                      className={() =>
+                        `topnav-link topnav-dropdown-trigger ${
+                          isCustomerMoreRoute(location.pathname) ? "active" : ""
+                        }`
+                      }
+                      onClick={() => {
+                        setOpenDropdown(null);
+                      }}
+                      aria-expanded={openDropdown === "more"}
+                      aria-haspopup="menu"
+                    >
+                      <span>More</span>
+                      <i
+                        className={`fas fa-chevron-down topnav-caret ${
+                          openDropdown === "more" ? "rotate" : ""
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleDropdown("more");
+                        }}
+                      ></i>
+                    </NavLink>
+
+                    {openDropdown === "more" && (
+                      <div className="topnav-dropdown-menu" role="menu">
+                        <div className="topnav-dropdown-section-title">Activity</div>
+                        <Link
+                          to="/my-requests"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>My Requests</span>
+                          <i className="fas fa-clipboard-list"></i>
+                        </Link>
+                        <Link
+                          to="/bookings"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>My Bookings</span>
+                          <i className="fas fa-calendar-check"></i>
+                        </Link>
+                        <Link
+                          to="/request-service"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>Request Service</span>
+                          <i className="fas fa-plus-circle"></i>
+                        </Link>
+                        <Link
+                          to="/wallet"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>Wallet</span>
+                          <i className="fas fa-wallet"></i>
+                        </Link>
+                        <Link
+                          to="/support"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>Support Tickets</span>
+                          <i className="fas fa-life-ring"></i>
+                        </Link>
+                        <Link
+                          to="/bookings"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>Reviews</span>
+                          <i className="fas fa-star"></i>
+                        </Link>
+
+                        <div className="topnav-dropdown-divider"></div>
+                        <div className="topnav-dropdown-section-title">Features</div>
+                        <Link
+                          to="/nearby-providers"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>AI Assistant</span>
+                          <span className="topnav-mono-badge">AI</span>
+                        </Link>
+                        <Link
+                          to="/request-service"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>Products</span>
+                          <span className="topnav-mono-badge">NEW</span>
+                        </Link>
+                        <Link
+                          to="/#how-it-works"
+                          className="topnav-dropdown-item"
+                          role="menuitem"
+                          onClick={closeAllMenus}
+                        >
+                          <span>How It Works</span>
+                          <i className="fas fa-info-circle"></i>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : isAuthenticated ? (
+                <NavLink
+                  to={dashboardRoute}
+                  className={({ isActive }) =>
+                    `topnav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  Dashboard
+                </NavLink>
+              ) : null}
+            </nav>
+          </div>
 
         <div className="topnav-right">
           {isAuthenticated ? (
@@ -699,14 +733,7 @@ export const TopNav: React.FC = () => {
                     to="/nearby-providers"
                     className={() =>
                       `topnav-mobile-item ${
-                        location.pathname.startsWith("/nearby-providers") ||
-                        location.pathname.startsWith("/messages") ||
-                        location.pathname.startsWith("/chat") ||
-                        location.pathname.startsWith("/profile") ||
-                        location.pathname.startsWith("/notifications") ||
-                        location.pathname.startsWith("/settings")
-                          ? "active"
-                          : ""
+                        isCustomerWorkspaceRoute(location.pathname) ? "active" : ""
                       }`
                     }
                     onClick={closeAllMenus}
@@ -718,12 +745,7 @@ export const TopNav: React.FC = () => {
                     to="/my-requests"
                     className={() =>
                       `topnav-mobile-item ${
-                        location.pathname.startsWith("/my-requests") ||
-                        location.pathname.startsWith("/request-service") ||
-                        location.pathname.startsWith("/bookings") ||
-                        location.pathname.startsWith("/reviews")
-                          ? "active"
-                          : ""
+                        isCustomerMoreRoute(location.pathname) ? "active" : ""
                       }`
                     }
                     onClick={closeAllMenus}
