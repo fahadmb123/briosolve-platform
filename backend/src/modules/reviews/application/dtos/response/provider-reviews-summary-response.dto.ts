@@ -10,6 +10,8 @@ export interface ProviderReviewsSummaryResponseDto {
   providerId: string;
   averageRating: number;
   totalReviews: number;
+  unrepliedCount: number;
+  ratingCounts: Record<number, number>;
   breakdown: RatingBreakdownItemDto[];
   reviews: ReviewResponseDto[];
   pagination: {

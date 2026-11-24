@@ -48,13 +48,20 @@ export class ReviewController extends BaseController {
   getProviderReviews = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const providerId = String(req.params.providerId);
+      const search = req.query.search ? String(req.query.search) : undefined;
       const rating = req.query.rating ? Number(req.query.rating) : undefined;
+      const replied =
+        req.query.replied === "REPLIED" || req.query.replied === "UNREPLIED"
+          ? req.query.replied
+          : undefined;
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
 
       const response = await this._getProviderReviewsUseCase.execute({
         providerId,
+        search,
         rating,
+        replied,
         page,
         limit
       });

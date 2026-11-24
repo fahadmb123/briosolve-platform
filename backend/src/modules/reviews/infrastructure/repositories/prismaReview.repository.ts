@@ -110,29 +110,81 @@ export class PrismaReviewRepository implements IReviewRepository {
     const limit = params.limit || 10;
     const skip = (page - 1) * limit;
 
-    let query = db.orm.public.reviews.where({ provider_id: params.providerId as never });
-
-    if (!params.includeHidden) {
-      query = query.where({ is_hidden: false });
-    }
-
-    if (params.rating) {
-      query = query.where({ rating: params.rating });
-    }
+    let resolvedProviderId = params.providerId;
+    try {
+      const byProfile = await db.orm.public.provider_profiles
+        .where({ id: params.providerId as never })
+        .first();
+      if (!byProfile) {
+        const byUser = await db.orm.public.provider_profiles
+          .where({ user_id: params.providerId as never })
+          .first();
+        if (byUser) {
+          resolvedProviderId = byUser.id;
+        }
+      }
+    } catch {}
 
     const allProviderReviews = await db.orm.public.reviews
-      .where({ provider_id: params.providerId as never, is_hidden: false })
+      .where({ provider_id: resolvedProviderId as never, is_hidden: false })
       .all();
 
     const ratingCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    let unrepliedCount = 0;
     for (const r of allProviderReviews) {
       const star = r.rating;
       if (star >= 1 && star <= 5) {
         ratingCounts[star] = (ratingCounts[star] || 0) + 1;
       }
+      if (!r.provider_reply) {
+        unrepliedCount++;
+      }
     }
 
+    const totalReviews = allProviderReviews.length;
     const averageRating = ReviewRatingService.calculateAverageRating(ratingCounts);
+
+    let query = db.orm.public.reviews.where({ provider_id: resolvedProviderId as never });
+
+    if (!params.includeHidden) {
+      query = query.where({ is_hidden: false });
+    }
+
+    if (params.rating && params.rating >= 1 && params.rating <= 5) {
+      query = query.where({ rating: params.rating });
+    }
+
+    const searchTerm = params.search?.trim().toLowerCase();
+    if (searchTerm || params.replied) {
+      const records = await query
+        .orderBy((r) => r.created_at.desc())
+        .all();
+
+      const allPopulated = await this.populateExtras(records);
+      const matched = allPopulated.filter((rev) => {
+        if (params.replied === "REPLIED" && !rev.providerReply) return false;
+        if (params.replied === "UNREPLIED" && rev.providerReply) return false;
+        if (!searchTerm) return true;
+        return (
+          (rev.customerName && rev.customerName.toLowerCase().includes(searchTerm)) ||
+          (rev.serviceTitle && rev.serviceTitle.toLowerCase().includes(searchTerm)) ||
+          (rev.bookingNumber && rev.bookingNumber.toLowerCase().includes(searchTerm)) ||
+          (rev.title && rev.title.toLowerCase().includes(searchTerm)) ||
+          rev.comment.toLowerCase().includes(searchTerm)
+        );
+      });
+
+      const paginated = matched.slice(skip, skip + limit);
+
+      return {
+        reviews: paginated,
+        total: matched.length,
+        totalReviews,
+        unrepliedCount,
+        averageRating,
+        ratingCounts
+      };
+    }
 
     const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
     const totalCount = Number(totalResult?.total || 0);
@@ -147,6 +199,8 @@ export class PrismaReviewRepository implements IReviewRepository {
     return {
       reviews: populated,
       total: totalCount,
+      totalReviews,
+      unrepliedCount,
       averageRating,
       ratingCounts
     };

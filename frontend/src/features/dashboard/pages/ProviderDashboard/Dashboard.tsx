@@ -282,18 +282,22 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="pro-kpi-card">
+        <Link to="/provider/reviews" className="pro-kpi-card">
           <div className="pro-kpi-icon-box bg-warning-light text-warning">
             <i className="fas fa-star"></i>
           </div>
           <div>
             <div className="pro-kpi-val">
-              {stats.averageRating > 0 ? `${stats.averageRating.toFixed(1)} ★` : "5.0 ★"}
+              {provider.reviewCount > 0 ? `${stats.averageRating.toFixed(1)} ★` : "—"}
             </div>
             <div className="pro-kpi-lbl">Reputation</div>
-            <div className="pro-kpi-sub">{provider.reviewCount} review{provider.reviewCount === 1 ? "" : "s"}</div>
+            <div className="pro-kpi-sub">
+              {provider.reviewCount > 0
+                ? `${provider.reviewCount} review${provider.reviewCount === 1 ? "" : "s"}`
+                : "No reviews yet"}
+            </div>
           </div>
-        </div>
+        </Link>
       </section>
 
       <section className="pro-chart-card">

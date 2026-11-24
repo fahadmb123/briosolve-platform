@@ -16,6 +16,7 @@ export interface ProviderDashboardRawData {
   bookingRequests: any[];
   bookingCustomers: any[];
   bookingAddresses: any[];
+  reviews?: any[];
 }
 
 export interface AdminDashboardRawData {
@@ -42,7 +43,7 @@ export class DashboardMapper {
           isVerified: false,
           serviceArea: "Not configured",
           serviceRadiusKm: 20,
-          rating: 5.0,
+          rating: 0,
           reviewCount: 0,
         },
         stats: {
@@ -50,7 +51,7 @@ export class DashboardMapper {
           activeQuotationsCount: 0,
           acceptedBookingsCount: 0,
           completedServicesCount: 0,
-          averageRating: 5.0,
+          averageRating: 0,
           totalEarnings: 0,
         },
         activeBookings: [],
@@ -120,6 +121,17 @@ export class DashboardMapper {
     }, 0);
 
     const isVerified = raw.profile.kyc_status === "APPROVED";
+    const visibleReviews = Array.isArray(raw.reviews) ? raw.reviews : [];
+    const reviewCount = visibleReviews.length;
+    const averageRating =
+      reviewCount > 0
+        ? Number(
+            (
+              visibleReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) /
+              reviewCount
+            ).toFixed(1)
+          )
+        : 0;
 
     return {
       provider: {
@@ -129,15 +141,15 @@ export class DashboardMapper {
         isVerified,
         serviceArea: raw.profile.business_name ? `${raw.profile.service_radius_km || 20} km Coverage` : "Local",
         serviceRadiusKm: raw.profile.service_radius_km || 20,
-        rating: 4.9,
-        reviewCount: raw.profile.completed_jobs || 0,
+        rating: averageRating,
+        reviewCount,
       },
       stats: {
         newRequestsCount: raw.availableRequests.length,
         activeQuotationsCount: activeQuotations.length,
         acceptedBookingsCount: acceptedBookings.length,
         completedServicesCount: completedBookings.length,
-        averageRating: 4.9,
+        averageRating,
         totalEarnings,
       },
       activeBookings: formattedActiveBookings,

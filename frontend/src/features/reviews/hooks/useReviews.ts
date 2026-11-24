@@ -3,9 +3,14 @@ import {
   createReview,
   getBookingReview,
   getMyReviews,
-  getProviderReviews
+  getProviderReviews,
+  replyToReview
 } from "../services/review.service";
-import type { CreateReviewPayload, GetCustomerReviewsQueryParams } from "../types/review.types";
+import type {
+  CreateReviewPayload,
+  GetCustomerReviewsQueryParams,
+  GetProviderReviewsQueryParams
+} from "../types/review.types";
 
 export const useCreateReviewMutation = () => {
   const queryClient = useQueryClient();
@@ -37,13 +42,26 @@ export const useMyReviewsQuery = (params?: GetCustomerReviewsQueryParams) => {
 
 export const useProviderReviewsQuery = (
   providerId?: string,
-  rating?: number,
-  page: number = 1,
-  limit: number = 10
+  params?: GetProviderReviewsQueryParams
 ) => {
   return useQuery({
-    queryKey: ["providerReviews", providerId, rating, page, limit],
-    queryFn: () => (providerId ? getProviderReviews(providerId, rating, page, limit) : Promise.reject("No providerId")),
+    queryKey: ["providerReviews", providerId, params],
+    queryFn: () => (providerId ? getProviderReviews(providerId, params) : Promise.reject("No providerId")),
     enabled: Boolean(providerId)
+  });
+};
+
+export const useReplyToReviewMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ reviewId, replyText }: { reviewId: string; replyText: string }) =>
+      replyToReview(reviewId, replyText),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["providerReviews"] });
+      queryClient.invalidateQueries({ queryKey: ["myReviews"] });
+      if (res?.data?.bookingId) {
+        queryClient.invalidateQueries({ queryKey: ["bookingReview", res.data.bookingId] });
+      }
+    }
   });
 };

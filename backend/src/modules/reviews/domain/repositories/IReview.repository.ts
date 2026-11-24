@@ -13,7 +13,9 @@ export interface CreateReviewRepoParams {
 
 export interface GetProviderReviewsParams {
   providerId: string;
+  search?: string;
   rating?: number;
+  replied?: "REPLIED" | "UNREPLIED";
   page?: number;
   limit?: number;
   includeHidden?: boolean;
@@ -22,6 +24,8 @@ export interface GetProviderReviewsParams {
 export interface ProviderReviewsResult {
   reviews: Review[];
   total: number;
+  totalReviews: number;
+  unrepliedCount: number;
   averageRating: number;
   ratingCounts: Record<number, number>;
 }

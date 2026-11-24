@@ -58,12 +58,32 @@ export interface CustomerReviewsResponse {
   };
 }
 
+export interface RatingBreakdownItem {
+  stars: number;
+  count: number;
+  percentage: number;
+}
+
+export interface GetProviderReviewsQueryParams {
+  search?: string;
+  rating?: number;
+  replied?: "REPLIED" | "UNREPLIED";
+  page?: number;
+  limit?: number;
+}
+
 export interface ProviderReviewsSummary {
+  providerId: string;
   reviews: ReviewItem[];
-  total: number;
+  totalReviews: number;
+  unrepliedCount: number;
   averageRating: number;
   ratingCounts: Record<number, number>;
-  page: number;
-  limit: number;
-  totalPages: number;
+  breakdown: RatingBreakdownItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    total: number;
+  };
 }

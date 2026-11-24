@@ -26,6 +26,15 @@ export class ReplyToReviewUseCase implements IUseCase<ReplyReviewRequestDto, Rev
       throw new ApplicationError("REVIEW_NOT_FOUND", "Review not found", "NOT_FOUND");
     }
 
+    if (
+      input.providerId &&
+      existing.providerUserId &&
+      existing.providerUserId !== input.providerId &&
+      existing.providerId !== input.providerId
+    ) {
+      throw new ApplicationError("FORBIDDEN", "You can only reply to your own reviews", "AUTHORIZATION");
+    }
+
     const updated = await this._reviewRepo.replyToReview(input.reviewId, input.replyText.trim());
     if (!updated) {
       throw new ApplicationError("REPLY_FAILED", "Failed to record reply to review", "INTERNAL");

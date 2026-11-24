@@ -10,7 +10,12 @@ import {
 import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
 import { BookingStatusModal, ServiceMismatchModal } from "../../components";
 import { RaiseDisputeModal } from "../../../support";
-import { ReviewModal, BookingReviewCard, useBookingReviewQuery } from "../../../reviews";
+import {
+  ReviewModal,
+  BookingReviewCard,
+  useBookingReviewQuery,
+  useReplyToReviewMutation
+} from "../../../reviews";
 import { useGetProviderPublicProfile } from "../../../nearby-providers/hooks/mutations/useGetProviderPublicProfile";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
@@ -47,11 +52,33 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const [isMismatchModalOpen, setIsMismatchModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isReplyOpen, setIsReplyOpen] = useState(false);
+  const [replyText, setReplyText] = useState("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const activeRazorpayRef = useRef<any>(null);
 
   const { data: reviewData, refetch: refetchReview } = useBookingReviewQuery(booking?.id);
+  const replyMutation = useReplyToReviewMutation();
   const existingReview = reviewData?.data || null;
+
+  const handleReplySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!existingReview || !replyText.trim()) return;
+    replyMutation.mutate(
+      { reviewId: existingReview.id, replyText: replyText.trim() },
+      {
+        onSuccess: () => {
+          toast.success("Reply posted successfully");
+          setReplyText("");
+          setIsReplyOpen(false);
+          refetchReview();
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Failed to post reply");
+        }
+      }
+    );
+  };
 
   const targetProviderId = booking?.providerUserId || booking?.providerId;
 
@@ -1220,6 +1247,52 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 </div>
               </div>
               <BookingReviewCard review={existingReview} />
+              {isProvider && !existingReview.providerReply && (
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
+                  {!isReplyOpen ? (
+                    <button
+                      type="button"
+                      className="btn-outline-sm"
+                      onClick={() => setIsReplyOpen(true)}
+                    >
+                      <i className="fas fa-reply mr-2" />
+                      Reply to Review
+                    </button>
+                  ) : (
+                    <form onSubmit={handleReplySubmit} className="flex flex-col gap-2.5">
+                      <textarea
+                        rows={3}
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder="Write a professional reply to this customer review..."
+                        maxLength={1000}
+                        className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        required
+                      />
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          className="btn-outline-sm"
+                          onClick={() => {
+                            setIsReplyOpen(false);
+                            setReplyText("");
+                          }}
+                          disabled={replyMutation.isPending}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="btn-primary-sm"
+                          disabled={replyMutation.isPending || !replyText.trim()}
+                        >
+                          {replyMutation.isPending ? "Posting..." : "Post Reply"}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

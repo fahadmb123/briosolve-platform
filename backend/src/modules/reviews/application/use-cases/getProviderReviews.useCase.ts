@@ -19,19 +19,23 @@ export class GetProviderReviewsUseCase implements IUseCase<GetProviderReviewsReq
 
     const result = await this._reviewRepo.findProviderReviews({
       providerId: input.providerId,
+      search: input.search,
       rating: input.rating,
+      replied: input.replied,
       page,
       limit,
       includeHidden: input.includeHidden
     });
 
-    const breakdown = ReviewRatingService.buildBreakdown(result.ratingCounts, result.total);
+    const breakdown = ReviewRatingService.buildBreakdown(result.ratingCounts, result.totalReviews);
     const totalPages = Math.ceil(result.total / limit) || 1;
 
     return {
       providerId: input.providerId,
       averageRating: result.averageRating,
-      totalReviews: result.total,
+      totalReviews: result.totalReviews,
+      unrepliedCount: result.unrepliedCount,
+      ratingCounts: result.ratingCounts,
       breakdown,
       reviews: result.reviews.map(ReviewMapper.toDto),
       pagination: {

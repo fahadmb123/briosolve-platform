@@ -13,7 +13,8 @@ import {
   ProviderBookings,
   ProviderBookingDetails,
   ProviderWallet,
-  ProviderSupport
+  ProviderSupport,
+  ProviderReviews
 } from '../lazy/provider.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
 import RoleRoute from '../guards/RoleRoute';
@@ -42,6 +43,7 @@ export const providerRoutes = (
       <Route path="notifications" element={<ProviderNotifications />} />
       <Route path="support" element={<ProviderSupport />} />
       <Route path="tickets" element={<ProviderSupport />} />
+      <Route path="reviews" element={<ProviderReviews />} />
     </Route>
   </Route>
   </>

@@ -237,6 +237,16 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       ? await db.orm.public.addresses.where((a) => a.id.in(bookingAddressIds as never)).all()
       : [];
 
+    let reviews: any[] = [];
+    try {
+      reviews = await db.orm.public.reviews
+        .where({ provider_id: profile.id as never, is_hidden: false })
+        .select("rating")
+        .all();
+    } catch {
+      reviews = [];
+    }
+
     return {
       user,
       profile,
@@ -251,6 +261,7 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       bookingRequests,
       bookingCustomers,
       bookingAddresses,
+      reviews,
     };
   }
 

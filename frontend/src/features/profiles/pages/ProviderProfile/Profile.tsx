@@ -9,6 +9,7 @@ import { useUpdateProfileImage } from '../../hooks/provider/useUpdateProfileImag
 import { useDeleteProfileImage } from '../../hooks/provider/useDeleteProfileImage';
 import { useGetProviderServices } from '../../../service-catalog';
 import { useGetProviderVerifications } from '../../../verification/hooks/mutations/useVerification';
+import { useProviderReviewsQuery } from '../../../reviews';
 import { getAddresses, type Address } from '../../../addresses';
 import type { PopulatedProviderService, ProviderProfile } from '../../types/profile.types';
 import type { response } from '../../../../shared/types/Dtos';
@@ -132,6 +133,10 @@ export default function Profile() {
   const { mutate: deleteProfileImage, isPending: isImageDeleting } = useDeleteProfileImage();
   const { data: providerServicesRes, isLoading: isLoadingServices } = useGetProviderServices();
   const { data: verificationsRes } = useGetProviderVerifications();
+  const { data: reviewsSummaryRes } = useProviderReviewsQuery(providerProfile?.id, { page: 1, limit: 1 });
+
+  const averageRating = reviewsSummaryRes?.data?.averageRating ?? 0;
+  const totalReviews = reviewsSummaryRes?.data?.totalReviews ?? 0;
 
   useEffect(() => {
     if (!user || !profile) {
@@ -313,7 +318,9 @@ export default function Profile() {
                   </span>
                 </div>
                 <div className="stat-box">
-                  <span className="stat-value text-warning">5.0</span>
+                  <span className="stat-value text-warning">
+                    {totalReviews > 0 ? averageRating.toFixed(1) : '—'}
+                  </span>
                   <span className="stat-label">
                     <i className="fas fa-star text-warning mr-1"></i> Rating
                   </span>
@@ -481,18 +488,32 @@ export default function Profile() {
             <div className="form-card-modern p-5 w-full">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="h6 mb-0">Marketplace Track Record</h3>
+                <Link to="/provider/reviews" className="text-xs font-semibold text-primary hover:underline">
+                  View All Reviews
+                </Link>
               </div>
 
               <div className="mb-4">
-                <div className="text-3xl font-black text-warning">5.0</div>
-                <div className="text-warning text-sm mt-1 mb-1">
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
+                <div className="text-3xl font-black text-warning">
+                  {totalReviews > 0 ? averageRating.toFixed(1) : '—'}
                 </div>
-                <div className="font-bold text-text text-sm">Provider Rating</div>
+                <div className="text-warning text-sm mt-1 mb-1 flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <i
+                      key={star}
+                      className={
+                        totalReviews > 0 && averageRating >= star - 0.25
+                          ? 'fas fa-star'
+                          : 'far fa-star opacity-40'
+                      }
+                    ></i>
+                  ))}
+                </div>
+                <div className="font-bold text-text text-sm">
+                  {totalReviews > 0
+                    ? `${totalReviews} Customer Review${totalReviews === 1 ? '' : 's'}`
+                    : 'No reviews yet'}
+                </div>
                 <p className="text-xs text-secondary mt-1 mb-0">
                   {address?.city ? `Operational in ${address.city}` : 'Marketplace Verified Provider'}
                 </p>

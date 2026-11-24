@@ -67,6 +67,11 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
     to: "/provider/support",
     icon: "fas fa-life-ring",
   },
+  {
+    label: "Reviews",
+    to: "/provider/reviews",
+    icon: "fas fa-star",
+  },
 ];
 
 export const ProviderSubnavSidebar: React.FC = () => {
@@ -89,7 +94,8 @@ export const ProviderSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/provider/quotations") ||
     location.pathname.startsWith("/provider/wallet") ||
     location.pathname.startsWith("/provider/support") ||
-    location.pathname.startsWith("/provider/tickets");
+    location.pathname.startsWith("/provider/tickets") ||
+    location.pathname.startsWith("/provider/reviews");
 
   const isWorkspaceSection =
     location.pathname === "/provider/dashboard" ||
