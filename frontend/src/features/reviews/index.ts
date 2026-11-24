@@ -1,4 +1,5 @@
 export * from "./types/review.types";
+export * from "./schemas/review.schema";
 export * from "./services/review.service";
 export * from "./hooks/useReviews";
 export * from "./components/ReviewModal/ReviewModal";

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { useCreateReviewMutation } from "../../hooks/useReviews";
+import { createReviewSchema, type CreateReviewFormData } from "../../schemas/review.schema";
 import type { ReviewItem } from "../../types/review.types";
 import "./ReviewModal.css";
 
@@ -31,32 +34,39 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   serviceTitle,
   onSuccess
 }) => {
-  const [rating, setRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
-  const [title, setTitle] = useState<string>("");
-  const [comment, setComment] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const createReviewMutation = useCreateReviewMutation();
 
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid }
+  } = useForm<CreateReviewFormData>({
+    resolver: zodResolver(createReviewSchema),
+    mode: "onChange",
+    defaultValues: {
+      rating: 5,
+      comment: ""
+    }
+  });
+
+  const rating = watch("rating");
+  const comment = watch("comment");
+
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
-
-    const trimmedComment = comment.trim();
-    if (!trimmedComment || trimmedComment.length < 5) {
-      setErrorMessage("Please write at least 5 characters sharing your experience.");
-      return;
-    }
+  const onSubmit = async (data: CreateReviewFormData) => {
+    setServerError(null);
 
     try {
       const response = await createReviewMutation.mutateAsync({
         bookingId,
-        rating,
-        title: title.trim() || undefined,
-        comment: trimmedComment
+        rating: data.rating,
+        comment: data.comment.trim()
       });
 
       toast.success("Review posted successfully! Thank you for your feedback.");
@@ -66,7 +76,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
       onClose();
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || "Failed to submit review";
-      setErrorMessage(msg);
+      setServerError(msg);
       toast.error(msg);
     }
   };
@@ -78,9 +88,6 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
       <div className="rev-modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="rev-modal-header">
           <div className="rev-modal-header-info">
-            <span className="rev-modal-badge">
-              <i className="fas fa-star" /> Verified Booking Review
-            </span>
             <h2 className="rev-modal-title">Rate Your Specialist</h2>
             <p className="rev-modal-subtitle">
               {providerName ? `How was your service with ${providerName}?` : "Share your experience with the specialist."}
@@ -104,9 +111,11 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="rev-modal-form">
+        <form onSubmit={handleSubmit(onSubmit)} className="rev-modal-form" noValidate>
           <div className="rev-modal-rating-section">
-            <label className="rev-modal-section-label">Overall Rating</label>
+            <label className="rev-modal-section-label">
+              Overall Rating <span className="rev-label-req">*</span>
+            </label>
             <div className="rev-stars-picker">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -115,7 +124,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                   className={`rev-star-btn ${star <= activeRating ? "active" : ""}`}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
-                  onClick={() => setRating(star)}
+                  onClick={() => setValue("rating", star, { shouldValidate: true })}
                   aria-label={`${star} star`}
                 >
                   <i className={`fa${star <= activeRating ? "s" : "r"} fa-star`} />
@@ -123,21 +132,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               ))}
             </div>
             <span className="rev-rating-descriptor">{RATING_LABELS[activeRating] || ""}</span>
-          </div>
-
-          <div className="rev-input-group">
-            <label htmlFor="rev-title" className="rev-input-label">
-              Review Headline <span className="rev-label-opt">(optional)</span>
-            </label>
-            <input
-              id="rev-title"
-              type="text"
-              className="rev-text-input"
-              placeholder="e.g. Prompt arrival and outstanding pipe repair!"
-              value={title}
-              maxLength={150}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            {errors.rating && (
+              <span className="rev-field-error">
+                <i className="fas fa-exclamation-circle" />
+                {errors.rating.message}
+              </span>
+            )}
           </div>
 
           <div className="rev-input-group">
@@ -145,24 +145,28 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               <label htmlFor="rev-comment" className="rev-input-label">
                 Detailed Review <span className="rev-label-req">*</span>
               </label>
-              <span className="rev-char-count">{comment.length}/2000</span>
+              <span className="rev-char-count">{(comment?.length || 0)}/1000</span>
             </div>
             <textarea
               id="rev-comment"
-              className="rev-textarea"
+              className={`rev-textarea ${errors.comment ? "has-error" : ""}`}
               rows={4}
-              placeholder="Describe the quality of work, professional attitude, and whether you would hire this specialist again..."
-              value={comment}
-              maxLength={2000}
-              onChange={(e) => setComment(e.target.value)}
-              required
+              placeholder="Describe the quality of work, professional attitude, punctuality, and whether you would hire this specialist again..."
+              maxLength={1000}
+              {...register("comment")}
             />
+            {errors.comment && (
+              <span className="rev-field-error">
+                <i className="fas fa-exclamation-circle" />
+                {errors.comment.message}
+              </span>
+            )}
           </div>
 
-          {errorMessage && (
+          {serverError && (
             <div className="rev-error-box">
               <i className="fas fa-exclamation-circle" />
-              <span>{errorMessage}</span>
+              <span>{serverError}</span>
             </div>
           )}
 
@@ -178,7 +182,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             <button
               type="submit"
               className="rev-btn-submit"
-              disabled={createReviewMutation.isPending || !comment.trim()}
+              disabled={createReviewMutation.isPending || !isValid}
             >
               {createReviewMutation.isPending ? (
                 <>
