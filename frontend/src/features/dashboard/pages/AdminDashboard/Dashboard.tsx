@@ -32,7 +32,22 @@ export default function Dashboard() {
     );
   }
 
-  const { kpis, recentActivity, recentOrders = [], monthlyTrends = [] } = data;
+  const kpis = data?.kpis || {
+    totalCustomers: 0,
+    totalProviders: 0,
+    verifiedProviders: 0,
+    pendingVerifications: 0,
+    activeRequests: 0,
+    totalQuotations: 0,
+    activeBookings: 0,
+    openInvestigations: 0,
+    totalVolume: 0,
+    currentMonthVolume: 0,
+    currentMonthSales: 0,
+  };
+  const recentActivity = data?.recentActivity || [];
+  const recentOrders = data?.recentOrders || [];
+  const monthlyTrends = data?.monthlyTrends || [];
 
   const totalUsers = (kpis.totalCustomers || 0) + (kpis.totalProviders || 0) + (kpis.activeBookings || 0);
   const customerPct = totalUsers > 0 ? Math.max(5, Math.round(((kpis.totalCustomers || 0) / totalUsers) * 100)) : 50;

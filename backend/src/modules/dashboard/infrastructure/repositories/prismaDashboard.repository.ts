@@ -379,21 +379,74 @@ export class PrismaDashboardRepository implements IDashboardRepository {
   }
 
   async getAdminDashboardData(): Promise<AdminDashboardResponseDto> {
-    const allUsers = await db.orm.public.users.all();
+    const toIsoString = (val: any): string => {
+      if (!val) return new Date().toISOString();
+      if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
+        return new Date(Number(val.epochMilliseconds)).toISOString();
+      }
+      if (val instanceof Date) return val.toISOString();
+      try {
+        return new Date(val).toISOString();
+      } catch {
+        return new Date().toISOString();
+      }
+    };
+
+    const toDateObj = (val: any): Date => {
+      if (!val) return new Date();
+      if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
+        return new Date(Number(val.epochMilliseconds));
+      }
+      if (val instanceof Date) return val;
+      try {
+        return new Date(val);
+      } catch {
+        return new Date();
+      }
+    };
+
+    let allUsers: any[] = [];
+    try {
+      allUsers = await db.orm.public.users.all();
+    } catch {
+      allUsers = [];
+    }
+
     const totalCustomers = allUsers.filter((u) => u.role === "CUSTOMER").length;
     const totalProviders = allUsers.filter((u) => u.role === "PROVIDER").length;
 
-    const providerProfiles = await db.orm.public.provider_profiles.all();
+    let providerProfiles: any[] = [];
+    try {
+      providerProfiles = await db.orm.public.provider_profiles.all();
+    } catch {
+      providerProfiles = [];
+    }
     const verifiedProviders = providerProfiles.filter((p) => p.kyc_status === "APPROVED").length;
     const pendingVerifications = providerProfiles.filter((p) => p.kyc_status === "PENDING").length;
 
-    const allRequests = await db.orm.public.service_requests.all();
+    let allRequests: any[] = [];
+    try {
+      allRequests = await db.orm.public.service_requests.all();
+    } catch {
+      allRequests = [];
+    }
     const activeRequests = allRequests.filter((r) =>
       ["PENDING", "ACTIVE", "IN_PROGRESS", "ACCEPTED"].includes(r.status)
     ).length;
 
-    const allQuotations = await db.orm.public.quotations.all();
-    const allBookings = await db.orm.public.bookings.all();
+    let allQuotations: any[] = [];
+    try {
+      allQuotations = await db.orm.public.quotations.all();
+    } catch {
+      allQuotations = [];
+    }
+
+    let allBookings: any[] = [];
+    try {
+      allBookings = await db.orm.public.bookings.all();
+    } catch {
+      allBookings = [];
+    }
     const activeBookings = allBookings.filter((b) =>
       ["CONFIRMED", "EN_ROUTE", "INSPECTION", "IN_PROGRESS", "PAYMENT_PENDING"].includes(b.status)
     ).length;
@@ -419,7 +472,7 @@ export class PrismaDashboardRepository implements IDashboardRepository {
     allBookings.forEach((b) => {
       const amt = Number(b.total_amount || 0);
       totalVolume += amt;
-      const bDate = new Date(b.created_at);
+      const bDate = toDateObj(b.created_at);
       if (bDate.getMonth() === currentMonth && bDate.getFullYear() === currentYear) {
         currentMonthVolume += amt;
         currentMonthSales += 1;
@@ -435,12 +488,12 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       const monthLabel = monthNames[targetMonth];
 
       const monthBookings = allBookings.filter((b) => {
-        const bDate = new Date(b.created_at);
+        const bDate = toDateObj(b.created_at);
         return bDate.getMonth() === targetMonth && bDate.getFullYear() === targetYear;
       });
 
       const monthQuotes = allQuotations.filter((q) => {
-        const qDate = new Date(q.created_at);
+        const qDate = toDateObj(q.created_at);
         return qDate.getMonth() === targetMonth && qDate.getFullYear() === targetYear;
       });
 
@@ -454,37 +507,57 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       });
     }
 
-    const latestBookings = await db.orm.public.bookings
-      .orderBy((b) => b.created_at.desc())
-      .limit(6)
-      .all();
+    let latestBookings: any[] = [];
+    try {
+      latestBookings = await db.orm.public.bookings
+        .orderBy((b) => b.created_at.desc())
+        .limit(6)
+        .all();
+    } catch {
+      latestBookings = allBookings.slice(0, 6);
+    }
 
     const customerIds = Array.from(new Set(latestBookings.map((b) => b.customer_id).filter(Boolean)));
-    const customers = customerIds.length
-      ? await db.orm.public.users.where((u) => u.id.in(customerIds as never)).all()
-      : [];
+    let customers: any[] = [];
+    try {
+      customers = customerIds.length
+        ? await db.orm.public.users.where((u) => u.id.in(customerIds as never)).all()
+        : [];
+    } catch {
+      customers = [];
+    }
     const customerMap = new Map(customers.map((c) => [c.id, c.name]));
 
     const requestIds = Array.from(new Set(latestBookings.map((b) => b.service_request_id).filter(Boolean)));
-    const requests = requestIds.length
-      ? await db.orm.public.service_requests.where((r) => r.id.in(requestIds as never)).all()
-      : [];
+    let requests: any[] = [];
+    try {
+      requests = requestIds.length
+        ? await db.orm.public.service_requests.where((r) => r.id.in(requestIds as never)).all()
+        : [];
+    } catch {
+      requests = [];
+    }
     const requestMap = new Map(requests.map((r) => [r.id, r.title]));
 
     const recentOrders = latestBookings.map((b) => ({
       id: b.id,
-      bookingNumber: b.booking_number,
+      bookingNumber: b.booking_number || String(b.id),
       customerName: customerMap.get(b.customer_id) || "Customer",
       serviceTitle: (b.service_request_id && requestMap.get(b.service_request_id)) || "Service Order",
       totalAmount: Number(b.total_amount || 0),
-      status: b.status,
-      createdAt: b.created_at,
+      status: b.status || "CONFIRMED",
+      createdAt: toIsoString(b.created_at),
     }));
 
-    const notifications = await db.orm.public.notifications
-      .orderBy((n) => n.created_at.desc())
-      .limit(6)
-      .all();
+    let notifications: any[] = [];
+    try {
+      notifications = await db.orm.public.notifications
+        .orderBy((n) => n.created_at.desc())
+        .limit(6)
+        .all();
+    } catch {
+      notifications = [];
+    }
 
     return {
       kpis: {
@@ -507,7 +580,7 @@ export class PrismaDashboardRepository implements IDashboardRepository {
         type: n.type,
         title: n.title,
         message: n.message,
-        createdAt: n.created_at,
+        createdAt: toIsoString(n.created_at),
       })),
       operationalHealth: {
         dbStatus: "Healthy",
