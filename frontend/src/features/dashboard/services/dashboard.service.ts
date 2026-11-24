@@ -11,7 +11,22 @@ export interface CustomerDashboardData {
     upcomingBookingsCount: number;
     completedServicesCount: number;
     totalCompletedSpend: number;
+    estimatedSavings?: number;
   };
+  monthlySpending?: Array<{
+    month: string;
+    spend: number;
+  }>;
+  categoryBreakdown?: Array<{
+    categoryName: string;
+    amount: number;
+    percentage: number;
+    count: number;
+  }>;
+  quickCategories?: Array<{
+    id: string;
+    name: string;
+  }>;
   activeRequests: Array<{
     id: string;
     title: string;
@@ -66,6 +81,18 @@ export interface ProviderDashboardData {
     averageRating: number;
     totalEarnings: number;
   };
+  activeBookings?: Array<{
+    id: string;
+    bookingNumber: string;
+    status: string;
+    scheduledDate?: string;
+    scheduledTime?: string;
+    serviceTitle: string;
+    categoryName: string;
+    customerName: string;
+    location: string;
+    totalAmount: number;
+  }>;
   opportunities: Array<{
     id: string;
     title: string;
@@ -96,7 +123,25 @@ export interface AdminDashboardData {
     totalQuotations: number;
     activeBookings: number;
     openInvestigations: number;
+    totalVolume?: number;
+    currentMonthVolume?: number;
+    currentMonthSales?: number;
   };
+  monthlyTrends?: Array<{
+    month: string;
+    bookingsCount: number;
+    quotationsCount: number;
+    volume: number;
+  }>;
+  recentOrders?: Array<{
+    id: string;
+    bookingNumber: string;
+    customerName: string;
+    serviceTitle: string;
+    totalAmount: number;
+    status: string;
+    createdAt: string;
+  }>;
   recentActivity: Array<{
     id: string;
     type: string;
@@ -111,6 +156,80 @@ export interface AdminDashboardData {
   };
 }
 
+export interface AdminAuditLogItem {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  createdAt: string;
+  actor?: string;
+  severity?: 'INFO' | 'WARNING' | 'CRITICAL' | 'SUCCESS';
+  metadata?: Record<string, any>;
+}
+
+export interface AdminAuditLogsResponse {
+  logs: AdminAuditLogItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface AdminAnalyticsKpis {
+  gmv: number;
+  platformRevenue: number;
+  totalBookings: number;
+  completedBookings: number;
+  averageOrderValue: number;
+  quotationToBookingRate: number;
+  customerGrowthRate: number;
+  activeProviders: number;
+}
+
+export interface AdminVolumeTrendPoint {
+  label: string;
+  volume: number;
+  revenue: number;
+  bookings: number;
+}
+
+export interface AdminFunnelStage {
+  stage: string;
+  count: number;
+  percentage: number;
+  dropoffRate: number;
+}
+
+export interface AdminCategoryShare {
+  categoryId: string;
+  categoryName: string;
+  volume: number;
+  bookingsCount: number;
+  percentage: number;
+}
+
+export interface AdminRegionalShare {
+  region: string;
+  bookingsCount: number;
+  volume: number;
+}
+
+export interface AdminFulfillmentMetric {
+  metric: string;
+  value: string;
+  score: number;
+}
+
+export interface AdminAnalyticsResponse {
+  timeframe: string;
+  kpis: AdminAnalyticsKpis;
+  volumeTrends: AdminVolumeTrendPoint[];
+  funnel: AdminFunnelStage[];
+  categoryShares: AdminCategoryShare[];
+  regionalShares: AdminRegionalShare[];
+  fulfillmentMetrics: AdminFulfillmentMetric[];
+}
+
 export const dashboardService = {
   async getCustomerDashboard(): Promise<CustomerDashboardData> {
     const res = await apiClient.get<{ success: boolean; data: CustomerDashboardData }>("/api/dashboard/customer");
@@ -122,6 +241,31 @@ export const dashboardService = {
   },
   async getAdminDashboard(): Promise<AdminDashboardData> {
     const res = await apiClient.get<{ success: boolean; data: AdminDashboardData }>("/api/dashboard/admin");
+    return res.data.data;
+  },
+  async getAdminAuditLogs(params?: {
+    page?: number;
+    limit?: number;
+    type?: string;
+    search?: string;
+  }): Promise<AdminAuditLogsResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.append("page", String(params.page));
+    if (params?.limit) query.append("limit", String(params.limit));
+    if (params?.type && params.type !== "ALL") query.append("type", params.type);
+    if (params?.search) query.append("search", params.search);
+
+    const queryString = query.toString() ? `?${query.toString()}` : "";
+    const res = await apiClient.get<{ success: boolean; data: AdminAuditLogsResponse }>(
+      `/api/dashboard/admin/audit-logs${queryString}`
+    );
+    return res.data.data;
+  },
+  async getAdminAnalytics(timeframe?: string): Promise<AdminAnalyticsResponse> {
+    const query = timeframe ? `?timeframe=${encodeURIComponent(timeframe)}` : "";
+    const res = await apiClient.get<{ success: boolean; data: AdminAnalyticsResponse }>(
+      `/api/dashboard/admin/analytics${query}`
+    );
     return res.data.data;
   },
 };

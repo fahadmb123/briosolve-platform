@@ -1,0 +1,669 @@
+.admin-analytics-page {
+    width: 100%;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.ana-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.ana-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ana-page-title {
+    font-size: 2.15rem;
+    font-weight: 900;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: -0.03em;
+}
+
+.ana-page-subtitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.ana-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.ana-timeframe-selector {
+    display: flex;
+    align-items: center;
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--border);
+    padding: 0.3rem;
+    border-radius: 9999px;
+    gap: 0.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.ana-time-pill {
+    background: transparent;
+    border: none;
+    padding: 0.4rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.775rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ana-time-pill:hover {
+    color: var(--text);
+}
+
+.ana-time-pill.active {
+    background: linear-gradient(135deg, #e91e63, #ff4081);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.35);
+}
+
+.ana-btn-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    padding: 0.55rem 1.15rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.ana-btn-refresh:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.ana-kpis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+
+.ana-kpi-card {
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    padding: 1.35rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ana-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.ana-kpi-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+}
+
+.ana-kpi-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+}
+
+.ana-kpi-icon-wrap.pink {
+    background: rgba(233, 30, 99, 0.12);
+    color: #e91e63;
+}
+
+.ana-kpi-icon-wrap.purple {
+    background: rgba(103, 58, 183, 0.12);
+    color: #673ab7;
+}
+
+.ana-kpi-icon-wrap.cyan {
+    background: rgba(0, 188, 212, 0.12);
+    color: #00acc1;
+}
+
+.ana-kpi-icon-wrap.amber {
+    background: rgba(255, 152, 0, 0.12);
+    color: #fb8c00;
+}
+
+.ana-kpi-icon-wrap.emerald {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+}
+
+.ana-kpi-icon-wrap.indigo {
+    background: rgba(63, 81, 181, 0.12);
+    color: #3f51b5;
+}
+
+.ana-kpi-badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--surface);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.ana-kpi-value {
+    font-size: 1.85rem;
+    font-weight: 900;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.ana-kpi-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin: 0.35rem 0 0 0;
+}
+
+.ana-kpi-sub {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #10b981;
+    margin-top: 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.ana-charts-grid {
+    display: grid;
+    grid-template-columns: 1.7fr 1.3fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 1080px) {
+    .ana-charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ana-card {
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+}
+
+.ana-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.ana-card-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.ana-card-subtitle {
+    font-size: 0.775rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+}
+
+.ana-chart-legend {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.ana-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.ana-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.ana-svg-container {
+    width: 100%;
+    height: 260px;
+    position: relative;
+}
+
+.ana-svg-chart {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.ana-funnel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    margin-top: 0.5rem;
+}
+
+.ana-funnel-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.ana-funnel-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    font-weight: 800;
+}
+
+.ana-funnel-label {
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ana-funnel-count {
+    color: var(--text-secondary);
+    font-weight: 700;
+}
+
+.ana-funnel-bar-track {
+    width: 100%;
+    height: 14px;
+    background: var(--surface);
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+}
+
+.ana-funnel-bar-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ana-funnel-bar-fill.stage-0 {
+    background: linear-gradient(90deg, #e91e63, #ff4081);
+}
+
+.ana-funnel-bar-fill.stage-1 {
+    background: linear-gradient(90deg, #673ab7, #9c27b0);
+}
+
+.ana-funnel-bar-fill.stage-2 {
+    background: linear-gradient(90deg, #00acc1, #00e5ff);
+}
+
+.ana-funnel-bar-fill.stage-3 {
+    background: linear-gradient(90deg, #43a047, #66bb6a);
+}
+
+.ana-bottom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+    .ana-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ana-share-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ana-share-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.ana-share-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    font-weight: 800;
+}
+
+.ana-share-title {
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+}
+
+.ana-share-val {
+    color: var(--text);
+}
+
+.ana-share-track {
+    width: 100%;
+    height: 8px;
+    background: var(--surface);
+    border-radius: 9999px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.ana-share-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #e91e63, #ff4081);
+    transition: width 0.6s ease;
+}
+
+.ana-metric-scorecards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.ana-scorecard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.ana-score-val {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.ana-score-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+}
+
+.ana-score-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-top: 0.4rem;
+}
+
+.ana-score-fill {
+    height: 100%;
+    background: #10b981;
+    border-radius: 9999px;
+}
+
+.ana-sk-shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(226, 232, 240, 0.7) 0%,
+        rgba(241, 245, 249, 0.95) 50%,
+        rgba(226, 232, 240, 0.7) 100%
+    );
+    background-size: 200% 100%;
+    animation: anaShimmer 1.5s infinite ease-in-out;
+    border-radius: 6px;
+}
+
+[data-theme="dark"] .ana-sk-shimmer {
+    background: linear-gradient(
+        90deg,
+        #1e293b 0%,
+        #334155 50%,
+        #1e293b 100%
+    );
+    background-size: 200% 100%;
+    animation: anaShimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes anaShimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.ana-chart-tooltip {
+    position: absolute;
+    background: #111827;
+    color: #ffffff;
+    padding: 0.65rem 0.9rem;
+    border-radius: 12px;
+    font-size: 0.775rem;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    pointer-events: none;
+    z-index: 30;
+    transform: translate(-50%, -105%);
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.ana-chart-tooltip-header {
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
+}
+
+.ana-legend-item {
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ana-legend-item:hover {
+    transform: translateY(-1px);
+}
+
+.ana-legend-item.dimmed {
+    opacity: 0.35;
+}
+
+.ana-kpi-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ana-kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.ana-kpi-card.focused {
+    border-color: #e91e63;
+    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.25), 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.ana-funnel-item {
+    cursor: pointer;
+    padding: 0.45rem;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+}
+
+.ana-funnel-item:hover {
+    background: var(--surface);
+}
+
+.ana-share-row {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 10px;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.ana-share-row:hover {
+    background: var(--surface);
+    transform: translateX(3px);
+}
+
+.ana-btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #e91e63, #ff4081);
+    color: #ffffff;
+    border: none;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    padding: 0.55rem 1.15rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(233, 30, 99, 0.35);
+}
+
+.ana-btn-export:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(233, 30, 99, 0.45);
+}
+
+.ana-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1.5rem;
+}
+
+.ana-modal-card {
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.ana-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.ana-modal-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.ana-modal-body {
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.ana-modal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.ana-modal-stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ana-modal-stat-val {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.ana-modal-stat-lbl {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
