@@ -38,12 +38,24 @@ export interface ReviewItem {
   serviceTitle?: string | null;
 }
 
+export interface GetCustomerReviewsQueryParams {
+  search?: string;
+  rating?: number;
+  page?: number;
+  limit?: number;
+}
+
 export interface CustomerReviewsResponse {
   reviews: ReviewItem[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+  averageRating: number;
+  totalReviews: number;
+  ratingCounts: Record<number, number>;
+  pagination: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    total: number;
+  };
 }
 
 export interface ProviderReviewsSummary {

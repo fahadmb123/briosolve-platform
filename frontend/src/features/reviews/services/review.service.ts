@@ -4,6 +4,7 @@ import type {
   CreateReviewPayload,
   ReviewItem,
   CustomerReviewsResponse,
+  GetCustomerReviewsQueryParams,
   ProviderReviewsSummary
 } from "../types/review.types";
 
@@ -22,11 +23,10 @@ export const getBookingReview = async (
 };
 
 export const getMyReviews = async (
-  page: number = 1,
-  limit: number = 10
+  params?: GetCustomerReviewsQueryParams
 ): Promise<response<CustomerReviewsResponse>> => {
   const res = await apiClient.get<response<CustomerReviewsResponse>>("/api/reviews/my", {
-    params: { page, limit }
+    params
   });
   return res.data;
 };

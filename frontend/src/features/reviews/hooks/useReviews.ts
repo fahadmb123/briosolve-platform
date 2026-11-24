@@ -5,7 +5,7 @@ import {
   getMyReviews,
   getProviderReviews
 } from "../services/review.service";
-import type { CreateReviewPayload } from "../types/review.types";
+import type { CreateReviewPayload, GetCustomerReviewsQueryParams } from "../types/review.types";
 
 export const useCreateReviewMutation = () => {
   const queryClient = useQueryClient();
@@ -28,10 +28,10 @@ export const useBookingReviewQuery = (bookingId?: string) => {
   });
 };
 
-export const useMyReviewsQuery = (page: number = 1, limit: number = 10) => {
+export const useMyReviewsQuery = (params?: GetCustomerReviewsQueryParams) => {
   return useQuery({
-    queryKey: ["myReviews", page, limit],
-    queryFn: () => getMyReviews(page, limit)
+    queryKey: ["myReviews", params],
+    queryFn: () => getMyReviews(params)
   });
 };
 

@@ -18,6 +18,8 @@ export class GetCustomerReviewsUseCase implements IUseCase<GetCustomerReviewsReq
 
     const result = await this._reviewRepo.findCustomerReviews({
       customerId: input.customerId,
+      search: input.search,
+      rating: input.rating,
       page,
       limit
     });
@@ -26,6 +28,9 @@ export class GetCustomerReviewsUseCase implements IUseCase<GetCustomerReviewsReq
 
     return {
       reviews: result.reviews.map(ReviewMapper.toDto),
+      averageRating: result.averageRating,
+      totalReviews: result.totalReviews,
+      ratingCounts: result.ratingCounts,
       pagination: {
         page,
         limit,

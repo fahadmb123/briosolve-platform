@@ -12,6 +12,7 @@ import { UpdateBookingRepoDto } from "../../application/dtos/request/update-book
 import { GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
 import { BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
 import { BookingMapper } from "../../application/mappers/booking.mapper";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export class PrismaBookingRepository implements IBookingRepository {
     async findById(id: string): Promise<Booking | null> {
@@ -378,7 +379,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                 if (providerProfile) {
                     providerBusinessName = providerProfile.business_name;
                     providerUserId = providerProfile.user_id;
-                    providerAvatar = providerProfile.profile_image || null;
+                    providerAvatar = StorageUtil.getPublicUrl(providerProfile.profile_image || null);
                     providerExperience = providerProfile.experience || null;
                     providerCompletedJobs = providerProfile.completed_jobs ?? null;
                     providerBio = providerProfile.bio || null;
@@ -417,7 +418,7 @@ export class PrismaBookingRepository implements IBookingRepository {
                         .where({ user_id: cUser.id as never })
                         .first();
                     if (cProfile) {
-                        customerAvatar = cProfile.profile_image || null;
+                        customerAvatar = StorageUtil.getPublicUrl(cProfile.profile_image || null);
                     }
                 }
 

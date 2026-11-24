@@ -28,6 +28,8 @@ export interface ProviderReviewsResult {
 
 export interface GetCustomerReviewsParams {
   customerId: string;
+  search?: string;
+  rating?: number;
   page?: number;
   limit?: number;
 }
@@ -35,6 +37,9 @@ export interface GetCustomerReviewsParams {
 export interface CustomerReviewsResult {
   reviews: Review[];
   total: number;
+  averageRating: number;
+  totalReviews: number;
+  ratingCounts: Record<number, number>;
 }
 
 export interface GetAdminReviewsParams {

@@ -14,6 +14,7 @@ import {
 } from "../../domain/repositories/IReview.repository";
 import { ReviewMapper } from "../../application/mappers/review.mapper";
 import { ReviewRatingService } from "../../application/services/review-rating.service";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export class PrismaReviewRepository implements IReviewRepository {
   async findBookingEligibility(bookingId: string): Promise<ReviewBookingEligibility | null> {
@@ -156,7 +157,57 @@ export class PrismaReviewRepository implements IReviewRepository {
     const limit = params.limit || 10;
     const skip = (page - 1) * limit;
 
-    const query = db.orm.public.reviews.where({ customer_id: params.customerId as never });
+    const allCustomerRecords = await db.orm.public.reviews
+      .where({ customer_id: params.customerId as never })
+      .select("rating")
+      .all();
+
+    const ratingCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    for (const r of allCustomerRecords) {
+      const star = r.rating;
+      if (star >= 1 && star <= 5) {
+        ratingCounts[star] = (ratingCounts[star] || 0) + 1;
+      }
+    }
+
+    const totalReviews = allCustomerRecords.length;
+    const averageRating = ReviewRatingService.calculateAverageRating(ratingCounts);
+
+    let query = db.orm.public.reviews.where({ customer_id: params.customerId as never });
+
+    if (params.rating && params.rating >= 1 && params.rating <= 5) {
+      query = query.where({ rating: params.rating });
+    }
+
+    const searchTerm = params.search?.trim().toLowerCase();
+    if (searchTerm) {
+      const records = await query
+        .orderBy((r) => r.created_at.desc())
+        .all();
+
+      const allPopulated = await this.populateExtras(records);
+      const matched = allPopulated.filter((rev) => {
+        return (
+          (rev.providerName && rev.providerName.toLowerCase().includes(searchTerm)) ||
+          (rev.providerBusinessName && rev.providerBusinessName.toLowerCase().includes(searchTerm)) ||
+          (rev.serviceTitle && rev.serviceTitle.toLowerCase().includes(searchTerm)) ||
+          (rev.bookingNumber && rev.bookingNumber.toLowerCase().includes(searchTerm)) ||
+          (rev.title && rev.title.toLowerCase().includes(searchTerm)) ||
+          rev.comment.toLowerCase().includes(searchTerm)
+        );
+      });
+
+      const paginated = matched.slice(skip, skip + limit);
+
+      return {
+        reviews: paginated,
+        total: matched.length,
+        averageRating,
+        totalReviews,
+        ratingCounts
+      };
+    }
+
     const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
     const totalCount = Number(totalResult?.total || 0);
 
@@ -170,7 +221,10 @@ export class PrismaReviewRepository implements IReviewRepository {
 
     return {
       reviews: populated,
-      total: totalCount
+      total: totalCount,
+      averageRating,
+      totalReviews,
+      ratingCounts
     };
   }
 
@@ -337,7 +391,7 @@ export class PrismaReviewRepository implements IReviewRepository {
         if (customerIds.includes(u.id)) {
           map.set(u.id, {
             name: (u as any).name || (u as any).email || "Customer",
-            avatar: avatarByUserId.get(u.id) || (u as any).avatar_url || (u as any).avatar || null
+            avatar: StorageUtil.getPublicUrl(avatarByUserId.get(u.id) || (u as any).avatar_url || (u as any).avatar || null)
           });
         }
       }
@@ -360,7 +414,7 @@ export class PrismaReviewRepository implements IReviewRepository {
           map.set(p.id, {
             name,
             businessName: (p as any).business_name || null,
-            avatar: (p as any).profile_image || null,
+            avatar: StorageUtil.getPublicUrl((p as any).profile_image || null),
             userId: p.user_id || null
           });
         }

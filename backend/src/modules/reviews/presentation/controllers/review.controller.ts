@@ -68,11 +68,15 @@ export class ReviewController extends BaseController {
   getMyReviews = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const customerId = req.user?.userId;
+      const search = req.query.search ? String(req.query.search) : undefined;
+      const rating = req.query.rating ? Number(req.query.rating) : undefined;
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
 
       const response = await this._getCustomerReviewsUseCase.execute({
         customerId: customerId!,
+        search,
+        rating,
         page,
         limit
       });
