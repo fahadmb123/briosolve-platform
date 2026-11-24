@@ -119,7 +119,7 @@ export default function Dashboard() {
     { label: '0', y: 165 },
   ];
 
-  const xCoords = [75, 175, 275, 375, 475, 565];
+  const xCoords = [80, 185, 290, 395, 500, 600];
 
   const bookingPoints = trends.map((t, idx) => {
     const x = xCoords[idx] ?? 75;
@@ -197,10 +197,78 @@ export default function Dashboard() {
       </div>
 
       <div className="mad-top-grid">
-        <div className="mad-card">
+        <div className="mad-card mad-summary-card">
+          <div className="mad-card-title-block mb-3">
+            <h2 className="mad-card-title">Overview</h2>
+            <span className="mad-card-subtitle">Monthly Financial Telemetry</span>
+          </div>
+
+          <div className="mad-summary-body">
+            <div className="mad-summary-stat-block">
+              <div className="mad-big-stat-val">₹{displayVolume.toLocaleString('en-IN')}</div>
+              <div className="mad-big-stat-lbl">Current Month Volume</div>
+            </div>
+
+            <div className="mad-summary-stat-block mt-3">
+              <div className="mad-big-stat-val" style={{ fontSize: '1.65rem' }}>{displaySales}</div>
+              <div className="mad-big-stat-lbl">Active Month Sales</div>
+            </div>
+
+            <Link to="/admin/bookings" className="mad-btn-summary mt-3">
+              <span>Last Month Summary</span>
+              <i className="fas fa-arrow-right"></i>
+            </Link>
+          </div>
+
+          <div className="mad-summary-divider"></div>
+
+          <div className="mad-summary-quick-grid">
+            <Link to="/admin/bookings" className="mad-quick-stat-chip">
+              <div className="mad-strip-icon-circle pink sm">
+                <i className="fas fa-crown"></i>
+              </div>
+              <div className="mad-quick-stat-meta">
+                <span className="mad-quick-lbl">Bookings</span>
+                <span className="mad-quick-val">{kpis.activeBookings} Jobs</span>
+              </div>
+            </Link>
+
+            <Link to="/admin/users?tab=providers" className="mad-quick-stat-chip">
+              <div className="mad-strip-icon-circle purple sm">
+                <i className="fas fa-heart"></i>
+              </div>
+              <div className="mad-quick-stat-meta">
+                <span className="mad-quick-lbl">Providers</span>
+                <span className="mad-quick-val">{kpis.totalProviders} Pros</span>
+              </div>
+            </Link>
+
+            <Link to="/admin/requests" className="mad-quick-stat-chip">
+              <div className="mad-strip-icon-circle cyan sm">
+                <i className="fas fa-paper-plane"></i>
+              </div>
+              <div className="mad-quick-stat-meta">
+                <span className="mad-quick-lbl">Requests</span>
+                <span className="mad-quick-val">{kpis.activeRequests} Posts</span>
+              </div>
+            </Link>
+
+            <Link to="/admin/users?tab=customers" className="mad-quick-stat-chip">
+              <div className="mad-strip-icon-circle orange sm">
+                <i className="fas fa-coins"></i>
+              </div>
+              <div className="mad-quick-stat-meta">
+                <span className="mad-quick-lbl">Customers</span>
+                <span className="mad-quick-val">{kpis.totalCustomers} Accounts</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        <div className="mad-card mad-chart-card">
           <div className="mad-chart-card-header">
             <div className="mad-card-title-block">
-              <h2 className="mad-card-title">Dashboard</h2>
+              <h2 className="mad-card-title">Marketplace Velocity</h2>
               <span className="mad-card-subtitle">Overview of Latest Month</span>
             </div>
 
@@ -231,131 +299,71 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="mad-chart-body">
-            <div className="mad-chart-metrics-left">
-              <div>
-                <div className="mad-big-stat-val">₹{displayVolume.toLocaleString('en-IN')}</div>
-                <div className="mad-big-stat-lbl">Current Month Volume</div>
-              </div>
+          <div className="mad-svg-chart-container">
+            <svg className="mad-svg-chart" viewBox="0 0 650 215">
+              <defs>
+                <linearGradient id="wavePinkGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#e91e63" stopOpacity="0.45" />
+                  <stop offset="100%" stopColor="#e91e63" stopOpacity="0.0" />
+                </linearGradient>
+                <linearGradient id="waveOrangeGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ff9800" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#ff9800" stopOpacity="0.0" />
+                </linearGradient>
+              </defs>
 
-              <div>
-                <div className="mad-big-stat-val" style={{ fontSize: '1.65rem' }}>{displaySales}</div>
-                <div className="mad-big-stat-lbl">Active Month Sales</div>
-              </div>
-
-              <Link to="/admin/bookings" className="mad-btn-summary">
-                <span>Last Month Summary</span>
-              </Link>
-            </div>
-
-            <div className="mad-svg-chart-container">
-              <svg className="mad-svg-chart" viewBox="0 0 600 205">
-                <defs>
-                  <linearGradient id="wavePinkGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#e91e63" stopOpacity="0.45" />
-                    <stop offset="100%" stopColor="#e91e63" stopOpacity="0.0" />
-                  </linearGradient>
-                  <linearGradient id="waveOrangeGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ff9800" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#ff9800" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-
-                {yTicks.map((tick, i) => (
-                  <g key={`ytick-${i}`}>
-                    <text
-                      x="38"
-                      y={tick.y + 4}
-                      textAnchor="end"
-                      fill="var(--text-secondary)"
-                      fontSize="11"
-                      fontWeight="700"
-                    >
-                      {tick.label}
-                    </text>
-                    <line
-                      x1="48"
-                      y1={tick.y}
-                      x2="590"
-                      y2={tick.y}
-                      stroke="var(--border)"
-                      strokeDasharray={i === yTicks.length - 1 ? 'none' : '3 3'}
-                      opacity={i === yTicks.length - 1 ? 1 : 0.6}
-                    />
-                  </g>
-                ))}
-
-                <path d={quoteAreaD} fill="url(#waveOrangeGrad)" />
-                <path d={quotePathD} fill="none" stroke="#ff9800" strokeWidth="2.5" />
-
-                <path d={bookingAreaD} fill="url(#wavePinkGrad)" />
-                <path d={bookingPathD} fill="none" stroke="#e91e63" strokeWidth="3" />
-
-                {quotePoints.map((p, idx) => (
-                  <circle key={`qp-${idx}`} cx={p.x} cy={p.y} r="4.5" fill="#ff9800" stroke="#ffffff" strokeWidth="2" />
-                ))}
-
-                {bookingPoints.map((p, idx) => (
-                  <circle key={`bp-${idx}`} cx={p.x} cy={p.y} r="5" fill="#e91e63" stroke="#ffffff" strokeWidth="2" />
-                ))}
-
-                {trends.map((t, idx) => (
+              {yTicks.map((tick, i) => (
+                <g key={`ytick-${i}`}>
                   <text
-                    key={`txt-${idx}`}
-                    x={xCoords[idx]}
-                    y="190"
-                    textAnchor="middle"
+                    x="38"
+                    y={tick.y + 4}
+                    textAnchor="end"
                     fill="var(--text-secondary)"
                     fontSize="11"
                     fontWeight="700"
                   >
-                    {t.month}
+                    {tick.label}
                   </text>
-                ))}
-              </svg>
-            </div>
-          </div>
+                  <line
+                    x1="48"
+                    y1={tick.y}
+                    x2="635"
+                    y2={tick.y}
+                    stroke="var(--border)"
+                    strokeDasharray={i === yTicks.length - 1 ? 'none' : '3 3'}
+                    opacity={i === yTicks.length - 1 ? 1 : 0.6}
+                  />
+                </g>
+              ))}
 
-          <div className="mad-chart-bottom-strip">
-            <Link to="/admin/bookings" className="mad-strip-item">
-              <div className="mad-strip-icon-circle pink">
-                <i className="fas fa-crown"></i>
-              </div>
-              <div className="mad-strip-meta">
-                <span className="mad-strip-lbl">Active Bookings</span>
-                <span className="mad-strip-val">{kpis.activeBookings} Jobs</span>
-              </div>
-            </Link>
+              <path d={quoteAreaD} fill="url(#waveOrangeGrad)" />
+              <path d={quotePathD} fill="none" stroke="#ff9800" strokeWidth="2.5" />
 
-            <Link to="/admin/users?tab=providers" className="mad-strip-item">
-              <div className="mad-strip-icon-circle purple">
-                <i className="fas fa-heart"></i>
-              </div>
-              <div className="mad-strip-meta">
-                <span className="mad-strip-lbl">Providers Pool</span>
-                <span className="mad-strip-val">{kpis.totalProviders} Pros</span>
-              </div>
-            </Link>
+              <path d={bookingAreaD} fill="url(#wavePinkGrad)" />
+              <path d={bookingPathD} fill="none" stroke="#e91e63" strokeWidth="3" />
 
-            <Link to="/admin/requests" className="mad-strip-item">
-              <div className="mad-strip-icon-circle cyan">
-                <i className="fas fa-paper-plane"></i>
-              </div>
-              <div className="mad-strip-meta">
-                <span className="mad-strip-lbl">Estimate Requests</span>
-                <span className="mad-strip-val">{kpis.activeRequests} Posts</span>
-              </div>
-            </Link>
+              {quotePoints.map((p, idx) => (
+                <circle key={`qp-${idx}`} cx={p.x} cy={p.y} r="4.5" fill="#ff9800" stroke="#ffffff" strokeWidth="2" />
+              ))}
 
-            <Link to="/admin/users?tab=customers" className="mad-strip-item">
-              <div className="mad-strip-icon-circle orange">
-                <i className="fas fa-coins"></i>
-              </div>
-              <div className="mad-strip-meta">
-                <span className="mad-strip-lbl">Customers Base</span>
-                <span className="mad-strip-val">{kpis.totalCustomers} Accounts</span>
-              </div>
-            </Link>
+              {bookingPoints.map((p, idx) => (
+                <circle key={`bp-${idx}`} cx={p.x} cy={p.y} r="5" fill="#e91e63" stroke="#ffffff" strokeWidth="2" />
+              ))}
+
+              {trends.map((t, idx) => (
+                <text
+                  key={`txt-${idx}`}
+                  x={xCoords[idx]}
+                  y="196"
+                  textAnchor="middle"
+                  fill="var(--text-secondary)"
+                  fontSize="12"
+                  fontWeight="700"
+                >
+                  {t.month}
+                </text>
+              ))}
+            </svg>
           </div>
         </div>
 
