@@ -140,7 +140,7 @@ export const CustomerReviewsPage: React.FC = () => {
       <div className="crv-content">
         {isLoading ? (
           <div className="crv-reviewed-grid" aria-hidden="true">
-            {[1, 2, 3, 4].map((item) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
               <div key={item} className="crv-submitted-card crv-skeleton-card">
                 <div className="crv-submitted-header">
                   <div className="crv-submitted-provider">
