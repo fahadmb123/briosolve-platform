@@ -295,7 +295,7 @@ export class PrismaReviewRepository implements IReviewRepository {
     const bookingIds = Array.from(new Set(records.map((r) => r.booking_id).filter(Boolean)));
 
     const customerMap = new Map<string, { name: string; avatar: string | null }>();
-    const providerMap = new Map<string, { name: string; businessName: string | null }>();
+    const providerMap = new Map<string, { name: string; businessName: string | null; avatar: string | null; userId: string | null }>();
     const bookingMap = new Map<string, { bookingNumber: string; serviceTitle: string | null }>();
 
     await Promise.all([
@@ -314,6 +314,8 @@ export class PrismaReviewRepository implements IReviewRepository {
         customerAvatar: c?.avatar || null,
         providerName: p?.name || "Provider",
         providerBusinessName: p?.businessName || null,
+        providerAvatar: p?.avatar || null,
+        providerUserId: p?.userId || null,
         bookingNumber: b?.bookingNumber || null,
         serviceTitle: b?.serviceTitle || null
       });
@@ -324,18 +326,25 @@ export class PrismaReviewRepository implements IReviewRepository {
     if (customerIds.length === 0) return;
     try {
       const users = await db.orm.public.users.all();
+      const cProfiles = await db.orm.public.customer_profiles.all();
+      const avatarByUserId = new Map<string, string | null>();
+      for (const cp of cProfiles) {
+        if (cp.user_id) {
+          avatarByUserId.set(cp.user_id, (cp as any).profile_image || null);
+        }
+      }
       for (const u of users) {
         if (customerIds.includes(u.id)) {
           map.set(u.id, {
             name: (u as any).name || (u as any).email || "Customer",
-            avatar: (u as any).avatar_url || (u as any).avatar || null
+            avatar: avatarByUserId.get(u.id) || (u as any).avatar_url || (u as any).avatar || null
           });
         }
       }
     } catch {}
   }
 
-  private async populateProviders(providerIds: string[], map: Map<string, { name: string; businessName: string | null }>): Promise<void> {
+  private async populateProviders(providerIds: string[], map: Map<string, { name: string; businessName: string | null; avatar: string | null; userId: string | null }>): Promise<void> {
     if (providerIds.length === 0) return;
     try {
       const profiles = await db.orm.public.provider_profiles.all();
@@ -350,7 +359,9 @@ export class PrismaReviewRepository implements IReviewRepository {
           }
           map.set(p.id, {
             name,
-            businessName: (p as any).business_name || null
+            businessName: (p as any).business_name || null,
+            avatar: (p as any).profile_image || null,
+            userId: p.user_id || null
           });
         }
       }

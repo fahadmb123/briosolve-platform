@@ -29,6 +29,8 @@ export class ReviewMapper {
       customerAvatar?: string | null;
       providerName?: string | null;
       providerBusinessName?: string | null;
+      providerAvatar?: string | null;
+      providerUserId?: string | null;
       bookingNumber?: string | null;
       serviceTitle?: string | null;
     }
@@ -52,6 +54,8 @@ export class ReviewMapper {
       extra?.customerAvatar,
       extra?.providerName,
       extra?.providerBusinessName,
+      extra?.providerAvatar,
+      extra?.providerUserId,
       extra?.bookingNumber,
       extra?.serviceTitle
     );
@@ -77,6 +81,8 @@ export class ReviewMapper {
       customerAvatar: review.customerAvatar,
       providerName: review.providerName,
       providerBusinessName: review.providerBusinessName,
+      providerAvatar: review.providerAvatar,
+      providerUserId: review.providerUserId,
       bookingNumber: review.bookingNumber,
       serviceTitle: review.serviceTitle
     };

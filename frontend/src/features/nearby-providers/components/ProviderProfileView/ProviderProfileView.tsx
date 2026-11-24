@@ -42,7 +42,8 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
     const state = location.state as { from?: string; returnUrl?: string } | null;
     const isFromChat = state?.from === 'chat' || Boolean(state?.returnUrl && (state.returnUrl.includes('messages') || state.returnUrl.includes('chat')));
     const isFromBooking = state?.from === 'booking' || Boolean(state?.returnUrl && (state.returnUrl.includes('/bookings') || state.returnUrl.includes('/my-bookings')));
-    const resolvedBackLabel = backLabel || (isFromChat ? 'Back to Chat' : isFromBooking ? 'Back to Booking' : 'Back to Nearby Providers');
+    const isFromReviews = state?.from === 'reviews' || Boolean(state?.returnUrl && state.returnUrl.includes('/reviews'));
+    const resolvedBackLabel = backLabel || (isFromChat ? 'Back to Chat' : isFromBooking ? 'Back to Booking' : isFromReviews ? 'Back to Reviews' : 'Back to Nearby Providers');
 
     const handleBack = () => {
         if (onBack) {
@@ -176,7 +177,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                 </button>
 
                 <div className="provider-profile-breadcrumb">
-                    <span>{isFromChat ? 'Chat' : isFromBooking ? 'Booking' : 'Providers'}</span>
+                    <span>{isFromChat ? 'Chat' : isFromBooking ? 'Booking' : isFromReviews ? 'Reviews' : 'Providers'}</span>
                     <i className="fas fa-chevron-right text-xs" />
                     <span className="crumb-active">{activeProviderName}</span>
                 </div>

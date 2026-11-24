@@ -26,6 +26,8 @@ export class Review {
     public readonly customerAvatar?: string | null,
     public readonly providerName?: string | null,
     public readonly providerBusinessName?: string | null,
+    public readonly providerAvatar?: string | null,
+    public readonly providerUserId?: string | null,
     public readonly bookingNumber?: string | null,
     public readonly serviceTitle?: string | null
   ) {}

@@ -4,9 +4,13 @@ import "./BookingReviewCard.css";
 
 interface BookingReviewCardProps {
   review: ReviewItem;
+  variant?: "standalone" | "embedded";
 }
 
-export const BookingReviewCard: React.FC<BookingReviewCardProps> = ({ review }) => {
+export const BookingReviewCard: React.FC<BookingReviewCardProps> = ({
+  review,
+  variant = "standalone"
+}) => {
   const formattedDate = new Date(review.createdAt).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
@@ -14,10 +18,10 @@ export const BookingReviewCard: React.FC<BookingReviewCardProps> = ({ review }) 
   });
 
   return (
-    <div className="bk-review-card">
+    <div className={`bk-review-card ${variant === "embedded" ? "embedded" : ""}`}>
       <div className="bk-review-header">
         <div className="bk-review-stars-wrap">
-          <div className="bk-review-stars">
+          <div className="bk-review-stars" aria-label={`Rated ${review.rating} out of 5 stars`}>
             {[1, 2, 3, 4, 5].map((star) => (
               <i
                 key={star}
@@ -39,7 +43,7 @@ export const BookingReviewCard: React.FC<BookingReviewCardProps> = ({ review }) 
 
       <p className="bk-review-comment">{review.comment}</p>
 
-      {review.aspectRatings && (
+      {review.aspectRatings && Object.keys(review.aspectRatings).length > 0 && (
         <div className="bk-review-aspects">
           {review.aspectRatings.punctuality !== undefined && (
             <span className="bk-review-aspect-pill">
@@ -68,7 +72,7 @@ export const BookingReviewCard: React.FC<BookingReviewCardProps> = ({ review }) 
         <div className="bk-review-reply-box">
           <div className="bk-review-reply-header">
             <span className="bk-review-reply-title">
-              <i className="fas fa-reply" /> Provider Response
+              <i className="fas fa-reply" /> Specialist Response
             </span>
             {review.providerRepliedAt && (
               <span className="bk-review-reply-time">

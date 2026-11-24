@@ -19,6 +19,8 @@ export interface ReviewResponseDto {
   customerAvatar?: string | null;
   providerName?: string | null;
   providerBusinessName?: string | null;
+  providerAvatar?: string | null;
+  providerUserId?: string | null;
   bookingNumber?: string | null;
   serviceTitle?: string | null;
 }
