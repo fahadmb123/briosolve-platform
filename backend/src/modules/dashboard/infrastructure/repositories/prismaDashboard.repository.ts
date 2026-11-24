@@ -3,32 +3,7 @@ import { IDashboardRepository, RawAuditLogSources } from "../../domain/repositor
 import { CustomerDashboardResponseDto } from "../../application/dtos/response/customer-dashboard-response.dto";
 import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
 import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
-
-const toIsoString = (val: any): string => {
-  if (!val) return new Date().toISOString();
-  if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
-    return new Date(Number(val.epochMilliseconds)).toISOString();
-  }
-  if (val instanceof Date) return val.toISOString();
-  try {
-    return new Date(val).toISOString();
-  } catch {
-    return new Date().toISOString();
-  }
-};
-
-const toDateObj = (val: any): Date => {
-  if (!val) return new Date();
-  if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
-    return new Date(Number(val.epochMilliseconds));
-  }
-  if (val instanceof Date) return val;
-  try {
-    return new Date(val);
-  } catch {
-    return new Date();
-  }
-};
+import { toIsoString, toDateObj } from "../../application/services/dashboard-date.service";
 
 export class PrismaDashboardRepository implements IDashboardRepository {
   async getCustomerDashboardData(userId: string): Promise<CustomerDashboardResponseDto> {

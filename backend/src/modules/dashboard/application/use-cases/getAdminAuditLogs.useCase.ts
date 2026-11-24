@@ -2,19 +2,7 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IDashboardRepository } from "../../domain/repositories/IDashboard.repository";
 import { GetAdminAuditLogsRequestDto } from "../dtos/request/get-admin-audit-logs.dto";
 import { AdminAuditLogEntry, AdminAuditLogsResponseDto } from "../dtos/response/admin-audit-logs-response.dto";
-
-const toIsoString = (val: any): string => {
-  if (!val) return new Date().toISOString();
-  if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
-    return new Date(Number(val.epochMilliseconds)).toISOString();
-  }
-  if (val instanceof Date) return val.toISOString();
-  try {
-    return new Date(val).toISOString();
-  } catch {
-    return new Date().toISOString();
-  }
-};
+import { toIsoString } from "../services/dashboard-date.service";
 
 export class GetAdminAuditLogsUseCase implements IUseCase<GetAdminAuditLogsRequestDto, AdminAuditLogsResponseDto> {
   constructor(private readonly _dashboardRepository: IDashboardRepository) {}

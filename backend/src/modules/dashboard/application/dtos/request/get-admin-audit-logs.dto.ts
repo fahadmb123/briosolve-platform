@@ -4,5 +4,3 @@ export interface GetAdminAuditLogsRequestDto {
   type?: string;
   search?: string;
 }
-
-export type GetAdminAuditLogsInputDto = GetAdminAuditLogsRequestDto;
