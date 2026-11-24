@@ -4,6 +4,24 @@ import { CreateReviewRepoParams } from "../../domain/repositories/IReview.reposi
 import { ReviewRatingService } from "../services/review-rating.service";
 
 export class ReviewMapper {
+  private static parseDate(val: any): Date {
+    if (!val) return new Date();
+    if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
+      const epoch = (val as { epochMilliseconds: bigint | number }).epochMilliseconds;
+      return new Date(Number(epoch));
+    }
+    return new Date(val);
+  }
+
+  private static parseNullableDate(val: any): Date | null {
+    if (!val) return null;
+    if (typeof val === "object" && val !== null && "epochMilliseconds" in val) {
+      const epoch = (val as { epochMilliseconds: bigint | number }).epochMilliseconds;
+      return new Date(Number(epoch));
+    }
+    return new Date(val);
+  }
+
   public static toDomain(
     record: any,
     extra?: {
@@ -25,11 +43,11 @@ export class ReviewMapper {
       record.comment,
       record.aspect_ratings as any,
       record.provider_reply,
-      record.provider_replied_at ? new Date(record.provider_replied_at) : null,
+      this.parseNullableDate(record.provider_replied_at),
       Boolean(record.is_reported),
       Boolean(record.is_hidden),
-      new Date(record.created_at),
-      new Date(record.updated_at),
+      this.parseDate(record.created_at),
+      this.parseDate(record.updated_at),
       extra?.customerName,
       extra?.customerAvatar,
       extra?.providerName,
@@ -77,9 +95,7 @@ export class ReviewMapper {
       provider_reply: null,
       provider_replied_at: null,
       is_reported: false,
-      is_hidden: false,
-      created_at: new Date(),
-      updated_at: new Date()
+      is_hidden: false
     };
   }
 }

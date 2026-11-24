@@ -1,3 +1,4 @@
+import { Temporal } from "@js-temporal/polyfill";
 import { db } from "../../../../shared/database/client";
 import { Review } from "../../domain/entities/review.entity";
 import {
@@ -210,7 +211,7 @@ export class PrismaReviewRepository implements IReviewRepository {
         .where({ id: reviewId as never })
         .update({
           provider_reply: replyText as never,
-          provider_replied_at: new Date()
+          provider_replied_at: Temporal.Now.instant() as never
         });
 
       if (!updated) return null;
