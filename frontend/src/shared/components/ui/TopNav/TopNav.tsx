@@ -210,15 +210,6 @@ export const TopNav: React.FC = () => {
 
             {isCustomer ? (
               <>
-                <NavLink
-                  to="/bookings"
-                  className={({ isActive }) =>
-                    `topnav-link ${isActive ? "active" : ""}`
-                  }
-                >
-                  My Bookings
-                </NavLink>
-
                 <div
                   className="topnav-dropdown-wrapper"
                   onMouseEnter={() => setOpenDropdown("workspace")}
@@ -704,16 +695,6 @@ export const TopNav: React.FC = () => {
 
               {isCustomer ? (
                 <>
-                  <NavLink
-                    to="/bookings"
-                    className={({ isActive }) =>
-                      `topnav-mobile-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAllMenus}
-                  >
-                    My Bookings
-                  </NavLink>
-
                   <NavLink
                     to="/nearby-providers"
                     className={() =>
