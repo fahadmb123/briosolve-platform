@@ -1,15 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { BaseController } from "../../../../shared/base/controller/baseController";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
-import {
-  GetCustomerDashboardInputDto,
-  CustomerDashboardResponseDto,
-} from "../../application/dtos/customer-dashboard.dto";
-import {
-  GetProviderDashboardInputDto,
-  ProviderDashboardResponseDto,
-} from "../../application/dtos/provider-dashboard.dto";
-import { AdminDashboardResponseDto } from "../../application/dtos/admin-dashboard.dto";
+import { GetCustomerDashboardInputDto } from "../../application/dtos/request/get-customer-dashboard.dto";
+import { CustomerDashboardResponseDto } from "../../application/dtos/response/customer-dashboard-response.dto";
+import { GetProviderDashboardInputDto } from "../../application/dtos/request/get-provider-dashboard.dto";
+import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
+import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export class DashboardController extends BaseController {

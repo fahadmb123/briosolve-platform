@@ -1,8 +1,8 @@
 import { db } from "../../../../shared/database/client";
 import { IDashboardRepository } from "../../domain/repositories/IDashboard.repository";
-import { CustomerDashboardResponseDto } from "../../application/dtos/customer-dashboard.dto";
-import { ProviderDashboardResponseDto } from "../../application/dtos/provider-dashboard.dto";
-import { AdminDashboardResponseDto } from "../../application/dtos/admin-dashboard.dto";
+import { CustomerDashboardResponseDto } from "../../application/dtos/response/customer-dashboard-response.dto";
+import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
+import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
 
 export class PrismaDashboardRepository implements IDashboardRepository {
   async getCustomerDashboardData(userId: string): Promise<CustomerDashboardResponseDto> {

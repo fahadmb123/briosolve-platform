@@ -1,9 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
 import { requireRole } from "../../../../shared/middlewares/role.middleware";
-import { DashboardRouteDependencies } from "../types/dashboard.route.dependencies";
-import { DashboardController } from "../controllers/dashboard.controller";
-import { createDashboardController } from "../../infrastructure/composition/controller";
+import { DashboardRouteDependencies } from "../types/dashboard-route-dependencies";
 
 export function buildDashboardRoute(dependencies: DashboardRouteDependencies): Router {
   const router = Router();
@@ -30,9 +28,4 @@ export function buildDashboardRoute(dependencies: DashboardRouteDependencies): R
   );
 
   return router;
-}
-
-export function createDashboardRoutes(controller?: DashboardController): Router {
-  const resolvedController = controller || createDashboardController();
-  return buildDashboardRoute({ dashboard: resolvedController });
 }

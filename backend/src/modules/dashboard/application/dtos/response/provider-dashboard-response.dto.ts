@@ -1,7 +1,3 @@
-export interface GetProviderDashboardInputDto {
-  userId: string;
-}
-
 export interface ProviderDashboardResponseDto {
   provider: {
     id: string;

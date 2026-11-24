@@ -1,13 +1,14 @@
 import { buildDashboardRoute } from "../../presentation/routes/dashboard.routes";
-import { createDashboardController } from "./controller";
+import { dashboardController } from "./controllers";
+
+export const dashboardRoutes = buildDashboardRoute({
+  dashboard: dashboardController,
+});
 
 export function createDashboardRoutes() {
-  const dashboardController = createDashboardController();
-  return buildDashboardRoute({
-    dashboard: dashboardController,
-  });
+  return dashboardRoutes;
 }
 
 export * from "./repositories";
 export * from "./useCases";
-export * from "./controller";
+export * from "./controllers";

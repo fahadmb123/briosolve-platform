@@ -1,6 +1,7 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IDashboardRepository } from "../../domain/repositories/IDashboard.repository";
-import { GetCustomerDashboardInputDto, CustomerDashboardResponseDto } from "../dtos/customer-dashboard.dto";
+import { GetCustomerDashboardInputDto } from "../dtos/request/get-customer-dashboard.dto";
+import { CustomerDashboardResponseDto } from "../dtos/response/customer-dashboard-response.dto";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export class GetCustomerDashboardUseCase implements IUseCase<GetCustomerDashboardInputDto, CustomerDashboardResponseDto> {

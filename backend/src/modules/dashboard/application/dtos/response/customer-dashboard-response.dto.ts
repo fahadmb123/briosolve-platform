@@ -1,7 +1,3 @@
-export interface GetCustomerDashboardInputDto {
-  userId: string;
-}
-
 export interface CustomerDashboardResponseDto {
   user: {
     name: string;

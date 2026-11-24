@@ -1,6 +1,7 @@
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IDashboardRepository } from "../../domain/repositories/IDashboard.repository";
-import { GetProviderDashboardInputDto, ProviderDashboardResponseDto } from "../dtos/provider-dashboard.dto";
+import { GetProviderDashboardInputDto } from "../dtos/request/get-provider-dashboard.dto";
+import { ProviderDashboardResponseDto } from "../dtos/response/provider-dashboard-response.dto";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 
 export class GetProviderDashboardUseCase implements IUseCase<GetProviderDashboardInputDto, ProviderDashboardResponseDto> {

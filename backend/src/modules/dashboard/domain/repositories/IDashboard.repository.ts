@@ -1,6 +1,6 @@
-import { CustomerDashboardResponseDto } from "../../application/dtos/customer-dashboard.dto";
-import { ProviderDashboardResponseDto } from "../../application/dtos/provider-dashboard.dto";
-import { AdminDashboardResponseDto } from "../../application/dtos/admin-dashboard.dto";
+import { CustomerDashboardResponseDto } from "../../application/dtos/response/customer-dashboard-response.dto";
+import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
+import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
 
 export interface IDashboardRepository {
   getCustomerDashboardData(userId: string): Promise<CustomerDashboardResponseDto>;
