@@ -32,26 +32,104 @@ export default function Dashboard() {
     );
   }
 
-  const { kpis, recentActivity } = data;
+  const { kpis, recentActivity, recentOrders = [], monthlyTrends = [] } = data;
 
   const totalUsers = (kpis.totalCustomers || 0) + (kpis.totalProviders || 0) + (kpis.activeBookings || 0);
-  const customerPct = totalUsers > 0 ? Math.round(((kpis.totalCustomers || 1) / totalUsers) * 100) : 55;
-  const providerPct = totalUsers > 0 ? Math.round(((kpis.totalProviders || 1) / totalUsers) * 100) : 33;
-  const bookingsPct = Math.max(100 - customerPct - providerPct, 12);
+  const customerPct = totalUsers > 0 ? Math.max(5, Math.round(((kpis.totalCustomers || 0) / totalUsers) * 100)) : 50;
+  const providerPct = totalUsers > 0 ? Math.max(5, Math.round(((kpis.totalProviders || 0) / totalUsers) * 100)) : 30;
+  const bookingsPct = Math.max(0, 100 - customerPct - providerPct);
 
-  const sampleOrders = [
-    { id: '#BK-8821', customer: 'Fahad Basheer', service: 'AC Cooling Repair', price: '₹1,650', status: 'Process', statusClass: 'process' },
-    { id: '#BK-8819', customer: 'Charity Duss', service: 'Custom Wood Partitions', price: '₹1,240', status: 'Open', statusClass: 'open' },
-    { id: '#BK-8814', customer: 'Derisel Onek', service: 'Electrician Fuse Check', price: '₹950', status: 'Unpaid', statusClass: 'unpaid' },
-    { id: '#BK-8809', customer: 'Belgiri Bardene', service: 'Plumbing Drain Flush', price: '₹750', status: 'Process', statusClass: 'process' },
-    { id: '#BK-8802', customer: 'Sami Onvaka', service: 'Appliance Repair', price: '₹1,340', status: 'Paid', statusClass: 'paid' },
-  ].filter((o) => o.customer.toLowerCase().includes(searchQuery.toLowerCase()) || o.id.toLowerCase().includes(searchQuery.toLowerCase()));
+  const orders = recentOrders.map((o) => {
+    let statusLabel = 'Process';
+    let statusClass = 'process';
+    if (o.status === 'COMPLETED') {
+      statusLabel = 'Paid';
+      statusClass = 'paid';
+    } else if (o.status === 'CLOSED') {
+      statusLabel = 'Closed';
+      statusClass = 'closed';
+    } else if (o.status === 'PAYMENT_PENDING') {
+      statusLabel = 'Unpaid';
+      statusClass = 'unpaid';
+    } else if (['EN_ROUTE', 'INSPECTION', 'IN_PROGRESS'].includes(o.status)) {
+      statusLabel = 'Open';
+      statusClass = 'open';
+    }
+    return {
+      id: o.bookingNumber,
+      customer: o.customerName,
+      service: o.serviceTitle,
+      price: `₹${Number(o.totalAmount).toLocaleString('en-IN')}`,
+      status: statusLabel,
+      statusClass,
+    };
+  });
+
+  const filteredOrders = orders.filter(
+    (o) =>
+      o.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      o.service.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const trends = monthlyTrends.length > 0 ? monthlyTrends : [
+    { month: 'Jan', bookingsCount: 12, quotationsCount: 22, volume: 15000 },
+    { month: 'Feb', bookingsCount: 16, quotationsCount: 28, volume: 21000 },
+    { month: 'Mar', bookingsCount: 14, quotationsCount: 26, volume: 18000 },
+    { month: 'Apr', bookingsCount: 24, quotationsCount: 38, volume: 31000 },
+    { month: 'May', bookingsCount: 30, quotationsCount: 48, volume: 42000 },
+    { month: 'Jun', bookingsCount: 26, quotationsCount: 42, volume: 35000 },
+  ];
+
+  const maxPointVal = Math.max(
+    ...trends.map((t) => Math.max(t.bookingsCount, t.quotationsCount, 1)),
+    10
+  );
+
+  const xCoords = [25, 125, 225, 325, 425, 515];
+  const bookingPoints = trends.map((t, idx) => {
+    const x = xCoords[idx] ?? 25;
+    const y = 150 - Math.round((t.bookingsCount / maxPointVal) * 110);
+    return { x, y, val: t.bookingsCount, month: t.month };
+  });
+
+  const quotePoints = trends.map((t, idx) => {
+    const x = xCoords[idx] ?? 25;
+    const y = 150 - Math.round((t.quotationsCount / (maxPointVal * 1.25 || 1)) * 110);
+    return { x, y, val: t.quotationsCount, month: t.month };
+  });
+
+  const bookingPathD = bookingPoints.reduce((acc, p, i) => {
+    if (i === 0) return `M ${p.x} ${p.y}`;
+    const prev = bookingPoints[i - 1];
+    const cpx = (prev.x + p.x) / 2;
+    return `${acc} C ${cpx} ${prev.y}, ${cpx} ${p.y}, ${p.x} ${p.y}`;
+  }, '');
+
+  const bookingAreaD = `${bookingPathD} L ${bookingPoints[bookingPoints.length - 1].x} 160 L ${bookingPoints[0].x} 160 Z`;
+
+  const quotePathD = quotePoints.reduce((acc, p, i) => {
+    if (i === 0) return `M ${p.x} ${p.y}`;
+    const prev = quotePoints[i - 1];
+    const cpx = (prev.x + p.x) / 2;
+    return `${acc} C ${cpx} ${prev.y}, ${cpx} ${p.y}, ${p.x} ${p.y}`;
+  }, '');
+
+  const quoteAreaD = `${quotePathD} L ${quotePoints[quotePoints.length - 1].x} 160 L ${quotePoints[0].x} 160 Z`;
+
+  const displayVolume = kpis.currentMonthVolume
+    ? kpis.currentMonthVolume
+    : kpis.totalVolume
+    ? kpis.totalVolume
+    : (kpis.activeBookings * 1250);
+
+  const displaySales = kpis.currentMonthSales ?? kpis.activeBookings;
 
   const timelineEvents = recentActivity.length > 0 ? recentActivity.slice(0, 5) : [
-    { id: '1', title: 'Task Updated', message: 'Apex Electrician updated task progress', createdAt: new Date(Date.now() - 42 * 60 * 1000).toISOString(), type: 'KYC' },
-    { id: '2', title: 'Deal Added', message: 'Customer accepted quotation for AC Repair', createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(), type: 'BOOKING' },
+    { id: '1', title: 'Task Updated', message: 'Apex Electrician updated service progress', createdAt: new Date(Date.now() - 42 * 60 * 1000).toISOString(), type: 'KYC' },
+    { id: '2', title: 'Deal Added', message: 'Customer accepted quotation for Home Cleaning', createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(), type: 'BOOKING' },
     { id: '3', title: 'Published Request', message: 'New custom wooden partition job posted', createdAt: new Date(Date.now() - 28 * 3600 * 1000).toISOString(), type: 'DISPUTE' },
-    { id: '4', title: 'Dock Updated', message: 'Verification dossier submitted for audit', createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(), type: 'SYSTEM' },
+    { id: '4', title: 'Dock Updated', message: 'Provider profile submitted for verification', createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(), type: 'SYSTEM' },
     { id: '5', title: 'Replied Comment', message: 'Admin answered inquiry on dispute ticket', createdAt: new Date(Date.now() - 72 * 3600 * 1000).toISOString(), type: 'DISPUTE' },
   ];
 
@@ -122,12 +200,12 @@ export default function Dashboard() {
           <div className="mad-chart-body">
             <div className="mad-chart-metrics-left">
               <div>
-                <div className="mad-big-stat-val">₹{(kpis.activeBookings * 1250 + 3468).toLocaleString()}</div>
+                <div className="mad-big-stat-val">₹{displayVolume.toLocaleString('en-IN')}</div>
                 <div className="mad-big-stat-lbl">Current Month Volume</div>
               </div>
 
               <div>
-                <div className="mad-big-stat-val" style={{ fontSize: '1.5rem' }}>{kpis.activeBookings || 82}</div>
+                <div className="mad-big-stat-val" style={{ fontSize: '1.65rem' }}>{displaySales}</div>
                 <div className="mad-big-stat-lbl">Active Month Sales</div>
               </div>
 
@@ -158,49 +236,32 @@ export default function Dashboard() {
                 <line x1="0" y1="125" x2="540" y2="125" stroke="var(--border)" strokeDasharray="3 3" opacity="0.6" />
                 <line x1="0" y1="160" x2="540" y2="160" stroke="var(--border)" />
 
-                <path
-                  d="M 10 120 Q 70 80, 130 115 T 250 55 T 370 100 T 470 25 T 530 110 L 530 160 L 10 160 Z"
-                  fill="url(#wavePurpleGrad)"
-                />
-                <path
-                  d="M 10 120 Q 70 80, 130 115 T 250 55 T 370 100 T 470 25 T 530 110"
-                  fill="none"
-                  stroke="#673ab7"
-                  strokeWidth="2.5"
-                />
+                <path d={quoteAreaD} fill="url(#waveOrangeGrad)" />
+                <path d={quotePathD} fill="none" stroke="#ff9800" strokeWidth="2.5" />
 
-                <path
-                  d="M 10 140 Q 60 100, 120 105 T 230 75 T 340 105 T 450 40 T 530 100 L 530 160 L 10 160 Z"
-                  fill="url(#waveOrangeGrad)"
-                />
-                <path
-                  d="M 10 140 Q 60 100, 120 105 T 230 75 T 340 105 T 450 40 T 530 100"
-                  fill="none"
-                  stroke="#ff9800"
-                  strokeWidth="2.5"
-                />
+                <path d={bookingAreaD} fill="url(#wavePinkGrad)" />
+                <path d={bookingPathD} fill="none" stroke="#e91e63" strokeWidth="3" />
 
-                <path
-                  d="M 10 130 Q 80 110, 140 125 T 250 65 T 360 85 T 480 30 T 530 120 L 530 160 L 10 160 Z"
-                  fill="url(#wavePinkGrad)"
-                />
-                <path
-                  d="M 10 130 Q 80 110, 140 125 T 250 65 T 360 85 T 480 30 T 530 120"
-                  fill="none"
-                  stroke="#e91e63"
-                  strokeWidth="3"
-                />
+                {bookingPoints.map((p, idx) => (
+                  <circle key={`bp-${idx}`} cx={p.x} cy={p.y} r="4.5" fill="#e91e63" stroke="#ffffff" strokeWidth="2" />
+                ))}
 
-                <circle cx="250" cy="55" r="4.5" fill="#ff9800" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="250" cy="65" r="4.5" fill="#673ab7" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="470" cy="25" r="5" fill="#e91e63" stroke="#ffffff" strokeWidth="2" />
+                {quotePoints.map((p, idx) => (
+                  <circle key={`qp-${idx}`} cx={p.x} cy={p.y} r="4" fill="#ff9800" stroke="#ffffff" strokeWidth="2" />
+                ))}
 
-                <text x="15" y="172" fill="var(--text-secondary)" fontSize="10">Jan</text>
-                <text x="110" y="172" fill="var(--text-secondary)" fontSize="10">Feb</text>
-                <text x="215" y="172" fill="var(--text-secondary)" fontSize="10">Mar</text>
-                <text x="320" y="172" fill="var(--text-secondary)" fontSize="10">Apr</text>
-                <text x="425" y="172" fill="var(--text-secondary)" fontSize="10">May</text>
-                <text x="505" y="172" fill="var(--text-secondary)" fontSize="10">Jun</text>
+                {trends.map((t, idx) => (
+                  <text
+                    key={`txt-${idx}`}
+                    x={xCoords[idx] - 10}
+                    y="172"
+                    fill="var(--text-secondary)"
+                    fontSize="11"
+                    fontWeight="700"
+                  >
+                    {t.month}
+                  </text>
+                ))}
               </svg>
             </div>
           </div>
@@ -476,27 +537,35 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {sampleOrders.map((row) => (
-                  <tr key={row.id}>
-                    <td>
-                      <span style={{ fontWeight: 700, color: 'var(--text)' }}>{row.id}</span>
-                    </td>
-                    <td>{row.customer}</td>
-                    <td>{row.service}</td>
-                    <td style={{ fontWeight: 700 }}>{row.price}</td>
-                    <td>
-                      <span className={`mad-badge-status ${row.statusClass}`}>
-                        {row.status}
-                      </span>
+                {filteredOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)' }}>
+                      No marketplace bookings recorded yet.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredOrders.map((row) => (
+                    <tr key={row.id}>
+                      <td>
+                        <span style={{ fontWeight: 800, color: 'var(--text)' }}>{row.id}</span>
+                      </td>
+                      <td>{row.customer}</td>
+                      <td>{row.service}</td>
+                      <td style={{ fontWeight: 800 }}>{row.price}</td>
+                      <td>
+                        <span className={`mad-badge-status ${row.statusClass}`}>
+                          {row.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
 
           <div className="mad-table-footer">
-            <span>Showing 1 to {sampleOrders.length} of {sampleOrders.length} entries</span>
+            <span>Showing 1 to {filteredOrders.length} of {filteredOrders.length} entries</span>
             <div className="mad-pagination">
               <button type="button" className="mad-page-btn">‹</button>
               <button type="button" className="mad-page-btn active">1</button>

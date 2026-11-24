@@ -398,6 +398,89 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       ["CONFIRMED", "EN_ROUTE", "INSPECTION", "IN_PROGRESS", "PAYMENT_PENDING"].includes(b.status)
     ).length;
 
+    let openInvestigations = 0;
+    try {
+      const tickets = await db.orm.public.support_tickets
+        .where((t) => t.status.in(["OPEN", "UNDER_REVIEW"]))
+        .all();
+      openInvestigations = tickets.length;
+    } catch {
+      openInvestigations = 0;
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    let currentMonthVolume = 0;
+    let currentMonthSales = 0;
+    let totalVolume = 0;
+
+    allBookings.forEach((b) => {
+      const amt = Number(b.total_amount || 0);
+      totalVolume += amt;
+      const bDate = new Date(b.created_at);
+      if (bDate.getMonth() === currentMonth && bDate.getFullYear() === currentYear) {
+        currentMonthVolume += amt;
+        currentMonthSales += 1;
+      }
+    });
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthlyTrends = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(currentYear, currentMonth - i, 1);
+      const targetMonth = d.getMonth();
+      const targetYear = d.getFullYear();
+      const monthLabel = monthNames[targetMonth];
+
+      const monthBookings = allBookings.filter((b) => {
+        const bDate = new Date(b.created_at);
+        return bDate.getMonth() === targetMonth && bDate.getFullYear() === targetYear;
+      });
+
+      const monthQuotes = allQuotations.filter((q) => {
+        const qDate = new Date(q.created_at);
+        return qDate.getMonth() === targetMonth && qDate.getFullYear() === targetYear;
+      });
+
+      const vol = monthBookings.reduce((sum, b) => sum + Number(b.total_amount || 0), 0);
+
+      monthlyTrends.push({
+        month: monthLabel,
+        bookingsCount: monthBookings.length,
+        quotationsCount: monthQuotes.length,
+        volume: vol,
+      });
+    }
+
+    const latestBookings = await db.orm.public.bookings
+      .orderBy((b) => b.created_at.desc())
+      .limit(6)
+      .all();
+
+    const customerIds = Array.from(new Set(latestBookings.map((b) => b.customer_id).filter(Boolean)));
+    const customers = customerIds.length
+      ? await db.orm.public.users.where((u) => u.id.in(customerIds as never)).all()
+      : [];
+    const customerMap = new Map(customers.map((c) => [c.id, c.name]));
+
+    const requestIds = Array.from(new Set(latestBookings.map((b) => b.service_request_id).filter(Boolean)));
+    const requests = requestIds.length
+      ? await db.orm.public.service_requests.where((r) => r.id.in(requestIds as never)).all()
+      : [];
+    const requestMap = new Map(requests.map((r) => [r.id, r.title]));
+
+    const recentOrders = latestBookings.map((b) => ({
+      id: b.id,
+      bookingNumber: b.booking_number,
+      customerName: customerMap.get(b.customer_id) || "Customer",
+      serviceTitle: (b.service_request_id && requestMap.get(b.service_request_id)) || "Service Order",
+      totalAmount: Number(b.total_amount || 0),
+      status: b.status,
+      createdAt: b.created_at,
+    }));
+
     const notifications = await db.orm.public.notifications
       .orderBy((n) => n.created_at.desc())
       .limit(6)
@@ -412,8 +495,13 @@ export class PrismaDashboardRepository implements IDashboardRepository {
         activeRequests,
         totalQuotations: allQuotations.length,
         activeBookings,
-        openInvestigations: 0,
+        openInvestigations,
+        totalVolume,
+        currentMonthVolume,
+        currentMonthSales,
       },
+      monthlyTrends,
+      recentOrders,
       recentActivity: notifications.map((n) => ({
         id: n.id,
         type: n.type,
