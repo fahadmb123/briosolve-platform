@@ -202,7 +202,9 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 
   const counterpartyName =
     role === "CUSTOMER"
-      ? booking.providerBusinessName || booking.providerName || "Assigned Provider"
+      ? booking.providerName && booking.providerBusinessName
+        ? `${booking.providerName} (${booking.providerBusinessName})`
+        : booking.providerName || booking.providerBusinessName || "Assigned Provider"
       : booking.customerName || "Customer";
 
   const requiresInspection =

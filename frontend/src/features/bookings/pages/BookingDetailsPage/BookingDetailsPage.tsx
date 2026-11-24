@@ -670,9 +670,23 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
   const timeSlotText = booking.scheduledTime || "Schedule window as agreed with provider";
 
+  const providerPersonName = booking.providerName || null;
+  const providerBusinessName = booking.providerBusinessName || null;
+  const targetProviderId = booking.providerUserId || booking.providerId;
+
+  const handleViewProviderProfile = () => {
+    if (!targetProviderId) {
+      toast.error("Provider profile is not available");
+      return;
+    }
+    navigate(`/nearby-providers/${targetProviderId}`, {
+      state: { returnUrl: location.pathname }
+    });
+  };
+
   const counterpartyName = isProvider
     ? booking.customerName || "Customer"
-    : booking.providerBusinessName || booking.providerName || "Service Provider";
+    : booking.providerName || booking.providerBusinessName || "Service Provider";
   const counterpartyInitial = counterpartyName.charAt(0).toUpperCase();
 
   const mapsUrl = booking.addressText
@@ -1666,15 +1680,33 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
             <div className="bkdet-counterparty-row">
               <div className="bkdet-counterparty-avatar">
-                {counterpartyInitial}
+                {!isProvider && providerPersonName ? (
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(providerPersonName)}&background=FF7900&color=fff&size=120&bold=true`}
+                    alt={providerPersonName}
+                    className="bkdet-counterparty-avatar-img"
+                  />
+                ) : (
+                  counterpartyInitial
+                )}
               </div>
               <div className="bkdet-counterparty-info">
                 <span className="bkdet-counterparty-role">
                   {isProvider ? "Customer" : "Verified Provider"}
                 </span>
                 <span className="bkdet-counterparty-name">
-                  {counterpartyName}
+                  {!isProvider && providerPersonName ? providerPersonName : counterpartyName}
                 </span>
+                {!isProvider && providerBusinessName && (
+                  <span className="bkdet-counterparty-business">
+                    <i className="fas fa-building" /> {providerBusinessName}
+                  </span>
+                )}
+                {!isProvider && booking.providerPhone && (
+                  <a href={`tel:${booking.providerPhone}`} className="bkdet-counterparty-phone">
+                    <i className="fas fa-phone-alt" /> {booking.providerPhone}
+                  </a>
+                )}
               </div>
             </div>
 
@@ -1683,6 +1715,16 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <i className="fas fa-comment-dots" />
                 <span>Chat</span>
               </button>
+              {!isProvider && targetProviderId && (
+                <button
+                  type="button"
+                  className="bkdet-contact-btn bkdet-profile-btn"
+                  onClick={handleViewProviderProfile}
+                >
+                  <i className="fas fa-user-circle" />
+                  <span>View Profile</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
