@@ -128,9 +128,13 @@ export const ProviderReviewsPage: React.FC = () => {
               <i className="fas fa-star" />
             </div>
             <div className="prv-stat-body">
-              <span className="prv-stat-num">
-                {totalReviews > 0 ? averageRating.toFixed(1) : "—"}
-              </span>
+              {isLoading ? (
+                <div className="prv-sk-shimmer prv-sk-stat-num" aria-hidden="true" />
+              ) : (
+                <span className="prv-stat-num">
+                  {totalReviews > 0 ? averageRating.toFixed(1) : "—"}
+                </span>
+              )}
               <span className="prv-stat-label">Avg Rating</span>
             </div>
           </div>
@@ -140,7 +144,11 @@ export const ProviderReviewsPage: React.FC = () => {
               <i className="fas fa-comments" />
             </div>
             <div className="prv-stat-body">
-              <span className="prv-stat-num">{totalReviews}</span>
+              {isLoading ? (
+                <div className="prv-sk-shimmer prv-sk-stat-num" aria-hidden="true" />
+              ) : (
+                <span className="prv-stat-num">{totalReviews}</span>
+              )}
               <span className="prv-stat-label">Total Reviews</span>
             </div>
           </div>
@@ -150,54 +158,80 @@ export const ProviderReviewsPage: React.FC = () => {
               <i className="fas fa-reply" />
             </div>
             <div className="prv-stat-body">
-              <span className="prv-stat-num">{unrepliedCount}</span>
+              {isLoading ? (
+                <div className="prv-sk-shimmer prv-sk-stat-num" aria-hidden="true" />
+              ) : (
+                <span className="prv-stat-num">{unrepliedCount}</span>
+              )}
               <span className="prv-stat-label">Needs Reply</span>
             </div>
           </div>
         </div>
       </div>
 
-      {!isLoading && totalReviews > 0 && breakdown.length > 0 && (
-        <div className="prv-breakdown-card">
+      {isLoading ? (
+        <div className="prv-breakdown-card prv-skeleton-breakdown" aria-hidden="true">
           <div className="prv-breakdown-summary">
-            <div className="prv-breakdown-score">{averageRating.toFixed(1)}</div>
-            <div className="prv-breakdown-stars">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <i
-                  key={star}
-                  className={`fa${star <= Math.round(averageRating) ? "s" : "r"} fa-star ${
-                    star <= Math.round(averageRating) ? "active" : ""
-                  }`}
-                />
-              ))}
-            </div>
-            <span className="prv-breakdown-total">
-              Based on {totalReviews} {totalReviews === 1 ? "review" : "reviews"}
-            </span>
+            <div className="prv-sk-shimmer prv-sk-bd-score" />
+            <div className="prv-sk-shimmer prv-sk-bd-stars" />
+            <div className="prv-sk-shimmer prv-sk-bd-sub" />
           </div>
-
           <div className="prv-breakdown-bars">
-            {breakdown.map((item) => (
-              <button
-                key={item.stars}
-                type="button"
-                className={`prv-bar-row ${ratingFilter === item.stars ? "active" : ""}`}
-                onClick={() =>
-                  setRatingFilter((prev) => (prev === item.stars ? "ALL" : item.stars))
-                }
-              >
-                <span className="prv-bar-label">{item.stars} ★</span>
+            {[5, 4, 3, 2, 1].map((star) => (
+              <div key={star} className="prv-bar-row prv-bar-row-sk">
+                <div className="prv-sk-shimmer prv-sk-bd-label" />
                 <div className="prv-bar-track">
-                  <div
-                    className="prv-bar-fill"
-                    style={{ width: `${item.percentage}%` }}
-                  />
+                  <div className="prv-sk-shimmer prv-sk-bd-fill" />
                 </div>
-                <span className="prv-bar-count">{item.count}</span>
-              </button>
+                <div className="prv-sk-shimmer prv-sk-bd-count" />
+              </div>
             ))}
           </div>
         </div>
+      ) : (
+        totalReviews > 0 &&
+        breakdown.length > 0 && (
+          <div className="prv-breakdown-card">
+            <div className="prv-breakdown-summary">
+              <div className="prv-breakdown-score">{averageRating.toFixed(1)}</div>
+              <div className="prv-breakdown-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <i
+                    key={star}
+                    className={`fa${star <= Math.round(averageRating) ? "s" : "r"} fa-star ${
+                      star <= Math.round(averageRating) ? "active" : ""
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="prv-breakdown-total">
+                Based on {totalReviews} {totalReviews === 1 ? "review" : "reviews"}
+              </span>
+            </div>
+
+            <div className="prv-breakdown-bars">
+              {breakdown.map((item) => (
+                <button
+                  key={item.stars}
+                  type="button"
+                  className={`prv-bar-row ${ratingFilter === item.stars ? "active" : ""}`}
+                  onClick={() =>
+                    setRatingFilter((prev) => (prev === item.stars ? "ALL" : item.stars))
+                  }
+                >
+                  <span className="prv-bar-label">{item.stars} ★</span>
+                  <div className="prv-bar-track">
+                    <div
+                      className="prv-bar-fill"
+                      style={{ width: `${item.percentage}%` }}
+                    />
+                  </div>
+                  <span className="prv-bar-count">{item.count}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )
       )}
 
       <div className="prv-toolbar">
@@ -209,7 +243,7 @@ export const ProviderReviewsPage: React.FC = () => {
               onClick={() => setRatingFilter("ALL")}
             >
               <span>All</span>
-              <span className="prv-filter-count">{totalReviews}</span>
+              <span className="prv-filter-count">{isLoading ? "—" : totalReviews}</span>
             </button>
             {[5, 4, 3, 2, 1].map((star) => (
               <button
@@ -219,7 +253,9 @@ export const ProviderReviewsPage: React.FC = () => {
                 onClick={() => setRatingFilter(star)}
               >
                 <span>{star} ★</span>
-                <span className="prv-filter-count">{ratingCounts[star] ?? 0}</span>
+                <span className="prv-filter-count">
+                  {isLoading ? "—" : ratingCounts[star] ?? 0}
+                </span>
               </button>
             ))}
           </div>
@@ -281,10 +317,19 @@ export const ProviderReviewsPage: React.FC = () => {
                   </div>
                   <div className="prv-sk-shimmer prv-sk-badge" />
                 </div>
-                <div className="prv-card-body" style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <div className="prv-sk-shimmer prv-sk-stars" />
-                  <div className="prv-sk-shimmer prv-sk-line" />
-                  <div className="prv-sk-shimmer prv-sk-line-short" />
+                <div className="prv-card-body">
+                  <div className="prv-sk-review-block">
+                    <div className="prv-sk-shimmer prv-sk-stars" />
+                    <div className="prv-sk-shimmer prv-sk-line" />
+                    <div className="prv-sk-shimmer prv-sk-line-short" />
+                    <div className="prv-sk-aspects">
+                      <div className="prv-sk-shimmer prv-sk-chip" />
+                      <div className="prv-sk-shimmer prv-sk-chip" />
+                    </div>
+                  </div>
+                  <div className="prv-reply-section">
+                    <div className="prv-sk-shimmer prv-sk-reply-btn" />
+                  </div>
                 </div>
               </div>
             ))}
