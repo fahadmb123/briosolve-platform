@@ -15,6 +15,9 @@ export const ProviderTopNav: React.FC = () => {
   const unreadMessagesCount = useUnreadChatCount();
   const navigate = useNavigate();
   const location = useLocation();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const verifications = useAuthStore((state) => state.verifications);
+  const isVerified = verifications !== null && Object.values(verifications).every(Boolean);
 
   const centerNavRef = useRef<HTMLElement>(null);
   const isInitialCrossMount = useRef<boolean>(lastKnownProvTopNavPill !== null);
@@ -39,7 +42,7 @@ export const ProviderTopNav: React.FC = () => {
       if (activeEl) {
         const navRect = centerNavRef.current.getBoundingClientRect();
         const elRect = activeEl.getBoundingClientRect();
-        const targetLeft = elRect.left - navRect.left;
+        const targetLeft = elRect.left - navRect.left - centerNavRef.current.clientLeft;
         const targetWidth = elRect.width;
 
         if (isInitialCrossMount.current) {
@@ -71,7 +74,7 @@ export const ProviderTopNav: React.FC = () => {
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener("resize", updatePill);
     };
-  }, [location.pathname]);
+  }, [location.pathname, isAuthenticated, isVerified]);
 
   const isSettingsSection =
     location.pathname.startsWith("/provider/settings") ||
@@ -99,15 +102,12 @@ export const ProviderTopNav: React.FC = () => {
 
   const user = useAuthStore((state) => state.user);
   const profile = useAuthStore((state) => state.profile) as ProviderProfile | null;
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const logout = useLogout();
 
   const [activePanel, setActivePanel] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const navRef = useRef<HTMLDivElement>(null)
-  const verifications = useAuthStore(state => state.verifications)
-  const isVerified = verifications !== null && Object.values(verifications).every(Boolean);
   const showVerificationWarning = Boolean(isAuthenticated && !isVerified);
   const verificationRoute = "/provider/kyc";
 
@@ -835,44 +835,44 @@ export const ProviderTopNav: React.FC = () => {
                 </NavLink>
               </div>
 
-        <div className="prov-mobile-section">
-          <div className="prov-col-title">MORE</div>
-          <NavLink
-            to="/provider/bookings"
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Bookings</span>
-          </NavLink>
-          <NavLink
-            to="/provider/quotations"
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>My Quotations</span>
-          </NavLink>
-          <NavLink
-            to="/provider/wallet"
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Wallet & Earnings</span>
-          </NavLink>
-          <NavLink
-            to="/provider/support"
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Support Tickets</span>
-          </NavLink>
-          <NavLink
-            to="/provider/reviews"
-            className="prov-mobile-item"
-            onClick={closeAll}
-          >
-            <span>Reviews</span>
-          </NavLink>
-        </div>
+              <div className="prov-mobile-section">
+                <div className="prov-col-title">MORE</div>
+                <NavLink
+                  to="/provider/bookings"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Bookings</span>
+                </NavLink>
+                <NavLink
+                  to="/provider/quotations"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>My Quotations</span>
+                </NavLink>
+                <NavLink
+                  to="/provider/wallet"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Wallet & Earnings</span>
+                </NavLink>
+                <NavLink
+                  to="/provider/support"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Support Tickets</span>
+                </NavLink>
+                <NavLink
+                  to="/provider/reviews"
+                  className="prov-mobile-item"
+                  onClick={closeAll}
+                >
+                  <span>Reviews</span>
+                </NavLink>
+              </div>
 
               <div className="prov-mobile-section">
                 <div className="prov-col-title">ACCOUNT & SETTINGS</div>

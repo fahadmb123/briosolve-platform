@@ -76,7 +76,7 @@ export const TopNav: React.FC = () => {
       if (activeEl) {
         const navRect = linksNavRef.current.getBoundingClientRect();
         const elRect = activeEl.getBoundingClientRect();
-        const targetLeft = elRect.left - navRect.left;
+        const targetLeft = elRect.left - navRect.left - linksNavRef.current.clientLeft;
         const targetWidth = elRect.width;
 
         if (isInitialCrossMount.current) {
@@ -108,7 +108,7 @@ export const TopNav: React.FC = () => {
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener("resize", updatePill);
     };
-  }, [location.pathname]);
+  }, [location.pathname, isAuthenticated, user?.role, verifications]);
 
   const isCustomer = isAuthenticated && user?.role === "CUSTOMER";
   const isProvider = isAuthenticated && user?.role === "PROVIDER";
