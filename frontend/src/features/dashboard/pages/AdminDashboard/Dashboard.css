@@ -691,48 +691,20 @@
     gap: 0.65rem;
 }
 
-.mad-btn-pill-add {
+.mad-view-all-link {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    background: linear-gradient(135deg, #e91e63, #ff4081);
-    color: #ffffff !important;
-    border: none;
-    padding: 0.55rem 1.05rem;
-    border-radius: 8px;
     font-size: 0.8125rem;
     font-weight: 800;
-    text-decoration: none;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(233, 30, 99, 0.35);
-    transition: all 0.2s ease;
-}
-
-.mad-btn-pill-add:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 15px rgba(233, 30, 99, 0.5);
-}
-
-.mad-btn-tool-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    cursor: pointer;
+    color: var(--primary);
     text-decoration: none;
     transition: all 0.15s ease;
 }
 
-.mad-btn-tool-icon:hover {
-    background: var(--surface-elevated);
-    border-color: var(--text-secondary);
-    color: var(--text);
+.mad-view-all-link:hover {
+    color: var(--primary-hover, #e06a00);
+    transform: translateX(2px);
 }
 
 .mad-search-wrap {
@@ -883,8 +855,13 @@
     transition: all 0.15s ease;
 }
 
-.mad-page-btn:hover {
+.mad-page-btn:hover:not(:disabled) {
     background: var(--surface);
+}
+
+.mad-page-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
 }
 
 .mad-page-btn.active {

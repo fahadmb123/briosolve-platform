@@ -8,6 +8,8 @@ export default function Dashboard() {
   const { data, isLoading, isError, refetch } = useAdminDashboard();
   const [selectedPeriod, setSelectedPeriod] = useState<'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'>('MONTHLY');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   if (isLoading) {
     return <AdminDashboardSkeleton />;
@@ -55,20 +57,23 @@ export default function Dashboard() {
   const bookingsPct = Math.max(0, 100 - customerPct - providerPct);
 
   const orders = recentOrders.map((o) => {
-    let statusLabel = 'Process';
+    let statusLabel = 'Confirmed';
     let statusClass = 'process';
     if (o.status === 'COMPLETED') {
-      statusLabel = 'Paid';
+      statusLabel = 'Completed';
       statusClass = 'paid';
     } else if (o.status === 'CLOSED') {
       statusLabel = 'Closed';
       statusClass = 'closed';
     } else if (o.status === 'PAYMENT_PENDING') {
-      statusLabel = 'Unpaid';
+      statusLabel = 'Payment Pending';
       statusClass = 'unpaid';
     } else if (['EN_ROUTE', 'INSPECTION', 'IN_PROGRESS'].includes(o.status)) {
-      statusLabel = 'Open';
+      statusLabel = 'In Progress';
       statusClass = 'open';
+    } else if (o.status === 'CANCELLED') {
+      statusLabel = 'Cancelled';
+      statusClass = 'closed';
     }
     return {
       id: o.bookingNumber,
@@ -86,6 +91,10 @@ export default function Dashboard() {
       o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       o.service.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / itemsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedOrders = filteredOrders.slice((safePage - 1) * itemsPerPage, safePage * itemsPerPage);
 
   const trends = monthlyTrends.length > 0 ? monthlyTrends : [
     { month: 'Jan', bookingsCount: 12, quotationsCount: 22, volume: 15000 },
@@ -517,15 +526,10 @@ export default function Dashboard() {
 
           <div className="mad-table-toolbar">
             <div className="mad-toolbar-left">
-              <Link to="/admin/bookings" className="mad-btn-pill-add">
-                <i className="fas fa-plus"></i> Add
+              <Link to="/admin/bookings" className="mad-view-all-link">
+                <span>View All Bookings</span>
+                <i className="fas fa-arrow-right"></i>
               </Link>
-              <button type="button" onClick={() => refetch()} className="mad-btn-tool-icon" title="Refresh">
-                <i className="fas fa-sync-alt"></i>
-              </button>
-              <button type="button" className="mad-btn-tool-icon" title="Filter list">
-                <i className="fas fa-filter"></i>
-              </button>
             </div>
 
             <div className="mad-search-wrap">
@@ -533,9 +537,12 @@ export default function Dashboard() {
               <input
                 type="text"
                 className="mad-search-input"
-                placeholder="Search..."
+                placeholder="Search orders..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </div>
           </div>
@@ -552,14 +559,14 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.length === 0 ? (
+                {paginatedOrders.length === 0 ? (
                   <tr>
                     <td colSpan={5} style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)' }}>
                       No marketplace bookings recorded yet.
                     </td>
                   </tr>
                 ) : (
-                  filteredOrders.map((row) => (
+                  paginatedOrders.map((row) => (
                     <tr key={row.id}>
                       <td>
                         <span style={{ fontWeight: 800, color: 'var(--text)' }}>{row.id}</span>
@@ -580,15 +587,39 @@ export default function Dashboard() {
           </div>
 
           <div className="mad-table-footer">
-            <span>Showing 1 to {filteredOrders.length} of {filteredOrders.length} entries</span>
-            <div className="mad-pagination">
-              <button type="button" className="mad-page-btn">‹</button>
-              <button type="button" className="mad-page-btn active">1</button>
-              <button type="button" className="mad-page-btn">2</button>
-              <button type="button" className="mad-page-btn">3</button>
-              <button type="button" className="mad-page-btn">4</button>
-              <button type="button" className="mad-page-btn">›</button>
-            </div>
+            <span>
+              Showing {filteredOrders.length > 0 ? (safePage - 1) * itemsPerPage + 1 : 0} to {Math.min(safePage * itemsPerPage, filteredOrders.length)} of {filteredOrders.length} entries
+            </span>
+            {totalPages > 1 && (
+              <div className="mad-pagination">
+                <button
+                  type="button"
+                  className="mad-page-btn"
+                  disabled={safePage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                >
+                  ‹
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
+                  <button
+                    key={pg}
+                    type="button"
+                    className={`mad-page-btn ${safePage === pg ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(pg)}
+                  >
+                    {pg}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className="mad-page-btn"
+                  disabled={safePage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  ›
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
