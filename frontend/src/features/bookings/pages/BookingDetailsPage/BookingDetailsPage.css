@@ -1967,17 +1967,36 @@
   color: #ffffff;
 }
 
-.bkdet-provider-verified-badge {
-  display: inline-flex;
+.bkdet-person-avatar-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0 14px;
+}
+
+.bkdet-person-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #fed7aa;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  background: #0f172a;
+  display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #16a34a;
-  background: rgba(22, 163, 74, 0.1);
-  padding: 3px 8px;
-  border-radius: 9999px;
-  border: 1px solid rgba(22, 163, 74, 0.2);
+  justify-content: center;
+}
+
+.is-provider .bkdet-person-avatar {
+  border-color: #cbd5e1;
+}
+
+[data-theme="dark"] .bkdet-person-avatar {
+  border-color: rgba(255, 121, 0, 0.45);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .is-provider .bkdet-person-avatar {
+  border-color: #334155;
 }
 
 .bkdet-person-kv-list {
@@ -1988,7 +2007,7 @@
   border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 12px 14px;
-  margin: 14px 0 16px;
+  margin: 0 0 16px;
 }
 
 [data-theme="dark"] .bkdet-person-kv-list {
@@ -2047,82 +2066,6 @@
 
 [data-theme="dark"] .bkdet-person-kv-value {
   color: #f1f5f9;
-}
-
-.bkdet-person-kv-value a {
-  color: #ea580c;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.bkdet-person-kv-value a:hover {
-  text-decoration: underline;
-}
-
-.bkdet-person-kv-bio {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.bkdet-person-kv-bio .bkdet-person-kv-value {
-  text-align: left;
-  font-weight: 400;
-  font-style: italic;
-  color: #475569;
-  font-size: 0.8rem;
-  line-height: 1.4;
-}
-
-[data-theme="dark"] .bkdet-person-kv-bio .bkdet-person-kv-value {
-  color: #cbd5e1;
-}
-
-.bkdet-provider-stats-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.bkdet-provider-stat-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.74rem;
-  font-weight: 500;
-  color: #475569;
-  background: #f1f5f9;
-  padding: 2px 7px;
-  border-radius: 6px;
-}
-
-[data-theme="dark"] .bkdet-provider-stat-item {
-  background: #1e293b;
-  color: #94a3b8;
-}
-
-.bkdet-provider-stat-item.rating {
-  color: #d97706;
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-}
-
-.bkdet-provider-bio-snippet {
-  font-size: 0.78rem;
-  color: #64748b;
-  font-style: italic;
-  margin: 6px 0 2px;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-[data-theme="dark"] .bkdet-provider-bio-snippet {
-  color: #94a3b8;
 }
 
 .bkdet-loading-box,

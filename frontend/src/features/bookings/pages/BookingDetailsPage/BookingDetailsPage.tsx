@@ -709,7 +709,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const timeSlotText = booking.scheduledTime || "Schedule window as agreed with provider";
 
   const providerPersonName = booking.providerName || null;
-  const providerBusinessName = booking.providerBusinessName || null;
   const handleViewProviderProfile = () => {
     if (!targetProviderId) {
       toast.error("Provider profile is not available");
@@ -1711,16 +1710,11 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   {isProvider ? "Client Details" : "Provider Details"}
                 </h3>
               </div>
-              {!isProvider && (
-                <span className="bkdet-provider-verified-badge">
-                  <i className="fas fa-check-circle" /> Verified Specialist
-                </span>
-              )}
             </div>
 
-            <div className="bkdet-counterparty-row">
+            <div className="bkdet-person-avatar-wrap">
               <div
-                className="bkdet-counterparty-avatar"
+                className="bkdet-person-avatar"
                 onClick={!isProvider ? () => setIsProviderModalOpen(true) : undefined}
                 style={{ cursor: !isProvider ? "pointer" : "default" }}
                 title={!isProvider ? "Click to view full provider profile" : undefined}
@@ -1752,23 +1746,6 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                   />
                 )}
               </div>
-              <div className="bkdet-counterparty-info">
-                <span className="bkdet-counterparty-role">
-                  {isProvider ? "Client" : "Service Specialist"}
-                </span>
-                <span
-                  className="bkdet-counterparty-name"
-                  onClick={!isProvider ? () => setIsProviderModalOpen(true) : undefined}
-                  style={{ cursor: !isProvider ? "pointer" : "default" }}
-                >
-                  {isProvider ? (booking.customerName || "Customer") : (providerPersonName || counterpartyName)}
-                </span>
-                {!isProvider && providerBusinessName && (
-                  <span className="bkdet-counterparty-business">
-                    <i className="fas fa-building" /> {providerBusinessName}
-                  </span>
-                )}
-              </div>
             </div>
 
             <div className="bkdet-person-kv-list">
@@ -1776,134 +1753,48 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <>
                   <div className="bkdet-person-kv-row">
                     <span className="bkdet-person-kv-label">
-                      <i className="fas fa-user" /> Specialist
+                      <i className="fas fa-user" /> Name
                     </span>
                     <span className="bkdet-person-kv-value">
                       {providerPersonName || counterpartyName}
                     </span>
                   </div>
 
-                  {providerBusinessName && (
-                    <div className="bkdet-person-kv-row">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-briefcase" /> Business
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        {providerBusinessName}
-                      </span>
-                    </div>
-                  )}
-
-                  {booking.providerPhone && (
-                    <div className="bkdet-person-kv-row">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-phone-alt" /> Phone
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        <a href={`tel:${booking.providerPhone}`}>{booking.providerPhone}</a>
-                      </span>
-                    </div>
-                  )}
-
-                  {booking.providerEmail && (
-                    <div className="bkdet-person-kv-row">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-envelope" /> Email
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        <a href={`mailto:${booking.providerEmail}`}>{booking.providerEmail}</a>
-                      </span>
-                    </div>
-                  )}
-
-                  {(booking.providerExperience || publicProvider?.provider_profile?.experience) && (
-                    <div className="bkdet-person-kv-row">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-history" /> Experience
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        {booking.providerExperience || publicProvider?.provider_profile?.experience} years
-                      </span>
-                    </div>
-                  )}
-
-                  {(booking.providerCompletedJobs != null || publicProvider?.provider_profile?.completed_jobs != null) && (
-                    <div className="bkdet-person-kv-row">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-check-circle" /> Jobs Done
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        {booking.providerCompletedJobs ?? publicProvider?.provider_profile?.completed_jobs ?? 0} completed
-                      </span>
-                    </div>
-                  )}
-
-                  {(booking.providerRating != null || (booking.providerReviewCount && booking.providerReviewCount > 0)) && (
-                    <div className="bkdet-person-kv-row">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-star" /> Rating
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        ⭐ {booking.providerRating ? booking.providerRating.toFixed(1) : "New"} {booking.providerReviewCount ? `(${booking.providerReviewCount} reviews)` : ""}
-                      </span>
-                    </div>
-                  )}
-
-                  {(booking.providerBio || publicProvider?.provider_profile?.bio) && (
-                    <div className="bkdet-person-kv-row bkdet-person-kv-bio">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-quote-left" /> About
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        "{booking.providerBio || publicProvider?.provider_profile?.bio}"
-                      </span>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
                   <div className="bkdet-person-kv-row">
                     <span className="bkdet-person-kv-label">
-                      <i className="fas fa-user" /> Client Name
+                      <i className="fas fa-check-circle" /> Jobs Done
                     </span>
                     <span className="bkdet-person-kv-value">
-                      {booking.customerName || "Customer"}
+                      {booking.providerCompletedJobs ?? publicProvider?.provider_profile?.completed_jobs ?? 0}
                     </span>
                   </div>
 
-                  {booking.customerPhone && (
-                    <div className="bkdet-person-kv-row">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-phone-alt" /> Phone
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        <a href={`tel:${booking.customerPhone}`}>{booking.customerPhone}</a>
-                      </span>
-                    </div>
-                  )}
-
-                  {booking.customerEmail && (
-                    <div className="bkdet-person-kv-row">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-envelope" /> Email
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        <a href={`mailto:${booking.customerEmail}`}>{booking.customerEmail}</a>
-                      </span>
-                    </div>
-                  )}
-
-                  {booking.addressText && (
-                    <div className="bkdet-person-kv-row">
-                      <span className="bkdet-person-kv-label">
-                        <i className="fas fa-map-marker-alt" /> Location
-                      </span>
-                      <span className="bkdet-person-kv-value">
-                        {booking.addressText}
-                      </span>
-                    </div>
-                  )}
+                  <div className="bkdet-person-kv-row">
+                    <span className="bkdet-person-kv-label">
+                      <i className="fas fa-star" /> Reviews Rating
+                    </span>
+                    <span className="bkdet-person-kv-value">
+                      {booking.providerRating != null && (booking.providerReviewCount ?? 0) > 0 ? (
+                        <>
+                          <i className="fas fa-star" style={{ color: "#f59e0b", marginRight: "5px" }} />
+                          {booking.providerRating.toFixed(1)} ({booking.providerReviewCount}{" "}
+                          {booking.providerReviewCount === 1 ? "review" : "reviews"})
+                        </>
+                      ) : (
+                        "No reviews yet"
+                      )}
+                    </span>
+                  </div>
                 </>
+              ) : (
+                <div className="bkdet-person-kv-row">
+                  <span className="bkdet-person-kv-label">
+                    <i className="fas fa-user" /> Name
+                  </span>
+                  <span className="bkdet-person-kv-value">
+                    {booking.customerName || "Customer"}
+                  </span>
+                </div>
               )}
             </div>
 
