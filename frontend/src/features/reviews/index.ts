@@ -6,3 +6,4 @@ export * from "./components/ReviewModal/ReviewModal";
 export * from "./components/BookingReviewCard/BookingReviewCard";
 export * from "./pages/CustomerReviewsPage/CustomerReviewsPage";
 export * from "./pages/ProviderReviewsPage/ProviderReviewsPage";
+export * from "./pages/AdminReviewsPage/AdminReviewsPage";

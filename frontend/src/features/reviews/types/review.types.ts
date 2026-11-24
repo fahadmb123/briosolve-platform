@@ -87,3 +87,29 @@ export interface ProviderReviewsSummary {
     total: number;
   };
 }
+
+export interface GetAdminReviewsQueryParams {
+  search?: string;
+  rating?: number;
+  isReported?: boolean;
+  isHidden?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export interface AdminReviewsResponse {
+  reviews: ReviewItem[];
+  reportedCount: number;
+  pagination: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    total: number;
+  };
+}
+
+export interface ModerateReviewPayload {
+  reviewId: string;
+  isHidden?: boolean;
+  isReported?: boolean;
+}

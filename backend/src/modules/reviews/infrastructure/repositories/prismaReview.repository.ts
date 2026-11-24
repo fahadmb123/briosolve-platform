@@ -303,6 +303,35 @@ export class PrismaReviewRepository implements IReviewRepository {
 
     const reportedResult = await db.orm.public.reviews.where({ is_reported: true }).aggregate((agg) => ({ total: agg.count() }));
     const reportedCount = Number(reportedResult?.total || 0);
+
+    const searchTerm = params.search?.trim().toLowerCase();
+    if (searchTerm) {
+      const records = await query
+        .orderBy((r) => r.created_at.desc())
+        .all();
+
+      const allPopulated = await this.populateExtras(records);
+      const matched = allPopulated.filter((rev) => {
+        return (
+          (rev.title && rev.title.toLowerCase().includes(searchTerm)) ||
+          rev.comment.toLowerCase().includes(searchTerm) ||
+          (rev.customerName && rev.customerName.toLowerCase().includes(searchTerm)) ||
+          (rev.providerName && rev.providerName.toLowerCase().includes(searchTerm)) ||
+          (rev.providerBusinessName && rev.providerBusinessName.toLowerCase().includes(searchTerm)) ||
+          (rev.serviceTitle && rev.serviceTitle.toLowerCase().includes(searchTerm)) ||
+          (rev.bookingNumber && rev.bookingNumber.toLowerCase().includes(searchTerm))
+        );
+      });
+
+      const paginated = matched.slice(skip, skip + limit);
+
+      return {
+        reviews: paginated,
+        total: matched.length,
+        reportedCount
+      };
+    }
+
     const totalResult = await query.aggregate((agg) => ({ total: agg.count() }));
     const totalCount = Number(totalResult?.total || 0);
 
@@ -312,21 +341,7 @@ export class PrismaReviewRepository implements IReviewRepository {
       .limit(limit)
       .all();
 
-    let populated = await this.populateExtras(records);
-
-    if (params.search && params.search.trim()) {
-      const term = params.search.trim().toLowerCase();
-      populated = populated.filter((rev) => {
-        return (
-          (rev.title && rev.title.toLowerCase().includes(term)) ||
-          rev.comment.toLowerCase().includes(term) ||
-          (rev.customerName && rev.customerName.toLowerCase().includes(term)) ||
-          (rev.providerName && rev.providerName.toLowerCase().includes(term)) ||
-          (rev.providerBusinessName && rev.providerBusinessName.toLowerCase().includes(term)) ||
-          (rev.bookingNumber && rev.bookingNumber.toLowerCase().includes(term))
-        );
-      });
-    }
+    const populated = await this.populateExtras(records);
 
     return {
       reviews: populated,

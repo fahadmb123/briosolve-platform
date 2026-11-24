@@ -4,12 +4,16 @@ import {
   getBookingReview,
   getMyReviews,
   getProviderReviews,
-  replyToReview
+  replyToReview,
+  getAdminReviews,
+  moderateReview
 } from "../services/review.service";
 import type {
   CreateReviewPayload,
   GetCustomerReviewsQueryParams,
-  GetProviderReviewsQueryParams
+  GetProviderReviewsQueryParams,
+  GetAdminReviewsQueryParams,
+  ModerateReviewPayload
 } from "../types/review.types";
 
 export const useCreateReviewMutation = () => {
@@ -57,6 +61,30 @@ export const useReplyToReviewMutation = () => {
     mutationFn: ({ reviewId, replyText }: { reviewId: string; replyText: string }) =>
       replyToReview(reviewId, replyText),
     onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["providerReviews"] });
+      queryClient.invalidateQueries({ queryKey: ["myReviews"] });
+      queryClient.invalidateQueries({ queryKey: ["adminReviews"] });
+      if (res?.data?.bookingId) {
+        queryClient.invalidateQueries({ queryKey: ["bookingReview", res.data.bookingId] });
+      }
+    }
+  });
+};
+
+export const useAdminReviewsQuery = (params?: GetAdminReviewsQueryParams) => {
+  return useQuery({
+    queryKey: ["adminReviews", params],
+    queryFn: () => getAdminReviews(params)
+  });
+};
+
+export const useModerateReviewMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ reviewId, isHidden, isReported }: ModerateReviewPayload) =>
+      moderateReview(reviewId, { isHidden, isReported }),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["adminReviews"] });
       queryClient.invalidateQueries({ queryKey: ["providerReviews"] });
       queryClient.invalidateQueries({ queryKey: ["myReviews"] });
       if (res?.data?.bookingId) {

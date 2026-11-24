@@ -6,7 +6,9 @@ import type {
   CustomerReviewsResponse,
   GetCustomerReviewsQueryParams,
   GetProviderReviewsQueryParams,
-  ProviderReviewsSummary
+  ProviderReviewsSummary,
+  GetAdminReviewsQueryParams,
+  AdminReviewsResponse
 } from "../types/review.types";
 
 export const createReview = async (
@@ -49,5 +51,22 @@ export const replyToReview = async (
   const res = await apiClient.post<response<ReviewItem>>(`/api/reviews/${reviewId}/reply`, {
     replyText
   });
+  return res.data;
+};
+
+export const getAdminReviews = async (
+  params?: GetAdminReviewsQueryParams
+): Promise<response<AdminReviewsResponse>> => {
+  const res = await apiClient.get<response<AdminReviewsResponse>>("/api/reviews/admin", {
+    params
+  });
+  return res.data;
+};
+
+export const moderateReview = async (
+  reviewId: string,
+  payload: { isHidden?: boolean; isReported?: boolean }
+): Promise<response<ReviewItem>> => {
+  const res = await apiClient.patch<response<ReviewItem>>(`/api/reviews/${reviewId}/moderate`, payload);
   return res.data;
 };
