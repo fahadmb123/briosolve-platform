@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import { useAdminReviewsQuery, useModerateReviewMutation } from "../../hooks/useReviews";
 import { BookingReviewCard } from "../../components/BookingReviewCard/BookingReviewCard";
 import { AdminPagination } from "../../../admin/components/AdminPagination";
+import { ConfirmModal } from "../../../../shared/components/ui/ConfirmModal/ConfirmModal";
 import type { ReviewItem } from "../../types/review.types";
 import "./AdminReviewsPage.css";
 
@@ -14,6 +15,7 @@ export const AdminReviewsPage: React.FC = () => {
   const [visibilityFilter, setVisibilityFilter] = useState<"" | "VISIBLE" | "HIDDEN">("");
   const [reportFilter, setReportFilter] = useState<"" | "REPORTED" | "CLEAN">("");
   const [selectedReview, setSelectedReview] = useState<ReviewItem | null>(null);
+  const [pendingVisibilityReview, setPendingVisibilityReview] = useState<ReviewItem | null>(null);
   const limit = 10;
 
   useEffect(() => {
@@ -56,7 +58,9 @@ export const AdminReviewsPage: React.FC = () => {
     setPage(1);
   };
 
-  const handleToggleHidden = (review: ReviewItem) => {
+  const handleConfirmToggleHidden = () => {
+    if (!pendingVisibilityReview) return;
+    const review = pendingVisibilityReview;
     moderateMutation.mutate(
       { reviewId: review.id, isHidden: !review.isHidden },
       {
@@ -65,6 +69,7 @@ export const AdminReviewsPage: React.FC = () => {
           if (selectedReview?.id === review.id && res?.data) {
             setSelectedReview(res.data);
           }
+          setPendingVisibilityReview(null);
         },
         onError: (err: any) => {
           toast.error(err?.response?.data?.message || "Failed to update review visibility");
@@ -375,7 +380,7 @@ export const AdminReviewsPage: React.FC = () => {
                             className={`arv-icon-btn ${review.isHidden ? "restore" : "hide"}`}
                             title={review.isHidden ? "Restore review" : "Hide review"}
                             disabled={moderateMutation.isPending}
-                            onClick={() => handleToggleHidden(review)}
+                            onClick={() => setPendingVisibilityReview(review)}
                           >
                             <i className={`fas ${review.isHidden ? "fa-eye-slash" : "fa-ban"}`} />
                           </button>
@@ -447,7 +452,7 @@ export const AdminReviewsPage: React.FC = () => {
                 type="button"
                 className={`btn text-xs ${selectedReview.isHidden ? "btn-primary" : "btn-danger"}`}
                 disabled={moderateMutation.isPending}
-                onClick={() => handleToggleHidden(selectedReview)}
+                onClick={() => setPendingVisibilityReview(selectedReview)}
               >
                 <i className={`fas ${selectedReview.isHidden ? "fa-eye" : "fa-ban"} mr-1`} />
                 {selectedReview.isHidden ? "Restore Review" : "Hide Review"}
@@ -456,6 +461,25 @@ export const AdminReviewsPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={Boolean(pendingVisibilityReview)}
+        title={pendingVisibilityReview?.isHidden ? "Restore Review" : "Hide Review"}
+        message={
+          pendingVisibilityReview?.isHidden
+            ? "Are you sure you want to restore this review? It will become publicly visible on the provider's profile and ratings."
+            : "Are you sure you want to hide this review? It will be removed from public view and excluded from the provider's rating."
+        }
+        confirmText={pendingVisibilityReview?.isHidden ? "Restore Review" : "Hide Review"}
+        isDanger={!pendingVisibilityReview?.isHidden}
+        isLoading={moderateMutation.isPending}
+        onConfirm={handleConfirmToggleHidden}
+        onCancel={() => {
+          if (!moderateMutation.isPending) {
+            setPendingVisibilityReview(null);
+          }
+        }}
+      />
     </div>
   );
 };
