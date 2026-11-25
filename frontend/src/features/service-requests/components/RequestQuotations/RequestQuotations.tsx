@@ -44,6 +44,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState<boolean>(false);
   const [aiComparisonData, setAiComparisonData] = useState<CompareQuotationsResponse | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
   const activeRazorpayRef = useRef<any>(null);
   const [redirectOverlay, setRedirectOverlay] = useState<{
     show: boolean;
@@ -117,16 +118,20 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   const handleOpenAiComparison = () => {
     setIsAiModalOpen(true);
     if (!aiComparisonData) {
+      setAiError(null);
       compareAiMutation.mutate(
         { serviceRequestId: requestId, topN: 3 },
         {
           onSuccess: (res) => {
             if (res.data) {
               setAiComparisonData(res.data);
+              setAiError(null);
             }
           },
           onError: (err: any) => {
-            toast.error(err?.response?.data?.message || "Failed to analyze quotations with AI");
+            const msg = err?.response?.data?.message || err?.message || "Failed to analyze quotations with AI";
+            setAiError(msg);
+            toast.error(msg);
           }
         }
       );
@@ -134,17 +139,21 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   };
 
   const handleRefreshAiComparison = () => {
+    setAiError(null);
     compareAiMutation.mutate(
       { serviceRequestId: requestId, topN: 3 },
       {
         onSuccess: (res) => {
           if (res.data) {
             setAiComparisonData(res.data);
+            setAiError(null);
             toast.success("AI comparison updated");
           }
         },
         onError: (err: any) => {
-          toast.error(err?.response?.data?.message || "Failed to analyze quotations with AI");
+          const msg = err?.response?.data?.message || err?.message || "Failed to analyze quotations with AI";
+          setAiError(msg);
+          toast.error(msg);
         }
       }
     );
@@ -1059,6 +1068,7 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
         onAcceptQuote={(quote) => setConfirmAcceptQuote(quote)}
         onChatWithProvider={(quote) => handleChat(quote)}
         requestTitle={requestItem?.title}
+        errorMessage={aiError}
       />
     </>
   );

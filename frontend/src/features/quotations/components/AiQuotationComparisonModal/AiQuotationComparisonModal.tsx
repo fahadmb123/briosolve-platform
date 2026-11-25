@@ -13,6 +13,7 @@ interface AiQuotationComparisonModalProps {
   onAcceptQuote: (quote: RequestQuotationItem) => void;
   onChatWithProvider?: (quote: RequestQuotationItem) => void;
   requestTitle?: string;
+  errorMessage?: string | null;
 }
 
 const THINKING_MESSAGES = [
@@ -31,7 +32,8 @@ export const AiQuotationComparisonModal: React.FC<AiQuotationComparisonModalProp
   onRefresh,
   onAcceptQuote,
   onChatWithProvider,
-  requestTitle
+  requestTitle,
+  errorMessage
 }) => {
   const [msgIndex, setMsgIndex] = useState(0);
 
@@ -120,7 +122,7 @@ export const AiQuotationComparisonModal: React.FC<AiQuotationComparisonModalProp
             <div className="ai-modal-empty-state">
               <i className="fas fa-circle-exclamation ai-empty-icon" />
               <h4>Unable to load AI comparison</h4>
-              <p>We could not analyze the quotations at this time. Please try again.</p>
+              <p>{errorMessage || "We could not analyze the quotations at this time. Please try again."}</p>
               <button type="button" className="ai-primary-btn" onClick={onRefresh}>
                 Evaluate with AI
               </button>
