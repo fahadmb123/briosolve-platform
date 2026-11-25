@@ -9,7 +9,7 @@ import { useUpdateProfileImage } from '../../hooks/provider/useUpdateProfileImag
 import { useDeleteProfileImage } from '../../hooks/provider/useDeleteProfileImage';
 import { useGetProviderServices } from '../../../service-catalog';
 import { useGetProviderVerifications } from '../../../verification/hooks/mutations/useVerification';
-import { useProviderReviewsQuery } from '../../../reviews';
+import { useProviderReviewsQuery, BookingReviewCard } from '../../../reviews';
 import { getAddresses, type Address } from '../../../addresses';
 import type { PopulatedProviderService, ProviderProfile } from '../../types/profile.types';
 import type { response } from '../../../../shared/types/Dtos';
@@ -133,10 +133,19 @@ export default function Profile() {
   const { mutate: deleteProfileImage, isPending: isImageDeleting } = useDeleteProfileImage();
   const { data: providerServicesRes, isLoading: isLoadingServices } = useGetProviderServices();
   const { data: verificationsRes } = useGetProviderVerifications();
-  const { data: reviewsSummaryRes } = useProviderReviewsQuery(providerProfile?.id, { page: 1, limit: 1 });
+  const { data: reviewsSummaryRes, isLoading: isLoadingReviews } = useProviderReviewsQuery(
+    providerProfile?.id,
+    { page: 1, limit: 12 }
+  );
 
   const averageRating = reviewsSummaryRes?.data?.averageRating ?? 0;
   const totalReviews = reviewsSummaryRes?.data?.totalReviews ?? 0;
+  const bestReviews = useMemo(() => {
+    const list = reviewsSummaryRes?.data?.reviews || [];
+    return [...list]
+      .sort((a, b) => b.rating - a.rating || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 4);
+  }, [reviewsSummaryRes?.data?.reviews]);
 
   useEffect(() => {
     if (!user || !profile) {
@@ -702,6 +711,86 @@ export default function Profile() {
                   <Link to="/provider/settings" state={{ activeSection: 'services' }} className="btn btn-primary btn-sm">
                     <i className="fas fa-plus mr-1.5"></i> Manage Services in Settings
                   </Link>
+                </div>
+              )}
+            </div>
+
+            <div className="form-card-modern">
+              <div className="flex justify-between items-center mb-6 pb-4 border-bottom flex-wrap gap-2">
+                <div>
+                  <h3 className="h4 mb-0">Top Customer Reviews</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  {totalReviews > 0 && (
+                    <span className="badge badge-warning text-xs font-semibold px-2.5 py-1">
+                      <i className="fas fa-star mr-1"></i>
+                      {averageRating.toFixed(1)} ({totalReviews})
+                    </span>
+                  )}
+                  <Link to="/provider/reviews" className="btn btn-outline btn-xs">
+                    View All Reviews
+                  </Link>
+                </div>
+              </div>
+
+              {isLoadingReviews ? (
+                <div className="profile-best-reviews-grid">
+                  {Array.from({ length: 2 }).map((_, idx) => (
+                    <div key={`rev-skel-${idx}`} className="profile-best-review-card">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Skeleton circle width={38} height={38} />
+                        <div className="flex-1">
+                          <Skeleton width="55%" height={14} />
+                          <Skeleton width="35%" height={11} />
+                        </div>
+                      </div>
+                      <Skeleton width="40%" height={14} className="mb-2" />
+                      <Skeleton count={2} height={12} />
+                    </div>
+                  ))}
+                </div>
+              ) : bestReviews.length > 0 ? (
+                <div className="profile-best-reviews-grid">
+                  {bestReviews.map((review) => {
+                    const customerName = review.customerName || 'Customer';
+                    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=0f172a&color=fff&size=80&bold=true`;
+                    return (
+                      <div key={review.id} className="profile-best-review-card">
+                        <div className="profile-best-review-header">
+                          <img
+                            src={review.customerAvatar || fallbackAvatar}
+                            alt={customerName}
+                            className="profile-best-review-avatar"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = fallbackAvatar;
+                            }}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="font-bold text-sm text-text truncate">{customerName}</div>
+                            {review.serviceTitle && (
+                              <div className="text-xs text-secondary truncate">{review.serviceTitle}</div>
+                            )}
+                          </div>
+                        </div>
+                        <BookingReviewCard review={review} variant="embedded" />
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="profile-services-empty-state">
+                  <img
+                    src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                    alt="No reviews yet"
+                    className="profile-services-empty-img"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/images/no-data.png';
+                    }}
+                  />
+                  <h4 className="profile-services-empty-title">No Customer Reviews Yet</h4>
+                  <p className="profile-services-empty-desc">
+                    Your highest-rated customer reviews will be highlighted here once customers rate completed bookings.
+                  </p>
                 </div>
               )}
             </div>

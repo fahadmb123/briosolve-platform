@@ -5,6 +5,7 @@ import type { User } from '../../../../shared/types/Dtos';
 import type { Address } from '../../../addresses';
 import { useGetProviderPublicProfile } from '../../hooks/mutations/useGetProviderPublicProfile';
 import type { ProviderPublicProfileData } from '../../services/nearbyProviders.service';
+import { useProviderReviewsQuery, BookingReviewCard } from '../../../reviews';
 import './ProviderProfileView.css';
 
 interface ProviderProfileViewProps {
@@ -38,6 +39,19 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
     const targetId = providerId || initialProvider?.id;
     const [profileData, setProfileData] = useState<ProviderPublicProfileData | null>(null);
     const { data: profileRes, isLoading: isQueryLoading } = useGetProviderPublicProfile(targetId);
+    const { data: reviewsRes, isLoading: isLoadingReviews } = useProviderReviewsQuery(targetId, {
+        page: 1,
+        limit: 12
+    });
+
+    const averageRating = reviewsRes?.data?.averageRating ?? 0;
+    const totalReviews = reviewsRes?.data?.totalReviews ?? 0;
+    const bestReviews = useMemo(() => {
+        const list = reviewsRes?.data?.reviews || [];
+        return [...list]
+            .sort((a, b) => b.rating - a.rating || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .slice(0, 4);
+    }, [reviewsRes?.data?.reviews]);
 
     const state = location.state as { from?: string; returnUrl?: string } | null;
     const isFromChat = state?.from === 'chat' || Boolean(state?.returnUrl && (state.returnUrl.includes('messages') || state.returnUrl.includes('chat')));
@@ -362,6 +376,70 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                                 </span>
                             ))}
                         </div>
+                    </div>
+
+                    <div className="provider-info-card">
+                        <div className="provider-info-header">
+                            <div className="provider-info-header-title">
+                                <i className="fas fa-star" />
+                                <h3>Top Customer Reviews</h3>
+                            </div>
+                            {totalReviews > 0 && (
+                                <span className="ppv-rating-pill">
+                                    <i className="fas fa-star" />
+                                    <span>{averageRating.toFixed(1)} · {totalReviews} {totalReviews === 1 ? 'review' : 'reviews'}</span>
+                                </span>
+                            )}
+                        </div>
+                        {isLoadingReviews ? (
+                            <div className="ppv-reviews-grid">
+                                {Array.from({ length: 2 }).map((_, idx) => (
+                                    <div key={`ppv-rev-skel-${idx}`} className="ppv-review-card">
+                                        <div className="ppv-review-head">
+                                            <Skeleton circle width={36} height={36} />
+                                            <div style={{ flex: 1 }}>
+                                                <Skeleton width="55%" height={14} />
+                                                <Skeleton width="35%" height={11} />
+                                            </div>
+                                        </div>
+                                        <Skeleton width="45%" height={14} style={{ marginBottom: 6 }} />
+                                        <Skeleton count={2} height={12} />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : bestReviews.length > 0 ? (
+                            <div className="ppv-reviews-grid">
+                                {bestReviews.map((review) => {
+                                    const customerName = review.customerName || 'Customer';
+                                    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=0f172a&color=fff&size=80&bold=true`;
+                                    return (
+                                        <div key={review.id} className="ppv-review-card">
+                                            <div className="ppv-review-head">
+                                                <img
+                                                    src={review.customerAvatar || fallbackAvatar}
+                                                    alt={customerName}
+                                                    className="ppv-review-avatar"
+                                                    onError={(e) => {
+                                                        (e.currentTarget as HTMLImageElement).src = fallbackAvatar;
+                                                    }}
+                                                />
+                                                <div style={{ minWidth: 0, flex: 1 }}>
+                                                    <div className="ppv-review-author">{customerName}</div>
+                                                    {review.serviceTitle && (
+                                                        <div className="ppv-review-service">{review.serviceTitle}</div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <BookingReviewCard review={review} variant="embedded" />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <p className="text-secondary text-sm mb-0">
+                                No customer reviews yet for {activeProviderName}.
+                            </p>
+                        )}
                     </div>
 
                     <div className="provider-info-card">
