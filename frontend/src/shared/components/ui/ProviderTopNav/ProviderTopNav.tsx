@@ -608,63 +608,22 @@ export const ProviderTopNav: React.FC = () => {
                   </div>
                   <div className="prov-dropdown-divider"></div>
                   <NavLink
-                    to="/"
-                    end
-                    className="prov-mobile-item"
-                    onClick={closeAll}
-                  >
-                    <span>Home</span>
-                  </NavLink>
-                  <NavLink
-                    to="/provider/dashboard"
-                    end
-                    className="prov-mobile-item"
-                    onClick={closeAll}
-                  >
-                    <span>Dashboard</span>
-                  </NavLink>
-                  <NavLink
-                    to="/provider/service-requests"
-                    className="prov-mobile-item"
-                    onClick={closeAll}
-                  >
-                    <span>Service Requests</span>
-                  </NavLink>
-                  <Link to="/provider/messages" className="prov-mobile-item" onClick={closeAll}>
-                    <span>Messages</span>
-                    {unreadMessagesCount > 0 && (
-                      <span className="prov-mono-badge">
-                        {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
-                      </span>
-                    )}
-                  </Link>
-                  <NavLink
                     to="/provider/profile"
-                    className="prov-mobile-item"
-                    onClick={closeAll}
-                  >
-                    <span>Business Profile</span>
-                  </NavLink>
-                  <NavLink
-                    to="/provider/kyc"
-                    className="prov-panel-item"
+                    className={({ isActive }) =>
+                      `prov-panel-item ${isActive ? "item-active" : ""}`
+                    }
                     onClick={closeAll}
                   >
                     <div className="prov-item-main">
-                      <i className="fas fa-shield-alt"></i>
-                      <span>KYC Verification</span>
+                      <i className="fas fa-user-tie"></i>
+                      <span>Business Profile</span>
                     </div>
                   </NavLink>
                   <NavLink
-                    to="/provider/notifications"
-                    className="prov-mobile-item"
-                    onClick={closeAll}
-                  >
-                    <span>Notification Alerts</span>
-                  </NavLink>
-                  <NavLink
                     to="/provider/settings"
-                    className="prov-panel-item"
+                    className={({ isActive }) =>
+                      `prov-panel-item ${isActive ? "item-active" : ""}`
+                    }
                     onClick={closeAll}
                   >
                     <div className="prov-item-main">
@@ -677,16 +636,6 @@ export const ProviderTopNav: React.FC = () => {
                       </span>
                     )}
                   </NavLink>
-                  <Link
-                    to="/provider/verification"
-                    className="prov-panel-item"
-                    onClick={closeAll}
-                  >
-                    <div className="prov-item-main">
-                      <i className="fas fa-exchange-alt"></i>
-                      <span>Switch to User</span>
-                    </div>
-                  </Link>
                   <button
                     type="button"
                     className="prov-panel-item"
