@@ -742,15 +742,17 @@ export default function Profile() {
                           </div>
                           <i className={`fas fa-chevron-down profile-cat-accordion-chevron ${isOpen ? 'rotate' : ''}`}></i>
                         </button>
-                        {isOpen && (
-                          <div className="profile-cat-accordion-body">
-                            <div className="profile-services-grid">
-                              {group.items.map((item) => (
-                                <ProfileServiceCard key={item.id} item={item} />
-                              ))}
+                        <div className={`profile-cat-accordion-collapse ${isOpen ? 'is-open' : ''}`}>
+                          <div className="profile-cat-accordion-inner">
+                            <div className="profile-cat-accordion-body">
+                              <div className="profile-services-grid">
+                                {group.items.map((item) => (
+                                  <ProfileServiceCard key={item.id} item={item} />
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        )}
+                        </div>
                       </div>
                     );
                   })}

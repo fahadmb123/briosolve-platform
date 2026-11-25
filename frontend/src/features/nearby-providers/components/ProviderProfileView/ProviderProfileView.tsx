@@ -372,22 +372,24 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                                                 </div>
                                                 <i className={`fas fa-chevron-down ppv-cat-accordion-chevron ${isOpen ? 'rotate' : ''}`} />
                                             </button>
-                                            {isOpen && (
-                                                <div className="ppv-cat-accordion-body">
-                                                    <div className="provider-services-grid">
-                                                        {items.map((item) => (
-                                                            <div key={item.id} className="provider-service-card-item">
-                                                                <h4 className="provider-service-item-title">
-                                                                    {item.service?.name || 'Professional Service'}
-                                                                </h4>
-                                                                <p className="provider-service-item-desc">
-                                                                    {item.service?.description || 'Custom quotes and on-demand scheduling provided.'}
-                                                                </p>
-                                                            </div>
-                                                        ))}
+                                            <div className={`ppv-cat-accordion-collapse ${isOpen ? 'is-open' : ''}`}>
+                                                <div className="ppv-cat-accordion-inner">
+                                                    <div className="ppv-cat-accordion-body">
+                                                        <div className="provider-services-grid">
+                                                            {items.map((item) => (
+                                                                <div key={item.id} className="provider-service-card-item">
+                                                                    <h4 className="provider-service-item-title">
+                                                                        {item.service?.name || 'Professional Service'}
+                                                                    </h4>
+                                                                    <p className="provider-service-item-desc">
+                                                                        {item.service?.description || 'Custom quotes and on-demand scheduling provided.'}
+                                                                    </p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
                                     );
                                 })}

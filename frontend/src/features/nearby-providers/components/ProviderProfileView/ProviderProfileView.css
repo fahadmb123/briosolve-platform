@@ -892,6 +892,23 @@
     color: #FF7900;
 }
 
+.ppv-cat-accordion-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+}
+
+.ppv-cat-accordion-collapse.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.ppv-cat-accordion-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
 .ppv-cat-accordion-body {
     padding: 1rem 1.1rem 1.1rem 1.1rem;
     border-top: 1px solid var(--border);

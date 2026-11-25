@@ -799,8 +799,24 @@
     color: #FF7900;
 }
 
+.profile-cat-accordion-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+}
+
+.profile-cat-accordion-collapse.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.profile-cat-accordion-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
 .profile-cat-accordion-body {
-    padding: 0.25rem 1.15rem 1.15rem 1.15rem;
+    padding: 1rem 1.15rem 1.15rem 1.15rem;
     border-top: 1px solid var(--border);
-    padding-top: 1rem;
 }
