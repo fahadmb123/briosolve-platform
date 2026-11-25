@@ -2339,3 +2339,47 @@ body.light .chat-input-wrapper {
     left: -0.25rem;
   }
 }
+
+.chat-conv-preview {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.chat-conv-preview > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-conv-tick {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.chat-conv-tick.read {
+  color: #38bdf8;
+}
+
+.chat-conv-tick.sending {
+  opacity: 0.7;
+}
+
+.chat-conv-photo-icon {
+  font-size: 0.74rem;
+  color: var(--text-secondary, #64748b);
+  flex-shrink: 0;
+}
+
+.chat-conv-preview.typing {
+  color: #10b981 !important;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.chat-header-status-text.typing {
+  color: #10b981 !important;
+  font-weight: 700;
+}

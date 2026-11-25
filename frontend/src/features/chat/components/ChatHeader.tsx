@@ -8,6 +8,7 @@ interface ChatHeaderProps {
   onBackToMobileList: () => void;
   onStartAudioCall?: () => void;
   onStartVideoCall?: () => void;
+  isTyping?: boolean;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -17,6 +18,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   onBackToMobileList,
   onStartAudioCall,
   onStartVideoCall,
+  isTyping = false,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const participantName = participant?.name || "User";
@@ -77,8 +79,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               </span>
             )}
           </div>
-          <p className={`chat-header-status-text ${participant?.isOnline ? "online" : "offline"}`}>
-            {participant?.isOnline ? "Active now" : "Offline"}
+          <p className={`chat-header-status-text ${isTyping ? "typing" : participant?.isOnline ? "online" : "offline"}`}>
+            {isTyping ? "typing..." : participant?.isOnline ? "Active now" : "Offline"}
           </p>
         </div>
       </div>

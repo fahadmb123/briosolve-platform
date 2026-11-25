@@ -62,6 +62,8 @@ export default function CustomerChat() {
     Boolean(queryConversationId || queryRecipientId)
   );
   const [presenceMap, setPresenceMap] = useState<Record<string, boolean>>({});
+  const [typingMap, setTypingMap] = useState<Record<string, boolean>>({});
+  const typingTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const { data: conversationsRes, isLoading: isQueryConversationsLoading, refetch: refetchConversations } = useGetConversations();
   const getMessagesMutation = useGetMessages();
@@ -279,6 +281,8 @@ export default function CustomerChat() {
                 senderId: backendMsg.sender_id,
                 createdAt: chatMsg.createdAt,
                 isUnread: isFromOther && isNotSelected,
+                status: backendMsg.status || "SENT",
+                messageType: (backendMsg.message_type === "IMAGE" ? "IMAGE" : "TEXT") as "IMAGE" | "TEXT",
               },
               unreadCount: isFromOther && isNotSelected ? (c.unreadCount || 0) + 1 : c.unreadCount,
               updatedAt: new Date().toISOString(),
@@ -295,6 +299,12 @@ export default function CustomerChat() {
       const isFromOther = String(backendMsg.sender_id).trim() !== String(currentUser?.id).trim();
       const isViewingThisChat = String(selectedId).trim() === String(backendMsg.conversation_id).trim();
       if (isFromOther) {
+        const convKey = String(backendMsg.conversation_id).trim();
+        if (typingTimersRef.current[convKey]) {
+          clearTimeout(typingTimersRef.current[convKey]);
+          delete typingTimersRef.current[convKey];
+        }
+        setTypingMap((prev) => (prev[convKey] ? { ...prev, [convKey]: false } : prev));
         if (isViewingThisChat) {
           playChatRecieveSound();
         } else {
@@ -322,6 +332,52 @@ export default function CustomerChat() {
           ),
         };
       });
+      setConversations((prev) =>
+        prev.map((c) => {
+          if (
+            String(c.id).trim() === String(data.conversation_id).trim() &&
+            String(c.lastMessage?.senderId || "").trim() === String(currentUser?.id).trim()
+          ) {
+            return {
+              ...c,
+              lastMessage: {
+                ...c.lastMessage,
+                status: "READ",
+              },
+            };
+          }
+          return c;
+        })
+      );
+    },
+    [currentUser?.id]
+  );
+
+  const handleSocketTypingStart = useCallback(
+    (data: { conversationId: string; userId: string }) => {
+      if (String(data.userId).trim() === String(currentUser?.id).trim()) return;
+      const convId = String(data.conversationId).trim();
+      setTypingMap((prev) => (prev[convId] ? prev : { ...prev, [convId]: true }));
+      if (typingTimersRef.current[convId]) {
+        clearTimeout(typingTimersRef.current[convId]);
+      }
+      typingTimersRef.current[convId] = setTimeout(() => {
+        setTypingMap((prev) => ({ ...prev, [convId]: false }));
+        delete typingTimersRef.current[convId];
+      }, 4000);
+    },
+    [currentUser?.id]
+  );
+
+  const handleSocketTypingStop = useCallback(
+    (data: { conversationId: string; userId: string }) => {
+      if (String(data.userId).trim() === String(currentUser?.id).trim()) return;
+      const convId = String(data.conversationId).trim();
+      if (typingTimersRef.current[convId]) {
+        clearTimeout(typingTimersRef.current[convId]);
+        delete typingTimersRef.current[convId];
+      }
+      setTypingMap((prev) => (prev[convId] ? { ...prev, [convId]: false } : prev));
     },
     [currentUser?.id]
   );
@@ -384,6 +440,8 @@ export default function CustomerChat() {
     onNewMessage: handleSocketNewMessage,
     onConversationRead: handleSocketConversationRead,
     onUserStatus: handleSocketUserStatus,
+    onTypingStart: handleSocketTypingStart,
+    onTypingStop: handleSocketTypingStop,
   });
 
   const fetchedConversationIdRef = useRef<string | null>(null);
@@ -720,6 +778,17 @@ export default function CustomerChat() {
     });
   }, [navigate, selectedConversation?.participant?.id, location.pathname, location.search]);
 
+  const handleTyping = useCallback(
+    (isTyping: boolean) => {
+      if (!isRealConversation || !selectedConversation?.id) return;
+      socket.emit(isTyping ? "typing:start" : "typing:stop", {
+        conversationId: selectedConversation.id,
+        recipientId: selectedConversation.participant?.id,
+      });
+    },
+    [isRealConversation, selectedConversation?.id, selectedConversation?.participant?.id]
+  );
+
   return (
     <div className="chat-layout-root">
       <div
@@ -736,6 +805,8 @@ export default function CustomerChat() {
             filter={filter}
             onFilterChange={setFilter}
             isLoading={isConversationsLoading}
+            currentUserId={currentUser?.id}
+            typingMap={typingMap}
           />
         </div>
 
@@ -747,6 +818,7 @@ export default function CustomerChat() {
               <ChatHeader
                 participant={selectedConversation.participant}
                 isInfoOpen={false}
+                isTyping={Boolean(typingMap[selectedConversation.id])}
                 onToggleInfo={handleOpenDetails}
                 onBackToMobileList={() => setIsMobileThreadOpen(false)}
                 onStartAudioCall={() => {
@@ -791,7 +863,7 @@ export default function CustomerChat() {
                 )}
               </div>
 
-              <ChatInputBar onSendMessage={handleSendMessage} />
+              <ChatInputBar onSendMessage={handleSendMessage} onTyping={handleTyping} />
             </div>
           ) : (
             <EmptyChatState currentRole="CUSTOMER" hasConversations={conversations.length > 0} />

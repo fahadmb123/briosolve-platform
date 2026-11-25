@@ -54,6 +54,8 @@ export interface ChatConversation {
     senderId: string;
     createdAt: string;
     isUnread: boolean;
+    status?: MessageStatus;
+    messageType?: "TEXT" | "IMAGE" | "FILE";
   };
   unreadCount: number;
   updatedAt: string;

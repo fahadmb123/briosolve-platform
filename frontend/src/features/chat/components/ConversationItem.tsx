@@ -5,15 +5,41 @@ interface ConversationItemProps {
   conversation: ChatConversation;
   isSelected: boolean;
   onSelect: (conversationId: string) => void;
+  currentUserId?: string;
+  isTyping?: boolean;
 }
 
 export const ConversationItem: React.FC<ConversationItemProps> = ({
   conversation,
   isSelected,
   onSelect,
+  currentUserId,
+  isTyping = false,
 }) => {
   const { participant, lastMessage, unreadCount } = conversation;
   const participantName = participant?.name || "User";
+  const isOwnLastMessage = Boolean(
+    currentUserId &&
+      lastMessage?.senderId &&
+      String(lastMessage.senderId).trim() === String(currentUserId).trim()
+  );
+
+  const renderLastMessageTick = () => {
+    if (!isOwnLastMessage || (!lastMessage?.text && lastMessage?.messageType !== "IMAGE")) {
+      return null;
+    }
+    const status = lastMessage?.status || "SENT";
+    if (status === "SENDING") {
+      return <i className="far fa-clock chat-conv-tick sending" title="Sending" />;
+    }
+    if (status === "READ") {
+      return <i className="fas fa-check-double chat-conv-tick read" title="Seen" />;
+    }
+    if (status === "DELIVERED") {
+      return <i className="fas fa-check-double chat-conv-tick" title="Delivered" />;
+    }
+    return <i className="fas fa-check chat-conv-tick" title="Sent" />;
+  };
 
   return (
     <div
@@ -56,7 +82,17 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
         </div>
 
         <div className="chat-conv-bottom">
-          <p className="chat-conv-preview">{lastMessage?.text || ""}</p>
+          {isTyping ? (
+            <p className="chat-conv-preview typing">typing...</p>
+          ) : (
+            <p className="chat-conv-preview">
+              {renderLastMessageTick()}
+              {lastMessage?.messageType === "IMAGE" && (
+                <i className="fas fa-camera chat-conv-photo-icon" />
+              )}
+              <span>{lastMessage?.text || ""}</span>
+            </p>
+          )}
           {(unreadCount || 0) > 0 && (
             <span className="chat-unread-count-pill">{unreadCount}</span>
           )}

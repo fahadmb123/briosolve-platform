@@ -8,6 +8,8 @@ interface UseChatSocketProps {
     onNewMessage: (message: BackendMessageDto) => void;
     onConversationRead?: (data: { conversation_id: string; read_by: string; read_at: string }) => void;
     onUserStatus?: (data: { userId: string; isOnline: boolean }) => void;
+    onTypingStart?: (data: { conversationId: string; userId: string }) => void;
+    onTypingStop?: (data: { conversationId: string; userId: string }) => void;
 }
 
 export function useChatSocket({
@@ -15,12 +17,16 @@ export function useChatSocket({
     onNewMessage,
     onConversationRead,
     onUserStatus,
+    onTypingStart,
+    onTypingStop,
 }: UseChatSocketProps): void {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     const onNewMessageRef = useRef(onNewMessage);
     const onConversationReadRef = useRef(onConversationRead);
     const onUserStatusRef = useRef(onUserStatus);
+    const onTypingStartRef = useRef(onTypingStart);
+    const onTypingStopRef = useRef(onTypingStop);
 
     useEffect(() => {
         onNewMessageRef.current = onNewMessage;
@@ -34,7 +40,13 @@ export function useChatSocket({
         onUserStatusRef.current = onUserStatus;
     });
 
-    
+    useEffect(() => {
+        onTypingStartRef.current = onTypingStart;
+    });
+
+    useEffect(() => {
+        onTypingStopRef.current = onTypingStop;
+    });
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -55,14 +67,26 @@ export function useChatSocket({
             onUserStatusRef.current?.(data);
         };
 
+        const handleTypingStart = (data: { conversationId: string; userId: string }) => {
+            onTypingStartRef.current?.(data);
+        };
+
+        const handleTypingStop = (data: { conversationId: string; userId: string }) => {
+            onTypingStopRef.current?.(data);
+        };
+
         socket.on("message:new", handleNewMessage);
         socket.on("conversation:read", handleConversationRead);
         socket.on("user:status", handleUserStatus);
+        socket.on("typing:start", handleTypingStart);
+        socket.on("typing:stop", handleTypingStop);
 
         return () => {
             socket.off("message:new", handleNewMessage);
             socket.off("conversation:read", handleConversationRead);
             socket.off("user:status", handleUserStatus);
+            socket.off("typing:start", handleTypingStart);
+            socket.off("typing:stop", handleTypingStop);
         };
     }, [isAuthenticated]);
 

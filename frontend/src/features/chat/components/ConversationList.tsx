@@ -12,6 +12,8 @@ interface ConversationListProps {
   filter: ConversationFilter;
   onFilterChange: (f: ConversationFilter) => void;
   isLoading?: boolean;
+  currentUserId?: string;
+  typingMap?: Record<string, boolean>;
 }
 
 export const ConversationList: React.FC<ConversationListProps> = ({
@@ -23,6 +25,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   filter,
   onFilterChange,
   isLoading = false,
+  currentUserId,
+  typingMap = {},
 }) => {
   const unreadTotal = conversations.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
 
@@ -103,6 +107,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               conversation={conv}
               isSelected={conv.id === selectedId}
               onSelect={onSelect}
+              currentUserId={currentUserId}
+              isTyping={Boolean(typingMap[conv.id])}
             />
           ))
         )}

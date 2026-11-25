@@ -41,5 +41,31 @@ export class ChatSocketHandler {
         socket.on("conversation:leave", async (conversationId: string) => {
             await socket.leave(`conversation:${conversationId}`);
         });
+
+        socket.on("typing:start", (data: { conversationId: string; recipientId?: string }) => {
+            const userId = socket.data.user?.userId ?? (socket.data as any)?.userId;
+            if (!userId || !data?.conversationId) return;
+            const payload = {
+                conversationId: String(data.conversationId).trim(),
+                userId: String(userId).trim()
+            };
+            socket.to(`conversation:${payload.conversationId}`).emit("typing:start", payload);
+            if (data.recipientId) {
+                socket.to(`user:${String(data.recipientId).trim()}`).emit("typing:start", payload);
+            }
+        });
+
+        socket.on("typing:stop", (data: { conversationId: string; recipientId?: string }) => {
+            const userId = socket.data.user?.userId ?? (socket.data as any)?.userId;
+            if (!userId || !data?.conversationId) return;
+            const payload = {
+                conversationId: String(data.conversationId).trim(),
+                userId: String(userId).trim()
+            };
+            socket.to(`conversation:${payload.conversationId}`).emit("typing:stop", payload);
+            if (data.recipientId) {
+                socket.to(`user:${String(data.recipientId).trim()}`).emit("typing:stop", payload);
+            }
+        });
     }
 }

@@ -4,12 +4,14 @@ import { useTheme } from "../../../shared/hooks/useTheme";
 
 interface ChatInputBarProps {
   onSendMessage: (text: string, imageFile?: File) => void;
+  onTyping?: (isTyping: boolean) => void;
   prompts?: string[];
   disabled?: boolean;
 }
 
 export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   onSendMessage,
+  onTyping,
   prompts = [],
   disabled = false,
 }) => {
@@ -21,6 +23,44 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const emojiContainerRef = useRef<HTMLDivElement>(null);
+  const typingStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTypingEmitRef = useRef<number>(0);
+
+  useEffect(() => {
+    return () => {
+      if (typingStopTimerRef.current) {
+        clearTimeout(typingStopTimerRef.current);
+      }
+      onTyping?.(false);
+    };
+  }, [onTyping]);
+
+  const notifyTypingActivity = (hasText: boolean) => {
+    if (!onTyping) return;
+    if (!hasText) {
+      if (typingStopTimerRef.current) {
+        clearTimeout(typingStopTimerRef.current);
+        typingStopTimerRef.current = null;
+      }
+      lastTypingEmitRef.current = 0;
+      onTyping(false);
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastTypingEmitRef.current > 1500) {
+      lastTypingEmitRef.current = now;
+      onTyping(true);
+    }
+
+    if (typingStopTimerRef.current) {
+      clearTimeout(typingStopTimerRef.current);
+    }
+    typingStopTimerRef.current = setTimeout(() => {
+      lastTypingEmitRef.current = 0;
+      onTyping(false);
+    }, 2000);
+  };
 
   useEffect(() => {
     if (!showEmojiPicker) return;
@@ -54,6 +94,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
     const end = textarea.selectionEnd ?? inputText.length;
     const updated = inputText.slice(0, start) + emoji + inputText.slice(end);
     setInputText(updated);
+    notifyTypingActivity(Boolean(updated.trim()));
 
     requestAnimationFrame(() => {
       textarea.focus();
@@ -99,6 +140,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
     onSendMessage(trimmed, fileToSend);
 
     setShowEmojiPicker(false);
+    notifyTypingActivity(false);
     setInputText("");
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -121,7 +163,9 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputText(e.target.value);
+    const val = e.target.value;
+    setInputText(val);
+    notifyTypingActivity(Boolean(val.trim()));
     e.target.style.height = "auto";
     e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
   };
