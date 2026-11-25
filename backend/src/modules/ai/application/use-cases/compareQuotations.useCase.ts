@@ -5,6 +5,11 @@ import { CompareQuotationsRequestDto } from "../dtos/request/compare-quotations.
 import { CompareQuotationsResponseDto } from "../dtos/response/compare-quotations.response.dto";
 import { GetRequestQuotationsInputDto } from "../../../quotation-submission/application/dtos/request/get-request-quotations.dto";
 import { RequestQuotationsResponseDto } from "../../../quotation-submission/application/dtos/response/request-quotations-response.dto";
+import {
+    buildQuotationComparisonSystemPrompt,
+    buildQuotationComparisonUserPrompt,
+    QuotationComparisonBidPayload
+} from "../prompts";
 
 export class CompareQuotationsUseCase implements IUseCase<CompareQuotationsRequestDto, CompareQuotationsResponseDto> {
     constructor(
@@ -30,7 +35,7 @@ export class CompareQuotationsUseCase implements IUseCase<CompareQuotationsReque
 
         const topN = Math.max(1, Math.min(input.topN || 3, quotations.length));
 
-        const sanitizedBids = quotations.map((q) => ({
+        const sanitizedBids: QuotationComparisonBidPayload[] = quotations.map((q) => ({
             quotationId: q.id,
             amount: q.amount,
             quotationType: q.quotationType,
@@ -50,35 +55,8 @@ export class CompareQuotationsUseCase implements IUseCase<CompareQuotationsReque
             }
         }));
 
-        const systemPrompt = `You are a procurement advisor for a home services reverse marketplace.
-Analyze the provided provider bids for the client's service request, rank the best proposals up to top ${topN}, select one recommended winner, and provide concise pros, cons, and a verdict for each.
-
-Evaluate on:
-1. Value for money (Price vs. included items and materials)
-2. Provider credibility (Completed jobs count and experience)
-3. Feasibility and timing (Duration and availability)
-4. Transparency (Clarity of extra charge policies and exclusions)
-
-You MUST respond strictly with a valid JSON object matching this schema:
-{
-  "recommendedWinnerId": "string (the quotationId of the top recommended bid)",
-  "rankings": [
-    {
-      "quotationId": "string",
-      "providerName": "string",
-      "rank": 1,
-      "score": 95,
-      "pros": ["string"],
-      "cons": ["string"],
-      "verdict": "string"
-    }
-  ],
-  "aiSummary": "string (a concise 2-3 sentence overview explaining why the winning bid is recommended)"
-}`;
-
-        const userPrompt = `Compare these ${sanitizedBids.length} provider quotations and provide recommendations for the top ${topN}:
-
-${JSON.stringify(sanitizedBids, null, 2)}`;
+        const systemPrompt = buildQuotationComparisonSystemPrompt(topN);
+        const userPrompt = buildQuotationComparisonUserPrompt(sanitizedBids, topN);
 
         const result = await this._llmAdapter.generateJsonResponse<CompareQuotationsResponseDto>(
             systemPrompt,
