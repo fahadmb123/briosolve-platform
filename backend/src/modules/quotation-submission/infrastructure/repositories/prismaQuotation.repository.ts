@@ -3,7 +3,7 @@ import { Quotation } from "../../domain/entities/quotation.entity";
 import { IQuotationRepository, GetProviderQuotationsParams, ProviderQuotationsResult } from "../../domain/repositories/IQuotationRepository";
 import { CreateQuotationRepoDto } from "../../application/dtos/request/submit-quotation.dto";
 import { UpdateQuotationRepoDto } from "../../application/dtos/request/update-quotation.dto";
-import { QuotationMapper } from "../mappers/quotation.mapper";
+import { QuotationMapper } from "../../application/mappers/quotation.mapper";
 
 export class PrismaQuotationRepository implements IQuotationRepository {
     private async syncExpiredQuotations(): Promise<void> {

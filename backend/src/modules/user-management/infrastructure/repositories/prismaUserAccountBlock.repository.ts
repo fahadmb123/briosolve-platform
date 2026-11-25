@@ -2,7 +2,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { db } from "../../../../shared/database/client";
 import { UserAccountBlock } from "../../domain/entities/userAccountBlock.entity";
 import { IUserAccountBlockRepository, CreateUserAccountBlockInput } from "../../domain/repositories/IUserAccountBlockRepository";
-import { UserAccountBlockMapper } from "../mappers/userAccountBlock.mapper";
+import { UserAccountBlockMapper } from "../../application/mappers/userAccountBlock.mapper";
 
 export class UserAccountBlockRepository implements IUserAccountBlockRepository {
     async create(data: CreateUserAccountBlockInput): Promise<UserAccountBlock> {

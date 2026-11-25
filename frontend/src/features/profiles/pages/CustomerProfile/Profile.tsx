@@ -12,6 +12,9 @@ import { useAuthStore } from '../../../auth/stores/auth.store';
 import { ImageCropModal } from '../../../../shared/components/ui/ImageCropModal/ImageCropModal';
 import { useUpdateProfileImage } from '../../hooks/customer/useUpdateProfileImage';
 import { useDeleteProfileImage } from '../../hooks/customer/useDeleteProfileImage';
+import { useGetMyServiceRequests } from '../../../service-requests/hooks/useServiceRequestMutations';
+import { useGetCustomerBookings } from '../../../bookings/hooks/useBookingMutations';
+import { useMyReviewsQuery } from '../../../reviews';
 import type { CustomerProfile } from '../../types/profile.types';
 
 export default function Profile() {
@@ -40,6 +43,20 @@ export default function Profile() {
 
   const { mutate: updateProfile, isPending } = useUpdateProfile();
   useGetProfile();
+
+  const { data: requestsRes, isLoading: isLoadingRequests } = useGetMyServiceRequests({ page: 1, limit: 1 });
+  const { data: bookingsRes, isLoading: isLoadingBookings } = useGetCustomerBookings({ page: 1, limit: 1 });
+  const { data: reviewsRes, isLoading: isLoadingReviews } = useMyReviewsQuery({ page: 1, limit: 1 });
+
+  const requestsTotal = requestsRes?.data?.total ?? 0;
+  const activeRequestsCount =
+    (requestsRes?.data?.counts?.OPEN ?? 0) +
+    (requestsRes?.data?.counts?.QUOTED ?? 0) +
+    (requestsRes?.data?.counts?.IN_PROGRESS ?? 0);
+  const bookingsTotal = bookingsRes?.data?.total ?? 0;
+  const completedBookings = bookingsRes?.data?.counts?.COMPLETED ?? 0;
+  const reviewsTotal = reviewsRes?.data?.totalReviews ?? 0;
+  const avgReviewRating = reviewsRes?.data?.averageRating ?? 0;
 
   useEffect(() => {
     (()=>{
@@ -361,56 +378,84 @@ export default function Profile() {
             </form>
 
             <div className="form-card-modern">
-              <div className="flex justify-between items-center mb-5 pb-4 border-bottom border-border">
+              <div className="cust-activity-header">
                 <div>
                   <h3 className="h5 mb-0.5 text-text font-bold">Activity &amp; Quick Shortcuts</h3>
-                  <p className="text-xs text-secondary mb-0">Manage your connected marketplace actions and quick links.</p>
+                  <p className="text-xs text-secondary mb-0">Live summary of your marketplace activity and quick links.</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <div className="p-4 rounded-xl border border-border bg-surface-hover flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                    <i className="fas fa-file-invoice text-lg"></i>
+              <div className="cust-activity-grid">
+                <Link to="/my-requests" className="cust-activity-card">
+                  <div className="cust-activity-icon requests">
+                    <i className="fas fa-file-invoice"></i>
                   </div>
-                  <div>
-                    <div className="text-xs text-secondary uppercase font-semibold">Service Requests</div>
-                    <div className="text-lg font-bold text-text">14 Active/Past</div>
+                  <div className="cust-activity-body">
+                    <div className="cust-activity-label">Service Requests</div>
+                    {isLoadingRequests ? (
+                      <div className="cust-activity-sk" />
+                    ) : (
+                      <>
+                        <div className="cust-activity-val">{requestsTotal} Total</div>
+                        <div className="cust-activity-sub">
+                          {activeRequestsCount > 0 ? `${activeRequestsCount} active` : 'View all requests'}
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
+                  <i className="fas fa-chevron-right cust-activity-arrow"></i>
+                </Link>
 
-                <div className="p-4 rounded-xl border border-border bg-surface-hover flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
-                    <i className="fas fa-calendar-check text-lg"></i>
+                <Link to="/bookings" className="cust-activity-card">
+                  <div className="cust-activity-icon bookings">
+                    <i className="fas fa-calendar-check"></i>
                   </div>
-                  <div>
-                    <div className="text-xs text-secondary uppercase font-semibold">Bookings</div>
-                    <div className="text-lg font-bold text-text">12 Completed</div>
+                  <div className="cust-activity-body">
+                    <div className="cust-activity-label">Bookings</div>
+                    {isLoadingBookings ? (
+                      <div className="cust-activity-sk" />
+                    ) : (
+                      <>
+                        <div className="cust-activity-val">{completedBookings} Completed</div>
+                        <div className="cust-activity-sub">{bookingsTotal} total bookings</div>
+                      </>
+                    )}
                   </div>
-                </div>
+                  <i className="fas fa-chevron-right cust-activity-arrow"></i>
+                </Link>
 
-                <div className="p-4 rounded-xl border border-border bg-surface-hover flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
-                    <i className="fas fa-bell text-lg"></i>
+                <Link to="/reviews" className="cust-activity-card">
+                  <div className="cust-activity-icon reviews">
+                    <i className="fas fa-star"></i>
                   </div>
-                  <div>
-                    <div className="text-xs text-secondary uppercase font-semibold">Alerts</div>
-                    <div className="text-lg font-bold text-text">Live Push Ready</div>
+                  <div className="cust-activity-body">
+                    <div className="cust-activity-label">Reviews Shared</div>
+                    {isLoadingReviews ? (
+                      <div className="cust-activity-sk" />
+                    ) : (
+                      <>
+                        <div className="cust-activity-val">{reviewsTotal} {reviewsTotal === 1 ? 'Review' : 'Reviews'}</div>
+                        <div className="cust-activity-sub">
+                          {reviewsTotal > 0 ? `${avgReviewRating.toFixed(1)} ★ avg rating` : 'No reviews yet'}
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
+                  <i className="fas fa-chevron-right cust-activity-arrow"></i>
+                </Link>
               </div>
 
-              <div className="flex flex-wrap gap-3">
-                <Link to="/settings" className="btn btn-outline btn-sm flex items-center gap-1.5">
-                  <i className="fas fa-cog text-primary"></i>
+              <div className="cust-shortcuts-row">
+                <Link to="/settings" className="cust-shortcut-btn">
+                  <i className="fas fa-cog"></i>
                   <span>Account Settings</span>
                 </Link>
-                <Link to="/notifications" className="btn btn-outline btn-sm flex items-center gap-1.5">
-                  <i className="fas fa-bell text-primary"></i>
+                <Link to="/notifications" className="cust-shortcut-btn">
+                  <i className="fas fa-bell"></i>
                   <span>Notification Preferences</span>
                 </Link>
-                <button type="button" onClick={() => setIsLocModalOpen(true)} className="btn btn-outline btn-sm flex items-center gap-1.5">
-                  <i className="fas fa-map-marker-alt text-primary"></i>
+                <button type="button" onClick={() => setIsLocModalOpen(true)} className="cust-shortcut-btn">
+                  <i className="fas fa-map-marker-alt"></i>
                   <span>View Full Address Details</span>
                 </button>
               </div>

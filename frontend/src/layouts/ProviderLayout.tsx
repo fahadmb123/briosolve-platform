@@ -37,7 +37,8 @@ export default function ProviderLayout() {
     location.pathname.startsWith("/provider/quotations") ||
     location.pathname.startsWith("/provider/wallet") ||
     location.pathname.startsWith("/provider/support") ||
-    location.pathname.startsWith("/provider/tickets");
+    location.pathname.startsWith("/provider/tickets") ||
+    location.pathname.startsWith("/provider/reviews");
 
   const hasSubnav = isSettingsSection || isWorkspaceSection || isMoreSection;
 

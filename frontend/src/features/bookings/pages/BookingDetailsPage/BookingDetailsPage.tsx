@@ -10,6 +10,13 @@ import {
 import type { BookingItem, BookingStatus, BookingStatusHistoryItem } from "../../types/booking.types";
 import { BookingStatusModal, ServiceMismatchModal } from "../../components";
 import { RaiseDisputeModal } from "../../../support";
+import {
+  ReviewModal,
+  BookingReviewCard,
+  useBookingReviewQuery,
+  useReplyToReviewMutation
+} from "../../../reviews";
+import { useGetProviderPublicProfile } from "../../../nearby-providers/hooks/mutations/useGetProviderPublicProfile";
 import { useAuthStore } from "../../../auth/stores/auth.store";
 import { createBookingPaymentOrderService, verifyBookingPaymentService } from "../../../payment/services/payment.service";
 import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
@@ -44,8 +51,41 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const [targetStatus, setTargetStatus] = useState<BookingStatus | null>(null);
   const [isMismatchModalOpen, setIsMismatchModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isReplyOpen, setIsReplyOpen] = useState(false);
+  const [replyText, setReplyText] = useState("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const activeRazorpayRef = useRef<any>(null);
+
+  const { data: reviewData, isLoading: isLoadingReview, refetch: refetchReview } = useBookingReviewQuery(booking?.id);
+  const replyMutation = useReplyToReviewMutation();
+  const existingReview = reviewData?.data || null;
+
+  const handleReplySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!existingReview || !replyText.trim()) return;
+    replyMutation.mutate(
+      { reviewId: existingReview.id, replyText: replyText.trim() },
+      {
+        onSuccess: () => {
+          toast.success("Reply posted successfully");
+          setReplyText("");
+          setIsReplyOpen(false);
+          refetchReview();
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Failed to post reply");
+        }
+      }
+    );
+  };
+
+  const targetProviderId = booking?.providerUserId || booking?.providerId;
+
+  const { data: providerProfileRes } = useGetProviderPublicProfile(
+    !isProvider && targetProviderId ? targetProviderId : undefined
+  );
+  const publicProvider = providerProfileRes?.data || null;
 
   useEffect(() => {
     return () => {
@@ -665,10 +705,20 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
   const timeSlotText = booking.scheduledTime || "Schedule window as agreed with provider";
 
+  const providerPersonName = booking.providerName || null;
+  const handleViewProviderProfile = () => {
+    if (!targetProviderId) {
+      toast.error("Provider profile is not available");
+      return;
+    }
+    navigate(`/nearby-providers/${targetProviderId}`, {
+      state: { returnUrl: location.pathname, from: "booking" }
+    });
+  };
+
   const counterpartyName = isProvider
     ? booking.customerName || "Customer"
-    : booking.providerBusinessName || booking.providerName || "Service Provider";
-  const counterpartyInitial = counterpartyName.charAt(0).toUpperCase();
+    : booking.providerName || booking.providerBusinessName || "Service Provider";
 
   const mapsUrl = booking.addressText
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.addressText)}`
@@ -853,6 +903,18 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             >
               <i className="fas fa-times-circle" />
               <span>Cancel Booking</span>
+            </button>
+          )}
+
+          {!isProvider && isCompleted && !isLoadingReview && !existingReview && !booking.isReviewed && (
+            <button
+              type="button"
+              className="bkdet-action-btn primary"
+              style={{ background: "#FF7900", borderColor: "#ea580c" }}
+              onClick={() => setIsReviewModalOpen(true)}
+            >
+              <i className="fas fa-star" />
+              <span>Write Review</span>
             </button>
           )}
 
@@ -1172,6 +1234,116 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
       <div className="bkdet-layout-grid">
         <div className="bkdet-col-main">
+          {isCompleted && isLoadingReview && (
+            <div className="bkdet-section-card bkdet-skeleton-container" aria-hidden="true">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "50%" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "220px", height: "20px", borderRadius: "6px" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", paddingTop: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "110px", height: "18px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "36px", height: "16px", borderRadius: "4px" }} />
+                </div>
+                <div className="bkdet-sk-shimmer" style={{ width: "45%", height: "18px", borderRadius: "4px" }} />
+                <div className="bkdet-sk-shimmer" style={{ width: "95%", height: "14px", borderRadius: "4px" }} />
+                <div className="bkdet-sk-shimmer" style={{ width: "70%", height: "14px", borderRadius: "4px" }} />
+                <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "24px", borderRadius: "9999px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "24px", borderRadius: "9999px" }} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isCompleted && !isLoadingReview && existingReview && (
+            <div className="bkdet-section-card">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-section-icon" style={{ color: "#f59e0b" }}>
+                    <i className="fas fa-star" />
+                  </div>
+                  <h3 className="bkdet-section-title">
+                    {isProvider ? "Customer Feedback & Review" : "Your Review for Specialist"}
+                  </h3>
+                </div>
+              </div>
+              <BookingReviewCard review={existingReview} />
+              {isProvider && !existingReview.providerReply && (
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
+                  {!isReplyOpen ? (
+                    <button
+                      type="button"
+                      className="btn-outline-sm"
+                      onClick={() => setIsReplyOpen(true)}
+                    >
+                      <i className="fas fa-reply mr-2" />
+                      Reply to Review
+                    </button>
+                  ) : (
+                    <form onSubmit={handleReplySubmit} className="flex flex-col gap-2.5">
+                      <textarea
+                        rows={3}
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder="Write a professional reply to this customer review..."
+                        maxLength={1000}
+                        className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        required
+                      />
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          className="btn-outline-sm"
+                          onClick={() => {
+                            setIsReplyOpen(false);
+                            setReplyText("");
+                          }}
+                          disabled={replyMutation.isPending}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="btn-primary-sm"
+                          disabled={replyMutation.isPending || !replyText.trim()}
+                        >
+                          {replyMutation.isPending ? "Posting..." : "Post Reply"}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {isCompleted && !isLoadingReview && !isProvider && !existingReview && !booking.isReviewed && (
+            <div className="bkdet-section-card bkdet-review-prompt-card">
+              <div className="bkdet-review-prompt-content">
+                <div className="bkdet-review-prompt-icon">
+                  <i className="fas fa-star" />
+                </div>
+                <div className="bkdet-review-prompt-text">
+                  <h3 className="bkdet-review-prompt-title">Rate & Review Your Specialist</h3>
+                  <p className="bkdet-review-prompt-desc">
+                    Your service is completed! Take a moment to rate {counterpartyName} and help other customers in the marketplace.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="bkdet-review-prompt-btn"
+                  onClick={() => setIsReviewModalOpen(true)}
+                >
+                  <i className="fas fa-star" />
+                  <span>Write a Review</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="bkdet-section-card">
             <div className="bkdet-section-header">
               <div className="bkdet-section-title-wrap">
@@ -1595,7 +1767,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </div>
           </div>
 
-          <div className="bkdet-section-card">
+          <div className="bkdet-section-card bkdet-provider-card">
             <div className="bkdet-section-header">
               <div className="bkdet-section-title-wrap">
                 <div className="bkdet-section-icon">
@@ -1607,18 +1779,90 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
               </div>
             </div>
 
-            <div className="bkdet-counterparty-row">
-              <div className="bkdet-counterparty-avatar">
-                {counterpartyInitial}
+            <div className="bkdet-person-avatar-wrap">
+              <div
+                className="bkdet-person-avatar"
+                onClick={!isProvider && targetProviderId ? handleViewProviderProfile : undefined}
+                style={{ cursor: !isProvider && targetProviderId ? "pointer" : "default" }}
+                title={!isProvider && targetProviderId ? "Click to view full provider profile" : undefined}
+              >
+                {!isProvider ? (
+                  <img
+                    src={
+                      booking.providerAvatar ||
+                      publicProvider?.provider_profile?.profile_image ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(providerPersonName || counterpartyName)}&background=FF7900&color=fff&size=160&bold=true`
+                    }
+                    alt={providerPersonName || counterpartyName}
+                    className="bkdet-counterparty-avatar-img"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(providerPersonName || counterpartyName)}&background=FF7900&color=fff&size=160&bold=true`;
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={
+                      booking.customerAvatar ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.customerName || "Customer")}&background=0f172a&color=fff&size=160&bold=true`
+                    }
+                    alt={booking.customerName || "Customer"}
+                    className="bkdet-counterparty-avatar-img"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.customerName || "Customer")}&background=0f172a&color=fff&size=160&bold=true`;
+                    }}
+                  />
+                )}
               </div>
-              <div className="bkdet-counterparty-info">
-                <span className="bkdet-counterparty-role">
-                  {isProvider ? "Customer" : "Verified Provider"}
-                </span>
-                <span className="bkdet-counterparty-name">
-                  {counterpartyName}
-                </span>
-              </div>
+            </div>
+
+            <div className="bkdet-person-kv-list">
+              {!isProvider ? (
+                <>
+                  <div className="bkdet-person-kv-row">
+                    <span className="bkdet-person-kv-label">
+                      <i className="fas fa-user" /> Name
+                    </span>
+                    <span className="bkdet-person-kv-value">
+                      {providerPersonName || counterpartyName}
+                    </span>
+                  </div>
+
+                  <div className="bkdet-person-kv-row">
+                    <span className="bkdet-person-kv-label">
+                      <i className="fas fa-check-circle" /> Jobs Done
+                    </span>
+                    <span className="bkdet-person-kv-value">
+                      {booking.providerCompletedJobs ?? publicProvider?.provider_profile?.completed_jobs ?? 0}
+                    </span>
+                  </div>
+
+                  <div className="bkdet-person-kv-row">
+                    <span className="bkdet-person-kv-label">
+                      <i className="fas fa-star" /> Reviews Rating
+                    </span>
+                    <span className="bkdet-person-kv-value">
+                      {booking.providerRating != null && (booking.providerReviewCount ?? 0) > 0 ? (
+                        <>
+                          <i className="fas fa-star" style={{ color: "#f59e0b", marginRight: "5px" }} />
+                          {booking.providerRating.toFixed(1)} ({booking.providerReviewCount}{" "}
+                          {booking.providerReviewCount === 1 ? "review" : "reviews"})
+                        </>
+                      ) : (
+                        "No reviews yet"
+                      )}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="bkdet-person-kv-row">
+                  <span className="bkdet-person-kv-label">
+                    <i className="fas fa-user" /> Name
+                  </span>
+                  <span className="bkdet-person-kv-value">
+                    {booking.customerName || "Customer"}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="bkdet-contact-actions">
@@ -1626,6 +1870,16 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
                 <i className="fas fa-comment-dots" />
                 <span>Chat</span>
               </button>
+              {!isProvider && targetProviderId && (
+                <button
+                  type="button"
+                  className="bkdet-contact-btn bkdet-profile-btn"
+                  onClick={handleViewProviderProfile}
+                >
+                  <i className="fas fa-id-card" />
+                  <span>View Profile</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1670,6 +1924,21 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
           onSubmitConcern={() => {
             toast.success("Concern submitted successfully. Our resolution team will review it.");
             navigate(isProvider ? "/provider/support" : "/support");
+          }}
+        />
+      )}
+
+      {booking && (
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          bookingId={booking.id}
+          bookingNumber={booking.bookingNumber}
+          providerName={counterpartyName}
+          serviceTitle={booking.serviceRequestTitle || booking.categoryName}
+          onSuccess={() => {
+            refetchReview();
+            refetch();
           }}
         />
       )}

@@ -5,7 +5,7 @@ import {
     CreateMessageData,
     IMessageRepository
 } from "../../domain/repositories/IMessageRepository";
-import { MessageMapper } from "../mappers/message.mapper";
+import { MessageMapper } from "../../application/mappers/message.mapper";
 
 export class MessageRepository implements IMessageRepository {
     async findById(id: string): Promise<Message | null> {

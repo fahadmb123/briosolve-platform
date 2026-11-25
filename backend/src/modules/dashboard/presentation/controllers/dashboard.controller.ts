@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../../../../shared/base/controller/baseController";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
-import { GetCustomerDashboardRequestDto } from "../../application/dtos/request/get-customer-dashboard.dto";
-import { CustomerDashboardResponseDto } from "../../application/dtos/response/customer-dashboard-response.dto";
 import { GetProviderDashboardRequestDto } from "../../application/dtos/request/get-provider-dashboard.dto";
 import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
 import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
@@ -13,7 +11,6 @@ import { AdminAnalyticsResponseDto } from "../../application/dtos/response/admin
 
 export class DashboardController extends BaseController {
     constructor(
-        private readonly _getCustomerDashboardUseCase: IUseCase<GetCustomerDashboardRequestDto, CustomerDashboardResponseDto>,
         private readonly _getProviderDashboardUseCase: IUseCase<GetProviderDashboardRequestDto, ProviderDashboardResponseDto>,
         private readonly _getAdminDashboardUseCase: IUseCase<void, AdminDashboardResponseDto>,
         private readonly _getAdminAuditLogsUseCase: IUseCase<GetAdminAuditLogsRequestDto, AdminAuditLogsResponseDto>,
@@ -21,17 +18,6 @@ export class DashboardController extends BaseController {
     ) {
         super();
     }
-
-    getCustomerDashboard = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const userId = req.user?.userId as string;
-            const response = await this._getCustomerDashboardUseCase.execute({ userId });
-
-            return this.sendSuccess(res, "Customer dashboard retrieved successfully", response);
-        } catch (err) {
-            next(err);
-        }
-    };
 
     getProviderDashboard = async (req: Request, res: Response, next: NextFunction) => {
         try {

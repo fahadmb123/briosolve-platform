@@ -2,7 +2,7 @@ import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IWalletRepository } from "../../domain/repositories/IWallet.repository";
 import { WalletResponseDto } from "../dtos/response/wallet-response.dto";
-import { WalletMapper } from "../../infrastructure/mappers/wallet.mapper";
+import { WalletMapper } from "../mappers/wallet.mapper";
 import type { CreditWalletInputDto } from "../dtos/request/credit-wallet.dto";
 
 export type { CreditWalletInputDto };

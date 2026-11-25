@@ -6,7 +6,7 @@ import { IServiceRequestRepository } from "../../../service-request/domain/repos
 import { IQuotationRepository } from "../../../quotation-submission/domain/repositories/IQuotationRepository";
 import { AdminUpdateBookingStatusInputDto } from "../dtos/request/update-booking-status.dto";
 import { BookingResponseDto, BookingStatusHistoryItem } from "../dtos/response/booking-response.dto";
-import { BookingMapper } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper } from "../mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { WalletResponseDto } from "../../../wallet/application/dtos/response/wallet-response.dto";

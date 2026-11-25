@@ -12,11 +12,6 @@ interface SubnavItem {
 
 const WORKSPACE_SUBNAV_ITEMS: SubnavItem[] = [
   {
-    label: "Dashboard",
-    to: "/dashboard",
-    icon: "fas fa-chart-pie",
-  },
-  {
     label: "Find Providers",
     to: "/nearby-providers",
     icon: "fas fa-search-location",
@@ -45,14 +40,14 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-clipboard-list",
   },
   {
+    label: "My Bookings",
+    to: "/bookings",
+    icon: "fas fa-calendar-check",
+  },
+  {
     label: "Request Service",
     to: "/request-service",
     icon: "fas fa-plus-circle",
-  },
-  {
-    label: "Bookings",
-    to: "/bookings",
-    icon: "fas fa-calendar-check",
   },
   {
     label: "Wallet",
@@ -60,14 +55,14 @@ const MORE_SUBNAV_ITEMS: SubnavItem[] = [
     icon: "fas fa-wallet",
   },
   {
-    label: "Reviews",
-    to: "/dashboard#reviews",
-    icon: "fas fa-star",
-  },
-  {
     label: "Support Tickets",
     to: "/support",
     icon: "fas fa-life-ring",
+  },
+  {
+    label: "Reviews",
+    to: "/reviews",
+    icon: "fas fa-star",
   },
 ];
 
@@ -85,16 +80,17 @@ export const CustomerSubnavSidebar: React.FC = () => {
     location.pathname.startsWith("/my-requests") ||
     location.pathname.startsWith("/request-service") ||
     location.pathname.startsWith("/bookings") ||
+    location.pathname.startsWith("/my-bookings") ||
     location.pathname.startsWith("/wallet") ||
     location.pathname.startsWith("/support") ||
     location.pathname.startsWith("/tickets") ||
-    location.pathname.startsWith("/reviews");
+    location.pathname.startsWith("/reviews") ||
+    location.pathname.startsWith("/customer/payment") ||
+    location.pathname.startsWith("/payment");
 
   const isWorkspaceSection =
     !isMoreSection &&
-    (location.pathname === "/dashboard" ||
-      location.pathname.startsWith("/dashboard") ||
-      location.pathname.startsWith("/nearby-providers") ||
+    (location.pathname.startsWith("/nearby-providers") ||
       location.pathname.startsWith("/messages") ||
       location.pathname.startsWith("/chat") ||
       location.pathname.startsWith("/profile") ||

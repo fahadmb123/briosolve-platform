@@ -3,8 +3,8 @@ import { db } from "../../../../shared/database/client";
 import { IProviderAvailabilityRepository, AvailabilitySlotInput, CreateAvailabilityOverrideInput } from "../../domain/repositories/IProviderAvailabilityRepository";
 import { ProviderAvailability } from "../../domain/entities/providerAvailability.entity";
 import { ProviderAvailabilityOverride } from "../../domain/entities/providerAvailabilityOverride.entity";
-import { ProviderAvailabilityMapper, ProviderAvailabilityRaw } from "../mappers/providerAvailability.mapper";
-import { ProviderAvailabilityOverrideMapper, ProviderAvailabilityOverrideRaw } from "../mappers/providerAvailabilityOverride.mapper";
+import { ProviderAvailabilityMapper, ProviderAvailabilityRaw } from "../../application/mappers/providerAvailability.mapper";
+import { ProviderAvailabilityOverrideMapper, ProviderAvailabilityOverrideRaw } from "../../application/mappers/providerAvailabilityOverride.mapper";
 
 export class ProviderAvailabilityRepository implements IProviderAvailabilityRepository {
     async findByProviderId(providerId: string): Promise<ProviderAvailability[]> {

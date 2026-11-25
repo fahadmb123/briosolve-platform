@@ -4,7 +4,7 @@ import { IBookingRepository } from "../../domain/repositories/IBookingRepository
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { GetBookingByIdInputDto } from "../dtos/request/get-booking.dto";
 import { BookingResponseDto } from "../dtos/response/booking-response.dto";
-import { BookingMapper, calculateCancellationPolicy } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper, calculateCancellationPolicy } from "../mappers/booking.mapper";
 
 export class GetBookingByIdUseCase implements IUseCase<GetBookingByIdInputDto, BookingResponseDto> {
     constructor(

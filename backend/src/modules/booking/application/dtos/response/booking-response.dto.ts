@@ -48,7 +48,14 @@ export interface BookingResponseDto {
     providerEmail?: string | null;
     providerPhone?: string | null;
     providerUserId?: string | null;
+    providerAvatar?: string | null;
+    providerExperience?: string | null;
+    providerCompletedJobs?: number | null;
+    providerBio?: string | null;
+    providerRating?: number | null;
+    providerReviewCount?: number | null;
     customerName?: string | null;
+    customerAvatar?: string | null;
     customerEmail?: string | null;
     customerPhone?: string | null;
     quotationType?: string | null;
@@ -60,4 +67,5 @@ export interface BookingResponseDto {
     maxAllowedCancellations?: number;
     cancellationPolicy?: CancellationPolicyDetails;
     mismatchReport?: MismatchReport | null;
+    isReviewed?: boolean;
 }

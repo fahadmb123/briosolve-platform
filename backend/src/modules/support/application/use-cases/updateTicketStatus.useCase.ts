@@ -3,7 +3,7 @@ import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { ISupportTicketRepository } from "../../domain/repositories/ISupportTicket.repository";
 import { UpdateTicketStatusRequestDto } from "../dtos/request/update-ticket-status.dto";
 import { TicketResponseDto } from "../dtos/response/ticket-response.dto";
-import { SupportTicketMapper } from "../../infrastructure/mappers/support-ticket.mapper";
+import { SupportTicketMapper } from "../mappers/support-ticket.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 

@@ -95,6 +95,8 @@ export function toChatConversation(
             senderId: dto.last_message?.sender_id ?? "",
             createdAt: timeFormatted,
             isUnread: dto.last_message?.is_unread ?? false,
+            status: dto.last_message?.status,
+            messageType: dto.last_message?.message_type,
         },
         unreadCount: dto.unread_count ?? 0,
         updatedAt: dto.updated_at || dto.created_at,

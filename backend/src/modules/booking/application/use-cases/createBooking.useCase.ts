@@ -4,7 +4,7 @@ import { IBookingRepository } from "../../domain/repositories/IBookingRepository
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { CreateBookingInputDto } from "../dtos/request/create-booking.dto";
 import { BookingResponseDto } from "../dtos/response/booking-response.dto";
-import { BookingMapper } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper } from "../mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 

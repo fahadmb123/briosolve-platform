@@ -3,7 +3,7 @@ import { db } from "../../../../shared/database/client";
 import { Wallet } from "../../domain/entities/wallet.entity";
 import { WalletTransaction } from "../../domain/entities/wallet-transaction.entity";
 import { IWalletRepository, RecordTransactionParams } from "../../domain/repositories/IWallet.repository";
-import { WalletMapper } from "../mappers/wallet.mapper";
+import { WalletMapper } from "../../application/mappers/wallet.mapper";
 
 export class PrismaWalletRepository implements IWalletRepository {
     async findByUserId(userId: string): Promise<Wallet | null> {

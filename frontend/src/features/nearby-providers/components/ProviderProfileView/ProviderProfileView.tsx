@@ -5,6 +5,7 @@ import type { User } from '../../../../shared/types/Dtos';
 import type { Address } from '../../../addresses';
 import { useGetProviderPublicProfile } from '../../hooks/mutations/useGetProviderPublicProfile';
 import type { ProviderPublicProfileData } from '../../services/nearbyProviders.service';
+import { useProviderReviewsQuery } from '../../../reviews';
 import './ProviderProfileView.css';
 
 interface ProviderProfileViewProps {
@@ -37,11 +38,27 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
 
     const targetId = providerId || initialProvider?.id;
     const [profileData, setProfileData] = useState<ProviderPublicProfileData | null>(null);
+    const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
     const { data: profileRes, isLoading: isQueryLoading } = useGetProviderPublicProfile(targetId);
+    const { data: reviewsRes, isLoading: isLoadingReviews } = useProviderReviewsQuery(targetId, {
+        page: 1,
+        limit: 12
+    });
+
+    const averageRating = reviewsRes?.data?.averageRating ?? 0;
+    const totalReviews = reviewsRes?.data?.totalReviews ?? 0;
+    const bestReviews = useMemo(() => {
+        const list = reviewsRes?.data?.reviews || [];
+        return [...list]
+            .sort((a, b) => b.rating - a.rating || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .slice(0, 6);
+    }, [reviewsRes?.data?.reviews]);
 
     const state = location.state as { from?: string; returnUrl?: string } | null;
     const isFromChat = state?.from === 'chat' || Boolean(state?.returnUrl && (state.returnUrl.includes('messages') || state.returnUrl.includes('chat')));
-    const resolvedBackLabel = backLabel || (isFromChat ? 'Back to Chat' : 'Back to Nearby Providers');
+    const isFromBooking = state?.from === 'booking' || Boolean(state?.returnUrl && (state.returnUrl.includes('/bookings') || state.returnUrl.includes('/my-bookings')));
+    const isFromReviews = state?.from === 'reviews' || Boolean(state?.returnUrl && state.returnUrl.includes('/reviews'));
+    const resolvedBackLabel = backLabel || (isFromChat ? 'Back to Chat' : isFromBooking ? 'Back to Booking' : isFromReviews ? 'Back to Reviews' : 'Back to Nearby Providers');
 
     const handleBack = () => {
         if (onBack) {
@@ -175,7 +192,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                 </button>
 
                 <div className="provider-profile-breadcrumb">
-                    <span>{isFromChat ? 'Chat' : 'Providers'}</span>
+                    <span>{isFromChat ? 'Chat' : isFromBooking ? 'Booking' : isFromReviews ? 'Reviews' : 'Providers'}</span>
                     <i className="fas fa-chevron-right text-xs" />
                     <span className="crumb-active">{activeProviderName}</span>
                 </div>
@@ -318,25 +335,64 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                         </div>
 
                         {servicesList.length > 0 ? (
-                            <div className="provider-services-grid">
-                                {servicesList.map((item) => (
-                                    <div key={item.id} className="provider-service-card-item">
-                                        <div className="provider-service-top-row">
-                                            {item.service?.category?.name && (
-                                                <span className="provider-service-cat-badge">
-                                                    <i className="fas fa-tag" />
-                                                    <span>{item.service.category.name}</span>
-                                                </span>
-                                            )}
+                            <div className="ppv-cat-accordion-list">
+                                {Array.from(
+                                    servicesList.reduce((map, item) => {
+                                        const catName = item.service?.category?.name?.trim() || 'Other Services';
+                                        const arr = map.get(catName) || [];
+                                        arr.push(item);
+                                        map.set(catName, arr);
+                                        return map;
+                                    }, new Map<string, typeof servicesList>())
+                                ).map(([categoryName, items]) => {
+                                    const isOpen = Boolean(expandedCategories[categoryName]);
+                                    return (
+                                        <div key={categoryName} className={`ppv-cat-accordion ${isOpen ? 'is-open' : ''}`}>
+                                            <button
+                                                type="button"
+                                                className="ppv-cat-accordion-trigger"
+                                                onClick={() =>
+                                                    setExpandedCategories((prev) => ({
+                                                        ...prev,
+                                                        [categoryName]: !prev[categoryName]
+                                                    }))
+                                                }
+                                                aria-expanded={isOpen}
+                                            >
+                                                <div className="ppv-cat-accordion-left">
+                                                    <div className="ppv-cat-accordion-icon">
+                                                        <i className="fas fa-tag" />
+                                                    </div>
+                                                    <div className="ppv-cat-accordion-meta">
+                                                        <span className="ppv-cat-accordion-name">{categoryName}</span>
+                                                        <span className="ppv-cat-accordion-count">
+                                                            {items.length} {items.length === 1 ? 'service' : 'services'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <i className={`fas fa-chevron-down ppv-cat-accordion-chevron ${isOpen ? 'rotate' : ''}`} />
+                                            </button>
+                                            <div className={`ppv-cat-accordion-collapse ${isOpen ? 'is-open' : ''}`}>
+                                                <div className="ppv-cat-accordion-inner">
+                                                    <div className="ppv-cat-accordion-body">
+                                                        <div className="provider-services-grid">
+                                                            {items.map((item) => (
+                                                                <div key={item.id} className="provider-service-card-item">
+                                                                    <h4 className="provider-service-item-title">
+                                                                        {item.service?.name || 'Professional Service'}
+                                                                    </h4>
+                                                                    <p className="provider-service-item-desc">
+                                                                        {item.service?.description || 'Custom quotes and on-demand scheduling provided.'}
+                                                                    </p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <h4 className="provider-service-item-title">
-                                            {item.service?.name || 'Professional Service'}
-                                        </h4>
-                                        <p className="provider-service-item-desc">
-                                            {item.service?.description || 'Custom quotes and on-demand scheduling provided.'}
-                                        </p>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         ) : (
                             <p className="text-secondary text-sm mb-0">
@@ -360,6 +416,85 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                                 </span>
                             ))}
                         </div>
+                    </div>
+
+                    <div className="provider-info-card">
+                        <div className="provider-info-header">
+                            <div className="provider-info-header-title">
+                                <i className="fas fa-star" />
+                                <h3>Top Customer Reviews</h3>
+                            </div>
+                            {totalReviews > 0 && (
+                                <span className="ppv-rating-pill">
+                                    <i className="fas fa-star" />
+                                    <span>{averageRating.toFixed(1)} · {totalReviews} {totalReviews === 1 ? 'review' : 'reviews'}</span>
+                                </span>
+                            )}
+                        </div>
+                        {isLoadingReviews ? (
+                            <div className="ppv-reviews-grid">
+                                {Array.from({ length: 2 }).map((_, idx) => (
+                                    <div key={`ppv-rev-skel-${idx}`} className="ppv-review-card">
+                                        <div className="ppv-review-head">
+                                            <Skeleton circle width={36} height={36} />
+                                            <div style={{ flex: 1 }}>
+                                                <Skeleton width="55%" height={14} />
+                                                <Skeleton width="35%" height={11} />
+                                            </div>
+                                        </div>
+                                        <Skeleton width="45%" height={14} style={{ marginBottom: 6 }} />
+                                        <Skeleton count={2} height={12} />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : bestReviews.length > 0 ? (
+                            <div className="ppv-reviews-grid">
+                                {bestReviews.map((review) => {
+                                    const customerName = review.customerName || 'Customer';
+                                    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=0f172a&color=fff&size=120&bold=true`;
+                                    return (
+                                        <div key={review.id} className="ppv-modern-review-card">
+                                            <div className="ppv-modern-review-top">
+                                                <img
+                                                    src={review.customerAvatar || fallbackAvatar}
+                                                    alt={customerName}
+                                                    className="ppv-modern-review-avatar"
+                                                    onError={(e) => {
+                                                        (e.currentTarget as HTMLImageElement).src = fallbackAvatar;
+                                                    }}
+                                                />
+                                                <div className="ppv-modern-review-meta">
+                                                    <div className="ppv-modern-review-name" title={customerName}>
+                                                        {customerName}
+                                                    </div>
+                                                    <div className="ppv-modern-review-rating">
+                                                        <span className="ppv-modern-review-score">
+                                                            {review.rating.toFixed(1)}
+                                                        </span>
+                                                        <div className="ppv-modern-review-stars">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <i
+                                                                    key={star}
+                                                                    className={`fa${star <= Math.round(review.rating) ? 's' : 'r'} fa-star`}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <i className="fas fa-quote-right ppv-modern-review-quote" aria-hidden="true" />
+                                            </div>
+                                            <p className="ppv-modern-review-text" title={review.comment}>
+                                                {review.comment}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <p className="text-secondary text-sm mb-0">
+                                No customer reviews yet for {activeProviderName}.
+                            </p>
+                        )}
                     </div>
 
                     <div className="provider-info-card">

@@ -2,7 +2,7 @@ import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import { db } from "../../../../shared/database/client";
 import { Service } from "../../domain/entities/service.entity";
 import { IServiceRepository } from "../../domain/repositories/IServiceRepository";
-import { ServiceMapper } from "../mappers/service.mapper";
+import { ServiceMapper } from "../../application/mappers/service.mapper";
 import { AddServiceUseCaseInputDto } from "../../application/dtos/service/request/add-service.dto";
 import { UpdateServiceUseCaseDto } from "../../application/dtos/service/request/update-service.dto";
 import { GetServicesDto } from "../../application/dtos/category/response/get-service.dto";

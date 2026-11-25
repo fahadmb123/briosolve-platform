@@ -5,7 +5,7 @@ import { IServiceRequestRepository } from "../../../service-request/domain/repos
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { RejectQuotationInputDto } from "../dtos/request/reject-quotation.dto";
 import { RejectQuotationResponseDto } from "../dtos/response/reject-quotation-response.dto";
-import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
+import { QuotationMapper } from "../mappers/quotation.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 

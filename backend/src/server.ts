@@ -32,6 +32,7 @@ import { createBookingRoutes } from "./modules/booking/infrastructure/compositio
 import { createWalletRoutes, createCreditWalletUseCase } from "./modules/wallet/infrastructure/composition";
 import { createSupportRoutes } from "./modules/support/infrastructure/composition";
 import { createDashboardRoutes } from "./modules/dashboard/infrastructure/composition";
+import { createReviewRoutes } from "./modules/reviews/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -60,6 +61,7 @@ const startServer = async (): Promise<void> => {
         const walletRoutes = createWalletRoutes();
         const supportRoutes = createSupportRoutes(notificationUseCase);
         const dashboardRoutes = createDashboardRoutes();
+        const reviewRoutes = createReviewRoutes(notificationUseCase);
 
         const rootRouter = createRootRouter({
             authRoutes,
@@ -80,7 +82,8 @@ const startServer = async (): Promise<void> => {
             bookingRoutes,
             walletRoutes,
             supportRoutes,
-            dashboardRoutes
+            dashboardRoutes,
+            reviewRoutes
         });
 
         app.use("/api", rootRouter);

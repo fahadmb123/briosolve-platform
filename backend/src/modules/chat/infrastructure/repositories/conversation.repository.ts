@@ -1,7 +1,7 @@
 import { db } from "../../../../shared/database/client";
 import { Conversation } from "../../domain/entities/conversation.entity";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import { ConversationMapper } from "../mappers/conversation.mapper";
+import { ConversationMapper } from "../../application/mappers/conversation.mapper";
 import { ConversationResponseDto } from "../../application/dtos/response/conversation/conversation-response.dto";
 import { PresenceTracker } from "../../../../shared/realtime/services/presence.tracker";
 import { StorageUtil } from "../../../../shared/utils/storage.util";
@@ -177,11 +177,26 @@ export class ConversationRepository implements IConversationRepository {
 
         if (latestMsg) {
             const msgTime = parseDate(latestMsg.created_at).getTime();
+            const otherLastReadTime = otherPart?.last_read_at
+                ? parseDate(otherPart.last_read_at).getTime()
+                : 0;
+            const isOtherOnline = otherUser ? PresenceTracker.isOnline(otherUser.id) : false;
+            const computedStatus: "SENT" | "DELIVERED" | "READ" =
+                latestMsg.sender_id === userId
+                    ? otherLastReadTime >= msgTime
+                        ? "READ"
+                        : isOtherOnline
+                            ? "DELIVERED"
+                            : "SENT"
+                    : "READ";
+
             lastMessageDto = {
-                text: latestMsg.content,
+                text: latestMsg.message_type === "IMAGE" ? "Photo" : latestMsg.content,
                 sender_id: latestMsg.sender_id,
                 created_at: parseDate(latestMsg.created_at),
-                is_unread: latestMsg.sender_id !== userId && msgTime > lastReadTime
+                is_unread: latestMsg.sender_id !== userId && msgTime > lastReadTime,
+                status: computedStatus,
+                message_type: (latestMsg.message_type as "TEXT" | "IMAGE" | "FILE") || "TEXT"
             };
         }
 

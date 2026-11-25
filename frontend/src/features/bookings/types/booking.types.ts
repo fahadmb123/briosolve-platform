@@ -56,9 +56,18 @@ export interface BookingItem {
   addressText?: string | null;
   providerBusinessName?: string | null;
   providerName?: string | null;
+  providerEmail?: string | null;
   providerPhone?: string | null;
   providerUserId?: string | null;
+  providerAvatar?: string | null;
+  providerExperience?: string | null;
+  providerCompletedJobs?: number | null;
+  providerBio?: string | null;
+  providerRating?: number | null;
+  providerReviewCount?: number | null;
   customerName?: string | null;
+  customerAvatar?: string | null;
+  customerEmail?: string | null;
   customerPhone?: string | null;
   quotationType?: "FIXED" | "ESTIMATED" | "INSPECTION_REQUIRED" | string | null;
   requiresInspection?: boolean;
@@ -69,6 +78,7 @@ export interface BookingItem {
   maxAllowedCancellations?: number;
   cancellationPolicy?: CancellationPolicyDetails;
   mismatchReport?: MismatchReport | null;
+  isReviewed?: boolean;
 }
 
 export interface BookingCounts {

@@ -2,7 +2,7 @@ import { Varchar } from "@prisma/orm-postgres/target/codec-types";
 import { db } from "../../../../shared/database/client";
 import { Category } from "../../domain/entities/category.entity";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
-import { CategoryMapper, CategoryRecord } from "../mappers/category.mapper.";
+import { CategoryMapper, CategoryRecord } from "../../application/mappers/category.mapper.";
 import { GetCategoriesDto } from "../../application/dtos/category/response/get-categories.dto";
 import { AddCategoryUseCaseInputDto } from "../../application/dtos/category/request/add-category.dto";
 import { UpdateCategoryUseCaseDto } from "../../application/dtos/category/request/update-category.dto";

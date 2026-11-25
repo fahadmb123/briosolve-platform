@@ -9,6 +9,7 @@ import { useUpdateProfileImage } from '../../hooks/provider/useUpdateProfileImag
 import { useDeleteProfileImage } from '../../hooks/provider/useDeleteProfileImage';
 import { useGetProviderServices } from '../../../service-catalog';
 import { useGetProviderVerifications } from '../../../verification/hooks/mutations/useVerification';
+import { useProviderReviewsQuery } from '../../../reviews';
 import { getAddresses, type Address } from '../../../addresses';
 import type { PopulatedProviderService, ProviderProfile } from '../../types/profile.types';
 import type { response } from '../../../../shared/types/Dtos';
@@ -121,6 +122,7 @@ export default function Profile() {
   const [profileImage, setProfileImage] = useState<string | null>(providerProfile?.profile_image || null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [services, setServices] = useState<PopulatedProviderService[]>([]);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [documents, setDocuments] = useState<VerificationDocument[]>([]);
   const [address, setAddress] = useState<Address | null>(
     user?.current_address_id && typeof user.current_address_id === 'object'
@@ -132,6 +134,43 @@ export default function Profile() {
   const { mutate: deleteProfileImage, isPending: isImageDeleting } = useDeleteProfileImage();
   const { data: providerServicesRes, isLoading: isLoadingServices } = useGetProviderServices();
   const { data: verificationsRes } = useGetProviderVerifications();
+  const { data: reviewsSummaryRes, isLoading: isLoadingReviews } = useProviderReviewsQuery(
+    providerProfile?.id,
+    { page: 1, limit: 12 }
+  );
+
+  const groupedServices = useMemo(() => {
+    const groups = new Map<string, PopulatedProviderService[]>();
+    for (const item of services) {
+      const catName = item.service?.category?.name?.trim() || 'Other Services';
+      const existing = groups.get(catName);
+      if (existing) {
+        existing.push(item);
+      } else {
+        groups.set(catName, [item]);
+      }
+    }
+    return Array.from(groups.entries()).map(([categoryName, items]) => ({
+      categoryName,
+      items
+    }));
+  }, [services]);
+
+  const toggleCategory = (categoryName: string) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [categoryName]: !prev[categoryName]
+    }));
+  };
+
+  const averageRating = reviewsSummaryRes?.data?.averageRating ?? 0;
+  const totalReviews = reviewsSummaryRes?.data?.totalReviews ?? 0;
+  const bestReviews = useMemo(() => {
+    const list = reviewsSummaryRes?.data?.reviews || [];
+    return [...list]
+      .sort((a, b) => b.rating - a.rating || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 6);
+  }, [reviewsSummaryRes?.data?.reviews]);
 
   useEffect(() => {
     if (!user || !profile) {
@@ -313,7 +352,9 @@ export default function Profile() {
                   </span>
                 </div>
                 <div className="stat-box">
-                  <span className="stat-value text-warning">5.0</span>
+                  <span className="stat-value text-warning">
+                    {totalReviews > 0 ? averageRating.toFixed(1) : '—'}
+                  </span>
                   <span className="stat-label">
                     <i className="fas fa-star text-warning mr-1"></i> Rating
                   </span>
@@ -481,18 +522,32 @@ export default function Profile() {
             <div className="form-card-modern p-5 w-full">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="h6 mb-0">Marketplace Track Record</h3>
+                <Link to="/provider/reviews" className="text-xs font-semibold text-primary hover:underline">
+                  View All Reviews
+                </Link>
               </div>
 
               <div className="mb-4">
-                <div className="text-3xl font-black text-warning">5.0</div>
-                <div className="text-warning text-sm mt-1 mb-1">
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
+                <div className="text-3xl font-black text-warning">
+                  {totalReviews > 0 ? averageRating.toFixed(1) : '—'}
                 </div>
-                <div className="font-bold text-text text-sm">Provider Rating</div>
+                <div className="text-warning text-sm mt-1 mb-1 flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <i
+                      key={star}
+                      className={
+                        totalReviews > 0 && averageRating >= star - 0.25
+                          ? 'fas fa-star'
+                          : 'far fa-star opacity-40'
+                      }
+                    ></i>
+                  ))}
+                </div>
+                <div className="font-bold text-text text-sm">
+                  {totalReviews > 0
+                    ? `${totalReviews} Customer Review${totalReviews === 1 ? '' : 's'}`
+                    : 'No reviews yet'}
+                </div>
                 <p className="text-xs text-secondary mt-1 mb-0">
                   {address?.city ? `Operational in ${address.city}` : 'Marketplace Verified Provider'}
                 </p>
@@ -661,11 +716,46 @@ export default function Profile() {
                     <ProfileServiceCardSkeleton key={`service-skeleton-${index}`} />
                   ))}
                 </div>
-              ) : services.length > 0 ? (
-                <div className="profile-services-grid">
-                  {services.map((item) => (
-                    <ProfileServiceCard key={item.id} item={item} />
-                  ))}
+              ) : groupedServices.length > 0 ? (
+                <div className="profile-cat-accordion-list">
+                  {groupedServices.map((group) => {
+                    const isOpen = Boolean(expandedCategories[group.categoryName]);
+                    const iconClass = getCategoryIcon(group.categoryName);
+                    return (
+                      <div key={group.categoryName} className={`profile-cat-accordion ${isOpen ? 'is-open' : ''}`}>
+                        <button
+                          type="button"
+                          className="profile-cat-accordion-trigger"
+                          onClick={() => toggleCategory(group.categoryName)}
+                          aria-expanded={isOpen}
+                        >
+                          <div className="profile-cat-accordion-left">
+                            <div className="profile-cat-accordion-icon">
+                              <i className={`fas ${iconClass}`}></i>
+                            </div>
+                            <div className="profile-cat-accordion-meta">
+                              <span className="profile-cat-accordion-name">{group.categoryName}</span>
+                              <span className="profile-cat-accordion-count">
+                                {group.items.length} {group.items.length === 1 ? 'service' : 'services'}
+                              </span>
+                            </div>
+                          </div>
+                          <i className={`fas fa-chevron-down profile-cat-accordion-chevron ${isOpen ? 'rotate' : ''}`}></i>
+                        </button>
+                        <div className={`profile-cat-accordion-collapse ${isOpen ? 'is-open' : ''}`}>
+                          <div className="profile-cat-accordion-inner">
+                            <div className="profile-cat-accordion-body">
+                              <div className="profile-services-grid">
+                                {group.items.map((item) => (
+                                  <ProfileServiceCard key={item.id} item={item} />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="profile-services-empty-state">
@@ -681,6 +771,109 @@ export default function Profile() {
                   <Link to="/provider/settings" state={{ activeSection: 'services' }} className="btn btn-primary btn-sm">
                     <i className="fas fa-plus mr-1.5"></i> Manage Services in Settings
                   </Link>
+                </div>
+              )}
+            </div>
+
+            <div className="form-card-modern">
+              <div className="flex justify-between items-center mb-6 pb-4 border-bottom flex-wrap gap-2">
+                <div>
+                  <h3 className="h4 mb-0">Top Customer Reviews</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  {totalReviews > 0 && (
+                    <span className="badge badge-warning text-xs font-semibold px-2.5 py-1">
+                      <i className="fas fa-star mr-1"></i>
+                      {averageRating.toFixed(1)} ({totalReviews})
+                    </span>
+                  )}
+                  <Link to="/provider/reviews" className="btn btn-outline btn-xs">
+                    View All Reviews
+                  </Link>
+                </div>
+              </div>
+
+              {isLoadingReviews ? (
+                <div className="profile-best-reviews-grid">
+                  {Array.from({ length: 2 }).map((_, idx) => (
+                    <div key={`rev-skel-${idx}`} className="profile-best-review-card">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Skeleton circle width={38} height={38} />
+                        <div className="flex-1">
+                          <Skeleton width="55%" height={14} />
+                          <Skeleton width="35%" height={11} />
+                        </div>
+                      </div>
+                      <Skeleton width="40%" height={14} className="mb-2" />
+                      <Skeleton count={2} height={12} />
+                    </div>
+                  ))}
+                </div>
+              ) : bestReviews.length > 0 ? (
+                <>
+                  <div className="profile-best-reviews-grid">
+                    {bestReviews.map((review) => {
+                      const customerName = review.customerName || 'Customer';
+                      const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=0f172a&color=fff&size=120&bold=true`;
+                      return (
+                        <div key={review.id} className="profile-modern-review-card">
+                          <div className="profile-modern-review-top">
+                            <img
+                              src={review.customerAvatar || fallbackAvatar}
+                              alt={customerName}
+                              className="profile-modern-review-avatar"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = fallbackAvatar;
+                              }}
+                            />
+                            <div className="profile-modern-review-meta">
+                              <div className="profile-modern-review-name" title={customerName}>
+                                {customerName}
+                              </div>
+                              <div className="profile-modern-review-rating">
+                                <span className="profile-modern-review-score">
+                                  {review.rating.toFixed(1)}
+                                </span>
+                                <div className="profile-modern-review-stars">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <i
+                                      key={star}
+                                      className={`fa${star <= Math.round(review.rating) ? 's' : 'r'} fa-star`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <i className="fas fa-quote-right profile-modern-review-quote" aria-hidden="true" />
+                          </div>
+                          <p className="profile-modern-review-text" title={review.comment}>
+                            {review.comment}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="profile-best-reviews-footer">
+                    <Link to="/provider/reviews" className="btn btn-outline btn-sm">
+                      <span>View All Reviews</span>
+                      <i className="fas fa-arrow-right ml-1.5"></i>
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <div className="profile-services-empty-state">
+                  <img
+                    src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+                    alt="No reviews yet"
+                    className="profile-services-empty-img"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/images/no-data.png';
+                    }}
+                  />
+                  <h4 className="profile-services-empty-title">No Customer Reviews Yet</h4>
+                  <p className="profile-services-empty-desc">
+                    Your highest-rated customer reviews will be highlighted here once customers rate completed bookings.
+                  </p>
                 </div>
               )}
             </div>

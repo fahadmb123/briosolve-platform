@@ -6,7 +6,7 @@ import { IProviderServiceRepository } from "../../../../service-catalog/domain/r
 import { IProviderAvailabilityRepository } from "../../../domain/repositories/IProviderAvailabilityRepository";
 import { CalculateDistance } from "../../../../../shared/utils/calculate-distance";
 import { Address } from "../../../domain/entities/address.entity";
-import { UserMapper } from "../../../infrastructure/mappers/user.mapper";
+import { UserMapper } from "../../mappers/user.mapper";
 import { GetProviderPublicProfileDto } from "../../dtos/request/customer/get-provider-public-profile.dto";
 import { GetProviderPublicProfileOutputDto } from "../../dtos/response/customer/get-provider-public-profile-output.dto";
 
@@ -19,12 +19,21 @@ export class GetProviderPublicProfileUseCase implements IUseCase<GetProviderPubl
     ) {}
 
     async execute(input: GetProviderPublicProfileDto): Promise<GetProviderPublicProfileOutputDto> {
-        const user = await this._userRepository.findById(input.providerId);
+        let user = await this._userRepository.findById(input.providerId);
+        let profile = null;
+        if (!user) {
+            profile = await this._providerRepository.findById(input.providerId);
+            if (profile?.user_id) {
+                user = await this._userRepository.findById(profile.user_id);
+            }
+        }
         if (!user || user.role !== "PROVIDER") {
             throw new ApplicationError("PROVIDER_NOT_FOUND", "Provider not found", "NOT_FOUND");
         }
 
-        const profile = await this._providerRepository.findById(user.id);
+        if (!profile) {
+            profile = await this._providerRepository.findById(user.id);
+        }
         if (!profile) {
             throw new ApplicationError("PROFILE_NOT_FOUND", "Provider profile not found", "NOT_FOUND");
         }

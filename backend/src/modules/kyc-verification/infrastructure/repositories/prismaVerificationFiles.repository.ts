@@ -2,7 +2,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { db } from "../../../../shared/database/client";
 import { VerificationFile } from "../../domain/entities/verificationFile.entity";
 import { IVerificationFileRepository } from "../../domain/repositories/IVerificationFileRepository";
-import { VerificationFileMapper } from "../mappers/verificationFile.mapper";
+import { VerificationFileMapper } from "../../application/mappers/verificationFile.mapper";
 
 export class VerificationFileRepository implements IVerificationFileRepository {
     async create(documentId: string, fileUrl: string): Promise<VerificationFile> {

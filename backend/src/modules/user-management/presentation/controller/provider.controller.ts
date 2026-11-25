@@ -3,7 +3,7 @@ import { BaseController } from "../../../../shared/base/controller/baseControlle
 import { accessTokenCookie, registrationCookie } from "../../../../shared/utils/cookieConfig";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IGetProvidersUseCase } from "../../application/interfaces/use-cases/providers/get-providers.interface";
-import { UserMapper } from "../../infrastructure/mappers/user.mapper";
+import { UserMapper } from "../../application/mappers/user.mapper";
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { ImageUploadService } from "../../../../shared/interfaces/services/IImageUpload.service";
 import { UserResponseDto } from "../../application/dtos/response/user/user-dto";

@@ -4,7 +4,7 @@ import { IBookingRepository } from "../../domain/repositories/IBookingRepository
 import { IProviderRepository } from "../../../user-management/domain/repositories/IProviderRepository";
 import { UpdateBookingStatusInputDto } from "../dtos/request/update-booking-status.dto";
 import { BookingResponseDto, BookingStatusHistoryItem } from "../dtos/response/booking-response.dto";
-import { BookingMapper, BookingStatusToTitle, calculateCancellationPolicy } from "../../infrastructure/mappers/booking.mapper";
+import { BookingMapper, BookingStatusToTitle, calculateCancellationPolicy } from "../mappers/booking.mapper";
 import { CreateNotificationRequestDto } from "../../../notification/application/dtos/request/create-notificastion.dto";
 import { NotificationResponseDto } from "../../../notification/application/dtos/response/notification-response.dto";
 import { IServiceRequestRepository } from "../../../service-request/domain/repositories/IServiceRequestRepository";

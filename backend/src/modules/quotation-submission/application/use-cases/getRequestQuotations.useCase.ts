@@ -6,7 +6,7 @@ import { IProviderRepository } from "../../../user-management/domain/repositorie
 import { IUserRepository } from "../../../user-management/domain/repositories/IUserRepository";
 import { GetRequestQuotationsInputDto } from "../dtos/request/get-request-quotations.dto";
 import { RequestQuotationsResponseDto, RequestQuotationItemDto } from "../dtos/response/request-quotations-response.dto";
-import { QuotationMapper } from "../../infrastructure/mappers/quotation.mapper";
+import { QuotationMapper } from "../mappers/quotation.mapper";
 
 export class GetRequestQuotationsUseCase implements IUseCase<GetRequestQuotationsInputDto, RequestQuotationsResponseDto> {
     constructor(

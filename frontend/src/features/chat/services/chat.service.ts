@@ -28,6 +28,8 @@ export interface BackendLastMessageDto {
     sender_id: string;
     created_at: string;
     is_unread: boolean;
+    status?: "SENT" | "DELIVERED" | "READ";
+    message_type?: "TEXT" | "IMAGE" | "FILE";
 }
 
 export interface BackendLinkedRequestDto {

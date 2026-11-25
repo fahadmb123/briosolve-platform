@@ -6,7 +6,7 @@ import { IUserRepository } from "../../../user-management/domain/repositories/IU
 import { IRazorpayService } from "../../domain/services/IRazorpayService";
 import { CreatePaymentOrderInputDto } from "../dtos/request/create-payment-order.dto";
 import { CreatePaymentOrderResponseDto } from "../dtos/response/create-payment-order-response.dto";
-import { PaymentMapper } from "../../infrastructure/mappers/payment.mapper";
+import { PaymentMapper } from "../mappers/payment.mapper";
 
 export class CreatePaymentOrderUseCase implements IUseCase<CreatePaymentOrderInputDto, CreatePaymentOrderResponseDto> {
     constructor(

@@ -3,7 +3,7 @@ import { db } from "../../../../shared/database/client";
 import { SupportTicket, SupportTicketMessage, TicketStatus } from "../../domain/entities/support-ticket.entity";
 import { ISupportTicketRepository, GetUserTicketsParams, UserTicketsResult, GetAdminTicketsParams, AdminTicketsResult } from "../../domain/repositories/ISupportTicket.repository";
 import { CreateTicketRequestDto } from "../../application/dtos/request/create-ticket.dto";
-import { SupportTicketMapper } from "../mappers/support-ticket.mapper";
+import { SupportTicketMapper } from "../../application/mappers/support-ticket.mapper";
 
 export class PrismaSupportTicketRepository implements ISupportTicketRepository {
   async createTicket(input: CreateTicketRequestDto): Promise<SupportTicket> {

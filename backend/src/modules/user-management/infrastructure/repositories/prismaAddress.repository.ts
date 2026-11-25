@@ -2,7 +2,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { db } from "../../../../shared/database/client";
 import { Address } from "../../domain/entities/address.entity";
 import { IAddressRepository } from "../../domain/repositories/IAddressRepository";
-import { AddressMapper } from "../mappers/address.mapper";
+import { AddressMapper } from "../../application/mappers/address.mapper";
 import { GetAddressesInputDto } from "../../application/dtos/request/address/get-addresses.dto";
 import { GetAddressesOutputDto } from "../../application/dtos/response/address/get-addresses.dto";
 

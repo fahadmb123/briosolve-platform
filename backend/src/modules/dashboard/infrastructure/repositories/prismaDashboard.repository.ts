@@ -1,21 +1,14 @@
 import { db } from "../../../../shared/database/client";
 import { IDashboardRepository, RawAuditLogSources, RawAnalyticsSources } from "../../domain/repositories/IDashboard.repository";
-import { CustomerDashboardResponseDto } from "../../application/dtos/response/customer-dashboard-response.dto";
 import { ProviderDashboardResponseDto } from "../../application/dtos/response/provider-dashboard-response.dto";
 import { AdminDashboardResponseDto } from "../../application/dtos/response/admin-dashboard-response.dto";
 import {
   DashboardMapper,
-  CustomerDashboardRawData,
   ProviderDashboardRawData,
   AdminDashboardRawData,
-} from "../mappers/dashboard.mapper";
+} from "../../application/mappers/dashboard.mapper";
 
 export class PrismaDashboardRepository implements IDashboardRepository {
-  async getCustomerDashboardData(userId: string): Promise<CustomerDashboardResponseDto> {
-    const raw = await this.fetchCustomerRawData(userId);
-    return DashboardMapper.toCustomerDashboard(raw);
-  }
-
   async getProviderDashboardData(userId: string): Promise<ProviderDashboardResponseDto> {
     const raw = await this.fetchProviderRawData(userId);
     return DashboardMapper.toProviderDashboard(raw);
@@ -163,57 +156,6 @@ export class PrismaDashboardRepository implements IDashboardRepository {
     };
   }
 
-  private async fetchCustomerRawData(userId: string): Promise<CustomerDashboardRawData> {
-    const user = await db.orm.public.users.where({ id: userId as never }).first();
-    const allRequests = await db.orm.public.service_requests
-      .where({ customer_id: userId as never })
-      .orderBy((r) => r.created_at.desc())
-      .all();
-
-    const allCategories = await db.orm.public.categories.all();
-
-    const allAddresses = await db.orm.public.addresses
-      .where({ user_id: userId as never })
-      .all();
-
-    const allBookings = await db.orm.public.bookings
-      .where({ customer_id: userId as never })
-      .orderBy((b) => b.created_at.desc())
-      .all();
-
-    const requestIds = allRequests.map((r) => r.id);
-    const allQuotations = requestIds.length
-      ? await db.orm.public.quotations.where((q) => q.service_request_id.in(requestIds as never)).all()
-      : [];
-
-    const providerIds = Array.from(new Set(allBookings.map((b) => b.provider_id)));
-    const providers = providerIds.length
-      ? await db.orm.public.provider_profiles.where((p) => p.id.in(providerIds as never)).all()
-      : [];
-    const providerUserIds = providers.map((p) => p.user_id);
-    const providerUsers = providerUserIds.length
-      ? await db.orm.public.users.where((u) => u.id.in(providerUserIds as never)).all()
-      : [];
-
-    const notifications = await db.orm.public.notifications
-      .where({ recipient_id: userId as never })
-      .orderBy((n) => n.created_at.desc())
-      .limit(5)
-      .all();
-
-    return {
-      user,
-      allRequests,
-      allCategories,
-      allAddresses,
-      allBookings,
-      allQuotations,
-      providers,
-      providerUsers,
-      notifications,
-    };
-  }
-
   private async fetchProviderRawData(userId: string): Promise<ProviderDashboardRawData> {
     const user = await db.orm.public.users.where({ id: userId as never }).first();
     const profile = await db.orm.public.provider_profiles
@@ -295,6 +237,16 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       ? await db.orm.public.addresses.where((a) => a.id.in(bookingAddressIds as never)).all()
       : [];
 
+    let reviews: any[] = [];
+    try {
+      reviews = await db.orm.public.reviews
+        .where({ provider_id: profile.id as never, is_hidden: false })
+        .select("rating")
+        .all();
+    } catch {
+      reviews = [];
+    }
+
     return {
       user,
       profile,
@@ -309,6 +261,7 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       bookingRequests,
       bookingCustomers,
       bookingAddresses,
+      reviews,
     };
   }
 

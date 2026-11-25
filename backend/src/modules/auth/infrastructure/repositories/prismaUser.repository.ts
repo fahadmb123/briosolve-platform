@@ -3,7 +3,7 @@ import { User } from "../../domain/entities/user.entity";
 import { IUserRepository } from "../../domain/repositories/user.repository";
 import { db } from "../../../../shared/database/client";
 import { Varchar } from "@prisma/orm-postgres/target/codec-types";
-import { UserMapper } from "../mappers/user.mapper";
+import { UserMapper } from "../../application/mappers/user.mapper";
 
 type userPartial = Partial<User>;
 

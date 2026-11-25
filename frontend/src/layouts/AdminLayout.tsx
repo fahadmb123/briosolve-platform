@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
-import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSidebar } from '../shared/hooks/useSidebar';
 import { useTheme } from '../shared/hooks/useTheme';
 import { useAuthStore } from '../features/auth/stores/auth.store';
@@ -134,10 +134,13 @@ export default function AdminLayout() {
                         </NavLink>
                     </li>
                     <li>
-                        <Link to="#" className="sidebar-item">
+                        <NavLink
+                            to="/admin/reviews"
+                            className={({ isActive }) => `sidebar-item ${isActive || location.pathname.startsWith('/admin/reviews') ? 'active' : ''}`}
+                        >
                             <i className="fas fa-star-half-alt"></i>
                             <span>Reviews</span>
-                        </Link>
+                        </NavLink>
                     </li>
 
                     <li>

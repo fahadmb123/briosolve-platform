@@ -11,7 +11,8 @@ import { CreateBookingRepoDto } from "../../application/dtos/request/create-book
 import { UpdateBookingRepoDto } from "../../application/dtos/request/update-booking-status.dto";
 import { GetCustomerBookingsInputDto, GetProviderBookingsInputDto } from "../../application/dtos/request/get-booking.dto";
 import { BookingCountsDto } from "../../application/dtos/response/customer-bookings-response.dto";
-import { BookingMapper } from "../mappers/booking.mapper";
+import { BookingMapper } from "../../application/mappers/booking.mapper";
+import { StorageUtil } from "../../../../shared/utils/storage.util";
 
 export class PrismaBookingRepository implements IBookingRepository {
     async findById(id: string): Promise<Booking | null> {
@@ -347,6 +348,12 @@ export class PrismaBookingRepository implements IBookingRepository {
                 let providerEmail: string | null = null;
                 let providerPhone: string | null = null;
                 let providerUserId: string | null = null;
+                let providerAvatar: string | null = null;
+                let providerExperience: string | null = null;
+                let providerCompletedJobs: number | null = null;
+                let providerBio: string | null = null;
+                let providerRating: number | null = null;
+                let providerReviewCount: number | null = null;
                 let customerName: string | null = null;
                 let customerEmail: string | null = null;
                 let customerPhone: string | null = null;
@@ -372,6 +379,11 @@ export class PrismaBookingRepository implements IBookingRepository {
                 if (providerProfile) {
                     providerBusinessName = providerProfile.business_name;
                     providerUserId = providerProfile.user_id;
+                    providerAvatar = StorageUtil.getPublicUrl(providerProfile.profile_image || null);
+                    providerExperience = providerProfile.experience || null;
+                    providerCompletedJobs = providerProfile.completed_jobs ?? null;
+                    providerBio = providerProfile.bio || null;
+
                     const pUser = await db.orm.public.users
                         .where({ id: providerProfile.user_id as never })
                         .first();
@@ -380,8 +392,20 @@ export class PrismaBookingRepository implements IBookingRepository {
                         providerPhone = pUser.phone;
                         providerEmail = pUser.email;
                     }
+
+                    try {
+                        const pReviews = await db.orm.public.reviews
+                            .where({ provider_id: booking.provider_id as never, is_hidden: false as never })
+                            .all();
+                        if (pReviews.length > 0) {
+                            const sum = pReviews.reduce((acc: number, r: any) => acc + Number(r.rating || 0), 0);
+                            providerRating = Number((sum / pReviews.length).toFixed(1));
+                            providerReviewCount = pReviews.length;
+                        }
+                    } catch {}
                 }
 
+                let customerAvatar: string | null = null;
                 const cUser = await db.orm.public.users
                     .where({ id: booking.customer_id as never })
                     .first();
@@ -389,6 +413,13 @@ export class PrismaBookingRepository implements IBookingRepository {
                     customerName = cUser.name;
                     customerPhone = cUser.phone;
                     customerEmail = cUser.email;
+
+                    const cProfile = await db.orm.public.customer_profiles
+                        .where({ user_id: cUser.id as never })
+                        .first();
+                    if (cProfile) {
+                        customerAvatar = StorageUtil.getPublicUrl(cProfile.profile_image || null);
+                    }
                 }
 
                 let quotationType: string | null = null;
@@ -406,6 +437,14 @@ export class PrismaBookingRepository implements IBookingRepository {
                     quoteAmount = Number(quote.amount);
                 }
 
+                let isReviewed = false;
+                try {
+                    const rev = await db.orm.public.reviews
+                        .where({ booking_id: booking.id as never })
+                        .first();
+                    isReviewed = Boolean(rev);
+                } catch {}
+
                 return {
                     booking,
                     serviceRequestTitle,
@@ -416,12 +455,20 @@ export class PrismaBookingRepository implements IBookingRepository {
                     providerEmail,
                     providerPhone,
                     providerUserId,
+                    providerAvatar,
+                    providerExperience,
+                    providerCompletedJobs,
+                    providerBio,
+                    providerRating,
+                    providerReviewCount,
                     customerName,
+                    customerAvatar,
                     customerEmail,
                     customerPhone,
                     quotationType,
                     requiresInspection,
-                    quoteAmount
+                    quoteAmount,
+                    isReviewed
                 };
             })
         );

@@ -2,7 +2,7 @@ import { INotificationRepository } from "../../domain/repositories/INotification
 import { ApplicationError } from "../../../../shared/errors/applicationError";
 import { IUseCase } from "../../../../shared/interfaces/use-cases/IUseCase";
 import { IUserRepository } from "../../../auth/public";
-import { NotificationMapper } from "../../infrastructure/mappers/notification.mapper";
+import { NotificationMapper } from "../mappers/notification.mapper";
 import { NotificationResponseDto } from "../dtos/response/notification-response.dto";
 
 

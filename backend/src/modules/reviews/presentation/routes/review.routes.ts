@@ -1,0 +1,23 @@
+import { Router } from "express";
+import { authMiddleware } from "../../../../shared/middlewares/auth.middleware";
+import { requireRole } from "../../../../shared/middlewares/role.middleware";
+import validate from "../../../../shared/middlewares/validate-request";
+import { createReviewSchema, replyReviewSchema, moderateReviewSchema } from "../validators/review.validator";
+import { ReviewRouteDependencies } from "../types/review.route.dependencies";
+
+export function buildReviewRoute(controller: ReviewRouteDependencies): Router {
+  const router = Router();
+
+  router.get("/my", authMiddleware, controller.review.getMyReviews)
+  router.get("/admin", authMiddleware, requireRole(["ADMIN"]), controller.review.getAdminReviews)
+  router.get("/booking/:bookingId", authMiddleware, controller.review.getBookingReview)
+  router.get("/provider/:providerId", controller.review.getProviderReviews)
+
+  router.post("/", authMiddleware, requireRole(["CUSTOMER"]), validate(createReviewSchema), controller.review.createReview)
+  router.post("/:id/reply", authMiddleware, requireRole(["PROVIDER"]), validate(replyReviewSchema), controller.review.replyToReview)
+
+  router.patch("/:id/report", authMiddleware, controller.review.reportReview)
+  router.patch("/:id/moderate", authMiddleware, requireRole(["ADMIN"]), validate(moderateReviewSchema), controller.review.moderateReview)
+
+  return router;
+}

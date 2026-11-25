@@ -72,6 +72,10 @@
       "model": "quotations",
       "namespace": "public"
     },
+    "reviews": {
+      "model": "reviews",
+      "namespace": "public"
+    },
     "service_request_images": {
       "model": "service_request_images",
       "namespace": "public"
@@ -1185,6 +1189,20 @@
                   "codecId": "pg/timestamptz-temporal@1",
                   "kind": "scalar"
                 }
+              },
+              "warranty_days": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "warranty_expires_at": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -1233,6 +1251,22 @@
                 },
                 "to": {
                   "model": "quotations",
+                  "namespace": "public"
+                }
+              },
+              "review": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "booking_id"
+                  ]
+                },
+                "to": {
+                  "model": "reviews",
                   "namespace": "public"
                 }
               },
@@ -1323,6 +1357,12 @@
                 },
                 "updated_at": {
                   "column": "updated_at"
+                },
+                "warranty_days": {
+                  "column": "warranty_days"
+                },
+                "warranty_expires_at": {
+                  "column": "warranty_expires_at"
                 }
               },
               "namespaceId": "public",
@@ -2444,6 +2484,21 @@
                   "namespace": "public"
                 }
               },
+              "reviews": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "provider_id"
+                  ]
+                },
+                "to": {
+                  "model": "reviews",
+                  "namespace": "public"
+                }
+              },
               "service_requests": {
                 "cardinality": "1:N",
                 "on": {
@@ -3210,6 +3265,215 @@
               },
               "namespaceId": "public",
               "table": "quotations"
+            }
+          },
+          "reviews": {
+            "fields": {
+              "aspect_ratings": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "booking_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "comment": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 2000
+                  }
+                }
+              },
+              "created_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "customer_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "is_hidden": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "is_reported": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider_replied_at": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider_reply": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 1500
+                  }
+                }
+              },
+              "rating": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "title": {
+                "nullable": true,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 150
+                  }
+                }
+              },
+              "updated_at": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "booking": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "booking_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "bookings",
+                  "namespace": "public"
+                }
+              },
+              "customer": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "customer_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "users",
+                  "namespace": "public"
+                }
+              },
+              "provider": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "provider_id"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "provider_profiles",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "aspect_ratings": {
+                  "column": "aspect_ratings"
+                },
+                "booking_id": {
+                  "column": "booking_id"
+                },
+                "comment": {
+                  "column": "comment"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "customer_id": {
+                  "column": "customer_id"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "is_hidden": {
+                  "column": "is_hidden"
+                },
+                "is_reported": {
+                  "column": "is_reported"
+                },
+                "provider_id": {
+                  "column": "provider_id"
+                },
+                "provider_replied_at": {
+                  "column": "provider_replied_at"
+                },
+                "provider_reply": {
+                  "column": "provider_reply"
+                },
+                "rating": {
+                  "column": "rating"
+                },
+                "title": {
+                  "column": "title"
+                },
+                "updated_at": {
+                  "column": "updated_at"
+                }
+              },
+              "namespaceId": "public",
+              "table": "reviews"
             }
           },
           "service_request_images": {
@@ -4708,6 +4972,21 @@
                   "namespace": "public"
                 }
               },
+              "reviews": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "customer_id"
+                  ]
+                },
+                "to": {
+                  "model": "reviews",
+                  "namespace": "public"
+                }
+              },
               "service_requests": {
                 "cardinality": "1:N",
                 "on": {
@@ -5549,6 +5828,20 @@
                   "codecId": "pg/timestamptz-temporal@1",
                   "nativeType": "timestamptz",
                   "nullable": false
+                },
+                "warranty_days": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "warranty_expires_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -7211,6 +7504,196 @@
               },
               "uniques": []
             },
+            "reviews": {
+              "columns": {
+                "aspect_ratings": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
+                "booking_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "comment": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 2000
+                  }
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "customer_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "is_hidden": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "is_reported": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "provider_id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "provider_replied_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "provider_reply": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 1500
+                  }
+                },
+                "rating": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 5
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "title": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": true,
+                  "typeParams": {
+                    "length": 150
+                  }
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "booking_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "reviews"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "bookings"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "customer_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "reviews"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "users"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "provider_id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "reviews"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "provider_profiles"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "created_at"
+                  ],
+                  "name": "reviews_created_at_idx_225d8c0f",
+                  "prefix": "reviews_created_at_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "customer_id"
+                  ],
+                  "name": "reviews_customer_id_idx_e16dfa6b",
+                  "prefix": "reviews_customer_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "provider_id"
+                  ],
+                  "name": "reviews_provider_id_idx_d89e110d",
+                  "prefix": "reviews_provider_id_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "booking_id"
+                  ]
+                }
+              ]
+            },
             "service_request_images": {
               "columns": {
                 "created_at": {
@@ -8842,10 +9325,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "591aad6c6aeceeb18f7eaf740494daf3fa66e688ad385063f2bca3bb2e142b70"
+    "storageHash": "2db44ecb41245d0c14c748346c59b58464bca6fa4b9820332bb93530effc12bf"
   },
   "execution": {
-    "executionHash": "c9f957c3fe6980f77d61b2f6eba3a6d772da140a60d8b8c809b73b53332e35db",
+    "executionHash": "3d4f6ac5e388dd3ade1700a37bd971c22056a7385185ae2c60c32c3ae1690e4c",
     "mutations": {
       "defaults": [
         {
@@ -9213,6 +9696,32 @@
             "column": "updated_at",
             "namespace": "public",
             "table": "quotations"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "reviews"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updated_at",
+            "namespace": "public",
+            "table": "reviews"
           }
         },
         {

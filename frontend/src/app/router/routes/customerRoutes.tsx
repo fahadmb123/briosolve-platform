@@ -1,6 +1,5 @@
-import { Route } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import {
-  CustomerDashboard,
   CustomerNotifications,
   CustomerProfile,
   CustomerSettings,
@@ -14,7 +13,8 @@ import {
   CustomerBookings,
   CustomerBookingDetails,
   CustomerWallet,
-  CustomerSupport
+  CustomerSupport,
+  CustomerReviews
 } from '../lazy/customer.lazy';
 import ProtectedRoute from '../guards/ProtectedRoute';
 import RoleRoute from '../guards/RoleRoute';
@@ -25,7 +25,7 @@ export const customerRoutes = (
     <Route element={<ProtectedRoute />}>
       <Route element={<RoleRoute allowedRoles={["CUSTOMER"]} />}>
         <Route path="settings" element={<CustomerSettings />} />
-        <Route path="dashboard" element={<CustomerDashboard />} />
+        <Route path="dashboard" element={<Navigate to="/bookings" replace />} />
         <Route path="profile" element={<CustomerProfile />} />
         <Route path="notifications" element={<CustomerNotifications />} />
         <Route path="nearby-providers" element={<CustomerNearbyProviders />} />
@@ -46,6 +46,7 @@ export const customerRoutes = (
         <Route path="chat" element={<CustomerChat />} />
         <Route path="support" element={<CustomerSupport />} />
         <Route path="tickets" element={<CustomerSupport />} />
+        <Route path="reviews" element={<CustomerReviews />} />
       </Route>
     </Route>
   </>

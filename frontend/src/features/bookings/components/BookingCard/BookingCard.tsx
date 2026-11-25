@@ -8,6 +8,7 @@ interface BookingCardProps {
   onViewDetails: (booking: BookingItem) => void;
   onChat: (booking: BookingItem) => void;
   onUpdateStatus?: (booking: BookingItem, newStatus: BookingStatus) => void;
+  onReview?: (booking: BookingItem) => void;
 }
 
 export const BookingCard: React.FC<BookingCardProps> = ({
@@ -15,7 +16,8 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   role,
   onViewDetails,
   onChat,
-  onUpdateStatus
+  onUpdateStatus,
+  onReview
 }) => {
   const formattedDate = booking.scheduledDate
     ? new Date(booking.scheduledDate).toLocaleDateString("en-IN", {
@@ -200,7 +202,9 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 
   const counterpartyName =
     role === "CUSTOMER"
-      ? booking.providerBusinessName || booking.providerName || "Assigned Provider"
+      ? booking.providerName && booking.providerBusinessName
+        ? `${booking.providerName} (${booking.providerBusinessName})`
+        : booking.providerName || booking.providerBusinessName || "Assigned Provider"
       : booking.customerName || "Customer";
 
   const requiresInspection =
@@ -272,9 +276,35 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 
         <div className="bkcard-info-grid">
           <div className="bkcard-info-item">
-            <div className="bkcard-info-icon-wrapper primary">
-              <i className={role === "CUSTOMER" ? "fas fa-user-tie" : "fas fa-user"}></i>
-            </div>
+            {role === "PROVIDER" ? (
+              <img
+                src={
+                  booking.customerAvatar ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.customerName || "Customer")}&background=0f172a&color=fff&size=80&bold=true`
+                }
+                alt={booking.customerName || "Customer"}
+                className="bkcard-counterparty-avatar"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.customerName || "Customer")}&background=0f172a&color=fff&size=80&bold=true`;
+                }}
+              />
+            ) : booking.providerAvatar || booking.providerName ? (
+              <img
+                src={
+                  booking.providerAvatar ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.providerName || "Provider")}&background=FF7900&color=fff&size=80&bold=true`
+                }
+                alt={booking.providerName || "Provider"}
+                className="bkcard-counterparty-avatar"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.providerName || "Provider")}&background=FF7900&color=fff&size=80&bold=true`;
+                }}
+              />
+            ) : (
+              <div className="bkcard-info-icon-wrapper primary">
+                <i className="fas fa-user-tie"></i>
+              </div>
+            )}
             <div className="bkcard-info-content">
               <span className="bkcard-info-label">{role === "CUSTOMER" ? "Service Provider" : "Client"}</span>
               <span className="bkcard-info-value" title={counterpartyName}>
@@ -423,6 +453,27 @@ export const BookingCard: React.FC<BookingCardProps> = ({
               <i className="fas fa-check"></i>
               <span>Mark Completed</span>
             </button>
+          )}
+
+          {role === "CUSTOMER" && booking.status === "COMPLETED" && (
+            booking.isReviewed ? (
+              <span className="bkcard-reviewed-badge">
+                <i className="fas fa-check-circle"></i>
+                <span>Reviewed</span>
+              </span>
+            ) : onReview ? (
+              <button
+                type="button"
+                className="bkcard-btn-action review"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReview(booking);
+                }}
+              >
+                <i className="fas fa-star"></i>
+                <span>Write Review</span>
+              </button>
+            ) : null
           )}
         </div>
       </div>

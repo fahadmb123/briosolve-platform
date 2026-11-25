@@ -1,7 +1,7 @@
 import { db } from "../../../../shared/database/client";
 import { PushSubscription } from "../../domain/entities/pushSubscription.entity";
 import { IPushSubscriptionRepository } from "../../domain/repositories/IPushSubscription.respository";
-import { PushSubscriptionMapper } from "../mappers/pushSubscription.mapper";
+import { PushSubscriptionMapper } from "../../application/mappers/pushSubscription.mapper";
 
 export class PrismaPushSubscriptionRepository implements IPushSubscriptionRepository {
     async findById(id: string): Promise<PushSubscription | null> {

@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'591aad6c6aeceeb18f7eaf740494daf3fa66e688ad385063f2bca3bb2e142b70'>;
+  StorageHashBase<'2db44ecb41245d0c14c748346c59b58464bca6fa4b9820332bb93530effc12bf'>;
 export type ExecutionHash =
-  ExecutionHashBase<'c9f957c3fe6980f77d61b2f6eba3a6d772da140a60d8b8c809b73b53332e35db'>;
+  ExecutionHashBase<'3d4f6ac5e388dd3ade1700a37bd971c22056a7385185ae2c60c32c3ae1690e4c'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -295,6 +295,8 @@ export type FieldOutputTypes = {
       readonly payment_id: Varchar<255> | null;
       readonly order_id: Varchar<255> | null;
       readonly notes: CodecTypes['pg/text@1']['output'] | null;
+      readonly warranty_days: CodecTypes['pg/int4@1']['output'] | null;
+      readonly warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -434,6 +436,22 @@ export type FieldOutputTypes = {
       readonly extra_charge_policy: Varchar<300>;
       readonly rejection_reason: CodecTypes['pg/text@1']['output'] | null;
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    };
+    readonly reviews: {
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly booking_id: CodecTypes['pg/uuid@1']['output'];
+      readonly customer_id: CodecTypes['pg/uuid@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly rating: CodecTypes['pg/int4@1']['output'];
+      readonly title: Varchar<150> | null;
+      readonly comment: Varchar<2000>;
+      readonly aspect_ratings: CodecTypes['pg/json@1']['output'] | null;
+      readonly provider_reply: Varchar<1500> | null;
+      readonly provider_replied_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
+      readonly is_reported: CodecTypes['pg/bool@1']['output'];
+      readonly is_hidden: CodecTypes['pg/bool@1']['output'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -620,6 +638,8 @@ export type FieldInputTypes = {
       readonly payment_id: CodecTypes['sql/varchar@1']['input'] | null;
       readonly order_id: CodecTypes['sql/varchar@1']['input'] | null;
       readonly notes: CodecTypes['pg/text@1']['input'] | null;
+      readonly warranty_days: CodecTypes['pg/int4@1']['input'] | null;
+      readonly warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -759,6 +779,22 @@ export type FieldInputTypes = {
       readonly extra_charge_policy: CodecTypes['sql/varchar@1']['input'];
       readonly rejection_reason: CodecTypes['pg/text@1']['input'] | null;
       readonly status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly reviews: {
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly booking_id: CodecTypes['pg/uuid@1']['input'];
+      readonly customer_id: CodecTypes['pg/uuid@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly rating: CodecTypes['pg/int4@1']['input'];
+      readonly title: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly comment: CodecTypes['sql/varchar@1']['input'];
+      readonly aspect_ratings: CodecTypes['pg/json@1']['input'] | null;
+      readonly provider_reply: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly provider_replied_at: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
+      readonly is_reported: CodecTypes['pg/bool@1']['input'];
+      readonly is_hidden: CodecTypes['pg/bool@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -947,6 +983,8 @@ export type StorageColumnTypes = {
         | 'CLOSED';
       readonly total_amount: Numeric<12, 2>;
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly warranty_days: CodecTypes['pg/int4@1']['output'] | null;
+      readonly warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
     };
     readonly categories: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -1086,6 +1124,22 @@ export type StorageColumnTypes = {
       readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
       readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly work_description: Varchar<1000>;
+    };
+    readonly reviews: {
+      readonly aspect_ratings: CodecTypes['pg/json@1']['output'] | null;
+      readonly booking_id: CodecTypes['pg/uuid@1']['output'];
+      readonly comment: Varchar<2000>;
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly customer_id: CodecTypes['pg/uuid@1']['output'];
+      readonly id: CodecTypes['pg/uuid@1']['output'];
+      readonly is_hidden: CodecTypes['pg/bool@1']['output'];
+      readonly is_reported: CodecTypes['pg/bool@1']['output'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['output'];
+      readonly provider_replied_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
+      readonly provider_reply: Varchar<1500> | null;
+      readonly rating: CodecTypes['pg/int4@1']['output'];
+      readonly title: Varchar<150> | null;
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
     readonly service_request_images: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -1272,6 +1326,8 @@ export type StorageColumnInputTypes = {
         | 'CLOSED';
       readonly total_amount: CodecTypes['pg/numeric@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly warranty_days: CodecTypes['pg/int4@1']['input'] | null;
+      readonly warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
     };
     readonly categories: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -1411,6 +1467,22 @@ export type StorageColumnInputTypes = {
       readonly valid_until: 'HOURS_24' | 'HOURS_48' | 'DAYS_3' | 'DAYS_7';
       readonly valid_until_date: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly work_description: CodecTypes['sql/varchar@1']['input'];
+    };
+    readonly reviews: {
+      readonly aspect_ratings: CodecTypes['pg/json@1']['input'] | null;
+      readonly booking_id: CodecTypes['pg/uuid@1']['input'];
+      readonly comment: CodecTypes['sql/varchar@1']['input'];
+      readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly customer_id: CodecTypes['pg/uuid@1']['input'];
+      readonly id: CodecTypes['pg/uuid@1']['input'];
+      readonly is_hidden: CodecTypes['pg/bool@1']['input'];
+      readonly is_reported: CodecTypes['pg/bool@1']['input'];
+      readonly provider_id: CodecTypes['pg/uuid@1']['input'];
+      readonly provider_replied_at: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
+      readonly provider_reply: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly rating: CodecTypes['pg/int4@1']['input'];
+      readonly title: CodecTypes['sql/varchar@1']['input'] | null;
+      readonly updated_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly service_request_images: {
       readonly created_at: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -1568,6 +1640,7 @@ export namespace Models {
     push_subscriptions: public_push_subscriptions[];
     reactivation_requests: public_account_reactivation_requests[];
     reviewed_reactivation_requests: public_account_reactivation_requests[];
+    reviews: public_reviews[];
     service_requests: public_service_requests[];
     support_tickets: public_support_tickets[];
     wallet: public_wallets | null;
@@ -1585,6 +1658,7 @@ export namespace Models {
       | 'push_subscriptions'
       | 'reactivation_requests'
       | 'reviewed_reactivation_requests'
+      | 'reviews'
       | 'service_requests'
       | 'support_tickets'
       | 'wallet';
@@ -1608,6 +1682,7 @@ export namespace Models {
     bookings: public_bookings[];
     overrides: public_provider_availability_overrides[];
     quotations: public_quotations[];
+    reviews: public_reviews[];
     service_requests: public_service_request_providers[];
     services: public_provider_services[];
     user: public_users;
@@ -1617,6 +1692,7 @@ export namespace Models {
       | 'bookings'
       | 'overrides'
       | 'quotations'
+      | 'reviews'
       | 'service_requests'
       | 'services'
       | 'user'
@@ -1929,15 +2005,18 @@ export namespace Models {
     payment_id: Varchar<255> | null;
     order_id: Varchar<255> | null;
     notes: CodecTypes['pg/text@1']['output'] | null;
+    warranty_days: CodecTypes['pg/int4@1']['output'] | null;
+    warranty_expires_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
     created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
     customer: public_users;
     provider: public_provider_profiles;
     quotation: public_quotations;
+    review: public_reviews | null;
     service_request: public_service_requests;
     wallet_transactions: public_wallet_transactions[];
     readonly [RelationKeys]?:
-      'customer' | 'provider' | 'quotation' | 'service_request' | 'wallet_transactions';
+      'customer' | 'provider' | 'quotation' | 'review' | 'service_request' | 'wallet_transactions';
   };
   export type public_wallets = {
     id: CodecTypes['pg/uuid@1']['output'];
@@ -2001,6 +2080,26 @@ export namespace Models {
     ticket: public_support_tickets;
     readonly [RelationKeys]?: 'ticket';
   };
+  export type public_reviews = {
+    id: CodecTypes['pg/uuid@1']['output'];
+    booking_id: CodecTypes['pg/uuid@1']['output'];
+    customer_id: CodecTypes['pg/uuid@1']['output'];
+    provider_id: CodecTypes['pg/uuid@1']['output'];
+    rating: CodecTypes['pg/int4@1']['output'];
+    title: Varchar<150> | null;
+    comment: Varchar<2000>;
+    aspect_ratings: CodecTypes['pg/json@1']['output'] | null;
+    provider_reply: Varchar<1500> | null;
+    provider_replied_at: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
+    is_reported: CodecTypes['pg/bool@1']['output'];
+    is_hidden: CodecTypes['pg/bool@1']['output'];
+    created_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    updated_at: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    booking: public_bookings;
+    customer: public_users;
+    provider: public_provider_profiles;
+    readonly [RelationKeys]?: 'booking' | 'customer' | 'provider';
+  };
 }
 
 export declare const models: {
@@ -2032,6 +2131,7 @@ export declare const models: {
     wallet_transactions: Models.public_wallet_transactions;
     support_tickets: Models.public_support_tickets;
     support_ticket_messages: Models.public_support_ticket_messages;
+    reviews: Models.public_reviews;
   };
 };
 
@@ -2382,6 +2482,20 @@ type ContractBase = Omit<
                 readonly notes: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly warranty_days: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                };
+                readonly warranty_expires_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
                   readonly nullable: true;
                 };
                 readonly created_at: {
@@ -3552,6 +3666,156 @@ type ContractBase = Omit<
                   readonly source: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'quotations';
+                    readonly columns: readonly ['provider_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'provider_profiles';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly reviews: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly booking_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly customer_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly provider_id: {
+                  readonly nativeType: 'uuid';
+                  readonly codecId: 'pg/uuid@1';
+                  readonly nullable: false;
+                };
+                readonly rating: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 5>;
+                  };
+                };
+                readonly title: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 150 };
+                };
+                readonly comment: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 2000 };
+                };
+                readonly aspect_ratings: {
+                  readonly nativeType: 'json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                };
+                readonly provider_reply: {
+                  readonly nativeType: 'character varying';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly length: 1500 };
+                };
+                readonly provider_replied_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: true;
+                };
+                readonly is_reported: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
+                readonly is_hidden: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
+                readonly created_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updated_at: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['booking_id'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'reviews_provider_id_idx_d89e110d';
+                  readonly prefix: 'reviews_provider_id_idx';
+                  readonly columns: readonly ['provider_id'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'reviews_customer_id_idx_e16dfa6b';
+                  readonly prefix: 'reviews_customer_id_idx';
+                  readonly columns: readonly ['customer_id'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'reviews_created_at_idx_225d8c0f';
+                  readonly prefix: 'reviews_created_at_idx';
+                  readonly columns: readonly ['created_at'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'reviews';
+                    readonly columns: readonly ['booking_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'bookings';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'reviews';
+                    readonly columns: readonly ['customer_id'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'users';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'reviews';
                     readonly columns: readonly ['provider_id'];
                   };
                   readonly target: {
@@ -4791,6 +5055,7 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'support_ticket_messages';
     };
+    readonly reviews: { readonly namespace: 'public' & NamespaceId; readonly model: 'reviews' };
   };
   readonly domain: {
     readonly namespaces: {
@@ -5170,6 +5435,17 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly warranty_days: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly warranty_expires_at: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
               readonly created_at: {
                 readonly nullable: false;
                 readonly type: {
@@ -5222,6 +5498,18 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
+              readonly review: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'reviews';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['booking_id'];
+                };
+              };
               readonly service_request: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -5266,6 +5554,8 @@ type ContractBase = Omit<
                 readonly payment_id: { readonly column: 'payment_id' };
                 readonly order_id: { readonly column: 'order_id' };
                 readonly notes: { readonly column: 'notes' };
+                readonly warranty_days: { readonly column: 'warranty_days' };
+                readonly warranty_expires_at: { readonly column: 'warranty_expires_at' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
               };
@@ -6032,6 +6322,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['provider_id'];
                 };
               };
+              readonly reviews: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'reviews';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['provider_id'];
+                };
+              };
               readonly service_requests: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -6524,6 +6825,145 @@ type ContractBase = Omit<
                 readonly extra_charge_policy: { readonly column: 'extra_charge_policy' };
                 readonly rejection_reason: { readonly column: 'rejection_reason' };
                 readonly status: { readonly column: 'status' };
+                readonly created_at: { readonly column: 'created_at' };
+                readonly updated_at: { readonly column: 'updated_at' };
+              };
+            };
+          };
+          readonly reviews: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly booking_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly customer_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly provider_id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
+              };
+              readonly rating: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly title: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 150 };
+                };
+              };
+              readonly comment: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 2000 };
+                };
+              };
+              readonly aspect_ratings: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly provider_reply: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/varchar@1';
+                  readonly typeParams: { readonly length: 1500 };
+                };
+              };
+              readonly provider_replied_at: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly is_reported: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly is_hidden: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly created_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly updated_at: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly booking: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'bookings';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['booking_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly customer: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'users';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['customer_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly provider: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'provider_profiles';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['provider_id'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'reviews';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly booking_id: { readonly column: 'booking_id' };
+                readonly customer_id: { readonly column: 'customer_id' };
+                readonly provider_id: { readonly column: 'provider_id' };
+                readonly rating: { readonly column: 'rating' };
+                readonly title: { readonly column: 'title' };
+                readonly comment: { readonly column: 'comment' };
+                readonly aspect_ratings: { readonly column: 'aspect_ratings' };
+                readonly provider_reply: { readonly column: 'provider_reply' };
+                readonly provider_replied_at: { readonly column: 'provider_replied_at' };
+                readonly is_reported: { readonly column: 'is_reported' };
+                readonly is_hidden: { readonly column: 'is_hidden' };
                 readonly created_at: { readonly column: 'created_at' };
                 readonly updated_at: { readonly column: 'updated_at' };
               };
@@ -7533,6 +7973,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['reviewed_by'];
                 };
               };
+              readonly reviews: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'reviews';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['customer_id'];
+                };
+              };
               readonly service_requests: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -8258,6 +8709,23 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'quotations';
+            readonly column: 'updated_at';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'reviews';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'reviews';
             readonly column: 'updated_at';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
