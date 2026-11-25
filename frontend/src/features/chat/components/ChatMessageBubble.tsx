@@ -8,6 +8,15 @@ interface ChatMessageBubbleProps {
   onImageClick?: (imageUrl: string, caption?: string) => void;
 }
 
+const isEmojiOnlyMessage = (text?: string): boolean => {
+  if (!text) return false;
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  const withoutSpaces = trimmed.replace(/\s+/g, "");
+  const emojiRegex = /^(?:\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*){1,3}$/u;
+  return emojiRegex.test(withoutSpaces);
+};
+
 export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
   message,
   currentRole = "CUSTOMER",
@@ -19,6 +28,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
     : currentRole === "PROVIDER"
       ? message.senderRole === "PROVIDER"
       : message.senderRole === "CUSTOMER";
+  const emojiOnly = message.type !== "IMAGE" && isEmojiOnlyMessage(message.text);
 
   const renderStatusTicks = () => {
     if (!isMe) return null;
@@ -84,7 +94,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
             )}
           </div>
         ) : (
-          <div className="chat-text-bubble">
+          <div className={`chat-text-bubble ${emojiOnly ? "emoji-only" : ""}`}>
             <span className="chat-bubble-text">{message.text}</span>
             <span className="chat-bubble-meta">
               <span className="chat-msg-time">{message.createdAt}</span>

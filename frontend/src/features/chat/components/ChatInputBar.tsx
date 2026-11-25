@@ -1,4 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import EmojiPicker, { Theme, type EmojiClickData } from "emoji-picker-react";
+import { useTheme } from "../../../shared/hooks/useTheme";
 
 interface ChatInputBarProps {
   onSendMessage: (text: string, imageFile?: File) => void;
@@ -11,11 +13,56 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   prompts = [],
   disabled = false,
 }) => {
+  const { theme } = useTheme();
   const [inputText, setInputText] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const emojiContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showEmojiPicker) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (emojiContainerRef.current && !emojiContainerRef.current.contains(e.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    const handleKeyDownClose = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDownClose);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDownClose);
+    };
+  }, [showEmojiPicker]);
+
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    const emoji = emojiData.emoji;
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      setInputText((prev) => prev + emoji);
+      return;
+    }
+
+    const start = textarea.selectionStart ?? inputText.length;
+    const end = textarea.selectionEnd ?? inputText.length;
+    const updated = inputText.slice(0, start) + emoji + inputText.slice(end);
+    setInputText(updated);
+
+    requestAnimationFrame(() => {
+      textarea.focus();
+      const caret = start + emoji.length;
+      textarea.setSelectionRange(caret, caret);
+      textarea.style.height = "auto";
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    });
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,6 +98,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
     const fileToSend = selectedFile || undefined;
     onSendMessage(trimmed, fileToSend);
 
+    setShowEmojiPicker(false);
     setInputText("");
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -124,7 +172,33 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
         </div>
       )}
 
-      <div className="chat-input-row">
+      <div className="chat-input-row" ref={emojiContainerRef}>
+        {showEmojiPicker && !disabled && (
+          <div className="chat-emoji-popover">
+            <EmojiPicker
+              onEmojiClick={handleEmojiClick}
+              theme={theme === "dark" ? Theme.DARK : Theme.LIGHT}
+              width="100%"
+              height={360}
+              searchPlaceholder="Search emojis..."
+              previewConfig={{ showPreview: false }}
+              lazyLoadEmojis
+            />
+          </div>
+        )}
+
+        <button
+          type="button"
+          className={`chat-emoji-btn ${showEmojiPicker ? "active" : ""}`}
+          onClick={() => setShowEmojiPicker((prev) => !prev)}
+          disabled={disabled}
+          title="Add emoji"
+          aria-label="Add emoji"
+          aria-expanded={showEmojiPicker}
+        >
+          <i className="far fa-smile" />
+        </button>
+
         <input
           ref={fileInputRef}
           type="file"
