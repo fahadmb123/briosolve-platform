@@ -26,13 +26,14 @@ import { createBulkNotificationUseCase, createNotificationUseCase, webPushDelive
 import { createServiceRequestRoutes } from "./modules/service-request/infrastructure/composition";
 import { createChatRoutes } from "./modules/chat/infrastructure/composition";
 import { communicationRoutes } from "./modules/communication/infrastructure/composition";
-import { createQuotationRoutes } from "./modules/quotation-submission/infrastructure/composition";
+import { createQuotationRoutes, createGetRequestQuotationsUseCase } from "./modules/quotation-submission/infrastructure/composition";
 import { createPaymentRoutes } from "./modules/payment/infrastructure/composition";
 import { createBookingRoutes } from "./modules/booking/infrastructure/composition";
 import { createWalletRoutes, createCreditWalletUseCase } from "./modules/wallet/infrastructure/composition";
 import { createSupportRoutes } from "./modules/support/infrastructure/composition";
 import { createDashboardRoutes } from "./modules/dashboard/infrastructure/composition";
 import { createReviewRoutes } from "./modules/reviews/infrastructure/composition";
+import { createAiRoutes } from "./modules/ai/infrastructure/composition";
 
 const PORT = process.env.PORT || 5000;
 
@@ -62,6 +63,8 @@ const startServer = async (): Promise<void> => {
         const supportRoutes = createSupportRoutes(notificationUseCase);
         const dashboardRoutes = createDashboardRoutes();
         const reviewRoutes = createReviewRoutes(notificationUseCase);
+        const getRequestQuotationsUseCase = createGetRequestQuotationsUseCase();
+        const aiRoutes = createAiRoutes(getRequestQuotationsUseCase);
 
         const rootRouter = createRootRouter({
             authRoutes,
@@ -83,7 +86,8 @@ const startServer = async (): Promise<void> => {
             walletRoutes,
             supportRoutes,
             dashboardRoutes,
-            reviewRoutes
+            reviewRoutes,
+            aiRoutes
         });
 
         app.use("/api", rootRouter);

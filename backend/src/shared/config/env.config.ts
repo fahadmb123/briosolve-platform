@@ -24,6 +24,8 @@ const envSchema = z.object({
     LIVEKIT_API_SECRET: z.string().optional(),
     RAZORPAY_KEY_ID: z.string().optional(),
     RAZORPAY_KEY_SECRET: z.string().optional(),
+    GEMINI_API_KEY: z.string().optional(),
+    GEMINI_MODEL: z.string().optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -45,6 +47,8 @@ export const envConfig = {
     LIVEKIT_API_SECRET: rawConfig.LIVEKIT_API_SECRET || process.env.LIVEKIT_API_SECRET || "",
     RAZORPAY_KEY_ID: rawConfig.RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || "",
     RAZORPAY_KEY_SECRET: rawConfig.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_KEY_SECRET || "",
+    GEMINI_API_KEY: rawConfig.GEMINI_API_KEY || process.env.GEMINI_API_KEY || "",
+    GEMINI_MODEL: rawConfig.GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash",
     isProduction: rawConfig.NODE_ENV === "production"
 };
 

@@ -21,4 +21,5 @@ export interface RootRouterDependencies {
     supportRoutes: ExpressRouter;
     dashboardRoutes: ExpressRouter;
     reviewRoutes: ExpressRouter;
+    aiRoutes: ExpressRouter;
 }
