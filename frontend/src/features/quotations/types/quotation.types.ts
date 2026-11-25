@@ -117,3 +117,19 @@ export interface GetMyQuotationsResponse {
   limit: number;
   counts: Record<string, number>;
 }
+
+export interface QuotationRankingItem {
+  quotationId: string;
+  providerName: string;
+  rank: number;
+  score: number;
+  pros: string[];
+  cons: string[];
+  verdict: string;
+}
+
+export interface CompareQuotationsResponse {
+  recommendedWinnerId: string;
+  rankings: QuotationRankingItem[];
+  aiSummary: string;
+}

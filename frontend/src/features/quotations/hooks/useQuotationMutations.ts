@@ -6,7 +6,8 @@ import {
   getMyQuotationsService,
   getRequestQuotationsService,
   acceptQuotationService,
-  rejectQuotationService
+  rejectQuotationService,
+  compareQuotationsWithAiService
 } from "../services/quotation.service";
 import type { SubmitQuotationPayload, UpdateQuotationPayload, GetMyQuotationsParams } from "../types/quotation.types";
 
@@ -81,5 +82,12 @@ export const useRejectQuotation = () => {
       queryClient.invalidateQueries({ queryKey: ["myServiceRequests"] });
       queryClient.invalidateQueries({ queryKey: ["serviceRequest"] });
     }
+  });
+};
+
+export const useCompareQuotationsWithAi = () => {
+  return useMutation({
+    mutationFn: ({ serviceRequestId, topN }: { serviceRequestId: string; topN?: number }) =>
+      compareQuotationsWithAiService(serviceRequestId, topN)
   });
 };

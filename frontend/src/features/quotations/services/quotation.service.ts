@@ -5,7 +5,8 @@ import type {
   UpdateQuotationPayload,
   GetMyQuotationsParams,
   GetMyQuotationsResponse,
-  RequestQuotationsResponse
+  RequestQuotationsResponse,
+  CompareQuotationsResponse
 } from "../types/quotation.types";
 
 export const submitQuotationService = async (
@@ -56,5 +57,16 @@ export const getMyQuotationsService = async (
   params?: GetMyQuotationsParams
 ): Promise<response<GetMyQuotationsResponse>> => {
   const res = await apiClient.get("/api/quotation/my", { params });
+  return res.data;
+};
+
+export const compareQuotationsWithAiService = async (
+  serviceRequestId: string,
+  topN?: number
+): Promise<response<CompareQuotationsResponse>> => {
+  const res = await apiClient.post("/api/ai/quotations/compare", {
+    serviceRequestId,
+    topN
+  });
   return res.data;
 };

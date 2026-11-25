@@ -3,14 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
   useGetRequestQuotations,
-  useRejectQuotation
+  useRejectQuotation,
+  useCompareQuotationsWithAi
 } from "../../../quotations/hooks/useQuotationMutations";
+import { AiQuotationComparisonModal } from "../../../quotations/components";
 import {
   useCreatePaymentOrder,
   useVerifyPayment
 } from "../../../payment/hooks/usePayment";
 import { loadRazorpayScript, resetRazorpay } from "../../../payment/utils/razorpay.utils";
-import type { RequestQuotationItem } from "../../../quotations/types/quotation.types";
+import type { RequestQuotationItem, CompareQuotationsResponse } from "../../../quotations/types/quotation.types";
 import type { CustomerServiceRequestItem } from "../../types/serviceRequest.types";
 import "./RequestQuotations.css";
 
@@ -33,12 +35,15 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
   const rejectMutation = useRejectQuotation();
   const createOrderMutation = useCreatePaymentOrder();
   const verifyPaymentMutation = useVerifyPayment();
+  const compareAiMutation = useCompareQuotationsWithAi();
 
   const [confirmAcceptQuote, setConfirmAcceptQuote] = useState<RequestQuotationItem | null>(null);
   const [confirmRejectQuote, setConfirmRejectQuote] = useState<RequestQuotationItem | null>(null);
   const [declineReason, setDeclineReason] = useState<string>("Price is higher than expected");
   const [customDeclineReason, setCustomDeclineReason] = useState<string>("");
   const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState<boolean>(false);
+  const [aiComparisonData, setAiComparisonData] = useState<CompareQuotationsResponse | null>(null);
   const activeRazorpayRef = useRef<any>(null);
   const [redirectOverlay, setRedirectOverlay] = useState<{
     show: boolean;
@@ -107,6 +112,42 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
         requestTitle: "Service Quotation"
       }
     });
+  };
+
+  const handleOpenAiComparison = () => {
+    setIsAiModalOpen(true);
+    if (!aiComparisonData) {
+      compareAiMutation.mutate(
+        { serviceRequestId: requestId, topN: 3 },
+        {
+          onSuccess: (res) => {
+            if (res.data) {
+              setAiComparisonData(res.data);
+            }
+          },
+          onError: (err: any) => {
+            toast.error(err?.response?.data?.message || "Failed to analyze quotations with AI");
+          }
+        }
+      );
+    }
+  };
+
+  const handleRefreshAiComparison = () => {
+    compareAiMutation.mutate(
+      { serviceRequestId: requestId, topN: 3 },
+      {
+        onSuccess: (res) => {
+          if (res.data) {
+            setAiComparisonData(res.data);
+            toast.success("AI comparison updated");
+          }
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Failed to analyze quotations with AI");
+        }
+      }
+    );
   };
 
   const handlePayAndAccept = async () => {
@@ -377,17 +418,30 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
             <i className="fas fa-file-invoice-dollar srdetails-card-icon"></i>
             <h3 className="srdetails-card-title">Provider Quotations</h3>
           </div>
-          <span className={`reqquotes-count-badge ${acceptedQuoteId ? "has-accepted" : ""}`}>
-            {acceptedQuoteId
-              ? "Provider Selected"
-              : activeQuotations.length === 1
-              ? "1 Active Quote"
-              : activeQuotations.length > 1
-              ? `${activeQuotations.length} Active Quotes`
-              : pastQuotations.length > 0
-              ? "Awaiting New Quotes"
-              : "0 Quotes"}
-          </span>
+          <div className="reqquotes-header-actions">
+            {activeQuotations.length >= 2 && !acceptedQuoteId && (
+              <button
+                type="button"
+                className="reqquotes-ai-compare-btn"
+                onClick={handleOpenAiComparison}
+                title="Compare all bids with Gemini AI"
+              >
+                <i className="fas fa-wand-magic-sparkles" />
+                <span>AI Compare Bids</span>
+              </button>
+            )}
+            <span className={`reqquotes-count-badge ${acceptedQuoteId ? "has-accepted" : ""}`}>
+              {acceptedQuoteId
+                ? "Provider Selected"
+                : activeQuotations.length === 1
+                ? "1 Active Quote"
+                : activeQuotations.length > 1
+                ? `${activeQuotations.length} Active Quotes`
+                : pastQuotations.length > 0
+                ? "Awaiting New Quotes"
+                : "0 Quotes"}
+            </span>
+          </div>
         </div>
 
         {activeQuotations.length === 0 ? (
@@ -421,12 +475,35 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
               const typeConfig = getTypeLabel(quote.quotationType);
               const isAccepted = quote.status === "ACCEPTED";
               const isPending = quote.status === "PENDING";
+              const isAiWinner = aiComparisonData?.recommendedWinnerId === quote.id;
+              const aiWinnerRanking = isAiWinner
+                ? aiComparisonData?.rankings.find((r) => r.quotationId === quote.id)
+                : null;
 
               return (
                 <div
                   key={quote.id}
-                  className={`reqquotes-item ${isAccepted ? "status-accepted" : ""}`}
+                  className={`reqquotes-item ${isAccepted ? "status-accepted" : ""} ${isAiWinner ? "ai-winner-highlight" : ""}`}
                 >
+                  {isAiWinner && (
+                    <div
+                      className="reqquotes-ai-winner-ribbon"
+                      onClick={handleOpenAiComparison}
+                      role="button"
+                      tabIndex={0}
+                      title="Click to view full AI comparison"
+                    >
+                      <div className="reqquotes-ai-winner-ribbon-left">
+                        <i className="fas fa-crown" />
+                        <span>#1 AI Recommended Pick</span>
+                      </div>
+                      <span className="reqquotes-ai-winner-pill">
+                        Match Score: {aiWinnerRanking?.score || 95}/100
+                        <i className="fas fa-chevron-right" />
+                      </span>
+                    </div>
+                  )}
+
                   <div className="reqquotes-item-header">
                     <div className="reqquotes-provider-info">
                       {quote.provider.profileImage ? (
@@ -970,6 +1047,19 @@ export const RequestQuotations: React.FC<RequestQuotationsProps> = ({
           </div>
         </div>
       )}
+
+      <AiQuotationComparisonModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        serviceRequestId={requestId}
+        quotations={activeQuotations}
+        comparisonData={aiComparisonData}
+        isLoading={compareAiMutation.isPending}
+        onRefresh={handleRefreshAiComparison}
+        onAcceptQuote={(quote) => setConfirmAcceptQuote(quote)}
+        onChatWithProvider={(quote) => handleChat(quote)}
+        requestTitle={requestItem?.title}
+      />
     </>
   );
 };
