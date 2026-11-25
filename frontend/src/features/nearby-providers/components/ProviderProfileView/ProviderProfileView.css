@@ -750,37 +750,37 @@
 
 .ppv-reviews-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 0.75rem;
 }
 
 .ppv-modern-review-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 1.15rem 1.2rem;
+    border-radius: 14px;
+    padding: 0.85rem 0.95rem;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    gap: 0.55rem;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
 .ppv-modern-review-card:hover {
     transform: translateY(-2px);
     border-color: rgba(255, 121, 0, 0.35);
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07);
 }
 
 .ppv-modern-review-top {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
+    gap: 0.65rem;
 }
 
 .ppv-modern-review-avatar {
-    width: 56px;
-    height: 56px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
@@ -792,11 +792,11 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .ppv-modern-review-name {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 800;
     color: var(--text);
     white-space: nowrap;
@@ -808,11 +808,11 @@
 .ppv-modern-review-rating {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.35rem;
 }
 
 .ppv-modern-review-score {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 800;
     color: var(--text);
 }
@@ -822,11 +822,11 @@
     align-items: center;
     gap: 2px;
     color: #f59e0b;
-    font-size: 0.92rem;
+    font-size: 0.85rem;
 }
 
 .ppv-modern-review-quote {
-    font-size: 2rem;
+    font-size: 1.45rem;
     color: rgba(16, 185, 129, 0.16);
     flex-shrink: 0;
     align-self: flex-start;
@@ -835,12 +835,12 @@
 
 .ppv-modern-review-text {
     margin: 0;
-    font-size: 0.86rem;
+    font-size: 0.8rem;
     font-style: italic;
-    line-height: 1.55;
+    line-height: 1.45;
     color: var(--text-secondary);
     display: -webkit-box;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
