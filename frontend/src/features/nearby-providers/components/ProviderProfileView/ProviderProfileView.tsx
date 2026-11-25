@@ -5,7 +5,7 @@ import type { User } from '../../../../shared/types/Dtos';
 import type { Address } from '../../../addresses';
 import { useGetProviderPublicProfile } from '../../hooks/mutations/useGetProviderPublicProfile';
 import type { ProviderPublicProfileData } from '../../services/nearbyProviders.service';
-import { useProviderReviewsQuery, BookingReviewCard } from '../../../reviews';
+import { useProviderReviewsQuery } from '../../../reviews';
 import './ProviderProfileView.css';
 
 interface ProviderProfileViewProps {
@@ -51,7 +51,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
         const list = reviewsRes?.data?.reviews || [];
         return [...list]
             .sort((a, b) => b.rating - a.rating || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .slice(0, 4);
+            .slice(0, 6);
     }, [reviewsRes?.data?.reviews]);
 
     const state = location.state as { from?: string; returnUrl?: string } | null;
@@ -451,26 +451,41 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                             <div className="ppv-reviews-grid">
                                 {bestReviews.map((review) => {
                                     const customerName = review.customerName || 'Customer';
-                                    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=0f172a&color=fff&size=80&bold=true`;
+                                    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=0f172a&color=fff&size=120&bold=true`;
                                     return (
-                                        <div key={review.id} className="ppv-review-card">
-                                            <div className="ppv-review-head">
+                                        <div key={review.id} className="ppv-modern-review-card">
+                                            <div className="ppv-modern-review-top">
                                                 <img
                                                     src={review.customerAvatar || fallbackAvatar}
                                                     alt={customerName}
-                                                    className="ppv-review-avatar"
+                                                    className="ppv-modern-review-avatar"
                                                     onError={(e) => {
                                                         (e.currentTarget as HTMLImageElement).src = fallbackAvatar;
                                                     }}
                                                 />
-                                                <div style={{ minWidth: 0, flex: 1 }}>
-                                                    <div className="ppv-review-author">{customerName}</div>
-                                                    {review.serviceTitle && (
-                                                        <div className="ppv-review-service">{review.serviceTitle}</div>
-                                                    )}
+                                                <div className="ppv-modern-review-meta">
+                                                    <div className="ppv-modern-review-name" title={customerName}>
+                                                        {customerName}
+                                                    </div>
+                                                    <div className="ppv-modern-review-rating">
+                                                        <span className="ppv-modern-review-score">
+                                                            {review.rating.toFixed(1)}
+                                                        </span>
+                                                        <div className="ppv-modern-review-stars">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <i
+                                                                    key={star}
+                                                                    className={`fa${star <= Math.round(review.rating) ? 's' : 'r'} fa-star`}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
                                                 </div>
+                                                <i className="fas fa-quote-right ppv-modern-review-quote" aria-hidden="true" />
                                             </div>
-                                            <BookingReviewCard review={review} variant="embedded" />
+                                            <p className="ppv-modern-review-text" title={review.comment}>
+                                                {review.comment}
+                                            </p>
                                         </div>
                                     );
                                 })}

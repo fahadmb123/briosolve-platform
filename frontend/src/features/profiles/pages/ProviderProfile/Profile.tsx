@@ -9,7 +9,7 @@ import { useUpdateProfileImage } from '../../hooks/provider/useUpdateProfileImag
 import { useDeleteProfileImage } from '../../hooks/provider/useDeleteProfileImage';
 import { useGetProviderServices } from '../../../service-catalog';
 import { useGetProviderVerifications } from '../../../verification/hooks/mutations/useVerification';
-import { useProviderReviewsQuery, BookingReviewCard } from '../../../reviews';
+import { useProviderReviewsQuery } from '../../../reviews';
 import { getAddresses, type Address } from '../../../addresses';
 import type { PopulatedProviderService, ProviderProfile } from '../../types/profile.types';
 import type { response } from '../../../../shared/types/Dtos';
@@ -169,7 +169,7 @@ export default function Profile() {
     const list = reviewsSummaryRes?.data?.reviews || [];
     return [...list]
       .sort((a, b) => b.rating - a.rating || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 4);
+      .slice(0, 6);
   }, [reviewsSummaryRes?.data?.reviews]);
 
   useEffect(() => {
@@ -810,33 +810,56 @@ export default function Profile() {
                   ))}
                 </div>
               ) : bestReviews.length > 0 ? (
-                <div className="profile-best-reviews-grid">
-                  {bestReviews.map((review) => {
-                    const customerName = review.customerName || 'Customer';
-                    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=0f172a&color=fff&size=80&bold=true`;
-                    return (
-                      <div key={review.id} className="profile-best-review-card">
-                        <div className="profile-best-review-header">
-                          <img
-                            src={review.customerAvatar || fallbackAvatar}
-                            alt={customerName}
-                            className="profile-best-review-avatar"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).src = fallbackAvatar;
-                            }}
-                          />
-                          <div className="min-w-0 flex-1">
-                            <div className="font-bold text-sm text-text truncate">{customerName}</div>
-                            {review.serviceTitle && (
-                              <div className="text-xs text-secondary truncate">{review.serviceTitle}</div>
-                            )}
+                <>
+                  <div className="profile-best-reviews-grid">
+                    {bestReviews.map((review) => {
+                      const customerName = review.customerName || 'Customer';
+                      const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=0f172a&color=fff&size=120&bold=true`;
+                      return (
+                        <div key={review.id} className="profile-modern-review-card">
+                          <div className="profile-modern-review-top">
+                            <img
+                              src={review.customerAvatar || fallbackAvatar}
+                              alt={customerName}
+                              className="profile-modern-review-avatar"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = fallbackAvatar;
+                              }}
+                            />
+                            <div className="profile-modern-review-meta">
+                              <div className="profile-modern-review-name" title={customerName}>
+                                {customerName}
+                              </div>
+                              <div className="profile-modern-review-rating">
+                                <span className="profile-modern-review-score">
+                                  {review.rating.toFixed(1)}
+                                </span>
+                                <div className="profile-modern-review-stars">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <i
+                                      key={star}
+                                      className={`fa${star <= Math.round(review.rating) ? 's' : 'r'} fa-star`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <i className="fas fa-quote-right profile-modern-review-quote" aria-hidden="true" />
                           </div>
+                          <p className="profile-modern-review-text" title={review.comment}>
+                            {review.comment}
+                          </p>
                         </div>
-                        <BookingReviewCard review={review} variant="embedded" />
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                  <div className="profile-best-reviews-footer">
+                    <Link to="/provider/reviews" className="btn btn-outline btn-sm">
+                      <span>View All Reviews</span>
+                      <i className="fas fa-arrow-right ml-1.5"></i>
+                    </Link>
+                  </div>
+                </>
               ) : (
                 <div className="profile-services-empty-state">
                   <img
