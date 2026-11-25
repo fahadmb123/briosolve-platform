@@ -8,14 +8,16 @@ import { ReviewRouteDependencies } from "../types/review.route.dependencies";
 export function buildReviewRoute(controller: ReviewRouteDependencies): Router {
   const router = Router();
 
-  router.post("/", authMiddleware, requireRole(["CUSTOMER"]), validate(createReviewSchema), controller.review.createReview);
-  router.get("/booking/:bookingId", authMiddleware, controller.review.getBookingReview);
-  router.get("/provider/:providerId", controller.review.getProviderReviews);
-  router.get("/my", authMiddleware, controller.review.getMyReviews);
-  router.post("/:id/reply", authMiddleware, requireRole(["PROVIDER"]), validate(replyReviewSchema), controller.review.replyToReview);
-  router.get("/admin", authMiddleware, requireRole(["ADMIN"]), controller.review.getAdminReviews);
-  router.patch("/:id/moderate", authMiddleware, requireRole(["ADMIN"]), validate(moderateReviewSchema), controller.review.moderateReview);
-  router.patch("/:id/report", authMiddleware, controller.review.reportReview);
+  router.get("/my", authMiddleware, controller.review.getMyReviews)
+  router.get("/admin", authMiddleware, requireRole(["ADMIN"]), controller.review.getAdminReviews)
+  router.get("/booking/:bookingId", authMiddleware, controller.review.getBookingReview)
+  router.get("/provider/:providerId", controller.review.getProviderReviews)
+
+  router.post("/", authMiddleware, requireRole(["CUSTOMER"]), validate(createReviewSchema), controller.review.createReview)
+  router.post("/:id/reply", authMiddleware, requireRole(["PROVIDER"]), validate(replyReviewSchema), controller.review.replyToReview)
+
+  router.patch("/:id/moderate", authMiddleware, requireRole(["ADMIN"]), validate(moderateReviewSchema), controller.review.moderateReview)
+  router.patch("/:id/report", authMiddleware, controller.review.reportReview)
 
   return router;
 }
