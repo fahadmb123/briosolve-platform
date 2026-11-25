@@ -7,6 +7,8 @@ interface ChatInputBarProps {
   onTyping?: (isTyping: boolean) => void;
   prompts?: string[];
   disabled?: boolean;
+  isPartnerTyping?: boolean;
+  partnerName?: string;
 }
 
 export const ChatInputBar: React.FC<ChatInputBarProps> = ({
@@ -14,6 +16,8 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   onTyping,
   prompts = [],
   disabled = false,
+  isPartnerTyping = false,
+  partnerName,
 }) => {
   const { theme } = useTheme();
   const [inputText, setInputText] = useState("");
@@ -186,6 +190,21 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
               {prompt}
             </button>
           ))}
+        </div>
+      )}
+
+      {isPartnerTyping && (
+        <div className="chat-typing-floating-bar" aria-live="polite">
+          <div className="chat-typing-floating-pill">
+            <span className="chat-typing-dots">
+              <span className="chat-typing-dot" />
+              <span className="chat-typing-dot" />
+              <span className="chat-typing-dot" />
+            </span>
+            <span className="chat-typing-text">
+              {partnerName ? `${partnerName} is typing...` : "typing..."}
+            </span>
+          </div>
         </div>
       )}
 

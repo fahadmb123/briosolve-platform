@@ -852,7 +852,12 @@ export default function ProviderChat() {
                 )}
               </div>
 
-              <ChatInputBar onSendMessage={handleSendMessage} onTyping={handleTyping} />
+              <ChatInputBar
+                onSendMessage={handleSendMessage}
+                onTyping={handleTyping}
+                isPartnerTyping={Boolean(typingMap[selectedConversation.id])}
+                partnerName={selectedConversation.participant.name}
+              />
             </div>
           ) : (
             <EmptyChatState currentRole="PROVIDER" hasConversations={conversations.length > 0} />

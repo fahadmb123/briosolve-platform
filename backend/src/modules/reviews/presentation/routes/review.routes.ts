@@ -16,8 +16,8 @@ export function buildReviewRoute(controller: ReviewRouteDependencies): Router {
   router.post("/", authMiddleware, requireRole(["CUSTOMER"]), validate(createReviewSchema), controller.review.createReview)
   router.post("/:id/reply", authMiddleware, requireRole(["PROVIDER"]), validate(replyReviewSchema), controller.review.replyToReview)
 
-  router.patch("/:id/moderate", authMiddleware, requireRole(["ADMIN"]), validate(moderateReviewSchema), controller.review.moderateReview)
   router.patch("/:id/report", authMiddleware, controller.review.reportReview)
+  router.patch("/:id/moderate", authMiddleware, requireRole(["ADMIN"]), validate(moderateReviewSchema), controller.review.moderateReview)
 
   return router;
 }

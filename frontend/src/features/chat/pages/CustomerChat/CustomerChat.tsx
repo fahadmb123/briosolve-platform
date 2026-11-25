@@ -863,7 +863,12 @@ export default function CustomerChat() {
                 )}
               </div>
 
-              <ChatInputBar onSendMessage={handleSendMessage} onTyping={handleTyping} />
+              <ChatInputBar
+                onSendMessage={handleSendMessage}
+                onTyping={handleTyping}
+                isPartnerTyping={Boolean(typingMap[selectedConversation.id])}
+                partnerName={selectedConversation.participant.name}
+              />
             </div>
           ) : (
             <EmptyChatState currentRole="CUSTOMER" hasConversations={conversations.length > 0} />
