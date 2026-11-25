@@ -57,7 +57,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const activeRazorpayRef = useRef<any>(null);
 
-  const { data: reviewData, refetch: refetchReview } = useBookingReviewQuery(booking?.id);
+  const { data: reviewData, isLoading: isLoadingReview, refetch: refetchReview } = useBookingReviewQuery(booking?.id);
   const replyMutation = useReplyToReviewMutation();
   const existingReview = reviewData?.data || null;
 
@@ -906,7 +906,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </button>
           )}
 
-          {!isProvider && isCompleted && !existingReview && !booking.isReviewed && (
+          {!isProvider && isCompleted && !isLoadingReview && !existingReview && !booking.isReviewed && (
             <button
               type="button"
               className="bkdet-action-btn primary"
@@ -1234,7 +1234,31 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
 
       <div className="bkdet-layout-grid">
         <div className="bkdet-col-main">
-          {isCompleted && existingReview && (
+          {isCompleted && isLoadingReview && (
+            <div className="bkdet-section-card bkdet-skeleton-container" aria-hidden="true">
+              <div className="bkdet-section-header">
+                <div className="bkdet-section-title-wrap">
+                  <div className="bkdet-sk-shimmer" style={{ width: "24px", height: "24px", borderRadius: "50%" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "220px", height: "20px", borderRadius: "6px" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", paddingTop: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "110px", height: "18px", borderRadius: "4px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "36px", height: "16px", borderRadius: "4px" }} />
+                </div>
+                <div className="bkdet-sk-shimmer" style={{ width: "45%", height: "18px", borderRadius: "4px" }} />
+                <div className="bkdet-sk-shimmer" style={{ width: "95%", height: "14px", borderRadius: "4px" }} />
+                <div className="bkdet-sk-shimmer" style={{ width: "70%", height: "14px", borderRadius: "4px" }} />
+                <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
+                  <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "24px", borderRadius: "9999px" }} />
+                  <div className="bkdet-sk-shimmer" style={{ width: "80px", height: "24px", borderRadius: "9999px" }} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isCompleted && !isLoadingReview && existingReview && (
             <div className="bkdet-section-card">
               <div className="bkdet-section-header">
                 <div className="bkdet-section-title-wrap">
@@ -1296,7 +1320,7 @@ export const BookingDetailsPage: React.FC<BookingDetailsPageProps> = ({ role: ro
             </div>
           )}
 
-          {isCompleted && !isProvider && !existingReview && !booking.isReviewed && (
+          {isCompleted && !isLoadingReview && !isProvider && !existingReview && !booking.isReviewed && (
             <div className="bkdet-section-card bkdet-review-prompt-card">
               <div className="bkdet-review-prompt-content">
                 <div className="bkdet-review-prompt-icon">
