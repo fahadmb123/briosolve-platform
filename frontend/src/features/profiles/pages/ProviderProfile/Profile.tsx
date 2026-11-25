@@ -581,9 +581,8 @@ export default function Profile() {
                   <div className="text-xs text-secondary">If you want to edit your profile details, business name, bio, or working availability, visit <Link to="/provider/settings" className="text-primary font-medium hover:underline">Settings</Link>.</div>
                 </div>
               </div>
-              <Link to="/provider/settings" className="profile-modern-btn profile-modern-btn--outline profile-modern-btn--sm">
-                <i className="fas fa-cog"></i>
-                <span>Visit Settings</span>
+              <Link to="/provider/settings" className="btn btn-outline btn-sm">
+                <i className="fas fa-cog mr-1"></i> Visit Settings
               </Link>
             </div>
 
@@ -703,9 +702,8 @@ export default function Profile() {
                       <span className="badge badge-primary text-xs font-semibold px-2.5 py-1">
                         {services.length} {services.length === 1 ? 'Service' : 'Services'}
                       </span>
-                      <Link to="/provider/settings" state={{ activeSection: 'services' }} className="profile-modern-btn profile-modern-btn--outline profile-modern-btn--xs">
-                        <i className="fas fa-sliders-h"></i>
-                        <span>Manage</span>
+                      <Link to="/provider/settings" state={{ activeSection: 'services' }} className="btn btn-outline btn-xs">
+                        <i className="fas fa-sliders-h mr-1"></i> Manage
                       </Link>
                     </>
                   )}
@@ -770,9 +768,8 @@ export default function Profile() {
                   <p className="profile-services-empty-desc">
                     Add the trade services and skill categories you specialize in to start receiving leads from customers.
                   </p>
-                  <Link to="/provider/settings" state={{ activeSection: 'services' }} className="profile-modern-btn profile-modern-btn--primary profile-modern-btn--sm">
-                    <i className="fas fa-plus"></i>
-                    <span>Manage Services in Settings</span>
+                  <Link to="/provider/settings" state={{ activeSection: 'services' }} className="btn btn-primary btn-sm">
+                    <i className="fas fa-plus mr-1.5"></i> Manage Services in Settings
                   </Link>
                 </div>
               )}
@@ -790,9 +787,8 @@ export default function Profile() {
                       {averageRating.toFixed(1)} ({totalReviews})
                     </span>
                   )}
-                  <Link to="/provider/reviews" className="profile-modern-btn profile-modern-btn--outline profile-modern-btn--xs">
-                    <span>View All Reviews</span>
-                    <i className="fas fa-arrow-right profile-modern-btn-arrow"></i>
+                  <Link to="/provider/reviews" className="btn btn-outline btn-xs">
+                    View All Reviews
                   </Link>
                 </div>
               </div>
@@ -858,9 +854,9 @@ export default function Profile() {
                     })}
                   </div>
                   <div className="profile-best-reviews-footer">
-                    <Link to="/provider/reviews" className="profile-modern-btn profile-modern-btn--outline profile-modern-btn--sm">
+                    <Link to="/provider/reviews" className="btn btn-outline btn-sm">
                       <span>View All Reviews</span>
-                      <i className="fas fa-arrow-right profile-modern-btn-arrow"></i>
+                      <i className="fas fa-arrow-right ml-1.5"></i>
                     </Link>
                   </div>
                 </>
