@@ -122,6 +122,7 @@ export default function Profile() {
   const [profileImage, setProfileImage] = useState<string | null>(providerProfile?.profile_image || null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [services, setServices] = useState<PopulatedProviderService[]>([]);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [documents, setDocuments] = useState<VerificationDocument[]>([]);
   const [address, setAddress] = useState<Address | null>(
     user?.current_address_id && typeof user.current_address_id === 'object'
@@ -137,6 +138,30 @@ export default function Profile() {
     providerProfile?.id,
     { page: 1, limit: 12 }
   );
+
+  const groupedServices = useMemo(() => {
+    const groups = new Map<string, PopulatedProviderService[]>();
+    for (const item of services) {
+      const catName = item.service?.category?.name?.trim() || 'Other Services';
+      const existing = groups.get(catName);
+      if (existing) {
+        existing.push(item);
+      } else {
+        groups.set(catName, [item]);
+      }
+    }
+    return Array.from(groups.entries()).map(([categoryName, items]) => ({
+      categoryName,
+      items
+    }));
+  }, [services]);
+
+  const toggleCategory = (categoryName: string) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [categoryName]: !prev[categoryName]
+    }));
+  };
 
   const averageRating = reviewsSummaryRes?.data?.averageRating ?? 0;
   const totalReviews = reviewsSummaryRes?.data?.totalReviews ?? 0;
@@ -691,11 +716,44 @@ export default function Profile() {
                     <ProfileServiceCardSkeleton key={`service-skeleton-${index}`} />
                   ))}
                 </div>
-              ) : services.length > 0 ? (
-                <div className="profile-services-grid">
-                  {services.map((item) => (
-                    <ProfileServiceCard key={item.id} item={item} />
-                  ))}
+              ) : groupedServices.length > 0 ? (
+                <div className="profile-cat-accordion-list">
+                  {groupedServices.map((group) => {
+                    const isOpen = Boolean(expandedCategories[group.categoryName]);
+                    const iconClass = getCategoryIcon(group.categoryName);
+                    return (
+                      <div key={group.categoryName} className={`profile-cat-accordion ${isOpen ? 'is-open' : ''}`}>
+                        <button
+                          type="button"
+                          className="profile-cat-accordion-trigger"
+                          onClick={() => toggleCategory(group.categoryName)}
+                          aria-expanded={isOpen}
+                        >
+                          <div className="profile-cat-accordion-left">
+                            <div className="profile-cat-accordion-icon">
+                              <i className={`fas ${iconClass}`}></i>
+                            </div>
+                            <div className="profile-cat-accordion-meta">
+                              <span className="profile-cat-accordion-name">{group.categoryName}</span>
+                              <span className="profile-cat-accordion-count">
+                                {group.items.length} {group.items.length === 1 ? 'service' : 'services'}
+                              </span>
+                            </div>
+                          </div>
+                          <i className={`fas fa-chevron-down profile-cat-accordion-chevron ${isOpen ? 'rotate' : ''}`}></i>
+                        </button>
+                        {isOpen && (
+                          <div className="profile-cat-accordion-body">
+                            <div className="profile-services-grid">
+                              {group.items.map((item) => (
+                                <ProfileServiceCard key={item.id} item={item} />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="profile-services-empty-state">

@@ -38,6 +38,7 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
 
     const targetId = providerId || initialProvider?.id;
     const [profileData, setProfileData] = useState<ProviderPublicProfileData | null>(null);
+    const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
     const { data: profileRes, isLoading: isQueryLoading } = useGetProviderPublicProfile(targetId);
     const { data: reviewsRes, isLoading: isLoadingReviews } = useProviderReviewsQuery(targetId, {
         page: 1,
@@ -334,25 +335,62 @@ export const ProviderProfileView: React.FC<ProviderProfileViewProps> = React.mem
                         </div>
 
                         {servicesList.length > 0 ? (
-                            <div className="provider-services-grid">
-                                {servicesList.map((item) => (
-                                    <div key={item.id} className="provider-service-card-item">
-                                        <div className="provider-service-top-row">
-                                            {item.service?.category?.name && (
-                                                <span className="provider-service-cat-badge">
-                                                    <i className="fas fa-tag" />
-                                                    <span>{item.service.category.name}</span>
-                                                </span>
+                            <div className="ppv-cat-accordion-list">
+                                {Array.from(
+                                    servicesList.reduce((map, item) => {
+                                        const catName = item.service?.category?.name?.trim() || 'Other Services';
+                                        const arr = map.get(catName) || [];
+                                        arr.push(item);
+                                        map.set(catName, arr);
+                                        return map;
+                                    }, new Map<string, typeof servicesList>())
+                                ).map(([categoryName, items]) => {
+                                    const isOpen = Boolean(expandedCategories[categoryName]);
+                                    return (
+                                        <div key={categoryName} className={`ppv-cat-accordion ${isOpen ? 'is-open' : ''}`}>
+                                            <button
+                                                type="button"
+                                                className="ppv-cat-accordion-trigger"
+                                                onClick={() =>
+                                                    setExpandedCategories((prev) => ({
+                                                        ...prev,
+                                                        [categoryName]: !prev[categoryName]
+                                                    }))
+                                                }
+                                                aria-expanded={isOpen}
+                                            >
+                                                <div className="ppv-cat-accordion-left">
+                                                    <div className="ppv-cat-accordion-icon">
+                                                        <i className="fas fa-tag" />
+                                                    </div>
+                                                    <div className="ppv-cat-accordion-meta">
+                                                        <span className="ppv-cat-accordion-name">{categoryName}</span>
+                                                        <span className="ppv-cat-accordion-count">
+                                                            {items.length} {items.length === 1 ? 'service' : 'services'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <i className={`fas fa-chevron-down ppv-cat-accordion-chevron ${isOpen ? 'rotate' : ''}`} />
+                                            </button>
+                                            {isOpen && (
+                                                <div className="ppv-cat-accordion-body">
+                                                    <div className="provider-services-grid">
+                                                        {items.map((item) => (
+                                                            <div key={item.id} className="provider-service-card-item">
+                                                                <h4 className="provider-service-item-title">
+                                                                    {item.service?.name || 'Professional Service'}
+                                                                </h4>
+                                                                <p className="provider-service-item-desc">
+                                                                    {item.service?.description || 'Custom quotes and on-demand scheduling provided.'}
+                                                                </p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
-                                        <h4 className="provider-service-item-title">
-                                            {item.service?.name || 'Professional Service'}
-                                        </h4>
-                                        <p className="provider-service-item-desc">
-                                            {item.service?.description || 'Custom quotes and on-demand scheduling provided.'}
-                                        </p>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         ) : (
                             <p className="text-secondary text-sm mb-0">
