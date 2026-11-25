@@ -472,3 +472,170 @@
         font-size: 0.825rem !important;
     }
 }
+
+.cust-activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.cust-activity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+@media (max-width: 900px) {
+    .cust-activity-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cust-activity-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface-hover);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.cust-activity-card:hover {
+    transform: translateY(-2px);
+    border-color: #FF7900;
+    box-shadow: 0 8px 20px rgba(255, 121, 0, 0.1);
+}
+
+.cust-activity-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.cust-activity-icon.requests {
+    background: rgba(255, 121, 0, 0.12);
+    color: #ea580c;
+}
+
+.cust-activity-icon.bookings {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.cust-activity-icon.reviews {
+    background: rgba(245, 158, 11, 0.14);
+    color: #d97706;
+}
+
+.cust-activity-body {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cust-activity-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+
+.cust-activity-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.25;
+}
+
+.cust-activity-sub {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cust-activity-arrow {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    opacity: 0.55;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.cust-activity-card:hover .cust-activity-arrow {
+    transform: translateX(3px);
+    opacity: 1;
+    color: #FF7900;
+}
+
+.cust-activity-sk {
+    width: 78px;
+    height: 22px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 400px 100%;
+    animation: custActShimmer 1.3s infinite linear;
+    margin-top: 2px;
+}
+
+[data-theme="dark"] .cust-activity-sk {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 400px 100%;
+}
+
+@keyframes custActShimmer {
+    0% {
+        background-position: -400px 0;
+    }
+    100% {
+        background-position: 400px 0;
+    }
+}
+
+.cust-shortcuts-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.cust-shortcut-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.95rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.cust-shortcut-btn i {
+    color: #FF7900;
+}
+
+.cust-shortcut-btn:hover {
+    border-color: #FF7900;
+    background: rgba(255, 121, 0, 0.06);
+    color: #ea580c;
+}
