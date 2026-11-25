@@ -885,3 +885,77 @@
     padding: 1rem 1.15rem 1.15rem 1.15rem;
     border-top: 1px solid var(--border);
 }
+
+.profile-modern-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.profile-modern-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.profile-modern-btn--sm {
+    padding: 0.55rem 1.05rem;
+    font-size: 0.84rem;
+}
+
+.profile-modern-btn--xs {
+    padding: 0.38rem 0.8rem;
+    font-size: 0.78rem;
+    border-radius: 8px;
+}
+
+.profile-modern-btn--primary {
+    background: linear-gradient(135deg, #FF7900 0%, #ea580c 100%);
+    color: #ffffff;
+    border: 1px solid transparent;
+    box-shadow: 0 4px 14px rgba(255, 121, 0, 0.28);
+}
+
+.profile-modern-btn--primary:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 8px 20px rgba(255, 121, 0, 0.38);
+    color: #ffffff;
+}
+
+.profile-modern-btn--outline {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+.profile-modern-btn--outline i {
+    color: #FF7900;
+}
+
+.profile-modern-btn--outline:hover {
+    transform: translateY(-1.5px);
+    border-color: #FF7900;
+    background: rgba(255, 121, 0, 0.06);
+    color: #ea580c;
+    box-shadow: 0 6px 16px rgba(255, 121, 0, 0.14);
+}
+
+.profile-modern-btn-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.18s ease;
+}
+
+.profile-modern-btn:hover .profile-modern-btn-arrow {
+    transform: translateX(3px);
+}
