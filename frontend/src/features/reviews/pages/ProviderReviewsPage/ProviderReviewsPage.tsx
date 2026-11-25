@@ -350,9 +350,14 @@ export const ProviderReviewsPage: React.FC = () => {
           </div>
         ) : reviews.length === 0 ? (
           <div className="prv-empty-card">
-            <div className="prv-empty-icon">
-              <i className={isFiltered ? "fas fa-filter" : "fas fa-star"} />
-            </div>
+            <img
+              src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+              alt="No customer reviews found"
+              className="prv-empty-img"
+              onError={(e) => {
+                e.currentTarget.src = "/images/no-data.png";
+              }}
+            />
             <h3 className="prv-empty-title">
               {isFiltered ? "No Matching Reviews" : "No Customer Reviews Yet"}
             </h3>

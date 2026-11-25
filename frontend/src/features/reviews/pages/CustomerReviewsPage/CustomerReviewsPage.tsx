@@ -180,9 +180,14 @@ export const CustomerReviewsPage: React.FC = () => {
           </div>
         ) : myReviews.length === 0 ? (
           <div className="crv-empty-card">
-            <div className="crv-empty-icon">
-              <i className={isFiltered ? "fas fa-filter" : "fas fa-comment-dots"} />
-            </div>
+            <img
+              src="https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png"
+              alt="No reviews found"
+              className="crv-empty-img"
+              onError={(e) => {
+                e.currentTarget.src = "/images/no-data.png";
+              }}
+            />
             <h3 className="crv-empty-title">
               {isFiltered ? "No Matching Reviews" : "No Reviews Submitted Yet"}
             </h3>

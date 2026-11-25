@@ -246,10 +246,24 @@ export const AdminReviewsPage: React.FC = () => {
                 </tr>
               ) : reviews.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-secondary">
-                    <i className="fas fa-star-half-alt text-2xl mb-2 block opacity-40" />
-                    <div className="font-semibold">
-                      {isFiltered ? "No reviews match your filters" : "No reviews submitted yet"}
+                  <td colSpan={6} className="admin-empty-ticket-cell">
+                    <div className="admin-empty-ticket-box">
+                      <img
+                        src="/images/admin-no-data.png"
+                        alt="No Reviews Found"
+                        className="admin-empty-ticket-img"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://res.cloudinary.com/zjhxcdmi/image/upload/v1794756715/no-data-found-logo.png";
+                        }}
+                      />
+                      <h3 className="font-semibold text-base mb-1 text-text">
+                        {isFiltered ? "No Reviews Found" : "No Reviews Submitted Yet"}
+                      </h3>
+                      <p className="text-secondary text-xs mb-0">
+                        {isFiltered
+                          ? "There are no reviews matching your search query or filters."
+                          : "Customer reviews and specialist feedback will appear here as bookings are completed."}
+                      </p>
                     </div>
                   </td>
                 </tr>

@@ -825,6 +825,16 @@
   gap: 0.75rem;
 }
 
+.prv-empty-img {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  max-height: 160px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.08));
+}
+
 [data-theme="dark"] .prv-empty-card {
   background: #0f172a;
   border-color: #334155;
